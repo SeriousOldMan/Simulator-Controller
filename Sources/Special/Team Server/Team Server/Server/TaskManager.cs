@@ -59,8 +59,10 @@ namespace TeamServer.Server {
         #endregion
 
         #region CRUD
-        public Model.Task.Task CreateTask(string name, Model.Task.Task.Type what, Model.Task.Task.Period when) {
-            Model.Task.Task task = new Model.Task.Task { Name = name, What = what, When = when };
+        public Model.Task.Task CreateTask(Model.Task.Task.Type which,
+                                          Model.Task.Task.Operation what,
+                                          Model.Task.Task.Frequency when) {
+            Model.Task.Task task = new Model.Task.Task { Which = which, What = what, When = when };
 
             task.Save();
 
@@ -83,38 +85,54 @@ namespace TeamServer.Server {
         #endregion
 
         #region Operations
-        private void CleanupTokens() {
-            TeamServer.TokenIssuer.CleanupTokensAsync();
+        private void CleanupTokens(Model.Task.Task task) {
+            if (task.What == Model.Task.Task.Operation.Delete)
+                TeamServer.TokenIssuer.CleanupTokensAsync();
+            else
+                throw new Exception("Unsupported task operation detected...");
         }
 
-        private void CleanupSessions() {
-            new SessionManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).CleanupSessionsAsync();
+        private void CleanupSessions(Model.Task.Task task) {
+            SessionManager sessionManager = new SessionManager(ObjectManager, TeamServer.TokenIssuer.AdminToken);
+
+            if (task.What == Model.Task.Task.Operation.Delete)
+                sessionManager.DeleteSessionsAsync();
+            else if (task.What == Model.Task.Task.Operation.Cleanup)
+                sessionManager.CleanupSessionsAsync();
+            else if (task.What == Model.Task.Task.Operation.Reset)
+                sessionManager.ResetSessionsAsync();
+            else
+                throw new Exception("Unsupported task operation detected...");
+
         }
 
-        private void RenewContingents() {
-            new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).RenewAccountsAsync();
+        private void CleanupAccounts(Model.Task.Task task) {
+            if (task.What == Model.Task.Task.Operation.Renew)
+                new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).RenewAccountsAsync();
+            else
+                throw new Exception("Unsupported task operation detected...");
         }
 
         private void RunTask(Model.Task.Task task) {
-            if (task.What == Model.Task.Task.Type.TokenCleanup)
-                CleanupTokens();
-            else if (task.What == Model.Task.Task.Type.SessionCleanup)
-                CleanupSessions();
-            else if (task.What == Model.Task.Task.Type.AccountRenewal)
-                RenewContingents();
+            if (task.Which == Model.Task.Task.Type.Token)
+                CleanupTokens(task);
+            else if (task.Which == Model.Task.Task.Type.Session)
+                CleanupSessions(task);
+            else if (task.Which == Model.Task.Task.Type.Account)
+                CleanupAccounts(task);
         }
 
         private void ScheduleTask(Model.Task.Task task) {
             switch (task.When) {
-                case Model.Task.Task.Period.Daily:
+                case Model.Task.Task.Frequency.Daily:
                     task.Next = DateTime.Now + TimeSpan.FromDays(1);
 
                     break;
-                case Model.Task.Task.Period.Weekly:
+                case Model.Task.Task.Frequency.Weekly:
                     task.Next = DateTime.Now + TimeSpan.FromDays(7);
 
                     break;
-                case Model.Task.Task.Period.Monthly:
+                case Model.Task.Task.Frequency.Monthly:
                     DateTime now = DateTime.Now;
 
                     task.Next = new DateTime(now.AddMonths(1).Year, now.AddMonths(1).Month, 1);

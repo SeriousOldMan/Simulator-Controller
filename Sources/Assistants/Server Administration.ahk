@@ -144,7 +144,7 @@ loadAccounts(connector, listView) {
 			
 			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
 			
-			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
+			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Fixed", "Additional"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
 		}
 	}
 	
@@ -158,14 +158,33 @@ loadAccounts(connector, listView) {
 	return accounts
 }
 
-loadTasks(connector) {
+updateTask(connector, tasks, task, which, operation, frequency) {
+	if operation is integer
+		operation := ["Delete", "Cleanup", "Reset", "Renew"][operation],
 	
+	if frequency is integer
+		frequency := ["Never", "Daily", "Weekly", "Monthly"][frequency]
+	
+	if (frequency = "Never") {
+		if task {
+			connector.DeleteTask(task)
+			
+			tasks.Delete(which)
+		}
+	}
+	else if task
+		connector.UpdateTask(task, operation, frequency, true)
+	else
+		tasks[which] := connector.CreateTask(which, operation, frequency)
+	
+	return tasks
 }
 
 administrationEditor(configurationOrCommand, arguments*) {
 	static connector := false
 	static done := false
 	static accounts := {}
+	static tasks := {}
 	static account := false
 	
 	static teamServerURLEdit = "https://localhost:5001"
@@ -183,6 +202,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 	
 	static createPasswordButton
 	static copyPasswordButton
+	static availableMinutesButton
+	
+	static taskTokenOperationDropDown
+	static taskTokenFrequencyDropDown
+	static taskSessionOperationDropDown
+	static taskSessionFrequencyDropDown
+	static taskAccountOperationDropDown
+	static taskAccountFrequencyDropDown
 	
 	static addAccountButton
 	static deleteAccountButton
@@ -200,8 +227,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			vToken := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 		
 			accounts := loadAccounts(connector, accountsListView)
-			loadTasks(connector)
 			
+			administrationEditor(kEvent, "TasksLoad")
 			administrationEditor(kEvent, "AccountClear")
 			
 			GuiControl, , teamServerTokenEdit, % vToken
@@ -216,8 +243,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			accounts := loadAccounts(connector, accountsListView)
 			account := false
 			
-			loadTasks(connector)
-			
+			administrationEditor(kEvent, "TasksLoad")
 			administrationEditor(kEvent, "AccountClear")
 			
 			title := translate("Error")
@@ -229,7 +255,62 @@ administrationEditor(configurationOrCommand, arguments*) {
 	}
 	else if (configurationOrCommand == kEvent) {
 		try {
-			if (arguments[1] = "PasswordChange") {
+			if (arguments[1] = "TasksReset") {
+				 GuiControl Choose, taskTokenOperationDropDown, 1
+				 GuiControl Choose, taskTokenFrequencyDropDown, 1
+				 GuiControl Choose, taskSessionOperationDropDown, 3
+				 GuiControl Choose, taskSessionFrequencyDropDown, 1
+				 GuiControl Choose, taskAccountOperationDropDown, 1
+				 GuiControl Choose, taskAccountFrequencyDropDown, 1
+			}
+			else if (arguments[1] = "TasksLoad") {
+				administrationEditor(kEvent, "TasksReset")
+			
+				tasks := {}
+				
+				for ignore, identifier in string2Values(";", connector.GetAllTasks()) {
+					task := parseObject(connector.GetTask(identifier))
+
+					tasks[task.Which] := task.Identifier
+					
+					if (task.Which = "Token") {
+						GuiControl Choose, taskTokenOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
+						GuiControl Choose, taskTokenFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+					}
+					else if (task.Which = "Session") {
+						GuiControl Choose, taskSessionOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
+						GuiControl Choose, taskSessionFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+					}
+					else if (task.Which = "Account") {
+						GuiControl Choose, taskAccountOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What) - 3
+						GuiControl Choose, taskAccountFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+					}
+				}
+			}
+			else if (arguments[1] = "TaskUpdate") {
+				which := arguments[2]
+			
+				task := (tasks.HasKey(which) ? tasks[which] : false)
+				
+				switch which {
+					case "Token":
+						GuiControlGet taskTokenOperationDropDown
+						GuiControlGet taskTokenFrequencyDropDown
+				
+						tasks := updateTask(connector, tasks, task, which, taskTokenOperationDropDown, taskTokenFrequencyDropDown)
+					case "Session":
+						GuiControlGet taskSessionOperationDropDown
+						GuiControlGet taskSessionFrequencyDropDown
+				
+						tasks := updateTask(connector, tasks, task, which, taskSessionOperationDropDown, taskSessionFrequencyDropDown)
+					case "Account":
+						GuiControlGet taskAccountOperationDropDown
+						GuiControlGet taskAccountFrequencyDropDown
+				
+						tasks := updateTask(connector, tasks, task, which, taskAccountOperationDropDown + 3, taskAccountFrequencyDropDown)
+				}
+			}
+			else if (arguments[1] = "PasswordChange") {
 				connector.ChangePassword(arguments[2])
 				
 				GuiControl, , teamServerPasswordEdit, % arguments[2]
@@ -294,6 +375,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 				
 				administrationEditor(kEvent, "UpdateState")
 			}
+			else if (arguments[1] = "UpdateAvailableMinutes") {
+				title := translate("Team Server")
+				prompt := translate("Please enter the amount of available minutes:")
+				
+				locale := ((getLanguage() = "en") ? "" : "Locale")
+				minutes := account.AvailableMinutes
+				
+				InputBox minutes, %title%, %prompt%, , 200, 150, , , %locale%, , %minutes%
+				
+				if !ErrorLevel
+				{
+					connector.SetAccountMinutes(account.Identifier, minutes)
+					
+					accounts := loadAccounts(connector, accountsListView)
+				
+					administrationEditor(kEvent, "AccountClear")
+				}
+			}
 			else if (arguments[1] = "UpdateState") {
 				GuiControl Disable, copyPasswordButton
 			
@@ -307,6 +406,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				}
 				
 				if account {
+					GuiControlGet accountContractDropDown
+					
 					if (account == true)
 						GuiControl Enable, accountNameEdit
 					else
@@ -315,7 +416,15 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Enable, accountEMailEdit
 					GuiControl Enable, accountPasswordEdit
 					GuiControl Enable, accountContractDropDown
-					GuiControl Enable, accountMinutesEdit
+					
+					if (accountContractDropDown > 1) {
+						GuiControl Enable, availableMinutesButton
+						GuiControl Enable, accountMinutesEdit
+					}
+					else {
+						GuiControl Disable, availableMinutesButton
+						GuiControl Disable, accountMinutesEdit
+					}
 					
 					GuiControl Enable, createPasswordButton
 					
@@ -330,7 +439,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, accountMinutesEdit
 					
 					GuiControl Disable, createPasswordButton
-					
+					GuiControl Disable, availableMinutesButton
+						
 					GuiControl Disable, deleteAccountButton
 					GuiControl Disable, saveAccountButton
 				}
@@ -445,7 +555,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		
 		Gui Tab, 1
 		
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "eMail", "Contract", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "eMail", "Kontingent", "Available"], "translate")*)
 		
 		Gui ADM:Add, Text, x%x0% yp+124 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
@@ -460,10 +570,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 		
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contract")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown, % values2String("|", map(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"], "translate")*)
+		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21  vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
+		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
+		setButtonIcon(availableMinutesButtonHandle, kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")
 		
 		x5 := x4 - 1
 		x6 := x5 + 24
@@ -478,14 +590,17 @@ administrationEditor(configurationOrCommand, arguments*) {
 		
 		Gui Tab, 2
 		
-		Gui ADM:Add, Text, x%x0% y%y% w120 h23 +0x200, % translate("Delete expired Tokens")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose2, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, Text, x%x0% y%y% w120 h23 +0x200, % translate("Expired Tokens")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskTokenOperationDropDown gupdateTokenTask, % values2String("|", map(["Delete"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskTokenFrequencyDropDown gupdateTokenTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
 		
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Cleanup Sessions")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose2, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Finished Sessions")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", map(["Delete", "Cleanup", "Reset"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskSessionFrequencyDropDown gupdateSessionTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
 		
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Renew Accounts")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% Choose3, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Account Contingents")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", map(["Renew"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 		
 		Gui ADM:Show, AutoSize Center
 		
@@ -572,6 +687,10 @@ changePassword() {
 	}
 }
 
+updateAvailableMinutes() {
+	administrationEditor(kEvent, "UpdateAvailableMinutes")
+}
+
 accountsListEvent() {
 	if ((A_GuiEvent == "DoubleClick") || (A_GuiEvent == "Normal"))
 		administrationEditor(kEvent, "AccountLoad", A_EventInfo)
@@ -585,6 +704,10 @@ copyPassword() {
 	administrationEditor(kEvent, "PasswordCopy")
 }
 
+updateContract() {
+	administrationEditor(kEvent, "UpdateState")
+}
+
 newAccount() {
 	administrationEditor(kEvent, "AccountNew")
 }
@@ -594,6 +717,18 @@ deleteAccount() {
 
 saveAccount() {
 	administrationEditor(kEvent, "AccountSave")
+}
+
+updateTokenTask() {
+	administrationEditor(kEvent, "TaskUpdate", "Token")
+}
+
+updateSessionTask() {
+	administrationEditor(kEvent, "TaskUpdate", "Session")
+}
+
+updateAccountTask() {
+	administrationEditor(kEvent, "TaskUpdate", "Account")
 }
 
 startupServerAdministration() {

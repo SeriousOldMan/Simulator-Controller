@@ -212,6 +212,31 @@ namespace TeamServer {
 		}
 		#endregion
 
+		#region Task
+		public string GetAllTasks() {
+			return Get("task/alltasks");
+		}
+		public string CreateTask(string type, string operation, string frequency) {
+			return Post("task", body: BuildBody(new Parameters() { { "Which", type },
+																   { "What", operation },
+																   { "When", frequency } }));
+		}
+
+		public string GetTask(string identifier) {
+			return Get("task/" + identifier);
+		}
+
+		public string UpdateTask(string identifier, string operation, string frequency, bool active) {
+			return Put("task/" + identifier, body: BuildBody(new Parameters() { { "What", operation },
+																				{ "When", frequency },
+																				{ "Active", active.ToString() } }));
+		}
+
+		public void DeleteTask(string identifier) {
+			Delete("task/" + identifier);
+		}
+		#endregion
+
 		#region Team
 		public string GetAllTeams() {
 			return Get("team/allteams");

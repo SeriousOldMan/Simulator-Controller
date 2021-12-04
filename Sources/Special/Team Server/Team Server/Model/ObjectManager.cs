@@ -29,6 +29,10 @@ namespace TeamServer.Model {
                 return Connection.InsertAsync(modelObject);
         }
 
+        public Task<List<Attribute>> GetAttributesAsync(ModelObject modelObject) {
+            return Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier).ToListAsync();
+        }
+
         public string GetAttribute(ModelObject modelObject, string name, string defaultValue = "") {
             Attribute attribute = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name).FirstOrDefaultAsync().Result;
 
@@ -234,16 +238,7 @@ namespace TeamServer.Model {
         }
 
         public Task<Task.Task> GetTaskAsync(string identifier) {
-            Guid guid;
-
-            try {
-                guid = new Guid(identifier);
-            }
-            catch {
-                guid = Guid.Empty;
-            }
-
-            return Connection.Table<Task.Task>().Where(t => t.Name == identifier || t.Identifier == guid).FirstOrDefaultAsync();
+            return GetTaskAsync(new Guid(identifier));
         }
         #endregion
     }
@@ -258,6 +253,13 @@ namespace TeamServer.Model {
         [Ignore]
         public ObjectManager ObjectManager {
             get { return ObjectManager.Instance; }
+        }
+
+        [Ignore]
+        public List<Attribute> Attributes {
+            get {
+                return ObjectManager.GetAttributesAsync(this).Result;
+            }
         }
 
         public virtual System.Threading.Tasks.Task Save() {

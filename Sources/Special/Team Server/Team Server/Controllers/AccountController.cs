@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TeamServer.Model;
 using TeamServer.Model.Access;
 using TeamServer.Server;
 
@@ -115,14 +114,12 @@ namespace TeamServer.Controllers {
         }
 
         [HttpPut("{identifier}/minutes")]
-        public string AddMinutes([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
+        public string SetMinutes([FromQuery(Name = "token")] string token, string identifier, [FromBody] string minutes) {
             try {
                 AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
-                Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
-
-                accountManager.SetMinutes(account, Int32.Parse(properties["AvailableMinutes"]));
+                accountManager.SetMinutes(account, Int32.Parse(minutes));
 
                 account.Save();
 

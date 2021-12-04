@@ -7,18 +7,19 @@ namespace TeamServer.Model.Task {
 
     [Table("Task_Tasks")]
     public class Task : ModelObject {
-        public enum Period : int { Daily = 1, Weekly = 2, Monthly = 3 };
+        public enum Type : int { Token = 1, Session = 2, Account = 3 };
 
-        public enum Type : int { TokenCleanup = 1, SessionCleanup = 2, AccountRenewal = 3 };
+        public enum Operation : int { Delete = 1, Cleanup = 2, Reset = 3, Renew = 4 };
 
-        [Unique]
-        public string Name { get; set; }
+        public enum Frequency : int { Daily = 1, Weekly = 2, Monthly = 3 };
 
-        public bool Active { get; set; } = false;
+        public bool Active { get; set; } = true;
 
-        public Period When { get; set; } = Period.Daily;
+        public Type Which { get; set; } = Type.Token;
 
-        public Type What { get; set; } = Type.TokenCleanup;
+        public Operation What { get; set; } = Operation.Delete;
+
+        public Frequency When { get; set; } = Frequency.Daily;
 
         public DateTime Next { get; set; } = DateTime.MinValue;
     }

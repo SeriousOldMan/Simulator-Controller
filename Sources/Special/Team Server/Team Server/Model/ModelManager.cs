@@ -17,6 +17,7 @@ namespace TeamServer.Model {
             CreateStintTable();
             CreateLapTable();
             CreateAttributeTable();
+            CreateTaskTable();
         }
 
         protected void CreateAccountTable() {
@@ -49,6 +50,10 @@ namespace TeamServer.Model {
 
         protected void CreateAttributeTable() {
             Connection.CreateTableAsync<Attribute>().Wait();
+        }
+
+        protected void CreateTaskTable() {
+            Connection.CreateTableAsync<Model.Task.Task>().Wait();
         }
     }
 }

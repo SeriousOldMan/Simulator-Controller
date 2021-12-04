@@ -193,17 +193,52 @@ namespace TeamServer.Server {
 			FinishSession(new Guid(identifier));
 		}
 
+		public async void DeleteSessionsAsync() {
+			TeamServer.TokenIssuer.ElevateToken(Token);
+
+			await ObjectManager.Connection.QueryAsync<Session>(
+				@"
+                    Select * From Sessions Where Finished = ? And FinishTime < ?
+                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+					s.Delete();
+				}));
+		}
+
 		public async void CleanupSessionsAsync() {
 			TeamServer.TokenIssuer.ElevateToken(Token);
 
 			await ObjectManager.Connection.QueryAsync<Session>(
 				@"
-                    Select * From Sessions
-                ").ContinueWith(t => t.Result.ForEach(s => {
-					if (s.Finished && (s.FinishTime < DateTime.Now.AddHours(1))) {
-						foreach (Stint stint in s.Stints)
-							stint.Delete();
+                    Select * From Sessions Where Finished = ? And FinishTime < ?
+                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+					foreach (Model.Attribute attribute in s.Attributes)
+						attribute.Delete();
+
+					foreach (Stint stint in s.Stints) {
+						foreach (Model.Attribute attribute in stint.Attributes)
+							attribute.Delete();
+
+						foreach (Lap lap in stint.Laps)
+							foreach (Model.Attribute attribute in lap.Attributes)
+								attribute.Delete();
 					}
+				}));
+		}
+
+		public async void ResetSessionsAsync() {
+			TeamServer.TokenIssuer.ElevateToken(Token);
+
+			await ObjectManager.Connection.QueryAsync<Session>(
+				@"
+                    Select * From Sessions Where Finised = ? And FinishTime < ?
+                ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
+					foreach (Stint stint in s.Stints)
+						stint.Delete();
+
+					s.Started = false;
+					s.Finished = false;
+					s.StartTime = DateTime.MinValue;
+					s.FinishTime = DateTime.MinValue;
 				}));
 		}
 		#endregion

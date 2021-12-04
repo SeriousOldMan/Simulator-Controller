@@ -64,6 +64,8 @@ namespace TeamServer.Controllers {
                 if (properties.ContainsKey("Active"))
                     task.Active = (properties["Active"] == "true");
 
+                task.Save();
+
                 return "Ok";
             }
             catch (Exception exception) {

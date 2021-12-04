@@ -650,11 +650,11 @@ class RaceStrategist extends RaceAssistant {
 			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 		}
 		
+		simulator := knowledgeBase.getValue("Session.Simulator")
+		car := knowledgeBase.getValue("Session.Car")
+		track := knowledgeBase.getValue("Session.Track")
+		
 		if this.hasEnoughData(false) {
-			simulator := knowledgeBase.getValue("Session.Simulator")
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			
 			if (this.SaveTelemetry != kNever) {
 				pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 				

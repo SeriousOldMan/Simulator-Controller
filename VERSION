@@ -5,12 +5,12 @@ Date=12/04/2021
 Download=
 Changes=New "Server Administration" application
 [Release]
-Version=3.7.1-release
-Date=11/26/2021
-Download=https://bit.ly/3cTsNlD
-Changes=New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices
+Version=3.7.2-release
+Date=12/03/2021
+Download=https://cntr.click/2xk5BBK
+Changes=Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend voices
 [Current]
 Type=Development
 [Version]
-Release=3.7.1-release
+Release=3.7.2-release
 Development=3.7.4-dev

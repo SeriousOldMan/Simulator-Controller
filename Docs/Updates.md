@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.7.2
 
-The storage format of the Setup Database has been modified for this release. The migration is handled automatically by the update procedure (be patient, might take a few moments), but you should make a backup copy, before running the update, in order to be on the safe side. The "Team Server" has changed dramatically. You have to use the new version of the "Team Server" for this release and also older versions of Simulator Controller will not be compatible with the current release of "Team Server".
+The storage format of the Setup Database has been modified for this release. The migration is handled automatically by the update procedure (be patient, might take a few moments), but you should make a backup copy before running the update in order to be on the safe side. The "Team Server" has changed dramatically. You have to use the new version of the "Team Server" for this release and also older versions of Simulator Controller will not be compatible with the current release of "Team Server".
 
 ***
 

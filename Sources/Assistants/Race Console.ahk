@@ -372,7 +372,7 @@ raceConsole(configurationOrCommand, arguments*) {
 		Gui RC:Add, DropDownList, x106 yp w160 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
 		Gui RC:Show, AutoSize Center
 		
-		Gui RC:Add, Button, x136 yp+40 w140 h23 gplanPitstop, % translate("Instruct Engineer...")
+		Gui RC:Add, Button, x116 yp+40 w180 h23 gplanPitstop, % translate("Instruct Engineer...")
 		
 		raceConsole(kConnect, "Silent")
 		

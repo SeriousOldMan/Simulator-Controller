@@ -72,6 +72,16 @@ And now the important stuff: To declare, that you want to join a team session, y
 
 ### Race Console
 
+During a team session, all team members can use the "Race Console" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
+
+![](*)
+
+To use the "Race Console", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](*), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Race Console" window.
+
+Using the elements on the "Pitstop" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members are part of the crew supporting the active driver.
+
+Note: The current implementation of "Race Console" is in an early stage of development. When fully implemented, it will give you complete graphical access to all the session data similar to the implementation of "Race Reports" and "Strategy Workbench". 
+
 ### Special notes
 
 Every simulation game is unique and handles multiplayer team races different. Therefore, you have to be aware of the individual drawbacks and specialities. In this section I will provide a growing collection of hints and special operation tipps for all the individual simulations, whenever I stumble over them. When you found some specialities on your own, please feel free to share them with me, and I will be happy to add them to this section as well.

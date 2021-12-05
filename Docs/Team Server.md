@@ -38,7 +38,7 @@ Using the "Accounts" option, you can *preload* accounts into an empty database. 
 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
 
-If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](*) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
+If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
 
 ## Managing teams
 
@@ -74,9 +74,9 @@ And now the important stuff: To declare, that you want to join a team session, y
 
 During a team session, all team members can use the "Race Console" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Console%201.JPG)
 
-To use the "Race Console", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](*), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Race Console" window.
+To use the "Race Console", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Race Console" window.
 
 Using the elements on the "Pitstop" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members are part of the crew supporting the active driver.
 
@@ -94,7 +94,7 @@ Every simulation game is unique and handles multiplayer team races different. Th
 
 This section is only relevant for those of you, who want to setup and manage their own servers. After you have installed and setup the Team Server in your hosting environment as described above in the first section, you can use the "Server Administration" application to create the different accounts for all team managers, that will run team sessions on this server.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%201.JPG)
 
 In the top section of "Server Administration" you have to enter the login credentials of one of the administration accounts you have setup during the initial configuration of the Team Server. You have thought of that, right? If not, back to start. After you have successfully logged into the Team Server, you can create, delete or change accounts, which will have access to the server. An account is identified of a name, which must be unique, an optional E-Mail address, as well as contingent rule for the minutes which are available for race sessions on this account. You also have to create an initial password, which you must hand over together with the account name to the (team) manager of this account. You can create a password by clicking on the small key button and you can copy the password to the clipboard using the small button on the right.
 
@@ -102,7 +102,7 @@ Very important are the settings for the time contingent. You can choose between 
 
 If you don't want to use all this stuff, simply set the number of minutes to an astronomical high number and the contingent rule to "One-Time". You will end up with an account, that will last forever.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%202.JPG)
 
 On the second page, you start a couple of background jobs on the server, which will keep everything tight and clean. You can delete periodically expired access tokens, you can define when to renew the time contingents on all accounts, and you can manage finished sessions, which might occupy a lot of disk space on the server. "Cleanup" means that all secondary data (telemetry, standings, etc.) will be deleted, but the stints and laps will survive whereas a "Reset" also deletes all stints with their laps, which just retains the name of the session. But you might also let the server fully delete finished sessions. Whatever you define here, finished session will always be retained for one hour after the end of the session, so that all drivers have enough time to download the session data from the server.
 

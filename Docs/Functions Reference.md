@@ -28,8 +28,14 @@ Removes the given section including all keys and values from the configuration m
 #### *readConfiguration(configFile :: String)*
 Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 
+#### *parseConfiguration(text :: String)*
+Simular to *readConfiguration*, but reads the configuration from a string instead of a file.
+
 #### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
 Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
+
+#### *printConfiguration(configuration :: ConfigurationMap)*
+Simular to *writeConfiguration*, but returns the textual configuration as a string.
 
 #### *getControllerConfiguration()*
 This function returns a representation of the file *Simulator Controller.config* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller. This file is created by the *Simulator Controller.exe* application and is updated on each startup.

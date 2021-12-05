@@ -107,6 +107,9 @@
   - [Managing teams](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams)
   - [Preparing a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session)
   - [Running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session)
+    - [Race Console](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-console)
+    - [Special Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#special-notes)
+  - [Server Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#troubleshooting)
 

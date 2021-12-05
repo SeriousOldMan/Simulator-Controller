@@ -2,7 +2,7 @@
 Version=3.7.4-dev
 Target=3.7.4-release
 Date=12/05/2021
-Download=
+Download=https://www.dropbox.com/s/pu1s1ufof68bjz0/Simulator%20Controller%203.7.4-rc1.zip?dl=1
 Changes=New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration
 [Release]
 Version=3.7.2-release

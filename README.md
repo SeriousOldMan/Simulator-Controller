@@ -41,7 +41,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.7.4-rc1](https://www.dropbox.com/s/pu1s1ufof68bjz0/Simulator%20Controller%203.7.4-rc1.zip?dl=1) (Release candidate for 3.7.4. New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration. Stable, incl. update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-374) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

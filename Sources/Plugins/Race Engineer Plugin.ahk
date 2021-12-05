@@ -172,6 +172,32 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 	
+	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+		
+		if (this.TeamSession && this.RaceEngineer) {
+			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
+			
+			if (pitstopSettings && (pitstopSettings != "")) {
+				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
+				
+				pitstopSettings := parseConfiguration(pitstopSettings)
+				
+				this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1;26.1;26.1;26.1")
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
+											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false))
+				
+				this.TeamServer.setSessionValue("Pitstop Plan", "")
+			}
+		}
+	}		
+	
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["LapsRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)

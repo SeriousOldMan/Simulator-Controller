@@ -3,7 +3,8 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New "Server Administration" application for Team Server administration.
-  4. Support pitstop settings preparation by a team member in multiplayer endurance races.
+  4. New application "Team Console" supports pitstop settings preparation by a team member in multiplayer endurance races.
+  5. [Developer]Added *parseConfiguration* and *printConfiguration* functions.
 
 ## 3.7.2-release 12/03/21
 

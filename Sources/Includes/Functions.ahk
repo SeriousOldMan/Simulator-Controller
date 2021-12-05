@@ -1833,6 +1833,25 @@ readConfiguration(configFile) {
 	return configuration
 }
 
+parseConfiguration(text) {
+	Random postfix, 1, 100000
+	
+	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	
+	FileAppend %text%, %fileName%, UTF-16
+	
+	configuration := readConfiguration(fileName)
+	
+	try {
+		FileDelete %fileName%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	return configuration
+}
+
 writeConfiguration(configFile, configuration) {
 	configFile := getFileName(configFile, kUserConfigDirectory)
 	
@@ -1861,6 +1880,25 @@ writeConfiguration(configFile, configuration) {
 		
 		FileAppend %section%, %configFile%, UTF-16
 	}
+}
+
+printConfiguration(configuration) {
+	Random postfix, 1, 100000
+	
+	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	
+	writeConfiguration(fileName, configuration)
+	
+	FileRead text, %fileName%
+	
+	try {
+		FileDelete %fileName%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	return text
 }
 
 getConfigurationValue(configuration, section, key, default := false) {

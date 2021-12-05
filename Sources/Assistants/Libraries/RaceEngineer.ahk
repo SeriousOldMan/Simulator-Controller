@@ -1119,7 +1119,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 	
-	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__", changeTyres := "__Undefined__") {
+	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__"
+			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__", tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__"
+			  , tyrePressures := "__Undefined__", repairBodywork := "__Undefined__", repairSuspension := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
@@ -1154,9 +1156,36 @@ class RaceEngineer extends RaceAssistant {
 		if (refuelAmount != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount.Target", refuelAmount)
 		
-		if (changeTyres != kUndefined)
+		if (changeTyres != kUndefined) {
 			knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
+		
+			if changeTyres {
+				if (tyreSet != kUndefined)
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Set", tyreSet)
+				
+				if (tyreCompound != kUndefined)
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound)
+				
+				if (tyreCompoundColor != kUndefined)
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor)
+				
+				if (tyrePressures != kUndefined) {
+					tyrePressures := string2Values(";", tyrePressures)
+					
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.FL", tyrePressures[1])
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.FR", tyrePressures[2])
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.RL", tyrePressures[3])
+					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.RR", tyrePressures[4])
+				}
+			}
+		}
+		
+		if (repairBodyWork != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Repair.Bodywork", repairBodyWork)
 	
+		if (repairSuspension != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Repair.Suspension", repairSuspension)
+		
 		result := knowledgeBase.produce()
 		
 		if this.Debug[kDebugKnowledgeBase]

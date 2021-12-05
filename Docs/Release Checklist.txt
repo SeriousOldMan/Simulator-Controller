@@ -27,6 +27,7 @@ Release 3.7.4 Checklist
    a. Documentation
    b. Images
    c. Translations
+3. Doku for parseConfiguration, printConfiguration
 
 Release 3.7.2 Checklist
 =======================

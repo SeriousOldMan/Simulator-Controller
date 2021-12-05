@@ -485,7 +485,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			return false
 	}
 	
-	getSessionValue(name) {
+	getSessionValue(name, default := "__Undefined__") {
 		if this.SessionActive {
 			try {
 				value := this.Connector.GetSessionValue(this.Session, name)
@@ -496,11 +496,14 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				if (default != kUndefined)
+					return default
+				else
+					logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 		
-		return false
+		return ((default != kUndefined) ? default : false)
 	}
 	
 	setSessionValue(name, value) {
@@ -601,6 +604,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 	
 	addLap(lapNumber, telemetryData, positionsData) {
+		static lastLap := false
+		
 		if this.TeamServerActive {
 			try {
 				if isDebug()
@@ -628,7 +633,17 @@ class TeamServerPlugin extends ControllerPlugin {
 				else
 					stint := this.Connector.GetSessionStint(this.Session)
 				
-				this.Connector.CreateLap(stint, lapNumber)
+				lap := this.Connector.CreateLap(stint, lapNumber)
+				
+				if (lap != lastLap) {
+					lastLap := lap
+					
+					if telemetryData
+						this.setLapValue(lapNumber, "Telemetry Data", printConfiguration(telemetryData))
+				
+					if positionsData
+						this.setLapValue(lapNumber, "Positions Data", printConfiguration(positionsData))
+				}
 			}
 			catch exception {
 				this.iSessionActive := false

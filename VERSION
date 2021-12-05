@@ -1,9 +1,9 @@
 [Development]
 Version=3.7.4-dev
 Target=3.7.4-release
-Date=12/04/2021
+Date=12/05/2021
 Download=
-Changes=New "Server Administration" application
+Changes=New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration
 [Release]
 Version=3.7.2-release
 Date=12/03/2021

@@ -43,7 +43,6 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 global kClose = "Close"
-global kCancel = "Cancel"
 global kConnect = "Connect"
 global kEvent = "Event"
 

@@ -60,10 +60,8 @@ namespace TeamServer.Controllers {
 
         [HttpGet("{identifier}/lap/{lap:int}/value")]
         public string GetSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
-                                         [FromQuery(Name = "name")] string name)
-        {
-            try
-            {
+                                         [FromQuery(Name = "name")] string name) {
+            try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
@@ -81,10 +79,8 @@ namespace TeamServer.Controllers {
 
         [HttpPut("{identifier}/value")]
         public string SetSessionValue([FromQuery(Name = "token")] string token, string identifier,
-                                      [FromQuery(Name = "name")] string name, [FromBody] string value)
-        {
-            try
-            {
+                                      [FromQuery(Name = "name")] string name, [FromBody] string value) {
+            try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.SetSessionValue(identifier, name, value);
@@ -168,8 +164,16 @@ namespace TeamServer.Controllers {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
+                Stint stint = session.GetCurrentStint();
 
-                return session.GetCurrentStint().GetCurrentLap().Identifier.ToString();
+                if (stint != null) {
+                    Lap lap = stint.GetCurrentLap();
+
+                    if (lap != null)
+                        return lap.Identifier.ToString();
+                }
+
+                return "";
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

@@ -1889,9 +1889,10 @@ printConfiguration(configuration) {
 	
 	writeConfiguration(fileName, configuration)
 	
-	FileRead text, %fileName%
+	text := ""
 	
 	try {
+		FileRead text, %fileName%
 		FileDelete %fileName%
 	}
 	catch exception {

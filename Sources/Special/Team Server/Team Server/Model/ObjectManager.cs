@@ -45,6 +45,7 @@ namespace TeamServer.Model {
             if (attribute == null)
                 attribute = new Attribute { Owner = modelObject.Identifier, Name = name, Value = value };
             else
+                
                 attribute.Value = value;
 
             attribute.Save();

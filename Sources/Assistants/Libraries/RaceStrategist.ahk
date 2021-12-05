@@ -573,7 +573,7 @@ class RaceStrategist extends RaceAssistant {
 					, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
 			
 			for key, value in facts
-				knowledgeBase.setValue(key, value)
+				knowledgeBase.setFact(key, value)
 			
 			base.updateSession(settings)
 		}

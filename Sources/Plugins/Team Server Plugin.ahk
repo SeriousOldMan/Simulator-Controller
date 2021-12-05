@@ -594,8 +594,6 @@ class TeamServerPlugin extends ControllerPlugin {
 				return this.Connector.StartStint(this.Session, this.Driver, lapNumber)
 			}
 			catch exception {
-				this.iSessionActive := false
-				
 				logMessage(kLogCritical, translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))
 				
 				this.keepAlive()
@@ -638,16 +636,26 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (lap != lastLap) {
 					lastLap := lap
 					
-					if telemetryData
-						this.setLapValue(lapNumber, "Telemetry Data", printConfiguration(telemetryData))
+					if telemetryData {
+						telemetryData := printConfiguration(telemetryData)
+						
+						if isDebug()
+							showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryData)
+						
+						this.setLapValue(lapNumber, "Telemetry Data", telemetryData)
+					}
 				
-					if positionsData
-						this.setLapValue(lapNumber, "Positions Data", printConfiguration(positionsData))
+					if positionsData {
+						positionsData := printConfiguration(positionsData)
+						
+						if isDebug()
+							showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
+						
+						this.setLapValue(lapNumber, "Positions Data", positionsData)
+					}
 				}
 			}
 			catch exception {
-				this.iSessionActive := false
-				
 				logMessage(kLogCritical, translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}

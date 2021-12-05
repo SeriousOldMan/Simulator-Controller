@@ -59,7 +59,7 @@ class RaceAssistant extends ConfigurationItem {
 	iSession := kSessionFinished
 	iDriverForName := "John"
 	
-	iiDriverFullName := "John Doe (JD)"
+	iDriverFullName := "John Doe (JD)"
 	iDrivers := []
 	
 	iLearningLaps := 1
@@ -392,8 +392,11 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Session") {
 			this.iSession := values["Session"]
 			
-			if (this.Session == kSessionFinished)
+			if (this.Session == kSessionFinished) {
 				this.iDrivers := []
+				
+				this.iInitialFuelAmount := 0
+			}
 		}
 	}
 	
@@ -552,6 +555,12 @@ class RaceAssistant extends ConfigurationItem {
 		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
 								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)})
 		
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+		
+		this.updateSessionValues({DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
 		if this.AdjustLapTime {
@@ -622,7 +631,7 @@ class RaceAssistant extends ConfigurationItem {
 					, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
 			
 			for key, value in facts
-				knowledgeBase.setValue(key, value)
+				knowledgeBase.setFact(key, value)
 			
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledge(knowledgeBase)
@@ -651,6 +660,8 @@ class RaceAssistant extends ConfigurationItem {
 		
 		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
 		
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, DriverFullName: "John Doe (JD)"})
+		
 		this.updateSession(sessionSettings)
 	}
 	
@@ -672,10 +683,7 @@ class RaceAssistant extends ConfigurationItem {
 		
 		knowledgeBase := this.KnowledgeBase
 		
-		if (lapNumber == 1)
-			knowledgeBase.addFact("Lap", 1)
-		else
-			knowledgeBase.setValue("Lap", lapNumber)
+		knowledgeBase.setFact("Lap", lapNumber)
 		
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
@@ -689,7 +697,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		
-		this.updateSessionValues({Driver: driverForname, DriverFullname: computeDriverName(driverForName, driverSurName, driverNickName)})
+		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)
@@ -829,6 +837,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	performPitstop(lapNumber := false) {
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 	}
 	
 	finishPitstop(lapNumber := false) {

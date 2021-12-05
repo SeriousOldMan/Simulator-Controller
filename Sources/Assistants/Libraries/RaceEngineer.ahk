@@ -751,7 +751,7 @@ class RaceEngineer extends RaceAssistant {
 					, "Session.Setup.Tyre.Wet.Pressure.RR": getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)}
 			
 			for key, value in facts
-				knowledgeBase.setValue(key, value)
+				knowledgeBase.setFacts(key, value)
 			
 			base.updateSession(settings)
 		}
@@ -852,18 +852,18 @@ class RaceEngineer extends RaceAssistant {
 		if (knowledgeBase.getValue("Lap", false) != lapNumber) {
 			bodyworkDamage := string2Values(",", getConfigurationValue(data, "Car Data", "BodyworkDamage", ""))
 			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Front", Round(bodyworkDamage[1], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Rear", Round(bodyworkDamage[2], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Left", Round(bodyworkDamage[3], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Right", Round(bodyworkDamage[4], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Bodywork.Center", Round(bodyworkDamage[5], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Bodywork.Front", Round(bodyworkDamage[1], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Bodywork.Rear", Round(bodyworkDamage[2], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Bodywork.Left", Round(bodyworkDamage[3], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Bodywork.Right", Round(bodyworkDamage[4], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Bodywork.Center", Round(bodyworkDamage[5], 2))
 			
 			suspensionDamage := string2Values(",", getConfigurationValue(data, "Car Data", "SuspensionDamage", ""))
 			
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Suspension.FL", Round(suspensionDamage[1], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Suspension.FR", Round(suspensionDamage[2], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Suspension.RL", Round(suspensionDamage[3], 2))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 		}
 		
 		return data
@@ -1154,7 +1154,7 @@ class RaceEngineer extends RaceAssistant {
 		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
 		
 		if (refuelAmount != kUndefined)
-			knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount.Target", refuelAmount)
+			knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
 		
 		if (changeTyres != kUndefined) {
 			knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
@@ -1170,7 +1170,7 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor)
 				
 				if (tyrePressures != kUndefined) {
-					tyrePressures := string2Values(";", tyrePressures)
+					tyrePressures := string2Values(",", tyrePressures)
 					
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.FL", tyrePressures[1])
 					knowledgeBase.addFact("Pitstop.Plan.Tyre.Pressure.FR", tyrePressures[2])
@@ -1180,8 +1180,8 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 		
-		if (repairBodyWork != kUndefined)
-			knowledgeBase.addFact("Pitstop.Plan.Repair.Bodywork", repairBodyWork)
+		if (repairBodywork != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Repair.Bodywork", repairBodywork)
 	
 		if (repairSuspension != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Repair.Suspension", repairSuspension)
@@ -1238,22 +1238,22 @@ class RaceEngineer extends RaceAssistant {
 				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
 				incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
 			
-				if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0))
+				if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
 					speaker.speakPhrase("NewPressures")
 				
-				if (debug || (incrementFL != 0))
+				if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
 					speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
 												 , unit: fragments["PSI"]})
 				
-				if (debug || (incrementFR != 0))
+				if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
 					speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
 												 , unit: fragments["PSI"]})
 				
-				if (debug || (incrementRL != 0))
+				if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
 					speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
 												 , unit: fragments["PSI"]})
 				
-				if (debug || (incrementRR != 0))
+				if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
 					speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
 												 , unit: fragments["PSI"]})
 		
@@ -1272,7 +1272,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 
-			if ((options == true) || options.Repairs) {
+			if ((options == true) || options.Repairs || (repairBodywork != kUndefined) || (repairSuspension != kUndefined)) {
 				if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 					speaker.speakPhrase("RepairSuspension")
 				else if debug
@@ -1393,8 +1393,6 @@ class RaceEngineer extends RaceAssistant {
 		
 		result := knowledgeBase.produce()
 		
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(knowledgeBase)
 		
@@ -1411,7 +1409,7 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
 	}
 	
-	callPlanPitstop(lap := false) {		
+	callPlanPitstop(lap := "__Undefined__", arguments*) {		
 		this.clearContinuation()
 		
 		if !this.supportsPitstop()
@@ -1424,10 +1422,10 @@ class RaceEngineer extends RaceAssistant {
 			Loop 10
 				Sleep 500
 			
-			if lap
+			if (lap == kUndefined)
 				this.planPitstop(lap)
 			else
-				this.planPitstop()
+				this.planPitstop(lap, arguments*)
 		}
 	}
 	

@@ -144,6 +144,9 @@ namespace TeamServer.Server {
 		public Session StartSession(Session session, int duration, string car, string track) {
 			ValidateSession(session);
 
+			foreach (Model.Attribute attribute in session.Attributes)
+				attribute.Delete();
+
 			foreach (Stint stint in session.Stints)
 				stint.Delete();
 			

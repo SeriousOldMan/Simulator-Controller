@@ -207,7 +207,7 @@ raceConsole(configurationOrCommand, arguments*) {
 										, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
 					
 					setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-										, values2String(";", pitstopPressureFLEdit, pitstopPressureFREdit
+										, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
 														   , pitstopPressureRLEdit, pitstopPressureRREdit))
 				}
 				else
@@ -216,16 +216,18 @@ raceConsole(configurationOrCommand, arguments*) {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", false)
 				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", false)
 					
-				if ((pitstopRepairsDropDown = 1) || (pitstopRepairsDropDown = 3))
+				if ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 4))
 					setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", true)
 					
-				if (pitstopRepairsDropDown > 1)
+				if (pitstopRepairsDropDown > 2)
 					setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
 				
 				lap := connector.GetSessionLastLap(teamSession)
 
 				connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
 				connector.SetSessionValue(teamSession, "Pitstop Plan", lap)
+				
+				showMessage(translate("Race Engineer will be instructed in the next lap..."))
 			}
 		}
 		catch exception {

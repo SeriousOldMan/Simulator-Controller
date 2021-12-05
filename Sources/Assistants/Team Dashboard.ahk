@@ -464,9 +464,9 @@ teamDashboard(configurationOrCommand, arguments*) {
 			Gui TD:Add, DropDownList, x%x1% yp w123 AltSubmit vteamDropDownMenu gchooseTeam
 			
 		if sessionIdentifier
-			Gui TD:Add, DropDownList, x%x4% yp w123 Choose1 vsessionDropDownMenu gchooseSession, % sessionName
+			Gui TD:Add, DropDownList, x%x4% yp w123 AltSubmit Choose1 vsessionDropDownMenu gchooseSession, % sessionName
 		else
-			Gui TD:Add, DropDownList, x%x4% yp w123 Choose0 vsessionDropDownMenu gchooseSession
+			Gui TD:Add, DropDownList, x%x4% yp w123 AltSubmit Choose0 vsessionDropDownMenu gchooseSession
 		
 		Gui TD:Add, Tab3, x8 y150 w388 h296 -Wrap, % values2String("|", map(["Telemetry", "Standings", "Pitstop"], "translate")*)
 		

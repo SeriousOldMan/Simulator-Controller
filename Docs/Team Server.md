@@ -76,7 +76,7 @@ And now the important stuff: To declare, that you want to join a team session, y
 
 During a team session, all team members can use the "Team Dashboard" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Console%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Dashboard%201.JPG)
 
 To use the "Team Dashboard", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Team Dashboard" window.
 

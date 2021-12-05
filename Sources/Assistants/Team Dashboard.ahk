@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Team Race Console               ;;;
+;;;   Modular Simulator Controller System - Team Team Dashboard             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
-;@Ahk2Exe-ExeName Race Console.exe
+;@Ahk2Exe-ExeName Team Dashboard.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -292,7 +292,7 @@ raceConsole(configurationOrCommand, arguments*) {
 		Gui RC:Font, Norm, Arial
 		Gui RC:Font, Italic Underline, Arial
 
-		Gui RC:Add, Text, YP+20 w388 cBlue Center gopenConsoleDocumentation, % translate("Race Console")
+		Gui RC:Add, Text, YP+20 w388 cBlue Center gopenConsoleDocumentation, % translate("Team Dashboard")
 		
 		Gui RC:Add, Text, x24 yp+30 w356 0x10
 
@@ -414,7 +414,7 @@ connectServer() {
 }
 
 openConsoleDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-console
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#team-dashboard
 }
 
 updateState() {
@@ -433,7 +433,7 @@ startupRaceConsole() {
 	icon := kIconsDirectory . "Console.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Console
+	Menu Tray, Tip, Team Dashboard
 
 	SetTimer dataUpdate, 30000
 	

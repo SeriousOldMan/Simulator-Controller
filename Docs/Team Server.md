@@ -72,19 +72,19 @@ When you head out onto the track, you must decide, whether you want this session
 
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For convinience, it is also possible, to always enable team sessions using the action declaration of this plugin, but I don't recommend that, since you might end up beeing part of a session, you are not planned for.
 
-### Race Console
+### Team Dashboard
 
-During a team session, all team members can use the "Race Console" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
+During a team session, all team members can use the "Team Dashboard" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Console%201.JPG)
 
-To use the "Race Console", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Race Console" window.
+To use the "Team Dashboard", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Team Dashboard" window.
 
 #### Planning a Pitstop
 
 Using the elements on the "Pitstop" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members are part of the crew supporting the active driver. Once, you press "Instruct Engineer...", the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
 
-Note: The current implementation of "Race Console" is in an early stage of development. When fully implemented, it will give you complete graphical access to all the session data similar to the implementation of "Race Reports" and "Strategy Workbench". 
+Note: The current implementation of "Team Dashboard" is in an early stage of development. When fully implemented, it will give you complete graphical access to all the session data similar to the implementation of "Race Reports" and "Strategy Workbench". 
 
 ### Special notes
 

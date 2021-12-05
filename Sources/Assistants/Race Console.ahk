@@ -164,7 +164,25 @@ raceConsole(configurationOrCommand, arguments*) {
 	}
 	else if (configurationOrCommand == kEvent) {
 		try {
-			if (arguments[1] = "DataUpdate") {
+			if (arguments[1] = "UpdateState") {
+				GuiControlGet pitstopTyreCompoundDropDown
+				
+				if (pitstopTyreCompoundDropDown > 1) {
+					GuiControl Enable, pitstopTyreSetEdit
+					GuiControl Enable, pitstopPressureFLEdit
+					GuiControl Enable, pitstopPressureFREdit
+					GuiControl Enable, pitstopPressureRLEdit
+					GuiControl Enable, pitstopPressureRREdit
+				}
+				else {
+					GuiControl Disable, pitstopTyreSetEdit
+					GuiControl Disable, pitstopPressureFLEdit
+					GuiControl Disable, pitstopPressureFREdit
+					GuiControl Disable, pitstopPressureRLEdit
+					GuiControl Disable, pitstopPressureRREdit
+				}
+			}
+			else if (arguments[1] = "DataUpdate") {
 				if connected {
 					Gui RC:Default
 					
@@ -280,7 +298,7 @@ raceConsole(configurationOrCommand, arguments*) {
 
 		Gui RC:Font, Norm, Arial
 				
-		Gui RC:Add, Button, x164 y426 w80 h23 gcloseRaceConsole, % translate("Close")
+		Gui RC:Add, Button, x164 y428 w80 h23 gcloseRaceConsole, % translate("Close")
 		
 		x := 8
 		y := 70
@@ -316,22 +334,22 @@ raceConsole(configurationOrCommand, arguments*) {
 		Gui RC:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton gconnectServer
 		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		Gui RC:Add, Tab3, x8 y124 w388 h294 -Wrap, % values2String("|", map(["Telemetry", "Standings", "Pitstop"], "translate")*)
+		Gui RC:Add, Tab3, x8 y124 w388 h296 -Wrap, % values2String("|", map(["Telemetry", "Standings", "Pitstop"], "translate")*)
 		
 		x0 := 16
 		y := 178
 		
 		Gui Tab, 1
 		
-		Gui RC:Add, Edit, x16 y154 w372 h224 ReadOnly vtelemetryDataEdit
+		Gui RC:Add, Edit, x16 y154 w372 h256 ReadOnly vtelemetryDataEdit
 		
 		Gui Tab, 2
 		
-		Gui RC:Add, Edit, x16 y154 w372 h224 ReadOnly vpositionsDataEdit
+		Gui RC:Add, Edit, x16 y154 w372 h256 ReadOnly vpositionsDataEdit
 		
 		Gui Tab, 3
 	
-		Gui RC:Add, Text, x16 y154 w90 h20, % translate("Lap")
+		Gui RC:Add, Text, x16 y158 w90 h20, % translate("Lap")
 		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
 		Gui RC:Add, UpDown, x138 yp-2 w18 h20
 		
@@ -342,7 +360,7 @@ raceConsole(configurationOrCommand, arguments*) {
 
 		Gui RC:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
-		Gui RC:Add, DropDownList, x106 yp w160 AltSubmit Choose1 vpitstopTyreCompoundDropDown, % values2String("|", choices*)
+		Gui RC:Add, DropDownList, x106 yp w160 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
 		Gui RC:Add, Text, x16 yp+26 w95 h20, % translate("Tyre Set")
 		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit
@@ -375,6 +393,7 @@ raceConsole(configurationOrCommand, arguments*) {
 		Gui RC:Add, Button, x116 yp+40 w180 h23 gplanPitstop, % translate("Instruct Engineer...")
 		
 		raceConsole(kConnect, "Silent")
+		raceConsole(kEvent, "UpdateState")
 		
 		Loop {
 			Sleep 1000
@@ -396,6 +415,10 @@ connectServer() {
 
 openConsoleDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-console
+}
+
+updateState() {
+	raceConsole(kEvent, "UpdateState")
 }
 
 dataUpdate() {

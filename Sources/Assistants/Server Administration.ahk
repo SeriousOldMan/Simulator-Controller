@@ -179,6 +179,9 @@ updateTask(connector, tasks, task, which, operation, frequency) {
 	return tasks
 }
 
+global teamServerNameEdit = ""
+global teamServerPasswordEdit = ""
+	
 administrationEditor(configurationOrCommand, arguments*) {
 	static connector := false
 	static done := false
@@ -187,8 +190,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static account := false
 	
 	static teamServerURLEdit = "https://localhost:5001"
-	static teamServerNameEdit = ""
-	static teamServerPasswordEdit = ""
 	static changePasswordButton
 	static teamServerTokenEdit = ""
 	static accountsListView
@@ -657,6 +658,7 @@ changePassword() {
 		
 		Gui ADM:Default
 		
+		GuiControlGet teamServerNameEdit
 		GuiControlGet teamServerPasswordEdit
 		
 		locale := ((getLanguage() = "en") ? "" : "Locale")

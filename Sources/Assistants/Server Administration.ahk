@@ -403,10 +403,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 				if vToken {
 					GuiControl Enable, changePasswordButton
 					GuiControl Enable, addAccountButton
+					
+					GuiControl Enable, taskTokenOperationDropDown
+					GuiControl Enable, taskTokenFrequencyDropDown
+					GuiControl Enable, taskSessionOperationDropDown
+					GuiControl Enable, taskSessionFrequencyDropDown
+					GuiControl Enable, taskAccountOperationDropDown
+					GuiControl Enable, taskAccountFrequencyDropDown
 				}
 				else {
 					GuiControl Disable, changePasswordButton
 					GuiControl Disable, addAccountButton
+					
+					GuiControl Disable, taskTokenOperationDropDown
+					GuiControl Disable, taskTokenFrequencyDropDown
+					GuiControl Disable, taskSessionOperationDropDown
+					GuiControl Disable, taskSessionFrequencyDropDown
+					GuiControl Disable, taskAccountOperationDropDown
+					GuiControl Disable, taskAccountFrequencyDropDown
 				}
 				
 				if account {
@@ -434,13 +448,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 					
 					GuiControl Enable, deleteAccountButton
 					GuiControl Enable, saveAccountButton
-					
-					GuiControl Enable, taskTokenOperationDropDown
-					GuiControl Enable, taskTokenFrequencyDropDown
-					GuiControl Enable, taskSessionOperationDropDown
-					GuiControl Enable, taskSessionFrequencyDropDown
-					GuiControl Enable, taskAccountOperationDropDown
-					GuiControl Enable, taskAccountFrequencyDropDown
 				}
 				else {
 					GuiControl Disable, accountNameEdit
@@ -454,13 +461,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 						
 					GuiControl Disable, deleteAccountButton
 					GuiControl Disable, saveAccountButton
-					
-					GuiControl Disable, taskTokenOperationDropDown
-					GuiControl Disable, taskTokenFrequencyDropDown
-					GuiControl Disable, taskSessionOperationDropDown
-					GuiControl Disable, taskSessionFrequencyDropDown
-					GuiControl Disable, taskAccountOperationDropDown
-					GuiControl Disable, taskAccountFrequencyDropDown
 				}
 			}
 			else if (arguments[1] = "PasswordCreate") {

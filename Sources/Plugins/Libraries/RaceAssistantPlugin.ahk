@@ -1046,6 +1046,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 									return ; Still a different driver, might happen in some simulations
 							
 								this.TeamServer.addStint(dataLastLap)
+								
+								this.restoreSessionState()
 							}
 							else ; (this.iLastLap == (dataLastLap - 1))
 								if !this.driverActive(data)

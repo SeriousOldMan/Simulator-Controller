@@ -619,28 +619,33 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	addLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
 		local compound
-		local knowledgeBase
 		
+		static lastLap := 0
 		static strategyReported := 0
 		
-		currentDriver := this.DriverFullName
-		currentDrivers := this.Drivers.Clone()
+		if (lapNumber <= lastLap)
+			lastLap := 0
+		else if ((lastLap == 0) && (lapNumber > 1))
+			lastLap := (lapNumber - 1)
 		
 		if (lapNumber <= strategyReported)
-			strategyReported := false
+			strategyReported := 0
 		
 		result := base.addLap(lapNumber, data)
 		
 		knowledgeBase := this.KnowledgeBase
 		
-		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName)) {
+		if (this.Speaker && (lastLap < (lapNumber - 2)) && (currentDriver != this.DriverFullName)) {
 			Process Exist, Race Engineer.exe
 			
 			exists := ErrorLevel
 			
 			this.getSpeaker().speakPhrase(exists ? "" : "WelcomeBack")
 		}
+		
+		lastLap := lapNumber
 		
 		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {
 			this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)

@@ -870,15 +870,26 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	addLap(lapNumber, data) {
-		local knowledgeBase
+		local knowledgeBase := this.KnowledgeBase
+		
+		static lastLap := 0
+		
+		if (lapNumber <= lastLap)
+			lastLap := 0
+		else if ((lastLap == 0) && (lapNumber > 1))
+			lastLap := (lapNumber - 1)
+		
+		currentDriver := "John Doe (JD)"
 		
 		currentDriver := this.DriverFullName
 		currentDrivers := this.Drivers.Clone()
 		
 		result := base.addLap(lapNumber, data)
 		
-		if (this.Speaker && (lapNumber > 1) && (currentDriver != this.DriverFullName))
+		if (this.Speaker && (lastLap < (lapNumber - 2)) && (currentDriver != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
+		
+		lastLap := lapNumber
 		
 		if (this.hasEnoughData(false) && (this.SaveTyrePressures != kNever)) {
 			knowledgeBase := this.KnowledgeBase
@@ -1124,7 +1135,7 @@ class RaceEngineer extends RaceAssistant {
 			  , tyrePressures := "__Undefined__", repairBodywork := "__Undefined__", repairSuspension := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
-		
+			  
 		confirm := true
 		
 		options := optionsOrLap
@@ -1423,7 +1434,7 @@ class RaceEngineer extends RaceAssistant {
 				Sleep 500
 			
 			if (lap == kUndefined)
-				this.planPitstop(lap)
+				this.planPitstop()
 			else
 				this.planPitstop(lap, arguments*)
 		}

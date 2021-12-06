@@ -620,7 +620,7 @@ class RaceStrategist extends RaceAssistant {
 	
 	addLap(lapNumber, data) {
 		local compound
-		local knowledgeBase
+		local knowledgeBase := this.KnowledgeBase
 		
 		static strategyReported := 0
 		

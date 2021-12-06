@@ -198,8 +198,7 @@ teamDashboard(configurationOrCommand, arguments*) {
 		done := true
 	else if (configurationOrCommand == kConnect) {
 		GuiControlGet serverURLEdit
-		GuiControlGet teamServerNameEdit
-		GuiControlGet teamServerPasswordEdit
+		GuiControlGet serverTokenEdit
 		
 		try {
 			connector.Connect(serverURLEdit, serverTokenEdit)

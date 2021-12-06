@@ -126,6 +126,20 @@ namespace TeamServer.Server {
 			SetSessionValue(new Guid(identifier), name, value);
 		}
 
+		public void DeleteSessionValue(Session session, string name) {
+			ValidateSession(session);
+
+			ObjectManager.DeleteAttribute(session, name);
+		}
+
+		public void DeleteSessionValue(Guid identifier, string name) {
+			DeleteSessionValue(LookupSession(identifier), name);
+		}
+
+		public void DeleteSessionValue(string identifier, string name) {
+			DeleteSessionValue(new Guid(identifier), name);
+		}
+
 		public void DeleteSession(Session session) {
 			if (session != null)
 				session.Delete();
@@ -396,6 +410,20 @@ namespace TeamServer.Server {
 
 		public void SetLapValue(string identifier, string name, string value) {
 			SetLapValue(new Guid(identifier), name, value);
+		}
+
+		public void DeleteLapValue(Lap lap, string name) {
+			ValidateLap(lap);
+
+			ObjectManager.DeleteAttribute(lap, name);
+		}
+
+		public void DeleteLapValue(Guid identifier, string name) {
+			DeleteLapValue(ObjectManager.GetLapAsync(identifier).Result, name);
+		}
+
+		public void DeleteLapValue(string identifier, string name) {
+			DeleteLapValue(new Guid(identifier), name);
 		}
 		#endregion
 		#endregion

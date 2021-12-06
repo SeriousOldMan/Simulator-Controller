@@ -583,7 +583,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					case "Previous":
 						this.changePitstopOption("Tyre set", "Decrease", steps)
 					case "Increase", "Decrease":
-						this.changePitstopOption("Strategy", selection)
+						this.changePitstopOption("Tyre Set", selection, steps)
 					default:
 						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
 				}

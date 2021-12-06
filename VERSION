@@ -1,16 +1,16 @@
 [Development]
-Version=3.7.4-dev
-Target=3.7.4-release
-Date=12/05/2021
+Version=3.7.6-dev
+Target=3.7.6-release
+Date=12/06/2021
 Download=
-Changes=New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration
+Changes=
 [Release]
-Version=3.7.2-release
-Date=12/03/2021
-Download=https://cntr.click/2xk5BBK
-Changes=Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend voices
+Version=3.7.4-release
+Date=12/06/2021
+Download=https://cntr.click/HRJnb7N
+Changes=New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration
 [Current]
 Type=Development
 [Version]
-Release=3.7.2-release
-Development=3.7.4-dev
+Release=3.7.4-release
+Development=3.7.6-dev

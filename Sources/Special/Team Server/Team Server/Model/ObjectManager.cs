@@ -45,10 +45,16 @@ namespace TeamServer.Model {
             if (attribute == null)
                 attribute = new Attribute { Owner = modelObject.Identifier, Name = name, Value = value };
             else
-                
                 attribute.Value = value;
 
             attribute.Save();
+        }
+
+        public void DeleteAttribute(ModelObject modelObject, string name) {
+            Attribute attribute = Connection.Table<Attribute>().Where(a => a.Owner == modelObject.Identifier && a.Name == name).FirstOrDefaultAsync().Result;
+
+            if (attribute != null)
+                attribute.Delete();
         }
         #endregion
 

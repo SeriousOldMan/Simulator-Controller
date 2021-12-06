@@ -1081,9 +1081,9 @@ restart:
 			Gui RES:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session")
 			
 			if sessionIdentifier
-				Gui RES:Add, DropDownList, x126 yp w126 Choose1 vsessionDropDownMenu gchooseSession, % sessionName
+				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit Choose1 vsessionDropDownMenu gchooseSession, % sessionName
 			else
-				Gui RES:Add, DropDownList, x126 yp w126 vsessionDropDownMenu gchooseSession
+				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit vsessionDropDownMenu gchooseSession
 			
 			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
 		}

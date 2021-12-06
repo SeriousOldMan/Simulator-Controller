@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Team Race Console               ;;;
+;;;   Modular Simulator Controller System - Team Team Dashboard             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
-;@Ahk2Exe-ExeName Race Console.exe
+;@Ahk2Exe-ExeName Team Dashboard.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -114,16 +114,72 @@ parseObject(properties) {
 	return result
 }
 
-raceConsole(configurationOrCommand, arguments*) {
+getKeys(map) {
+	keys := []
+	
+	for key, ignore in map
+		keys.Push(key)
+	
+	return keys
+}
+
+getValues(map) {
+	values := []
+	
+	for ignore, value in map
+		values.Push(value)
+	
+	return values
+}
+
+loadTeams(connector) {
+	teams := {}
+	
+	for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
+		team := parseObject(connector.GetTeam(identifier))
+		
+		teams[team.Name] := team.Identifier
+	}
+	
+	return teams
+}
+
+loadSessions(connector, team) {
+	sessions := {}
+
+	if team
+		for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
+			try {
+				session := parseObject(connector.GetSession(identifier))
+				
+				sessions[session.Name] := session.Identifier
+			}
+			catch exception {
+				; ignore
+			}
+		}			
+	
+	return sessions
+}
+
+teamDashboard(configurationOrCommand, arguments*) {
 	static connector := false
 	static connected := false
 	
+	static teams := {}
+	static sessions := {}
+	
+	static teamIdentifier := false
+	static teamName := false
+	static sessionIdentifier := false
+	static sessionName := false
+	
 	static done := false
 	
-	static teamServerURLEdit = "https://localhost:5001"
-	static teamServerTokenEdit = ""
-	
-	static teamSession := false
+	static serverURLEdit = "https://localhost:5001"
+	static serverTokenEdit = ""
+	static sessionDropDownMenu
+	static teamDropDownMenu
 	
 	static telemetryDataEdit
 	static positionsDataEdit
@@ -141,16 +197,17 @@ raceConsole(configurationOrCommand, arguments*) {
 	if (configurationOrCommand == kClose)
 		done := true
 	else if (configurationOrCommand == kConnect) {
-		GuiControlGet teamServerURLEdit
-		GuiControlGet teamServerNameEdit
-		GuiControlGet teamServerPasswordEdit
+		GuiControlGet serverURLEdit
+		GuiControlGet serverTokenEdit
 		
 		try {
-			connector.Connect(teamServerURLEdit, teamServerTokenEdit)
+			connector.Connect(serverURLEdit, serverTokenEdit)
 	
 			connected := true
 			
 			showMessage(translate("Successfully connected to the Team Server."))
+			
+			teamDashBoard(kEvent, "TeamsLoad")
 		}
 		catch exception {
 			if ((arguments.Length() == 0) || (arguments[1] != "Silent")) {
@@ -164,12 +221,90 @@ raceConsole(configurationOrCommand, arguments*) {
 	}
 	else if (configurationOrCommand == kEvent) {
 		try {
-			if (arguments[1] = "DataUpdate") {
+			if (arguments[1] = "UpdateState") {
+				GuiControlGet pitstopTyreCompoundDropDown
+				
+				if (pitstopTyreCompoundDropDown > 1) {
+					GuiControl Enable, pitstopTyreSetEdit
+					GuiControl Enable, pitstopPressureFLEdit
+					GuiControl Enable, pitstopPressureFREdit
+					GuiControl Enable, pitstopPressureRLEdit
+					GuiControl Enable, pitstopPressureRREdit
+				}
+				else {
+					GuiControl Disable, pitstopTyreSetEdit
+					GuiControl Disable, pitstopPressureFLEdit
+					GuiControl Disable, pitstopPressureFREdit
+					GuiControl Disable, pitstopPressureRLEdit
+					GuiControl Disable, pitstopPressureRREdit
+				}
+			}
+			else if (arguments[1] = "TeamsLoad") {
+				teams := (connected ? loadTeams(connector) : {})
+			
+				names := getKeys(teams)
+				chosen := inList(getValues(teams), teamIdentifier)
+			
+				if ((chosen == 0) && (names.Length() > 0))
+					chosen := 1
+				
+				if (chosen == 0) {
+					teamName := ""
+					teamIdentifier := false
+				}
+				else {
+					teamName := names[chosen]
+					teamIdentifier := teams[teamName]
+				}
+
+				GuiControl, , teamDropDownMenu, % ("|" . values2String("|", names*))
+				GuiControl Choose, teamDropDownMenu, % chosen
+				
+				teamDashboard(kEvent, "TeamSelect")
+			}
+			else if (arguments[1] = "TeamSelect") {
+				GuiControlGet teamDropDownMenu
+				
+				teamName := getKeys(teams)[teamDropDownMenu]
+				teamIdentifier := teams[teamName]
+				
+				teamDashboard(kEvent, "SessionsLoad")
+			}
+			else if (arguments[1] = "SessionsLoad") {
+				sessions := ((connected && teamIdentifier) ? loadSessions(connector, teamIdentifier) : {})
+				
+				names := getKeys(sessions)
+				chosen := inList(getValues(sessions), sessionIdentifier)
+				
+				if ((chosen == 0) && (names.Length() > 0))
+					chosen := 1
+				
+				if (chosen == 0) {
+					sessionName := ""
+					sessionIdentifier := false
+				}
+				else {
+					sessionName := names[chosen]
+					sessionIdentifier := sessions[sessionName]
+				}
+				
+				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", names*))
+				GuiControl Choose, sessionDropDownMenu, % chosen
+				
+				teamDashboard(kEvent, "SessionSelect")
+			}
+			else if (arguments[1] = "SessionSelect") {
+				GuiControlGet sessionDropDownMenu
+				
+				sessionName := getKeys(sessions)[sessionDropDownMenu]
+				sessionIdentifier := sessions[sessionName]
+			}
+			else if (arguments[1] = "DataUpdate") {
 				if connected {
-					Gui RC:Default
+					Gui TD:Default
 					
 					try {
-						lap := connector.GetSessionLastLap(teamSession)
+						lap := connector.GetSessionLastLap(sessionIdentifier)
 						
 						if (lap && (lap != "")) {
 							GuiControl, , telemetryDataEdit, % connector.GetLapValue(lap, "Telemetry Data")
@@ -222,12 +357,17 @@ raceConsole(configurationOrCommand, arguments*) {
 				if (pitstopRepairsDropDown > 2)
 					setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
 				
-				lap := connector.GetSessionLastLap(teamSession)
+				try {
+					lap := connector.GetSessionLastLap(sessionIdentifier)
 
-				connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
-				connector.SetSessionValue(teamSession, "Pitstop Plan", lap)
-				
-				showMessage(translate("Race Engineer will be instructed in the next lap..."))
+					connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
+					connector.SetSessionValue(sessionIdentifier, "Pitstop Plan", lap)
+					
+					showMessage(translate("Race Engineer will be instructed in the next lap..."))
+				}
+				catch exception {
+					showMessage(translate("Session has not been started yet..."))
+				}
 			}
 		}
 		catch exception {
@@ -239,9 +379,12 @@ raceConsole(configurationOrCommand, arguments*) {
 		}
 	}
 	else {
-		teamServerURLEdit := getConfigurationValue(arguments[1], "Team Settings", "Server.URL", "")
-		teamServerTokenEdit := getConfigurationValue(arguments[1], "Team Settings", "Server.Token", "")
-		teamSession := getConfigurationValue(arguments[1], "Team Settings", "Session.Identifier", "")
+		serverURLEdit := getConfigurationValue(arguments[1], "Team Settings", "Server.URL", "")
+		serverTokenEdit := getConfigurationValue(arguments[1], "Team Settings", "Server.Token", "")
+		teamName := getConfigurationValue(arguments[1], "Team Settings", "Team.Name", "")
+		teamIdentifier := getConfigurationValue(arguments[1], "Team Settings", "Team.Identifier", false)
+		sessionIdentifier := getConfigurationValue(arguments[1], "Team Settings", "Session.Identifier", "")
+		sessionName := getConfigurationValue(arguments[1], "Team Settings", "Session.Name", "")
 			
 		dllName := "Team Server Connector.dll"
 		dllFile := kBinariesDirectory . dllName
@@ -262,25 +405,25 @@ raceConsole(configurationOrCommand, arguments*) {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	
-		Gui RC:Default
+		Gui TD:Default
 			
-		Gui RC:-Border ; -Caption
-		Gui RC:Color, D0D0D0, D8D8D8
+		Gui TD:-Border ; -Caption
+		Gui TD:Color, D0D0D0, D8D8D8
 
-		Gui RC:Font, Bold, Arial
+		Gui TD:Font, Bold, Arial
 
-		Gui RC:Add, Text, w388 Center gmoveRaceConsole, % translate("Modular Simulator Controller System") 
+		Gui TD:Add, Text, w388 Center gmoveTeamDashboard, % translate("Modular Simulator Controller System") 
 
-		Gui RC:Font, Norm, Arial
-		Gui RC:Font, Italic Underline, Arial
+		Gui TD:Font, Norm, Arial
+		Gui TD:Font, Italic Underline, Arial
 
-		Gui RC:Add, Text, YP+20 w388 cBlue Center gopenConsoleDocumentation, % translate("Race Console")
+		Gui TD:Add, Text, YP+20 w388 cBlue Center gopenConsoleDocumentation, % translate("Team Dashboard")
 		
-		Gui RC:Add, Text, x24 yp+30 w356 0x10
+		Gui TD:Add, Text, x24 yp+30 w356 0x10
 
-		Gui RC:Font, Norm, Arial
+		Gui TD:Font, Norm, Arial
 				
-		Gui RC:Add, Button, x164 y426 w80 h23 gcloseRaceConsole, % translate("Close")
+		Gui TD:Add, Button, x164 y454 w80 h23 gcloseTeamDashboard, % translate("Close")
 		
 		x := 8
 		y := 70
@@ -293,88 +436,97 @@ raceConsole(configurationOrCommand, arguments*) {
 		
 		w2 := w1 - 70
 		
-		x2 := x + 172
-		
 		x2 := x1 - 25
 		
 		w4 := w1 - 25
-		x4 := x1 + w4 + 2
+		x4 := x1 + 123 + 2
 		
 		w3 := Round((w4 / 2) - 3)
 		x3 := x1 + w3 + 6
 		
-		x4 := x3 + 64
-		
 		x5 := x3 + w3 + 2
 		w5 := w3 - 25
 			
-		Gui RC:Add, Text, x%x0% y%y% w90 h23 +0x200, % translate("Server URL")
-		Gui RC:Add, Edit, x%x1% yp+1 w%w1% h21 VteamServerURLEdit, %teamServerURLEdit%
+		Gui TD:Add, Text, x%x0% y%y% w90 h23 +0x200, % translate("Server URL")
+		Gui TD:Add, Edit, x%x1% yp+1 w%w1% h21 VserverURLEdit, %serverURLEdit%
 		
-		Gui RC:Add, Text, x%x0% yp+26 w90 h23 +0x200, % translate("Access Token")
-		Gui RC:Add, Edit, x%x1% yp-1 w%w1% h21 VteamServerTokenEdit, %teamServerTokenEdit%
-		Gui RC:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton gconnectServer
+		Gui TD:Add, Text, x%x0% yp+26 w90 h23 +0x200, % translate("Access Token")
+		Gui TD:Add, Edit, x%x1% yp-1 w%w1% h21 VserverTokenEdit, %serverTokenEdit%
+		Gui TD:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton gconnectServer
 		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		Gui RC:Add, Tab3, x8 y124 w388 h294 -Wrap, % values2String("|", map(["Telemetry", "Standings", "Pitstop"], "translate")*)
+		Gui TD:Add, Text, x16 yp+26 w90 h23 +0x200, % translate("Team / Session")
+			
+		if teamIdentifier
+			Gui TD:Add, DropDownList, x%x1% yp w123 AltSubmit Choose1 vteamDropDownMenu gchooseTeam, % teamName
+		else
+			Gui TD:Add, DropDownList, x%x1% yp w123 AltSubmit vteamDropDownMenu gchooseTeam
+			
+		if sessionIdentifier
+			Gui TD:Add, DropDownList, x%x4% yp w123 AltSubmit Choose1 vsessionDropDownMenu gchooseSession, % sessionName
+		else
+			Gui TD:Add, DropDownList, x%x4% yp w123 AltSubmit Choose0 vsessionDropDownMenu gchooseSession
+		
+		Gui TD:Add, Tab3, x8 y150 w388 h296 -Wrap, % values2String("|", map(["Telemetry", "Standings", "Pitstop"], "translate")*)
 		
 		x0 := 16
 		y := 178
 		
 		Gui Tab, 1
 		
-		Gui RC:Add, Edit, x16 y154 w372 h224 ReadOnly vtelemetryDataEdit
+		Gui TD:Add, Edit, x16 y180 w372 h256 ReadOnly vtelemetryDataEdit
 		
 		Gui Tab, 2
 		
-		Gui RC:Add, Edit, x16 y154 w372 h224 ReadOnly vpositionsDataEdit
+		Gui TD:Add, Edit, x16 y180 w372 h256 ReadOnly vpositionsDataEdit
 		
 		Gui Tab, 3
 	
-		Gui RC:Add, Text, x16 y154 w90 h20, % translate("Lap")
-		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
-		Gui RC:Add, UpDown, x138 yp-2 w18 h20
+		Gui TD:Add, Text, x16 y184 w90 h20, % translate("Lap")
+		Gui TD:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
+		Gui TD:Add, UpDown, x138 yp-2 w18 h20
 		
-		Gui RC:Add, Text, x16 yp+30 w90 h20, % translate("Refuel")
-		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
-		Gui RC:Add, UpDown, x138 yp-2 w18 h20
-		Gui RC:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
+		Gui TD:Add, Text, x16 yp+30 w90 h20, % translate("Refuel")
+		Gui TD:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
+		Gui TD:Add, UpDown, x138 yp-2 w18 h20
+		Gui TD:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
-		Gui RC:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Change")
+		Gui TD:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
-		Gui RC:Add, DropDownList, x106 yp w160 AltSubmit Choose1 vpitstopTyreCompoundDropDown, % values2String("|", choices*)
+		Gui TD:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
-		Gui RC:Add, Text, x16 yp+26 w95 h20, % translate("Tyre Set")
-		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit
-		Gui RC:Add, UpDown, x138 yp-2 w18 h20
+		Gui TD:Add, Text, x16 yp+26 w95 h20, % translate("Tyre Set")
+		Gui TD:Add, Edit, x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit
+		Gui TD:Add, UpDown, x138 yp-2 w18 h20
 
-		Gui RC:Font, Norm, Arial
-		Gui RC:Font, Italic, Arial
+		Gui TD:Font, Norm, Arial
+		Gui TD:Font, Italic, Arial
 
-		Gui RC:Add, GroupBox, -Theme x16 yp+26 w250 h72 Section, % translate("Pressures")
+		Gui TD:Add, GroupBox, -Theme x16 yp+26 w247 h72 Section, % translate("Pressures")
 				
-		Gui RC:Font, Norm, Arial
+		Gui TD:Font, Norm, Arial
 
-		Gui RC:Add, Text, x26 yp+24 w75 h20, % translate("Front")
-		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit
-		Gui RC:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit
-		; Gui RC:Add, UpDown, x138 yp-2 w18 h20
-		Gui RC:Add, Text, x218 yp+2 w30 h20, % translate("PSI")
+		Gui TD:Add, Text, x26 yp+24 w75 h20, % translate("Front")
+		Gui TD:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit
+		Gui TD:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit
+		; Gui TD:Add, UpDown, x138 yp-2 w18 h20
+		Gui TD:Add, Text, x218 yp+2 w30 h20, % translate("PSI")
 
-		Gui RC:Add, Text, x26 yp+24 w75 h20 , % translate("Rear")
-		Gui RC:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureRLEdit
-		Gui RC:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit
-		; Gui RC:Add, UpDown, x138 yp-2 w18 h20
-		Gui RC:Add, Text, x218 yp+2 w30 h20, % translate("PSI")
+		Gui TD:Add, Text, x26 yp+24 w75 h20 , % translate("Rear")
+		Gui TD:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureRLEdit
+		Gui TD:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit
+		; Gui TD:Add, UpDown, x138 yp-2 w18 h20
+		Gui TD:Add, Text, x218 yp+2 w30 h20, % translate("PSI")
 		
-		Gui RC:Add, Text, x16 ys+80 w85 h23 +0x200, % translate("Repairs")
+		Gui TD:Add, Text, x16 ys+80 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
-		Gui RC:Add, DropDownList, x106 yp w160 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
-		Gui RC:Show, AutoSize Center
+		Gui TD:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
+		Gui TD:Show, AutoSize Center
 		
-		Gui RC:Add, Button, x116 yp+40 w180 h23 gplanPitstop, % translate("Instruct Engineer...")
+		Gui TD:Add, Button, x116 yp+40 w180 h23 gplanPitstop, % translate("Instruct Engineer...")
 		
-		raceConsole(kConnect, "Silent")
+		teamDashboard(kConnect, "Silent")
+		teamDashboard(kEvent, "UpdateState")
 		
 		Loop {
 			Sleep 1000
@@ -382,39 +534,51 @@ raceConsole(configurationOrCommand, arguments*) {
 	}
 }
 
-moveRaceConsole() {
-	moveByMouse("RC")
+moveTeamDashboard() {
+	moveByMouse("TD")
 }
 
-closeRaceConsole() {
-	raceConsole(kClose)
+closeTeamDashboard() {
+	teamDashboard(kClose)
 }
 
 connectServer() {
-	raceConsole(kConnect)
+	teamDashboard(kConnect)
+}
+
+chooseTeam() {
+	teamDashboard(kEvent, "TeamSelect")
+}
+
+chooseSession() {
+	teamDashboard(kEvent, "SessionSelect")
 }
 
 openConsoleDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-console
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#team-dashboard
+}
+
+updateState() {
+	teamDashboard(kEvent, "UpdateState")
 }
 
 dataUpdate() {
-	raceConsole(kEvent, "DataUpdate")
+	teamDashboard(kEvent, "DataUpdate")
 }
 
 planPitstop() {
-	raceConsole(kEvent, "PitstopPlan")
+	teamDashboard(kEvent, "PitstopPlan")
 }
 
-startupRaceConsole() {
+startupTeamDashboard() {
 	icon := kIconsDirectory . "Console.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Console
+	Menu Tray, Tip, Team Dashboard
 
 	SetTimer dataUpdate, 30000
 	
-	raceConsole(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
+	teamDashboard(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 
 	ExitApp 0
 }
@@ -424,4 +588,4 @@ startupRaceConsole() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupRaceConsole()
+startupTeamDashboard()

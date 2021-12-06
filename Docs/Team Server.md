@@ -2,7 +2,9 @@
 
 *Team Server* is a server-based solution, which enables you to use the services of the Virtual Race Assistants in a team race, e.g. a 24h race. Without the *Team Server* these services are only available to the driver of the first stint, for all other drivers the Race Assistants do not even start because they do not have the data from the first laps. With the help of *Team Server*, a central server that manages the data of all drivers in a database, this critical knowledge can now be shared between all drivers. The connection to this server is established by the individual applications of teh Simulator Controller suite ("Simulator Controller", "Race Engineer", "Race Strategist", ...) using Web APIs over HTTPS. This ensures the greatest possible interoperability and flexibility when setting up the central server.
 
-Disclaimer: The current version of the *Team Server* should be considered to be in alpha stage. Therefore always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. Also, parts of the handling for shared special data like telemetry data or tyre pressure history are still under development. Currently, I would not recommend to use the setup for races longer than six hours, unless your PC has a lot of internal memory to spare.
+In a few days, a managed server will be available for you and your teams to use. To use it, you have to become a patron of Simulator Controller. Please check the [creator page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
+
+Disclaimer: The current version of the *Team Server* should be considered to be in beta stage. Therefore always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. Also, parts of the handling for shared special data like telemetry data or tyre pressure history are still under development. Currently, I would not recommend to use the setup for races longer than six hours, unless your PC has a lot of internal memory to spare.
 
 ## Installation & Configuration
 
@@ -38,7 +40,7 @@ Using the "Accounts" option, you can *preload* accounts into an empty database. 
 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
 
-If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](*) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
+If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
 
 ## Managing teams
 
@@ -70,17 +72,19 @@ When you head out onto the track, you must decide, whether you want this session
 
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For convinience, it is also possible, to always enable team sessions using the action declaration of this plugin, but I don't recommend that, since you might end up beeing part of a session, you are not planned for.
 
-### Race Console
+### Team Dashboard
 
-During a team session, all team members can use the "Race Console" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
+During a team session, all team members can use the "Team Dashboard" application. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver.  
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Team%20Dashboard%201.JPG)
 
-To use the "Race Console", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](*), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Race Console" window.
+To use the "Team Dashboard", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without beeing a driver in the session by entering the values directly into the fields at the top of the "Team Dashboard" window.
 
-Using the elements on the "Pitstop" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members are part of the crew supporting the active driver.
+#### Planning a Pitstop
 
-Note: The current implementation of "Race Console" is in an early stage of development. When fully implemented, it will give you complete graphical access to all the session data similar to the implementation of "Race Reports" and "Strategy Workbench". 
+Using the elements on the "Pitstop" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members are part of the crew supporting the active driver. Once, you press "Instruct Engineer...", the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
+
+Note: The current implementation of "Team Dashboard" is in an early stage of development. When fully implemented, it will give you complete graphical access to all the session data similar to the implementation of "Race Reports" and "Strategy Workbench". 
 
 ### Special notes
 
@@ -94,7 +98,7 @@ Every simulation game is unique and handles multiplayer team races different. Th
 
 This section is only relevant for those of you, who want to setup and manage their own servers. After you have installed and setup the Team Server in your hosting environment as described above in the first section, you can use the "Server Administration" application to create the different accounts for all team managers, that will run team sessions on this server.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%201.JPG)
 
 In the top section of "Server Administration" you have to enter the login credentials of one of the administration accounts you have setup during the initial configuration of the Team Server. You have thought of that, right? If not, back to start. After you have successfully logged into the Team Server, you can create, delete or change accounts, which will have access to the server. An account is identified of a name, which must be unique, an optional E-Mail address, as well as contingent rule for the minutes which are available for race sessions on this account. You also have to create an initial password, which you must hand over together with the account name to the (team) manager of this account. You can create a password by clicking on the small key button and you can copy the password to the clipboard using the small button on the right.
 
@@ -102,7 +106,7 @@ Very important are the settings for the time contingent. You can choose between 
 
 If you don't want to use all this stuff, simply set the number of minutes to an astronomical high number and the contingent rule to "One-Time". You will end up with an account, that will last forever.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Server%20Administration%202.JPG)
 
 On the second page, you start a couple of background jobs on the server, which will keep everything tight and clean. You can delete periodically expired access tokens, you can define when to renew the time contingents on all accounts, and you can manage finished sessions, which might occupy a lot of disk space on the server. "Cleanup" means that all secondary data (telemetry, standings, etc.) will be deleted, but the stints and laps will survive whereas a "Reset" also deletes all stints with their laps, which just retains the name of the session. But you might also let the server fully delete finished sessions. Whatever you define here, finished session will always be retained for one hour after the end of the session, so that all drivers have enough time to download the session data from the server.
 

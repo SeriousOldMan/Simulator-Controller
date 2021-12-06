@@ -113,6 +113,41 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpDelete("{identifier}/value")]
+        public string DeleteSessionValue([FromQuery(Name = "token")] string token, string identifier,
+                                         [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.DeleteSessionValue(identifier, name);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpDelete("{identifier}/lap/{lap:int}/value")]
+        public string DeleteSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
+                                            [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
+                    @"
+                        Select * From Laps Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, lap).Result.FirstOrDefault<Lap>();
+
+                sessionManager.DeleteLapValue(theLap, name);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/team")]
         public string GetTeam([FromQuery(Name = "token")] string token, string identifier) {
             try {
@@ -428,6 +463,21 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.SetLapValue(identifier, name, value);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpDelete("{identifier}/value")]
+        public string DeleteLapValue([FromQuery(Name = "token")] string token, string identifier,
+                                     [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.DeleteLapValue(identifier, name);
 
                 return "Ok";
             }

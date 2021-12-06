@@ -308,10 +308,13 @@ namespace TeamServer {
 					   arguments: new Parameters() { { "name", name } });
 		}
 
-		public void SetSessionValue(string identifier, string name, string value)
-		{
+		public void SetSessionValue(string identifier, string name, string value) {
 			Put("session/" + identifier + "/value",
 				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public void DeleteSessionValue(string identifier, string name) {
+			Delete("session/" + identifier + "/value", arguments: new Parameters() { { "name", name } });
 		}
 
 		public string GetSessionLapValue(string identifier, int lap, string name)
@@ -324,6 +327,10 @@ namespace TeamServer {
 		{
 			Put("session/" + identifier + "/lap/" + lap + "/value",
 				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public void DeleteSessionLapValue(string identifier, int lap, string name) {
+			Delete("session/" + identifier + "/lap/" + lap + "/value", arguments: new Parameters() { { "name", name } });
 		}
 
 		public string GetSessionTeam(string identifier) {
@@ -410,10 +417,13 @@ namespace TeamServer {
 					   arguments: new Parameters() { { "name", name } });
 		}
 
-		public string SetLapValue(string identifier, string name, string value) {
-			return Put("lap/" + identifier + "/value",
-					   arguments: new Parameters() { { "name", name } },
-					   body: value);
+		public void SetLapValue(string identifier, string name, string value) {
+			Put("lap/" + identifier + "/value",
+				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public void DeleteLapValue(string identifier, string name) {
+			Put("lap/" + identifier + "/value", arguments: new Parameters() { { "name", name } });
 		}
 		#endregion
 	}

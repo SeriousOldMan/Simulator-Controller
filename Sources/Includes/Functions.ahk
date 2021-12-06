@@ -913,8 +913,6 @@ loadSimulatorConfiguration() {
 		logMessage(kLogWarn, translate("SoX executable not configured"))
 	
 	kSilentMode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
-		
-	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
 
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
@@ -923,6 +921,8 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
+	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
+	
 	if A_IsCompiled {
 		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 		

@@ -512,7 +512,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Saving session value: " . name . " => " . value)
 				
-				this.Connector.SetSessionValue(this.Session, name, value)
+				if (!value || (value == ""))
+					this.Connector.DeleteSessionValue(this.Session, name)
+				else
+					this.Connector.SetSessionValue(this.Session, name, value)
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -571,10 +574,18 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 				
-				if lap is integer
-					this.Connector.SetSessionLapValue(session, lap, name, value)
-				else
-					this.Connector.SetLapValue(lap, name, value)
+				if (!value || (value == "")) {
+					if lap is integer
+						this.Connector.DeleteSessionLapValue(session, lap, name)
+					else
+						this.Connector.DeleteLapValue(lap, name, value)
+				}
+				else {
+					if lap is integer
+						this.Connector.SetSessionLapValue(session, lap, name, value)
+					else
+						this.Connector.SetLapValue(lap, name, value)
+				}
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))

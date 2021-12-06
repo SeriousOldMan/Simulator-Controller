@@ -8,6 +8,8 @@ If you find this tool useful, please help me with the further development. Any d
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)
 
+Another possibility is to use [Patreon](https://www.patreon.com/simulatorcontroller) to give me a hug, and as a benefit, you might get access to the public Team Server for your multiplayer endurance races.
+
 Thank you very much for your support!
 
 ### Download and Installation
@@ -29,15 +31,15 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.7.2-release](https://cntr.click/2xk5BBK) (New features: Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend.)
+[3.7.4-release](https://cntr.click/HRJnb7N) (New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-372) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-374) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.7.1-release](https://bit.ly/3cTsNlD) (New features: New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices. **Version 3.7.1 is a maintenance release for 3.7.0**)
+[3.7.2-release](https://cntr.click/2xk5BBK) (New features: Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend.)
 
-[3.6.8-release](https://bit.ly/3qwcKSQ) (New features: New editor for action labels and icons, Refactoring of the ButtonBoxEditor class, New editor for Stream Deck controller layouts, Updated "Simulator Setup" and "Simulator Configuration" to support the new editors, Revised online documentation for "Simulator Setup".)
+[3.7.1-release](https://bit.ly/3cTsNlD) (New features: New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices. **Version 3.7.1 is a maintenance release for 3.7.0**)
 
 #### Latest development build
 

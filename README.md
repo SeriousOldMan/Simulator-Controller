@@ -8,6 +8,8 @@ If you find this tool useful, please help me with the further development. Any d
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=7GV86ZPS95SL6)
 
+Another possibility is to use [Patreon](https://www.patreon.com/simulatorcontroller) to give me a hug, and as a benefit, you might get access to the public Team Server for your multiplayer endurance races.
+
 Thank you very much for your support!
 
 ### Download and Installation

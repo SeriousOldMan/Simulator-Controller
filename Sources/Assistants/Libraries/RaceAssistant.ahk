@@ -60,7 +60,6 @@ class RaceAssistant extends ConfigurationItem {
 	iDriverForName := "John"
 	
 	iDriverFullName := "John Doe (JD)"
-	iDrivers := []
 	
 	iLearningLaps := 1
 	
@@ -229,12 +228,6 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	Drivers[] {
-		Get {
-			return this.iDrivers
-		}
-	}
-	
 	SessionTime[] {
 		Get {
 			return this.iSessionTime
@@ -380,23 +373,14 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Driver")
 			this.iDriverForName := values["Driver"]
 		
-		if values.HasKey("DriverFullName") {
-			fullName := values["DriverFullName"]
-			
-			if !inList(this.Drivers, fullName)
-				this.Drivers.Push(fullName)
-		
-			this.iDriverFullName := fullName
-		}
+		if values.HasKey("DriverFullName") 
+			this.iDriverFullName := values["DriverFullName"]
 		
 		if values.HasKey("Session") {
 			this.iSession := values["Session"]
 			
-			if (this.Session == kSessionFinished) {
-				this.iDrivers := []
-				
+			if (this.Session == kSessionFinished)
 				this.iInitialFuelAmount := 0
-			}
 		}
 	}
 	
@@ -697,7 +681,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
 		
-		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)})
 			
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)

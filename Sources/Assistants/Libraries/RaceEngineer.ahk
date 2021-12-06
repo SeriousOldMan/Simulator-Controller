@@ -870,10 +870,17 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	addLap(lapNumber, data) {
-		local knowledgeBase
+		local knowledgeBase := this.KnowledgeBase
 		
-		currentDriver := this.DriverFullName
-		currentDrivers := this.Drivers.Clone()
+		currentDriver := "John Doe (JD)"
+		
+		if (this.Speaker && (lapNumber > 1)) {
+			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
+			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
+			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
+			
+			currentDriver := computeDriverName(driverForname, driverSurname, driverNickname)
+		}
 		
 		result := base.addLap(lapNumber, data)
 		

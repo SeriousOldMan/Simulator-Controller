@@ -871,6 +871,9 @@ class RaceEngineer extends RaceAssistant {
 	
 	addLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
+		local driverForname := ""
+		local driverSurname := ""
+		local driverNickname := ""
 		
 		static lastLap := 0
 		
@@ -879,19 +882,15 @@ class RaceEngineer extends RaceAssistant {
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
 		
-		currentDriver := "John Doe (JD)"
-		
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
-			
-			currentDriver := computeDriverName(driverForname, driverSurname, driverNickname)
 		}
 		
 		result := base.addLap(lapNumber, data)
 		
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (currentDriver != this.DriverFullName))
+		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
 			this.getSpeaker().speakPhrase("WelcomeBack")
 		
 		lastLap := lapNumber

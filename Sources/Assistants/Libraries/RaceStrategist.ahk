@@ -621,6 +621,9 @@ class RaceStrategist extends RaceAssistant {
 	addLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
+		local driverForname := ""
+		local driverSurname := ""
+		local driverNickname := ""
 		
 		static lastLap := 0
 		static strategyReported := 0
@@ -633,21 +636,17 @@ class RaceStrategist extends RaceAssistant {
 		if (lapNumber <= strategyReported)
 			strategyReported := 0
 		
-		currentDriver := "John Doe (JD)"
-		
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
-			
-			currentDriver := computeDriverName(driverForname, driverSurname, driverNickname)
 		}
 		
 		result := base.addLap(lapNumber, data)
 		
 		knowledgeBase := this.KnowledgeBase
 		
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (currentDriver != this.DriverFullName)) {
+		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
 			Process Exist, Race Engineer.exe
 			
 			exists := ErrorLevel

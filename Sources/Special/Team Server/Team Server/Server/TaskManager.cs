@@ -62,7 +62,12 @@ namespace TeamServer.Server {
         public Model.Task.Task CreateTask(Model.Task.Task.Type which,
                                           Model.Task.Task.Operation what,
                                           Model.Task.Task.Frequency when) {
-            Model.Task.Task task = new Model.Task.Task { Which = which, What = what, When = when };
+            DateTime next = DateTime.Now;
+            
+            if (when == Model.Task.Task.Frequency.Monthly)
+                next = new DateTime(next.AddMonths(1).Year, next.AddMonths(1).Month, 1);
+
+            Model.Task.Task task = new Model.Task.Task { Which = which, What = what, When = when, Next = next };
 
             task.Save();
 
@@ -109,6 +114,8 @@ namespace TeamServer.Server {
         private void CleanupAccounts(Model.Task.Task task) {
             if (task.What == Model.Task.Task.Operation.Renew)
                 new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).RenewAccountsAsync();
+            else if (task.What == Model.Task.Task.Operation.Delete)
+                new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).DeleteAccountsAsync();
             else
                 throw new Exception("Unsupported task operation detected...");
         }
@@ -139,22 +146,24 @@ namespace TeamServer.Server {
 
                     break;
             }
+
+            task.Save();
         }
 
         public Task RunBackgroundTasksAsync() {
             return Task.Run(RunBackgroundTasks);
         }
 
-        private void RunBackgroundTasks() {
+        private async void RunBackgroundTasks() {
             while (true) {
                 foreach (Model.Task.Task task in GetAllTasks())
-                    if ((task.Active) && (task.Next < DateTime.Now)) {
+                    if ((task.Active) && (task.Next <= DateTime.Now)) {
                         RunTask(task);
 
                         ScheduleTask(task);
                     }
 
-                Task.Delay(60 * 60 * 1000);
+                await Task.Delay(60 * 60 * 1000);
             }
         }
         #endregion

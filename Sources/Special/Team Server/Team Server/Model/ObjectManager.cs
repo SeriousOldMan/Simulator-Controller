@@ -93,7 +93,10 @@ namespace TeamServer.Model {
         }
 
         public Task<List<Session>> GetAccountSessionsAsync(Access.Account account) {
-            return Connection.Table<Session>().Where(s => account.Teams.Select(t => t.ID).Contains<int>(s.TeamID)).ToListAsync();
+            return Connection.QueryAsync<Session>(
+                @"
+                    Select * From Sessions Where TeamID In (Select ID From Teams Where AccountID = ?)
+                ", account.ID);
         }
         #endregion
 

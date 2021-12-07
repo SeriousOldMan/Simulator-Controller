@@ -100,7 +100,7 @@ namespace TeamServer.Server {
                     Select * From Access_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
-                        t.Delete();
+                        DeleteToken(t);
                     }));
         }
         #endregion

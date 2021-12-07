@@ -175,14 +175,25 @@ namespace TeamServer.Server {
                 @"
                     Select * From Access_Accounts
                 ").ContinueWith(t => t.Result.ForEach(a => {
-                    if (a.Contract == Account.ContractType.Expired)
-                        a.Delete();
-                    else if ((a.Contract == Account.ContractType.OneTime) && (a.AvailableMinutes <= 0))
-                        a.Delete();
-                    else if (a.Contract == Account.ContractType.FixedMinutes)
+                    if (a.Contract == Account.ContractType.FixedMinutes)
                         SetMinutes(a, a.ContractMinutes);
                     else if (a.Contract == Account.ContractType.AdditionalMinutes)
                         AddMinutes(a, a.ContractMinutes);
+                }));
+        }
+
+        public async void DeleteAccountsAsync() {
+            TeamServer.TokenIssuer.ElevateToken(Token);
+
+            await ObjectManager.Connection.QueryAsync<Account>(
+                @"
+                    Select * From Access_Accounts
+                ").ContinueWith(t => t.Result.ForEach(a => {
+                    if (!a.Administrator)
+                        if (a.Contract == Account.ContractType.Expired)
+                            a.Delete();
+                        else if ((a.Contract == Account.ContractType.OneTime) && (a.AvailableMinutes <= 0))
+                            a.Delete();
                 }));
         }
         #endregion

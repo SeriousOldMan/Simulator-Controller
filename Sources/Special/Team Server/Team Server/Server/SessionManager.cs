@@ -217,7 +217,7 @@ namespace TeamServer.Server {
 				@"
                     Select * From Sessions Where Finished = ? And FinishTime < ?
                 ", true, DateTime.Now.AddHours(1)).ContinueWith(t => t.Result.ForEach(s => {
-					s.Delete();
+					DeleteSession(s);
 				}));
 		}
 

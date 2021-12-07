@@ -13,3 +13,4 @@ Sources/Special/**/**/bin/
 *.pubxml.user
 *.pubxml
 profile.arm.json
+TeamServer.db

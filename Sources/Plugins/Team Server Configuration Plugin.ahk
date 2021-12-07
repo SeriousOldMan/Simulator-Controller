@@ -43,6 +43,8 @@ global addSessionButton
 global deleteSessionButton
 global editSessionButton
 
+global sessionStorePathEdit = ""
+
 class TeamServerConfigurator extends ConfigurationItem {
 	iEditor := false
 	
@@ -164,7 +166,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 		x5 := x3 + w3 + 2
 		w5 := w3 - 25
 		
-		Gui %window%:Add, Text, x%x0% y%y% w90 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
+		Gui %window%:Add, Text, x%x0% y%y% w160 h23 +0x200 HWNDwidget31 Hidden, % translate("Local Session Folder")
+		Gui %window%:Add, Edit, x%x1% yp w%w4% h21 VsessionStorePathEdit HWNDwidget32 Hidden, %sessionStorePathEdit%
+		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 gchooseSessionStorePath HWNDwidget33 Hidden, % translate("...")
+		
+		lineX := x + 20
+		lineW := width - 40
+		
+		Gui %window%:Add, Text, x%lineX% yp+30 w%lineW% 0x10 HWNDwidget30 Hidden
+		
+		Gui %window%:Add, Text, x%x0% yp+10 w90 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w4% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
 		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 Center +0x200 gcopyURL HWNDwidget26 Hidden
 		setButtonIcon(widget26, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
@@ -226,7 +237,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
 		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 		
-		Loop 29
+		Loop 33
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.connect(false)
@@ -241,6 +252,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
 		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
 		teamServerTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+		
+		sessionStorePathEdit := getConfigurationValue(configuration, "Team Server", "Session.Folder", "")
 		
 		if !teamServerTokenEdit
 			teamServerTokenEdit := ""
@@ -257,11 +270,14 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControlGet teamServerNameEdit
 		GuiControlGet teamServerPasswordEdit
 		GuiControlGet teamServerTokenEdit
+		GuiControlGet sessionStorePathEdit
 		
 		setConfigurationValue(configuration, "Team Server", "Server.URL", teamServerURLEdit)
 		setConfigurationValue(configuration, "Team Server", "Server.Token", teamServerTokenEdit)
 		setConfigurationValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
 		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
+		
+		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
 	}
 	
 	connect(message := true) {
@@ -647,6 +663,17 @@ class TeamServerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+chooseSessionStorePath() {
+	GuiControlGet sessionStorePathEdit
+		
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder directory, *%sessionStorePathEdit%, 0, % translate("Select local Session Folder...")
+	OnMessage(0x44, "")
+	
+	if (directory != "")
+		GuiControl Text, sessionStorePathEdit, %directory%
+}
 
 computeDriverName(forName, surName, nickName) {
 	name := ""

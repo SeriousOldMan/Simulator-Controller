@@ -13,6 +13,8 @@ namespace TeamServer.Server {
 
             ObjectManager = objectManager;
             TokenIssuer = new TokenIssuer(objectManager, tokenLifeTime);
+
+            new TaskManager(objectManager, TokenIssuer.AdminToken).RunBackgroundTasksAsync();
         }
     }
 }

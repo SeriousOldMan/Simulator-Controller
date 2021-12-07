@@ -71,7 +71,12 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp w%w2% h21 VraceReportsPathEdit HWNDwidget16 Hidden, %raceReportsPathEdit%
 		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 gchooseRaceReportsPath HWNDwidget17 Hidden, % translate("...")
 		
-		Gui %window%:Add, Text, x%x0% yp+34 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		lineX := x + 20
+		lineW := width - 40
+		
+		Gui %window%:Add, Text, x%lineX% yp+30 w%lineW% 0x10 HWNDwidget24 Hidden
+		
+		Gui %window%:Add, Text, x%x0% yp+10 w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -116,7 +121,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget23 Hidden, % translate("@ Session End")
 		
-		Loop 23
+		Loop 24
 			editor.registerWidget(this, widget%A_Index%)
 		
 		this.loadSimulatorConfiguration()

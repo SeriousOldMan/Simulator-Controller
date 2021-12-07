@@ -174,7 +174,7 @@ updateTask(connector, tasks, task, which, operation, frequency) {
 	else if task
 		connector.UpdateTask(task, operation, frequency, true)
 	else
-		tasks[which] := connector.CreateTask(which, operation, frequency)
+		tasks[which] := connector.CreateTask((which = "Quota") ? "Account" : which, operation, frequency)
 	
 	return tasks
 }
@@ -208,6 +208,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static taskTokenFrequencyDropDown
 	static taskSessionOperationDropDown
 	static taskSessionFrequencyDropDown
+	static taskQuotaOperationDropDown
+	static taskQuotaFrequencyDropDown
 	static taskAccountOperationDropDown
 	static taskAccountFrequencyDropDown
 	
@@ -265,6 +267,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				 GuiControl Choose, taskTokenFrequencyDropDown, 1
 				 GuiControl Choose, taskSessionOperationDropDown, 3
 				 GuiControl Choose, taskSessionFrequencyDropDown, 1
+				 GuiControl Choose, taskQuotaOperationDropDown, 1
+				 GuiControl Choose, taskQuotaFrequencyDropDown, 1
 				 GuiControl Choose, taskAccountOperationDropDown, 1
 				 GuiControl Choose, taskAccountFrequencyDropDown, 1
 			}
@@ -276,18 +280,28 @@ administrationEditor(configurationOrCommand, arguments*) {
 				for ignore, identifier in string2Values(";", connector.GetAllTasks()) {
 					task := parseObject(connector.GetTask(identifier))
 
-					tasks[task.Which] := task.Identifier
 					
-					if (task.Which = "Token") {
+					if ((task.Which = "Account") && (task.What = "Renew"))
+						type := "Quota"
+					else
+						type := task.Which
+					
+					tasks[type] := task.Identifier
+					
+					if (type = "Token") {
 						GuiControl Choose, taskTokenOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
 						GuiControl Choose, taskTokenFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
 					}
-					else if (task.Which = "Session") {
+					else if (type = "Session") {
 						GuiControl Choose, taskSessionOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
 						GuiControl Choose, taskSessionFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
 					}
-					else if (task.Which = "Account") {
-						GuiControl Choose, taskAccountOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What) - 3
+					else if (type = "Quota") {
+						GuiControl Choose, taskQuotaOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What) - 3
+						GuiControl Choose, taskQuotaFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+					}
+					else if (type = "Account") {
+						GuiControl Choose, taskAccountOperationDropDown, % inList(["Delete"], task.What)
 						GuiControl Choose, taskAccountFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
 					}
 				}
@@ -308,11 +322,16 @@ administrationEditor(configurationOrCommand, arguments*) {
 						GuiControlGet taskSessionFrequencyDropDown
 				
 						tasks := updateTask(connector, tasks, task, which, taskSessionOperationDropDown, taskSessionFrequencyDropDown)
+					case "Quota":
+						GuiControlGet taskQuotaOperationDropDown
+						GuiControlGet taskQuotaFrequencyDropDown
+				
+						tasks := updateTask(connector, tasks, task, which, taskQuotaOperationDropDown + 3, taskQuotaFrequencyDropDown)
 					case "Account":
 						GuiControlGet taskAccountOperationDropDown
 						GuiControlGet taskAccountFrequencyDropDown
 				
-						tasks := updateTask(connector, tasks, task, which, taskAccountOperationDropDown + 3, taskAccountFrequencyDropDown)
+						tasks := updateTask(connector, tasks, task, which, taskAccountOperationDropDown, taskAccountFrequencyDropDown)
 				}
 			}
 			else if (arguments[1] = "PasswordChange") {
@@ -409,6 +428,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Enable, taskTokenFrequencyDropDown
 					GuiControl Enable, taskSessionOperationDropDown
 					GuiControl Enable, taskSessionFrequencyDropDown
+					GuiControl Enable, taskQuotaOperationDropDown
+					GuiControl Enable, taskQuotaFrequencyDropDown
 					GuiControl Enable, taskAccountOperationDropDown
 					GuiControl Enable, taskAccountFrequencyDropDown
 				}
@@ -420,6 +441,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, taskTokenFrequencyDropDown
 					GuiControl Disable, taskSessionOperationDropDown
 					GuiControl Disable, taskSessionFrequencyDropDown
+					GuiControl Disable, taskQuotaOperationDropDown
+					GuiControl Disable, taskQuotaFrequencyDropDown
 					GuiControl Disable, taskAccountOperationDropDown
 					GuiControl Disable, taskAccountFrequencyDropDown
 				}
@@ -574,7 +597,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		
 		Gui Tab, 1
 		
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "eMail", "Kontingent", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Quota", "Available"], "translate")*)
 		
 		Gui ADM:Add, Text, x%x0% yp+124 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
@@ -590,7 +613,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Monthly Fixed", "Monthly Additional"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21  vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
@@ -613,13 +636,17 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskTokenOperationDropDown gupdateTokenTask, % values2String("|", map(["Delete"], "translate")*)
 		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskTokenFrequencyDropDown gupdateTokenTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
 		
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Expired Accounts")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", map(["Delete"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Finished Sessions")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", map(["Delete", "Cleanup", "Reset"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", map(["Delete", "Clear", "Reset"], "translate")*)
 		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskSessionFrequencyDropDown gupdateSessionTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
 		
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Account Contingents")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", map(["Renew"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Quotas")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 		
 		Gui ADM:Show, AutoSize Center
 		
@@ -745,6 +772,10 @@ updateTokenTask() {
 
 updateSessionTask() {
 	administrationEditor(kEvent, "TaskUpdate", "Session")
+}
+
+updateQuotaTask() {
+	administrationEditor(kEvent, "TaskUpdate", "Quota")
 }
 
 updateAccountTask() {

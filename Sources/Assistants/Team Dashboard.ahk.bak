@@ -224,12 +224,6 @@ class TeamDashboard extends ConfigurationItem {
 		}
 	}
 	
-	ReportViewer[] {
-		Get {
-			return this.iReportViewer
-		}
-	}
-	
 	__New(configuration, raceSettings) {
 		this.iRaceSettings := raceSettings
 		
@@ -416,8 +410,6 @@ class TeamDashboard extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
-		
-		this.iReportViewer := new RaceReportViewer(window, chartViewer)
 		
 		this.updateState()
 	}

@@ -328,7 +328,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					data := readConfiguration(kTempDirectory . "Race Report\Race.data")
 				}
 				catch exception {
-					; ignore
+					data := {}
 				}
 				
 				count := 0
@@ -336,14 +336,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				Loop % teamServer.getCurrentLap(session)
 				{
 					try {
-						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
-					
-						if (!lapData || (lapData == ""))
-							continue
+						lapData := parseConfiguration(teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session))
 						
 						count += 1
-						
-						FileAppend %lapData%, %kTempDirectory%Race Report\Race.temp, UTF-16
 						
 						lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
 						
@@ -373,13 +368,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						directory := (kTempDirectory . "Race Report\Drivers.CSV")
 						
 						FileAppend %line%, %directory%, UTF-16
-						
-						try {
-							FileDelete %kTempDirectory%Race Report\Race.temp
-						}
-						catch exception {
-							; ignore
-						}
 					}
 					catch exception {
 						break

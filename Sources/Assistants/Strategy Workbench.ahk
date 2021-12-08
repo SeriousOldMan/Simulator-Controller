@@ -276,8 +276,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	createGui(configuration) {
-		local stepWizard
-		
 		window := this.Window
 		
 		Gui %window%:Default

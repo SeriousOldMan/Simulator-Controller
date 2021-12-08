@@ -640,7 +640,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				else if !this.DriverActive
 					stint := this.addStint(lapNumber)
 				else
-					stint := this.Connector.GetSessionStint(this.Session)
+					stint := this.Connector.GetSessionCurrentStint(this.Session)
 				
 				lap := this.Connector.CreateLap(stint, lapNumber)
 				

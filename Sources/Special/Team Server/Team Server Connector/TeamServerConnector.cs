@@ -350,7 +350,7 @@ namespace TeamServer {
 			return Get("session/" + identifier + "/driver");
 		}
 
-		public string GetSessionStint(string identifier) {
+		public string GetSessionCurrentStint(string identifier) {
 			return Get("session/" + identifier + "/stint");
 		}
 

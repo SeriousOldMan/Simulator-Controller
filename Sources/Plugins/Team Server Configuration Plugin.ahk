@@ -472,14 +472,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 			stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
 			laps := 0
 			
-			if (stints > 0) {
+			if (stints > 0)
 				laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
-				/*
-				stint := this.parseObject(connector.GetStint(connector.GetSessionStint(identifier)))
-				
-				laps := (stint.Lap + (string2Values(";", connector.GetStintLaps(stint.Identifier)).Length()))
-				*/
-			}
 				
 			sessions.Push(name)
 			infos.Push(name . translate(" (") . stints . translate(" stints, ") . laps . translate(" laps)"))

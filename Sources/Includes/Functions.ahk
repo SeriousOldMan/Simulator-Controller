@@ -1673,7 +1673,7 @@ remove(list, object) {
 }
 
 greaterComparator(a, b) {
-	return a > b
+	return (a > b)
 }
 
 bubbleSort(ByRef array, comparator := "greaterComparator") {

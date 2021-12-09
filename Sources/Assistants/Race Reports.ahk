@@ -140,9 +140,19 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 	
-	Settings[] {
+	Settings[key := false] {
 		Get {
-			return this.ReportViewer.Settings
+			if key
+				return this.ReportViewer.Settings[key]
+			else
+				return this.ReportViewer.Settings
+		}
+		
+		Set {
+			if key
+				return this.ReportViewer.Settings[key] := value
+			else
+				return this.ReportViewer.Settings := value
 		}
 	}
 	

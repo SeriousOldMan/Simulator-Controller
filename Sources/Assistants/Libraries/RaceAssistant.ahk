@@ -660,8 +660,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	addLap(lapNumber, ByRef data) {
-		local knowledgeBase
+		local knowledgeBase := this.KnowledgeBase
 		static baseLap := false
+		
+		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
+			return false
 		
 		data := this.prepareData(lapNumber, data)
 		

@@ -224,6 +224,18 @@ class TeamDashboard extends ConfigurationItem {
 		}
 	}
 	
+	StintsListView[] {
+		Get {
+			return this.iStintsListView
+		}
+	}
+	
+	LapsListView[] {
+		Get {
+			return this.iLapsListView
+		}
+	}
+	
 	ReportViewer[] {
 		Get {
 			return this.iReportViewer
@@ -256,9 +268,9 @@ class TeamDashboard extends ConfigurationItem {
 		
 		TeamDashboard.Instance := this
 
-		this.initializeData()
+		this.initializeSession()
 		
-		callback := ObjBindMethod(this, "syncData")
+		callback := ObjBindMethod(this, "syncSession")
 		
 		SetTimer %callback%, 10000
 	}
@@ -430,7 +442,7 @@ class TeamDashboard extends ConfigurationItem {
 			
 			showMessage(translate("Successfully connected to the Team Server."))
 			
-			this.initializeData()
+			this.initializeSession()
 			this.loadTeams()
 		}
 		catch exception {
@@ -526,7 +538,7 @@ class TeamDashboard extends ConfigurationItem {
 		
 		chosen := inList(getValues(this.Sessions), identifier)
 		
-		GuiControl Choose, teamDropDownMenu, % chosen
+		GuiControl Choose, sessionDropDownMenu, % chosen
 
 		names := getKeys(this.Sessions)
 		
@@ -669,10 +681,21 @@ class TeamDashboard extends ConfigurationItem {
 		}
 	}
 	
-	initializeData() {
+	initializeSession() {
 		directory := this.iSessionDirectory
 		
 		FileCreateDir %directory%
+		
+		reportDirectory := (directory . "\Race Report")
+		
+		try {
+			FileRemoveDir %reportDirectory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+		FileCreateDir %reportDirectory%
 		
 		Gui ListView, % this.StintsListView
 		
@@ -688,15 +711,18 @@ class TeamDashboard extends ConfigurationItem {
 		this.iLastLap := false
 		this.iCurrentStint := false
 		
-		this.ReportViewer.showReportChart(false)
-		this.ReportViewer.showReportInfo(false)
+		if (this.ReportViewer) {
+			this.ReportViewer.showReportChart(false)
+			this.ReportViewer.showReportInfo(false)
+		}
 	}
 	
 	loadNewStints(currentStint) {
+		session := this.SelectedSession[true]
 		newStints := []
 			
 		if (!this.CurrentStint || (currentStint.Nr > this.CurrentStint.Nr)) {
-			for ignore, identifier in this.Connector.GetSessionStints(session)
+			for ignore, identifier in string2Values(";", this.Connector.GetSessionStints(session))
 				if !this.Stints.HasKey(identifier)
 					newStints.Push(parseObject(this.Connector.GetStint(identifier)))
 			
@@ -705,10 +731,10 @@ class TeamDashboard extends ConfigurationItem {
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
 				
-				driver := this.Connector.GetStintDriver(identifier)
+				driver := parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier)))
 				
 				stint.Driver := driver
-				stint.DriverFullname := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+				stint.Driver.Fullname := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 				stint.FuelConsumption := 0.0
 				stint.Accidents := 0
 				stint.Weather := "-"
@@ -731,95 +757,17 @@ class TeamDashboard extends ConfigurationItem {
 			
 		return newStints
 	}
-	
-	loadLapReport(lap) {
-		session := this.TeamSession
-		
-		runningLap := 0
-		
-		if this.ActiveSession {
-			directory := this.SessionDirectory . "\Race Report"
-			
-			if (lap.Nr == 1) {
-				try {
-					FileRemoveDir %directory%, 1
-				}
-				catch exception {
-					; ignore
-				}
-			
-				FileCreateDir %directory%
-			
-				try {
-					try {
-						raceInfo := this.Connector.getLapValue(lap.Identifier, "Race Strategist Race Info")
-					}
-					catch exception {
-						raceInfo := false
-					}
-
-					if (!raceInfo || (raceInfo == ""))
-						return
-						
-					FileAppend %raceInfo%, %directory%\Race.data
-				}
-				catch exception {
-					; ignore
-				}
-			}
-					
-			data := readConfiguration(directory . "\Race.data")
-			
-			lapData := parseConfiguration(this.Connector.getLapValue(lap.Identifier, "Race Strategist Race Lap"))
-			
-			for key, value in getConfigurationSectionValues(lapData, "Lap")
-				setConfigurationValue(data, "Laps", key, value)
-			
-			times := getConfigurationValue(lapData, "Times", lap.Nr)
-			positions := getConfigurationValue(lapData, "Positions", lap.Nr)
-			laps := getConfigurationValue(lapData, "Laps", lap.Nr)
-			drivers := getConfigurationValue(lapData, "Drivers", lap.Nr)
-			
-			newLine := ((lap.Nr > 1) ? "`n" : "")
-			
-			line := (newLine . times)
-			
-			FileAppend %line%, % directory . "\Times.CSV"
-			
-			line := (newLine . positions)
-			
-			FileAppend %line%, % directory . "\Positions.CSV"
-			
-			line := (newLine . laps)
-			
-			FileAppend %line%, % directory . "\Laps.CSV"
-			
-			line := (newLine . drivers)
-			directory := (directory . "\Drivers.CSV")
-			
-			FileAppend %line%, %directory%, UTF-16
-			
-			removeConfigurationValue(data, "Laps", "Lap")
-			setConfigurationValue(data, "Laps", "Count", lap.Nr)
-			
-			writeConfiguration(directory . "Race Report\Race.data", data)
-		
-			this.ReportViewer.showPositionReport(directory)
-		}
-	}
-	
-	loadLapPressures(lap) {
-	}
-	
-	loadLapTelemetry(lap) {
-	}
 
 	loadNewLaps(stint) {
 		newLaps := []
 				
-		for ignore, identifier in this.Connector.GetStintLaps(stint.Identifier)
-			if !this.Laps.HasKey(identifier)
-				newLaps.Push(parseObject(this.Connector.GetLap(identifier)))
+		for ignore, identifier in string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
+			if !this.Laps.HasKey(identifier) {
+				newLap := parseObject(this.Connector.GetLap(identifier))
+				
+				if !this.Laps.HasKey(newLap.Nr)
+					newLaps.Push(newLap)
+			}
 		
 		bubbleSort(newLaps, "objectOrder")
 		
@@ -853,18 +801,18 @@ class TeamDashboard extends ConfigurationItem {
 			else
 				lap.Accident := false
 			
-			lap.FuelRemaining := getConfigurationValue(data, "Car Data", "FuelRemaining")
+			lap.FuelRemaining := Round(getConfigurationValue(data, "Car Data", "FuelRemaining"), 1)
 			
 			if ((lap.Nr == 1) || (stint.Laps[1] == lap))
 				lap.FuelConsumption := "-"
 			else
-				lap.FuelConsumption := (this.Laps[lap.Nr - 1].FuelRemaining - lap.FuelRemaining)
+				lap.FuelConsumption := Round((this.Laps[lap.Nr - 1].FuelRemaining - lap.FuelRemaining), 1)
 			
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 			
 			lap.Weather := translate(getConfigurationValue(data, "Weather Data", "Weather"))
-			lap.AirTemperature := getConfigurationValue(data, "Weather Data", "Temperature")
-			lap.TrackTemperature := getConfigurationValue(data, "Track Data", "Temperature")
+			lap.AirTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature"), 1)
+			lap.TrackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature"), 1)
 			lap.Grip := translate(getConfigurationValue(data, "Track Data", "Grip"))
 			
 			compound := getConfigurationValue(data, "Car Data", "TyreCompound")
@@ -889,13 +837,9 @@ class TeamDashboard extends ConfigurationItem {
 			
 			this.Laps[identifier] := lap
 			this.Laps[lap.Nr] := lap
-			
-			this.loadLapReport(lap)
-			this.loadPressures(lap)
-			this.loadTelemetry(lap)
 		}
 		
-		return newStints
+		return newLaps
 	}
 	
 	updateDriverStats(stint) {
@@ -918,9 +862,14 @@ class TeamDashboard extends ConfigurationItem {
 		lapTimes := []
 		
 		for ignore, lap in laps {
-			stint.FuelConsumption += lap.FuelConsumption
-		
-			if ((A_Index > 1) && (lap.Accident))
+			if (lap.Nr > 1) {
+				consumption := lap.FuelConsumption
+					
+				if consumption is number
+					stint.FuelConsumption += ((this.Laps[lap.Nr - 1].FuelConsumption = "-") ? (consumption * 2) : consumption)
+			}
+				
+			if lap.Accident
 				stint.Accidents += 1
 			
 			lapTimes.Push(lap.Laptime)
@@ -941,125 +890,235 @@ class TeamDashboard extends ConfigurationItem {
 		}
 		
 		stint.AvgLaptime := Round(average(laptimes), 1)
+		stint.FuelConsumption := Round(stint.FuelConsumption, 1)
 		
 		this.updateDriverStats(stint)
 		
-		LV_Modify(stint.Row, "", stint.Nr, stint.DriverFullName, stint.Weather, stint.Compound, stint.Laps.Length()
+		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
 							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
 							   , stint.RaceCraft, stint.Consistency, stint.CarControl)
 	}
 	
-	syncData() {
+	syncLaps() {
+		session := this.SelectedSession[true]
+				
+		window := this.Window
+		
+		Gui %window%:Default
+		
 		try {
-			if this.ActiveSession {
-				session := this.SelectedSession[true]
-				
-				if !session
-					return
-				
-				window := this.Window
-				
-				Gui %window%:Default
-				
-				try {
-					currentStint := this.Connector.GetSessionCurrentStint(session)
-					
-					if currentStint
-						currentStint := parseObject(this.Connector.GetStint(currentStint))
-				}
-				catch exception {
-					currentStint := false
-				}
-				
-				try {
-					lastLap := this.Connector.GetSessionLastLap(session)
-					
-					if lastLap
-						lastLap := parseObject(this.Connector.GetLap(lastLap))
-				}
-				catch exception {
-					lastLap := false
-				}
-				
-				first := false
-				
-				if (!currentStint || !lastLap) {
-					this.initializeData()
-					
-					first := true
-				}
-				else if ((this.CurrentStint && (currentStint.Nr < this.CurrentStint.Nr))
-					  || (this.LastLap && (lastLap.Nr < this.LastLap.Nr))) {
-					this.initializeData()
-					
-					first := true
-				}
-				
-				needsUpdate := first
-				
-				if !lastLap
-					return
-				
-				if (!this.LastLap || (lastLap.Nr > this.LastLap.Nr)) {
-					newStints := this.loadNewStints(currentStint)
-					
-					updatedStints := []
-					
-					if this.CurrentStint
-						updatedStints := [this.CurrentStint]
-						
-					Gui ListView, % this.StintsListView
-					
-					for ignore, stint in newStints {
-						LV_Add("", stint.Nr, stint.DriverFullName, stint.Weather, stint.Compound, stint.Laps.Length()
-								 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
-								 , stint.RaceCraft, stint.Consistency, stint.CarControl)
-						
-						stint.Row := LV_GetCount()
-						
-						updatedStints.Push(stint)
-					}
-					
-					if first {
-						LV_ModifyCol()
-						
-						Loop 13
-							LV_ModifyCol(A_Index, "AutoHdr")
-					}
+			currentStint := this.Connector.GetSessionCurrentStint(session)
 			
-					Gui ListView, % this.LapsListView
-					
-					for ignore, stint in updatedStints {
-						for ignore, lap in this.loadNewLaps(stint) {
-							LV_Add("", lap.Nr, lap.Stint.Nr, stint.DriverFullname, lap.Position, lap.Laptime, lap.FuelConsumption, lap.Accident ? translate("x") : "")
-						
-							lap.Row := LV_GetCount()
-						}
-					}
-					
-					if first {
-						LV_ModifyCol()
-						
-						Loop 7
-							LV_ModifyCol(A_Index, "AutoHdr")
-					}
-					
-					for ignore, stint in updatedStints
-						this.updateStint(stint)
-					
-					needsUpdate := true
-				}
-			
-				if needsUpdate
-					this.updateReports()
-			}
+			if currentStint
+				currentStint := parseObject(this.Connector.GetStint(currentStint))
 		}
 		catch exception {
-			; silent
+			currentStint := false
+		}
+		
+		try {
+			lastLap := this.Connector.GetSessionLastLap(session)
+			
+			if lastLap
+				lastLap := parseObject(this.Connector.GetLap(lastLap))
+		}
+		catch exception {
+			lastLap := false
+		}
+		
+		first := (!this.CurrentStint || !this.LastLap)
+		
+		if (!currentStint || !lastLap) {
+			this.initializeSession()
+			
+			first := true
+		}
+		else if ((this.CurrentStint && (currentStint.Nr < this.CurrentStint.Nr))
+			  || (this.LastLap && (lastLap.Nr < this.LastLap.Nr))) {
+			this.initializeSession()
+			
+			first := true
+		}
+		
+		needsUpdate := first
+		
+		if !lastLap
+			return
+		
+		if (!this.LastLap || (lastLap.Nr > this.LastLap.Nr)) {
+			newStints := this.loadNewStints(currentStint)
+			
+			currentStint := this.Stints[currentStint.Identifier]
+			
+			updatedStints := []
+			
+			if this.CurrentStint
+				updatedStints := [this.CurrentStint]
+				
+			Gui ListView, % this.StintsListView
+			
+			for ignore, stint in newStints {
+				LV_Add("", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
+						 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+						 , stint.RaceCraft, stint.Consistency, stint.CarControl)
+				
+				stint.Row := LV_GetCount()
+				
+				updatedStints.Push(stint)
+			}
+			
+			if first {
+				LV_ModifyCol()
+				
+				Loop 13
+					LV_ModifyCol(A_Index, "AutoHdr")
+			}
+	
+			Gui ListView, % this.LapsListView
+			
+			for ignore, stint in updatedStints {
+				for ignore, lap in this.loadNewLaps(stint) {
+					LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, lap.Laptime, lap.FuelConsumption, lap.Accident ? translate("x") : "")
+				
+					lap.Row := LV_GetCount()
+				}
+			}
+			
+			if first {
+				LV_ModifyCol()
+				
+				Loop 7
+					LV_ModifyCol(A_Index, "AutoHdr")
+			}
+			
+			for ignore, stint in updatedStints
+				this.updateStint(stint)
+			
+			needsUpdate := true
+			
+			this.iLastLap := lastLap
+			this.iCurrentStint := currentStint
+		}
+	}
+	
+	syncRaceReport() {
+		lastLap := this.LastLap
+		
+		if lastLap
+			lastLap := lastLap.Nr
+		
+		directory := this.SessionDirectory . "\Race Report"
+		session := this.TeamSession
+		
+		data := readConfiguration(directory . "\Race.data")
+		
+		if (data.Count() == 0)
+			lap := 1
+		else
+			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
+		
+		showMessage(lastLap . " " . lap)
+		
+		if (lap == 1) {
+			try {
+				try {
+					raceInfo := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Info")
+				}
+				catch exception {
+					raceInfo := false
+				}
+
+				if (!raceInfo || (raceInfo == ""))
+					return
+					
+				FileAppend %raceInfo%, %directory%\Race.data
+			}
+			catch exception {
+				; ignore
+			}
+				
+			data := readConfiguration(directory . "\Race.data")
+		}
+		
+		newLaps := false
+		
+		while (lap <= lastLap) {
+			lapData := parseConfiguration(this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap"))
+			
+			if (lapData.Count() == 0)
+				return
+			
+			for key, value in getConfigurationSectionValues(lapData, "Lap")
+				setConfigurationValue(data, "Laps", key, value)
+			
+			times := getConfigurationValue(lapData, "Times", lap)
+			positions := getConfigurationValue(lapData, "Positions", lap)
+			laps := getConfigurationValue(lapData, "Laps", lap)
+			drivers := getConfigurationValue(lapData, "Drivers", lap)
+			
+			newLine := ((lap > 1) ? "`n" : "")
+			
+			line := (newLine . times)
+			
+			FileAppend %line%, % directory . "\Times.CSV"
+			
+			line := (newLine . positions)
+			
+			FileAppend %line%, % directory . "\Positions.CSV"
+			
+			line := (newLine . laps)
+			
+			FileAppend %line%, % directory . "\Laps.CSV"
+			
+			line := (newLine . drivers)
+			fileName := (directory . "\Drivers.CSV")
+			
+			FileAppend %line%, %fileName%, UTF-16
+			
+			removeConfigurationValue(data, "Laps", "Lap")
+			setConfigurationValue(data, "Laps", "Count", lap)
+			
+			newLaps := true
+			lap += 1
+		}
+		
+		writeConfiguration(directory . "\Race.data", data)
+		
+		if newlaps
+			this.updateReports()
+	}
+	
+	syncTelemetry() {
+	}
+	
+	syncSession() {
+		if this.ActiveSession {
+			try {
+				this.syncLaps()
+			}
+			catch exception {
+				; silent
+			}
+			
+			try {
+				this.syncRaceReport()
+			}
+			catch exception {
+				; silent
+			}
+			
+			try {
+				this.syncTelemetry()
+			}
+			catch exception {
+				; silent
+			}
 		}
 	}
 	
 	updateReports() {
+		this.ReportViewer.setReport(this.SessionDirectory . "\Race Report")
+		this.ReportViewer.showPositionReport()
 	}
 	
 	show() {

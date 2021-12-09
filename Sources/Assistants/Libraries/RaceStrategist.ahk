@@ -644,6 +644,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		result := base.addLap(lapNumber, data)
 		
+		if !result
+			return false
+		
 		knowledgeBase := this.KnowledgeBase
 		
 		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {

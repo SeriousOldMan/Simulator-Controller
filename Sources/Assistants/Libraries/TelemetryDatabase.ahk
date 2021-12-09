@@ -22,7 +22,7 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
+;;;                    Public Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
@@ -59,6 +59,10 @@ class TelemetryDatabase extends SessionDatabase {
 			
 			this.iDatabase := new Database(kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
 		}
+	}
+	
+	setDatabase(database) {
+		this.iDatabase := database
 	}
 	
 	getSchema(table, includeVirtualColumns := false) {

@@ -37,17 +37,17 @@ global kWetRaceSetup = "WR"
 
 global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
 global kSetupDataSchemas := {"Setup.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color",
 											   , "Pressure.Cold.FL", "Pressure.Cold.FR", "Pressure.Cold.RL", "Pressure.Cold.RR"
 											   , "Pressure.Hot.FL", "Pressure.Hot.FR", "Pressure.Hot.RL", "Pressure.Hot.RR"]
 						   , "Setup.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 															, "Type", "Tyre", "Pressure", "Count"]}
-									 
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 global kTemperatureDeltas = [0, 1, -1, 2, -2]
 global kMaxTemperatureDelta = 4
 
@@ -331,11 +331,8 @@ class SetupDatabase extends SessionDatabase {
 		
 		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
 		
-		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track))) {
-			this.iDatabase.flush()
-		
-			this.iDatabase := false
-		}
+		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track)))
+			this.flush()
 		
 		if !this.iDatabase
 			this.iDatabase := this.getSetupDatabase(simulator, car, track, "Local")

@@ -38,6 +38,8 @@ ListLines Off					; Disable execution history
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
 #Include Libraries\RaceReportViewer.ahk
+#Include Libraries\TelemetryDatabase.ahk
+#Include Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -116,6 +118,65 @@ class TeamDashboard extends ConfigurationItem {
 	
 	iReportViewer := false
 	
+	class SessionTelemetryDatabase extends TelemetryDatabase {
+		__New(dashboard) {
+			base.__New()
+			
+			this.setDatabase(new Database(dashboard.SessionDirectory, kTelemetrySchemas))
+		}
+	}
+	
+	class SessionPressuresDatabase {
+		iDatabase := false
+		
+		Database[] {
+			Get {
+				return this.iDatabase
+			}
+		}
+		
+		__New(dashboard) {
+			this.iDatabase := new Database(dashboard.SessionDirectory, kSetupDataSchemas)
+		}
+		
+		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
+			if (!compoundColor || (compoundColor = ""))
+				compoundColor := "Black"
+			
+			this.Database.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+												, Compound: compound, "Compound.Color": compoundColor
+												, "Pressure.Cold.FL": coldPressures[1], "Pressure.Cold.FR": coldPressures[2]
+												, "Pressure.Cold.RL": coldPressures[3], "Pressure.Cold.RR": coldPressures[4]
+												, "Pressure.Hot.FL": hotPressures[1], "Pressure.Hot.FR": hotPressures[2]
+												, "Pressure.Hot.RL": hotPressures[3], "Pressure.Hot.RR": hotPressures[4]}, flush)
+			
+			tyres := ["FL", "FR", "RL", "RR"]
+			types := ["Cold", "Hot"]
+			
+			for typeIndex, tPressures in [coldPressures, hotPressures]
+				for tyreIndex, pressure in tPressures
+					this.updatePressure(weather, airTemperature, trackTemperature, compound, compoundColor
+									  , types[typeIndex], tyres[tyreIndex], pressure, 1, flush, false)
+		}
+		
+		updatePressure(weather, airTemperature, trackTemperature, compound, compoundColor
+					 , type, tyre, pressure, count := 1, flush := true) {
+			if (!compoundColor || (compoundColor = ""))
+				compoundColor := "Black"
+			
+			rows := this.Database.query("Setup.Pressures.Distribution"
+									  , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+											   , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
+			
+			if (rows.Length() > 0)
+				rows[1].Count := rows[1].Count + count
+			else
+				this.Database.add("Setup.Pressures.Distribution"
+								, {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+								 , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
+		}
+	}
+	
 	Window[] {
 		Get {
 			return "Dashboard"
@@ -130,7 +191,10 @@ class TeamDashboard extends ConfigurationItem {
 	
 	SessionDirectory[] {
 		Get {
-			return this.iSessionDirectory
+			if this.ActiveSession
+				return (this.iSessionDirectory . this.iSessionName . "\")
+			else
+				return this.iSessionDirectory
 		}
 	}
 	
@@ -278,7 +342,7 @@ class TeamDashboard extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.iSessionDirectory := getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
+		this.iSessionDirectory := (getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions") . "\")
 		
 		settings := this.RaceSettings
 		
@@ -434,9 +498,9 @@ class TeamDashboard extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	connect(serverURL, serverToken, silent := false) {
+	connect(silent := false) {
 		try {
-			this.Connector.Connect(serverURL, serverToken)
+			this.Connector.Connect(this.ServerURL, this.ServerToken)
 	
 			this.iConnected := true
 			
@@ -682,20 +746,22 @@ class TeamDashboard extends ConfigurationItem {
 	}
 	
 	initializeSession() {
-		directory := this.iSessionDirectory
+		if this.ActiveSession {
+			directory := this.SessionDirectory
+			
+			FileCreateDir %directory%
+			
+			reportDirectory := (directory . "Race Report")
+			
+			try {
+				FileRemoveDir %reportDirectory%, 1
+			}
+			catch exception {
+				; ignore
+			}
 		
-		FileCreateDir %directory%
-		
-		reportDirectory := (directory . "\Race Report")
-		
-		try {
-			FileRemoveDir %reportDirectory%, 1
+			FileCreateDir %reportDirectory%
 		}
-		catch exception {
-			; ignore
-		}
-	
-		FileCreateDir %reportDirectory%
 		
 		Gui ListView, % this.StintsListView
 		
@@ -901,7 +967,7 @@ class TeamDashboard extends ConfigurationItem {
 	
 	syncLaps() {
 		session := this.SelectedSession[true]
-				
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -926,6 +992,8 @@ class TeamDashboard extends ConfigurationItem {
 			lastLap := false
 		}
 		
+		newData := false
+		
 		first := (!this.CurrentStint || !this.LastLap)
 		
 		if (!currentStint || !lastLap) {
@@ -940,65 +1008,72 @@ class TeamDashboard extends ConfigurationItem {
 			first := true
 		}
 		
-		needsUpdate := first
+		newData := first
 		
 		if !lastLap
-			return
+			return false
 		
 		if (!this.LastLap || (lastLap.Nr > this.LastLap.Nr)) {
-			newStints := this.loadNewStints(currentStint)
-			
-			currentStint := this.Stints[currentStint.Identifier]
-			
-			updatedStints := []
-			
-			if this.CurrentStint
-				updatedStints := [this.CurrentStint]
+			try {
+				newStints := this.loadNewStints(currentStint)
 				
-			Gui ListView, % this.StintsListView
-			
-			for ignore, stint in newStints {
-				LV_Add("", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
-						 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
-						 , stint.RaceCraft, stint.Consistency, stint.CarControl)
+				currentStint := this.Stints[currentStint.Identifier]
 				
-				stint.Row := LV_GetCount()
+				updatedStints := []
 				
-				updatedStints.Push(stint)
-			}
-			
-			if first {
-				LV_ModifyCol()
+				if this.CurrentStint
+					updatedStints := [this.CurrentStint]
+					
+				Gui ListView, % this.StintsListView
 				
-				Loop 13
-					LV_ModifyCol(A_Index, "AutoHdr")
-			}
-	
-			Gui ListView, % this.LapsListView
-			
-			for ignore, stint in updatedStints {
-				for ignore, lap in this.loadNewLaps(stint) {
-					LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, lap.Laptime, lap.FuelConsumption, lap.Accident ? translate("x") : "")
-				
-					lap.Row := LV_GetCount()
+				for ignore, stint in newStints {
+					LV_Add("", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
+							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.RaceCraft, stint.Consistency, stint.CarControl)
+					
+					stint.Row := LV_GetCount()
+					
+					updatedStints.Push(stint)
 				}
-			}
-			
-			if first {
-				LV_ModifyCol()
 				
-				Loop 7
-					LV_ModifyCol(A_Index, "AutoHdr")
+				if first {
+					LV_ModifyCol()
+					
+					Loop 13
+						LV_ModifyCol(A_Index, "AutoHdr")
+				}
+		
+				Gui ListView, % this.LapsListView
+				
+				for ignore, stint in updatedStints {
+					for ignore, lap in this.loadNewLaps(stint) {
+						LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, lap.Laptime, lap.FuelConsumption, lap.Accident ? translate("x") : "")
+					
+						lap.Row := LV_GetCount()
+					}
+				}
+				
+				if first {
+					LV_ModifyCol()
+					
+					Loop 7
+						LV_ModifyCol(A_Index, "AutoHdr")
+				}
+				
+				for ignore, stint in updatedStints
+					this.updateStint(stint)
+				
+				newData := true
+				
+				this.iLastLap := lastLap
+				this.iCurrentStint := currentStint
 			}
-			
-			for ignore, stint in updatedStints
-				this.updateStint(stint)
-			
-			needsUpdate := true
-			
-			this.iLastLap := lastLap
-			this.iCurrentStint := currentStint
+			catch exception {
+				return newData
+			}
 		}
+		
+		return newData
 	}
 	
 	syncRaceReport() {
@@ -1006,18 +1081,19 @@ class TeamDashboard extends ConfigurationItem {
 		
 		if lastLap
 			lastLap := lastLap.Nr
+		else
+			return
 		
-		directory := this.SessionDirectory . "\Race Report"
-		session := this.TeamSession
+		directory := this.SessionDirectory . "Race Report\"
 		
-		data := readConfiguration(directory . "\Race.data")
+		FileCreateDir %directory%
+		
+		data := readConfiguration(directory . "Race.data")
 		
 		if (data.Count() == 0)
 			lap := 1
 		else
 			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
-		
-		showMessage(lastLap . " " . lap)
 		
 		if (lap == 1) {
 			try {
@@ -1031,19 +1107,24 @@ class TeamDashboard extends ConfigurationItem {
 				if (!raceInfo || (raceInfo == ""))
 					return
 					
-				FileAppend %raceInfo%, %directory%\Race.data
+				FileAppend %raceInfo%, %directory%Race.data
 			}
 			catch exception {
 				; ignore
 			}
 				
-			data := readConfiguration(directory . "\Race.data")
+			data := readConfiguration(directory . "Race.data")
 		}
 		
-		newLaps := false
+		newData := false
 		
 		while (lap <= lastLap) {
-			lapData := parseConfiguration(this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap"))
+			try {
+				lapData := parseConfiguration(this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap"))
+			}
+			catch exception {
+				return newData
+			}
 			
 			if (lapData.Count() == 0)
 				return
@@ -1060,64 +1141,184 @@ class TeamDashboard extends ConfigurationItem {
 			
 			line := (newLine . times)
 			
-			FileAppend %line%, % directory . "\Times.CSV"
+			FileAppend %line%, % directory . "Times.CSV"
 			
 			line := (newLine . positions)
 			
-			FileAppend %line%, % directory . "\Positions.CSV"
+			FileAppend %line%, % directory . "Positions.CSV"
 			
 			line := (newLine . laps)
 			
-			FileAppend %line%, % directory . "\Laps.CSV"
+			FileAppend %line%, % directory . "Laps.CSV"
 			
 			line := (newLine . drivers)
-			fileName := (directory . "\Drivers.CSV")
+			fileName := (directory . "Drivers.CSV")
 			
 			FileAppend %line%, %fileName%, UTF-16
 			
 			removeConfigurationValue(data, "Laps", "Lap")
 			setConfigurationValue(data, "Laps", "Count", lap)
 			
-			newLaps := true
+			newData := true
 			lap += 1
 		}
 		
-		writeConfiguration(directory . "\Race.data", data)
+		if newData
+			writeConfiguration(directory . "Race.data", data)
 		
-		if newlaps
-			this.updateReports()
+		return newData
 	}
 	
 	syncTelemetry() {
+		static lastSession := false
+		static telemetryDB
+		
+		session := this.SelectedSession[true]
+		
+		if (session != lastSession) {
+			lastSession := session
+			telemetryDB := new this.SessionTelemetryDatabase(this)
+		}
+		
+		lastLap := this.LastLap
+		
+		if lastLap
+			lastLap := lastLap.Nr
+		else
+			return
+		
+		tyresTable := telemetryDB.Database.Tables["Tyres"]
+		lap := tyresTable.Length()
+		
+		if (lap > 0)
+			runningLap := tyresTable[lap]["Tyre.Laps"]
+		else
+			runningLap := 0
+
+		newData := false
+		lap += 1
+		
+		while (lap <= lastLap) {
+			try {
+				telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
+			}
+			catch exception {
+				lap += 1
+				
+				continue
+			}
+		
+			if (!telemetryData || (telemetryData == "")) {
+				lap += 1
+				
+				continue
+			}
+			
+			telemetryData := string2Values(";", telemetryData)
+		
+			if telemetryData[10]
+				runningLap := 0
+			
+			runningLap += 1
+			
+			pressures := string2Values(",", telemetryData[16])
+			temperatures := string2Values(",", telemetryData[17])
+			
+			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+										 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+										 
+			telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+								   , pressures[1], pressures[2], pressures[4], pressures[4]
+								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+								   , telemetryData[7], telemetryData[8], telemetryData[9])
+			
+			newData := true
+			lap += 1
+		}
+		
+		return newData
+	}
+	
+	syncTyrePressures() {
+		static lastSession := false
+		static pressuresDB
+		
+		session := this.SelectedSession[true]
+		
+		if (session != lastSession) {
+			lastSession := session
+			pressuresDB := new this.SessionPressuresDatabase(this)
+		}
+		
+		lastLap := this.LastLap
+		
+		if lastLap
+			lastLap := lastLap.Nr
+		else
+			return
+		
+		pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+		lap := pressuresTable.Length()
+		
+		newData := false
+		lap += 1
+		
+		flush := (Abs(lastLap - lap) <= 2)
+		
+		while (lap <= lastLap) {
+			try {
+				lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
+			}
+			catch exception {
+				lap += 1
+				
+				continue
+			}
+		
+			if (!lapPressures || (lapPressures == "")) {
+				lap += 1
+				
+				continue
+			}
+			
+			lapPressures := string2Values(";", lapPressures)
+			
+			pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
+									  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
+			
+			newData := true
+			lap += 1
+		}
+		
+		if (newData && !flush)
+			pressuresDB.Database.flush()
+		
+		return newData
 	}
 	
 	syncSession() {
+		newData := false
+		
 		if this.ActiveSession {
-			try {
-				this.syncLaps()
-			}
-			catch exception {
-				; silent
-			}
+			if this.syncLaps()
+				newData := true
 			
-			try {
-				this.syncRaceReport()
-			}
-			catch exception {
-				; silent
-			}
+			if this.syncRaceReport()
+				newData := true
 			
-			try {
-				this.syncTelemetry()
-			}
-			catch exception {
-				; silent
-			}
+			if this.syncTelemetry()
+				newData := true
+			
+			if this.syncTyrePressures()
+				newData := true
 		}
+		
+		if newData
+			this.updateReports()
 	}
 	
 	updateReports() {
-		this.ReportViewer.setReport(this.SessionDirectory . "\Race Report")
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showPositionReport()
 	}
 	
@@ -1438,10 +1639,15 @@ getValues(map) {
 loadTeams(connector) {
 	teams := {}
 	
-	for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
-		team := parseObject(connector.GetTeam(identifier))
-		
-		teams[team.Name] := team.Identifier
+	try {
+		for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
+			team := parseObject(connector.GetTeam(identifier))
+			
+			teams[team.Name] := team.Identifier
+		}
+	}
+	catch exception {
+		; ignore
 	}
 	
 	return teams
@@ -1476,7 +1682,13 @@ closeTeamDashboard() {
 connectServer() {
 	dashboard := TeamDashboard.Instance
 	
-	dashboard.connect(dashboard.ServerURL, dashboard.ServerToken)
+	GuiControlGet serverURLEdit
+	GuiControlGet serverTokenEdit
+	
+	dashboard.iServerURL := serverURLEdit
+	dashboard.iServerToken := serverTokenEdit
+	
+	dashboard.connect()
 }
 
 chooseTeam() {
@@ -1558,7 +1770,7 @@ startupTeamDashboard() {
 		
 		dashboard.createGui(dashboard.Configuration)
 		
-		dashboard.connect(dashboard.ServerURL, dashboard.ServerToken, true)
+		dashboard.connect(true)
 		
 		dashboard.show()
 		

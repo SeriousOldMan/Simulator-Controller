@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Team Team Dashboard             ;;;
+;;;   Modular Simulator Controller System - Session Workbench               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
-;@Ahk2Exe-ExeName Team Dashboard.exe
+;@Ahk2Exe-ExeName Session Workbench.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -86,7 +86,7 @@ global pitstopPressureRLEdit
 global pitstopPressureRREdit
 global pitstopRepairsDropDown
 
-class TeamDashboard extends ConfigurationItem {
+class SessionWorkbench extends ConfigurationItem {
 	iClosed := false
 	
 	iSessionDirectory := false
@@ -119,10 +119,10 @@ class TeamDashboard extends ConfigurationItem {
 	iReportViewer := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
-		__New(dashboard) {
+		__New(workbench) {
 			base.__New()
 			
-			this.setDatabase(new Database(dashboard.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(new Database(workbench.SessionDirectory, kTelemetrySchemas))
 		}
 	}
 	
@@ -135,8 +135,8 @@ class TeamDashboard extends ConfigurationItem {
 			}
 		}
 		
-		__New(dashboard) {
-			this.iDatabase := new Database(dashboard.SessionDirectory, kSetupDataSchemas)
+		__New(workbench) {
+			this.iDatabase := new Database(workbench.SessionDirectory, kSetupDataSchemas)
 		}
 		
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
@@ -330,7 +330,7 @@ class TeamDashboard extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		TeamDashboard.Instance := this
+		SessionWorkbench.Instance := this
 
 		this.initializeSession()
 		
@@ -369,7 +369,7 @@ class TeamDashboard extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenDashboardDocumentation, % translate("Team Dashboard")
+		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenDashboardDocumentation, % translate("Session Workbench")
 		
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
 			
@@ -1672,49 +1672,49 @@ loadSessions(connector, team) {
 }
 
 moveTeamDashboard() {
-	moveByMouse(TeamDashboard.Instance.Window)
+	moveByMouse(SessionWorkbench.Instance.Window)
 }
 
 closeTeamDashboard() {
-	TeamDashboard.Instance.close()
+	SessionWorkbench.Instance.close()
 }
 
 connectServer() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
 	GuiControlGet serverURLEdit
 	GuiControlGet serverTokenEdit
 	
-	dashboard.iServerURL := serverURLEdit
-	dashboard.iServerToken := serverTokenEdit
+	workbench.iServerURL := serverURLEdit
+	workbench.iServerToken := serverTokenEdit
 	
-	dashboard.connect()
+	workbench.connect()
 }
 
 chooseTeam() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
 	GuiControlGet teamDropDownMenu
 	
-	dashboard.withExceptionhandler(ObjBindMethod(dashboard, "selectTeam")
-								 , getValues(dashboard.Teams)[teamDropDownMenu])
+	workbench.withExceptionhandler(ObjBindMethod(workbench, "selectTeam")
+								 , getValues(workbench.Teams)[teamDropDownMenu])
 }
 
 chooseSession() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
 	GuiControlGet sessionDropDownMenu
 	
-	dashboard.withExceptionhandler(ObjBindMethod(dashboard, "selectSession")
-								 , getValues(dashboard.Teams)[sessionDropDownMenu])
+	workbench.withExceptionhandler(ObjBindMethod(workbench, "selectSession")
+								 , getValues(workbench.Teams)[sessionDropDownMenu])
 }
 
 chooseChartType() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
 	GuiControlGet chartTypeDropDown
 	
-	dashboard.loadChart(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
+	workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
 }
 
 analysisMenu() {
@@ -1722,7 +1722,7 @@ analysisMenu() {
 	
 	GuiControl Choose, analysisMenuDropDown, 1
 	
-	TeamDashboard.Instance.chooseAnalysisMenu(analysisMenuDropDown)
+	SessionWorkbench.Instance.chooseAnalysisMenu(analysisMenuDropDown)
 }
 
 informationMenu() {
@@ -1730,7 +1730,7 @@ informationMenu() {
 	
 	GuiControl Choose, informationMenuDropDown, 1
 	
-	TeamDashboard.Instance.chooseInformationMenu(informationMenuDropDown)
+	SessionWorkbench.Instance.chooseInformationMenu(informationMenuDropDown)
 }
 
 pitstopMenu() {
@@ -1738,41 +1738,41 @@ pitstopMenu() {
 	
 	GuiControl Choose, pitstopMenuDropDown, 1
 	
-	TeamDashboard.Instance.choosePitstopMenu(pitstopMenuDropDown)
+	SessionWorkbench.Instance.choosePitstopMenu(pitstopMenuDropDown)
 }
 
 openDashboardDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#team-dashboard
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session-workbench
 }
 
 updateState() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
-	dashboard.withExceptionhandler(ObjBindMethod(dashboard, "updateState"))
+	workbench.withExceptionhandler(ObjBindMethod(workbench, "updateState"))
 }
 
 planPitstop() {
-	dashboard := TeamDashboard.Instance
+	workbench := SessionWorkbench.Instance
 	
-	dashboard.withExceptionhandler(ObjBindMethod(dashboard, "planPitstop"))
+	workbench.withExceptionhandler(ObjBindMethod(workbench, "planPitstop"))
 }
 
 startupTeamDashboard() {
 	icon := kIconsDirectory . "Console.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Team Dashboard
+	Menu Tray, Tip, Session Workbench
 
 	current := fixIE(11)
 	
 	try {
-		dashboard := new TeamDashboard(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
+		workbench := new SessionWorkbench(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 		
-		dashboard.createGui(dashboard.Configuration)
+		workbench.createGui(workbench.Configuration)
 		
-		dashboard.connect(true)
+		workbench.connect(true)
 		
-		dashboard.show()
+		workbench.show()
 		
 		ExitApp 0
 	}

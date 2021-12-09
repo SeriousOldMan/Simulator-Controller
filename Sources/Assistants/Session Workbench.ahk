@@ -70,6 +70,9 @@ global sessionDropDownMenu
 global chartTypeDropDown
 global chartViewer
 
+global reportsDropDown
+global reportSettingsButton
+
 global informationViewer
 
 global analysisMenuDropDown
@@ -117,6 +120,7 @@ class SessionWorkbench extends ConfigurationItem {
 	iLapsListView := false
 	
 	iReportViewer := false
+	iSelectedReport := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		__New(workbench) {
@@ -306,6 +310,12 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	SelectedReport[] {
+		Get {
+			return this.iSelectedReport
+		}
+	}
+	
 	__New(configuration, raceSettings) {
 		this.iRaceSettings := raceSettings
 		
@@ -405,8 +415,14 @@ class SessionWorkbench extends ConfigurationItem {
 		else
 			Gui %window%:Add, DropDownList, x266 yp w120 AltSubmit Choose0 vsessionDropDownMenu gchooseSession
 		
-		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Chart")
-		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
+		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Report")
+		Gui %window%:Add, DropDownList, x444 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
+		
+		Gui %window%:Add, Text, x570 ys w40 h23 +0x200, % translate("Chart")
+		Gui %window%:Add, DropDownList, x614 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
+		
+		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
+		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
 		
 		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
 		
@@ -638,6 +654,19 @@ class SessionWorkbench extends ConfigurationItem {
 			GuiControl Disable, pitstopPressureFREdit
 			GuiControl Disable, pitstopPressureRLEdit
 			GuiControl Disable, pitstopPressureRREdit
+		}
+		
+		if this.ActiveSession {
+			GuiControl Enable, reportsDropDown
+			
+			if inList(["Driver", "Position", "Pace"], this.SelectedReport)
+				GuiControl Enable, reportSettingsButton
+			else
+				GuiControl Disable, reportSettingsButton
+		}
+		else {
+			GuiControl Disable, reportsDropDown
+			GuiControl Disable, reportSettingsButton
 		}
 	}
 	
@@ -1318,8 +1347,10 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	updateReports() {
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
-		this.ReportViewer.showPositionReport()
+		if !this.SelectedReport
+			this.iSelectedReport := "Overview"
+		
+		this.showRaceReport(this.SelectedReport, true)
 	}
 	
 	show() {
@@ -1511,6 +1542,122 @@ class SessionWorkbench extends ConfigurationItem {
 		informationViewer.Document.Open()
 		informationViewer.Document.Write(html)
 		informationViewer.Document.Close()
+	}
+	
+	showOverviewReport() {
+		GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
+	
+		this.iSelectedReport := "Overview"
+		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		this.ReportViewer.showOverviewReport()
+		
+		this.updateState()
+	}
+	
+	showCarReport() {
+		GuiControl Choose, reportsDropDown, % inList(kReports, "Car")
+	
+		this.iSelectedReport := "Car"
+		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		this.ReportViewer.showCarReport()
+		
+		this.updateState()
+	}
+	
+	showDriverReport() {
+		GuiControl Enable, reportSettingsButton
+		GuiControl Choose, reportsDropDown, % inList(kReports, "Driver")
+	
+		this.iSelectedReport := "Driver"
+		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		this.ReportViewer.showDriverReport()
+		
+		this.updateState()
+	}
+	
+	editDriverReportSettings() {
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		
+		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+	}
+	
+	showPositionReport() {
+		GuiControl Enable, reportSettingsButton
+		GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
+	
+		this.iSelectedReport := "Position"
+		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		this.ReportViewer.showPositionReport()
+		
+		this.updateState()
+	}
+	
+	editPositionReportSettings() {
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		
+		return this.ReportViewer.editReportSettings("Laps")
+	}
+	
+	showPaceReport() {
+		GuiControl Enable, reportSettingsButton
+		GuiControl Choose, reportsDropDown, % inList(kReports, "Pace")
+	
+		this.iSelectedReport := "Pace"
+		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		this.ReportViewer.showPaceReport()
+		
+		this.updateState()
+	}
+	
+	editPaceReportSettings() {
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		
+		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+	}
+	
+	showRaceReport(report, force := false) {
+		if (force || (report != this.SelectedReport)) {
+			if report {
+				this.iSelectedReport := report
+								
+				GuiControl Choose, reportsDropDown, % inList(kReports, report)
+				
+				switch report {
+					case "Overview":
+						this.showOverviewReport()
+					case "Car":
+						this.showCarReport()
+					case "Driver":
+						if !this.ReportViewer.Settings.HasKey("Drivers")
+							this.ReportViewer.Settings["Drivers"] := [1, 2, 3, 4, 5]
+						
+						this.showDriverReport()
+					case "Position":
+						this.showPositionReport()
+					case "Pace":
+						this.showPaceReport()
+				}
+			}
+		}
+	}	
+	
+	reportSettings(report) {
+		switch report {
+			case "Driver":
+				if this.editDriverReportSettings()
+					this.showDriverReport()
+			case "Position":
+				if this.editPositionReportSettings()
+					this.showPositionReport()
+			case "Pace":
+				if this.editPaceReportSettings()
+					this.showPaceReport()
+		}
 	}
 }
 
@@ -1755,6 +1902,22 @@ planPitstop() {
 	workbench := SessionWorkbench.Instance
 	
 	workbench.withExceptionhandler(ObjBindMethod(workbench, "planPitstop"))
+}
+
+chooseReport() {
+	workbench := SessionWorkbench.Instance
+	
+	GuiControlGet reportsDropDown
+	
+	workbench.showRaceReport(kReports[reportsDropDown])
+}
+
+reportSettings() {
+	workbench := SessionWorkbench.Instance
+	
+	GuiControlGet reportsDropDown
+	
+	workbench.reportSettings(kReports[reportsDropDown])
 }
 
 startupTeamDashboard() {

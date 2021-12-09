@@ -13,6 +13,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kReports = ["Overview", "Car", "Driver", "Position", "Pace"]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -954,7 +961,7 @@ editReportSettings(raceReport, report := false, options := false) {
 		Gui RRS:Font, s9 Norm, Arial
 		Gui RRS:Font, Italic Underline, Arial
 
-		Gui RRS:Add, Text, YP+20 w344 cBlue Center gopenReportsDocumentation, % translate("Report Settings")
+		Gui RRS:Add, Text, YP+20 w344 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
 		
 		Gui RRS:Font, s8 Norm, Arial
 		
@@ -1170,4 +1177,8 @@ selectDrivers() {
 
 moveSettings() {
 	moveByMouse("RRS")
+}
+
+openReportSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports
 }

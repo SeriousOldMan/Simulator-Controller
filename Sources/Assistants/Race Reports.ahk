@@ -42,8 +42,6 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kReports = ["Overview", "Car", "Driver", "Position", "Pace"]
-
 global kOk = "Ok"
 global kCancel = "Cancel"
 

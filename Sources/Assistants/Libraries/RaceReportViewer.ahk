@@ -13,6 +13,14 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kOk = "Ok"
+global kCancel = "Cancel"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -87,12 +95,15 @@ class RaceReportViewer {
 							google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
 				)
 
+				width := this.ChartViewer.Width
+				height := (this.ChartViewer.Height - 1)
+				
 				after =
 				(
 						</script>
 					</head>
 					<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-						<div id="chart_id" style="width: 908px; height: 470px"></div>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 					</body>
 				</html>
 				)

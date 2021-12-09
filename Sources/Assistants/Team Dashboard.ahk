@@ -687,6 +687,9 @@ class TeamDashboard extends ConfigurationItem {
 		
 		this.iLastLap := false
 		this.iCurrentStint := false
+		
+		this.ReportViewer.showReportChart(false)
+		this.ReportViewer.showReportInfo(false)
 	}
 	
 	loadNewStints(currentStint) {
@@ -735,17 +738,17 @@ class TeamDashboard extends ConfigurationItem {
 		runningLap := 0
 		
 		if this.ActiveSession {
-			directory := this.SessionDirectory . "\"
+			directory := this.SessionDirectory . "\Race Report"
 			
 			if (lap.Nr == 1) {
 				try {
-					FileRemoveDir %directory%Race Report, 1
+					FileRemoveDir %directory%, 1
 				}
 				catch exception {
 					; ignore
 				}
 			
-				FileCreateDir %directory%Race Report
+				FileCreateDir %directory%
 			
 				try {
 					try {
@@ -758,14 +761,14 @@ class TeamDashboard extends ConfigurationItem {
 					if (!raceInfo || (raceInfo == ""))
 						return
 						
-					FileAppend %raceInfo%, %directory%Race Report\Race.data
+					FileAppend %raceInfo%, %directory%\Race.data
 				}
 				catch exception {
 					; ignore
 				}
 			}
 					
-			data := readConfiguration(directory . "Race Report\Race.data")
+			data := readConfiguration(directory . "\Race.data")
 			
 			lapData := parseConfiguration(this.Connector.getLapValue(lap.Identifier, "Race Strategist Race Lap"))
 			
@@ -781,18 +784,18 @@ class TeamDashboard extends ConfigurationItem {
 			
 			line := (newLine . times)
 			
-			FileAppend %line%, % directory . "Race Report\Times.CSV"
+			FileAppend %line%, % directory . "\Times.CSV"
 			
 			line := (newLine . positions)
 			
-			FileAppend %line%, % directory . "Race Report\Positions.CSV"
+			FileAppend %line%, % directory . "\Positions.CSV"
 			
 			line := (newLine . laps)
 			
-			FileAppend %line%, % directory . "Race Report\Laps.CSV"
+			FileAppend %line%, % directory . "\Laps.CSV"
 			
 			line := (newLine . drivers)
-			directory := (directory . "Race Report\Drivers.CSV")
+			directory := (directory . "\Drivers.CSV")
 			
 			FileAppend %line%, %directory%, UTF-16
 			
@@ -800,6 +803,8 @@ class TeamDashboard extends ConfigurationItem {
 			setConfigurationValue(data, "Laps", "Count", lap.Nr)
 			
 			writeConfiguration(directory . "Race Report\Race.data", data)
+		
+			this.ReportViewer.showPositionReport(directory)
 		}
 	}
 	

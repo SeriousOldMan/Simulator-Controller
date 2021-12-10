@@ -174,10 +174,10 @@ class SessionWorkbench extends ConfigurationItem {
 			
 			this.Database.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 												, Compound: compound, "Compound.Color": compoundColor
-												, "Pressure.Cold.FL": coldPressures[1], "Pressure.Cold.FR": coldPressures[2]
-												, "Pressure.Cold.RL": coldPressures[3], "Pressure.Cold.RR": coldPressures[4]
-												, "Pressure.Hot.FL": hotPressures[1], "Pressure.Hot.FR": hotPressures[2]
-												, "Pressure.Hot.RL": hotPressures[3], "Pressure.Hot.RR": hotPressures[4]}, flush)
+												, "Tyre.Pressure.Cold.Front.Left": coldPressures[1], "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
+												, "Tyre.Pressure.Cold.Rear.Left": coldPressures[3], "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
+												, "Tyre.Pressure.Hot.Front.Left": hotPressures[1], "Tyre.Pressure.Hot.Front.Right": hotPressures[2]
+												, "Tyre.Pressure.Hot.Rear.Left": hotPressures[3], "Tyre.Pressure.Hot.Rear.Right": hotPressures[4]}, flush)
 			
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
@@ -291,6 +291,10 @@ class SessionWorkbench extends ConfigurationItem {
 		Get {
 			return (key ? this.iStints[key] : this.iStints)
 		}
+		
+		Set {
+			return (key ? (this.iStints[key] := value) : (this.iStints := value))
+		}
 	}
 	
 	CurrentStint[asIdentifier := false] {
@@ -305,6 +309,10 @@ class SessionWorkbench extends ConfigurationItem {
 	Laps[key := false] {
 		Get {
 			return (key ? this.iLaps[key] : this.iLaps)
+		}
+		
+		Set {
+			return (key ? (this.iLaps[key] := value) : (this.iLaps := value))
 		}
 	}
 	
@@ -390,10 +398,6 @@ class SessionWorkbench extends ConfigurationItem {
 		base.__New(configuration)
 		
 		SessionWorkbench.Instance := this
-		
-		callback := ObjBindMethod(this, "syncSession")
-		
-		SetTimer %callback%, 10000
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -878,6 +882,13 @@ class SessionWorkbench extends ConfigurationItem {
 		if this.ActiveSession {
 			directory := this.SessionDirectory
 			
+			try {
+				FileRemoveDir %directory%, 1
+			}
+			catch exception {
+				; ignore
+			}
+			
 			FileCreateDir %directory%
 			
 			reportDirectory := (directory . "Race Report")
@@ -1130,13 +1141,11 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		first := (!this.CurrentStint || !this.LastLap)
 		
-		if (!currentStint || !lastLap) {
-			this.initializeSession()
-			
-			first := true
-		}
-		else if ((this.CurrentStint && (currentStint.Nr < this.CurrentStint.Nr))
-			  || (this.LastLap && (lastLap.Nr < this.LastLap.Nr))) {
+		if (!currentStint
+		 || !lastLap
+		 || (this.CurrentStint && ((currentStint.Nr < this.CurrentStint.Nr)
+								|| ((currentStint.Nr = this.CurrentStint.Nr) && (currentStint.Identifier != this.CurrentStint.Identifier))))
+		 || (this.LastLap && (lastLap.Nr < this.LastLap.Nr))) {
 			this.initializeSession()
 			
 			first := true
@@ -1465,8 +1474,14 @@ class SessionWorkbench extends ConfigurationItem {
 			
 		Gui %window%:Show
 		
+		callback := ObjBindMethod(this, "syncSession")
+		
+		SetTimer %callback%, 10000
+		
 		while !this.iClosed
 			Sleep 1000
+		
+		SetTimer %callback%, Off
 	}
 	
 	close() {

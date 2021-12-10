@@ -905,8 +905,13 @@ selectSession() {
 	Gui %window%:Default
 	
 	GuiControlGet sessionListBox
+		
+	sessions := []
 	
-	configurator.selectSession(sessionListBox)
+	for name, ignore in configurator.Sessions
+		sessions.Push(name)
+	
+	configurator.selectSession(sessions[sessionListBox])
 }
 
 newSession() {

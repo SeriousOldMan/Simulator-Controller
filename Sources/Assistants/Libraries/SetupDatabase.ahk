@@ -37,9 +37,11 @@ global kWetRaceSetup = "WR"
 
 global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSetupDataSchemas := {"Setup.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color",
-											   , "Tyre.Pressure.Cold.FL", "Tyre.Pressure.Cold.FR", "Tyre.Pressure.Cold.RL", "Tyre.Pressure.Cold.RR"
-											   , "Tyre.Pressure.Hot.FL", "Tyre.Pressure.Hot.FR", "Tyre.Pressure.Hot.RL", "Tyre.Pressure.Hot.RR"]
+global kSetupDataSchemas := {"Setup.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+											   , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
+											   , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+											   , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
+											   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
 						   , "Setup.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 															, "Type", "Tyre", "Pressure", "Count"]}
 

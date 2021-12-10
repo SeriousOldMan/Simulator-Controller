@@ -50,6 +50,8 @@ global kClose = "Close"
 global kConnect = "Connect"
 global kEvent = "Event"
 
+global kSessionReports = concatenate(kRaceReports, ["Pressures", "Temperatures", "Free"])
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -70,10 +72,16 @@ global sessionDropDownMenu
 global chartTypeDropDown
 global chartViewer
 
-global reportsDropDown
 global reportSettingsButton
 
-global informationViewer
+global detailsViewer
+
+global reportsListView
+
+global dataXDropDown
+global dataY1DropDown
+global dataY2DropDown
+global dataY3DropDown
 
 global analysisMenuDropDown
 global informationMenuDropDown
@@ -121,6 +129,9 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	iReportViewer := false
 	iSelectedReport := false
+	
+	iTelemetryDatabase := false
+	iPressuresDatabase := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		__New(workbench) {
@@ -316,6 +327,18 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	TelemetryDatabase[] {
+		Get {
+			return this.iTelemetryDatabase
+		}
+	}
+	
+	PressuresDatabase[] {
+		Get {
+			return this.iPressuresDatabase
+		}
+	}
+	
 	__New(configuration, raceSettings) {
 		this.iRaceSettings := raceSettings
 		
@@ -415,11 +438,28 @@ class SessionWorkbench extends ConfigurationItem {
 		else
 			Gui %window%:Add, DropDownList, x266 yp w120 AltSubmit Choose0 vsessionDropDownMenu gchooseSession
 		
-		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Report")
-		Gui %window%:Add, DropDownList, x444 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
+		Gui %window%:Add, Text, x24 yp+30 w356 0x10
 		
-		Gui %window%:Add, Text, x570 ys w40 h23 +0x200, % translate("Chart")
-		Gui %window%:Add, DropDownList, x614 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
+		Gui %window%:Add, ListView, x16 yp+10 w115 h176 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
+		
+		for ignore, report in map(kSessionReports, "translate")
+			LV_Add("", report)
+		
+		LV_ModifyCol(1, "AutoHdr")
+		
+		
+		Gui %window%:Add, Text, x141 yp+2 w70 h23 +0x200, % translate("X-Axis")
+		
+		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataXDropDown gchooseAxis
+		
+		Gui %window%:Add, Text, x141 yp+24 w70 h23 +0x200, % translate("Series")
+		
+		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataY1DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY2DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY3DropDown gchooseAxis
+		
+		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Plot")
+		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
 		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
 		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
@@ -448,13 +488,13 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Information")
+		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Details")
 		
-		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vinformationViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vdetailsViewer, shell.explorer
 		
-		informationViewer.Navigate("about:blank")
+		detailsViewer.Navigate("about:blank")
 		
-		this.showInformation(false)
+		this.showDetails(false)
 		this.showChart(false)
 		
 		Gui %window%:Font, Norm, Arial
@@ -467,13 +507,13 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Race Craft", "Consistency", "Car Control"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Race Craft", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
 		Gui Tab, 2
 		
-		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Stint", "Driver", "Position", "Laptime", "Consumption", "Accident"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Laptime", "Consumption", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
@@ -656,17 +696,37 @@ class SessionWorkbench extends ConfigurationItem {
 			GuiControl Disable, pitstopPressureRREdit
 		}
 		
+		GuiControl Disable, dataXDropDown
+		GuiControl Disable, dataY1DropDown
+		GuiControl Disable, dataY2DropDown
+		GuiControl Disable, dataY3DropDown
+
 		if this.ActiveSession {
-			GuiControl Enable, reportsDropDown
-			
 			if inList(["Driver", "Position", "Pace"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
+			
+			if inList(["Pressures", "Temperatures", "Free"], this.SelectedReport) {
+				GuiControl Enable, dataXDropDown
+				GuiControl Enable, dataY1DropDown
+				GuiControl Enable, dataY2DropDown
+				GuiControl Enable, dataY3DropDown
+			}
+			else {
+				GuiControl Choose, dataXDropDown, 0
+				GuiControl Choose, dataY1DropDown, 0
+				GuiControl Choose, dataY2DropDown, 0
+				GuiControl Choose, dataY3DropDown, 0
+			}
 		}
 		else {
-			GuiControl Disable, reportsDropDown
 			GuiControl Disable, reportSettingsButton
+
+			GuiControl Choose, dataXDropDown, 0
+			GuiControl Choose, dataY1DropDown, 0
+			GuiControl Choose, dataY2DropDown, 0
+			GuiControl Choose, dataY3DropDown, 0
 		}
 	}
 	
@@ -711,10 +771,12 @@ class SessionWorkbench extends ConfigurationItem {
 			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
 		
 		try {
-			lap := this.Connector.GetSessionLastLap(sessionIdentifier)
+			session := this.SelectedSession[true]
+			
+			lap := this.Connector.GetSessionLastLap(session)
 
 			this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
-			this.Connector.SetSessionValue(sessionIdentifier, "Pitstop Plan", lap)
+			this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 			
 			showMessage(translate("Race Engineer will be instructed in the next lap..."))
 		}
@@ -806,10 +868,8 @@ class SessionWorkbench extends ConfigurationItem {
 		this.iLastLap := false
 		this.iCurrentStint := false
 		
-		if (this.ReportViewer) {
-			this.ReportViewer.showReportChart(false)
-			this.ReportViewer.showReportInfo(false)
-		}
+		if (this.ReportViewer)
+			this.showChart(false)
 	}
 	
 	loadNewStints(currentStint) {
@@ -1094,7 +1154,7 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				newData := true
 				
-				this.iLastLap := lastLap
+				this.iLastLap := this.Laps[lastLap.Nr]
 				this.iCurrentStint := currentStint
 			}
 			catch exception {
@@ -1200,13 +1260,16 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	syncTelemetry() {
 		static lastSession := false
-		static telemetryDB
+		
+		telemetryDB := this.TelemetryDatabase
 		
 		session := this.SelectedSession[true]
 		
 		if (session != lastSession) {
 			lastSession := session
 			telemetryDB := new this.SessionTelemetryDatabase(this)
+			
+			this.iTelemetryDatabase := telemetryDB
 		}
 		
 		lastLap := this.LastLap
@@ -1270,13 +1333,16 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	syncTyrePressures() {
 		static lastSession := false
-		static pressuresDB
+		
+		pressuresDB := this.PressuresDatabase
 		
 		session := this.SelectedSession[true]
 		
 		if (session != lastSession) {
 			lastSession := session
 			pressuresDB := new this.SessionPressuresDatabase(this)
+			
+			this.iPressuresDatabase := pressuresDB
 		}
 		
 		lastLap := this.LastLap
@@ -1502,11 +1568,12 @@ class SessionWorkbench extends ConfigurationItem {
 		this.showTelemetryChart(drawChartFunction)
 	}
 	
-	showInformation(information) {
-		html := ""
+	showDetails(details) {
+		chartID := 0
+		html := (details ? details : "")
 		
-		if information {
-			drawChartFunction := ""
+		if details {
+			drawChartFunction := "function drawChart" . chartID . "() {}"
 			
 			chartArea := ""
 			
@@ -1539,15 +1606,29 @@ class SessionWorkbench extends ConfigurationItem {
 			
 		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
-		informationViewer.Document.Open()
-		informationViewer.Document.Write(html)
-		informationViewer.Document.Close()
+		detailsViewer.Document.Open()
+		detailsViewer.Document.Write(html)
+		detailsViewer.Document.Close()
+	}
+	
+	selectReport(report) {
+		Gui ListView, % reportsListView
+		
+		if report {
+			LV_Modify(inList(kSessionReports, report), "+Select")
+		
+			this.iSelectedReport := report
+		}
+		else {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedReport := false
+		}
 	}
 	
 	showOverviewReport() {
-		GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
-	
-		this.iSelectedReport := "Overview"
+		this.selectReport("Overview")
 		
 		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showOverviewReport()
@@ -1556,9 +1637,7 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	showCarReport() {
-		GuiControl Choose, reportsDropDown, % inList(kReports, "Car")
-	
-		this.iSelectedReport := "Car"
+		this.selectReport("Car")
 		
 		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showCarReport()
@@ -1567,10 +1646,7 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	showDriverReport() {
-		GuiControl Enable, reportSettingsButton
-		GuiControl Choose, reportsDropDown, % inList(kReports, "Driver")
-	
-		this.iSelectedReport := "Driver"
+		this.selectReport("Driver")
 		
 		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showDriverReport()
@@ -1585,10 +1661,7 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	showPositionReport() {
-		GuiControl Enable, reportSettingsButton
-		GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
-	
-		this.iSelectedReport := "Position"
+		this.selectReport("Position")
 		
 		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showPositionReport()
@@ -1603,10 +1676,7 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	showPaceReport() {
-		GuiControl Enable, reportSettingsButton
-		GuiControl Choose, reportsDropDown, % inList(kReports, "Pace")
-	
-		this.iSelectedReport := "Pace"
+		this.selectReport("Pace")
 		
 		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showPaceReport()
@@ -1623,10 +1693,8 @@ class SessionWorkbench extends ConfigurationItem {
 	showRaceReport(report, force := false) {
 		if (force || (report != this.SelectedReport)) {
 			if report {
-				this.iSelectedReport := report
-								
-				GuiControl Choose, reportsDropDown, % inList(kReports, report)
-				
+				this.selectReport(report)
+		
 				switch report {
 					case "Overview":
 						this.showOverviewReport()
@@ -1644,7 +1712,80 @@ class SessionWorkbench extends ConfigurationItem {
 				}
 			}
 		}
-	}	
+	}
+	
+	showPressuresReport() {
+		this.selectReport("Pressures")
+		
+		this.showChart(false)
+		
+		this.updateState()
+	}
+	
+	showTemperaturesReport() {
+		this.selectReport("Temperatures")
+		
+		this.showChart(false)
+		
+		this.updateState()
+	}
+	
+	showCustomReport() {
+		this.selectReport("Free")
+		
+		this.showChart(false)
+		
+		this.updateState()
+	}
+	
+	createSeries(report) {
+		xChoices := []
+		y1Choices := []
+		y2Choices := []
+		y3Choices := []
+		y4Choices := []
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		if (report = "Pressures") {
+			xChoices := ["Stint", "Lap", "Lap.Time"]
+		
+			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+						, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
+			
+			y2Choices := y1Choices
+			y3Choices := y1Choices
+		}
+		else if (report = "Temperatures") {
+			xChoices := ["Stint", "Lap", "Lap.Time"]
+		
+			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+						, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
+						, "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+			
+			y2Choices := y1Choices
+			y3Choices := y1Choices
+		}
+		else if (report = "Free") {
+			xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
+		
+			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS",
+						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+						, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+			
+			y2Choices := y1Choices
+			y3Choices := y1Choices
+		}
+		
+		GuiControl, , dataXDropDown, % ("|" . values2String("|", xChoices*))
+		GuiControl, , dataY1DropDown, % ("|" . values2String("|", y1Choices*))
+		GuiControl, , dataY2DropDown, % ("|" . values2String("|", y2Choices*))
+		GuiControl, , dataY3DropDown, % ("|" . values2String("|", y3Choices*))
+	}
 	
 	reportSettings(report) {
 		switch report {
@@ -1658,6 +1799,62 @@ class SessionWorkbench extends ConfigurationItem {
 				if this.editPaceReportSettings()
 					this.showPaceReport()
 		}
+	}
+	
+	showReport(report, force := false) {
+		if (force || (report != this.SelectedReport)) {
+			this.createSeries(report)
+			
+			if inList(kRaceReports, report)
+				this.showRaceReport(report)
+			else if (report = "Pressures")
+				this.showPressuresReport()
+			else if (report = "Temperatures")
+				this.showTemperaturesReport()
+			else if (report = "Free")
+				this.showCustomReport()
+		}
+	}
+	
+	createStintHeader(stint) {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . stint.Driver.Fullname . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
+		html .= "</table>"
+		
+		return html
+	}
+	
+	createLaptimesDetails(stint) {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . stint.AvgLapTime . "</td></tr>")
+		
+		telemetry := ((stint.Nr == this.CurrentStint.Nr) ? this.LastLap.Telemetry : this.Laps[this.Stints[stint.Nr + 1].Lap - 1].Telemetry)
+		
+		telemetry := parseConfiguration(telemetry)
+		
+		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . Round(getConfigurationValue(telemetry, "Stint Data", "LapBestTime") / 1000, 1) . "</td></tr>")
+		
+		html .= "</table>"
+		
+		return html
+	}
+	
+	showStintDetails(stint) {
+		html := ("<div id=""header""><b>" . translate("Stint: ") . stint.Nr . "</b></div>")
+			
+		html .= ("<br>" . this.createStintHeader(stint))
+		
+		html .= ("<br><br><div id=""header""><i>" . translate("Laptimes") . "</i></div>")
+		
+		html .= ("<br>" . this.createLaptimesDetails(stint))
+			
+		this.showDetails(html)
+	}
+	
+	showLapDetails(lap) {
+		this.showDetails("Lap: " . lap.Nr . "`n" . "Laptime: " . lap.Laptime)
 	}
 }
 
@@ -1904,20 +2101,51 @@ planPitstop() {
 	workbench.withExceptionhandler(ObjBindMethod(workbench, "planPitstop"))
 }
 
+chooseStint() {
+	workbench := SessionWorkbench.Instance
+	
+	Gui ListView, % workbench.StintsListView
+	
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		LV_GetText(stint, A_EventInfo, 1)
+		
+		workbench.showStintDetails(workbench.Stints[stint])
+	}
+}
+
+chooseLap() {
+	workbench := SessionWorkbench.Instance
+	
+	Gui ListView, % workbench.LapsListView
+	
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		LV_GetText(lap, A_EventInfo, 1)
+		
+		workbench.showLapDetails(workbench.Laps[lap])
+	}
+}
+
 chooseReport() {
 	workbench := SessionWorkbench.Instance
 	
-	GuiControlGet reportsDropDown
+	Gui ListView, % reportsListView
 	
-	workbench.showRaceReport(kReports[reportsDropDown])
+	if workbench.ActiveSession {
+		if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
+			workbench.showReport(kSessionReports[A_EventInfo])
+	}
+	else
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
+}
+
+chooseAxis() {
 }
 
 reportSettings() {
 	workbench := SessionWorkbench.Instance
 	
-	GuiControlGet reportsDropDown
-	
-	workbench.reportSettings(kReports[reportsDropDown])
+	workbench.reportSettings(workbench.SelectedReport)
 }
 
 startupTeamDashboard() {

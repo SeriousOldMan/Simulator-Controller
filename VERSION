@@ -1,9 +1,9 @@
 [Development]
 Version=3.7.6-dev
 Target=3.7.6-release
-Date=12/06/2021
+Date=12/10/2021
 Download=
-Changes=
+Changes=Full implementation of the "Session Workbench"
 [Release]
 Version=3.7.4-release
 Date=12/06/2021

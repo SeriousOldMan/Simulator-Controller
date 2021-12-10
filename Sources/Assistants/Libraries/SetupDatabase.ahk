@@ -38,8 +38,8 @@ global kWetRaceSetup = "WR"
 global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
 global kSetupDataSchemas := {"Setup.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color",
-											   , "Pressure.Cold.FL", "Pressure.Cold.FR", "Pressure.Cold.RL", "Pressure.Cold.RR"
-											   , "Pressure.Hot.FL", "Pressure.Hot.FR", "Pressure.Hot.RL", "Pressure.Hot.RR"]
+											   , "Tyre.Pressure.Cold.FL", "Tyre.Pressure.Cold.FR", "Tyre.Pressure.Cold.RL", "Tyre.Pressure.Cold.RR"
+											   , "Tyre.Pressure.Hot.FL", "Tyre.Pressure.Hot.FR", "Tyre.Pressure.Hot.RL", "Tyre.Pressure.Hot.RR"]
 						   , "Setup.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 															, "Type", "Tyre", "Pressure", "Count"]}
 
@@ -346,10 +346,10 @@ class SetupDatabase extends SessionDatabase {
 		
 		this.iDatabase.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , Compound: compound, "Compound.Color": compoundColor
-											 , "Pressure.Cold.FL": coldPressures[1], "Pressure.Cold.FR": coldPressures[2]
-											 , "Pressure.Cold.RL": coldPressures[3], "Pressure.Cold.RR": coldPressures[4]
-											 , "Pressure.Hot.FL": hotPressures[1], "Pressure.Hot.FR": hotPressures[2]
-											 , "Pressure.Hot.RL": hotPressures[3], "Pressure.Hot.RR": hotPressures[4]}, flush)
+											 , "Tyre.Pressure.Cold.Front.Left": coldPressures[1], "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
+											 , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3], "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
+											 , "Tyre.Pressure.Hot.Front.Left": hotPressures[1], "Tyre.Pressure.Hot.Front.Right": hotPressures[2]
+											 , "Tyre.Pressure.Hot.Rear.Left": hotPressures[3], "Tyre.Pressure.Hot.Rear.Right": hotPressures[4]}, flush)
 		
 		tyres := ["FL", "FR", "RL", "RR"]
 		types := ["Cold", "Hot"]

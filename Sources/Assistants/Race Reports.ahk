@@ -219,7 +219,7 @@ class RaceReports extends ConfigurationItem {
 		infoViewer.Navigate("about:blank")
 		
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
-		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kReports, "translate")*)
+		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kRaceReports, "translate")*)
 		
 		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
 		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
@@ -245,7 +245,7 @@ class RaceReports extends ConfigurationItem {
 	
 	showOverviewReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Overview")
 		
 			this.iSelectedReport := "Overview"
 		}
@@ -261,7 +261,7 @@ class RaceReports extends ConfigurationItem {
 	
 	showCarReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Car")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Car")
 		
 			this.iSelectedReport := "Car"
 		}
@@ -278,7 +278,7 @@ class RaceReports extends ConfigurationItem {
 	showDriverReport(reportDirectory) {
 		if reportDirectory {
 			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Driver")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Driver")
 		
 			this.iSelectedReport := "Driver"
 		}
@@ -301,7 +301,7 @@ class RaceReports extends ConfigurationItem {
 	showPositionReport(reportDirectory) {
 		if reportDirectory {
 			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Position")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Position")
 		
 			this.iSelectedReport := "Position"
 		}
@@ -324,7 +324,7 @@ class RaceReports extends ConfigurationItem {
 	showPaceReport(reportDirectory) {
 		if reportDirectory {
 			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kReports, "Pace")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Pace")
 		
 			this.iSelectedReport := "Pace"
 		}
@@ -524,7 +524,7 @@ class RaceReports extends ConfigurationItem {
 			
 			if raceNr {
 				GuiControl Enable, reportsDropDown
-				GuiControl Choose, reportsDropDown, % inList(kReports, "Overview")
+				GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Overview")
 				GuiControl Enable, %deleteRaceReportButtonHandle%
 				
 				this.iSelectedRace := raceNr
@@ -569,7 +569,7 @@ class RaceReports extends ConfigurationItem {
 				
 				this.iSelectedReport := report
 								
-				GuiControl Choose, reportsDropDown, % inList(kReports, report)
+				GuiControl Choose, reportsDropDown, % inList(kRaceReports, report)
 				GuiControl Disable, reportSettingsButton
 				
 				reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
@@ -669,13 +669,13 @@ chooseReport() {
 	
 	GuiControlGet reportsDropDown
 	
-	RaceReports.Instance.loadReport(kReports[reportsDropDown])
+	RaceReports.Instance.loadReport(kRaceReports[reportsDropDown])
 }
 
 reportSettings() {
 	GuiControlGet reportsDropDown
 	
-	RaceReports.Instance.reportSettings(kReports[reportsDropDown])
+	RaceReports.Instance.reportSettings(kRaceReports[reportsDropDown])
 }
 
 deleteRaceReport() {

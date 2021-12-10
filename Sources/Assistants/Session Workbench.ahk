@@ -1295,9 +1295,7 @@ class SessionWorkbench extends ConfigurationItem {
 				telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
 			}
 			catch exception {
-				lap += 1
-				
-				continue
+				telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", false, "n/a", "n/a", "n/a", "-", "-", "-,-,-,-", "-,-,-,-")
 			}
 		
 			if (!telemetryData || (telemetryData == "")) {
@@ -1365,9 +1363,7 @@ class SessionWorkbench extends ConfigurationItem {
 				lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
 			}
 			catch exception {
-				lap += 1
-				
-				continue
+				lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-")
 			}
 		
 			if (!lapPressures || (lapPressures == "")) {

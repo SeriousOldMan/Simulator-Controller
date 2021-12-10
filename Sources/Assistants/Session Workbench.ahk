@@ -1457,7 +1457,7 @@ class SessionWorkbench extends ConfigurationItem {
 		if !this.SelectedReport
 			this.iSelectedReport := "Overview"
 		
-		this.showRaceReport(this.SelectedReport, true)
+		this.showReport(this.SelectedReport, true)
 	}
 	
 	show() {
@@ -1729,27 +1729,21 @@ class SessionWorkbench extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Drivers")
 	}
 	
-	showRaceReport(report, force := false) {
-		if (force || (report != this.SelectedReport)) {
-			if report {
-				this.selectReport(report)
-		
-				switch report {
-					case "Overview":
-						this.showOverviewReport()
-					case "Car":
-						this.showCarReport()
-					case "Driver":
-						if !this.ReportViewer.Settings.HasKey("Drivers")
-							this.ReportViewer.Settings["Drivers"] := [1, 2, 3, 4, 5]
-						
-						this.showDriverReport()
-					case "Position":
-						this.showPositionReport()
-					case "Pace":
-						this.showPaceReport()
-				}
-			}
+	showRaceReport(report) {
+		switch report {
+			case "Overview":
+				this.showOverviewReport()
+			case "Car":
+				this.showCarReport()
+			case "Driver":
+				if !this.ReportViewer.Settings.HasKey("Drivers")
+					this.ReportViewer.Settings["Drivers"] := [1, 2, 3, 4, 5]
+				
+				this.showDriverReport()
+			case "Position":
+				this.showPositionReport()
+			case "Pace":
+				this.showPaceReport()
 		}
 	}
 	
@@ -1801,68 +1795,68 @@ class SessionWorkbench extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	createSeries(report) {
-		xChoices := []
-		y1Choices := []
-		y2Choices := []
-		y3Choices := []
-		y4Choices := []
-		
+	updateSeriesSelector(report, force := false) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		if (report = "Pressures") {
-			xChoices := ["Stint", "Lap", "Lap.Time"]
-		
-			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
-						, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
-						, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
-						, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
-			
-			y2Choices := y1Choices
-			y3Choices := y1Choices
-		}
-		else if (report = "Temperatures") {
-			xChoices := ["Stint", "Lap", "Lap.Time"]
-		
-			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
-						, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
-						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
-						, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
-						, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
-			
-			y2Choices := y1Choices
-			y3Choices := y1Choices
-		}
-		else if (report = "Free") {
-			xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
-		
-			y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS",
-						, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", , "Tyre.Pressure.Cold.Rear.Average"
-						, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
-						, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
-						, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
-						, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
-			
-			y2Choices := y1Choices
-			y3Choices := y1Choices
-		}
-		
-		this.iXColumns := xChoices
-		this.iY1Columns := y1Choices
-		this.iY2Columns := y2Choices
-		this.iY3Columns := y3Choices
-		
-		GuiControl, , dataXDropDown, % ("|" . values2String("|", xChoices*))
-		GuiControl, , dataY1DropDown, % ("|" . values2String("|", y1Choices*))
-		GuiControl, , dataY2DropDown, % ("|" . values2String("|", translate("None"), y2Choices*))
-		GuiControl, , dataY3DropDown, % ("|" . values2String("|", translate("None"), y3Choices*))
-		
 		GuiControlGet dataXDropDown
 		
-		if ((report != this.SelectedReport) || (dataXDropDown == 0)) {
+		if (force || (report != this.SelectedReport) || (dataXDropDown == 0)) {
+			xChoices := []
+			y1Choices := []
+			y2Choices := []
+			y3Choices := []
+			y4Choices := []
+		
+			if (report = "Pressures") {
+				xChoices := ["Stint", "Lap", "Lap.Time"]
+			
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
+							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
+							, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
+				
+				y2Choices := y1Choices
+				y3Choices := y1Choices
+			}
+			else if (report = "Temperatures") {
+				xChoices := ["Stint", "Lap", "Lap.Time"]
+			
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
+							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
+							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
+							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+				
+				y2Choices := y1Choices
+				y3Choices := y1Choices
+			}
+			else if (report = "Free") {
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
+			
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
+							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
+							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
+							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
+							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+				
+				y2Choices := y1Choices
+				y3Choices := y1Choices
+			}
+			
+			this.iXColumns := xChoices
+			this.iY1Columns := y1Choices
+			this.iY2Columns := y2Choices
+			this.iY3Columns := y3Choices
+			
+			GuiControl, , dataXDropDown, % ("|" . values2String("|", xChoices*))
+			GuiControl, , dataY1DropDown, % ("|" . values2String("|", y1Choices*))
+			GuiControl, , dataY2DropDown, % ("|" . values2String("|", translate("None"), y2Choices*))
+			GuiControl, , dataY3DropDown, % ("|" . values2String("|", translate("None"), y3Choices*))
+		
 			dataY1DropDown := 0
 			dataY2DropDown := 0
 			dataY3DropDown := 0
@@ -1874,8 +1868,8 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				dataXDropDown := inList(xChoices, "Lap")
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
-				dataY2DropDown := inList(y2Choices, "Tyre.Pressure.Cold.Average")
-				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average")
+				dataY2DropDown := inList(y2Choices, "Tyre.Pressure.Cold.Average") + 1
+				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 			else if (report = "Temperatures") {
 				GuiControl Choose, chartTypeDropDown, 1
@@ -1884,8 +1878,8 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				dataXDropDown := inList(xChoices, "Lap")
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
-				dataY2DropDown := inList(y2Choices, "Tyre.Temperature.Front.Average")
-				dataY3DropDown := inList(y3Choices, "Tyre.Temperature.Rear.Average")
+				dataY2DropDown := inList(y2Choices, "Tyre.Temperature.Front.Average") + 1
+				dataY3DropDown := inList(y3Choices, "Tyre.Temperature.Rear.Average") + 1
 			}
 			else if (report = "Free") {
 				GuiControl Choose, chartTypeDropDown, 1
@@ -1894,8 +1888,8 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				dataXDropDown := inList(xChoices, "Lap")
 				dataY1DropDown := inList(y1Choices, "Lap.Time")
-				dataY2DropDown := inList(y2Choices, "Temperature.Air")
-				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average")
+				dataY2DropDown := inList(y2Choices, "Temperature.Air") + 1
+				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 			
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
@@ -1903,89 +1897,91 @@ class SessionWorkbench extends ConfigurationItem {
 			GuiControl Choose, dataY2DropDown, %dataY2DropDown%
 			GuiControl Choose, dataY3DropDown, %dataY3DropDown%
 		}
+	}
+	
+	syncReportDatabase(report) {
+		reportDB := this.ReportDatabase
 		
-		if inList(["Pressures", "Temperatures", "Free"], report) {
+		if !reportDB {
 			reportDB := new Database(false, kSessionDataSchemas)
 			
 			this.iReportDatabase := reportDB
-			
-			lastLap := this.LastLap
-			
-			pressuresDB := this.PressuresDatabase
-			telemetryDB := this.TelemetryDatabase
-			
-			if lastLap
-				Loop % lastLap.Nr
-				{
-					lap := this.Laps[A_Index]
-					
-					lapData := {Lap: lap.Nr, Stint: lap.Stint.Nr, "Lap.Time": lap.Laptime
-							  , "Fuel.Consumption": lap.FuelConsumption, "Fuel.Remaining": lap.FuelRemaining
-							  , "Temperature.Air": valueOrNull(lap.AirTemperature), "Temperature.Track": valueOrNull(lap.TrackTemperature)
-							  , Map: valueOrNull(lap.Map), TC: valueOrNull(lap.TC), ABS: valueOrNull(lap.ABS)}
-					
-					if pressuresDB {
-						pressureTable := pressuresDB.Database.Tables["Setup.Pressures"]
-						
-						if (pressureTable.Length() >= lap.Nr) {
-							pressures := pressureTable[lap.Nr]
-							
-							pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
-							pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
-							pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
-							pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
-							
-							lapData["Tyre.Pressure.Cold.Front.Left"] := valueOrNull(pressureFL)
-							lapData["Tyre.Pressure.Cold.Front.Right"] := valueOrNull(pressureFR)
-							lapData["Tyre.Pressure.Cold.Rear.Left"] := valueOrNull(pressureRL)
-							lapData["Tyre.Pressure.Cold.Rear.Right"] := valueOrNull(pressureRR)
-							lapData["Tyre.Pressure.Cold.Average"] := valueOrNull(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-							lapData["Tyre.Pressure.Cold.Front.Average"] := valueOrNull(average([pressureFL, pressureFR]))
-							lapData["Tyre.Pressure.Cold.Rear.Average"] := valueOrNull(average([pressureRL, pressureRR]))
-							
-							pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
-							pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
-							pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
-							pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
-							
-							lapData["Tyre.Pressure.Hot.Front.Left"] := valueOrNull(pressureFL)
-							lapData["Tyre.Pressure.Hot.Front.Right"] := valueOrNull(pressureFR)
-							lapData["Tyre.Pressure.Hot.Rear.Left"] := valueOrNull(pressureRL)
-							lapData["Tyre.Pressure.Hot.Rear.Right"] := valueOrNull(pressureRR)
-							lapData["Tyre.Pressure.Hot.Average"] := valueOrNull(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-							lapData["Tyre.Pressure.Hot.Front.Average"] := valueOrNull(average([pressureFL, pressureFR]))
-							lapData["Tyre.Pressure.Hot.Rear.Average"] := valueOrNull(average([pressureRL, pressureRR]))
-						}
-					}
-			
-					if telemetryDB {
-						tyresTable := telemetryDB.Database.Tables["Tyres"]
-						
-						if (tyresTable.Length() >= lap.Nr) {
-							tyres := tyresTable[lap.Nr]
-							
-							lapData["Tyre.Laps"] := valueOrNull(tyres["Tyre.Laps"])
-							
-							temperatureFL := tyres["Tyre.Temperature.Front.Left"]
-							temperatureFR := tyres["Tyre.Temperature.Front.Right"]
-							temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
-							temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
-							
-							lapData["Tyre.Temperature.Front.Left"] := valueOrNull(temperatureFL)
-							lapData["Tyre.Temperature.Front.Right"] := valueOrNull(temperatureFR)
-							lapData["Tyre.Temperature.Rear.Left"] := valueOrNull(temperatureRL)
-							lapData["Tyre.Temperature.Rear.Right"] := valueOrNull(temperatureRR)
-							lapData["Tyre.Temperature.Average"] := valueOrNull(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
-							lapData["Tyre.Temperature.Front.Average"] := valueOrNull(average([temperatureFL, temperatureFR]))
-							lapData["Tyre.Temperature.Rear.Average"] := valueOrNull(average([temperatureRL, temperatureRR]))
-						}
-					}
-					
-					reportDB.add("Lap.Data", lapData, false)
-				}
 		}
-		else
-			this.iReportDatabase := false
+		pressuresDB := this.PressuresDatabase
+		telemetryDB := this.TelemetryDatabase
+		
+		if (!pressuresDB || !telemetryDB)
+			return
+				
+		lastLap := this.LastLap
+		
+		if lastLap {
+			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			tyresTable := telemetryDB.Database.Tables["Tyres"]
+					
+			newLap := (reportDB.Tables["Lap.Data"].Length() + 1)
+			
+			while (newLap <= lastLap.Nr) {
+				lap := this.Laps[newLap]
+				
+				if ((pressuresTable.Length() < newLap) || (tyresTable.Length() < newLap))
+					return
+				
+				lapData := {Lap: newLap, Stint: lap.Stint.Nr, "Lap.Time": lap.Laptime
+						  , "Fuel.Consumption": lap.FuelConsumption, "Fuel.Remaining": lap.FuelRemaining
+						  , "Temperature.Air": valueOrNull(lap.AirTemperature), "Temperature.Track": valueOrNull(lap.TrackTemperature)
+						  , Map: valueOrNull(lap.Map), TC: valueOrNull(lap.TC), ABS: valueOrNull(lap.ABS)}				
+				
+				pressures := pressuresTable[newLap]
+				
+				pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
+				pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
+				pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
+				pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
+				
+				lapData["Tyre.Pressure.Cold.Front.Left"] := valueOrNull(pressureFL)
+				lapData["Tyre.Pressure.Cold.Front.Right"] := valueOrNull(pressureFR)
+				lapData["Tyre.Pressure.Cold.Rear.Left"] := valueOrNull(pressureRL)
+				lapData["Tyre.Pressure.Cold.Rear.Right"] := valueOrNull(pressureRR)
+				lapData["Tyre.Pressure.Cold.Average"] := valueOrNull(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+				lapData["Tyre.Pressure.Cold.Front.Average"] := valueOrNull(average([pressureFL, pressureFR]))
+				lapData["Tyre.Pressure.Cold.Rear.Average"] := valueOrNull(average([pressureRL, pressureRR]))
+				
+				pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
+				pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
+				pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
+				pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
+				
+				lapData["Tyre.Pressure.Hot.Front.Left"] := valueOrNull(pressureFL)
+				lapData["Tyre.Pressure.Hot.Front.Right"] := valueOrNull(pressureFR)
+				lapData["Tyre.Pressure.Hot.Rear.Left"] := valueOrNull(pressureRL)
+				lapData["Tyre.Pressure.Hot.Rear.Right"] := valueOrNull(pressureRR)
+				lapData["Tyre.Pressure.Hot.Average"] := valueOrNull(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+				lapData["Tyre.Pressure.Hot.Front.Average"] := valueOrNull(average([pressureFL, pressureFR]))
+				lapData["Tyre.Pressure.Hot.Rear.Average"] := valueOrNull(average([pressureRL, pressureRR]))
+		
+				tyres := tyresTable[newLap]
+				
+				lapData["Tyre.Laps"] := valueOrNull(tyres["Tyre.Laps"])
+				
+				temperatureFL := tyres["Tyre.Temperature.Front.Left"]
+				temperatureFR := tyres["Tyre.Temperature.Front.Right"]
+				temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
+				temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
+				
+				lapData["Tyre.Temperature.Front.Left"] := valueOrNull(temperatureFL)
+				lapData["Tyre.Temperature.Front.Right"] := valueOrNull(temperatureFR)
+				lapData["Tyre.Temperature.Rear.Left"] := valueOrNull(temperatureRL)
+				lapData["Tyre.Temperature.Rear.Right"] := valueOrNull(temperatureRR)
+				lapData["Tyre.Temperature.Average"] := valueOrNull(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
+				lapData["Tyre.Temperature.Front.Average"] := valueOrNull(average([temperatureFL, temperatureFR]))
+				lapData["Tyre.Temperature.Rear.Average"] := valueOrNull(average([temperatureRL, temperatureRR]))
+				
+				reportDB.add("Lap.Data", lapData, false)
+				
+				newLap += 1
+			}
+		}
 	}
 	
 	reportSettings(report) {
@@ -2004,7 +2000,8 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	showReport(report, force := false) {
 		if (force || (report != this.SelectedReport)) {
-			this.createSeries(report)
+			this.syncReportDatabase(report)
+			this.updateSeriesSelector(report)
 			
 			if inList(kRaceReports, report)
 				this.showRaceReport(report)
@@ -2366,7 +2363,7 @@ reportSettings() {
 	workbench.reportSettings(workbench.SelectedReport)
 }
 
-startupTeamDashboard() {
+startupSessionWorkbench() {
 	icon := kIconsDirectory . "Console.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -2395,4 +2392,4 @@ startupTeamDashboard() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupTeamDashboard()
+startupSessionWorkbench()

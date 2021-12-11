@@ -311,7 +311,7 @@ namespace ACCUDPProvider {
                     File.Delete(cmdFileName);
                 }
                 else
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
             }
 
             client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;

@@ -183,6 +183,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			exePath := kBinariesDirectory . "ACC UDP Provider.exe"
 			
 			try {
+				Loop 6 {
+					Process Exist, ACC UDP Provider.exe
+					
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+						
+						Sleep 250
+					}
+					else
+						break
+				}
+				
 				if FileExist(kTempDirectory . "ACCUDP.cmd")
 					FileDelete %kTempDirectory%ACCUDP.cmd
 					
@@ -217,6 +229,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			FileAppend Exit, %kTempDirectory%ACCUDP.cmd
 			
 			OnExit(this.iUDPClient, 0)
+
+			Sleep 250
+			
+			Loop 5 {
+				Process Exist, ACC UDP Provider.exe
+				
+				if ErrorLevel {
+					Process Close, %ErrorLevel%
+					
+					Sleep 250
+				}
+				else
+					break
+			}
 			
 			this.iUDPClient := false
 		}

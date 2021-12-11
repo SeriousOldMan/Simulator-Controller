@@ -1016,7 +1016,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if !this.iInPit {
 							this.performPitstop(dataLastLap)
 						
-							this.iInPit := true
+							this.iInPit := dataLastLap
 						}
 					}
 					; else if (dataLastLap == 0) {
@@ -1037,6 +1037,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if !this.driverActive(data)
 									return ; Still a different driver, might happen in some simulations
 							
+								this.iInPit := false
+								
 								joinedSession := true
 							}
 							else if (this.iLastLap < (dataLastLap - 1)) {
@@ -1047,6 +1049,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							
 								this.TeamServer.addStint(dataLastLap)
 								
+								this.iInPit := false
+								
 								this.restoreSessionState()
 							}
 							else ; (this.iLastLap == (dataLastLap - 1))
@@ -1056,6 +1060,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						
 						newLap := (dataLastLap > this.iLastLap)
 						firstLap := ((dataLastLap == 1) && newLap)
+						
+						if this.iInPit {
+							; Was in the pits, check if same driver for next stint...
+							
+							if this.driverActive(data)
+								this.TeamServer.addStint(dataLastLap)
+						}
 						
 						this.iInPit := false
 						

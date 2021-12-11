@@ -410,7 +410,12 @@ class SessionWorkbench extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
-		this.iSessionDirectory := (getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions") . "\")
+		directory := getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
+		
+		if (!directory || (directory = ""))
+			directory := (kTempDirectory . "Sessions")
+		
+		this.iSessionDirectory := (directory . "\")
 		
 		settings := this.RaceSettings
 		
@@ -1469,19 +1474,19 @@ class SessionWorkbench extends ConfigurationItem {
 			
 			if lap {
 				fuel := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
-				compound := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false))
-				compoundColor := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color"))
-				tyreSet := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-"))
-				pressureFL := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-"), 1)
-				pressureFR := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-"), 1)
-				pressureRL := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-"), 1)
-				pressureRR := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-"), 1)
-				repairBodywork := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", "-"))
-				repairSuspension := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", "-"))
+				compound := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
+				compoundColor := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color")
+				tyreSet := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
+				pressureFL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
+				pressureFR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
+				pressureRL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
+				pressureRR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
+				repairBodywork := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
+				repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
 				
 				if compound {
-					compound := (compound . ((compoundColor = "Black") ? "" : (" (" . compoundColor . ")")))
-					pressures := values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR)
+					compound := translate((compound . ((compoundColor = "Black") ? "" : (" (" . compoundColor . ")"))))
+					pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 				}
 				else {
 					compound := "-"

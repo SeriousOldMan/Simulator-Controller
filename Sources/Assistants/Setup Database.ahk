@@ -49,7 +49,7 @@ global kClose = "Close"
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vSettingsPID = false
+global vRequestorPID = false
 
 global vSetupDatabase = false
 
@@ -537,7 +537,7 @@ loadPressures() {
 					GuiControl Disable, %tyre%Pressure%postfix%
 				}
 
-			if vSettingsPID
+			if vRequestorPID
 				GuiControl Disable, transferPressuresButton
 		}
 		else {
@@ -578,7 +578,7 @@ loadPressures() {
 					pressure += 0.1
 				}
 			
-				if vSettingsPID
+				if vRequestorPID
 					GuiControl Enable, transferPressuresButton
 			}
 		}
@@ -927,7 +927,7 @@ transferPressures() {
 														  , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
-	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vSettingsPID)
+	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)
 }
 
 showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27, compound := "Dry") {
@@ -1045,7 +1045,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		}
 		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%chosen% gloadPressures vtyreCompoundDropDown, % values2String("|", choices*)
 		
-		if vSettingsPID
+		if vRequestorPID
 			Gui RES:Add, Button, x292 yp w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
 		Gui RES:Font, Norm, Arial
@@ -1201,8 +1201,8 @@ showSetupDatabase() {
 			case "-Compound":
 				compound := A_Args[index + 1]
 				index += 2
-			case "-Settings":
-				vSettingsPID := A_Args[index + 1]
+			case "-Setup":
+				vRequestorPID := A_Args[index + 1]
 				index += 2
 			default:
 				index += 1

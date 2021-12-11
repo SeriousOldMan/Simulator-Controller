@@ -1169,7 +1169,7 @@ openSetupDatabase() {
 		for ignore, arg in A_Args
 			options.Push("""" . arg . """")
 		
-		options.Push("-Settings")
+		options.Push("-Setup")
 		
 		Process Exist
 		

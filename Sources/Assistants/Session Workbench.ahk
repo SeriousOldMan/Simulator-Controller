@@ -831,6 +831,24 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	initializePitstopFromSession() {
+		pressuresDB := this.PressuresDatabase
+		
+		if pressuresDB {
+			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+		
+			last := pressuresTable.Length()
+			
+			if (last > 0) {
+				pressures := pressuresTable[last]
+				
+				this.initializePitstopTyreSetup(pressures["Compound"], pressures["Compound.Color"]
+											  , pressures["Tyre.Pressure.Cold.Front.Left"], pressures["Tyre.Pressure.Cold.Front.Right"]
+											  , pressures["Tyre.Pressure.Cold.Rear.Left"], pressures["Tyre.Pressure.Cold.Rear.Right"])
+			}
+		}
+	}
+	
 	initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 		window := this.Window
 		
@@ -954,7 +972,7 @@ class SessionWorkbench extends ConfigurationItem {
 					Process Exist
 					
 					options := ["-Simulator", this.Simulator, "-Car", this.Car, "-Track", this.Track, "-Weather", this.Weather
-							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Settings", ErrorLevel]
+							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Setup", ErrorLevel]
 					options := values2String(A_Space, options*)
 					
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid

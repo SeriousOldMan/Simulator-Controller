@@ -138,6 +138,7 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	iStintsListView := false
 	iLapsListView := false
+	iPitstopsListView := false
 	
 	iReportViewer := false
 	iReportDatabase := false
@@ -334,6 +335,12 @@ class SessionWorkbench extends ConfigurationItem {
 	LapsListView[] {
 		Get {
 			return this.iLapsListView
+		}
+	}
+	
+	PitstopsListView[] {
+		Get {
+			return this.iPitstopsListView
 		}
 	}
 	
@@ -535,13 +542,13 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Race Craft", "Consistency", "Car Control"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Race Craft", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
 		Gui Tab, 2
 		
-		Gui %window%:Add, ListView, x24 ys+34 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Laptime", "Consumption", "Accident"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Laptime", "Consumption", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
@@ -556,7 +563,7 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
 		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
-		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200 Section, % translate("Tyre Change")
+		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
@@ -576,6 +583,10 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Lap", "Refuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
+		
+		this.iPitstopsListView := listHandle
 		
 		this.iReportViewer := new RaceReportViewer(window, chartViewer)
 		
@@ -911,11 +922,18 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		LV_Delete()
 		
+		Gui ListView, % this.PitstopsListView
+		
+		LV_Delete()
+		
 		this.iStints := {}
 		this.iLaps := {}
 		
 		this.iLastLap := false
 		this.iCurrentStint := false
+		
+		this.iTelemetryDatabase := false
+		this.iPressuresDatabase := false
 		
 		this.iReportDatabase := false
 		this.iSelectedReport := false
@@ -1313,18 +1331,12 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	syncTelemetry() {
-		static lastSession := false
-		
-		telemetryDB := this.TelemetryDatabase
-		
 		session := this.SelectedSession[true]
 		
-		if (session != lastSession) {
-			lastSession := session
-			telemetryDB := new this.SessionTelemetryDatabase(this)
-			
-			this.iTelemetryDatabase := telemetryDB
-		}
+		if !this.TelemetryDatabase
+			this.iTelemetryDatabase := new this.SessionTelemetryDatabase(this)
+		
+		telemetryDB := this.TelemetryDatabase
 		
 		lastLap := this.LastLap
 		
@@ -1384,18 +1396,12 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	syncTyrePressures() {
-		static lastSession := false
-		
-		pressuresDB := this.PressuresDatabase
-		
 		session := this.SelectedSession[true]
 		
-		if (session != lastSession) {
-			lastSession := session
-			pressuresDB := new this.SessionPressuresDatabase(this)
-			
-			this.iPressuresDatabase := pressuresDB
-		}
+		if !this.PressuresDatabase
+			this.iPressuresDatabase := new this.SessionPressuresDatabase(this)
+		
+		pressuresDB := this.PressuresDatabase
 		
 		lastLap := this.LastLap
 		
@@ -1441,12 +1447,80 @@ class SessionWorkbench extends ConfigurationItem {
 		return newData
 	}
 	
+	syncPitstops(state := false) {
+		session := this.SelectedSession[true]
+		
+		Gui ListView, % this.PitstopsListView
+		
+		nextStop := (LV_GetCount() + 1)
+		
+		if !state
+			try {
+				state := this.Connector.GetSessionValue(session, "Race Engineer State")
+				
+				state := parseConfiguration(state)
+			}
+			catch exception {
+				; ignore
+			}
+		
+		if (state && (state != "")) {
+			lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
+			
+			if lap {
+				fuel := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
+				compound := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false))
+				compoundColor := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color"))
+				tyreSet := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-"))
+				pressureFL := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-"), 1)
+				pressureFR := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-"), 1)
+				pressureRL := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-"), 1)
+				pressureRR := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-"), 1)
+				repairBodywork := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", "-"))
+				repairSuspension := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", "-"))
+				
+				if compound {
+					compound := (compound . ((compoundColor = "Black") ? "" : (" (" . compoundColor . ")")))
+					pressures := values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR)
+				}
+				else {
+					compound := "-"
+				
+					tyreSet := "-"
+					pressures := "-"
+				}
+				
+				if (repairBodywork && repairSuspension)
+					repairs := (translate("Bodywork") . ", " . translate("Suspension"))
+				else if repairBodywork
+					repairs := translate("Bodywork")
+				else if repairSuspension
+					repairs := translate("Suspension")
+				else
+					repairs := "-"
+				
+				LV_Add("", nextStop, lap, fuel, compound, tyreSet, pressures, repairs)
+				
+				if (nextStop = 1) {
+					LV_ModifyCol()
+					
+					Loop 7
+						LV_ModifyCol(A_Index, "AutoHdr")
+				}
+					
+				
+				this.syncPitstop(state)
+			}
+		}
+	}
+	
 	syncSession() {
+		newLaps := false
 		newData := false
 		
 		if this.ActiveSession {
 			if this.syncLaps()
-				newData := true
+				newLaps := true
 			
 			if this.syncRaceReport()
 				newData := true
@@ -1456,9 +1530,12 @@ class SessionWorkbench extends ConfigurationItem {
 			
 			if this.syncTyrePressures()
 				newData := true
+			
+			if newLaps
+				this.syncPitstops()
 		}
 		
-		if newData
+		if (newData || newLaps)
 			this.updateReports()
 	}
 	

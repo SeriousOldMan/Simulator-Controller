@@ -95,7 +95,7 @@ global dataY1DropDown
 global dataY2DropDown
 global dataY3DropDown
 
-global analysisMenuDropDown
+global strategyMenuDropDown
 global informationMenuDropDown
 global pitstopMenuDropDown
 
@@ -129,6 +129,13 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	iSessionIdentifier := false
 	iSessionName := false
+	
+	iSimulator := false
+	iCar := false
+	iTrack := false
+	iWeather := false
+	iAirTemperature := false
+	iTrackTemperature := false
 	
 	iStints := {}
 	iLaps := {}
@@ -285,6 +292,42 @@ class SessionWorkbench extends ConfigurationItem {
 	ActiveSession[] {
 		Get {
 			return (this.Connected && this.SelectedTeam[true] && this.SelectedSession[true])
+		}
+	}
+	
+	Simulator[] {
+		Get {
+			return this.iSimulator
+		}
+	}
+	
+	Car[] {
+		Get {
+			return this.iCar
+		}
+	}
+	
+	Track[] {
+		Get {
+			return this.iTrack
+		}
+	}
+	
+	Weather[] {
+		Get {
+			return this.iWeather
+		}
+	}
+	
+	AirTemperature[] {
+		Get {
+			return this.iAirTemperature
+		}
+	}
+	
+	TrackTemperature[] {
+		Get {
+			return this.iTrackTemperature
 		}
 	}
 	
@@ -516,12 +559,12 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x50 yp+5 w80 h26, % translate("Session")
 		
 		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vinformationMenuDropDown ginformationMenu, % values2String("|", map(["Information", "---------------------------------------------", "Stint Summary", "Driver Summary", "Accident Analysis"], "translate")*)
 
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vanalysisMenuDropDown ganalysisMenu, % values2String("|", map(["Analysis", "---------------------------------------------"], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Run Simulation...", "Use as Strategy...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vinformationMenuDropDown ginformationMenu, % values2String("|", map(["Information", "---------------------------------------------"], "translate")*)
-		
-		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Instruct Engineer..."], "translate")*)
+		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session...", "Initialize from Setup Database...", "---------------------------------------------", "Instruct Engineer..."], "translate")*)
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -788,7 +831,29 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		if (compoundColor != "Black")
+			compound := (compound . " (" . compoundColor . ")")
+		
+		GuiControl Choose, pitstopTyreCompoundDropDown, % inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound)
+		
+		GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
+		GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
+		GuiControl, , pitstopPressureRLEdit, % Round(rlPressure, 1)
+		GuiControl, , pitstopPressureRREdit, % Round(rrPressure, 1)
+		
+		this.updateState()
+	}
+	
 	planPitstop() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
 		GuiControlGet pitstopLapEdit
 		GuiControlGet pitstopRefuelEdit
 		GuiControlGet pitstopTyreCompoundDropDown
@@ -843,7 +908,7 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	chooseAnalysisMenu(line) {
+	chooseInformationMenu(line) {
 		if !this.ActiveSession
 			return
 		
@@ -852,10 +917,14 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Default
 		
 		switch line {
+			case 3:
+				this.reportRemainingTimes()
+			case 4:
+				this.estimateFutureStints()
 		}
 	}
 	
-	chooseInformationMenu(line) {
+	chooseStrategyMenu(line) {
 		if !this.ActiveSession
 			return
 		
@@ -869,7 +938,7 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	choosePitstopMenu(line) {
 		if !this.ActiveSession
-			return
+		 	return
 		
 		window := this.Window
 						
@@ -877,6 +946,26 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		switch line {
 			case 3:
+				this.initializePitstopFromSession()
+			case 4:
+				exePath := kBinariesDirectory . "Setup Database.exe"
+				
+				try {
+					Process Exist
+					
+					options := ["-Simulator", this.Simulator, "-Car", this.Car, "-Track", this.Track, "-Weather", this.Weather
+							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Settings", ErrorLevel]
+					options := values2String(A_Space, options*)
+					
+					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+						
+					showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			case 6:
 				this.planPitstop()
 		}
 	}
@@ -1233,6 +1322,12 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				this.iLastLap := this.Laps[lastLap.Nr]
 				this.iCurrentStint := currentStint
+				
+				lastLap := this.iLastLap
+				
+				this.iWeather := lastLap.Weather
+				this.iAirTemperature := lastLap.AirTemperature
+				this.iTrackTemperature := lastLap.TrackTemperature
 			}
 			catch exception {
 				return newData
@@ -1438,6 +1533,10 @@ class SessionWorkbench extends ConfigurationItem {
 			}
 			
 			lapPressures := string2Values(";", lapPressures)
+			
+			this.iSimulator := lapPressures[1]
+			this.iCar := lapPressures[2]
+			this.iTrack := lapPressures[3]
 			
 			pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 									  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
@@ -2370,20 +2469,20 @@ chooseChartType() {
 	workbench.selectChartType(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
 }
 
-analysisMenu() {
-	GuiControlGet analysisMenuDropDown
-	
-	GuiControl Choose, analysisMenuDropDown, 1
-	
-	SessionWorkbench.Instance.chooseAnalysisMenu(analysisMenuDropDown)
-}
-
 informationMenu() {
 	GuiControlGet informationMenuDropDown
 	
 	GuiControl Choose, informationMenuDropDown, 1
 	
 	SessionWorkbench.Instance.chooseInformationMenu(informationMenuDropDown)
+}
+
+strategyMenu() {
+	GuiControlGet strategyMenuDropDown
+	
+	GuiControl Choose, strategyMenuDropDown, 1
+	
+	SessionWorkbench.Instance.chooseStrategyMenu(strategyMenuDropDown)
 }
 
 pitstopMenu() {
@@ -2460,6 +2559,14 @@ reportSettings() {
 	workbench.reportSettings(workbench.SelectedReport)
 }
 
+setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+	workbench := SessionWorkbench.Instance
+	
+	workbench.initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
+	
+	return false
+}
+
 startupSessionWorkbench() {
 	icon := kIconsDirectory . "Console.ico"
 	
@@ -2474,6 +2581,8 @@ startupSessionWorkbench() {
 		workbench.createGui(workbench.Configuration)
 		
 		workbench.connect(true)
+		
+		registerEventHandler("Setup", "functionEventHandler")
 		
 		workbench.show()
 		

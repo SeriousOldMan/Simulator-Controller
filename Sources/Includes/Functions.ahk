@@ -1702,10 +1702,10 @@ functionEventHandler(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		
-		withProtection(data[1], string2Values(";", data[2])*)
+		return withProtection(data[1], string2Values(";", data[2])*)
 	}
 	else	
-		withProtection(data)
+		return withProtection(data)
 }
 
 registerEventHandler(event, handler) {

@@ -921,11 +921,13 @@ transferPressures() {
 	else
 		compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 	
+	compound := compound[1]
+	
 	for ignore, pressureInfo in vSetupDatabase.getPressures(simulatorDropDown, carDropDown, trackDropDown, kWeatherOptions[weatherDropDown]
-														  , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+														  , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
-	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, tyrePressures*), vSettingsPID)
+	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vSettingsPID)
 }
 
 showSetups(command := false, simulator := false, car := false, track := false, weather := "Dry", airTemperature := 23, trackTemperature := 27, compound := "Dry") {

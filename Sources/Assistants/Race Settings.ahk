@@ -1340,7 +1340,7 @@ showRaceSettingsEditor() {
 		writeConfiguration(fileName, settings)
 	}
 	else {
-		registerEventHandler("Setup", "handleSetupRemoteCalls")
+		registerEventHandler("Setup", "functionEventHandler")
 	
 		if (editSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
@@ -1357,10 +1357,10 @@ showRaceSettingsEditor() {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setTyrePressures(compound, flPressure, frPressure, rlPressure, rrPressure) {
+setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 	Gui RES:Default
 			
-	if InStr(compound, "Wet") {
+	if (compound = "Wet") {
 		spWetFrontLeftEdit := Round(flPressure, 1)
 		spWetFrontRightEdit := Round(frPressure, 1)
 		spWetRearLeftEdit := Round(rlPressure, 1)
@@ -1382,16 +1382,8 @@ setTyrePressures(compound, flPressure, frPressure, rlPressure, rrPressure) {
 		GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
 		GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
 	}
-}
-
-handleSetupRemoteCalls(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
 	
-		return withProtection(data[1], string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(data)
+	return false
 }
 
 

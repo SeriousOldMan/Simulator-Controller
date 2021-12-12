@@ -1198,7 +1198,7 @@ class SessionWorkbench extends ConfigurationItem {
 		Loop % stint.Laps.Length()
 			laps.Push(lap + A_Index - 1)
 		
-		this.ReportViewer.loadReportData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+		this.ReportViewer.loadReportData(laps, raceData, drivers, positions, times)
 			
 		driver := getConfigurationValue(raceData, "Cars", "Driver", false)
 		
@@ -1214,13 +1214,31 @@ class SessionWorkbench extends ConfigurationItem {
 			consistencies := false
 			carControls := false
 			
-			this.ReportViewer.getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef carControls)
+			oldLapSettings := (this.ReportViewer.Settings.HasKey("Laps") ? this.ReportViewer.Settings["Laps"] : false)
 			
-			stint.Potential := potentials[driver]
-			stint.RaceCraft := raceCrafts[driver]
-			stint.Speed := speeds[driver]
-			stint.Consistency := consistency[driver]
-			stint.CarControl := carControls[driver]
+			count := laps.Length()
+			laps := []
+			
+			Loop %count%
+				laps.Push(A_Index)
+			
+			try {
+				this.ReportViewer.Settings["Laps"] := laps
+				
+				this.ReportViewer.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+			}
+			finally {
+				if oldLapSettings
+					this.ReportViewer.Settings["Laps"] := oldLapSettings
+				else
+					this.ReportViewer.Settings.Delete("Laps")
+			}
+			
+			stint.Potential := Round(potentials[driver], 2)
+			stint.RaceCraft := Round(raceCrafts[driver], 2)
+			stint.Speed := Round(speeds[driver], 2)
+			stint.Consistency := Round(consistencies[driver], 2)
+			stint.CarControl := Round(carControls[driver], 2)
 		}
 		
 	}
@@ -1351,7 +1369,7 @@ class SessionWorkbench extends ConfigurationItem {
 				if first {
 					LV_ModifyCol()
 					
-					Loop 13
+					Loop % LV_GetCount("Col")
 						LV_ModifyCol(A_Index, "AutoHdr")
 				}
 		
@@ -1368,7 +1386,7 @@ class SessionWorkbench extends ConfigurationItem {
 				if first {
 					LV_ModifyCol()
 					
-					Loop 7
+					Loop % LV_GetCount("Col")
 						LV_ModifyCol(A_Index, "AutoHdr")
 				}
 				
@@ -1485,6 +1503,23 @@ class SessionWorkbench extends ConfigurationItem {
 			writeConfiguration(directory . "Race.data", data)
 		
 		return newData
+	}
+	
+	syncDriverStats() {
+		currentStint := this.CurrentStint
+		
+		if currentStint
+			Loop % currentStint.Nr
+			{
+				stint := this.Stints[A_Index]
+				
+				if (stint.Potential = "-") {
+					this.updateDriverStats(stint)
+					
+					LV_Modify(stint.Row, "Col11", stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+				
+				}
+			}
 	}
 	
 	syncTelemetry() {
@@ -1665,7 +1700,7 @@ class SessionWorkbench extends ConfigurationItem {
 				if (nextStop = 1) {
 					LV_ModifyCol()
 					
-					Loop 7
+					Loop % LV_GetCount("Col")
 						LV_ModifyCol(A_Index, "AutoHdr")
 				}
 					
@@ -1692,8 +1727,11 @@ class SessionWorkbench extends ConfigurationItem {
 			if this.syncTyrePressures()
 				newData := true
 			
-			if newLaps
+			if newLaps {
+				this.syncDriverStats()
+				
 				this.syncPitstops()
+			}
 		}
 		
 		if (newData || newLaps)
@@ -2540,7 +2578,7 @@ chooseSession() {
 	GuiControlGet sessionDropDownMenu
 	
 	workbench.withExceptionhandler(ObjBindMethod(workbench, "selectSession")
-								 , getValues(workbench.Teams)[sessionDropDownMenu])
+								 , getValues(workbench.Sessions)[sessionDropDownMenu])
 }
 
 chooseChartType() {

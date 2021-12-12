@@ -70,6 +70,13 @@ class RaceReportViewer {
 			else
 				return this.iSettings
 		}
+		
+		Set {
+			if key
+				return this.iSettings[key] := value
+			else
+				return this.iSettings := value
+		}
 	}
 	
 	__New(window, chartViewer := false, infoViewer := false) {
@@ -459,7 +466,7 @@ class RaceReportViewer {
 			positions := true
 			times := true
 			
-			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+			this.loadReportData(false, raceData, drivers, positions, times)
 			
 			cars := []
 			
@@ -626,7 +633,7 @@ class RaceReportViewer {
 			positions := true
 			times := true
 			
-			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+			this.loadReportData(false, raceData, drivers, positions, times)
 			
 			allDrivers := this.getDrivers(raceData, drivers)
 			
@@ -683,7 +690,7 @@ class RaceReportViewer {
 			positions := true
 			times := false
 			
-			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+			this.loadReportData(false, raceData, drivers, positions, times)
 			
 			cars := []
 			
@@ -750,7 +757,7 @@ class RaceReportViewer {
 			positions := false
 			times := true
 			
-			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+			this.loadReportData(false, raceData, drivers, positions, times)
 			
 			selectedCars := this.getReportDrivers(raceData)
 			cars := []

@@ -395,6 +395,48 @@ class RaceReportViewer {
 		return true
 	}
 	
+	loadReportData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times) {
+		if drivers
+			drivers := []
+		
+		if positions
+			positions := []
+		
+		if times
+			times := []
+			
+		report := this.Report
+		
+		if report {
+			if raceData
+				raceData := readConfiguration(report . "\Race.data")
+			
+			oldEncoding := A_FileEncoding
+			
+			FileEncoding UTF-8
+			
+			try {
+				if drivers
+					Loop Read, % report . "\Drivers.CSV"
+						if (!laps || inList(laps, A_Index))
+							drivers.Push(string2Values(";", A_LoopReadLine))
+				
+				if positions
+					Loop Read, % report . "\Positions.CSV"
+						if (!laps || inList(laps, A_Index))
+							positions.Push(string2Values(";", A_LoopReadLine))
+				
+				if times
+					Loop Read, % report . "\Times.CSV"
+						if (!laps || inList(laps, A_Index))
+							times.Push(string2Values(";", A_LoopReadLine))
+			}
+			finally {
+				FileEncoding %oldEncoding%
+			}
+		}
+	}
+	
 	editReportSettings(settings*) {
 		result := editReportSettings(this, this.Report, settings)
 		
@@ -412,30 +454,14 @@ class RaceReportViewer {
 		report := this.Report
 		
 		if report {
-			raceData := readConfiguration(report . "\Race.data")
+			raceData := true
+			drivers := true
+			positions := true
+			times := true
+			
+			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
 			
 			cars := []
-			drivers := []
-			positions := []
-			times := []
-			
-			oldEncoding := A_FileEncoding
-			
-			FileEncoding UTF-8
-			
-			try {
-				Loop Read, % report . "\Drivers.CSV"
-					drivers.Push(string2Values(";", A_LoopReadLine))
-				
-				Loop Read, % report . "\Positions.CSV"
-					positions.Push(string2Values(";", A_LoopReadLine))
-				
-				Loop Read, % report . "\Times.CSV"
-					times.Push(string2Values(";", A_LoopReadLine))
-			}
-			finally {
-				FileEncoding %oldEncoding%
-			}
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
 			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
@@ -595,29 +621,12 @@ class RaceReportViewer {
 		report := this.Report
 		
 		if report {
-			raceData := readConfiguration(report . "\Race.data")
+			raceData := true
+			drivers := true
+			positions := true
+			times := true
 			
-			drivers := []
-			positions := []
-			times := []
-			
-			oldEncoding := A_FileEncoding
-			
-			FileEncoding UTF-8
-			
-			try {
-				Loop Read, % report . "\Drivers.CSV"
-					drivers.Push(string2Values(";", A_LoopReadLine))
-				
-				Loop Read, % report . "\Positions.CSV"
-					positions.Push(string2Values(";", A_LoopReadLine))
-				
-				Loop Read, % report . "\Times.CSV"
-					times.Push(string2Values(";", A_LoopReadLine))
-			}
-			finally {
-				FileEncoding %oldEncoding%
-			}	
+			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
 			
 			allDrivers := this.getDrivers(raceData, drivers)
 			
@@ -669,22 +678,14 @@ class RaceReportViewer {
 		report := this.Report
 		
 		if report {
-			raceData := readConfiguration(report . "\Race.data")
+			raceData := true
+			drivers := false
+			positions := true
+			times := false
+			
+			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
 			
 			cars := []
-			positions := []
-			
-			oldEncoding := A_FileEncoding
-			
-			FileEncoding UTF-8
-			
-			try {
-				Loop Read, % report . "\Positions.CSV"
-					positions.Push(string2Values(";", A_LoopReadLine))
-			}
-			finally {
-				FileEncoding %oldEncoding%
-			}
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
 			
@@ -744,23 +745,15 @@ class RaceReportViewer {
 		report := this.Report
 		
 		if report {
-			raceData := readConfiguration(report . "\Race.data")
+			raceData := true
+			drivers := false
+			positions := false
+			times := true
+			
+			this.loadReportData(false, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
 			
 			selectedCars := this.getReportDrivers(raceData)
 			cars := []
-			times := []
-			
-			oldEncoding := A_FileEncoding
-			
-			FileEncoding UTF-8
-			
-			try {
-				Loop Read, % report . "\Times.CSV"
-					times.Push(string2Values(";", A_LoopReadLine))
-			}
-			finally {
-				FileEncoding %oldEncoding%
-			}
 			
 			drawChartFunction := "function drawChart() {`nvar array = [`n"
 			

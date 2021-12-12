@@ -590,7 +590,7 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Race Craft", "Consistency", "Car Control"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
@@ -651,7 +651,6 @@ class SessionWorkbench extends ConfigurationItem {
 			
 			showMessage(translate("Successfully connected to the Team Server."))
 			
-			this.initializeSession()
 			this.loadTeams()
 		}
 		catch exception {
@@ -760,7 +759,7 @@ class SessionWorkbench extends ConfigurationItem {
 			this.iSessionIdentifier := false
 		}
 		
-		this.loadSession()
+		this.initializeSession()
 	}
 	
 	updateState() {
@@ -791,7 +790,7 @@ class SessionWorkbench extends ConfigurationItem {
 		GuiControl Disable, dataY3DropDown
 
 		if this.ActiveSession {
-			if inList(["Driver", "Position", "Pace"], this.SelectedReport)
+			if inList(["Driver", "Position", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -1051,6 +1050,8 @@ class SessionWorkbench extends ConfigurationItem {
 		this.iSelectedReport := false
 		this.iSelectedChartType := false
 		
+		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
+		
 		this.showChart(false)
 	}
 	
@@ -1079,7 +1080,9 @@ class SessionWorkbench extends ConfigurationItem {
 				stint.StartPosition := "-"
 				stint.EndPosition := "-"
 				stint.AvgLaptime := "-"
+				stint.Potential := "-"
 				stint.RaceCraft := "-"
+				stint.Speed := "-"
 				stint.Consistency := "-"
 				stint.CarControl := "-"
 				
@@ -1184,6 +1187,42 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	updateDriverStats(stint) {
+		raceData := true
+		drivers := false
+		positions := true
+		times := true
+		
+		laps := []
+		lap := stint.Lap
+		
+		Loop % stint.Laps.Length()
+			laps.Push(lap + A_Index - 1)
+		
+		this.ReportViewer.loadReportData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times)
+			
+		driver := getConfigurationValue(raceData, "Cars", "Driver", false)
+		
+		if driver {		
+			cars := []
+			
+			Loop % getConfigurationValue(raceData, "Cars", "Count")
+				cars.Push(A_Index)
+		
+			potentials := false
+			raceCrafts := false
+			speeds := false
+			consistencies := false
+			carControls := false
+			
+			this.ReportViewer.getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef carControls)
+			
+			stint.Potential := potentials[driver]
+			stint.RaceCraft := raceCrafts[driver]
+			stint.Speed := speeds[driver]
+			stint.Consistency := consistency[driver]
+			stint.CarControl := carControls[driver]
+		}
+		
 	}
 		
 	updateStint(stint) {
@@ -1237,7 +1276,7 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
 							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
-							   , stint.RaceCraft, stint.Consistency, stint.CarControl)
+							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 	}
 	
 	syncLaps() {
@@ -1302,7 +1341,7 @@ class SessionWorkbench extends ConfigurationItem {
 				for ignore, stint in newStints {
 					LV_Add("", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
 							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
-							 , stint.RaceCraft, stint.Consistency, stint.CarControl)
+							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					
 					stint.Row := LV_GetCount()
 					
@@ -1750,12 +1789,27 @@ class SessionWorkbench extends ConfigurationItem {
 			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
 		}
 		
+		settingsLaps := this.ReportViewer.Settings["Laps"]
+		laps := false
+		
+		if (settingsLaps && (settingsLaps.Length() > 0)) {
+			laps := {}
+			
+			for ignore, lap in settingsLaps
+				laps[lap] := lap
+		}
+		
 		drawChartFunction .= "`ndata.addRows(["
+		first := true
 		
 		for ignore, values in data {
-			if (A_Index > 1)
+			if (laps && !laps.HasKey(A_Index))
+				continue
+			
+			if !first
 				drawChartFunction .= ",`n"
 			
+			first := false
 			value := values[xAxis]
 			
 			if ((value = "n/a") || (value == kNull))
@@ -1883,7 +1937,6 @@ class SessionWorkbench extends ConfigurationItem {
 	showOverviewReport() {
 		this.selectReport("Overview")
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showOverviewReport()
 		
 		this.updateState()
@@ -1892,7 +1945,6 @@ class SessionWorkbench extends ConfigurationItem {
 	showCarReport() {
 		this.selectReport("Car")
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showCarReport()
 		
 		this.updateState()
@@ -1901,45 +1953,36 @@ class SessionWorkbench extends ConfigurationItem {
 	showDriverReport() {
 		this.selectReport("Driver")
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showDriverReport()
 		
 		this.updateState()
 	}
 	
 	editDriverReportSettings() {
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
-		
 		return this.ReportViewer.editReportSettings("Laps", "Drivers")
 	}
 	
 	showPositionReport() {
 		this.selectReport("Position")
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showPositionReport()
 		
 		this.updateState()
 	}
 	
 	editPositionReportSettings() {
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
-		
 		return this.ReportViewer.editReportSettings("Laps")
 	}
 	
 	showPaceReport() {
 		this.selectReport("Pace")
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
 		this.ReportViewer.showPaceReport()
 		
 		this.updateState()
 	}
 	
 	editPaceReportSettings() {
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
-		
 		return this.ReportViewer.editReportSettings("Laps", "Drivers")
 	}
 	
@@ -1993,6 +2036,10 @@ class SessionWorkbench extends ConfigurationItem {
 		this.updateState()
 	}
 	
+	editPressuresReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps")
+	}
+	
 	showTemperaturesReport() {
 		this.selectReport("Temperatures")
 		
@@ -2001,12 +2048,20 @@ class SessionWorkbench extends ConfigurationItem {
 		this.updateState()
 	}
 	
+	editTemperaturesReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps")
+	}
+	
 	showCustomReport() {
 		this.selectReport("Free")
 		
 		this.showTelemetryReport()
 		
 		this.updateState()
+	}
+	
+	editCustomReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps")
 	}
 	
 	updateSeriesSelector(report, force := false) {
@@ -2209,6 +2264,15 @@ class SessionWorkbench extends ConfigurationItem {
 			case "Pace":
 				if this.editPaceReportSettings()
 					this.showPaceReport()
+			case "Pressures":
+				if this.editPressuresReportSettings()
+					this.showPressuresReport()
+			case "Temperatures":
+				if this.editTemperaturesReportSettings()
+					this.showTemperaturesReport()
+			case "Free":
+				if this.editCustomReportSettings()
+					this.showCustomReport()
 		}
 	}
 	

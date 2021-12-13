@@ -185,20 +185,30 @@ class TelemetryDatabase extends SessionDatabase {
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, fuelRemaining, lapTime) {
 		this.Database.add("Electronics", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
-										, "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime
+										, "Fuel.Remaining": valueOrNull(fuelRemaining)
+										, "Fuel.Consumption": valueOrNull(fuelConsumption)
+										, "Lap.Time": valueOrNull(lapTime)
 										, Map: map, TC: tc, ABS: abs}, true)
 	}
 	
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
 				, fuelConsumption, fuelRemaining, lapTime) {
-		this.Database.add("Tyres", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.Database.add("Tyres", {Weather: weather
+								  , "Temperature.Air": valueOrNull(airTemperature), "Temperature.Track": valueOrNull(trackTemperature)
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
-								  , "Fuel.Remaining": fuelRemaining, "Fuel.Consumption": fuelConsumption, "Lap.Time": lapTime, "Tyre.Laps": tyreLaps
-								  , "Tyre.Pressure.Front.Left": pressureFL, "Tyre.Pressure.Front.Right": pressureFR
-								  , "Tyre.Pressure.Rear.Left": pressureRL, "Tyre.Pressure.Rear.Right": pressureRR
-								  , "Tyre.Temperature.Front.Left": temperatureFL, "Tyre.Temperature.Front.Right": temperatureFR
-								  , "Tyre.Temperature.Rear.Left": temperatureRL, "Tyre.Temperature.Rear.Right": temperatureRR}, true)
+								  , "Fuel.Remaining": valueOrNull(fuelRemaining)
+								  , "Fuel.Consumption": valueOrNull(fuelConsumption)
+								  , "Lap.Time": valueOrNull(lapTime), "Tyre.Laps": valueOrNull(tyreLaps)
+								  , "Tyre.Pressure.Front.Left": valueOrNull(pressureFL)
+								  , "Tyre.Pressure.Front.Right": valueOrNull(pressureFR)
+								  , "Tyre.Pressure.Rear.Left": valueOrNull(pressureRL)
+								  , "Tyre.Pressure.Rear.Right": valueOrNull(pressureRR)
+								  , "Tyre.Temperature.Front.Left": valueOrNull(temperatureFL)
+								  , "Tyre.Temperature.Front.Right": valueOrNull(temperatureFR)
+								  , "Tyre.Temperature.Rear.Left": valueOrNull(temperatureRL)
+								  , "Tyre.Temperature.Rear.Right": valueOrNull(temperatureRR)}
+								  , true)
 	}
 }
 

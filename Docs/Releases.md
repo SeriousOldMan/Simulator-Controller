@@ -1,3 +1,10 @@
+## 3.7.6-release 12/17/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Fully implemented "Session Workbench" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and exhaustive [documentation](*) for more information.
+  4. Added the new BMW M4 GT3 to the list of known ACC cars.
+
 ## 3.7.4-release 12/06/21
 
   1. Bugfixes, as always

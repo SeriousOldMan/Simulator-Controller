@@ -1,9 +1,9 @@
 [Development]
 Version=3.7.6-dev
 Target=3.7.6-release
-Date=12/11/2021
+Date=12/13/2021
 Download=
-Changes=Full implementation of the "Session Workbench"
+Changes=Full implementation of the "Session Workbench", Added BMW M4 to the list of ACC cars
 [Release]
 Version=3.7.4-release
 Date=12/06/2021

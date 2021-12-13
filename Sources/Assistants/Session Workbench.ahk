@@ -1639,6 +1639,12 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	syncPitstops(state := false) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PitstopsListView
+		
 		session := this.SelectedSession[true]
 		
 		nextStop := (LV_GetCount() + 1)
@@ -1646,14 +1652,14 @@ class SessionWorkbench extends ConfigurationItem {
 		if !state
 			try {
 				state := this.Connector.GetSessionValue(session, "Race Engineer State")
-				
-				state := parseConfiguration(state)
 			}
 			catch exception {
 				; ignore
 			}
 		
 		if (state && (state != "")) {
+			state := parseConfiguration(state)
+				
 			lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 			
 			if lap {
@@ -1698,7 +1704,6 @@ class SessionWorkbench extends ConfigurationItem {
 					Loop % LV_GetCount("Col")
 						LV_ModifyCol(A_Index, "AutoHdr")
 				}
-					
 				
 				this.syncPitstop(state)
 			}

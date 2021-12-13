@@ -331,7 +331,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if (carID == kUndefined)
 					break
 				else {
-					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", getConfigurationValue(carNames, "Car Model", carID, "Unknown"))
+					car := getConfigurationValue(carNames, "Car Model", carID, "Unknown")
+					
+					if ((car = "Unknown") && isDebug())
+						showMessage("Unknown car with ID " . carID . " detected...")
+					 	
+					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", car)
 				
 					if !driverCar {
 						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)

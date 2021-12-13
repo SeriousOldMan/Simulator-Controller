@@ -822,7 +822,7 @@ class RaceReportViewer {
 			
 			drawChartFunction .= ("`n" . substituteVariables(text, {cars: translate("Cars"), seconds: translate("Seconds")}))
 			
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)

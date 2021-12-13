@@ -119,7 +119,7 @@ class SessionWorkbench extends ConfigurationItem {
 	iConnected := false
 	
 	iServerURL := ""
-	iServerToken := ""
+	iServerToken := "__INVALID__"
 	
 	iTeams := {}
 	iSessions := {}
@@ -498,7 +498,7 @@ class SessionWorkbench extends ConfigurationItem {
 		settings := this.RaceSettings
 		
 		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "__INVALID__")
 		this.iTeamName := getConfigurationValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getConfigurationValue(settings, "Team Settings", "Session.Name", "")
@@ -631,7 +631,7 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui Tab, 2
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Laptime", "Consumption", "Accident"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Laptime", "Consumption", "Pressures", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
@@ -684,7 +684,7 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:+Disabled
 		
 		try {
-			this.Connector.Connect(this.ServerURL, this.ServerToken)
+			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
 	
 			this.iConnected := true
 			
@@ -697,7 +697,7 @@ class SessionWorkbench extends ConfigurationItem {
 		catch exception {
 			SetTimer syncSession, Off
 			
-			this.iServerToken := ""
+			this.iServerToken := "__INVALID__"
 			
 			GuiControl, , serverTokenEdit, % ""
 			
@@ -1225,10 +1225,10 @@ class SessionWorkbench extends ConfigurationItem {
 			lap.TC := getConfigurationValue(data, "Car Data", "TC")
 			lap.ABS := getConfigurationValue(data, "Car Data", "ABS")
 			
-			lap.Weather := translate(getConfigurationValue(data, "Weather Data", "Weather"))
+			lap.Weather := getConfigurationValue(data, "Weather Data", "Weather")
 			lap.AirTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature"), 1)
 			lap.TrackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature"), 1)
-			lap.Grip := translate(getConfigurationValue(data, "Track Data", "Grip"))
+			lap.Grip := getConfigurationValue(data, "Track Data", "Grip")
 			
 			compound := getConfigurationValue(data, "Car Data", "TyreCompound")
 			color := getConfigurationValue(data, "Car Data", "TyreCompoundColor")
@@ -1236,7 +1236,7 @@ class SessionWorkbench extends ConfigurationItem {
 			if (color != "Black")
 				compound .= (" (" . color . ")")
 			
-			lap.Compound := translate(compound)
+			lap.Compound := compound
 			
 			rawData := this.Connector.GetLapValue(identifier, "Positions Data")
 			data := parseConfiguration(rawData)
@@ -1305,7 +1305,7 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui ListView, % this.StintsListView
 		
-		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
+		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*), translate(stint.Compound), stint.Laps.Length()
 							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
 							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 	}
@@ -1370,7 +1370,8 @@ class SessionWorkbench extends ConfigurationItem {
 				Gui ListView, % this.StintsListView
 				
 				for ignore, stint in newStints {
-					LV_Add("", stint.Nr, stint.Driver.FullName, stint.Weather, stint.Compound, stint.Laps.Length()
+					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
+							 , translate(stint.Compound), stint.Laps.Length()
 							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					
@@ -1390,7 +1391,7 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, lap.Laptime, lap.FuelConsumption, lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -1623,6 +1624,10 @@ class SessionWorkbench extends ConfigurationItem {
 			pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 									  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
 			
+			Gui ListView, % this.LapsListView
+			
+			LV_Modify(this.Laps[lap].Row, "Col9", values2String(", ", string2Values(",", lapPressures[9])*))
+
 			newData := true
 			lap += 1
 		}
@@ -1817,7 +1822,7 @@ class SessionWorkbench extends ConfigurationItem {
 		potential := false
 		raceCraft := false
 		speed := false
-		consitency := false
+		consistency := false
 		carControl := false
 		
 		this.computeLapStatistics(driver, laps, potential, raceCraft, speed, consistency, carControl)
@@ -2522,7 +2527,7 @@ class SessionWorkbench extends ConfigurationItem {
 		return drawChartFunction
 	}
 	
-	createDriverDetailsChart(chartID, width, height, stint) {
+	createStintPerformanceChart(chartID, width, height, stint) {
 		this.updateStintStatistics(stint)
 
 		drawChartFunction := ""
@@ -2622,26 +2627,26 @@ class SessionWorkbench extends ConfigurationItem {
 			
 		html .= ("<br><br><div id=""header""><i>" . translate("Driver") . "</i></div>")
 		
-		chart2 := this.createDriverDetailsChart(2, 555, 248, stint)
+		chart2 := this.createStintPerformanceChart(2, 555, 248, stint)
 		
 		html .= ("<br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
 			
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
-	createDriverDetails() {
-		drivers := []
-		stints := []
-		laps := []
-		drivingTimes := []
-		avgLapTimes := []
-		avgFuelConsumptions := []
-		accidents := []
+	createDriverDetails(drivers) {
+		driverData := []
+		stintsData := []
+		lapsData := []
+		drivingTimesData := []
+		avgLapTimesData := []
+		avgFuelConsumptionsData := []
+		accidentsData := []
 		
-		for ignore, driver in this.Drivers {
-			drivers.Push("<td id=""data"">" . StrReplace(driver.FullName, "'", "\'") . "</td>")
-			stints.Push("<td id=""data"">" . driver.Stints.Length() . "</td>")
-			laps.Push("<td id=""data"">" . driver.Laps.Length() . "</td>")
+		for ignore, driver in drivers {
+			driverData.Push("<td id=""data"">" . StrReplace(driver.FullName, "'", "\'") . "</td>")
+			stintsData.Push("<td id=""data"">" . driver.Stints.Length() . "</td>")
+			lapsData.Push("<td id=""data"">" . driver.Laps.Length() . "</td>")
 			
 			drivingTime := 0
 			lapAccidents := 0
@@ -2657,36 +2662,161 @@ class SessionWorkbench extends ConfigurationItem {
 					lapAccidents += 1
 			}
 			
-			drivingTimes.Push("<td id=""data"">" . Round(drivingTime / 60) . "</td>")
-			avgLapTimes.Push("<td id=""data"">" . Round(average(lapTimes), 1) . "</td>")
-			avgFuelConsumptions.Push("<td id=""data"">" . Round(average(fuelConsumptions), 1) . "</td>")
-			accidents.Push("<td id=""data"">" . lapAccidents . "</td>")
+			drivingTimesData.Push("<td id=""data"">" . Round(drivingTime / 60) . "</td>")
+			avgLapTimesData.Push("<td id=""data"">" . Round(average(lapTimes), 1) . "</td>")
+			avgFuelConsumptionsData.Push("<td id=""data"">" . Round(average(fuelConsumptions), 1) . "</td>")
+			accidentsData.Push("<td id=""data"">" . lapAccidents . "</td>")
 		}
 			
 		html := "<table id=""laps"">"
-		html .= ("<tr><td><i>" . translate("Driver:") . "</i></td>" . values2String("", drivers*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("# Stints:") . "</i></td>" . values2String("", stints*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("# Laps:") . "</i></td>" . values2String("", laps*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("Driving Time:") . "</i></td>" . values2String("", drivingTimes*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("Avg. Lap Time:") . "</i></td>" . values2String("", avgLapTimes*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("Avg. Fuel Consumption:") . "</i></td>" . values2String("", avgFuelConsumptions*) . "</tr>")
-		html .= ("<tr><td><i>" . translate("# Accidents:") . "</i></td>" . values2String("", accidents*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("Driver:") . "</i></td>" . values2String("", driverData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("# Stints:") . "</i></td>" . values2String("", stintsData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("# Laps:") . "</i></td>" . values2String("", lapsData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("Driving Time:") . "</i></td>" . values2String("", drivingTimesData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("Avg. Lap Time:") . "</i></td>" . values2String("", avgLapTimesData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("Avg. Fuel Consumption:") . "</i></td>" . values2String("", avgFuelConsumptionsData*) . "</tr>")
+		html .= ("<tr><td><i>" . translate("# Accidents:") . "</i></td>" . values2String("", accidentsData*) . "</tr>")
 		html .= "</table>"
 			
 		return html
 	}
 	
+	createDriverPaceChart(chartID, width, height, drivers) {
+		drawChartFunction := "function drawChart" . chartID . "() {`nvar array = [`n"
+		
+		length := 2000000
+		
+		for ignore, driver in drivers
+			length := Min(length, driver.Laps.Length())
+		
+		if (length = 2000000)
+			return ""
+			
+		lapTimes := []
+		
+		for ignore, driver in drivers {
+			driverTimes := Array("'" . driver.Nickname . "'")
+			
+			for ignore, lap in driver.Laps {
+				if (A_Index > length)
+					break
+				
+				value := chartValue(null(lap.Laptime))
+				
+				if (value != "null")
+					driverTimes.Push(value)
+			}
+			lapTimes.Push("[" . values2String(", ", driverTimes*) . "]")
+		}
+		
+		drawChartFunction .= (values2String("`n, ", lapTimes*) . "];")
+			
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+		drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver") . "');"
+		
+		Loop %length%
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . A_Index . "');"
+		
+		text =
+		(
+		data.addColumn({id:'max', type:'number', role:'interval'});
+		data.addColumn({id:'min', type:'number', role:'interval'});
+		data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
+		data.addColumn({id:'median', type:'number', role:'interval'});
+		data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
+		)
+		
+		drawChartFunction .= ("`n" . text)
+		
+		drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (length + 1) . "));")
+		
+		drawChartFunction .= ("`n" . getPaceJSFunctions())
+		
+		text =
+		(
+		var options = {
+			backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+			legend: { position: 'none' },
+		)
+		
+		drawChartFunction .= text
+		
+		text =
+		(
+			hAxis: { title: '`%drivers`%', gridlines: { color: '#777' } },
+			vAxis: { title: '`%seconds`%' }, 
+			lineWidth: 0,
+			series: [ { 'color': 'D8D8D8' } ],
+			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
+			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
+						min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+		};
+		)
+		
+		drawChartFunction .= ("`n" . substituteVariables(text, {drivers: translate("Drivers"), seconds: translate("Seconds")}))
+		
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		
+		return drawChartFunction
+	}
+	
+	createDriverPerformanceChart(chartID, width, height, drivers) {
+		driverNames := []
+		potentialsData := []
+		raceCraftsData := []
+		speedsData := []
+		consistenciesData := []
+		carControlsData := []
+		
+		for ignore, driver in drivers {
+			driverNames.Push(StrReplace(driver.FullName, "'", "\'"))
+			potentialsData.Push(driver.Potential)
+			raceCraftsData.Push(driver.RaceCraft)
+			speedsData.Push(driver.Speed)
+			consistenciesData.Push(driver.Consistency)
+			carControlsData.Push(driver.CarControl)
+		}
+
+		drawChartFunction := ""
+		
+		drawChartFunction .= "function drawChart" . chartID . "() {"
+		drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+		drawChartFunction .= "`n['" . values2String("', '", translate("Category"), driverNames*) . "'],"
+		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentialsData*) . "],"
+		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCraftsData*) . "],"
+		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speedsData*) . "],"
+		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistenciesData*) . "],"
+		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControlsData*) . "]"
+		
+		drawChartFunction .= ("`n]);")
+			
+		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
+		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		
+		return drawChartFunction
+	}			
+			
 	showDriverStatistics() {
 		for ignore, driver in this.Drivers
 			this.updateDriverStatistics(driver)
 		
 		html := ("<div id=""header""><b>" . translate("Driver Statistics") . "</b></div>")
+		
+		html .= ("<br>" . this.createDriverDetails(this.Drivers))
+		
+		html .= ("<br><br><div id=""header""><i>" . translate("Pace") . "</i></div>")
 			
-		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
+		chart1 := this.createDriverPaceChart(1, 555, 248, this.Drivers)
 		
-		html .= ("<br>" . this.createDriverDetails())
+		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
+			
+		html .= ("<br><br><div id=""header""><i>" . translate("Performance") . "</i></div>")
+			
+		chart2 := this.createDriverPerformanceChart(2, 555, 248, this.Drivers)
 		
-		this.showDetails(html)
+		html .= ("<br><br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
+		
+		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 }
 
@@ -2870,7 +3000,7 @@ connectServer() {
 	GuiControlGet serverTokenEdit
 	
 	workbench.iServerURL := serverURLEdit
-	workbench.iServerToken := serverTokenEdit
+	workbench.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
 	
 	workbench.connect()
 }

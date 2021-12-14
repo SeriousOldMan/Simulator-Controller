@@ -2,8 +2,10 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Fully implemented "Session Workbench" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and exhaustive [documentation](*) for more information.
-  4. Added the new BMW M4 GT3 to the list of known ACC cars.
+  3. Almost fully implemented "Race Center" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and exhaustive [documentation](*) for more information.
+  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "RaceEngineer" and "Race Strategist" plugins.
+  5. New ["openRaceCenter" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Race Center" from external event sources.
+  6. Added the new BMW M4 GT3 to the list of known ACC cars.
 
 ## 3.7.4-release 12/06/21
 
@@ -111,7 +113,7 @@
   3. Renamed "Setup Database" repository to "Database".
   4. New "Strategy Workbench" tool. Currently undocumented and not much more than an Alpha release.
   5. "Race Strategist" can now save race statistics for later use in the "Strategy Workbench". See the [revised configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the "Race Strategist" plugin for more information.
-  6. New [plugin parameter "openStrategyWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "Race Strategist" plugin
+  6. New [plugin parameter "openStrategyWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "Race Strategist" plugin.
   7. New ["openStrategyWorkbench" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Strategy Workbench" from external event sources.
   8. Fixed "Setup Wizard" to correctly generate the "Pedal Calibration" configuration.
   9. [Developer] New lightweight Database library to handle simple in-memory or persistent data sets.

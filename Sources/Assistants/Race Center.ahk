@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Session Workbench               ;;;
+;;;   Modular Simulator Controller System - Race Center                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
-;@Ahk2Exe-ExeName Session Workbench.exe
+;@Ahk2Exe-ExeName Race Center.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -119,7 +119,7 @@ global pitstopPressureRLEdit
 global pitstopPressureRREdit
 global pitstopRepairsDropDown
 
-class SessionWorkbench extends ConfigurationItem {
+class RaceCenter extends ConfigurationItem {
 	iClosed := false
 	
 	iSessionDirectory := false
@@ -171,10 +171,10 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
-		__New(workbench) {
+		__New(rCenter) {
 			base.__New()
 			
-			this.setDatabase(new Database(workbench.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(new Database(rCenter.SessionDirectory, kTelemetrySchemas))
 		}
 	}
 	
@@ -187,8 +187,8 @@ class SessionWorkbench extends ConfigurationItem {
 			}
 		}
 		
-		__New(workbench) {
-			this.iDatabase := new Database(workbench.SessionDirectory, kSetupDataSchemas)
+		__New(rCenter) {
+			this.iDatabase := new Database(rCenter.SessionDirectory, kSetupDataSchemas)
 		}
 		
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
@@ -510,7 +510,7 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		SessionWorkbench.Instance := this
+		RaceCenter.Instance := this
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -548,7 +548,7 @@ class SessionWorkbench extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenDashboardDocumentation, % translate("Session Workbench")
+		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
 		
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
 			
@@ -623,9 +623,9 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Stint Overview", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Simulate Over-/Undercut", "Run Simulation", "---------------------------------------------", "Use as Strategy...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Monte Carlo Analysis...", "Run Simulation", "---------------------------------------------", "Update Race Strategy", "Clear Race Strategy"], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session...", "Initialize from Setup Database...", "---------------------------------------------", "Instruct Engineer..."], "translate")*)
 		
@@ -695,7 +695,7 @@ class SessionWorkbench extends ConfigurationItem {
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
+		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 		
 		this.iPitstopsListView := listHandle
 		
@@ -1047,8 +1047,8 @@ class SessionWorkbench extends ConfigurationItem {
 				}
 			case 7: ; Update Statistics
 				this.updateStatistics()
-			case 9: ; Stint Overview
-				this.showStintOverview()
+			case 9: ; Race Summary
+				this.showRaceSummary()
 			case 10: ; Driver Statistics
 				this.showDriverStatistics()
 		}
@@ -3203,6 +3203,8 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		html := ("<div id=""header""><b>" . translate("Driver Statistics") . "</b></div>")
 		
+		html .= ("<br><br><div id=""header""><i>" . translate("Driver") . "</i></div>")
+		
 		html .= ("<br>" . this.createDriverDetails(this.Drivers))
 		
 		html .= ("<br><br><div id=""header""><i>" . translate("Pace") . "</i></div>")
@@ -3220,8 +3222,35 @@ class SessionWorkbench extends ConfigurationItem {
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
-	showStintOverview() {
-		html := ("<div id=""header""><b>" . translate("Stint Statistics") . "</b></div>")
+	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries) {
+		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Remaining") . "');")
+		drawChartFunction .= "`ndata.addRows(["
+		
+		for ignore, time in lapSeries {
+			if (A_Index > 1)
+				drawChartFunction .= ", "
+			
+			drawChartFunction .= ("[" . values2String(", ", lapSeries[A_Index]
+														  , chartValue(null(positionSeries[A_Index]))
+														  , chartValue(null(fuelSeries[A_Index])))
+									  . "]")
+		}
+		
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+				
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+		
+		return drawChartFunction
+	}
+	
+	showRaceSummary() {
+		html := ("<div id=""header""><b>" . translate("Race Summary") . "</b></div>")
+		
+		html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
 		
 		stints := []
 		drivers := []
@@ -3257,7 +3286,7 @@ class SessionWorkbench extends ConfigurationItem {
 				accidents.Push("<td id=""data"">" . stint.Accidents . "</td>")
 			}
 		
-		html := "<br><br><table id=""table"">"
+		html .= "<br><br><table id=""table"">"
 		html .= ("<tr><td><b>" . translate("Stint:") . "</b></div></td>" . values2String("", stints*) . "</tr>")
 		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td>" . values2String("", drivers*) . "</tr>")
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td>" . values2String("", laps*) . "</tr>")
@@ -3269,7 +3298,29 @@ class SessionWorkbench extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("# Accidents:") . "</b></div></td>" . values2String("", accidents*) . "</tr>")
 		html .= "</table>"
 		
-		this.showDetails(html)
+		html .= ("<br><br><div id=""header""><i>" . translate("Race Course") . "</i></div>")
+		
+		laps := []
+		positions := []
+		remainingFuels := []
+		
+		lastLap := this.LastLap
+		
+		if lastLap
+			Loop % lastLap.Nr
+			{
+				lap := this.Laps[A_Index]
+				
+				laps.Push(lap.Nr)
+				positions.Push(chartValue(null(lap.Position)))
+				remainingFuels.Push(chartValue(null(lap.FuelRemaining)))
+			}
+		
+		chart1 := this.createRaceSummaryChart(1, 555, 248, laps, positions, remainingFuels)
+		
+		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
+		
+		this.showDetails(html, [1, chart1])
 	}
 }
 
@@ -3439,49 +3490,49 @@ loadSessions(connector, team) {
 }
 
 moveTeamDashboard() {
-	moveByMouse(SessionWorkbench.Instance.Window)
+	moveByMouse(RaceCenter.Instance.Window)
 }
 
 closeTeamDashboard() {
-	SessionWorkbench.Instance.close()
+	RaceCenter.Instance.close()
 }
 
 connectServer() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
 	GuiControlGet serverURLEdit
 	GuiControlGet serverTokenEdit
 	
-	workbench.iServerURL := serverURLEdit
-	workbench.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
+	rCenter.iServerURL := serverURLEdit
+	rCenter.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
 	
-	workbench.connect()
+	rCenter.connect()
 }
 
 chooseTeam() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
 	GuiControlGet teamDropDownMenu
 	
-	workbench.withExceptionhandler(ObjBindMethod(workbench, "selectTeam")
-								 , getValues(workbench.Teams)[teamDropDownMenu])
+	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "selectTeam")
+							   , getValues(rCenter.Teams)[teamDropDownMenu])
 }
 
 chooseSession() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
 	GuiControlGet sessionDropDownMenu
 	
-	workbench.withExceptionhandler(ObjBindMethod(workbench, "selectSession")
-								 , getValues(workbench.Sessions)[sessionDropDownMenu])
+	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "selectSession")
+							   , getValues(rCenter.Sessions)[sessionDropDownMenu])
 }
 
 chooseChartType() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
 	GuiControlGet chartTypeDropDown
 	
-	workbench.selectChartType(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
+	rCenter.selectChartType(["Scatter", "Bar", "Bubble", "Line"][chartTypeDropDown])
 }
 
 sessionMenu() {
@@ -3489,7 +3540,7 @@ sessionMenu() {
 	
 	GuiControl Choose, sessionMenuDropDown, 1
 	
-	SessionWorkbench.Instance.chooseSessionMenu(sessionMenuDropDown)
+	RaceCenter.Instance.chooseSessionMenu(sessionMenuDropDown)
 }
 
 strategyMenu() {
@@ -3497,7 +3548,7 @@ strategyMenu() {
 	
 	GuiControl Choose, strategyMenuDropDown, 1
 	
-	SessionWorkbench.Instance.chooseStrategyMenu(strategyMenuDropDown)
+	RaceCenter.Instance.chooseStrategyMenu(strategyMenuDropDown)
 }
 
 pitstopMenu() {
@@ -3505,54 +3556,63 @@ pitstopMenu() {
 	
 	GuiControl Choose, pitstopMenuDropDown, 1
 	
-	SessionWorkbench.Instance.choosePitstopMenu(pitstopMenuDropDown)
+	RaceCenter.Instance.choosePitstopMenu(pitstopMenuDropDown)
 }
 
 openDashboardDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session-workbench
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center
 }
 
 updateState() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	workbench.withExceptionhandler(ObjBindMethod(workbench, "updateState"))
+	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "updateState"))
 }
 
 planPitstop() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	workbench.withExceptionhandler(ObjBindMethod(workbench, "planPitstop"))
+	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "planPitstop"))
 }
 
 chooseStint() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	Gui ListView, % workbench.StintsListView
+	Gui ListView, % rCenter.StintsListView
 	
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		LV_GetText(stint, A_EventInfo, 1)
 		
-		workbench.showStintDetails(workbench.Stints[stint])
+		rCenter.showStintDetails(rCenter.Stints[stint])
 	}
 }
 
 chooseLap() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	Gui ListView, % workbench.LapsListView
+	Gui ListView, % rCenter.LapsListView
+	
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
+choosePitstop() {
+	rCenter := RaceCenter.Instance
+	
+	Gui ListView, % rCenter.PitstopsListView
 	
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 }
 
 chooseReport() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
 	Gui ListView, % reportsListView
 	
-	if workbench.HasData {
+	if rCenter.HasData {
 		if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-			workbench.showReport(kSessionReports[A_EventInfo])
+			rCenter.showReport(kSessionReports[A_EventInfo])
 	}
 	else
 		Loop % LV_GetCount()
@@ -3560,33 +3620,33 @@ chooseReport() {
 }
 
 chooseAxis() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	workbench.showTelemetryReport()
+	rCenter.showTelemetryReport()
 }
 
 reportSettings() {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	workbench.reportSettings(workbench.SelectedReport)
+	rCenter.reportSettings(rCenter.SelectedReport)
 }
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	workbench := SessionWorkbench.Instance
+	rCenter := RaceCenter.Instance
 	
-	workbench.initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
+	rCenter.initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
 	
 	return false
 }
 
 syncSession() {
-	workbench := SessionWorkbench.Instance
-	window := workbench.Window
+	rCenter := RaceCenter.Instance
+	window := rCenter.Window
 	
 	try {
 		Gui %window%:+Disabled
 		
-		workbench.syncSession()
+		rCenter.syncSession()
 	}
 	finally {
 		Gui %window%:-Disabled
@@ -3595,24 +3655,24 @@ syncSession() {
 	}
 }
 
-startupSessionWorkbench() {
+startupRaceCenter() {
 	icon := kIconsDirectory . "Console.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Session Workbench
+	Menu Tray, Tip, Race Center
 
 	current := fixIE(11)
 	
 	try {
-		workbench := new SessionWorkbench(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
+		rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 		
-		workbench.createGui(workbench.Configuration)
+		rCenter.createGui(rCenter.Configuration)
 		
-		workbench.connect(true)
+		rCenter.connect(true)
 		
 		registerEventHandler("Setup", "functionEventHandler")
 		
-		workbench.show()
+		rCenter.show()
 		
 		ExitApp 0
 	}
@@ -3626,4 +3686,4 @@ startupSessionWorkbench() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startupSessionWorkbench()
+startupRaceCenter()

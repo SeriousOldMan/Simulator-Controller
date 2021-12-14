@@ -185,6 +185,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceSettings(false, false, this.Plugin)
 			else if (this.Action = "SetupImport")
 				openRaceSettings(true, false, this.Plugin)
+			else if (this.Action = "RaceCenterOpen")
+				openRaceCenter(this.Plugin)
 			else if (this.Action = "SetupDatabaseOpen")
 				openSetupDatabase(this.Plugin)
 			else if (this.Action = "StrategyWorkbenchOpen")
@@ -407,6 +409,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if openStrategyWorkbench
 			this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
 		
+		openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+		
+		if openRaceCenter
+			this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
+		
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
@@ -471,7 +478,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				this.registerAction(new this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
-			else if ((action = "RaceSettingsOpen") || (action = "SetupImport") || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen")) {
+			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
+				  || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
@@ -519,7 +527,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				theAction.Function.enable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
-				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen") || (theAction.Action = "StrategyWorkbenchOpen")) {
+				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen")
+				 || (theAction.Action = "StrategyWorkbenchOpen")|| (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -1356,6 +1365,30 @@ openStrategyWorkbench(plugin := false) {
 		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
 		showMessage(substituteVariables(translate("Cannot start the Strategy Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openRaceCenter(plugin := false) {
+	exePath := kBinariesDirectory . "Race Center.exe"	
+	controller := SimulatorController.Instance
+	
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
+	
+	try {
+		options := getSimulatorOptions(plugin)
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

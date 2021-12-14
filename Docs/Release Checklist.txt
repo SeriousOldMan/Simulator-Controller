@@ -21,12 +21,16 @@ Release 3.7.6 Checklist
 =======================
 
 0. Search for new links (*)
-1. Full implementation of "Session Workbench"
+1. Full implementation of "Race Center"
    a. Translations
    b. Images
    c. Documentation
+2. New "openRaceCenter" action and action function
+   a. Documentation
+   b. Update procedure
 2. Update procedure
    a. Translations
+   a. Controller Action Labels & Icons
 
 Release 3.7.4 Checklist
 =======================

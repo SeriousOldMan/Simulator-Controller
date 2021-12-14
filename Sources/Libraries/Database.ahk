@@ -34,6 +34,7 @@ class Database {
 	iDirectory := false
 	iSchemas := false
 	iTables := {}
+	iTableChanged := {}
 	
 	Directory[] {
 		Get {
@@ -134,40 +135,6 @@ class Database {
 		return (needsClone ? rows.Clone() : rows)
 	}
 	
-	flush(name := false) {
-		if name {
-			if this.Tables.HasKey(name) {
-				directory := this.Directory
-				fileName := (directory . name . ".CSV")
-				
-				FileCreateDir %directory%
-				
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
-				
-				schema := this.Schemas[name]
-				
-				for ignore, row in this.Tables[name] {
-					values := []
-				
-					for ignore, column in schema
-						values.Push(row.HasKey(column) ? row[column] : kNull)
-					
-					row := (values2String(";", values*) . "`n")
-		
-					FileAppend %row%, %fileName%
-				}
-			}
-		}
-		else
-			for name, ignore in this.Tables
-				this.flush(name)
-	}
-	
 	reload(flush := true) {
 		if flush
 			this.flush()
@@ -193,6 +160,8 @@ class Database {
 			
 			FileAppend %row%, %fileName%
 		}
+		else
+			this.iTableChanged[name] := true
 	}
 	
 	remove(name, where, predicate, flush := false) {
@@ -210,9 +179,56 @@ class Database {
 				rows.Push(row)
 		
 		this.iTables[name] := rows
+		this.iTableChanged[name] := true
 		
 		if flush
 			this.flush(name)
+	}
+	
+	clear(name, flush := false) {
+		if this.Tables.HasKey(name) {
+			this.Tables[name] := []
+			this.iTableChanged[name] := true
+			
+			if flush
+				this.flush(name)
+		}
+	}
+	
+	flush(name := false) {
+		if name {
+			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
+				directory := this.Directory
+				fileName := (directory . name . ".CSV")
+				
+				FileCreateDir %directory%
+				
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+				
+				schema := this.Schemas[name]
+				
+				for ignore, row in this.Tables[name] {
+					values := []
+				
+					for ignore, column in schema
+						values.Push(row.HasKey(column) ? row[column] : kNull)
+					
+					row := (values2String(";", values*) . "`n")
+		
+					FileAppend %row%, %fileName%
+				}
+				
+				this.iTableChanged.Delete(name)
+			}
+		}
+		else
+			for name, ignore in this.Tables
+				this.flush(name)
 	}
 }
 

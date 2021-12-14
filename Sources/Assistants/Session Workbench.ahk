@@ -4,7 +4,7 @@
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+	
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -52,8 +52,14 @@ global kEvent = "Event"
 
 global kSessionReports = concatenate(kRaceReports, ["Pressures", "Temperatures", "Free"])
 
-global kSessionDataSchemas := {"Lap.Data": ["Stint", "Lap", "Lap.Time", "Temperature.Air", "Temperature.Track", "Map", "TC", "ABS"
-										  , "Fuel.Remaining", "Fuel.Consumption", "Tyre.Laps"
+global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
+											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
+											, "Position.Start", "Position.End"]
+							 , "Driver.Data": ["Forname", "Surname", "Nickname"]
+							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
+										  , "Weather", "Temperature.Air", "Temperature.Track"
+										  , "Fuel.Remaining", "Fuel.Consumption", "Damage", "Accident"
+										  , "Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
 										  , "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 										  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 										  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -62,8 +68,12 @@ global kSessionDataSchemas := {"Lap.Data": ["Stint", "Lap", "Lap.Time", "Tempera
 										  , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 										  , "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 										  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
-										  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]}
-										  
+										  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
+											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
+											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+											  , "Repair.Bodywork", "Repair.Suspension"]}
+				
 						
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -131,6 +141,7 @@ class SessionWorkbench extends ConfigurationItem {
 	iSessionName := false
 	
 	iSessionLoaded := false
+	iSessionFinished := false
 	
 	iSimulator := false
 	iCar := false
@@ -150,13 +161,14 @@ class SessionWorkbench extends ConfigurationItem {
 	iLapsListView := false
 	iPitstopsListView := false
 	
+	iSessionDatabase := false
+	iTelemetryDatabase := false
+	iPressuresDatabase := false
+	
 	iReportViewer := false
-	iReportDatabase := false
 	iSelectedReport := false
 	iSelectedChartType := false
 	
-	iTelemetryDatabase := false
-	iPressuresDatabase := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		__New(workbench) {
@@ -308,6 +320,12 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
+	SessionFinished[] {
+		Get {
+			return this.iSessionFinished
+		}
+	}
+	
 	SessionLoaded[] {
 		Get {
 			return this.iSessionLoaded
@@ -422,15 +440,37 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	ReportViewer[] {
+	SessionDatabase[] {
 		Get {
-			return this.iReportViewer
+			if (!this.iSessionDatabase && this.HasData) {
+				this.iSessionDatabase := new Database(this.SessionDirectory, kSessionDataSchemas)
+			}
+			
+			return this.iSessionDatabase
 		}
 	}
 	
-	ReportDatabase[] {
+	TelemetryDatabase[] {
 		Get {
-			return this.iReportDatabase
+			if !this.iTelemetryDatabase
+				this.iTelemetryDatabase := new this.SessionTelemetryDatabase(this)
+			
+			return this.iTelemetryDatabase
+		}
+	}
+	
+	PressuresDatabase[] {
+		Get {
+			if !this.iPressuresDatabase
+				this.iPressuresDatabase := new this.SessionPressuresDatabase(this)
+		
+			return this.iPressuresDatabase
+		}
+	}
+	
+	ReportViewer[] {
+		Get {
+			return this.iReportViewer
 		}
 	}
 	
@@ -443,18 +483,6 @@ class SessionWorkbench extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
-		}
-	}
-	
-	TelemetryDatabase[] {
-		Get {
-			return this.iTelemetryDatabase
-		}
-	}
-	
-	PressuresDatabase[] {
-		Get {
-			return this.iPressuresDatabase
 		}
 	}
 	
@@ -595,9 +623,9 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Load Session...", "Save Session", "Save Session Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Stint Statistics", "Driver Statistics", "Accident Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Stint Overview", "Driver Statistics"], "translate")*)
 
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Run Simulation...", "Use as Strategy...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Simulate Over-/Undercut", "Run Simulation", "---------------------------------------------", "Use as Strategy...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session...", "Initialize from Setup Database...", "---------------------------------------------", "Instruct Engineer..."], "translate")*)
 		
@@ -667,7 +695,7 @@ class SessionWorkbench extends ConfigurationItem {
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Lap", "Refuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
+		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 		
 		this.iPitstopsListView := listHandle
 		
@@ -810,9 +838,12 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	addDriver(driver) {
 		for ignore, candidate in this.Drivers
-			if candidate.Identifier == driver.Identifier
+			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
+				return candidate
+			else if ((candidate.Forname = driver.Forname) && (candidate.Surname = driver.Surname) && (candidate.Nickname = driver.Nickname))
 				return candidate
 		
+		driver.Fullname := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 		driver.Laps := []
 		driver.Stints := []
 		driver.Accidents := 0
@@ -994,17 +1025,32 @@ class SessionWorkbench extends ConfigurationItem {
 			case 3: ; Load Session...
 				this.loadSession()
 			case 4: ; Save Session
-				this.saveSession()
+				if this.HasData
+					if this.SessionActive
+						this.saveSession()
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session. Use ""Save a Copy..."" instead.")
+						OnMessage(0x44, "")
+					}
 			case 5: ; Save Session Copy...
-				this.saveSession(true)
+				if this.HasData
+					this.saveSession(true)
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
+					OnMessage(0x44, "")
+				}
 			case 7: ; Update Statistics
 				this.updateStatistics()
-			case 9: ; Stint Statistics
-				this.showStintStatistics()
+			case 9: ; Stint Overview
+				this.showStintOverview()
 			case 10: ; Driver Statistics
 				this.showDriverStatistics()
-			case 11: ; Driver Statistics
-				this.showAccidentStatistics()
 		}
 	}
 	
@@ -1048,10 +1094,15 @@ class SessionWorkbench extends ConfigurationItem {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:
-				if !this.SessionActive
-					return
-				
-				this.planPitstop()
+				if this.SessionActive
+					this.planPitstop()
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
+					OnMessage(0x44, "")
+				}
 		}
 	}
 	
@@ -1069,6 +1120,9 @@ class SessionWorkbench extends ConfigurationItem {
 	}
 	
 	initializeSession() {
+		this.iSessionFinished := false
+		this.iSessionLoaded := false
+		
 		if this.SessionActive {
 			directory := this.SessionDirectory
 			
@@ -1091,6 +1145,8 @@ class SessionWorkbench extends ConfigurationItem {
 			}
 		
 			FileCreateDir %reportDirectory%
+			
+			this.ReportViewer.setReport(reportDirectory)
 		}
 		
 		Gui ListView, % this.StintsListView
@@ -1114,14 +1170,13 @@ class SessionWorkbench extends ConfigurationItem {
 		
 		this.iTelemetryDatabase := false
 		this.iPressuresDatabase := false
+		this.iSessionDatabase := false
 		
-		this.iReportDatabase := false
 		this.iSelectedReport := false
 		this.iSelectedChartType := false
 		
-		this.ReportViewer.setReport(this.SessionDirectory . "Race Report")
-		
 		this.showChart(false)
+		this.showDetails(false)
 	}
 	
 	loadNewStints(currentStint) {
@@ -1142,7 +1197,6 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				stint.Driver := driver
 				driver.Stints.Push(stint)
-				stint.Driver.Fullname := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 				stint.FuelConsumption := 0.0
 				stint.Accidents := 0
 				stint.Weather := "-"
@@ -1187,6 +1241,10 @@ class SessionWorkbench extends ConfigurationItem {
 			identifier := lap.Identifier
 			
 			lap.Stint := stint
+			
+			if (stint.Laps.Length() == 0)
+				stint.Lap := lap.Nr
+			
 			stint.Laps.Push(lap)
 			stint.Driver.Laps.Push(lap)
 			
@@ -1391,7 +1449,7 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, lap.Stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -1519,126 +1577,150 @@ class SessionWorkbench extends ConfigurationItem {
 		return newData
 	}
 	
-	syncTelemetry() {
-		session := this.SelectedSession[true]
-		
-		if !this.TelemetryDatabase
-			this.iTelemetryDatabase := new this.SessionTelemetryDatabase(this)
-		
-		telemetryDB := this.TelemetryDatabase
-		
+	syncTelemetry(load := false) {
 		lastLap := this.LastLap
 		
 		if lastLap
 			lastLap := lastLap.Nr
 		else
-			return
+			return false
 		
-		tyresTable := telemetryDB.Database.Tables["Tyres"]
-		lap := tyresTable.Length()
-		
-		if (lap > 0)
-			runningLap := tyresTable[lap]["Tyre.Laps"]
-		else
-			runningLap := 0
-
 		newData := false
-		lap += 1
 		
-		while (lap <= lastLap) {
-			try {
-				telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
-				
-				if (!telemetryData || (telemetryData == ""))
-					throw "No data..."
-			}
-			catch exception {
-				telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", false, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
-			}
+		if !load {
+			session := this.SelectedSession[true]
+			telemetryDB := this.TelemetryDatabase
 			
-			telemetryData := string2Values(";", telemetryData)
+			tyresTable := telemetryDB.Database.Tables["Tyres"]
 		
-			if telemetryData[10]
+			lap := tyresTable.Length()
+			
+			if (lap > 0)
+				runningLap := tyresTable[lap]["Tyre.Laps"]
+			else
 				runningLap := 0
-			
-			runningLap += 1
-			
-			pressures := string2Values(",", telemetryData[16])
-			temperatures := string2Values(",", telemetryData[17])
-			
-			telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-										 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
-										 
-			telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-								   , pressures[1], pressures[2], pressures[4], pressures[4]
-								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-								   , telemetryData[7], telemetryData[8], telemetryData[9])
-			
-			newData := true
+		
 			lap += 1
+		
+			while (lap <= lastLap) {
+				try {
+					telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
+					
+					if (!telemetryData || (telemetryData == ""))
+						throw "No data..."
+				}
+				catch exception {
+					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", false, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
+				}
+				
+				telemetryData := string2Values(";", telemetryData)
+			
+				if telemetryData[10]
+					runningLap := 0
+				
+				runningLap += 1
+				
+				pressures := string2Values(",", telemetryData[16])
+				temperatures := string2Values(",", telemetryData[17])
+				
+				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+											 
+				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+									   , pressures[1], pressures[2], pressures[4], pressures[4]
+									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+									   , telemetryData[7], telemetryData[8], telemetryData[9])
+				
+				newData := true
+				lap += 1
+			}
 		}
 		
 		return newData
 	}
 	
-	syncTyrePressures() {
-		session := this.SelectedSession[true]
-		
-		if !this.PressuresDatabase
-			this.iPressuresDatabase := new this.SessionPressuresDatabase(this)
-		
-		pressuresDB := this.PressuresDatabase
-		
-		lastLap := this.LastLap
-		
-		if lastLap
-			lastLap := lastLap.Nr
-		else
-			return
-		
-		pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
-		lap := pressuresTable.Length()
-		
-		newData := false
-		lap += 1
-		
-		flush := (Abs(lastLap - lap) <= 2)
-		
-		while (lap <= lastLap) {
-			try {
-				lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
-				
-				if (!lapPressures || (lapPressures == ""))
-					throw "No data..."
-			}
-			catch exception {
-				lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-")
-			}
-			
-			lapPressures := string2Values(";", lapPressures)
-			
-			this.iSimulator := lapPressures[1]
-			this.iCar := lapPressures[2]
-			this.iTrack := lapPressures[3]
-			
-			pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
-									  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
-			
+	syncTyrePressures(load := false) {
+		if load {
 			Gui ListView, % this.LapsListView
 			
-			LV_Modify(this.Laps[lap].Row, "Col9", values2String(", ", string2Values(",", lapPressures[9])*))
-
-			newData := true
-			lap += 1
+			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Setup.Pressures"] {
+				pressureFL := pressureData["Tyre.Pressure.Hot.Front.Left"]
+				pressureFR := pressureData["Tyre.Pressure.Hot.Front.Right"]
+				pressureRL := pressureData["Tyre.Pressure.Hot.Rear.Left"]
+				pressureRR := pressureData["Tyre.Pressure.Hot.Rear.Right"]
+				
+				if (pressureFL == kNull)
+					pressureFL := "-"
+				
+				if (pressureFR == kNull)
+					pressureFR := "-"
+				
+				if (pressureRL == kNull)
+					pressureRL := "-"
+				
+				if (pressureRR == kNull)
+					pressureRR := "-"
+				
+				LV_Modify(this.Laps[A_Index].Row, "Col9", values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR))
+			}
+			
+			return false
 		}
-		
-		if (newData && !flush)
-			pressuresDB.Database.flush()
-		
-		return newData
+		else {
+			session := this.SelectedSession[true]
+			pressuresDB := this.PressuresDatabase
+			lastLap := this.LastLap
+			
+			if lastLap
+				lastLap := lastLap.Nr
+			else
+				return
+			
+			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			lap := pressuresTable.Length()
+			
+			newData := false
+			lap += 1
+			
+			flush := (Abs(lastLap - lap) <= 2)
+			
+			while (lap <= lastLap) {
+				try {
+					lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
+					
+					if (!lapPressures || (lapPressures == ""))
+						throw "No data..."
+				}
+				catch exception {
+					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-")
+				}
+				
+				lapPressures := string2Values(";", lapPressures)
+				
+				this.iSimulator := lapPressures[1]
+				this.iCar := lapPressures[2]
+				this.iTrack := lapPressures[3]
+				
+				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
+										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
+				
+				Gui ListView, % this.LapsListView
+				
+				LV_Modify(this.Laps[lap].Row, "Col9", values2String(", ", string2Values(",", lapPressures[10])*))
+
+				newData := true
+				lap += 1
+			}
+			
+			if (newData && !flush)
+				pressuresDB.Database.flush()
+			
+			return newData
+		}
 	}
 	
 	syncPitstops(state := false) {
+		sessionDB := this.SessionDatabase
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1674,15 +1756,14 @@ class SessionWorkbench extends ConfigurationItem {
 				repairBodywork := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
 				repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
 				
-				if compound {
-					compound := translate((compound . ((compoundColor = "Black") ? "" : (" (" . compoundColor . ")"))))
+				if (compound && (compound != "-"))
 					pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
-				}
 				else {
 					compound := "-"
+					compoundColor := false
 				
 					tyreSet := "-"
-					pressures := "-"
+					pressures := "-, -, -, -"
 				}
 				
 				if (repairBodywork && repairSuspension)
@@ -1696,7 +1777,7 @@ class SessionWorkbench extends ConfigurationItem {
 				
 				Gui ListView, % this.PitstopsListView
 				
-				LV_Add("", nextStop, lap, fuel, compound, tyreSet, pressures, repairs)
+				LV_Add("", nextStop, lap, fuel, translate(compound(compound, compoundColor)), tyreSet, pressures, repairs)
 				
 				if (nextStop = 1) {
 					LV_ModifyCol()
@@ -1705,6 +1786,13 @@ class SessionWorkbench extends ConfigurationItem {
 						LV_ModifyCol(A_Index, "AutoHdr")
 				}
 				
+				pressures := string2Values(",", pressures)
+				
+				sessionDB.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
+											 , "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
+											 , "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
+											 , "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension})
+											  
 				this.syncPitstop(state)
 			}
 		}
@@ -1732,6 +1820,16 @@ class SessionWorkbench extends ConfigurationItem {
 		
 			if (newData || newLaps)
 				this.updateReports()
+			
+			if (!newLaps && !this.SessionFinished) {
+				finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
+				
+				if (finished && (finished = "true")) {
+					this.saveSession()
+					
+					this.iSessionFinished := true
+				}
+			}
 		}
 	}
 	
@@ -1884,11 +1982,289 @@ class SessionWorkbench extends ConfigurationItem {
 		hideProgress()
 	}
 	
-	saveSession() {
+	saveSession(copy := false) {
+		if this.SessionActive {
+			this.syncSessionDatabase(true)
+			
+			info := newConfiguration()
+			
+			setConfigurationValue(info, "Session", "Team", this.SelectedTeam)
+			setConfigurationValue(info, "Session", "Session", this.SelectedSession)
+			setConfigurationValue(info, "Session", "Simulator", this.Simulator)
+			setConfigurationValue(info, "Session", "Car", this.Car)
+			setConfigurationValue(info, "Session", "Track", this.Track)
+			
+			writeConfiguration(this.SessionDirectory . "Session.info", info)
+		}
 		
+		if copy {
+			directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
+			
+			title := translate("Select target folder...")
+			
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+			FileSelectFolder folder, *%directory%, 0, %title%
+			OnMessage(0x44, "")
+		
+			if (folder != "")
+				FileCopyDir %directory%, %folder%, 1
+		}
+	}
+	
+	loadDrivers() {
+		this.iDrivers := []
+		
+		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"]
+			this.addDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname
+						  , Fullname: computeDriverName(driver.Forname, driver.Surname, driver.Nickname)})
+	}
+			
+	loadLaps() {
+		this.iLaps := []
+		
+		for ignore, lap in this.SessionDatabase.Tables["Lap.Data"] {
+			newLap := {Nr: lap.Nr, Stint: lap.Stint, Laptime: lap["Lap.Time"], Position: lap.Position, Grip: lap.Grip
+						  , Map: lap.Map, TC: lap.TC, ABS: lap.ABS
+						  , Weather: lap.Weather, AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
+						  , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
+						  , Damage: lap.Damage, Accident: lap.Accident
+						  , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
+			
+			if (newLap.Map == kNull)
+				newLap.Map := "n/a"
+			
+			if (newLap.TC == kNull)
+				newLap.TC := "n/a"
+			
+			if (newLap.ABS == kNull)
+				newLap.ABS := "n/a"
+			
+			if (newLap.Position == kNull)
+				newLap.Position := "-"
+			
+			if (newLap.Laptime == kNull)
+				newLap.Laptime := "-"
+			
+			if (newLap.FuelConsumption == kNull)
+				newLap.FuelConsumption := "-"
+			
+			if (newLap.FuelRemaining == kNull)
+				newLap.FuelRemaining := "-"
+			
+			if (newLap.AirTemperature == kNull)
+				newLap.AirTemperature := "-"
+			
+			if (newLap.TrackTemperature == kNull)
+				newLap.TrackTemperature := "-"
+			
+			this.Laps[newLap.Nr] := newLap
+			this.iLastLap := newLap
+		}
+	}
+	
+	loadStints() {
+		this.iStints := []
+		
+		for ignore, stint in this.SessionDatabase.Tables["Stint.Data"] {
+			driver := this.addDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"]})
+			
+			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
+					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
+					   , FuelConsumption: stint["Fuel.Consumption"], Accidents: stint.Accidents
+					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]}
+			
+			driver.Stints.Push(newStint)
+			laps := []
+			
+			newStint.Laps := laps
+			
+			stintNr := newStint.Nr
+			stintLap := newStint.Lap
+			
+			Loop {
+				if !this.Laps.HasKey(stintLap)
+					break
+				
+				lap := this.Laps[stintLap]
+			
+				if IsObject(lap.Stint)
+					newStint.Lap := (stintLap + 1)
+				else
+					if (lap.Stint != stintNr)
+						break
+					else {
+						lap.Stint := newStint
+						laps.Push(lap)
+						
+						driver.Laps.Push(lap)
+					}
+				
+				stintLap += 1
+			}
+					
+			newStint.Potential := "-"
+			newStint.RaceCraft := "-"
+			newStint.Speed := "-"
+			newStint.Consistency := "-"
+			newStint.CarControl := "-"
+
+			if (newStint.AvgLaptime == kNull)
+				newStint.AvgLaptime := "-"
+			
+			if (newStint.BestLaptime == kNull)
+				newStint.BestLaptime := "-"
+			
+			if (newStint.FuelConsumption == kNull)
+				newStint.FuelConsumption := "-"
+			
+			if (newStint.StartPosition == kNull)
+				newStint.StartPosition := "-"
+			
+			if (newStint.EndPosition == kNull)
+				newStint.EndPosition := "-"
+			
+			this.Stints[newStint.Nr] := newStint
+			
+			this.iCurrentStint := newStint
+		}
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.StintsListView
+			
+		currentStint := this.CurrentStint
+		
+		if currentStint
+			Loop % currentStint.Nr
+			{
+				stint := this.Stints[A_Index]
+				stint.Row := A_Index
+				
+				LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
+						 , translate(stint.Compound), stint.Laps.Length()
+						 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+						 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+			}
+				
+		LV_ModifyCol()
+		
+		Loop % LV_GetCount("Col")
+			LV_ModifyCol(A_Index, "AutoHdr")
+		
+		Gui ListView, % this.LapsListView
+			
+		lastLap := this.LastLap
+		
+		if lastLap
+			Loop % lastLap.Nr
+			{
+				lap := this.Laps[A_Index]
+				lap.Row := A_Index
+				
+				LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, "", lap.Accident ? translate("x") : "")
+			}
+				
+		LV_ModifyCol()
+		
+		Loop % LV_GetCount("Col")
+			LV_ModifyCol(A_Index, "AutoHdr")
+	}			
+				
+	loadPitstops() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PitstopsListView
+		
+		for ignore, pitstop in this.SessionDatabase.Tables["Pitstop.Data"] {
+			repairBodywork := pitstop["Repair.Bodywork"]
+			repairSuspension := pitstop["Repair.Suspension"]
+		
+			if (repairBodywork && repairSuspension)
+				repairs := (translate("Bodywork") . ", " . translate("Suspension"))
+			else if repairBodywork
+				repairs := translate("Bodywork")
+			else if repairSuspension
+				repairs := translate("Suspension")
+			else
+				repairs := "-"
+			
+			pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
+										   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
+				
+			LV_Add("", A_Index, pitstop.Lap, pitstop.Fuel
+					 , translate(compound(pitstop["Tyre.Compound"], pitstop["Tyre.Compound.Color"]))
+					 , pitstop["Tyre.Set"], pressures, repairs)
+		}
+				
+		LV_ModifyCol()
+		
+		Loop % LV_GetCount("Col")
+			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 	
 	loadSession() {
+		title := translate("Select Session folder...")
+		
+		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
+			
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+		FileSelectFolder folder, *%directory%, 0, %title%
+		OnMessage(0x44, "")
+	
+		if (folder != "") {
+			folder := (folder . "\")
+			
+			info := readConfiguration(folder . "Session.info")
+			
+			if (info.Count() == 0) {
+				title := translate("Error")
+			
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % translate("This is not a valid folder with a saved session.")
+				OnMessage(0x44, "")
+			}
+			else {
+				SetTimer syncSession, Off
+			
+				this.iConnected := false
+				
+				this.initializeSession()
+				
+				this.iSessionLoaded := folder
+				
+				this.iTeamName := getConfigurationValue(info, "Session", "Team")
+				this.iTeamIdentifier := false
+				
+				this.iSessionName := getConfigurationValue(info, "Session", "Session")
+				this.iSessionIdentifier := false
+			
+				window := this.Window
+		
+				Gui %window%:Default
+				
+				GuiControl, , teamDropDownMenu, % "|" . this.iTeamName
+				GuiControl Choose, teamDropDownMenu, 1
+				
+				GuiControl, , sessionDropDownMenu, % "|" . this.iSessionName
+				GuiControl Choose, sessionDropDownMenu, 1
+				
+				this.loadDrivers()
+				this.loadLaps()
+				this.loadStints()
+				this.loadPitstops()
+				
+				this.syncTelemetry(true)
+				this.syncTyrePressures(true)
+			
+				this.ReportViewer.setReport(folder . "Race Report")
+				
+				this.updateReports()
+			}
+		}
 	}
 	
 	show() {
@@ -2093,7 +2469,7 @@ class SessionWorkbench extends ConfigurationItem {
 		else
 			script := ""
 			
-		html := ("<html>" . script . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #laps td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div></body></html>")
+		html := ("<html>" . script . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #table td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div></body></html>")
 
 		detailsViewer.Document.Open()
 		detailsViewer.Document.Write(html)
@@ -2205,7 +2581,7 @@ class SessionWorkbench extends ConfigurationItem {
 		if (dataY3DropDown > 1)
 			yAxises.Push(this.iY3Columns[dataY3DropDown - 1])
 		
-		this.showDataPlot(this.ReportDatabase.Tables["Lap.Data"], xAxis, yAxises)
+		this.showDataPlot(this.SessionDatabase.Tables["Lap.Data"], xAxis, yAxises)
 		
 		this.updateState()
 	}
@@ -2350,28 +2726,15 @@ class SessionWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	syncReportDatabase() {
-		reportDB := this.ReportDatabase
-		
-		if !reportDB {
-			reportDB := new Database(false, kSessionDataSchemas)
-			
-			this.iReportDatabase := reportDB
-		}
-		
-		pressuresDB := this.PressuresDatabase
-		telemetryDB := this.TelemetryDatabase
-		
-		if (!pressuresDB || !telemetryDB)
-			return
-				
+	syncSessionDatabase(forSave := false) {
+		sessionDB := this.SessionDatabase
 		lastLap := this.LastLap
 		
 		if lastLap {
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
-			tyresTable := telemetryDB.Database.Tables["Tyres"]
+			pressuresTable := this.PressuresDatabase.Database.Tables["Setup.Pressures"]
+			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 					
-			newLap := (reportDB.Tables["Lap.Data"].Length() + 1)
+			newLap := (sessionDB.Tables["Lap.Data"].Length() + 1)
 			
 			while (newLap <= lastLap.Nr) {
 				lap := this.Laps[newLap]
@@ -2379,10 +2742,12 @@ class SessionWorkbench extends ConfigurationItem {
 				if ((pressuresTable.Length() < newLap) || (tyresTable.Length() < newLap))
 					return
 				
-				lapData := {Lap: newLap, Stint: lap.Stint.Nr, "Lap.Time": lap.Laptime
-						  , "Fuel.Consumption": lap.FuelConsumption, "Fuel.Remaining": lap.FuelRemaining
-						  , "Temperature.Air": null(lap.AirTemperature), "Temperature.Track": null(lap.TrackTemperature)
-						  , Map: null(lap.Map), TC: null(lap.TC), ABS: null(lap.ABS)}				
+				lapData := {Nr: newLap, Lap: newLap, Stint: lap.Stint.Nr, "Lap.Time": null(lap.Laptime), Position: null(lap.Position)
+						  , Damage: lap.Damage, Accident: lap.Accident
+						  , "Fuel.Consumption": null(lap.FuelConsumption), "Fuel.Remaining": null(lap.FuelRemaining)
+						  , Weather: lap.Weather, "Temperature.Air": null(lap.AirTemperature), "Temperature.Track": null(lap.TrackTemperature)
+						  , Grip: lap.Grip, Map: null(lap.Map), TC: null(lap.TC), ABS: null(lap.ABS)
+						  , "Tyre.Compound": compound(lap.Compound), "Tyre.Compound.Color": compoundColor(lap.Compound)}				
 				
 				pressures := pressuresTable[newLap]
 				
@@ -2429,10 +2794,41 @@ class SessionWorkbench extends ConfigurationItem {
 				lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
 				lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
 				
-				reportDB.add("Lap.Data", lapData, false)
+				sessionDB.add("Lap.Data", lapData)
 				
 				newLap += 1
 			}
+		}
+		
+		if (forSave && !this.SessionFinished) {
+			currentStint := this.CurrentStint
+			
+			if currentStint {
+				newStint := (sessionDB.Tables["Stint.Data"].Length() + 1)
+				
+				while (newStint <= currentStint.Nr) {
+					stint := this.Stints[newStint]
+				
+					stintData := {Nr: newStint, Lap: stint.Lap
+								, "Driver.Forname": stint.Driver.Forname, "Driver.Surname": stint.Driver.Surname, "Driver.Nickname": stint.Driver.Nickname
+								, "Weather": stint.Weather, "Compound": stint.Compound, "Lap.Time.Average": null(stint.AvgLaptime), "Lap.Time.Best": null(stint.BestLapTime)
+								, "Fuel.Consumption": null(stint.FuelConsumption), "Accidents": stint.Accidents
+								, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)}
+					
+					sessionDB.add("Stint.Data", stintData)
+					
+					newStint += 1
+				}
+			}
+			
+			if (this.Drivers.Length() != sessionDB.Tables["Driver.Data"].Length()) {
+				sessionDB.clear("Driver")
+				
+				for ignore, driver in this.Drivers
+					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
+			}
+			
+			sessionDB.flush()
 		}
 	}
 	
@@ -2461,7 +2857,7 @@ class SessionWorkbench extends ConfigurationItem {
 	
 	showReport(report, force := false) {
 		if (force || (report != this.SelectedReport)) {
-			this.syncReportDatabase()
+			this.syncSessionDatabase()
 			this.updateSeriesSelector(report)
 			
 			if inList(kRaceReports, report)
@@ -2575,7 +2971,7 @@ class SessionWorkbench extends ConfigurationItem {
 			accidentData.Push("<td id=""data"">" . (lap.Accident ? "x" : "") . "</td>")
 		}
 		
-		html .= "<br><table id=""laps"">"
+		html .= "<br><table id=""table"">"
 		
 		html .= ("<tr><td><i>" . translate("Lap") . "</i></td>"
 			       . "<td><i>" . translate("Map") . "</i></td>"
@@ -2614,9 +3010,9 @@ class SessionWorkbench extends ConfigurationItem {
 		fuelConsumptions := []
 		temperatures := []
 		
-		this.syncReportDatabase()
+		this.syncSessionDatabase()
 		
-		lapTable := this.ReportDatabase.Tables["Lap.Data"]
+		lapTable := this.SessionDatabase.Tables["Lap.Data"]
 		
 		for ignore, lap in stint.Laps {
 			laps.Push(lap.Nr)
@@ -2673,7 +3069,7 @@ class SessionWorkbench extends ConfigurationItem {
 			accidentsData.Push("<td id=""data"">" . lapAccidents . "</td>")
 		}
 			
-		html := "<table id=""laps"">"
+		html := "<table id=""table"">"
 		html .= ("<tr><td><i>" . translate("Driver:") . "</i></td>" . values2String("", driverData*) . "</tr>")
 		html .= ("<tr><td><i>" . translate("# Stints:") . "</i></td>" . values2String("", stintsData*) . "</tr>")
 		html .= ("<tr><td><i>" . translate("# Laps:") . "</i></td>" . values2String("", lapsData*) . "</tr>")
@@ -2822,6 +3218,58 @@ class SessionWorkbench extends ConfigurationItem {
 		html .= ("<br><br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
 		
 		this.showDetails(html, [1, chart1], [2, chart2])
+	}
+	
+	showStintOverview() {
+		html := ("<div id=""header""><b>" . translate("Stint Statistics") . "</b></div>")
+		
+		stints := []
+		drivers := []
+		laps := []
+		durations := []
+		numLaps := []
+		positions := []
+		avgLapTimes := []
+		fuelConsumptions := []
+		accidents := []
+		
+		currentStint := this.CurrentStint
+		
+		if currentStint
+			Loop % currentStint.Nr
+			{
+				stint := this.Stints[A_Index]
+				
+				stints.Push("<td id=""data"">" . stint.Nr . "</td>")
+				drivers.Push("<td id=""data"">" . StrReplace(stint.Driver.Nickname, "'", "\'") . "</td>")
+				laps.Push("<td id=""data"">" . stint.Lap . "</td>")
+				
+				duration := 0
+				
+				for ignore, lap in stint.Laps
+					duration += lap.Laptime
+				
+				durations.Push("<td id=""data"">" . Round(duration / 60) . "</td>")
+				numLaps.Push("<td id=""data"">" . stint.Laps.Length() . "</td>")
+				positions.Push("<td id=""data"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
+				avgLapTimes.Push("<td id=""data"">" . stint.AvgLaptime . "</td>")
+				fuelConsumptions.Push("<td id=""data"">" . stint.FuelConsumption . "</td>")
+				accidents.Push("<td id=""data"">" . stint.Accidents . "</td>")
+			}
+		
+		html := "<br><br><table id=""table"">"
+		html .= ("<tr><td><b>" . translate("Stint:") . "</b></div></td>" . values2String("", stints*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td>" . values2String("", drivers*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td>" . values2String("", laps*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td>" . values2String("", durations*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("# Laps:") . "</b></div></td>" . values2String("", numLaps*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Position:") . "</b></div></td>" . values2String("", positions*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Avg. Lap Time:") . "</b></div></td>" . values2String("", avgLapTimes*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("Fuel Consumption:") . "</b></div></td>" . values2String("", fuelConsumptions*) . "</tr>")
+		html .= ("<tr><td><b>" . translate("# Accidents:") . "</b></div></td>" . values2String("", accidents*) . "</tr>")
+		html .= "</table>"
+		
+		this.showDetails(html)
 	}
 }
 

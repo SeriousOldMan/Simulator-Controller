@@ -571,7 +571,8 @@ class RaceReportViewer {
 			rows := []
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				weather := (translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")) . translate(" (") . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")) . translate(")"))
+				compound := translate(compound(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
+											 , getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
 				consumption := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 				
 				if (consumption == 0)
@@ -585,7 +586,7 @@ class RaceReportViewer {
 				row := values2String(", "
 									, lap
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")) . "'"
-									, "'" . weather . "'"
+									, "'" . compound . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
@@ -836,6 +837,31 @@ class RaceReportViewer {
 	editPaceReportSettings() {
 		return this.editReportSettings("Laps", "Drivers")
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+compound(compound, color := false) {
+	if color {
+		if (color = "Black")
+			return compound
+		else
+			return (compound . " (" . color . ")")
+	}
+	else
+		return string2Values(A_Space, compound)[1]
+}
+
+compoundColor(compound) {
+	compound := string2Values(A_Space, compound)
+	
+	if (compound.Length() == 1)
+		return "Black"
+	else
+		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 }
 
 

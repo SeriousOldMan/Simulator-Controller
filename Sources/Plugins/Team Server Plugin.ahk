@@ -613,8 +613,6 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 	
 	addLap(lapNumber, telemetryData, positionsData) {
-		static lastLap := false
-		
 		if this.TeamServerActive {
 			try {
 				if isDebug()
@@ -644,26 +642,22 @@ class TeamServerPlugin extends ControllerPlugin {
 				
 				lap := this.Connector.CreateLap(stint, lapNumber)
 				
-				if (lap != lastLap) {
-					lastLap := lap
+				if telemetryData {
+					telemetryData := printConfiguration(telemetryData)
 					
-					if telemetryData {
-						telemetryData := printConfiguration(telemetryData)
-						
-						if isDebug()
-							showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryData)
-						
-						this.setLapValue(lapNumber, "Telemetry Data", telemetryData)
-					}
-				
-					if positionsData {
-						positionsData := printConfiguration(positionsData)
-						
-						if isDebug()
-							showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
-						
-						this.setLapValue(lapNumber, "Positions Data", positionsData)
-					}
+					if isDebug()
+						showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryData)
+					
+					this.setLapValue(lapNumber, "Telemetry Data", telemetryData)
+				}
+			
+				if positionsData {
+					positionsData := printConfiguration(positionsData)
+					
+					if isDebug()
+						showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
+					
+					this.setLapValue(lapNumber, "Positions Data", positionsData)
 				}
 			}
 			catch exception {

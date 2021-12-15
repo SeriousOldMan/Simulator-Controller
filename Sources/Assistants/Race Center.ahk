@@ -1304,17 +1304,27 @@ class RaceCenter extends ConfigurationItem {
 			
 			lap.Compound := compound
 			
-			rawData := this.Connector.GetLapValue(identifier, "Positions Data")
-			data := parseConfiguration(rawData)
-			
-			lap.Positions := rawData
-			
-			car := getConfigurationValue(data, "Position Data", "Driver.Car")
-			
-			if car
-				lap.Position := getConfigurationValue(data, "Position Data", "Car." . car . ".Position")
-			else
-				lap.Position := "-"
+			try {
+				rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+				
+				if (!rawData || (rawData = ""))
+					throw "No data..."
+					
+				data := parseConfiguration(rawData)
+				
+				lap.Positions := rawData
+				
+				car := getConfigurationValue(data, "Position Data", "Driver.Car")
+				
+				if car
+					lap.Position := getConfigurationValue(data, "Position Data", "Car." . car . ".Position")
+				else
+					throw "No data..."
+			}
+			catch exception {
+				if (lap.Nr > 1)
+					lap.Position := this.Laps[lap.Nr - 1].Position
+			}
 			
 			this.Laps[identifier] := lap
 			this.Laps[lap.Nr] := lap

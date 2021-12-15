@@ -682,7 +682,7 @@ class RaceStrategist extends RaceAssistant {
 				
 				validLap := knowledgeBase.getValue(prefix . ".Valid", true)
 				
-				if validLap {
+				if (validLap || pitstop) {
 					weather := knowledgeBase.getValue(prefix . ".Weather")
 					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
 					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")

@@ -1628,7 +1628,27 @@ class RaceCenter extends ConfigurationItem {
 						throw "No data..."
 				}
 				catch exception {
-					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", false, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
+					state := false
+					
+					try {
+						state := this.Connector.GetSessionValue(session, "Race Engineer State")
+					}
+					catch exception {
+						; ignore
+					}
+				
+					if (state && (state != "")) {
+						state := parseConfiguration(state)
+						
+						pitstop := getConfigurationValue(state, "Session State", "Pitstop.Last", false)
+				
+						if pitstop
+							pitstop := (lap == (getConfigurationValue(state, "Session State", "Pitstop." . pitstop . ".Lap") + 1))
+					}
+					else
+						pitstop := false
+				
+					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
 				}
 				
 				telemetryData := string2Values(";", telemetryData)
@@ -3240,12 +3260,13 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
-	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries) {
+	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 		
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Remaining") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
 		drawChartFunction .= "`ndata.addRows(["
 		
 		for ignore, time in lapSeries {
@@ -3254,7 +3275,8 @@ class RaceCenter extends ConfigurationItem {
 			
 			drawChartFunction .= ("[" . values2String(", ", lapSeries[A_Index]
 														  , chartValue(null(positionSeries[A_Index]))
-														  , chartValue(null(fuelSeries[A_Index])))
+														  , chartValue(null(fuelSeries[A_Index]))
+														  , chartValue(null(tyreSeries[A_Index])))
 									  . "]")
 		}
 		
@@ -3321,20 +3343,24 @@ class RaceCenter extends ConfigurationItem {
 		laps := []
 		positions := []
 		remainingFuels := []
+		tyreLaps := []
 		
 		lastLap := this.LastLap
+		
+		lapDataTable := this.SessionDatabase.Tables["Lap.Data"]
 		
 		if lastLap
 			Loop % lastLap.Nr
 			{
 				lap := this.Laps[A_Index]
 				
-				laps.Push(lap.Nr)
-				positions.Push(chartValue(null(lap.Position)))
-				remainingFuels.Push(chartValue(null(lap.FuelRemaining)))
+				laps.Push(A_Index)
+				positions.Push(lap.Position)
+				remainingFuels.Push(lap.FuelRemaining)
+				tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps"])
 			}
 		
-		chart1 := this.createRaceSummaryChart(1, 555, 248, laps, positions, remainingFuels)
+		chart1 := this.createRaceSummaryChart(1, 555, 248, laps, positions, remainingFuels, tyreLaps)
 		
 		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
 		

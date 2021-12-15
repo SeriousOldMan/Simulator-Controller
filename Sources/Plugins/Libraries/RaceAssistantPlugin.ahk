@@ -36,6 +36,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	iLastLap := 0
 	iLastLapCounter := 0
+	iWaitPeriod := 0
 	iInPit := false
 	iFinished := false
 	
@@ -1009,15 +1010,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					this.iFinished := false
 					this.iInPit := false
 			
-					if this.RaceAssistant
+					if this.RaceAssistant {
 						this.finishSession()
+						
+						this.iWaitPeriod := (A_TickCount + (60 * 1000))
+					}
 				}
 				
 				if this.RaceAssistantEnabled {
 					; Car is on the track
 				
-					if !this.RaceAssistant
+					if (!this.RaceAssistant && (A_TickCount > this.iWaitPeriod)) {
 						this.startupRaceAssistant()
+						
+						this.iWaitPeriod := 0
+					}
 						
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit

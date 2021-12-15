@@ -2,8 +2,8 @@
 Version=3.7.6-dev
 Target=3.7.6-release
 Date=12/15/2021
-Download=
-Changes=Full implementation of the "Race Center", New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 to the list of ACC cars
+Download=https://www.dropbox.com/s/i8jklucpswusbzc/Simulator%20Controller%203.7.6-dev.zip?dl=1
+Changes=Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 to the list of ACC cars
 [Release]
 Version=3.7.4-release
 Date=12/06/2021

@@ -72,7 +72,7 @@ Once you have entered the server credentials, you can click on the small button 
 
 When you head out onto the track, you must decide, whether you want this session a team session or not. This decision must be made, before the first stint driver of the session has completed the first lap. More on that down below. It is also absolutely necessary that all drivers are connnected to the simulation during the first lap and also for the rest of the session. Otherwise, Simulator Controller detects, that the simulation has terminated also closes the connection to the *Team Server*. The team session will be initialized and started on the *Team Server* in the moment, the driver of the first stint has completed the first lap. It will be finished and closed, when the current driver in the simulation crosses the finish line or terminates the simulation.
 
-And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For convinience, it is also possible, to always enable team sessions using the action declaration of this plugin, but I don't recommend that, since you might end up beeing part of a session, you are not planned for.
+And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For convinience, it is also possible, to always enable team sessions using the action declaration of this plugin, but I don't recommend that, since you might end up being part of a session, you are not planned for.
 
 ### Race Center
 
@@ -107,12 +107,15 @@ The reports at the top of the list are the well known report, wich are also avai
 Beside that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
   1. Details of the current stint
+  
      This will give you detailed data for all the laps in a stint as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
 
   2. Driver Statistics
+  
      You can generate a special report for all active drivers with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
 	 
   3. Race Summary
+  
      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report is also available in the "Data" menu.
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.

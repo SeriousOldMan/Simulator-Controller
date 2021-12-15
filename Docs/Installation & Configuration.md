@@ -286,7 +286,7 @@ Although you may call any globally defined function, you should use only the fol
 
 #### Trigger Detector Tool
 
-This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently beeing pushed there. To disable the tool tip, press the "Trigger..." button again or use the "ESC" key.
+This little tool will help you identifying the button numbers of your hardware controller. If you push the "Trigger..." button, a flying tool tip will apear next to your mouse cursor, which provide some information about your connected controller devices and the buttons or other triggers, that are currently being pushed there. To disable the tool tip, press the "Trigger..." button again or use the "ESC" key.
 
 ### Tab *Launchpad*
 

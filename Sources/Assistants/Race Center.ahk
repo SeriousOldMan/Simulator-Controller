@@ -627,7 +627,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Monte Carlo Analysis...", "Run Simulation", "---------------------------------------------", "Update Race Strategy", "Clear Race Strategy"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session...", "Initialize from Setup Database...", "---------------------------------------------", "Instruct Engineer..."], "translate")*)
+		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Setup Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -649,17 +649,17 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Button, x574 y656 w80 h23 GcloseTeamDashboard, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Stints", "Laps", "Pitstop"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Stints", "Laps", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Laptime", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
 		Gui Tab, 2
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Laptime", "Consumption", "Pressures", "Accident"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Pressures", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
@@ -1009,10 +1009,10 @@ class RaceCenter extends ConfigurationItem {
 			this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
 			this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 			
-			showMessage(translate("Race Engineer will be instructed in the next lap..."))
+			showMessage(translate("Race Engineer will be instructed in the next lap."))
 		}
 		catch exception {
-			showMessage(translate("Session has not been started yet..."))
+			showMessage(translate("Session has not been started yet."))
 		}
 	}
 	

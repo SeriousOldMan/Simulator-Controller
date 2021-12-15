@@ -543,7 +543,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s10 Bold, Arial
 
-		Gui %window%:Add, Text, w1184 Center gmoveTeamDashboard, % translate("Modular Simulator Controller System") 
+		Gui %window%:Add, Text, w1184 Center gmoveRaceCenter, % translate("Modular Simulator Controller System") 
 		
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
@@ -636,7 +636,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Output")
 		
-		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vdetailsViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w577 h293 Border vdetailsViewer, shell.explorer
 		
 		detailsViewer.Navigate("about:blank")
 		
@@ -645,21 +645,21 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y650 w1200 0x10
+		Gui %window%:Add, Text, x8 y750 w1200 0x10
 		
-		Gui %window%:Add, Button, x574 y656 w80 h23 GcloseTeamDashboard, % translate("Close")
+		Gui %window%:Add, Button, x574 y756 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Stints", "Laps", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Stints", "Laps", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
 		Gui Tab, 2
 		
-		Gui %window%:Add, ListView, x24 ys+33 w577 h170 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Pressures", "Accident"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Pressures", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
@@ -695,7 +695,7 @@ class RaceCenter extends ConfigurationItem {
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, ListView, x270 ys+34 w331 h169 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
+		Gui %window%:Add, ListView, x270 ys+34 w331 h269 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 		
 		this.iPitstopsListView := listHandle
 		
@@ -3042,6 +3042,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<br>" . this.createLapDetails(stint))
 		
+		html .= ("<br><br><div id=""header""><i>" . translate("Telemetry") . "</i></div>")
+		
 		laps := []
 		positions := []
 		lapTimes := []
@@ -3533,11 +3535,11 @@ loadSessions(connector, team) {
 	return sessions
 }
 
-moveTeamDashboard() {
+moveRaceCenter() {
 	moveByMouse(RaceCenter.Instance.Window)
 }
 
-closeTeamDashboard() {
+closeRaceCenter() {
 	RaceCenter.Instance.close()
 }
 

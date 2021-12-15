@@ -17,8 +17,6 @@ namespace TeamServer.Server {
 		public void ValidateSession(Session session) {
 			if (session == null)
 				throw new Exception("Not a valid or active session...");
-			else
-				ValidateAccount(session.Duration);
 		}
 
 		public void ValidateDriver(Driver driver) {
@@ -157,6 +155,7 @@ namespace TeamServer.Server {
 		#region Operations
 		public Session StartSession(Session session, int duration, string car, string track) {
 			ValidateSession(session);
+			ValidateAccount(duration);
 
 			foreach (Model.Attribute attribute in session.Attributes)
 				attribute.Delete();

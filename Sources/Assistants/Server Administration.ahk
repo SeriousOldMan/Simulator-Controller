@@ -388,6 +388,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 				
 				administrationEditor(kEvent, "AccountClear")
 			}
+			else if (arguments[1] = "AccountDelete") {
+				connector.DeleteAccount(account.Identifier)
+				
+				accounts := loadAccounts(connector, accountsListView)
+				
+				administrationEditor(kEvent, "AccountClear")
+			}
 			else if (arguments[1] = "AccountClear") {
 				account := false
 			
@@ -606,7 +613,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4% ReadOnly Password vaccountPasswordEdit
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDcreatePasswordButtonHandle vcreatePasswordButton gcreatePassword
 		setButtonIcon(createPasswordButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		Gui ADM:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDcopyPasswordButtonHandle vcopyPasswordButton
+		Gui ADM:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDcopyPasswordButtonHandle vcopyPasswordButton gcopyPassword
 		setButtonIcon(copyPasswordButtonHandle, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
@@ -760,6 +767,13 @@ newAccount() {
 }
 
 deleteAccount() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Delete")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected account?")
+	OnMessage(0x44, "")
+	
+	IfMsgBox Yes
+		administrationEditor(kEvent, "AccountDelete")
 }
 
 saveAccount() {

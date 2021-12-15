@@ -94,7 +94,7 @@ To use the "Race Center", you must have a valid connection to a team session. Th
 
 #### Session data handling
 
-All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data will be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](*) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Data" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
+All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data will be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Data" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
 
 #### Data Analysis
 
@@ -102,7 +102,7 @@ All data of an active session is stored on the Team Server. It is therefore poss
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%205.JPG)
 
-The reports at the top of the list are the well known report, wich are also available after a session using the ["Race Reports" tool](*). They are mostly usefull to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Last but not least, using the small button with the gear icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
+The reports at the top of the list are the well known report, wich are also available after a session using the ["Race Reports" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports). They are mostly usefull to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Last but not least, using the small button with the gear icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
 Beside that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
@@ -121,7 +121,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 Not yet implememted...
 
-If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](*), you can alter this strategy, when necessary cause of important race events, for example an accident.
+If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can alter this strategy, when necessary cause of important race events, for example an accident.
 
 #### Planning a Pitstop
 
@@ -129,7 +129,7 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
-Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the data from the ["Setup Database"](*) using the "Load from Setup Database..." command, when you think that you might have setup information there from previous sessions in comparable conditions.
+Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the data from the ["Setup Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) using the "Load from Setup Database..." command, when you think that you might have setup information there from previous sessions in comparable conditions.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
 

@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.7.6
 
-Many changes in the Team Server internals. If you are hosting an own installation, you have to redeploy the server. Data will be preserved and updated to the new format. All other changes in this release are handled automatically, although you might want to checkout the new [*openRaceCenter* plugin](*) parameter.
+Many changes in the Team Server internals. If you are hosting an own installation, you have to redeploy the server. Data will be preserved and updated to the new format. All other changes in this release are handled automatically, although you might want to checkout the new [*openRaceCenter* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) parameter of the "Race Engineer" and "Race Strategist" plugins.
 
 ***
 

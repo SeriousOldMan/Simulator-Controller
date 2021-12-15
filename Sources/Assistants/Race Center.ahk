@@ -623,7 +623,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "---------------------------------------------", "Load...", "Save", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Monte Carlo Analysis...", "Run Simulation", "---------------------------------------------", "Update Race Strategy", "Clear Race Strategy"], "translate")*)
 		
@@ -1022,9 +1022,17 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 		
 		switch line {
-			case 3: ; Load Session...
+			case 3: ; Connect...
+				GuiControlGet serverURLEdit
+				GuiControlGet serverTokenEdit
+
+				this.iServerURL := serverURLEdit
+				this.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
+				
+				this.connect()
+			case 5: ; Load Session...
 				this.loadSession()
-			case 4: ; Save Session
+			case 6: ; Save Session
 				if this.HasData
 					if this.SessionActive
 						this.saveSession()
@@ -1035,7 +1043,7 @@ class RaceCenter extends ConfigurationItem {
 						MsgBox 262192, %title%, % translate("You are not connected to an active session. Use ""Save a Copy..."" instead.")
 						OnMessage(0x44, "")
 					}
-			case 5: ; Save Session Copy...
+			case 7: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -1045,11 +1053,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 7: ; Update Statistics
+			case 9: ; Update Statistics
 				this.updateStatistics()
-			case 9: ; Race Summary
+			case 11: ; Race Summary
 				this.showRaceSummary()
-			case 10: ; Driver Statistics
+			case 12: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}

@@ -279,15 +279,35 @@ namespace TeamServer.Controllers {
         }
 
         [HttpPut("{identifier}/finish")]
-        public string FinishSession([FromQuery(Name = "token")] string token, string identifier) {
-            try {
+        public string FinishSession([FromQuery(Name = "token")] string token, string identifier)
+        {
+            try
+            {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.FinishSession(identifier);
 
                 return "Ok";
             }
-            catch (Exception exception) {
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpPut("{identifier}/clear")]
+        public string ClearSession([FromQuery(Name = "token")] string token, string identifier)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.ClearSession(identifier);
+
+                return "Ok";
+            }
+            catch (Exception exception)
+            {
                 return "Error: " + exception.Message;
             }
         }

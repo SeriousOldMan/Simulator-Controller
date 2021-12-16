@@ -375,6 +375,11 @@ namespace TeamServer {
 		public void FinishSession(string identifier) {
 			Put("session/" + identifier + "/finish");
 		}
+
+		public void ClearSession(string identifier)
+		{
+			Put("session/" + identifier + "/clear");
+		}
 		#endregion
 
 		#region Stint

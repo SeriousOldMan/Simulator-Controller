@@ -1,22 +1,5 @@
 [Update]
-Release 1.5=updateToV15
-Release 2.0=Release 1.5 -> updateTranslations, updatePluginLabels, updateConfigurationForV20, updateACCPluginForV20
-Release 2.0.1=Release 2.0 -> updateTranslations
-Release 2.0.2=Release 2.0.1 -> updateTranslations
-Release 2.0.3=Release 2.0.2 -> updateTranslations, updateConfigurationForV203
-Release 2.1=Release 2.0.3 -> updateTranslations, updatePluginLabels, updateACCPluginForV21, updatePedalCalibrationPluginForV21
-Release 2.2=Release 2.1 -> updateTranslations, updatePluginLabels
-Release 2.3=Release 2.2 -> updateTranslations, updatePluginLabels, updatePhraseGrammars, updateRF2PluginForV23
-Release 2.4=Release 2.3 -> updateTranslations, updatePhraseGrammars, updateRREPluginForV24
-Release 2.5=Release 2.4 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV25
-Release 2.5.4=Release 2.5 -> updateTranslations, updatePhraseGrammars, updatePluginLabels
-Release 2.6.1=Release 2.5.4 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV261, updatePluginLabels
-Release 2.7=Release 2.6.1 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV27, updatePluginLabels, renewConsent
-Release 2.8=Release 2.7 -> updateTranslations, updatePhraseGrammars, updatePluginsForV28, updateConfigurationForV28, updatePluginLabels
-Release 2.8.2=Release 2.8 -> updateTranslations, updateConfigurationForV282, updatePluginLabels
-Release 2.8.5=Release 2.8.2 -> updateTranslations, updatePhraseGrammars, updatePluginsForV285, updatePluginLabels
-Release 2.8.6=Release 2.8.5 -> updateTranslations, updatePluginLabels
-Release 3.0=Release 2.8.6 -> updateTranslations, updatePluginLabels
+Release 3.0=updateToV30
 Release 3.0.2=Release 3.0 -> updateTranslations
 Release 3.0.4=Release 3.0.2 -> updateTranslations, renewConsent
 Release 3.0.6=Release 3.0.4 -> updateTranslations, updatePhraseGrammars
@@ -40,7 +23,7 @@ Release 3.6.8=Release 3.6.6 -> updateTranslations, updateConfigurationForV368
 Release 3.7.0=Release 3.6.8 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons, updatePluginsForV370
 Release 3.7.2=Release 3.7.0 -> updateTranslations, updateConfigurationForV372
 Release 3.7.4=Release 3.7.2 -> updateTranslations
-; Release 3.7.6=Release 3.7.4 -> updateTranslations, updateActionLabels, updateActionIcons
+Release 3.7.6=Release 3.7.4 -> updateTranslations, updateActionLabels, updateActionIcons
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

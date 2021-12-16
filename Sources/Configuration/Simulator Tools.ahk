@@ -1034,6 +1034,14 @@ editTargets(command := "") {
 	static buildVariable14
 	static buildVariable15
 	static buildVariable16
+	static buildVariable17
+	static buildVariable18
+	static buildVariable19
+	static buildVariable20
+	static buildVariable21
+	static buildVariable22
+	static buildVariable23
+	static buildVariable24
 	
 	static splashTheme
 	
@@ -1094,7 +1102,7 @@ editTargets(command := "") {
 		if (vCopySettings.Count() > 16)
 			Throw "Too many copy targets detected in editTargets..."
 		
-		if (vBuildSettings.Count() > 16)
+		if (vBuildSettings.Count() > 24)
 			Throw "Too many build targets detected in editTargets..."
 		
 		Gui TE:-Border ; -Caption
@@ -1962,7 +1970,13 @@ updateACCPluginForV20() {
 	}
 }
 
-updateToV15() {
+updateToV30() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+	title := translate("Error")
+	MsgBox 262160, %title%, % translate("Your installed version is to old to be updated automatically. Please remove the ""Simulator Controller"" folder in your user ""Documents"" folder and restart the application. Application will exit...")
+	OnMessage(0x44, "")
+	
+	ExitApp 0
 }
 
 checkFileDependency(file, modification) {

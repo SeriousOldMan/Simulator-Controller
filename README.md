@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.7.6-dev](https://www.dropbox.com/s/i8jklucpswusbzc/Simulator%20Controller%203.7.6-dev.zip?dl=1) (Early build for 3.7.6. New features: Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 to the list of ACC cars. Stable, with documentation and update procedure.)
+[3.7.6-beta](https://www.dropbox.com/s/6e0dpuu9827sgqf/Simulator%20Controller%203.7.6-beta.zip?dl=1) (Public test version for 3.7.6. New features: Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 to the list of ACC cars. Stable, with documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-376) of this version and all the versions you might have skipped, before installing and using this version.
 

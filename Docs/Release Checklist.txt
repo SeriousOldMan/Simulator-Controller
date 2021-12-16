@@ -27,7 +27,7 @@ Release 3.7.6 Checklist
    c. Documentation
 2. New "openRaceCenter" action and action function
    a. Documentation
-   b. Update procedure
+   b. Update notes
 2. Update procedure
    a. Translations
    a. Controller Action Labels & Icons

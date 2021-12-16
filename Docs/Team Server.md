@@ -92,7 +92,11 @@ Please note, that all the data and graphs shown in the window will be updated dy
 
 To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being aan active driver in the session by entering the access token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Data" menu.
 
-If you have connected to a session that has already been used, it is possible, that you will see a lot of data from the previous race. This no problem, because the old data will be automatically cleared, when the new session is started. But you can also use the command "Clear" from the "Data" menu beforehand to erase all current data, if you whish. Please note, that it is not a good idea to use the same session in more than one race at the same time.
+If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%207.JPG)
+
+It is no problem, to reuse a session for many races, because the old data will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Data" menu beforehand to erase all current data, if you whish. Please note, that it is **not** a good idea to use the same session in more than one race at the same time.
 
 #### Session data handling
 

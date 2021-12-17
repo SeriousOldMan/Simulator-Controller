@@ -1,4 +1,4 @@
-## 3.7.6-release 12/17/21 (planned)
+## 3.7.6-release 12/17/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

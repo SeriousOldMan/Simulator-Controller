@@ -748,7 +748,8 @@ createShortcuts(location, installLocation) {
 		
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 		
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports", "Strategy Workbench"]
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
+						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
 	else
@@ -774,7 +775,8 @@ deleteShortcuts(location) {
 		}
 	}
 	
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database", "Race Reports", "Strategy Workbench"]
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
+					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration"]
 		try {
 			FileDelete %location%\%name%.lnk
 		}
@@ -794,15 +796,17 @@ deleteShortcuts(location) {
 }
 
 writeAppPaths(installLocation) {
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe,, %installLocation%\Binaries\Simulator Startup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe,, %installLocation%\Binaries\Simulator Controller.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe,, %installLocation%\Binaries\Simulator Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe,, %installLocation%\Binaries\Simulator Setup.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe,, %installLocation%\Binaries\Simulator Configuration.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe,, %installLocation%\Binaries\Race Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe,, %installLocation%\Binaries\Setup Database.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe,, %installLocation%\Binaries\Race Reports.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe,, %installLocation%\Binaries\Strategy Workbench.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe, , %installLocation%\Binaries\Simulator Startup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe, , %installLocation%\Binaries\Simulator Controller.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe, , %installLocation%\Binaries\Simulator Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe, , %installLocation%\Binaries\Simulator Setup.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe, , %installLocation%\Binaries\Simulator Configuration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe, , %installLocation%\Binaries\Race Settings.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe, , %installLocation%\Binaries\Setup Database.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe, , %installLocation%\Binaries\Race Reports.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe, , %installLocation%\Binaries\Strategy Workbench.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
 }
 
 deleteAppPaths() {
@@ -814,6 +818,9 @@ deleteAppPaths() {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe
 }
 
 writeUninstallerInfo(installLocation) {
@@ -1381,6 +1388,17 @@ renewConsent() {
 		setConfigurationValue(consent, "General", "ReNew", true)
 		
 		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+	}
+}
+
+updateInstallationForV376() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		FileCreateShortCut %installLocation%\Binaries\Race Center.exe, %A_StartMenu%\Simulator Controller\Race Center.lnk, %installLocation%\Binaries
+		FileCreateShortCut %installLocation%\Binaries\Server Administration.exe, %A_StartMenu%\Simulator Controller\Server Administration.lnk, %installLocation%\Binaries
 	}
 }
 

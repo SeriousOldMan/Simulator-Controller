@@ -1260,16 +1260,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	loadNewLaps(stint) {
-		wait := true
 		newLaps := []
-				
-		for ignore, identifier in string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
+		
+		stintLaps := string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
+		
+		for ignore, identifier in stintLaps
 			if !this.Laps.HasKey(identifier) {
-				if wait {
+				if (A_Index == stintLaps.Length())
 					Sleep 10000
-					
-					wait := false
-				}
 				
 				newLap := parseObject(this.Connector.GetLap(identifier))
 				newLap.Nr := (newLap.Nr + 0)

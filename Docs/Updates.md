@@ -49,7 +49,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Many changes in the Team Server internals. If you are hosting an own installation, you have to redeploy the server. Data will be preserved and updated to the new format. All other changes in this release are handled automatically, although you might want to checkout the new [*openRaceCenter* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) parameter of the "Race Engineer" and "Race Strategist" plugins.
 
-Attention: All automatic update handling for versions older than 3.0 have been removed. In this case, you have to remove your *Simulator Controller* folder in your user *Documents* folder and start again. You can restore your changes, if any, later on.
+Attention: All automatic update handling for versions older than 3.0 have been removed. If you haven't updated Simulator Controller for such a long time, you have to remove your *Simulator Controller* folder in your user *Documents* folder (make a backup copy) and start with a fresh installation. You can restore your changes, if any, later on.
 
 ***
 

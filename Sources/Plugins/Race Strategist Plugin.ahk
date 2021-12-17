@@ -332,38 +332,40 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				Loop % teamServer.getCurrentLap(session)
 				{
 					try {
-						lapData := parseConfiguration(teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session))
+						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
 						
-						count += 1
-						
-						lapData := readConfiguration(kTempDirectory . "Race Report\Race.temp")
-						
-						for key, value in getConfigurationSectionValues(lapData, "Lap")
-							setConfigurationValue(data, "Laps", key, value)
-						
-						times := getConfigurationValue(lapData, "Times", A_Index)
-						positions := getConfigurationValue(lapData, "Positions", A_Index)
-						laps := getConfigurationValue(lapData, "Laps", A_Index)
-						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
-						
-						newLine := ((count > 1) ? "`n" : "")
-						
-						line := (newLine . times)
-						
-						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
-						
-						line := (newLine . positions)
-						
-						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
-						
-						line := (newLine . laps)
-						
-						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
-						
-						line := (newLine . drivers)
-						directory := (kTempDirectory . "Race Report\Drivers.CSV")
-						
-						FileAppend %line%, %directory%, UTF-16
+						if (lapData && (lapData != "")) {
+							lapData := parseConfiguration(lapData)
+							
+							count += 1
+							
+							for key, value in getConfigurationSectionValues(lapData, "Lap")
+								setConfigurationValue(data, "Laps", key, value)
+							
+							times := getConfigurationValue(lapData, "Times", A_Index)
+							positions := getConfigurationValue(lapData, "Positions", A_Index)
+							laps := getConfigurationValue(lapData, "Laps", A_Index)
+							drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+							
+							newLine := ((count > 1) ? "`n" : "")
+							
+							line := (newLine . times)
+							
+							FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+							
+							line := (newLine . positions)
+							
+							FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+							
+							line := (newLine . laps)
+							
+							FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+							
+							line := (newLine . drivers)
+							directory := (kTempDirectory . "Race Report\Drivers.CSV")
+							
+							FileAppend %line%, %directory%, UTF-16
+						}
 					}
 					catch exception {
 						break

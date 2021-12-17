@@ -107,6 +107,8 @@ global dataY1DropDown
 global dataY2DropDown
 global dataY3DropDown
 
+global syncInfoText
+
 global sessionMenuDropDown
 global strategyMenuDropDown
 global pitstopMenuDropDown
@@ -623,9 +625,13 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 Section, %kIconsDirectory%Tools BW.ico
 		Gui %window%:Add, Text, x50 yp+5 w80 h26, % translate("Session")
 		
-		Gui %window%:Font, s8 Norm, Arial
+		Gui %window%:Font, s8 Norm cGray, Courier
 		
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "---------------------------------------------", "Load...", "Save", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, Text, x1175 yp+2 w23 h23 vsyncInfoText
+		
+		Gui %window%:Font, s8 Norm cBlack, Arial
+		
+		Gui %window%:Add, DropDownList, x220 yp-4 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load...", "Save", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Monte Carlo Analysis...", "Run Simulation", "---------------------------------------------", "Update Race Strategy", "Clear Race Strategy"], "translate")*)
 		
@@ -1032,9 +1038,28 @@ class RaceCenter extends ConfigurationItem {
 				this.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
 				
 				this.connect()
-			case 5: ; Load Session...
+			case 4: ; Clear...
+				if this.SessionActive {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+
+					title := translate("Delete")
+					MsgBox 262436, %title%, % translate("Do you really want to delete all data from the currently active session? This can take quite a while...")
+					OnMessage(0x44, "")
+					
+					IfMsgBox Yes
+						this.clearSession()
+				}
+				else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+						OnMessage(0x44, "")
+					}
+					
+			case 6: ; Load Session...
 				this.loadSession()
-			case 6: ; Save Session
+			case 7: ; Save Session
 				if this.HasData
 					if this.SessionActive
 						this.saveSession()
@@ -1045,7 +1070,7 @@ class RaceCenter extends ConfigurationItem {
 						MsgBox 262192, %title%, % translate("You are not connected to an active session. Use ""Save a Copy..."" instead.")
 						OnMessage(0x44, "")
 					}
-			case 7: ; Save Session Copy...
+			case 8: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -1055,11 +1080,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 9: ; Update Statistics
+			case 10: ; Update Statistics
 				this.updateStatistics()
-			case 11: ; Race Summary
+			case 12: ; Race Summary
 				this.showRaceSummary()
-			case 12: ; Driver Statistics
+			case 13: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -1195,8 +1220,12 @@ class RaceCenter extends ConfigurationItem {
 			
 		if (!this.CurrentStint || (currentStint.Nr > this.CurrentStint.Nr)) {
 			for ignore, identifier in string2Values(";", this.Connector.GetSessionStints(session))
-				if !this.Stints.HasKey(identifier)
-					newStints.Push(parseObject(this.Connector.GetStint(identifier)))
+				if !this.Stints.HasKey(identifier) {
+					newStint := parseObject(this.Connector.GetStint(identifier))
+					newStint.Nr := (newStint.Nr + 0)
+				
+					newStints.Push(newStint)
+				}
 			
 			Loop % newStints.Length()
 			{
@@ -1234,10 +1263,16 @@ class RaceCenter extends ConfigurationItem {
 
 	loadNewLaps(stint) {
 		newLaps := []
-				
-		for ignore, identifier in string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
+		
+		stintLaps := string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
+		
+		for ignore, identifier in stintLaps
 			if !this.Laps.HasKey(identifier) {
+				if (A_Index == stintLaps.Length())
+					Sleep 10000
+				
 				newLap := parseObject(this.Connector.GetLap(identifier))
+				newLap.Nr := (newLap.Nr + 0)
 				
 				if !this.Laps.HasKey(newLap.Nr)
 					newLaps.Push(newLap)
@@ -1398,8 +1433,10 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			currentStint := this.Connector.GetSessionCurrentStint(session)
 			
-			if currentStint
+			if currentStint {
 				currentStint := parseObject(this.Connector.GetStint(currentStint))
+				currentStint.Nr := (currentStint.Nr + 0)
+			}
 		}
 		catch exception {
 			currentStint := false
@@ -1408,8 +1445,11 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			lastLap := this.Connector.GetSessionLastLap(session)
 			
-			if lastLap
+			if lastLap {
 				lastLap := parseObject(this.Connector.GetLap(lastLap))
+				lastLap.Nr := (lastLap.Nr + 0)
+			}
+				
 		}
 		catch exception {
 			lastLap := false
@@ -1548,7 +1588,12 @@ class RaceCenter extends ConfigurationItem {
 		
 		while (lap <= lastLap) {
 			try {
-				lapData := parseConfiguration(this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap"))
+				lapData := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap")
+				
+				if (lapData && (lapData != ""))
+					lapData := parseConfiguration(lapData)
+				else
+					throw "No data..."
 			}
 			catch exception {
 				return newData
@@ -1621,13 +1666,25 @@ class RaceCenter extends ConfigurationItem {
 				runningLap := 0
 		
 			lap += 1
-		
+			
 			while (lap <= lastLap) {
 				try {
-					telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
-					
-					if (!telemetryData || (telemetryData == ""))
-						throw "No data..."
+					tries := 10
+			
+					while (tries > 0) {
+						telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
+						
+						if (!telemetryData || (telemetryData == "")) {
+							tries -= 1
+							
+							if (tries <= 0)
+								throw "No data..."
+							else
+								Sleep 1
+						}
+						else
+							break
+					}
 				}
 				catch exception {
 					state := false
@@ -1683,7 +1740,15 @@ class RaceCenter extends ConfigurationItem {
 		if load {
 			Gui ListView, % this.LapsListView
 			
+			lastLap := this.LastLap
+			
+			if lastLap
+				lastLap := (lastLap.Nr + 0)
+			
 			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Setup.Pressures"] {
+				if (A_Index > lastLap)
+					break
+				
 				pressureFL := pressureData["Tyre.Pressure.Hot.Front.Left"]
 				pressureFR := pressureData["Tyre.Pressure.Hot.Front.Right"]
 				pressureRL := pressureData["Tyre.Pressure.Hot.Rear.Left"]
@@ -1726,10 +1791,22 @@ class RaceCenter extends ConfigurationItem {
 			
 			while (lap <= lastLap) {
 				try {
-					lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
-					
-					if (!lapPressures || (lapPressures == ""))
-						throw "No data..."
+					tries := 10
+			
+					while (tries > 0) {
+						lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
+						
+						if (!lapPressures || (lapPressures == "")) {
+							tries -= 1
+							
+							if (tries <= 0)
+								throw "No data..."
+							else
+								Sleep 1
+						}
+						else
+							break
+					}
 				}
 				catch exception {
 					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-")
@@ -1840,26 +1917,44 @@ class RaceCenter extends ConfigurationItem {
 	
 	syncSession() {
 		if this.SessionActive {
+			window := this.Window
+			
+			Gui %window%:Default
+			
+			GuiControl, , syncInfoText, (-)
+			
 			newLaps := false
 			newData := false
 			
 			if this.syncLaps()
 				newLaps := true
 			
+			GuiControl, , syncInfoText, (\)
+			
 			if this.syncRaceReport()
 				newData := true
+			
+			GuiControl, , syncInfoText, (|)
 			
 			if this.syncTelemetry()
 				newData := true
 			
+			GuiControl, , syncInfoText, (/)
+			
 			if this.syncTyrePressures()
 				newData := true
+			
+			GuiControl, , syncInfoText, (-)
 			
 			if newLaps
 				this.syncPitstops()
 		
+			GuiControl, , syncInfoText, (\)
+			
 			if (newData || newLaps)
 				this.updateReports()
+			
+			GuiControl, , syncInfoText, (|)
 			
 			if (!newLaps && !this.SessionFinished) {
 				finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
@@ -1870,6 +1965,8 @@ class RaceCenter extends ConfigurationItem {
 					this.iSessionFinished := true
 				}
 			}
+			
+			GuiControl, , syncInfoText, % ""
 		}
 	}
 	
@@ -2038,7 +2135,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		if copy {
-			directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
+			directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory)
 			
 			title := translate("Select target folder...")
 			
@@ -2244,6 +2341,21 @@ class RaceCenter extends ConfigurationItem {
 		
 		Loop % LV_GetCount("Col")
 			LV_ModifyCol(A_Index, "AutoHdr")
+	}
+	
+	clearSession() {
+		session := this.SelectedSession[true]
+		
+		if session {
+			try {
+				this.Connector.ClearSession(session)
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.initializeSession()
+		}
 	}
 	
 	loadSession() {

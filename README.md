@@ -31,15 +31,15 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.7.4-release](https://cntr.click/HRJnb7N) (New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration.)
+[3.7.6-release](https://cntr.click/f5Rrfgx) (New features: Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 GT3 to the list of ACC cars.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-374) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-376) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.7.2-release](https://cntr.click/2xk5BBK) (New features: Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend.)
+[3.7.4-release](https://cntr.click/HRJnb7N) (New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration.)
 
-[3.7.1-release](https://bit.ly/3cTsNlD) (New features: New "Team Server" for endurance races, New "Team Server" tab in "Simulator Configuration", New "Team" tab in "Race Settings", Bugfix in "Simulator Setup" for Stream Deck configuration support, Fixed label handling in "Simlator Setup", Fixed several other Bugs in "Simulator Setup", Fixed a bug when using mixed scenarios in "Strategy Workbench", Rework of the voice configuration both for locally installed as well as for Azure voices. **Version 3.7.1 is a maintenance release for 3.7.0**)
+[3.7.2-release](https://cntr.click/2xk5BBK) (New features: Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend.)
 
 #### Latest development build
 
@@ -89,7 +89,7 @@ Another capability of the Virtual Race Strategist is to support you during the [
 
 You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server also supports a so called "Race Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 
 ### Additional features
 

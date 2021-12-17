@@ -1,8 +1,8 @@
-## 3.7.6-release 12/17/21 (planned)
+## 3.7.6-release 12/17/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Almost fully implemented "Race Center" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and exhaustive [documentation](*) for more information.
+  3. Almost fully implemented "Race Center" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center) for more information.
   4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "RaceEngineer" and "Race Strategist" plugins.
   5. New ["openRaceCenter" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Race Center" from external event sources.
   6. Fixed several critical bugs in "Server Administration".

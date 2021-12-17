@@ -1,16 +1,16 @@
 [Development]
 Version=3.7.8-dev
 Target=3.7.8-release
-Date=01/14/2022
+Date=12/31/2021
 Download=
 Changes=Lap detail report for "Race Center"
 [Release]
-Version=3.7.4-release
-Date=12/06/2021
-Download=https://cntr.click/HRJnb7N
-Changes=New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration
+Version=3.7.6-release
+Date=12/17/2021
+Download=https://cntr.click/f5Rrfgx
+Changes=Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 GT3 to the list of ACC cars
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.7.4-release
-Development=3.7.6-dev
+Release=3.7.6-release
+Development=3.7.6-release

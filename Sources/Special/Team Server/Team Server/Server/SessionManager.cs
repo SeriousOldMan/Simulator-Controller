@@ -157,11 +157,7 @@ namespace TeamServer.Server {
 			ValidateSession(session);
 			ValidateAccount(duration);
 
-			foreach (Model.Attribute attribute in session.Attributes)
-				attribute.Delete();
-
-			foreach (Stint stint in session.Stints)
-				stint.Delete();
+			ClearSession(session);
 			
 			session.Duration = duration;
 			session.Car = car;
@@ -209,6 +205,27 @@ namespace TeamServer.Server {
 			FinishSession(new Guid(identifier));
 		}
 
+		public void ClearSession(Session session)
+		{
+			ValidateSession(session);
+
+			foreach (Model.Attribute attribute in session.Attributes)
+				attribute.Delete();
+
+			foreach (Stint stint in session.Stints)
+				stint.Delete();
+		}
+
+		public void ClearSession(Guid identifier)
+		{
+			ClearSession(ObjectManager.GetSessionAsync(identifier).Result);
+		}
+
+		public void ClearSession(string identifier)
+		{
+			ClearSession(new Guid(identifier));
+		}
+
 		public async void DeleteSessionsAsync() {
 			TeamServer.TokenIssuer.ElevateToken(Token);
 
@@ -230,7 +247,8 @@ namespace TeamServer.Server {
 					foreach (Model.Attribute attribute in s.Attributes)
 						attribute.Delete();
 
-					foreach (Stint stint in s.Stints) {
+					foreach (Stint stint in s.Stints)
+					{
 						foreach (Model.Attribute attribute in stint.Attributes)
 							attribute.Delete();
 

@@ -704,7 +704,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else
 				this.iTeamSessionActive := true
 			
-			this.iTeamSession := (this.iTeamSessionActive ? sessionIdentifier : false)
+			this.iTeamSession := (this.TeamSessionActive ? sessionIdentifier : false)
 		}
 		else
 			this.iTeamSession := false

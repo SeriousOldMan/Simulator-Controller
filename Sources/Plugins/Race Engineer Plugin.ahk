@@ -284,7 +284,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		else
 			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-											 , "Compound": compound, "Compound.Color": compoundColor, "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
+											 , "Compound": compound, "Compound.Color": compoundColor
+											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
 	}
 	
 	updateSetupDatabase() {

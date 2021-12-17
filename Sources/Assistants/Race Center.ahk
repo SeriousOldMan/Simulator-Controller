@@ -72,7 +72,9 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-											  , "Repair.Bodywork", "Repair.Suspension"]}
+											  , "Repair.Bodywork", "Repair.Suspension"]
+							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance"]
+							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]}
 				
 						
 ;;;-------------------------------------------------------------------------;;;
@@ -3075,6 +3077,9 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
+	showLapDetails(lap) {
+	}
+	
 	createDriverDetails(drivers) {
 		driverData := []
 		stintsData := []
@@ -3638,8 +3643,11 @@ chooseLap() {
 	
 	Gui ListView, % rCenter.LapsListView
 	
-	Loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		LV_GetText(lap, A_EventInfo, 1)
+		
+		rCenter.showLapDetails(rCenter.Laps[lap])
+	}
 }
 
 choosePitstop() {

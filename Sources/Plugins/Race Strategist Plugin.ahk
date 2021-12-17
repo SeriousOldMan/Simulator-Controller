@@ -234,7 +234,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			}
 	}
 	
-	saveRaceInfo(fileName) {
+	setLapValue(lapNumber, name, fileName) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive) {
@@ -242,13 +242,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			
 			try {
 				FileEncoding UTF-16
-				FileRead info, %fileName%
+				FileRead lapData, %fileName%
 			}
 			finally {
 				FileEncoding %currentEncoding%
 			}
 			
-			teamServer.setLapValue(1, this.Plugin . " Race Info", info)
+			teamServer.setLapValue(lapNumber, this.Plugin . " Race Standings", lapData)
 			
 			try {
 				FileDelete %fileName%
@@ -257,6 +257,20 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				; ignore
 			}
 		}
+	}
+	
+	saveStandingsData(lapNumber, fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive)
+			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
+	}
+	
+	saveRaceInfo(fileName) {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.SessionActive)
+			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
 		else {
 			try {
 				FileRemoveDir %kTempDirectory%Race Report, 1
@@ -274,26 +288,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	saveRaceLap(lapNumber, fileName) {
 		teamServer := this.TeamServer
 		
-		if (teamServer && teamServer.SessionActive) {
-			currentEncoding := A_FileEncoding
-			
-			try {
-				FileEncoding UTF-16
-				FileRead lapData, %fileName%
-			}
-			finally {
-				FileEncoding %currentEncoding%
-			}
-			
-			teamServer.setLapValue(lapNumber, this.Plugin . " Race Lap", lapData)
-			
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
-		}
+		if (teamServer && teamServer.SessionActive)
+			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
 		else 
 			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%
 	}

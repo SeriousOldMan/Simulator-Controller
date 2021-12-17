@@ -40,6 +40,10 @@ class RaceStrategist extends RaceAssistant {
 			base.__New("Race Strategist", remotePID)
 		}
 		
+		saveStandingsData(arguments*) {
+			this.callRemote("saveStandingsData", arguments*)
+		}
+		
 		saveTelemetryData(arguments*) {
 			this.callRemote("saveTelemetryData", arguments*)
 		}
@@ -712,7 +716,9 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 		}
-			
+		
+		this.saveLapStandings(lapNumber, simulator, car, track)
+		
 		if (this.SaveRaceReport != kNever)
 			this.saveStandingsData(lapNumber, simulator, car, track)
 		
@@ -1098,6 +1104,37 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 			
 			this.finishSession()
+		}
+	}
+	
+	saveLapStandings(lapNumber, simulator, car, track) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if this.RemoteHandler {
+			Random postfix, 1, 1000000
+				
+			driver := knowledgeBase.getValue("Driver.Car")
+			carCount := knowledgeBase.getValue("Car.Count")
+			
+			if ((driver == 0) || (carCount == 0))
+				return
+			
+			fileName := (kTempDirectory . "Race Strategist Lap.standings")
+			data := newConfiguration()
+			
+			setConfigurationValue(data, "Lap", "Lap", lapNumber)
+			setConfigurationValue(data, "Lap", "Driver", driver)
+			setConfigurationValue(data, "Lap", "Cars", carCount)
+			
+			for key, value in knowledgeBase.Facts.Facts
+				if (InStr(key, "Position", 1) == 1)
+					setConfigurationValue(data, "Position", key, value)
+				else if InStr(key, prefix, 1)
+					setConfigurationValue(data, "Standings", key, value)
+			
+			writeConfiguration(fileName, data)
+			
+			this.RemoteHandler.saveStandingsData(lapNumber, fileName)
 		}
 	}
 	

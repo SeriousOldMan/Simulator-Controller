@@ -1678,7 +1678,7 @@ class RaceCenter extends ConfigurationItem {
 							if (tries <= 0)
 								throw "No data..."
 							else
-								Sleep 1
+								Sleep 400
 						}
 						else
 							break
@@ -1800,7 +1800,7 @@ class RaceCenter extends ConfigurationItem {
 							if (tries <= 0)
 								throw "No data..."
 							else
-								Sleep 1
+								Sleep 400
 						}
 						else
 							break

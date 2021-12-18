@@ -3429,7 +3429,7 @@ class RaceCenter extends ConfigurationItem {
 			index := rowIndex[entry.Type]
 			
 			rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
-						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, carName, driverFullname, delta)
+						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, this.TelemetryDatabase.getCarName(this.Simulator, carName), driverFullname, delta)
 						  . "</td></tr>")
 		}
 		
@@ -3443,6 +3443,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	createLapStandings(lap) {
 		sessionDB := this.SessionDatabase
+		telemetryDB := this.TelemetryDatabase
 		
 		html := "<table class=""table-std"">"
 		
@@ -3479,7 +3480,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			html .= ("<tr><th class=""th-std"">" . position . "</td>"
-				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index], carNames[index]
+				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index],  telemetryDB.getCarName(carNames[index])
 																						 , computeDriverName(driverFornames[index]
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])

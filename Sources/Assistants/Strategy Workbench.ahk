@@ -323,7 +323,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			simulator := false
 		
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Car")
-		Gui %window%:Add, DropDownList, x90 yp w290 vcarDropDown gchooseCar
+		Gui %window%:Add, DropDownList, AltSubmit x90 yp w290 vcarDropDown gchooseCar
 		
 		Gui %window%:Add, Text, x16 yp24 w70 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x90 yp w290 vtrackDropDown gchooseTrack
@@ -1160,15 +1160,15 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getSimulators() {
-		return new TelemetryDatabase().getSimulators()
+		return new SessionDatabase().getSimulators()
 	}
 	
 	getCars(simulator) {
-		return new TelemetryDatabase().getCars(simulator)
+		return new SessionDatabase().getCars(simulator)
 	}
 	
 	getTracks(simulator, car) {
-		return new TelemetryDatabase().getTracks(simulator, car)
+		return new SessionDatabase().getTracks(simulator, car)
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -1179,10 +1179,16 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			this.iSelectedSimulator := simulator
 			
+			sessionDB := new SessionDatabase()
+			
 			cars := this.getCars(simulator)
+			carNames := cars.Clone()
+			
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
 			
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
-			GuiControl, , carDropDown, % "|" . values2String("|", cars*)
+			GuiControl, , carDropDown, % "|" . values2String("|", carNames*)
 			
 			this.loadCar((cars.Length() > 0) ? cars[1] : false, true)
 		}
@@ -3277,7 +3283,7 @@ chooseCar() {
 	
 	GuiControlGet carDropDown
 	
-	workbench.loadCar(carDropDown)
+	workbench.loadCar(workbench.getCars(workbench.SelectedSimulator)[carDropDown])
 }
 
 chooseTrack() {

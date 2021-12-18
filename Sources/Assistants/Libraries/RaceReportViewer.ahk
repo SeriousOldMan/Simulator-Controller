@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\Math.ahk
+#Include Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -551,6 +552,9 @@ class RaceReportViewer {
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
 			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			
+			sessionDB := new SessionDatabase()
 			
 			Loop % carsCount
 			{
@@ -601,7 +605,7 @@ class RaceReportViewer {
 				
 				hasDNF := (hasDNF || (result = "DNF"))
 				
-				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(cars[A_Index][2], "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				rows.Push(Array(cars[A_Index][1], "'" . sessionDB.getCarName(simulator, StrReplace(cars[A_Index][2], "'", "\'")) . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
 			}
 			

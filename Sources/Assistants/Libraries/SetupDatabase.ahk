@@ -155,6 +155,21 @@ class SessionDatabase {
 		else
 			return []
 	}
+	
+	getCarName(simulator, car) {
+		static carNames := false
+		
+		code := this.getSimulatorCode(simulator)
+		
+		if (code == "ACC") {
+			if !carNames
+				carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+		
+			return getConfigurationValue(carNames, "Car Model", car, car)
+		}
+		else
+			return car
+	}
 }
 
 class SetupDatabase extends SessionDatabase {

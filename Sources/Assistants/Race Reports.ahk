@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\RaceReportViewer.ahk
+#Include Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -443,10 +444,16 @@ class RaceReports extends ConfigurationItem {
 			
 			this.iSelectedSimulator := simulator
 			
+			sessionDB := new SessionDatabase()
+			
 			cars := this.getCars(simulator)
+			carNames := cars.Clone()
+			
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
 			
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
-			GuiControl, , carDropDown, % "|" . values2String("|", cars*)
+			GuiControl, , carDropDown, % "|" . values2String("|", carNames*)
 			
 			this.loadCar((cars.Length() > 0) ? cars[1] : false, true)
 		}

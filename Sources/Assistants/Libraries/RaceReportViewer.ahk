@@ -206,6 +206,86 @@ class RaceReportViewer {
 		}
 	}
 	
+	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
+		local raceData := true
+		local drivers := true
+		local positions := false
+		local times := false
+		
+		this.loadReportData(Array(lap), raceData, drivers, positions, times)
+		
+		carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
+		carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
+		
+		if (drivers.Length() > 0) {
+			parts := string2Values(A_Space, drivers[1][car])
+			
+			driverForname := parts[1]
+			driverSurname := parts[2]
+			driverNickname := StrReplace(StrReplace(parts[3], "(", ""), ")", "")
+		}
+		else {
+			driverForname := "John"
+			driverSurname := "Doe"
+			driverNickname := "JDO"
+		}
+	}
+	
+	getStandings(lap, ByRef cars, ByRef positions, ByRef carNumbers, ByRef carNames, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+		local raceData := true
+		local drivers := true
+		local tPositions := true
+		local times := false
+		
+		this.loadReportData(Array(lap), raceData, drivers, tPositions, times)
+		
+		if cars
+			cars := []
+			
+		if positions
+			positions := []
+		
+		if carNumbers
+			carNumbers := []
+		
+		if carNames
+			carNames := []
+				
+		if driverFornames
+			driverFornames := []
+			
+		if driverSurnames
+			driverSurnames := []
+			
+		if driverNicknames
+			driverNicknames := []
+			
+		if cars
+			Loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
+				cars.Push(A_Index)
+			
+				if positions
+					positions.Push(tPositions[1][A_Index])
+			
+				if carNumbers
+					carNumbers.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
+			
+				if carNames
+					carNames.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+		
+				parts := string2Values(A_Space, drivers[1][A_Index])
+				
+				if driverFornames
+					driverFornames.Push(parts[1])
+				
+				if driverSurnames
+					driverSurnames.Push(parts[2])
+				
+				if driverNicknames
+					driverNicknames.Push(StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+			}
+	}
+	
 	getDriverPositions(raceData, positions, car) {
 		result := []
 		

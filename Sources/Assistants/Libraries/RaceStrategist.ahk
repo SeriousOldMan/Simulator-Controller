@@ -643,7 +643,7 @@ class RaceStrategist extends RaceAssistant {
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
+			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
 		
 		result := base.addLap(lapNumber, data)
@@ -717,10 +717,7 @@ class RaceStrategist extends RaceAssistant {
 			}
 		}
 		
-		this.saveLapStandings(lapNumber, simulator, car, track)
-		
-		if (this.SaveRaceReport != kNever)
-			this.saveStandingsData(lapNumber, simulator, car, track)
+		this.saveStandingsData(lapNumber, simulator, car, track)
 		
 		return result
 	}
@@ -1143,7 +1140,7 @@ class RaceStrategist extends RaceAssistant {
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.RemoteHandler {			
+		if this.RemoteHandler {
 			Random postfix, 1, 1000000
 				
 			driver := knowledgeBase.getValue("Driver.Car")
@@ -1176,7 +1173,7 @@ class RaceStrategist extends RaceAssistant {
 				
 				writeConfiguration(fileName, data)
 			
-				this.RemoteHandler.saveRaceInfo(fileName)
+				this.RemoteHandler.saveRaceInfo(lapNumber, fileName)
 			}
 			
 			data := newConfiguration()
@@ -1235,6 +1232,8 @@ class RaceStrategist extends RaceAssistant {
 			if !knowledgeBase.getValue("Cleanup", false)
 				knowledgeBase.addFact("Cleanup", "Standings")
 		}
+		
+		this.saveLapStandings(lapNumber, simulator, car, track)
 	}
 	
 	createRaceReport() {

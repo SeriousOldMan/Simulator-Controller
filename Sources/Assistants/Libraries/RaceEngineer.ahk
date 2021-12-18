@@ -885,7 +885,7 @@ class RaceEngineer extends RaceAssistant {
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
+			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
 		
 		result := base.addLap(lapNumber, data)

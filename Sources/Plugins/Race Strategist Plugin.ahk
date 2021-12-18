@@ -266,7 +266,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
 	}
 	
-	saveRaceInfo(fileName) {
+	saveRaceInfo(lapNumber, fileName) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive)

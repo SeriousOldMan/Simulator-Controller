@@ -541,7 +541,7 @@ class RaceAssistant extends ConfigurationItem {
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 		
 		this.updateSessionValues({DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 		
@@ -682,7 +682,7 @@ class RaceAssistant extends ConfigurationItem {
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 		
 		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)})
 			

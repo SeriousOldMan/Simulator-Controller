@@ -319,7 +319,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				
 			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
 			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JD")
+			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 			
 			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 			

@@ -248,7 +248,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				FileEncoding %currentEncoding%
 			}
 			
-			teamServer.setLapValue(lapNumber, this.Plugin . " Race Standings", lapData)
+			teamServer.setLapValue(lapNumber, name, lapData)
 			
 			try {
 				FileDelete %fileName%

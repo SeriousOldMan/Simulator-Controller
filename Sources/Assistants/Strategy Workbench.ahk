@@ -602,7 +602,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Fuel Consumption")
+		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Consumption")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-10 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
 		
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Initial Fuel")
@@ -877,12 +877,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		html := ""
 		
 		if !strategy.LastPitstop {
-			html .= "<table id=""stints"">"
-			html .= ("<tr><td><i>" . translate("Stint:") . "</i></td><td id=""data"">1</td></tr>")
-			html .= ("<tr><td><i>" . translate("Map:") . "</i></td><td id=""data"">" . strategy.Map . "</td></tr>")
-			html .= ("<tr><td><i>" . translate("Laps:") . "</i></td><td id=""data"">" . strategy.RemainingLaps . "</td></tr>")
-			html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td><td id=""data"">" . strategy.AvgLapTime . "</td></tr>")
-			html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td><td id=""data"">" . strategy.FuelConsumption . "</td></tr>")
+			html .= "<table class=""table-std"">"
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">1</th></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . strategy.AvgLapTime . "</td></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th><td class=""td-std"">" . strategy.FuelConsumption . "</td></tr>")
 			html .= "</table>"
 			
 			timeSeries.Push(strategy.getSessionDuration() / 60)
@@ -910,14 +910,14 @@ class StrategyWorkbench extends ConfigurationItem {
 			lastTyreLaps := strategy.RemainingTyreLaps
 		
 			for ignore, pitstop in strategy.Pitstops {
-				stints.Push("<td id=""data"">" . A_Index . "</td>")
-				maps.Push("<td id=""data"">" . lastMap . "</td>")
-				laps.Push("<td id=""data"">" . (pitstop.Lap - lastLap) . "</td>")
-				lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
-				fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
-				pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
-				refuels.Push("<td id=""data"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
-				tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+				stints.Push("<th class=""th-std"">" . A_Index . "</th>")
+				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
+				laps.Push("<td class=""td-std"">" . (pitstop.Lap - lastLap) . "</td>")
+				lapTimes.Push("<td class=""td-std"">" . Round(lastLapTime, 1) . "</td>")
+				fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
+				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
+				refuels.Push("<td class=""td-std"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
+				tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
 				
 				timeSeries.Push(pitstop.Time / 60)
 				lapSeries.Push(pitstop.Lap)
@@ -939,29 +939,29 @@ class StrategyWorkbench extends ConfigurationItem {
 				tyreSeries.Push(lastTyreLaps)
 			}
 			
-			stints.Push("<td id=""data"">" . (strategy.Pitstops.Length() + 1) . "</td>")
-			maps.Push("<td id=""data"">" . lastMap . "</td>")
-			laps.Push("<td id=""data"">" . strategy.LastPitstop.StintLaps . "</td>")
-			lapTimes.Push("<td id=""data"">" . Round(lastLapTime, 1) . "</td>")
-			fuelConsumptions.Push("<td id=""data"">" . Round(lastFuelConsumption, 2) . "</td>")
-			pitstopLaps.Push("<td id=""data"">" . lastPitstopLap . "</td>")
-			refuels.Push("<td id=""data"">" . Ceil(lastRefuel) . "</td>")
-			tyreChanges.Push("<td id=""data"">" . lastTyreChange . "</td>")
+			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + 1) . "</th>")
+			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
+			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
+			lapTimes.Push("<td class=""td-std"">" . Round(lastLapTime, 1) . "</td>")
+			fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
+			pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
+			refuels.Push("<td class=""td-std"">" . Ceil(lastRefuel) . "</td>")
+			tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
 			
 			timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
 			lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
 			fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
 			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
 			
-			html .= "<table id=""stints"">"
-			html .= ("<tr><td><i>" . translate("Stint:") . "</i></td>" . values2String("", stints*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Map:") . "</i></td>" . values2String("", maps*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Laps:") . "</i></td>" . values2String("", laps*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Lap Time:") . "</i></td>" . values2String("", lapTimes*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Fuel Consumption:") . "</i></td>" . values2String("", fuelConsumptions*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Pitstop Lap:") . "</i></td>" . values2String("", pitstopLaps*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Refuel Amount:") . "</i></td>" . values2String("", refuels*) . "</tr>")
-			html .= ("<tr><td><i>" . translate("Tyre Change:") . "</i></td>" . values2String("", tyreChanges*) . "</tr>")
+			html .= "<table class=""table-std"">"
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", lapTimes*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th>" . values2String("", fuelConsumptions*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop Lap") . "</th>" . values2String("", pitstopLaps*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Refuel Amount") . "</th>" . values2String("", refuels*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Change") . "</th>" . values2String("", tyreChanges*) . "</tr>")
 			html .= "</table>"
 		}
 		
@@ -1059,8 +1059,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			drawChartFunction := ""
 			chartArea := ""
 		}
-			
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+
+		tableCSS := getTableCSS()
+		
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		strategyViewer.Document.Open()
 		strategyViewer.Document.Write(html)
@@ -1870,7 +1872,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id" . vChartID . """ style=""width: 778px; height: 348px"">")
 
-		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #stints td { border-right: solid 1px #A0A0A0; } </style><style> #header { font-size: 12px; } </style><style> #data { border-collapse: separate; border-spacing: 10px; text-align: center; } </style>" . html . "<br><hr style=""width: 50`%""><br>" . chartArea . "</body></html>")
+		tableCSS := getTableCSS()
+		
+		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=""width: 50`%""><br>" . chartArea . "</body></html>")
 		
 		this.showComparisonChart(html)
 	}
@@ -3117,6 +3121,55 @@ class Strategy extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getTableCSS() {
+	script =
+	(
+		.table-std, .th-std, .td-std { 
+			border-collapse: collapse;
+			padding: .3em .5em; 
+		}
+
+		.th-std, .td-std {
+			text-align: center;
+		} 
+		
+		.th-std, .caption-std { 
+			background-color: #BBB; 
+			color: #000; 
+			border: thin solid #BBB;
+		}
+
+		.td-std {
+			border-left: thin solid #BBB;
+			border-right: thin solid #BBB;
+		}
+		
+		.th-left {
+			text-align: left;
+		}
+
+		tfoot {
+			border-bottom: thin solid #BBB;
+		}
+
+		.caption-std {
+			font-size: 1.5em;
+			border-radius: .5em .5em 0 0;
+			padding: .5em 0 0 0
+		}
+		
+		.table-std tbody tr:nth-child(even) { 
+			background-color: #D8D8D8;
+		}
+		
+		.table-std tbody tr:nth-child(odd) { 
+			background-color: #D0D0D0;
+		}
+	)
+
+	return script
+}
 
 lookupLapTime(lapTimes, map, remainingFuel) {
 	selected := false

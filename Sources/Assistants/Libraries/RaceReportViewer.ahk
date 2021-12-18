@@ -166,7 +166,6 @@ class RaceReportViewer {
 				infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", map(conditions, "translate")*) . "</td></tr>")
 				infoText .= "</table>"
 				
-				infoText := "<html><meta charset='utf-8'><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 				infoText := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 				
 				this.InfoViewer.Document.write(infoText)
@@ -864,11 +863,6 @@ compoundColor(compound) {
 		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 }
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Private Function Declaration Section                 ;;;
-;;;-------------------------------------------------------------------------;;;
-
 getPaceJSFunctions() {
 	script =
 	(
@@ -935,6 +929,11 @@ getPaceJSFunctions() {
 	
 	return script
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
 
 global rangeLapsEdit
 global driverSelectCheck

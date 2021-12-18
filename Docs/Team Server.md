@@ -94,8 +94,6 @@ To use the "Race Center", you must have a valid connection to a team session. Th
 
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%207.JPG)
-
 It is no problem, to reuse a session for many races, because the old data will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Data" menu beforehand to erase all current data, if you whish. Please note, that it is **not** a good idea to use the same session in more than one race at the same time.
 
 #### Session data handling

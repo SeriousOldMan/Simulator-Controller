@@ -1126,6 +1126,8 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Lap", "Driver", driver)
 			setConfigurationValue(data, "Lap", "Cars", carCount)
 			
+			prefix := ("Standings.Lap." . lapNumber)
+			
 			for key, value in knowledgeBase.Facts.Facts
 				if (InStr(key, "Position", 1) == 1)
 					setConfigurationValue(data, "Position", key, value)

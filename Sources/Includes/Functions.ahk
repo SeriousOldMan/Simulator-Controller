@@ -1030,7 +1030,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		
 		vVideoPlayer.Navigate("about:blank")
 		
-		html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" image "' width=780 height=438 border=0 padding=0></body></html>"
+		html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . image . "' width=780 height=438 border=0 padding=0></body></html>"
 
 		vVideoPlayer.document.write(html)
 	}

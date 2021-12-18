@@ -2012,6 +2012,14 @@ class RaceCenter extends ConfigurationItem {
 		this.showReport(this.SelectedReport, true)
 	}
 	
+	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
+		this.ReportViewer.getCar(lap, car, carNumber, carName, driverForname, driverSurname, driverNickname)
+	}
+	
+	getStandings(lap, ByRef cars, ByRef positions, ByRef carNumbers, ByRef carNames, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+		this.ReportViewer.getCar(lap, cars, positions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
+	}
+	
 	computeLapStatistics(driver, laps, ByRef potential, ByRef raceCraft, ByRef speed, ByRef consistency, ByRef carControl) {
 		raceData := true
 		drivers := false
@@ -3322,12 +3330,7 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
-	getCarInfo(lap, Car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
-	}
-	
 	createLapDeltas(lap) {
-		sessionDB := this.SessionDatabase()
-		
 		html := "<table class=""table-std"">"
 		
 		html .= ("<tr><th class=""th-std"">" . "" . "</th>"
@@ -3348,7 +3351,7 @@ class RaceCenter extends ConfigurationItem {
 			driverSurname := false
 			driverNickname := false
 			
-			this.getCarInfo(lap, entry.Car, carNumer, carName, driverForname, driverSurname, driverNickname)
+			this.getCar(lap, entry.Car, carNumber, carName, driverForname, driverSurname, driverNickname)
 			
 			index := rowIndex[entry.Type]
 			
@@ -3365,6 +3368,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	createLapStandings(lap) {
+		sessionDB := this.SessionDatabase
+		
 		html := "<table class=""table-std"">"
 		
 		html .= ("<tr><th class=""th-std th-left"">" . translate("#") . "</th>"
@@ -3375,6 +3380,38 @@ class RaceCenter extends ConfigurationItem {
 			   . "<th class=""th-std th-left"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std th-left"">" . translate("Delta") . "</th>"
 			   . "</tr>")
+	
+		cars := true
+		positions := true
+		carNumbers := true
+		carNames := true
+		driverForames := true
+		driverSurames := true
+		driverNickames := true
+		
+		this.getStandings(lap, cars, positions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames) {
+	
+		for index, position in positions {
+			lapTime := "-"
+			laps := "-"
+			delta := "-"
+			
+			result := sessionDB.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]})
+			
+			if (result.Length() > 0) {
+				lapTime := result[1].Time
+				laps := result[1].Laps
+				delta := Round(result[1].Delta, 1)
+			}
+			
+			html .= ("<tr><th class=""th-std"">" . position . "</td>"
+				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index], carNames[index]
+																						 , computeDriverName(driverFornames[index]
+																										   , driverSurnames[index]
+																										   , driverNickNames[index])
+																						 , lapTime, laps, delta)
+				   . "</td></tr>")
+		}
 		
 		html .= "</table>"
 		

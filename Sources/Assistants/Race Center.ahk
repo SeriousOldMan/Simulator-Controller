@@ -3397,10 +3397,10 @@ class RaceCenter extends ConfigurationItem {
 		html := "<table class=""table-std"">"
 		
 		html .= ("<tr><th class=""th-std"">" . "" . "</th>"
-			   . "<th class=""th-std th-left"">" . translate("Nr.") . "</th>"
-			   . "<th class=""th-std th-left"">" . translate("Car") . "</th>"
-			   . "<th class=""th-std th-left"">" . translate("Driver") . "</th>"
-			   . "<th class=""th-std th-left"">" . translate("Delta") . "</th>"
+			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
+			   . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			   . "<th class=""th-std"">" . translate("Car") . "</th>"
+			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
 			   . "</tr>")
 		
 		label := [translate("Leader"), translate("Standings (Front)"), translate("Standings (Behind)")
@@ -3429,7 +3429,7 @@ class RaceCenter extends ConfigurationItem {
 			index := rowIndex[entry.Type]
 			
 			rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
-						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, this.TelemetryDatabase.getCarName(this.Simulator, carName), driverFullname, delta)
+						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, this.TelemetryDatabase.getCarName(this.Simulator, carName), delta)
 						  . "</td></tr>")
 		}
 		
@@ -3449,8 +3449,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
-			   . "<th class=""th-std"">" . translate("Car") . "</th>"
 			   . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			   . "<th class=""th-std"">" . translate("Car") . "</th>"
 			   . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
 			   . "<th class=""th-std"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
@@ -3480,10 +3480,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			html .= ("<tr><th class=""th-std"">" . position . "</td>"
-				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index],  telemetryDB.getCarName(carNames[index])
+				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
 																						 , computeDriverName(driverFornames[index]
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
+																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
 																						 , lapTime, laps, delta)
 				   . "</td></tr>")
 		}

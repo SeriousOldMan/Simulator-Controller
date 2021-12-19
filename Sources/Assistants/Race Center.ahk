@@ -1246,6 +1246,10 @@ class RaceCenter extends ConfigurationItem {
 		this.iSelectedReport := false
 		this.iSelectedChartType := false
 		
+		this.iSimulator := false
+		this.iCar := false
+		this.iTrack := false
+					
 		this.showChart(false)
 		this.showDetails(false)
 	}
@@ -1850,9 +1854,11 @@ class RaceCenter extends ConfigurationItem {
 				
 				lapPressures := string2Values(";", lapPressures)
 				
-				this.iSimulator := lapPressures[1]
-				this.iCar := lapPressures[2]
-				this.iTrack := lapPressures[3]
+				if (!this.iSimulator && (lapPressures[1] != "-")) {
+					this.iSimulator := lapPressures[1]
+					this.iCar := lapPressures[2]
+					this.iTrack := lapPressures[3]
+				}
 				
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
@@ -2534,9 +2540,11 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
 		
-				this.iSimulator := getConfigurationValue(raceData, "Session", "Simulator")
-				this.iCar := getConfigurationValue(raceData, "Session", "Car")
-				this.iTrack := getConfigurationValue(raceData, "Session", "Track")
+				if !this.iSimulator {
+					this.iSimulator := getConfigurationValue(raceData, "Session", "Simulator", false)
+					this.iCar := getConfigurationValue(raceData, "Session", "Car")
+					this.iTrack := getConfigurationValue(raceData, "Session", "Track")
+				}
 			
 				this.updateReports()
 			}
@@ -3421,33 +3429,36 @@ class RaceCenter extends ConfigurationItem {
 		telemetryDB := this.TelemetryDatabase
 		
 		rows := [1, 2, 3, 4, 5]
+		deltas := sessionDB.query("Delta.Data", {Where: {Lap: lap.Nr}})
 		
-		for ignore, entry in sessionDB.query("Delta.Data", {Where: {Lap: lap.Nr}}) {
-			carNumber := "-"
-			carName := "-"
-			driverFullname := "-"
-			delta := "-"
-			
-			if (entry.Car) {
-				driverFullname := false
-				driverSurname := false
-				driverNickname := false
+		if (deltas.Length() > 0) {
+			for ignore, entry in deltas {
+				carNumber := "-"
+				carName := "-"
+				driverFullname := "-"
+				delta := "-"
 				
-				this.getCar(lap, entry.Car, carNumber, carName, driverForname, driverSurname, driverNickname)
+				if (entry.Car) {
+					driverFullname := false
+					driverSurname := false
+					driverNickname := false
+					
+					this.getCar(lap, entry.Car, carNumber, carName, driverForname, driverSurname, driverNickname)
+					
+					driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
+					delta := entry.Delta
+				}
 				
-				driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
-				delta := entry.Delta
+				index := rowIndex[entry.Type]
+				
+				rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
+							  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
+							  . "</td></tr>")
 			}
 			
-			index := rowIndex[entry.Type]
-			
-			rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
-						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
-						  . "</td></tr>")
+			for ignore, row in rows
+				html .= row
 		}
-		
-		for ignore, row in rows
-			html .= row
 		
 		html .= "</table>"
 		

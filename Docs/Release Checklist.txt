@@ -23,6 +23,10 @@ Release 3.7.8 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Car Model.ini => iexus -> lexus
+2. New lap report details in "Race Center"
+   a. Documentation
+   b. Images of new lap detail report
 
 Release 3.7.6 Checklist
 =======================

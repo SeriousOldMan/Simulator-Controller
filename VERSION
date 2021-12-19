@@ -1,7 +1,7 @@
 [Development]
 Version=3.7.8-dev
 Target=3.7.8-release
-Date=12/18/2021
+Date=12/19/2021
 Download=
 Changes=Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay
 [Release]

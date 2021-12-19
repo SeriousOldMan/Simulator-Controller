@@ -146,45 +146,51 @@ int main(int argc, char* argv[])
 	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
 		wprintf_s(L"[Position Data]\n");
 		
-		wprintf_s(L"Car.Count=%d\n", map_buffer->num_cars);
-		wprintf_s(L"Driver.Car=%d\n", getPlayerCarID() + 1);
-		
-		for (int i = 1; i <= map_buffer->num_cars; ++i) {
-			r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
-
-			wprintf_s(L"Car.%d.Nr=%d\n", i, i);
-			wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
-			wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
-			wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
-			wprintf_s(L"Car.%d.Time=%ld\n", i, (long)((vehicle.sector_time_previous_self[0] + vehicle.sector_time_previous_self[1] + vehicle.sector_time_previous_self[2]) * 1000));
+		if (!mapped_r3e) {
+			wprintf_s(L"Car.Count=%d\n", 0);
+			wprintf_s(L"Driver.Car=%d\n", 0);
+		}
+		else {
+			wprintf_s(L"Car.Count=%d\n", map_buffer->num_cars);
+			wprintf_s(L"Driver.Car=%d\n", getPlayerCarID() + 1);
 			
-			char buffer[33];
+			for (int i = 1; i <= map_buffer->num_cars; ++i) {
+				r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
 
-			_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
+				wprintf_s(L"Car.%d.Nr=%d\n", i, i);
+				wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
+				wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
+				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
+				wprintf_s(L"Car.%d.Time=%ld\n", i, (long)((vehicle.sector_time_previous_self[0] + vehicle.sector_time_previous_self[1] + vehicle.sector_time_previous_self[2]) * 1000));
+				
+				char buffer[33];
 
-			wprintf_s(L"Car.%d.Car=%S\n", i, buffer);
-			
-			char* name = (char*)vehicle.driver_info.name;
-			
-			if (strchr((char *)name, ' ')) {		
-				char forName[100];
-				char surName[100];
-				char nickName[3];
+				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
 
-				size_t length = strcspn(name, " ");
+				wprintf_s(L"Car.%d.Car=%S\n", i, buffer);
+				
+				char* name = (char*)vehicle.driver_info.name;
+				
+				if (strchr((char *)name, ' ')) {		
+					char forName[100];
+					char surName[100];
+					char nickName[3];
 
-				substring(name, forName, 0, length);
-				substring(name, surName, length + 1, strlen(name) - length - 1);
-				nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+					size_t length = strcspn(name, " ");
 
-				wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, forName);
-				wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, surName);
-				wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, nickName);
-			}
-			else {
-				wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, name);
-				wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
-				wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
+					substring(name, forName, 0, length);
+					substring(name, surName, length + 1, strlen(name) - length - 1);
+					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
+
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, forName);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, surName);
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, nickName);
+				}
+				else {
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, name);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
+				}
 			}
 		}
 	}
@@ -220,7 +226,6 @@ int main(int argc, char* argv[])
 
 		wprintf_s(L"[Car Data]\n");
 		if (mapped_r3e) {
-
 			double suspDamage = normalizeDamage(map_buffer->car_damage.suspension);
 
 			wprintf_s(L"MAP="); printNAValue(map_buffer->engine_map_setting);

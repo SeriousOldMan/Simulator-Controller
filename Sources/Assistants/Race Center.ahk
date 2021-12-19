@@ -1043,9 +1043,9 @@ class RaceCenter extends ConfigurationItem {
 				this.connect()
 			case 4: ; Clear...
 				if this.SessionActive {
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-
 					title := translate("Delete")
+					
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 					MsgBox 262436, %title%, % translate("Do you really want to delete all data from the currently active session? This can take quite a while...")
 					OnMessage(0x44, "")
 					

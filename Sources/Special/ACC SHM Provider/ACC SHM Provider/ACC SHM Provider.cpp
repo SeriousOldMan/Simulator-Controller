@@ -274,8 +274,8 @@ int main(int argc, char* argv[])
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE)) ? "true" : "false");
-		printData("Paused", (gf->status == AC_PAUSE) ? "true" : "false");
+		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
+		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Session", getSession(gf->session));
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;

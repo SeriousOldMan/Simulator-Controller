@@ -2526,7 +2526,18 @@ class RaceCenter extends ConfigurationItem {
 				this.syncStandings(true)
 			
 				this.ReportViewer.setReport(folder . "Race Report")
+			
+				raceData := true
+				drivers := false
+				positions := false
+				times := false
 				
+				this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
+		
+				this.iSimulator := getConfigurationValue(raceData, "Session", "Simulator")
+				this.iCar := getConfigurationValue(raceData, "Session", "Car")
+				this.iTrack := getConfigurationValue(raceData, "Session", "Track")
+			
 				this.updateReports()
 			}
 		}
@@ -3407,6 +3418,8 @@ class RaceCenter extends ConfigurationItem {
 				, translate("Track (Front)"), translate("Track (Behind)")]
 		rowIndex := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Behind": 3, "Track.Front": 4, "Track.Behind": 5}
 		
+		telemetryDB := this.TelemetryDatabase
+		
 		rows := [1, 2, 3, 4, 5]
 		
 		for ignore, entry in sessionDB.query("Delta.Data", {Where: {Lap: lap.Nr}}) {
@@ -3429,7 +3442,7 @@ class RaceCenter extends ConfigurationItem {
 			index := rowIndex[entry.Type]
 			
 			rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
-						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, this.TelemetryDatabase.getCarName(this.Simulator, carName), delta)
+						  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
 						  . "</td></tr>")
 		}
 		

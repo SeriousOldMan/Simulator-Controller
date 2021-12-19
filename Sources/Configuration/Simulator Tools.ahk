@@ -1466,9 +1466,6 @@ updateConfigurationForV372() {
 							for ignore, pressure in string2Values(",", pressures[index]) {
 								pressure := string2Values(":", pressure)
 							
-								if (!simulator || !car || !track)
-									msgbox break
-									
 								setupDB.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 													 , "Cold", tyre, pressure[1], pressure[2], false, false)
 							}

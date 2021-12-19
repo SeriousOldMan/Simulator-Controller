@@ -44,6 +44,39 @@ updateProgress(max) {
 }
 
 downloadSimulatorController() {
+	if !A_IsAdmin {
+		options := ""
+		
+		if inList(A_Args, "-NoUpdate")
+			options .= " -NoUpdate"
+		
+		if inList(A_Args, "-Update")
+			options .= " -Update"
+		
+		if inList(A_Args, "-Download")
+			options .= " -Download"
+		
+		index := inList(A_Args, "-Start")
+		
+		if index
+			options .= (" -Start """ . A_Args[index + 1] . """")
+		
+		try {
+			if A_IsCompiled
+				Run *RunAs "%A_ScriptFullPath%" /restart %options%
+			else
+				Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" %options%
+		}
+		catch exception {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
+			OnMessage(0x44, "")
+		}
+		
+		ExitApp 0
+	}
+	
 	URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
 	release := readConfiguration(kTempDirectory . "VERSION")
@@ -102,6 +135,24 @@ downloadSimulatorController() {
 				; ignore
 			}
 			
+			directory := (A_Temp . "\Simulator Controller")
+			
+			if FileExist(directory . "\Simulator Controller")
+				directory .= "\Simulator Controller"
+			
+			showProgress({message: translate("Unblocking Applications and DLLs...")})
+		
+			currentDirectory := A_WorkingDir
+
+			try {
+				SetWorkingDir %directory%
+				
+				RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+			}
+			finally {
+				SetWorkingDir %currentDirectory%
+			}
+			
 			SetTimer %updateProgress%, Off
 			
 			showProgress({progress: 90, message: translate("Preparing installation...")})
@@ -110,20 +161,23 @@ downloadSimulatorController() {
 			
 			showProgress({progress: 100, message: translate("Starting installation...")})
 			
-			directory := (A_Temp . "\Simulator Controller")
-			
-			if FileExist(directory . "\Simulator Controller")
-				directory .= "\Simulator Controller"
-			
 			index := inList(A_Args, "-Start")
-			
-			if index {
-				start := A_Args[index + 1]
-				
-				Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
+
+			try {
+				if index {
+					start := A_Args[index + 1]
+					
+					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
+				}
+				else
+					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			}
-			else
-				Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
+			catch exeception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
+				OnMessage(0x44, "")
+			}
 			
 			Sleep 1000
 			

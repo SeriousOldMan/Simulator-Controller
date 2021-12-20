@@ -1648,7 +1648,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
 		
-		return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
+		return lapTime ? lapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {
@@ -1720,19 +1720,26 @@ class StrategyWorkbench extends ConfigurationItem {
 		return result
 	}
 	
-	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
+	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
 		GuiControlGet stintLengthEdit
+		GuiControlGet formationLapCheck
+		GuiControlGet postRaceLapCheck
 		GuiControlGet fuelCapacityEdit
+		GuiControlGet safetyFuelEdit
 		
-		fuelCapacity := fuelCapacityEdit
 		stintLength := stintLengthEdit
+		formationLap := formationLapCheck
+		postRaceLap := postRaceLapCheck
+		fuelCapacity := fuelCapacityEdit
+		safetyFuel := safetyFuelEdit
 	}
 	
-	getStartConditions(ByRef initialFuelAmount, ByRef initialFuelConsumption, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialMap, ByRef initialAvgLapTime) {
+	getStartConditions(ByRef initialLap, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialFuelAmount
+					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1743,11 +1750,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simFuelConsumptionEdit
 		GuiControlGet simAvgLapTimeEdit
 		
-		initialFuelAmount := simInitialFuelAmountEdit
-		initialFuelConsumption := simFuelConsumptionEdit
+		initialLap := 0
 		initialStintLength := stintLengthEdit
 		initialTyreLaps := 0
+		initialFuelAmount := simInitialFuelAmountEdit
 		initialMap := simMapEdit
+		initialFuelConsumption := simFuelConsumptionEdit
 		initialAvgLapTime := simAvgLapTimeEdit
 	}
 	

@@ -1410,10 +1410,14 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 	
-	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
+	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel) {
 		if this.Strategy {
+			stintLength := getConfigurationValue(this.Strategy, "Session", "StintLength")
+			formationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
+			postRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
+			
 			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
-			stintLength := getConfigurationValue(this.Strategy, "Settings", "StintLength")
+			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
 			
 			return true
 		}
@@ -1421,8 +1425,10 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	getStartConditions(ByRef initialFuelAmount, ByRef initialFuelConsumption, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialMap, ByRef initialAvgLapTime) {
-		return this.StrategyManager.getStartConditions(initialFuelAmount, initialFuelConsumption, initialStintLength, initialTyreLaps, initialMap, initialAvgLapTime)
+	getStartConditions(ByRef initialLap, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialFuelAmount
+					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
+		return this.StrategyManager.getStartConditions(initialLap, initialStintLength, initialTyreLaps, initialFuelAmount
+													 , initialMap, initialFuelConsumption, initialAvgLapTime)
 	}
 	
 	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
@@ -1453,11 +1459,22 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	getAvgLapTime(map, remainingFuel, default := false) {
-		return this.StrategyManager.getAvgLapTime(map, remainingFuel, default)
+		lapTimes := this.TelemetryDatabase.getLapTimes(this.Weather, this.TyreCompound, this.TyreCompoundColor)
+		
+		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+		
+		return lapTime ? lapTime : (default ? default : getConfigurationValue(this.Strategy, "Strategy", "AvgLapTime"))
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {
-		return this.StrategyManager.getMaxFuelLaps(fuelConsumption)
+		if this.Strategy {
+			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
+			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
+			
+			return Floor((fuelCapacity - safetyFuel) / fuelConsumption)
+		}
+		else
+			return false
 	}
 	
 	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {

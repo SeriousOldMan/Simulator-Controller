@@ -157,6 +157,9 @@ class RaceCenter extends ConfigurationItem {
 	iAirTemperature := false
 	iTrackTemperature := false
 	
+	iTyreCompound := false
+	iTyreCompoundColor := false
+	
 	iStrategy := false
 	
 	iDrivers := []
@@ -381,6 +384,18 @@ class RaceCenter extends ConfigurationItem {
 	TrackTemperature[] {
 		Get {
 			return this.iTrackTemperature
+		}
+	}
+	
+	TyreCompound[] {
+		Get {
+			return this.iTyreCompound
+		}
+	}
+	
+	TyreCompoundColor[] {
+		Get {
+			return this.iTyreCompoundColor
 		}
 	}
 	
@@ -1367,18 +1382,38 @@ class RaceCenter extends ConfigurationItem {
 		else
 			return false
 		
+		if this.TyreCompound {
+			tyreCompound := this.TyreCompound
+			tyreCompoundColor := this.TyreCompoundColor
+		}
+		else if strategy {
+			tyreCompound := getConfigurationValue(strategy, "Setup", "TyreCompound")
+			tyreCompoundColor := getConfigurationValue(strategy, "Setup", "TyreCompoundColor")
+		}
+		else
+			return false
+		
 		if strategy {
 			sessionType := getConfigurationValue(strategy, "Session", "SessionType")
 			sessionLength := getConfigurationValue(strategy, "Session", "SessionDuration")
 			
 			maxTyreLaps := getConfigurationValue(strategy, "Strategy", "MaxTyreLaps", 40)
 			
-			tyreCompound := getConfigurationValue(strategy, "Setup", "TyreCompound")
-			tyreCompoundColor := getConfigurationValue(strategy, "Setup", "TyreCompoundColor")
 			tyrePressures := [getConfigurationValue(strategy, "Setup", "TyrePressureFL", 27.7)
 							, getConfigurationValue(strategy, "Setup", "TyrePressureFR", 27.7)
 							, getConfigurationValue(strategy, "Setup", "TyrePressureRL", 27.7)
 							, getConfigurationValue(strategy, "Setup", "TyrePressureRR", 27.7)]
+		}
+		else
+			return false
+	
+		return true
+	}
+	
+	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
+		if this.Strategy {
+			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
+			stintLength := getConfigurationValue(this.Strategy, "Settings", "StintLength")
 			
 			return true
 		}
@@ -1386,51 +1421,96 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
-		return this.StrategyManager.getSessionSettings(fuelCapacity, stintLength)
-	}
-	
 	getStartConditions(ByRef initialFuelAmount, ByRef initialFuelConsumption, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialMap, ByRef initialAvgLapTime) {
 		return this.StrategyManager.getStartConditions(initialFuelAmount, initialFuelConsumption, initialStintLength, initialTyreLaps, initialMap, initialAvgLapTime)
 	}
 	
-	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumption, ByRef initialFuel, ByRef tyreUsage) {
-		return this.StrategyManager.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
+		useStartConditions := false
+		useTelemetryData := true
+		
+		consumptionWeight := 0
+		initialFuelWeight := 0
+		tyreUsageWeight := 0
+		
+		return true
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
-		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+		if this.Strategy {
+			pitstopRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopRequired")
+			
+			if (pitstopRequired && (pitstopRequired != true))
+				pitstopRequired := string2Values("-", pitstopRequired)
+			
+			refuelRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopRefuel")
+			tyreChangeRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopTyreChange")
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	getAvgLapTime(map, remainingFuel, default := false) {
-		if this.iFixedLapTime
-			return this.iFixedLapTime
-		else
-			return this.StrategyManager.getAvgLapTime(map, remainingFuel, default)
+		return this.StrategyManager.getAvgLapTime(map, remainingFuel, default)
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {
 		return this.StrategyManager.getMaxFuelLaps(fuelConsumption)
 	}
 	
-	setFixedLapTime(lapTime) {
-		this.iFixedLapTime := lapTime
-	}
-	
 	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
-		return this.StrategyManager.calcSessionLaps(avgLapTime, formationLap, postRaceLap)
+		if this.Strategy {
+			sessionLength := getConfigurationValue(this.Strategy, "Session", "SessionLength")
+			hasFormationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
+			hasPostRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
+			
+			if (getConfigurationValue(this.Strategy, "Session", "SessionType") = "Duration")
+				return Ceil(((sessionLength * 60) / avgLapTime) + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
+			else
+				return (sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
+		}
+		else
+			return false
 	}
 	
 	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
-		return this.StrategyManager.calcSessionTime(avgLapTime, formationLap, postRaceLap)
+		if this.Strategy {
+			sessionLength := getConfigurationValue(this.Strategy, "Session", "SessionLength")
+			hasFormationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
+			hasPostRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
+			
+			if (getConfigurationValue(this.Strategy, "Session", "SessionType") = "Duration")
+				return ((sessionLength * 60) + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime))
+			else
+				return ((sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) * avgLapTime)
+		}
+		else
+			return false
 	}
 	
 	calcRefuelAmount(targetFuel, currentFuel) {
-		return this.StrategyManager.calcRefuelAmount(targetFuel, currentFuel)
+		if this.Strategy {
+			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
+			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
+			
+			return (Min(fuelCapacity, targetFuel + safetyFuel) - currentFuel)
+		}
+		else
+			return false
 	}
 	
 	calcPitstopDuration(refuelAmount, changeTyres) {
-		return this.StrategyManager.calcPitstopDuration(refuelAmount, changeTyres)
+		if this.Strategy {
+			pitstopDelta := getConfigurationValue(this.Strategy, "Settings", "PitstopDelta")
+			pitstopTyreService := getConfigurationValue(this.Strategy, "Settings", "PitstopTyreService")
+			pitstopRefuelService := getConfigurationValue(this.Strategy, "Settings", "PitstopRefuelService")
+			
+			return (pitstopDelta + (changeTyres ? pitstopTyreService : 0) + ((refuelAmount / 10) * pitstopRefuelService))
+		}
+		else
+			return false
 	}
 	
 	showWait(state := true) {
@@ -1521,6 +1601,9 @@ class RaceCenter extends ConfigurationItem {
 		this.iWeather := false
 		this.iAirTemperature := false
 		this.iTrackTemperature := false
+		
+		this.iTyreCompound := false
+		this.iTyreCompoundColor := false
 	
 		this.showChart(false)
 		this.showDetails(false)
@@ -1842,11 +1925,20 @@ class RaceCenter extends ConfigurationItem {
 				this.iLastLap := this.Laps[lastLap.Nr]
 				this.iCurrentStint := currentStint
 				
-				lastLap := this.iLastLap
+				lastLap := this.LastLap
 				
-				this.iWeather := lastLap.Weather
-				this.iAirTemperature := lastLap.AirTemperature
-				this.iTrackTemperature := lastLap.TrackTemperature
+				if lastLap {
+					this.iWeather := lastLap.Weather
+					this.iAirTemperature := lastLap.AirTemperature
+					this.iTrackTemperature := lastLap.TrackTemperature
+				}
+				
+				currentStint := this.CurrentStint
+				
+				if currentStint {
+					this.iTyreCompound := compound(currentStint.Compound)
+					this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+				}	
 			}
 			catch exception {
 				return newData

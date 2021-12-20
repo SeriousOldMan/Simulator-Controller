@@ -62,8 +62,8 @@ class StrategySimulation {
 		return this.StrategyManager.getStartConditions(initialFuelAmount, initialFuelConsumption, initialStintLength, initialTyreLaps, initialMap, initialAvgLapTime)
 	}
 	
-	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumption, ByRef initialFuel, ByRef tyreUsage) {
-		return this.StrategyManager.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
+		return this.StrategyManager.getSimulationSettings(useStartConditions, useTelemetryData, consumptionWeight, initialFuelWeight, tyreUsageWeight)
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
@@ -1209,7 +1209,7 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 		
-		return targetLap
+		return (targetLap - 1)
 	}
 	
 	createStints(startFuel, stintLaps, tyreLaps, map, fuelConsumption, avgLapTime, adjustments := false) {

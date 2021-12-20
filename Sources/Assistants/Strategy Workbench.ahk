@@ -1771,7 +1771,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	runSimulation() {
-		new VariationSimulation(this, new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)).runSimulation(true)
+		new VariationSimulation(this, this.SelectedSessionType
+							  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)).runSimulation(true)
 	}
 	
 	chooseScenario(strategy) {

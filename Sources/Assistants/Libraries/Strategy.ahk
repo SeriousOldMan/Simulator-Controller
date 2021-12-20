@@ -27,8 +27,15 @@ class StrategySimulation {
 		}
 	}
 	
-	__New(strategyManager, telemetryDatabase) {
+	SessionType[] {
+		Get {
+			return this.iSessionType
+		}
+	}
+	
+	__New(strategyManager, sessionType, telemetryDatabase) {
 		this.iStrategyManager := strategyManager
+		this.iSessionType := sessionType
 		this.iTelemetryDatabase := telemetryDatabase
 	}
 	
@@ -145,7 +152,7 @@ class StrategySimulation {
 	optimizeScenarios(scenarios, verbose, ByRef progress) {
 		local strategy
 		
-		if (this.SelectedSessionType = "Duration")
+		if (this.SessionType = "Duration")
 			for name, strategy in scenarios {
 				if verbose {
 					message := (translate("Optimizing Stint length for Scenario ") . name . translate("..."))
@@ -204,7 +211,7 @@ class StrategySimulation {
 			if !candidate
 				candidate := strategy
 			else {
-				if (this.SelectedSessionType = "Duration") {
+				if (this.SessionType = "Duration") {
 					sLaps := strategy.getSessionLaps()
 					cLaps := candidate.getSessionLaps()
 					sTime := strategy.getSessionDuration()

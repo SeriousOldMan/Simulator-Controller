@@ -1378,7 +1378,7 @@ class RaceCenter extends ConfigurationItem {
 			tyrePressures := [getConfigurationValue(strategy, "Setup", "TyrePressureFL", 27.7)
 							, getConfigurationValue(strategy, "Setup", "TyrePressureFR", 27.7)
 							, getConfigurationValue(strategy, "Setup", "TyrePressureRL", 27.7)
-							, getConfigurationValue(strategy, "Setup", "TyrePressureRR", 27.7)]
+							, getConfigurationValue(strategy, "Setup", "TyrePressureRR", 27.7))
 			
 			return true
 		}

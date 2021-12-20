@@ -1302,7 +1302,7 @@ class RaceEngineer extends RaceAssistant {
 					speaker.speakPhrase("NoRepairBodywork")
 			}
 			
-			if (confirm && this.Listener)
+			if confirm
 				if plannedLap
 					speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 				else {
@@ -1333,7 +1333,7 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker.speakPhrase("MissingPlan")
 				
-				if (this.Listener && this.supportsPitstop()) {
+				if this.supportsPitstop() {
 					speaker.speakPhrase("ConfirmPlan", false, true)
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -1473,7 +1473,7 @@ class RaceEngineer extends RaceAssistant {
 			
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 						
-			if (this.Listener && this.supportsPitstop()) {
+			if this.supportsPitstop() {
 				if this.hasPreparedPitstop()
 					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 				else if !this.hasPlannedPitstop() {
@@ -1526,7 +1526,7 @@ class RaceEngineer extends RaceAssistant {
 				if repair {
 					speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
 			
-					if (this.Listener && this.supportsPitstop()) {
+					if this.supportsPitstop() {
 						speaker.speakPhrase("ConfirmPlan", false, true)
 					
 						this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -1563,7 +1563,7 @@ class RaceEngineer extends RaceAssistant {
 				speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
 								  , {minutes: minutes, compound: fragments[recommendedCompound]})
 				
-				if (this.Listener && this.supportsPitstop()) {
+				if this.supportsPitstop() {
 					speaker.speakPhrase("ConfirmPlan", false, true)
 				
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))

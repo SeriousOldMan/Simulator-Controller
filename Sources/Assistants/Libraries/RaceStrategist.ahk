@@ -26,6 +26,7 @@
 
 class RaceStrategist extends RaceAssistant {
 	iStrategy := false
+	iStrategyReported := false
 	
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
@@ -68,6 +69,12 @@ class RaceStrategist extends RaceAssistant {
 	Strategy[] {
 		Get {
 			return this.iStrategy
+		}
+	}
+	
+	StrategyReported[] {
+		Get {
+			return this.iStrategyReported
 		}
 	}
 	
@@ -117,6 +124,13 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("Strategy")
 			this.iStrategy := values["Strategy"]
+	}
+	
+	updateDynamicValues(values) {
+		base.updateDynamicValues(values)
+		
+		if values.HasKey("StrategyReported")
+			this.iStrategyReported := values["StrategyReported"]
 	}
 	
 	hasEnoughData(inform := true) {
@@ -468,7 +482,7 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 	
-	createStrategy(facts, strategy) {
+	createStrategy(facts, strategy, lap := false) {
 		facts["Strategy.Name"] := getConfigurationValue(strategy, "General", "Name")
 		
 		facts["Strategy.Weather"] := getConfigurationValue(strategy, "Weather", "Weather")
@@ -484,10 +498,18 @@ class RaceStrategist extends RaceAssistant {
 		
 		pitstops := string2Values(", ", getConfigurationValue(strategy, "Strategy", "Pitstops", ""))
 		
-		facts["Strategy.Pitstop.Count"] := pitstops.Length()
+		first := true
+		count := 0
 		
 		for ignore, pitstopLap in pitstops {
-			if (A_Index = 1) {
+			if (lap && (pitstopLap < lap))
+				continue
+			
+			count += 1
+			
+			if first {
+				first := false
+				
 				facts["Strategy.Pitstop.Next"] := 1
 				facts["Strategy.Pitstop.Lap"] := pitstopLap
 			}
@@ -500,8 +522,8 @@ class RaceStrategist extends RaceAssistant {
 			facts["Strategy.Pitstop." . A_Index . ".TC"] := getConfigurationValue(strategy, "Pitstop", "TC." . pitstopLap, "n/a")
 			facts["Strategy.Pitstop." . A_Index . ".ABS"] := getConfigurationValue(strategy, "Setup", "ABS." . pitstopLap, "n/a")
 		}
-			
-		this.updateSessionValues({Strategy: strategy})
+		
+		facts["Strategy.Pitstop.Count"] := count
 	}
 				
 	createSession(settings, data) {
@@ -538,8 +560,11 @@ class RaceStrategist extends RaceAssistant {
 						applicableStrategy := false
 				}
 				
-				if applicableStrategy
+				if applicableStrategy {
 					this.createStrategy(facts, strategy)
+			
+					this.updateSessionValues({Strategy: strategy})
+				}
 			}
 		}
 		
@@ -613,7 +638,8 @@ class RaceStrategist extends RaceAssistant {
 									  , SaveSettings: saveSettings})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+								, EnoughData: false, StrategyReported: false})
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
@@ -630,15 +656,11 @@ class RaceStrategist extends RaceAssistant {
 		local driverNickname := ""
 		
 		static lastLap := 0
-		static strategyReported := 0
 		
 		if (lapNumber <= lastLap)
 			lastLap := 0
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
-		
-		if (lapNumber <= strategyReported)
-			strategyReported := 0
 		
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
@@ -663,10 +685,10 @@ class RaceStrategist extends RaceAssistant {
 		
 		lastLap := lapNumber
 		
-		if (!strategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker && this.Listener) {
+		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker) {
 			this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 	
-			strategyReported := lapNumber
+			this.updateDynamicValues({StrategyReported: lapNumber})
 			
 			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 		}
@@ -764,7 +786,7 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 		
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, StrategyReported: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
 	}
 	
@@ -878,7 +900,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact
 		
-		if (this.Speaker && this.Listener && confirm) {
+		if (this.Speaker && confirm) {
 			this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
 					
 			this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
@@ -899,6 +921,50 @@ class RaceStrategist extends RaceAssistant {
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("StrategyCanceled")
+	}
+	
+	clearStrategy() {
+		local knowledgeBase := this.KnowledgeBase
+		local fact
+		
+		for ignore, fact in ["Strategy.Name", "Strategy.Weather", "Strategy.Weather.Temperature.Air", "Strategy.Weather.Temperature.Track"
+						   , "Strategy.Tyre.Compound", "Strategy.Tyre.Compound.Color", "Strategy.Map", "Strategy.TC", "Strategy.ABS",
+						   , "Strategy.Pitstop.Next", "Strategy.Pitstop.Lap"]
+			knowledgeBase.clearFact(fact)
+		
+		Loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
+		{
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Lap")
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Fuel.Amount")
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Tyre.Change")
+			
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Map")
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".TC")
+			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".ABS")
+		}
+		
+		knowledgeBase.clearFact("Strategy.Pitstop.Count")
+	}
+	
+	updateStrategy(strategy) {
+		local knowledgeBase := this.KnowledgeBase
+		local facts
+		local fact
+		
+		if !IsObject(strategy)
+			strategy := readConfiguration(strategy)
+		
+		this.clearStrategy()
+		
+		facts := {}
+		
+		this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
+		
+		for fact, value in facts
+			knowledgeBase.addFact(fact, value)
+		
+		this.updateSessionValues({Strategy: strategy})
+		this.updateDynamicValues({StrategyReported: false})
 	}
 	
 	recommendPitstop(lap := false) {
@@ -934,7 +1000,7 @@ class RaceStrategist extends RaceAssistant {
 		
 			Process Exist, Race Engineer.exe
 			
-			if (ErrorLevel && this.Listener) {
+			if ErrorLevel {
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 				
 				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
@@ -1030,7 +1096,7 @@ class RaceStrategist extends RaceAssistant {
 				
 				Process Exist, Race Engineer.exe
 					
-				if (ErrorLevel && this.Listener) {
+				if ErrorLevel {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
@@ -1064,7 +1130,7 @@ class RaceStrategist extends RaceAssistant {
 			
 			Process Exist, Race Engineer.exe
 				
-			if (ErrorLevel && this.Listener) {
+			if ErrorLevel {
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 				
 				nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")

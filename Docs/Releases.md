@@ -1,3 +1,14 @@
+## 3.7.8-release 12/24/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Fixed a bug in Telemetry Provider for RaceRoom Racing Experience, which may result in error messages during the startup of R§E-
+  4. Complete new and optical pleasing table layout in HTML vievs in "Strategy Workbench" and "Race Center".
+  5. Going to replay in a paused game no longer ends the session in *Assetto Corsa Competizione*.
+  6. Detailed standings and gap report in "Race Center" when clicking on a lap in the lap list.
+  7. Added strategy handling and updating to "Race Center".
+  8. Optimized Race Assistant behaviour when no voice recognition is enabled - more interaction possible using hardware controller.
+
 ## 3.7.6-release 12/17/21
 
   1. Bugfixes, as always
@@ -6,7 +17,7 @@
   4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "RaceEngineer" and "Race Strategist" plugins.
   5. New ["openRaceCenter" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Race Center" from external event sources.
   6. Fixed several critical bugs in "Server Administration".
-  6. Added the new BMW M4 GT3 to the list of known ACC cars.
+  7. Added the new BMW M4 GT3 to the list of known ACC cars.
 
 ## 3.7.4-release 12/06/21
 

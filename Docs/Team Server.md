@@ -110,15 +110,19 @@ The reports at the top of the list are the well known report, wich are also avai
 
 Beside that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
-  1. Details of the current stint
+  1. Details of a selected stint
   
-     This will give you detailed data for all the laps in a stint as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
+     This will give you an overview over the stint, the driven laps, as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
 
-  2. Driver Statistics
+  2. Details for a given lap
   
-     You can generate a special report for all active drivers with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
+     When you select a lap in the *Laps* tab, you will get a detailed table of the standings and the gaps to the cars in front of and behind the drivers car, as well as to the leader.
+
+  3. Driver Statistics
+  
+     You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
 	 
-  3. Race Summary
+  4. Race Summary
   
      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report is also available in the "Data" menu.
 	 

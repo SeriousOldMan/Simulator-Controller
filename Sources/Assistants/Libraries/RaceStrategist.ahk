@@ -908,16 +908,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 		}
 		
-		pitstops := knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
-		
-		for ignore, fact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
-						   , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
-						   , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
-			knowledgeBase.clearFact("Strategy." . fact)
-		
-		Loop %pitstops%
-			for ignore, fact in ["Fuel.Amount", "Tyre.Change", "Map", "TC", "ABS"]
-				knowledgeBase.clearFact("Strategy.Pitstop." . A_Index .  "." . fact)
+		this.clearStrategy()
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("StrategyCanceled")
@@ -927,21 +918,16 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact
 		
-		for ignore, fact in ["Strategy.Name", "Strategy.Weather", "Strategy.Weather.Temperature.Air", "Strategy.Weather.Temperature.Track"
-						   , "Strategy.Tyre.Compound", "Strategy.Tyre.Compound.Color", "Strategy.Map", "Strategy.TC", "Strategy.ABS",
-						   , "Strategy.Pitstop.Next", "Strategy.Pitstop.Lap"]
-			knowledgeBase.clearFact(fact)
+		pitstops := knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
 		
-		Loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
-		{
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Lap")
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Fuel.Amount")
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Tyre.Change")
-			
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".Map")
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".TC")
-			knowledgeBase.clearFact("Strategy.Pitstop." . A_Index . ".ABS")
-		}
+		for ignore, fact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
+						   , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
+						   , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
+			knowledgeBase.clearFact("Strategy." . fact)
+		
+		Loop %pitstops%
+			for ignore, fact in ["Lap", "Fuel.Amount", "Tyre.Change", "Map", "TC", "ABS"]
+				knowledgeBase.clearFact("Strategy.Pitstop." . A_Index .  "." . fact)
 		
 		knowledgeBase.clearFact("Strategy.Pitstop.Count")
 	}
@@ -951,17 +937,21 @@ class RaceStrategist extends RaceAssistant {
 		local facts
 		local fact
 		
-		if !IsObject(strategy)
-			strategy := readConfiguration(strategy)
+		if strategy {
+			if !IsObject(strategy)
+				strategy := readConfiguration(strategy)
 		
-		this.clearStrategy()
-		
-		facts := {}
-		
-		this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
-		
-		for fact, value in facts
-			knowledgeBase.addFact(fact, value)
+			this.clearStrategy()
+			
+			facts := {}
+			
+			this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
+			
+			for fact, value in facts
+				knowledgeBase.addFact(fact, value)
+		}
+		else
+			this.cancelStrategy(false)
 		
 		this.updateSessionValues({Strategy: strategy})
 		this.updateDynamicValues({StrategyReported: false})

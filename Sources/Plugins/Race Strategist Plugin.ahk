@@ -114,6 +114,28 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 	
+	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+		
+		if (this.TeamSession && this.RaceStrategist) {
+			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
+			
+			if (strategyUpdate && (strategyUpdate != "")) {
+				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
+				
+				if (strategyUpdate = "CLEAR")
+					this.RaceEngineer.updateStrategy(false)
+				else {
+					FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
+				
+					this.RaceEngineer.updateStrategy(kTempDirectory . "Race Strategy.update")
+				}
+				
+				this.TeamServer.setSessionValue("Strategy Update", "")
+			}
+		}
+	}
+	
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)

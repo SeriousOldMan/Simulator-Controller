@@ -161,8 +161,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iStrategyViewer := false
 	
-	iFixedLapTime := false
-	
 	Window[] {
 		Get {
 			return "Workbench"
@@ -1161,197 +1159,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
-					  , ByRef sessionType, ByRef sessionLength
-					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
-		window := this.Window
-			
-		Gui %window%:Default
-		
-		GuiControlGet sessionLengthEdit
-		GuiControlGet simMaxTyreLapsEdit
-		GuiControlGet simCompoundDropDown
-		
-		simulator := this.SelectedSimulator
-		car := this.SelectedCar
-		track := this.SelectedTrack
-		
-		weather := this.SelectedWeather
-		airTemperature := this.AirTemperature
-		trackTemperature := this.TrackTemperature
-		
-		sessionType := this.SelectedSessionType
-		sessionLength := sessionLengthEdit
-		
-		compound := false
-		compoundColor := false
-		
-		splitQualifiedCompound(kQualifiedTyreCompounds[simCompoundDropDown], compound, compoundColor)
-		
-		tyreCompound := compound
-		tyreCompoundColor := compoundColor
-		
-		maxTyreLaps := simMaxTyreLapsEdit
-		
-		if (tyreCompound = "Dry")
-			tyrePressures := [27.7, 27.7, 27.7, 27.7]
-		else
-			tyrePressures := [30.0, 30.0, 30.0, 30.0]
-		
-		telemetryDB := new TelemetryDatabase(this.Simulator, this.Car, this.Track)
-		lowestLapTime := false
-		
-		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
-			lapTime := row["Lap.Time"]
-		
-			if (!lowestLapTime || (lapTime < lowestLapTime)) {
-				lowestLapTime := lapTime
-				
-				tyrePressures := [Round(row["Tyre.Pressure.Front.Left"], 1), Round(row["Tyre.Pressure.Front.Right"], 1)
-								, Round(row["Tyre.Pressure.Rear.Left"], 1), Round(row["Tyre.Pressure.Rear.Right"], 1)]
-			}
-		}
-	}
-	
-	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet sessionLengthEdit
-		GuiControlGet formationLapCheck
-		GuiControlGet postRaceLapCheck
-		
-		if (this.SelectedSessionType = "Duration")
-			return Ceil(((sessionLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
-		else
-			return (sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
-	}
-	
-	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet sessionLengthEdit
-		GuiControlGet formationLapCheck
-		GuiControlGet postRaceLapCheck
-		
-		if (this.SelectedSessionType = "Duration")
-			return ((sessionLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
-		else
-			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
-	}
-	
-	setFixedLapTime(lapTime) {
-		this.iFixedLapTime := lapTime
-	}
-	
-	getAvgLapTime(map, remainingFuel, default := false) {
-		if this.iFixedLapTime
-			return this.iFixedLapTime
-		else {
-			window := this.Window
-			
-			Gui %window%:Default
-		
-			GuiControlGet simInputDropDown
-			GuiControlGet simAvgLapTimeEdit
-			
-			if (simInputDropDown > 1)
-				lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
-			else
-				lapTimes := []
-			
-			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
-			
-			return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
-		}
-	}
-	
-	getMaxFuelLaps(fuelConsumption) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet safetyFuelEdit
-		GuiControlGet fuelCapacityEdit
-		
-		return Floor((fuelCapacityEdit - safetyFuelEdit) / fuelConsumption)
-	}
-	
-	calcRefuelAmount(targetFuel, currentFuel) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet safetyFuelEdit
-		GuiControlGet fuelCapacityEdit
-		
-		return (Min(fuelCapacityEdit, targetFuel + safetyFuelEdit) - currentFuel)
-	}
-
-	calcPitstopDuration(refuelAmount, changeTyres) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet pitstopDeltaEdit
-		GuiControlGet pitstopTyreServiceEdit
-		GuiControlGet pitstopRefuelServiceEdit
-		
-		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
-	}
-	
-	getSimulationWeights(ByRef consumption, ByRef initialFuel, ByRef tyreUsage) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet simConsumptionWeight
-		GuiControlGet simInitialFuelWeight
-		GuiControlGet simTyreUsageWeight
-		
-		consumption := simConsumptionWeight
-		initialFuel := simInitialFuelWeight
-		tyreUsage := simTyreUsageWeight
-	}
-	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
-		result := true
-		
-		window := this.Window
-						
-		Gui %window%:Default
-		
-		GuiControlGet pitstopRequirementsDropDown
-		GuiControlGet pitstopWindowEdit
-		GuiControlGet tyreChangeRequirementsDropDown
-		GuiControlGet refuelRequirementsDropDown
-		
-		switch pitstopRequirementsDropDown {
-			case 1:
-				pitstopRequired := false
-			case 2:
-				pitstopRequired := true
-			case 3:
-				window := string2Values("-", pitstopWindowEdit)
-				
-				if (window.Length() = 2)
-					pitstopRequired := window
-				else {
-					pitstopRequired := true
-				
-					result := false
-				}
-		}
-		
-		refuelRequired := (refuelRequirementsDropDown = 2)
-		tyreChangeRequired := (tyreChangeRequirementsDropDown = 2)
-			
-		return result
-	}
-	
 	chooseSettingsMenu(line) {
 		if (!this.SelectedSimulator || !this.SelectedCar || !this.SelectedTrack)
 			return
@@ -1744,245 +1551,230 @@ class StrategyWorkbench extends ConfigurationItem {
 		return theStrategy
 	}
 	
-	acquireTelemetryData(ByRef progress, ByRef electronicsData, ByRef tyreData) {
-		message := translate("Reading Electronics Data...")
+	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
+					  , ByRef sessionType, ByRef sessionLength
+					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
+		window := this.Window
+			
+		Gui %window%:Default
 		
-		showProgress({progress: progress, message: message})
+		GuiControlGet sessionLengthEdit
+		GuiControlGet simMaxTyreLapsEdit
+		GuiControlGet simCompoundDropDown
 		
-		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		simulator := this.SelectedSimulator
+		car := this.SelectedCar
+		track := this.SelectedTrack
 		
-		electronicsData := telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		weather := this.SelectedWeather
+		airTemperature := this.AirTemperature
+		trackTemperature := this.TrackTemperature
 		
-		Sleep 200
+		sessionType := this.SelectedSessionType
+		sessionLength := sessionLengthEdit
 		
-		message := translate("Reading Tyre Data...")
+		compound := false
+		compoundColor := false
 		
-		showProgress({progress: progress, message: message})
+		splitQualifiedCompound(kQualifiedTyreCompounds[simCompoundDropDown], compound, compoundColor)
 		
-		Sleep 200
+		tyreCompound := compound
+		tyreCompoundColor := compoundColor
 		
-		progress += 5
+		maxTyreLaps := simMaxTyreLapsEdit
+		
+		if (tyreCompound = "Dry")
+			tyrePressures := [27.7, 27.7, 27.7, 27.7]
+		else
+			tyrePressures := [30.0, 30.0, 30.0, 30.0]
+		
+		telemetryDB := new TelemetryDatabase(this.Simulator, this.Car, this.Track)
+		lowestLapTime := false
+		
+		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
+			lapTime := row["Lap.Time"]
+		
+			if (!lowestLapTime || (lapTime < lowestLapTime)) {
+				lowestLapTime := lapTime
+				
+				tyrePressures := [Round(row["Tyre.Pressure.Front.Left"], 1), Round(row["Tyre.Pressure.Front.Right"], 1)
+								, Round(row["Tyre.Pressure.Rear.Left"], 1), Round(row["Tyre.Pressure.Rear.Right"], 1)]
+			}
+		}
 	}
 	
-	createScenarios(ByRef progress, electronicsData, tyreData) {
-		local strategy
-		
+	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
 		window := this.Window
 		
 		Gui %window%:Default
+	
+		GuiControlGet sessionLengthEdit
+		GuiControlGet formationLapCheck
+		GuiControlGet postRaceLapCheck
 		
-		GuiControlGet simMaxTyreLapsEdit
-		GuiControlGet simInitialFuelAmountEdit
-		GuiControlGet stintLengthEdit
-		GuiControlGet simMapEdit
-		GuiControlGet simFuelConsumptionEdit
-		GuiControlGet simAvgLapTimeEdit
-		GuiControlGet fuelCapacityEdit
+		if (this.SelectedSessionType = "Duration")
+			return Ceil(((sessionLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
+		else
+			return (sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
+	}
+	
+	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
+		window := this.Window
 		
+		Gui %window%:Default
+	
+		GuiControlGet sessionLengthEdit
+		GuiControlGet formationLapCheck
+		GuiControlGet postRaceLapCheck
+		
+		if (this.SelectedSessionType = "Duration")
+			return ((sessionLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
+		else
+			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
+	}
+	
+	getAvgLapTime(map, remainingFuel, default := false) {
+		window := this.Window
+			
+		Gui %window%:Default
+	
 		GuiControlGet simInputDropDown
-		
-		fuelConsumption := simFuelConsumptionEdit
-		maxTyreLaps := simMaxTyreLapsEdit
-		
-		consumption := 0
-		tyreUsage := 0
-		initialFuel := 0
-		
-		this.getSimulationWeights(consumption, initialFuel, tyreUsage)
-		
-		consumptionStep := (consumption / 4)
-		tyreUsageStep := (tyreUsage / 4)
-		initialFuelStep := (initialFuel / 4)
-		
-		scenarios := {}
-		variation := 1
+		GuiControlGet simAvgLapTimeEdit
 		
 		if (simInputDropDown > 1)
 			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 		else
 			lapTimes := []
 		
-		Loop { ; consumption
-			Loop { ; initialFuel
-				Loop { ; tyreUsage
-					if ((simInputDropDown = 1) || (simInputDropDown = 3)) {
-						if simMapEdit is number
-						{			
-							message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
-								
-							showProgress({progress: progress, message: message})
-							
-							stintLaps := Floor((stintLengthEdit * 60) / simAvgLapTimeEdit)
-							
-							name := (translate("Initial Conditions - Map ") . simMapEdit)
-							
-							this.setFixedLapTime(simAvgLapTimeEdit)
-							
-							try {
-								strategy := this.createStrategy(name)
-						
-								initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
-								lapTime := lookupLapTime(lapTimes, simMapEdit, initialFuelAmount)
-								
-								if !lapTime
-									lapTime := simAvgLapTimeEdit
-								
-								strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), simMapEdit
-													, simFuelConsumptionEdit - (simFuelConsumptionEdit / 100 * consumption), lapTime)
-							}
-							finally {
-								this.setFixedLapTime(false)
-							}
-							
-							scenarios[name . translate(":") . variation++] := strategy
-								
-							Sleep 100
-								
-							progress += 1
-						}
-					}
-					
-					if (simInputDropDown > 1)
-						for ignore, mapData in electronicsData {
-							map := mapData["Map"]
-							fuelConsumption := mapData["Fuel.Consumption"]
-							avgLapTime := mapData["Lap.Time"]
-
-							if map is number
-							{
-								message := (translate("Creating Telemetry Scenario with Map ") . map . translate("..."))
-								
-								showProgress({progress: progress, message: message})
-							
-								stintLaps := Floor((stintLengthEdit * 60) / avgLapTime)
-								
-								name := (translate("Telemetry - Map ") . map)
-								
-								strategy := this.createStrategy(name)
-							
-								initialFuelAmount := Min(fuelCapacityEdit, simInitialFuelAmountEdit + (initialFuel / 100 * fuelCapacityEdit))
-								lapTime := lookupLapTime(lapTimes, map, initialFuelAmount)
-								
-								if !lapTime
-									lapTime := avgLapTime
-							
-								strategy.createStints(initialFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-													, fuelConsumption - (fuelConsumption / 100 * consumption), lapTime)
-								
-								scenarios[name . translate(":") . variation++] := strategy
-								
-								Sleep 100
-								
-								progress += 1
-							}
-						}
-				
-					if (tyreUsage = 0)
-						break
-					else
-						tyreUsage := Max(0, tyreUsage - tyreUsageStep)
-				}
-						
-				if (initialFuel = 0)
-					break
-				else
-					initialFuel := Max(0, initialFuel - initialFuelStep)
-			}
-			
-			if (consumption = 0)
-				break
-			else
-				consumption := Max(0, consumption - consumptionStep)
-		}
+		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
 		
-		progress := Floor(progress + 10)
-		
-		return scenarios
+		return lapTime ? lapTime : (default ? simAvgLapTimeEdit : false)
 	}
 	
-	optimizeScenarios(ByRef progress, scenarios) {
-		local strategy
+	getMaxFuelLaps(fuelConsumption) {
+		window := this.Window
 		
-		if (this.SelectedSessionType = "Duration")
-			for name, strategy in scenarios {
-				message := (translate("Optimizing Stint length for Scenario ") . name . translate("..."))
-			
-				showProgress({progress: progress, message: message})
-				
-				avgLapTime := strategy.AvgLapTime[true]
+		Gui %window%:Default
+	
+		GuiControlGet safetyFuelEdit
+		GuiControlGet fuelCapacityEdit
+		
+		return Floor((fuelCapacityEdit - safetyFuelEdit) / fuelConsumption)
+	}
+	
+	calcRefuelAmount(targetFuel, currentFuel) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet safetyFuelEdit
+		GuiControlGet fuelCapacityEdit
+		
+		return (Min(fuelCapacityEdit, targetFuel + safetyFuelEdit) - currentFuel)
+	}
 
-				targetTime := this.calcSessionTime(avgLapTime, false)
-				sessionTime := strategy.getSessionDuration()
-				
-				superfluousLaps := -1
-				
-				while (sessionTime > targetTime) {
-					superfluousLaps += 1
-					sessionTime -= avgLapTime
-				}
-				
+	calcPitstopDuration(refuelAmount, changeTyres) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		GuiControlGet pitstopDeltaEdit
+		GuiControlGet pitstopTyreServiceEdit
+		GuiControlGet pitstopRefuelServiceEdit
+		
+		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
+	}
+	
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
+		result := true
+		
+		window := this.Window
+						
+		Gui %window%:Default
+		
+		GuiControlGet pitstopRequirementsDropDown
+		GuiControlGet pitstopWindowEdit
+		GuiControlGet tyreChangeRequirementsDropDown
+		GuiControlGet refuelRequirementsDropDown
+		
+		switch pitstopRequirementsDropDown {
+			case 1:
 				pitstopRequired := false
-				refuelRequired := false
-				tyreChangeRequired := false
+			case 2:
+				pitstopRequired := true
+			case 3:
+				window := string2Values("-", pitstopWindowEdit)
 				
-				this.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+				if (window.Length() = 2)
+					pitstopRequired := window
+				else {
+					pitstopRequired := true
 				
-				if ((strategy.Pitstops.Length() != 1) || !pitstopRequired)
-					strategy.adjustLastPitstop(superfluousLaps)
-				
-				strategy.adjustLastPitstopRefuelAmount()
-				
-				Sleep 500
-				
-				progress += 1
-			}
-		
-		progress := Floor(progress + 10)
-		
-		return scenarios
-	}
-	
-	evaluateScenarios(ByRef progress, scenarios) {
-		local strategy
-		
-		candidate := false
-		
-		for name, strategy in scenarios {
-			message := (translate("Evaluating Scenario ") . name . translate("..."))
-			
-			showProgress({progress: progress, message: message})
-			
-			if !candidate
-				candidate := strategy
-			else {
-				if (this.SelectedSessionType = "Duration") {
-					sLaps := strategy.getSessionLaps()
-					cLaps := candidate.getSessionLaps()
-					sTime := strategy.getSessionDuration()
-					cTime := candidate.getSessionDuration()
-					
-					if (sLaps > cLaps)
-						candidate := strategy
-					else if ((sLaps = cLaps) && (sTime < cTime))
-						candidate := strategy
-					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] > strategy.FuelConsumption[true] ))
-						candidate := strategy
+					result := false
 				}
-				else if (strategy.getSessionDuration() < candidate.getSessionDuration())
-					candidate := strategy
-			}
-			
-			progress += 1
-		
-			Sleep 500
 		}
 		
-		progress := Floor(progress + 10)
+		refuelRequired := (refuelRequirementsDropDown = 2)
+		tyreChangeRequired := (tyreChangeRequirementsDropDown = 2)
+			
+		return result
+	}
+	
+	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
+		window := this.Window
 		
-		return candidate
+		Gui %window%:Default
+		
+		GuiControlGet stintLengthEdit
+		GuiControlGet fuelCapacityEdit
+		
+		fuelCapacity := fuelCapacityEdit
+		stintLength := stintLengthEdit
+	}
+	
+	getStartConditions(ByRef initialFuelAmount, ByRef initialFuelConsumption, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialMap, ByRef initialAvgLapTime) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet simMaxTyreLapsEdit
+		GuiControlGet simInitialFuelAmountEdit
+		GuiControlGet simMapEdit
+		GuiControlGet simFuelConsumptionEdit
+		GuiControlGet simAvgLapTimeEdit
+		
+		initialFuelAmount := simInitialFuelAmountEdit
+		initialFuelConsumption := simFuelConsumptionEdit
+		initialStintLength := stintLengthEdit
+		initialTyreLaps := 0
+		initialMap := simMapEdit
+		initialAvgLapTime := simAvgLapTimeEdit
+	}
+	
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet simInputDropDown
+		
+		GuiControlGet simConsumptionWeight
+		GuiControlGet simInitialFuelWeight
+		GuiControlGet simTyreUsageWeight
+		
+		useStartConditions := ((simInputDropDown == 1) || (simInputDropDown == 3))
+		useTelemetryData := (simInputDropDown > 1)
+		
+		consumptionWeight := simConsumptionWeight
+		initialFuelWeight := simInitialFuelWeight
+		tyreUsageWeight := simTyreUsageWeight
 	}
 
-	chooseScenario(ByRef progress, strategy) {
+	runSimulation() {
+		new VariationSimulation(this, new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)).runSimulation(true)
+	}
+	
+	chooseScenario(strategy) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -2024,89 +1816,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.iSelectedScenario := strategy
 	}
-
-	runSimulation() {
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-			
-		window := this.Window
-		
-		progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Data")})
-		
-		Gui %progressWindow%:+Owner%window%
-		Gui %window%:+Disabled
-		
-		Sleep 200
-		
-		progress := 0
-		
-		electronicsData := false
-		tyreData := false
-		
-		this.acquireTelemetryData(progress, electronicsData, tyreData)
-		
-		message := translate("Creating Scenarios...")
-		
-		showProgress({progress: progress, color: "Green", title: translate("Running Simulation")})
-		
-		Sleep 200
-		
-		scenarios := this.createScenarios(progress, electronicsData, tyreData)
-		
-		message := translate("Optimizing Scenarios...")
-		
-		showProgress({progress: progress, message: message})
-		
-		Sleep 200
-		
-		scenarios := this.optimizeScenarios(progress, scenarios)
-		
-		message := translate("Evaluating Scenarios...")
-		
-		showProgress({progress: progress, message: message})
-		
-		Sleep 200
-		
-		scenario := this.evaluateScenarios(progress, scenarios)
-		
-		if scenario {
-			message := translate("Choose Scenario...")
-			
-			showProgress({progress: progress, message: message})
-			
-			Sleep 200
-			
-			this.chooseScenario(progress, scenario)
-		}
-		else
-			this.chooseScenario(progress, false)
-		
-		message := translate("Finished...")
-		
-		showProgress({progress: 100, message: message})
-		
-		Sleep 1000
-		
-		hideProgress()
-		
-		Gui %window%:-Disabled
-	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-lookupLapTime(lapTimes, map, remainingFuel) {
-	selected := false
-	
-	for ignore, candidate in lapTimes
-		if ((candidate.Map = map) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
-			selected := candidate
-				
-	return (selected ? selected["Lap.Time"] : false)
-}
 
 readSimulatorData(simulator) {
 	dataFile := kTempDirectory . simulator . " Data\Setup.data"

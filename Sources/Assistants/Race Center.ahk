@@ -37,9 +37,11 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
-#Include Libraries\RaceReportViewer.ahk
 #Include Libraries\TelemetryDatabase.ahk
 #Include Libraries\SetupDatabase.ahk
+#Include Libraries\RaceReportViewer.ahk
+#Include Libraries\Strategy.ahk
+#Include Libraries\StrategyViewer.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -155,6 +157,8 @@ class RaceCenter extends ConfigurationItem {
 	iAirTemperature := false
 	iTrackTemperature := false
 	
+	iStrategy := false
+	
 	iDrivers := []
 	iStints := {}
 	iLaps := {}
@@ -174,6 +178,7 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedReport := false
 	iSelectedChartType := false
 	
+	iStrategyViewer := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		__New(rCenter) {
@@ -379,6 +384,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	Strategy[] {
+		Get {
+			return this.iStrategy
+		}
+	}
+	
 	Drivers[] {
 		Get {
 			return this.iDrivers
@@ -476,6 +487,12 @@ class RaceCenter extends ConfigurationItem {
 	ReportViewer[] {
 		Get {
 			return this.iReportViewer
+		}
+	}
+	
+	StrategyViewer[] {
+		Get {
+			return this.iStrategyViewer
 		}
 	}
 	
@@ -634,9 +651,9 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm cBlack, Arial
 		
-		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load...", "Save", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Monte Carlo Analysis...", "Run Simulation", "---------------------------------------------", "Update Race Strategy", "Clear Race Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", "Run Monte Carlo Simulation...", "Run Standard Simulation", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Setup Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
@@ -650,6 +667,8 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, ActiveX, x619 yp+21 w582 h293 Border vdetailsViewer, shell.explorer
 		
 		detailsViewer.Navigate("about:blank")
+		
+		this.iStrategyViewer := new StrategyViewer(window, detailsViewer)
 		
 		this.showDetails(false)
 		this.showChart(false)
@@ -968,6 +987,49 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 	
+	updateStrategy() {
+		local strategy
+		
+		if this.Strategy
+			try {
+				strategy := newConfiguration()
+							
+				this.Strategy.saveToConfiguration(strategy)
+				
+				writeConfiguration(file, strategy)
+							
+				session := this.SelectedSession[true]
+				
+				lap := this.Connector.GetSessionLastLap(session)
+
+				this.Connector.SetLapValue(lap, "Strategy Update", printConfiguration(strategy))
+				this.Connector.SetSessionValue(session, "Strategy Update", lap)
+				
+				showMessage(translate("Race Strategist will be instructed in the next lap."))
+			}
+			catch exception {
+				showMessage(translate("Session has not been started yet."))
+			}
+	}
+	
+	abandonStrategy() {
+		this.iStrategy := false
+		
+		try {
+			session := this.SelectedSession[true]
+			
+			lap := this.Connector.GetSessionLastLap(session)
+
+			this.Connector.SetLapValue(lap, "Strategy Update", "CLEAR")
+			this.Connector.SetSessionValue(session, "Strategy Update", lap)
+			
+			showMessage(translate("Race Strategist will be instructed in the next lap."))
+		}
+		catch exception {
+			showMessage(translate("Session has not been started yet."))
+		}
+	}
+	
 	planPitstop() {
 		window := this.Window
 		
@@ -1053,12 +1115,12 @@ class RaceCenter extends ConfigurationItem {
 						this.clearSession()
 				}
 				else {
-						title := translate("Information")
+					title := translate("Information")
 
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
-						OnMessage(0x44, "")
-					}
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+					OnMessage(0x44, "")
+				}
 					
 			case 6: ; Load Session...
 				this.loadSession()
@@ -1105,11 +1167,106 @@ class RaceCenter extends ConfigurationItem {
 						
 		Gui %window%:Default
 		
+		if this.Simulator {
+			simulator := this.Simulator
+			car := this.Car
+			track := this.Track
+			sessionDB := new SessionDatabase()
+			simulatorCode := sessionDB.getSimulatorCode(simulator)
+			
+			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
+			
+			FileCreateDir %dirName%
+		}
+		else
+			dirName := ""
+			
 		switch line {
 			case 3:
-				this.reportRemainingTimes()
-			case 4:
-				this.estimateFutureStints()
+				title := translate("Load Race Strategy...")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+				OnMessage(0x44, "")
+			
+				if (file != "") {
+					configuration := readConfiguration(file)
+					
+					if (configuration.Count() > 0) {
+						this.iStrategy := this.createStrategy(configuration)
+						
+						this.StrategyViewer.showStrategyInfo(this.Strategy)
+					}
+				}
+			case 4: ; "Save Strategy..."
+				if this.Strategy {
+					title := translate("Save Race Strategy...")
+					
+					fileName := (dirName . "\" . this.Strategy.Name . ".strategy")
+					
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
+					OnMessage(0x44, "")
+				
+					if (file != "") {
+						if !InStr(file, ".")
+							file := (file . ".strategy")
+			
+						SplitPath file, , , , name
+						
+						this.Strategy.setName(name)
+							
+						configuration := newConfiguration()
+						
+						this.Strategy.saveToConfiguration(configuration)
+						
+						writeConfiguration(file, configuration)
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 6: ; Strategy Summary
+				if this.Strategy
+					this.StrategyViewer.showStrategyInfo(this.Strategy)
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 11: ; Discard Strategy
+				if this.Strategy {
+					if this.SessionActive {
+						title := translate("Strategy")
+						
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+						MsgBox 262436, %title%, % translate("Do you really want to abandon the active strategy? Strategist will be instructed in the next lap...")
+						OnMessage(0x44, "")
+						
+						IfMsgBox Yes
+							this.abandonStrategy()
+					}
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+						OnMessage(0x44, "")
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
 		}
 	}
 	
@@ -1163,6 +1320,20 @@ class RaceCenter extends ConfigurationItem {
 			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
 		}
+	}
+	
+	createStrategy(nameOrConfiguration := false) {
+		name := nameOrConfiguration
+		
+		if !IsObject(nameOrConfiguration)
+			nameOrConfiguration := false
+		
+		theStrategy := new Strategy(this, nameOrConfiguration)
+		
+		if (name && !IsObject(name))
+			theStrategy.setName(name)
+		
+		return theStrategy
 	}
 	
 	showWait(state := true) {
@@ -3897,55 +4068,6 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 	
 	return previousValue
-}
-
-getTableCSS() {
-	script =
-	(
-		.table-std, .th-std, .td-std { 
-			border-collapse: collapse;
-			padding: .3em .5em; 
-		}
-
-		.th-std, .td-std {
-			text-align: center;
-		} 
-		
-		.th-std, .caption-std { 
-			background-color: #BBB; 
-			color: #000; 
-			border: thin solid #BBB;
-		}
-
-		.td-std {
-			border-left: thin solid #BBB;
-			border-right: thin solid #BBB;
-		}
-		
-		.th-left {
-			text-align: left;
-		}
-
-		tfoot {
-			border-bottom: thin solid #BBB;
-		}
-
-		.caption-std {
-			font-size: 1.5em;
-			border-radius: .5em .5em 0 0;
-			padding: .5em 0 0 0
-		}
-		
-		.table-std tbody tr:nth-child(even) { 
-			background-color: #D8D8D8;
-		}
-		
-		.table-std tbody tr:nth-child(odd) { 
-			background-color: #D0D0D0;
-		}
-	)
-
-	return script
 }
 
 chartValue(value) {

@@ -196,7 +196,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				this.TeamServer.setSessionValue("Pitstop Plan", "")
 			}
 		}
-	}		
+	}
 	
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["LapsRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {

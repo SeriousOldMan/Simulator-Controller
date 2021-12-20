@@ -9,6 +9,472 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class StrategySimulation {
+	iStrategyManager := false
+	iTelemetryDatabase := false
+	
+	iFixedLapTime := false
+	
+	StrategyManager[] {
+		Get {
+			return this.iStrategyManager
+		}
+	}
+	
+	TelemetryDatabase[] {
+		Get {
+			return this.iTelemetryDatabase
+		}
+	}
+	
+	__New(strategyManager, telemetryDatabase) {
+		this.iStrategyManager := strategyManager
+		this.iTelemetryDatabase := telemetryDatabase
+	}
+	
+	createStrategy(nameOrConfiguration := false) {
+		local strategy := this.StrategyManager.createStrategy(nameOrConfiguration)
+		
+		strategy.setStrategyManager(this)
+		
+		return strategy
+	}
+	
+	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
+					  , ByRef sessionType, ByRef sessionLength
+					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
+		return this.StrategyManager.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
+													  , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+	}
+	
+	getSessionSettings(ByRef fuelCapacity, ByRef stintLength) {
+		return this.StrategyManager.getSessionSettings(fuelCapacity, stintLength)
+	}
+	
+	getStartConditions(ByRef initialFuelAmount, ByRef initialFuelConsumption, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialMap, ByRef initialAvgLapTime) {
+		return this.StrategyManager.getStartConditions(initialFuelAmount, initialFuelConsumption, initialStintLength, initialTyreLaps, initialMap, initialAvgLapTime)
+	}
+	
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumption, ByRef initialFuel, ByRef tyreUsage) {
+		return this.StrategyManager.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+	}
+	
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
+		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+	}
+	
+	getAvgLapTime(map, remainingFuel, default := false) {
+		if this.iFixedLapTime
+			return this.iFixedLapTime
+		else
+			return this.StrategyManager.getAvgLapTime(map, remainingFuel, default)
+	}
+	
+	getMaxFuelLaps(fuelConsumption) {
+		return this.StrategyManager.getMaxFuelLaps(fuelConsumption)
+	}
+	
+	setFixedLapTime(lapTime) {
+		this.iFixedLapTime := lapTime
+	}
+	
+	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
+		return this.StrategyManager.calcSessionLaps(avgLapTime, formationLap, postRaceLap)
+	}
+	
+	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
+		return this.StrategyManager.calcSessionTime(avgLapTime, formationLap, postRaceLap)
+	}
+	
+	calcRefuelAmount(targetFuel, currentFuel) {
+		return this.StrategyManager.calcRefuelAmount(targetFuel, currentFuel)
+	}
+	
+	calcPitstopDuration(refuelAmount, changeTyres) {
+		return this.StrategyManager.calcPitstopDuration(refuelAmount, changeTyres)
+	}
+	
+	acquireTelemetryData(ByRef electronicsData, ByRef tyreData, verbose, ByRef progress) {
+		telemetryDB := this.TelemetryDatabase
+		
+		simulator := false
+		car := false
+		track := false
+		weather := false
+		airTemperature := false
+		trackTemperature := false
+		sessionType := false
+		sessionLength := false
+		maxTyreLaps := false
+		tyreCompound := false
+		tyreCompoundColor := false
+		tyrePressures := false
+		
+		this.StrategyManager.getStrategySettings(simulator, car, track,weather, airTemperature, trackTemperature
+											   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+		
+		if verbose {
+			message := translate("Reading Electronics Data...")
+			
+			showProgress({progress: progress, message: message})
+		}
+		
+		electronicsData := telemetryDB.getMapData(weather, tyreCompound, tyreCompoundColor)
+		
+		if verbose {
+			Sleep 200
+			
+			message := translate("Reading Tyre Data...")
+			
+			showProgress({progress: progress, message: message})
+		}
+		
+		tyreData := telemetryDB.getTyreData(weather, tyreCompound, tyreCompoundColor)
+		
+		if verbose {
+			Sleep 200
+			
+			progress += 5
+		}
+	}
+	
+	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+		Throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
+	}
+	
+	optimizeScenarios(scenarios, verbose, ByRef progress) {
+		local strategy
+		
+		if (this.SelectedSessionType = "Duration")
+			for name, strategy in scenarios {
+				if verbose {
+					message := (translate("Optimizing Stint length for Scenario ") . name . translate("..."))
+				
+					showProgress({progress: progress, message: message})
+				}
+				
+				avgLapTime := strategy.AvgLapTime[true]
+
+				targetTime := this.calcSessionTime(avgLapTime, false)
+				sessionTime := strategy.getSessionDuration()
+				
+				superfluousLaps := -1
+				
+				while (sessionTime > targetTime) {
+					superfluousLaps += 1
+					sessionTime -= avgLapTime
+				}
+				
+				pitstopRequired := false
+				refuelRequired := false
+				tyreChangeRequired := false
+				
+				this.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+				
+				if ((strategy.Pitstops.Length() != 1) || !pitstopRequired)
+					strategy.adjustLastPitstop(superfluousLaps)
+				
+				strategy.adjustLastPitstopRefuelAmount()
+				
+				if verbose {
+					Sleep 500
+					
+					progress += 1
+				}
+			}
+		
+		if verbose
+			progress := Floor(progress + 10)
+		
+		return scenarios
+	}
+	
+	evaluateScenarios(scenarios, verbose, ByRef progress) {
+		local strategy
+		
+		candidate := false
+		
+		for name, strategy in scenarios {
+			if verbose {
+				message := (translate("Evaluating Scenario ") . name . translate("..."))
+				
+				showProgress({progress: progress, message: message})
+			}
+			
+			if !candidate
+				candidate := strategy
+			else {
+				if (this.SelectedSessionType = "Duration") {
+					sLaps := strategy.getSessionLaps()
+					cLaps := candidate.getSessionLaps()
+					sTime := strategy.getSessionDuration()
+					cTime := candidate.getSessionDuration()
+					
+					if (sLaps > cLaps)
+						candidate := strategy
+					else if ((sLaps = cLaps) && (sTime < cTime))
+						candidate := strategy
+					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] > strategy.FuelConsumption[true] ))
+						candidate := strategy
+				}
+				else if (strategy.getSessionDuration() < candidate.getSessionDuration())
+					candidate := strategy
+			}
+			
+			if verbose {
+				progress += 1
+			
+				Sleep 500
+			}
+		}
+		
+		if verbose
+			progress := Floor(progress + 10)
+		
+		return candidate
+	}
+
+	chooseScenario(scenario) {
+		this.StrategyManager.chooseScenario(scenario)
+	}
+
+	runSimulation(verbose := true) {
+		window := this.StrategyManager.Window
+		
+		if verbose {
+			x := Round((A_ScreenWidth - 300) / 2)
+			y := A_ScreenHeight - 150
+				
+			progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Data")})
+		
+			if window {
+				Gui %progressWindow%:+Owner%window%
+				Gui %window%:+Disabled
+			}
+		}
+		
+		if verbose
+			Sleep 200
+		
+		progress := 0
+		
+		electronicsData := false
+		tyreData := false
+		
+		this.acquireTelemetryData(electronicsData, tyreData, verbose, progress)
+		
+		if verbose {
+			message := translate("Creating Scenarios...")
+			
+			showProgress({progress: progress, color: "Green", title: translate("Running Simulation")})
+			
+			Sleep 200
+		}
+		
+		scenarios := this.createScenarios(electronicsData, tyreData, verbose, progress)
+		
+		if verbose {
+			message := translate("Optimizing Scenarios...")
+			
+			showProgress({progress: progress, message: message})
+			
+			Sleep 200
+		}
+		
+		scenarios := this.optimizeScenarios(scenarios, verbose, progress)
+		
+		if verbose {
+			message := translate("Evaluating Scenarios...")
+			
+			showProgress({progress: progress, message: message})
+			
+			Sleep 200
+		}
+		
+		scenario := this.evaluateScenarios(scenarios, verbose, progress)
+		
+		if scenario {
+			if verbose {
+				message := translate("Choose Scenario...")
+				
+				showProgress({progress: progress, message: message})
+				
+				Sleep 200
+			}
+			
+			this.chooseScenario(scenario)
+		}
+		else
+			this.chooseScenario(false)
+		
+		if verbose {
+			message := translate("Finished...")
+			
+			showProgress({progress: 100, message: message})
+			
+			Sleep 1000
+			
+			hideProgress()
+		
+			if window
+				Gui %window%:-Disabled
+		}
+	}
+}
+
+class VariationSimulation extends StrategySimulation {
+	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+		local strategy
+
+		simulator := false
+		car := false
+		track := false
+		weather := false
+		airTemperature := false
+		trackTemperature := false
+		sessionType := false
+		sessionLength := false
+		maxTyreLaps := false
+		tyreCompound := false
+		tyreCompoundColor := false
+		tyrePressures := false
+		
+		this.StrategyManager.getStrategySettings(simulator, car, track,weather, airTemperature, trackTemperature
+											   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+		
+		fuelCapacity := false
+		stintLength := false
+		
+		this.StrategyManager.getSessionSettings(fuelCapacity, stintLength)
+	
+		initialFuelAmount := false
+		initialStintLength := false
+		initialTyreLaps := false
+		map := false
+		fuelConsumption := false
+		avgLapTime := false
+		
+		this.StrategyManager.getStartConditions(initialFuelAmount, fuelConsumption, initialStintLength, initialTyreLaps, map, avgLapTime)
+		
+		useStartConditions := false
+		useTelemetryData := false
+		consumption := 0
+		tyreUsage := 0
+		initialFuel := 0
+		
+		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+		
+		consumptionStep := (consumption / 4)
+		tyreUsageStep := (tyreUsage / 4)
+		initialFuelStep := (initialFuel / 4)
+		
+		scenarios := {}
+		variation := 1
+		
+		if (useTelemetryData)
+			lapTimes := this.TelemetryDatabase.getLapTimes(weather, tyreCompound, tyreCompoundColor)
+		else
+			lapTimes := []
+		
+		Loop { ; consumption
+			Loop { ; initialFuel
+				Loop { ; tyreUsage
+					if useStartConditions {
+						if map is number
+						{			
+							message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+								
+							showProgress({progress: progress, message: message})
+							
+							stintLaps := Floor((stintLength * 60) / avgLapTime)
+							
+							name := (translate("Initial Conditions - Map ") . map)
+							
+							this.setFixedLapTime(avgLapTime)
+							
+							try {
+								strategy := this.createStrategy(name)
+						
+								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+								lapTime := lookupLapTime(lapTimes, map, startFuelAmount)
+								
+								if !lapTime
+									lapTime := simAvgLapTimeEdit
+								
+								strategy.createStints(startFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+													, fuelConsumption - (fuelConsumption / 100 * consumption), lapTime)
+							}
+							finally {
+								this.setFixedLapTime(false)
+							}
+							
+							scenarios[name . translate(":") . variation++] := strategy
+								
+							Sleep 100
+								
+							progress += 1
+						}
+					}
+					
+					if useTelemetryData
+						for ignore, mapData in electronicsData {
+							scenarioMap := mapData["Map"]
+							scenarioFuelConsumption := mapData["Fuel.Consumption"]
+							scenarioAvgLapTime := mapData["Lap.Time"]
+
+							if scenarioMap is number
+							{
+								message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate("..."))
+								
+								showProgress({progress: progress, message: message})
+							
+								stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+								
+								name := (translate("Telemetry - Map ") . scenarioMap)
+								
+								strategy := this.createStrategy(name)
+							
+								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+								lapTime := lookupLapTime(lapTimes, scenarioMap, startFuelAmount)
+								
+								if !lapTime
+									lapTime := scenarioAvgLapTime
+							
+								strategy.createStints(startFuelAmount, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
+													, scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption), lapTime)
+								
+								scenarios[name . translate(":") . variation++] := strategy
+								
+								Sleep 100
+								
+								progress += 1
+							}
+						}
+				
+					if (tyreUsage = 0)
+						break
+					else
+						tyreUsage := Max(0, tyreUsage - tyreUsageStep)
+				}
+						
+				if (initialFuel = 0)
+					break
+				else
+					initialFuel := Max(0, initialFuel - initialFuelStep)
+			}
+			
+			if (consumption = 0)
+				break
+			else
+				consumption := Max(0, consumption - consumptionStep)
+		}
+		
+		progress := Floor(progress + 10)
+		
+		return scenarios
+	}
+}
+
 class Strategy extends ConfigurationItem {
 	iStrategyManager := false
 	
@@ -546,6 +1012,10 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	setStrategyManager(strategyManager) {
+		this.iStrategyManager := strategyManager
+	}
+	
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 		
@@ -888,4 +1358,14 @@ splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
 		if (index > 2)
 			compoundColor := ["Red", "White", "Blue"][index - 2]
 	}
+}
+
+lookupLapTime(lapTimes, map, remainingFuel) {
+	selected := false
+	
+	for ignore, candidate in lapTimes
+		if ((candidate.Map = map) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
+			selected := candidate
+				
+	return (selected ? selected["Lap.Time"] : false)
 }

@@ -1339,7 +1339,7 @@ class RaceCenter extends ConfigurationItem {
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
-		strategy := this.Strategy
+		local strategy := this.Strategy
 		
 		if this.Simulator {
 			simulator := this.Simulator

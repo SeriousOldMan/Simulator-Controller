@@ -1603,36 +1603,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet sessionLengthEdit
-		GuiControlGet formationLapCheck
-		GuiControlGet postRaceLapCheck
-		
-		if (this.SelectedSessionType = "Duration")
-			return Ceil(((sessionLengthEdit * 60) / avgLapTime) + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
-		else
-			return (sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0))
-	}
-	
-	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet sessionLengthEdit
-		GuiControlGet formationLapCheck
-		GuiControlGet postRaceLapCheck
-		
-		if (this.SelectedSessionType = "Duration")
-			return ((sessionLengthEdit * 60) + (((formationLap && formationLapCheck) ? 1 : 0) * avgLapTime) + (((postRaceLap && postRaceLapCheck) ? 1 : 0) * avgLapTime))
-		else
-			return ((sessionLengthEdit + ((formationLap && formationLapCheck) ? 1 : 0) + ((postRaceLap && postRaceLapCheck) ? 1 : 0)) * avgLapTime)
-	}
-	
 	getAvgLapTime(map, remainingFuel, default := false) {
 		window := this.Window
 			
@@ -1649,40 +1619,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
 		
 		return lapTime ? lapTime : (default ? default : simAvgLapTimeEdit)
-	}
-	
-	getMaxFuelLaps(fuelConsumption) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet safetyFuelEdit
-		GuiControlGet fuelCapacityEdit
-		
-		return Floor((fuelCapacityEdit - safetyFuelEdit) / fuelConsumption)
-	}
-	
-	calcRefuelAmount(targetFuel, currentFuel) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet safetyFuelEdit
-		GuiControlGet fuelCapacityEdit
-		
-		return (Min(fuelCapacityEdit, targetFuel + safetyFuelEdit) - currentFuel)
-	}
-
-	calcPitstopDuration(refuelAmount, changeTyres) {
-		window := this.Window
-		
-		Gui %window%:Default
-	
-		GuiControlGet pitstopDeltaEdit
-		GuiControlGet pitstopTyreServiceEdit
-		GuiControlGet pitstopRefuelServiceEdit
-		
-		return (pitstopDeltaEdit + (changeTyres ? pitstopTyreServiceEdit : 0) + ((refuelAmount / 10) * pitstopRefuelServiceEdit))
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
@@ -1720,7 +1656,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		return result
 	}
 	
-	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel) {
+	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
+					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1730,15 +1667,22 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet postRaceLapCheck
 		GuiControlGet fuelCapacityEdit
 		GuiControlGet safetyFuelEdit
+	
+		GuiControlGet pitstopDeltaEdit
+		GuiControlGet pitstopTyreServiceEdit
+		GuiControlGet pitstopRefuelServiceEdit
 		
 		stintLength := stintLengthEdit
 		formationLap := formationLapCheck
 		postRaceLap := postRaceLapCheck
 		fuelCapacity := fuelCapacityEdit
 		safetyFuel := safetyFuelEdit
+		pitstopDelta := pitstopDeltaEdit
+		pitstopFuelService := pitstopRefuelServiceEdit
+		pitstopTyreService := pitstopTyreServiceEdit
 	}
 	
-	getStartConditions(ByRef initialLap, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		window := this.Window
 		
@@ -1751,7 +1695,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simAvgLapTimeEdit
 		
 		initialLap := 0
-		initialStintLength := stintLengthEdit
+		initialStintTime := 0
 		initialTyreLaps := 0
 		initialFuelAmount := simInitialFuelAmountEdit
 		initialMap := simMapEdit

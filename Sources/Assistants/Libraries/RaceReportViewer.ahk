@@ -605,7 +605,7 @@ class RaceReportViewer {
 				
 				hasDNF := (hasDNF || (result = "DNF"))
 				
-				rows.Push(Array(cars[A_Index][1], "'" . sessionDB.getCarName(simulator, StrReplace(cars[A_Index][2], "'", "\'")) . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
 			}
 			
@@ -779,6 +779,9 @@ class RaceReportViewer {
 			cars := []
 			
 			carsCount := getConfigurationValue(raceData, "Cars", "Count")
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			
+			sessionDB := new SessionDatabase()
 			
 			Loop % carsCount
 			{
@@ -795,7 +798,8 @@ class RaceReportViewer {
 						positions[A_Index][car] := "null" ; carsCount
 				
 				if valid
-					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space . StrReplace(getConfigurationValue(raceData, "Cars", "Car." . car . ".Car"), "'", "\'") . "'")
+					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+								   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 				else
 					for ignore, lap in this.getReportLaps(raceData)
 						positions[lap].RemoveAt(car)

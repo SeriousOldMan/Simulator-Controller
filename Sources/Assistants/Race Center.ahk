@@ -162,6 +162,10 @@ class RaceCenter extends ConfigurationItem {
 	
 	iStrategy := false
 	
+	iUseSessionData := true
+	iUseTelemetryDatabase := false
+	iUseCurrentMap := true
+	
 	iDrivers := []
 	iStints := {}
 	iLaps := {}
@@ -184,10 +188,93 @@ class RaceCenter extends ConfigurationItem {
 	iStrategyViewer := false
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
-		__New(rCenter) {
+		iRaceCenter := false
+		iTelemetryDatabase := false
+		
+		__New(raceCenter, simulator := false, car := false, track := false) {
+			this.iRaceCenter := raceCenter
+			
 			base.__New()
 			
-			this.setDatabase(new Database(rCenter.SessionDirectory, kTelemetrySchemas))
+			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
+			
+			if simulator
+				this.iTelemetryDatabase := new TelemetryDatabase(simulator, car, track)
+		}
+		
+		getMapData(weather, compound, compoundColor) {
+			entries := []
+			
+			if this.iRaceCenter.UseSessionData
+				entries := base.getMapData(weather, compound, compoundColor)
+			
+			if this.iRaceCenter.UseTelemetryDatabase {
+				newEntries := []
+			
+				for ignore, entry in this.iTelemetryDatabse.getMapData(weather, compound, compoundColor) {
+					found := false
+				
+					for ignore, candidate in entries
+						if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
+														&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
+							found := true
+						
+							break
+						}
+					
+					if !found
+						newEntries.Push(entry)
+				}
+				
+				for ignore, entry in newEntries
+					entries.Push(entry)
+			}
+			
+			if this.iRaceCenter.UseCurrentMap {
+				lastLap := this.iRaceCenter.LastLap
+				
+				if lastLap {
+					result := []
+					
+					for ignore, entry in entries
+						if (entry.Map = lastLap.Map)
+							result.Push(entry)
+					
+					return result
+				}
+			}
+			
+			return entries
+		}
+		
+		getTyreData(weather, compound, compoundColor) {
+			entries := []
+			
+			if this.iRaceCenter.UseSessionData
+				entries := base.getTyreData(weather, compound, compoundColor)
+			
+			if this.iRaceCenter.UseTelemetryDatabase {
+				newEntries := []
+			
+				for ignore, entry in this.iTelemetryDatabse.getTyreData(weather, compound, compoundColor) {
+					found := false
+				
+					for ignore, candidate in entries
+						if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+							found := true
+						
+							break
+						}
+					
+					if !found
+						newEntries.Push(entry)
+				}
+				
+				for ignore, entry in newEntries
+					entries.Push(entry)
+			}
+			
+			return entries
 		}
 	}
 	
@@ -252,7 +339,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	Window[] {
 		Get {
-			return "Dashboard"
+			return "RaceCenter"
 		}
 	}
 	
@@ -402,6 +489,24 @@ class RaceCenter extends ConfigurationItem {
 	Strategy[] {
 		Get {
 			return this.iStrategy
+		}
+	}
+	
+	UseSessionData[] {
+		Get {
+			return this.iUseSessionData
+		}
+	}
+	
+	UseTelemetryDatabase[] {
+		Get {
+			return this.iUseTelemetryDatabase
+		}
+	}
+	
+	UseCurrentMap[] {
+		Get {
+			return this.iUseCurrentMap
 		}
 	}
 	
@@ -668,7 +773,9 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x220 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Data", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
-		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", "Run Monte Carlo Simulation...", "Run Standard Simulation", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		Gui %window%:Add, DropDownList, x405 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
+		
+		this.updateStrategyMenu()
 		
 		Gui %window%:Add, DropDownList, x590 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Setup Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
@@ -964,6 +1071,22 @@ class RaceCenter extends ConfigurationItem {
 			
 			this.iSelectedChartType := false
 		}
+		
+		this.updateStrategyMenu()
+	}
+	
+	updateStrategyMenu() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
+		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
+		use3 := (this.UseCurrentMap ? "(x) Use current Map" : "      Use current Map")
+		
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, "---------------------------------------------", "Adjust Strategy (Monte Carlo)...", "Adjust Strategy (Multivariate)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		
+		GuiControl Choose, strategyMenuDropDown, 1
 	}
 	
 	initializePitstopFromSession() {
@@ -978,8 +1101,8 @@ class RaceCenter extends ConfigurationItem {
 				pressures := pressuresTable[last]
 				
 				this.initializePitstopTyreSetup(pressures["Compound"], pressures["Compound.Color"]
-											  , pressures["Tyre.Pressure.Cold.Front.Left"], pressures["Tyre.Pressure.Cold.Front.Right"]
-											  , pressures["Tyre.Pressure.Cold.Rear.Left"], pressures["Tyre.Pressure.Cold.Rear.Right"])
+											  , displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+											  , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
 			}
 		}
 	}
@@ -1027,7 +1150,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 	}
 	
-	abandonStrategy() {
+	discardStrategy() {
 		this.iStrategy := false
 		
 		try {
@@ -1255,18 +1378,68 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 11: ; Discard Strategy
+			case 8: ; Use Session Data
+				this.iUseSessionData := !this.UseSessionData
+				
+				this.updateStrategyMenu()
+			case 9: ; Use Telemetry Database
+				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
+				
+				this.updateStrategyMenu()
+			case 10: ; Use current Mao
+				this.iUseCurrentMap := !this.UseCurrentMap
+				
+				this.updateStrategyMenu()
+			case 12: ; Run Monte Carlo Simulation
+				title := translate("Information")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262192, %title%, % translate("Not yet implemented.")
+				OnMessage(0x44, "")
+			case 13: ; Run Standard Simulation
+				if this.Strategy {
+					sessionType := getConfigurationValue(this.Strategy, "Session", "SessionType")
+					
+					new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 15: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						title := translate("Strategy")
 						
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-						MsgBox 262436, %title%, % translate("Do you really want to abandon the active strategy? Strategist will be instructed in the next lap...")
+						MsgBox 262436, %title%, % translate("Do you really want to discard the active strategy? Strategist will be instructed in the next lap...")
 						OnMessage(0x44, "")
 						
 						IfMsgBox Yes
-							this.abandonStrategy()
+							this.discardStrategy()
 					}
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+						OnMessage(0x44, "")
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 17: ; Instruct Strategist
+				if this.Strategy {
+					if this.SessionActive
+						this.updateStrategy()
 					else {
 						title := translate("Information")
 
@@ -1362,9 +1535,9 @@ class RaceCenter extends ConfigurationItem {
 			track := this.Track
 		}
 		else if strategy {
-			simulator := getConfigurationValue(strategy, "Session", "Simulator")
-			car := getConfigurationValue(strategy, "Session", "Car")
-			track := getConfigurationValue(strategy, "Session", "Track")
+			simulator := strategy.Simulator
+			car := strategy.Car
+			track := strategy.Track
 		}
 		else
 			return false
@@ -1375,9 +1548,9 @@ class RaceCenter extends ConfigurationItem {
 			trackTemperature := this.TrackTemperature
 		}
 		else if strategy {
-			weather := getConfigurationValue(strategy, "Weather", "Weather")
-			airTemperature := getConfigurationValue(strategy, "Weather", "AirTemperature")
-			track := getConfigurationValue(strategy, "Weather", "TrackTemperature")
+			weather := strategy.Weather
+			airTemperature := strategy.AirTemperature
+			track := strategy.TrackTemperature
 		}
 		else
 			return false
@@ -1387,22 +1560,17 @@ class RaceCenter extends ConfigurationItem {
 			tyreCompoundColor := this.TyreCompoundColor
 		}
 		else if strategy {
-			tyreCompound := getConfigurationValue(strategy, "Setup", "TyreCompound")
-			tyreCompoundColor := getConfigurationValue(strategy, "Setup", "TyreCompoundColor")
+			tyreCompound := strategy.TyreCompound
+			tyreCompoundColor := strategy.TyreCompoundColor
 		}
 		else
 			return false
 		
 		if strategy {
-			sessionType := getConfigurationValue(strategy, "Session", "SessionType")
-			sessionLength := getConfigurationValue(strategy, "Session", "SessionDuration")
-			
-			maxTyreLaps := getConfigurationValue(strategy, "Strategy", "MaxTyreLaps", 40)
-			
-			tyrePressures := [getConfigurationValue(strategy, "Setup", "TyrePressureFL", 27.7)
-							, getConfigurationValue(strategy, "Setup", "TyrePressureFR", 27.7)
-							, getConfigurationValue(strategy, "Setup", "TyrePressureRL", 27.7)
-							, getConfigurationValue(strategy, "Setup", "TyrePressureRR", 27.7)]
+			sessionType := strategy.SessionType
+			sessionLength := strategy.SessionLength
+			maxTyreLaps := strategy.MaxTyreLaps
+			tyrePressures := strategy.TyrePressures
 		}
 		else
 			return false
@@ -1410,14 +1578,19 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 	
-	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel) {
+	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
+					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
 		if this.Strategy {
-			stintLength := getConfigurationValue(this.Strategy, "Session", "StintLength")
-			formationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
-			postRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
+			stintLength := this.Strategy.StintLength
+			formationLap := this.Strategy.FormationLap
+			postRaceLap := this.Strategy.PostRaceLap
 			
-			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
-			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
+			fuelCapacity := this.Strategy.FuelCapacity
+			safetyFuel := this.Strategy.SafetyFuel
+			
+			pitstopDelta := this.Strategy.PitstopDelta
+			pitstopFuelService := this.Strategy.PitstopFuelService
+			pitstopTyreService := this.Strategy.PitstopTyreService
 			
 			return true
 		}
@@ -1425,10 +1598,40 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	getStartConditions(ByRef initialLap, ByRef initialStintLength, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
-		return this.StrategyManager.getStartConditions(initialLap, initialStintLength, initialTyreLaps, initialFuelAmount
-													 , initialMap, initialFuelConsumption, initialAvgLapTime)
+		this.syncSessionDatabase()
+		
+		lastLap := this.LastLap
+		initialLap := 0
+		initialStintTime := 0
+		initialTyreLaps := 0
+		initialFuelAmount := 0
+		initialMap := "n/a"
+		initialFuelConsumption := 0
+		initialAvgLapTime := 0.0
+		
+		if lastLap {
+			telemetryDB := this.TelemetryDatabase
+			
+			initialLap := lastLap.Nr + 1
+			initialFuelAmount := lastLap.FuelRemaining
+			initialMap := lastLap.Map
+			initialFuelConsumption := lastLap.FuelConsumption
+			initialAvgLapTime := lastLap.AvgLapTime
+			
+			Loop % lastLap.nr
+				initialStintTime += lastLap.Laptime
+			
+			tyresTable := telemetryDB.Database.Tables["Tyres"]
+	
+			lap := tyresTable.Length()
+			
+			if (tyresTable.Length() >= lastLap.Nr)
+				initialTyreLaps := tyresTable[lastLap.Nr]["Tyre.Laps"]
+			else
+				initialTyreLaps := 0
+		}
 	}
 	
 	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
@@ -1444,13 +1647,9 @@ class RaceCenter extends ConfigurationItem {
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
 		if this.Strategy {
-			pitstopRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopRequired")
-			
-			if (pitstopRequired && (pitstopRequired != true))
-				pitstopRequired := string2Values("-", pitstopRequired)
-			
-			refuelRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopRefuel")
-			tyreChangeRequired := getConfigurationValue(this.Strategy, "Settings", "PitstopTyreChange")
+			pitstopRequired := this.Strategy.PitstopRequired
+			refuelRequired := this.Strategy.RefuelRequired
+			tyreChangeRequired := this.Strategy.TyreChangeRequired
 			
 			return true
 		}
@@ -1463,71 +1662,15 @@ class RaceCenter extends ConfigurationItem {
 		
 		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
 		
-		return lapTime ? lapTime : (default ? default : getConfigurationValue(this.Strategy, "Strategy", "AvgLapTime"))
+		return lapTime ? lapTime : (default ? default : this.Strategy.AvgLapTime)
 	}
 	
-	getMaxFuelLaps(fuelConsumption) {
-		if this.Strategy {
-			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
-			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
+	chooseScenario(strategy) {
+		if strategy {
+			this.iStrategy := strategy
 			
-			return Floor((fuelCapacity - safetyFuel) / fuelConsumption)
+			this.StrategyViewer.showStrategyInfo(this.Strategy)
 		}
-		else
-			return false
-	}
-	
-	calcSessionLaps(avgLapTime, formationLap := true, postRaceLap := true) {
-		if this.Strategy {
-			sessionLength := getConfigurationValue(this.Strategy, "Session", "SessionLength")
-			hasFormationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
-			hasPostRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
-			
-			if (getConfigurationValue(this.Strategy, "Session", "SessionType") = "Duration")
-				return Ceil(((sessionLength * 60) / avgLapTime) + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
-			else
-				return (sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
-		}
-		else
-			return false
-	}
-	
-	calcSessionTime(avgLapTime, formationLap := true, postRaceLap := true) {
-		if this.Strategy {
-			sessionLength := getConfigurationValue(this.Strategy, "Session", "SessionLength")
-			hasFormationLap := getConfigurationValue(this.Strategy, "Session", "FormationLap")
-			hasPostRaceLap := getConfigurationValue(this.Strategy, "Session", "PostRaceLap")
-			
-			if (getConfigurationValue(this.Strategy, "Session", "SessionType") = "Duration")
-				return ((sessionLength * 60) + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime))
-			else
-				return ((sessionLength + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0)) * avgLapTime)
-		}
-		else
-			return false
-	}
-	
-	calcRefuelAmount(targetFuel, currentFuel) {
-		if this.Strategy {
-			fuelCapacity := getConfigurationValue(this.Strategy, "Settings", "FuelCapacity")
-			safetyFuel := getConfigurationValue(this.Strategy, "Settings", "SafetyFuel")
-			
-			return (Min(fuelCapacity, targetFuel + safetyFuel) - currentFuel)
-		}
-		else
-			return false
-	}
-	
-	calcPitstopDuration(refuelAmount, changeTyres) {
-		if this.Strategy {
-			pitstopDelta := getConfigurationValue(this.Strategy, "Settings", "PitstopDelta")
-			pitstopTyreService := getConfigurationValue(this.Strategy, "Settings", "PitstopTyreService")
-			pitstopRefuelService := getConfigurationValue(this.Strategy, "Settings", "PitstopRefuelService")
-			
-			return (pitstopDelta + (changeTyres ? pitstopTyreService : 0) + ((refuelAmount / 10) * pitstopRefuelService))
-		}
-		else
-			return false
 	}
 	
 	showWait(state := true) {
@@ -1955,7 +2098,7 @@ class RaceCenter extends ConfigurationItem {
 				if currentStint {
 					this.iTyreCompound := compound(currentStint.Compound)
 					this.iTyreCompoundColor := compoundColor(currentStint.Compound)
-				}	
+				}
 			}
 			catch exception {
 				return newData
@@ -2921,10 +3064,29 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
 		
-				if !this.iSimulator {
+				if !this.Simulator {
 					this.iSimulator := getConfigurationValue(raceData, "Session", "Simulator", false)
 					this.iCar := getConfigurationValue(raceData, "Session", "Car")
 					this.iTrack := getConfigurationValue(raceData, "Session", "Track")
+				}
+				
+				if !this.Weather {
+					lastLap := this.LastLap
+					
+					if lastLap {
+						this.iWeather := lastLap.Weather
+						this.iAirTemperature := lastLap.AirTemperature
+						this.iTrackTemperature := lastLap.TrackTemperature
+					}
+				}
+				
+				if !this.TyreCompound {
+					currentStint := this.CurrentStint
+					
+					if currentStint {
+						this.iTyreCompound := compound(currentStint.Compound)
+						this.iTyreCompoundColor := compoundColor(currentStint.Compound)
+					}
 				}
 			
 				this.updateReports()
@@ -3791,6 +3953,38 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails(html, [1, chart1], [2, chart2])
 	}
 	
+	createLapOverview(lap) {
+		hotPressures := "-, -, -, -"
+		coldPressures := "-, -, -, -"
+		
+		pressuresDB := this.PressuresDatabase
+		
+		if pressuresDB {
+			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+		
+			if (pressuresTable.Length() >= lap.Nr) {
+				pressures := pressuresTable[lap.Nr]
+				
+				coldPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+												   , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
+												   
+				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
+												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
+			}
+		}
+		
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lap.LapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . lap.FuelConsumption . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . lap.FuelRemaining . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Pressures (cold):") . "</b></td><td>" . coldPressures . "</td></tr>")
+		html .= "</table>"
+		
+		return html
+	}
+	
 	createLapDeltas(lap) {
 		sessionDB := this.SessionDatabase
 		
@@ -3904,6 +4098,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		html := ("<div id=""header""><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 			
+		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
+		
+		html .= ("<br>" . this.createLapOverview(lap))
+		
 		html .= ("<br><br><div id=""header""><i>" . translate("Deltas") . "</i></div>")
 		
 		html .= ("<br>" . this.createLapDeltas(lap))
@@ -4278,6 +4476,10 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 	
 	return previousValue
+}
+
+displayValue(value) {
+	return ((value == kNull) ? "-" : value)
 }
 
 chartValue(value) {

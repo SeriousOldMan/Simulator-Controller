@@ -80,8 +80,8 @@ class StrategyViewer {
 	}
 	
 	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
-		timeSeries := [0]
-		lapSeries := [0]
+		timeSeries := [strategy.StartTime]
+		lapSeries := [strategy.StartLap]
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]
 		
@@ -112,7 +112,7 @@ class StrategyViewer {
 			tyreChanges := []
 			
 			lastMap := strategy.Map
-			lastLap := 0
+			lastLap := strategy.StartLap
 			lastLapTime := strategy.AvgLapTime
 			lastFuelConsumption := strategy.FuelConsumption
 			lastRefuel := ""
@@ -184,7 +184,7 @@ class StrategyViewer {
 		
 		chartID := vChartID
 		
-		durationSession := (this.SelectedSessionType = "Duration")
+		durationSession := (strategy.SessionType = "Duration")
 				
 		drawChartFunction := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
 		

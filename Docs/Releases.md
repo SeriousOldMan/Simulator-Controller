@@ -6,8 +6,9 @@
   4. Complete new and optical pleasing table layout in HTML vievs in "Strategy Workbench" and "Race Center".
   5. Going to replay in a paused game no longer ends the session in *Assetto Corsa Competizione*.
   6. Detailed standings and gap report in "Race Center" when clicking on a lap in the lap list.
-  7. Added strategy handling and updating to "Race Center".
-  8. Optimized Race Assistant behaviour when no voice recognition is enabled - more interaction possible using hardware controller.
+  7. Full refactoring and partial rewrite of the strategy development and handling algorithms.
+  8. Added strategy handling and updating to "Race Center".
+  9. Optimized Race Assistant behaviour when no voice recognition is enabled - more interaction possible using hardware controller.
 
 ## 3.7.6-release 12/17/21
 

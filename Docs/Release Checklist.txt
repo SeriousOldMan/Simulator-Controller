@@ -27,6 +27,7 @@ Release 3.7.8 Checklist
 2. New lap report details in "Race Center"
    a. Documentation
    b. Images of new lap detail report
+   c. Translations
 
 Release 3.7.6 Checklist
 =======================

@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.7.8
 
-Nothing to do for this release.
+The file storage format for Strategies has been heavily extended. Although old strategy files should load without error, I strongly recommend to recreate any strategy that will be used in conjunction with the new dynamic, situation aware strategy adjustment feature of the "Race Center" tool.
 
 ***
 

@@ -80,7 +80,7 @@ class StrategyViewer {
 	}
 	
 	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
-		timeSeries := [strategy.StartTime]
+		timeSeries := [strategy.StartTime / 60]
 		lapSeries := [strategy.StartLap]
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]

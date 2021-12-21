@@ -309,7 +309,7 @@ class SetupDatabase extends SessionDatabase {
 					this.getPressureDistributions(localSetupDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
 					
 					if this.UseGlobalDatabase
-						this.getPressureDistributions(globalSetupDatabse, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
+						this.getPressureDistributions(globalSetupDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
 					
 					if (distributions["FL"].Count() != 0) {
 						thePressures := {}

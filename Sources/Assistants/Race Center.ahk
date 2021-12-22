@@ -2560,6 +2560,9 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 			}
+			catch exception {
+				showMessage(translate("Cannot connect to the Team Server.") . "`n`n" . translate("Retry in 10 seconds."))
+			}
 			finally {
 				Gui %window%:-Disabled
 				

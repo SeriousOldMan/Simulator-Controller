@@ -43,6 +43,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.callRemote("callRecommendPitstop", arguments*)
 		}
 		
+		updateStrategy(arguments*) {
+			this.callRemote("updateStrategy", arguments*)
+		}
+		
 		cancelStrategy(arguments*) {
 			this.callRemote("cancelStrategy", arguments*)
 		}
@@ -123,12 +127,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (strategyUpdate && (strategyUpdate != "")) {
 				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
 				
-				if (strategyUpdate = "CLEAR")
-					this.RaceEngineer.updateStrategy(false)
+				if (strategyUpdate = "CANCEL")
+					this.RaceStrategist.updateStrategy(false)
 				else {
-					FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
+					try {
+						FileDelete %kTempDirectory%Race Strategy.update
+						
+						FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
+					}
+					catch exception {
+						; ignore
+					}
 				
-					this.RaceEngineer.updateStrategy(kTempDirectory . "Race Strategy.update")
+					this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
 				}
 				
 				this.TeamServer.setSessionValue("Strategy Update", "")

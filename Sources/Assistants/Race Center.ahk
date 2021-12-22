@@ -53,6 +53,7 @@ global kConnect = "Connect"
 global kEvent = "Event"
 
 global kSessionReports = concatenate(kRaceReports, ["Pressures", "Temperatures", "Free"])
+global kDetailReports = ["Stint", "Lap", "Session", "Driver", "Strategy"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
@@ -165,6 +166,7 @@ class RaceCenter extends ConfigurationItem {
 	iUseSessionData := true
 	iUseTelemetryDatabase := false
 	iUseCurrentMap := true
+	iUseTraffic := false
 	
 	iDrivers := []
 	iStints := {}
@@ -184,6 +186,8 @@ class RaceCenter extends ConfigurationItem {
 	iReportViewer := false
 	iSelectedReport := false
 	iSelectedChartType := false
+	
+	iSelectedDetailReport := false
 	
 	iStrategyViewer := false
 	
@@ -510,6 +514,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	UseTraffic[] {
+		Get {
+			return this.iUseTraffic
+		}
+	}
+	
 	Drivers[] {
 		Get {
 			return this.iDrivers
@@ -625,6 +635,12 @@ class RaceCenter extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+	
+	SelectedDetailReport[] {
+		Get {
+			return this.iSelectedDetailReport
 		}
 	}
 	
@@ -792,7 +808,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.iStrategyViewer := new StrategyViewer(window, detailsViewer)
 		
-		this.showDetails(false)
+		this.showDetails(false, false)
 		this.showChart(false)
 		
 		Gui %window%:Font, Norm, Arial
@@ -1083,8 +1099,9 @@ class RaceCenter extends ConfigurationItem {
 		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
 		use3 := (this.UseCurrentMap ? "(x) Use current Map" : "      Use current Map")
+		use4 := (this.UseTraffic ? "(x) Include Traffic" : "      Include Traffic")
 		
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, "---------------------------------------------", "Adjust Strategy (Monte Carlo)...", "Adjust Strategy (Multivariate)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		GuiControl Choose, strategyMenuDropDown, 1
 	}
@@ -1134,8 +1151,6 @@ class RaceCenter extends ConfigurationItem {
 							
 				this.Strategy.saveToConfiguration(strategy)
 				
-				writeConfiguration(file, strategy)
-							
 				session := this.SelectedSession[true]
 				
 				lap := this.Connector.GetSessionLastLap(session)
@@ -1158,7 +1173,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			lap := this.Connector.GetSessionLastLap(session)
 
-			this.Connector.SetLapValue(lap, "Strategy Update", "CLEAR")
+			this.Connector.SetLapValue(lap, "Strategy Update", "CANCEL")
 			this.Connector.SetSessionValue(session, "Strategy Update", lap)
 			
 			showMessage(translate("Race Strategist will be instructed in the next lap."))
@@ -1334,6 +1349,8 @@ class RaceCenter extends ConfigurationItem {
 						this.iStrategy := this.createStrategy(configuration)
 						
 						this.StrategyViewer.showStrategyInfo(this.Strategy)
+						
+						this.iSelectedDetailReport := "Strategy"
 					}
 				}
 			case 4: ; "Save Strategy..."
@@ -1369,8 +1386,11 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, "")
 				}
 			case 6: ; Strategy Summary
-				if this.Strategy
+				if this.Strategy {
 					this.StrategyViewer.showStrategyInfo(this.Strategy)
+						
+					this.iSelectedDetailReport := "Strategy"
+				}
 				else {
 					title := translate("Information")
 
@@ -1386,17 +1406,23 @@ class RaceCenter extends ConfigurationItem {
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
 				
 				this.updateStrategyMenu()
-			case 10: ; Use current Mao
+			case 10: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 				
 				this.updateStrategyMenu()
-			case 12: ; Run Monte Carlo Simulation
+			case 11: ; Use Traffic
+				/*
+				this.iUseTraffic := !this.UseTraffic
+				
+				this.updateStrategyMenu()
+				*/
+				
 				title := translate("Information")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262192, %title%, % translate("Not yet implemented.")
+				MsgBox 262192, %title%, % translate("Not yet implemented...")
 				OnMessage(0x44, "")
-			case 13: ; Run Standard Simulation
+			case 13: ; Run Simulation
 				if this.Strategy {
 					sessionType := getConfigurationValue(this.Strategy, "Session", "SessionType")
 					
@@ -1419,7 +1445,12 @@ class RaceCenter extends ConfigurationItem {
 						OnMessage(0x44, "")
 						
 						IfMsgBox Yes
+						{
 							this.discardStrategy()
+							
+							if (this.SelectedDetailReport = "Strategy")
+								this.showDetails(false, false)
+						}
 					}
 					else {
 						title := translate("Information")
@@ -1670,6 +1701,8 @@ class RaceCenter extends ConfigurationItem {
 			this.iStrategy := strategy
 			
 			this.StrategyViewer.showStrategyInfo(this.Strategy)
+						
+			this.iSelectedDetailReport := "Strategy"
 		}
 	}
 	
@@ -1766,7 +1799,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iTyreCompoundColor := false
 	
 		this.showChart(false)
-		this.showDetails(false)
+		this.showDetails(false, false)
 	}
 	
 	loadNewStints(currentStint) {
@@ -3258,9 +3291,11 @@ class RaceCenter extends ConfigurationItem {
 		this.showChart(drawChartFunction)
 	}
 	
-	showDetails(details, charts*) {
+	showDetails(report, details, charts*) {
 		chartID := 1
 		html := (details ? details : "")
+		
+		this.iSelectedDetailReport := report
 		
 		if details {
 			tableCSS := getTableCSS()
@@ -3950,7 +3985,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
 			
-		this.showDetails(html, [1, chart1], [2, chart2])
+		this.showDetails("Stint", html, [1, chart1], [2, chart2])
 	}
 	
 	createLapOverview(lap) {
@@ -4110,7 +4145,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<br>" . this.createLapStandings(lap))
 			
-		this.showDetails(html)
+		this.showDetails("Lap", html)
 	}
 	
 	createDriverDetails(drivers) {
@@ -4297,7 +4332,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<br><br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
 		
-		this.showDetails(html, [1, chart1], [2, chart2])
+		this.showDetails("Driver", html, [1, chart1], [2, chart2])
 	}
 	
 	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
@@ -4404,7 +4439,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
 		
-		this.showDetails(html, [1, chart1])
+		this.showDetails("Session", html, [1, chart1])
 	}
 }
 

@@ -1099,7 +1099,7 @@ class RaceCenter extends ConfigurationItem {
 		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
-		use4 := (this.UseTraffic ? "(x) Include Traffic" : "      Include Traffic")
+		use4 := (this.UseTraffic ? "(x) Consider Traffic" : "      Consider Traffic")
 		
 		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		

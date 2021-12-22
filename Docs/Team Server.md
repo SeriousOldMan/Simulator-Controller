@@ -164,7 +164,7 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
      This option chooses only input data for the simulation which is based on the same ECU Map as the currently selected one, even if choosing a different map might supposedly lead to better results.
 
-  4. Include Traffic
+  4. Consider Traffic
   
      Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monta Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development. This algorithm is currently under development and will be available in an upcoming release.
 

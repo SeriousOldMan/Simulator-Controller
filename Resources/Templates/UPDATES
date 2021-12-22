@@ -1,21 +1,4 @@
 [Processed]
-Release 1.5=true
-Release 2.0=true
-Release 2.0.1=true
-Release 2.0.2=true
-Release 2.0.3=true
-Release 2.1=true
-Release 2.2=true
-Release 2.3=true
-Release 2.4=true
-Release 2.5=true
-Release 2.5.4=true
-Release 2.6.1=true
-Release 2.7=true
-Release 2.8=true
-Release 2.8.2=true
-Release 2.8.5=true
-Release 2.8.6=true
 Release 3.0=true
 Release 3.0.2=true
 Release 3.0.4=true
@@ -42,3 +25,4 @@ Release 3.7.0=true
 Release 3.7.2=true
 Release 3.7.4=true
 Release 3.7.6=true
+Release 3.7.8=true

@@ -1205,7 +1205,7 @@ class Strategy extends ConfigurationItem {
 		this.iFuelConsumption := getConfigurationValue(configuration, "Strategy", "FuelConsumption", 0)
 		
 		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
-			this.Pitstops.Push(new this.Pitstop(this, A_Index, lap, configuration))
+			this.Pitstops.Push(this.createPitstop(A_Index, lap, configuration))
 	}
 	
 	saveToConfiguration(configuration) {
@@ -1277,6 +1277,10 @@ class Strategy extends ConfigurationItem {
 		}
 		
 		setConfigurationValue(configuration, "Strategy", "Pitstops", values2String(", ", pitstops*))
+	}
+	
+	createPitstop(id, lap, configuration := false, adjustments := false) {
+		return new this.Pitstop(this, id, lap, configuration, adjustments)
 	}
 	
 	setName(name) {
@@ -1428,7 +1432,7 @@ class Strategy extends ConfigurationItem {
 			
 			pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
-			pitstop := new this.Pitstop(this, A_Index, pitstopLap, false, adjustments)
+			pitstop := this.createPitstop(A_Index, pitstopLap, false, adjustments)
 			
 			if (this.SessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)

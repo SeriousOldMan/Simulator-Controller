@@ -113,30 +113,68 @@ Beside that, you can request several context specific data, which will be shown 
   1. Details of a selected stint
   
      This will give you an overview over the stint, the driven laps, as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%208.JPG)
 
   2. Details for a given lap
   
      When you select a lap in the *Laps* tab, you will get a detailed table of the standings and the gaps to the cars in front of and behind the drivers car, as well as to the leader.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 
   3. Driver Statistics
   
      You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
 	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2010.JPG)
+	 
   4. Race Summary
   
-     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report is also available in the "Data" menu.
+     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Data" menu.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
+
+  5. Strategy Summary
+
+     This report will display the details of a currently loaded race strategy. See the next section for details.
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 
 #### Strategy Handling
 
-Not yet implememted...
+If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
-If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can alter this strategy, when necessary cause of important race events, for example an accident.
+To do this, you have to load the strategy, which has been set for the current race using the "Load Strategy..." command from the "Strategy" menu. A summary of this strategy will be displayed in the output area.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%207.JPG)
+
+Many values from this *base* strategy (session length, stint length, weather, tyre selection, etc.) will be used for the subsequent strategy simulation, therefore it might be beneficial in case of significant weather changes to create a new base strategy using the "Strategy Worbench" with a different set of options and load it into the "Race Center", before trying to simulate a new strategy.
+
+You then may choose the settings for the upcoming strategy simulation using the "Strategy" menu.
+
+  1. Use Session Data
+  
+     All telemetry data from the current race session will be used for the strategy simulation. Normally a good choice, except in cases of drastic weather changes.
+
+  2. Use Telemetry Database
+  
+     Choosing this option will include all the data from the general telemetry database. Use this option, if you think, that you need additional data for example for a different ECU Map choice or different weather conditions.
+	 
+  3. Keep current Map
+
+     This option chooses only input data for the simulation which is based on the same ECU Map as the currently selected one, even if choosing a different map might supposedly lead to better results.
+
+  4. Include Traffic
+  
+     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monta Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development. This algorithm is currently under development and will be available in an upcoming release.
+
+After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation.
+
+If you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section.
 
 #### Planning a Pitstop
 
-Using the elements on the "Pitstops" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of Jona, the Virtual Race Engineer, in an endurance race, where currently passive team members or even a dedicated race engineer are part of the crew supporting the active driver.
+Using the elements on the "Pitstops" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of the Virtual Race Assistants in an endurance race, where currently passive team members or even a dedicated race engineer are part of the crew supporting the active driver.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 

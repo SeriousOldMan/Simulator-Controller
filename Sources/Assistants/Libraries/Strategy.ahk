@@ -156,13 +156,7 @@ class StrategySimulation {
 					sessionTime -= avgLapTime
 				}
 				
-				pitstopRequired := false
-				refuelRequired := false
-				tyreChangeRequired := false
-				
-				this.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
-				
-				if ((strategy.Pitstops.Length() != 1) || !pitstopRequired)
+				if ((strategy.Pitstops.Length() != 1) || !strategy.PitstopRequired)
 					strategy.adjustLastPitstop(superfluousLaps)
 				
 				strategy.adjustLastPitstopRefuelAmount()
@@ -1133,6 +1127,11 @@ class Strategy extends ConfigurationItem {
 			
 			this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
 
+			if !pitstopRequired {
+				refuelRequired := false
+				tyreChangeRequired := false
+			}
+			
 			this.iPitstopRequired := pitstopRequired
 			this.iRefuelRequired := refuelRequired
 			this.iTyreChangeRequired := tyreChangeRequired
@@ -1223,7 +1222,7 @@ class Strategy extends ConfigurationItem {
 		pitstopRequired := this.PitstopRequired
 		
 		if IsObject(pitstopRequired)
-			pitstopRequired := values2String("-", pitstopRequired)
+			pitstopRequired := values2String("-", pitstopRequired*)
 		
 		setConfigurationValue(configuration, "Settings", "PitstopRequired", pitstopRequired)
 		setConfigurationValue(configuration, "Settings", "PitstopRefuel", this.RefuelRequired)

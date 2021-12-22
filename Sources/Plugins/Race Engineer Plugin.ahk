@@ -179,6 +179,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
 			
 			if (pitstopSettings && (pitstopSettings != "")) {
+				this.TeamServer.setSessionValue("Pitstop Plan", "")
+				
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
 				
 				pitstopSettings := parseConfiguration(pitstopSettings)
@@ -192,8 +194,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
 											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
 											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false))
-				
-				this.TeamServer.setSessionValue("Pitstop Plan", "")
 			}
 		}
 	}

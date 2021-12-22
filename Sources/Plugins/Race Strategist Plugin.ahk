@@ -125,6 +125,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
 			
 			if (strategyUpdate && (strategyUpdate != "")) {
+				this.TeamServer.setSessionValue("Strategy Update", "")
+				
 				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
 				
 				if (strategyUpdate = "CANCEL")
@@ -141,8 +143,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 					this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
 				}
-				
-				this.TeamServer.setSessionValue("Strategy Update", "")
 			}
 		}
 	}

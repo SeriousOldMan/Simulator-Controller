@@ -1610,7 +1610,7 @@ class RaceCenter extends ConfigurationItem {
 		local strategy := this.Strategy
 		
 		if this.Simulator {
-			simulator := this.Simulator
+			simulator := new SessionDatabase().getSimulatorName(this.Simulator)
 			car := this.Car
 			track := this.Track
 		}
@@ -2903,8 +2903,11 @@ class RaceCenter extends ConfigurationItem {
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
 		
-			if (folder != "")
-				FileCopyDir %directory%, %folder%, 1
+			if (folder != "") {
+				session := this.SelectedSession
+				
+				FileCopyDir %directory%, %folder%\%session%, 1
+			}
 		}
 	}
 	

@@ -1146,9 +1146,13 @@ editReportSettings(raceReport, report := false, options := false) {
 			else
 				Loop % allDrivers.Length()
 					selectedDrivers.Push(A_Index)
-				
+			
+			sessionDB := new SessionDatabase()
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			
 			for ignore, driver in allDrivers
-				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver
+					 , sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car")))
 			
 			if (!selectedDrivers || (selectedDrivers.Length() == allDrivers.Length()))
 				GuiControl, , driverSelectCheck, 1

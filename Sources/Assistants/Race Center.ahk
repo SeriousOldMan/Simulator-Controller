@@ -2181,6 +2181,7 @@ class RaceCenter extends ConfigurationItem {
 			data := readConfiguration(directory . "Race.data")
 		}
 		
+		pitstops := false
 		newData := false
 		
 		while (lap <= lastLap) {
@@ -2201,6 +2202,8 @@ class RaceCenter extends ConfigurationItem {
 			
 			for key, value in getConfigurationSectionValues(lapData, "Lap")
 				setConfigurationValue(data, "Laps", key, value)
+				
+			pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
 			
 			times := getConfigurationValue(lapData, "Times", lap)
 			positions := getConfigurationValue(lapData, "Positions", lap)
@@ -2233,8 +2236,11 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 		}
 		
-		if newData
+		if newData {
+			setConfigurationValue(data, "Laps", "Pitstops", pitstops)
+				
 			writeConfiguration(directory . "Race.data", data)
+		}
 		
 		return newData
 	}

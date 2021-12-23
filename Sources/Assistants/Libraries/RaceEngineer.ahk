@@ -1433,15 +1433,16 @@ class RaceEngineer extends RaceAssistant {
 		if !this.supportsPitstop()
 			this.getSpeaker().speakPhrase("NoPitstop")
 		else {
-			this.getSpeaker().speakPhrase("Confirm")
+			if (lap == kUndefined) {
+				this.getSpeaker().speakPhrase("Confirm")
 		
-			sendMessage()
-		
-			Loop 10
-				Sleep 500
+				sendMessage()
 			
-			if (lap == kUndefined)
+				Loop 10
+					Sleep 500
+				
 				this.planPitstop()
+			}
 			else
 				this.planPitstop(lap, arguments*)
 		}

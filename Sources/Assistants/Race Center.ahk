@@ -1905,9 +1905,6 @@ class RaceCenter extends ConfigurationItem {
 		
 		for ignore, identifier in stintLaps
 			if !this.Laps.HasKey(identifier) {
-				; if (A_Index == stintLaps.Length())
-				; 	Sleep 10000
-				
 				newLap := parseObject(this.Connector.GetLap(identifier))
 				newLap.Nr := (newLap.Nr + 0)
 				

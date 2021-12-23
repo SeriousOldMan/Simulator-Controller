@@ -170,7 +170,7 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
   4. Consider Traffic
   
-     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monta Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development. This algorithm is currently under development and will be available in an upcoming release.
+     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. This algorithm is currently under development and will be available in an upcoming release.
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation.
 

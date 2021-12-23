@@ -3,7 +3,7 @@ Version=3.7.8-beta
 Target=3.7.8-release
 Date=12/23/2021
 Download=https://www.dropbox.com/s/o6o0nl6vsfx592a/Simulator%20Controller%203.7.8-beta.zip?dl=1
-Changes=Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Optimized assistant support when no voice recognition is enabled
+Changes=Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Supporting more data series in "Race Center" graphs, Optimized assistant support when no voice recognition is enabled
 [Release]
 Version=3.7.6-release
 Date=12/17/2021

@@ -110,6 +110,9 @@ global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
 global dataY3DropDown
+global dataY4DropDown
+global dataY5DropDown
+global dataY6DropDown
 
 global waitViewer
 
@@ -761,6 +764,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataY1DropDown gchooseAxis
 		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY2DropDown gchooseAxis
 		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY3DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY4DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY5DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY6DropDown gchooseAxis
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Plot")
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
@@ -1049,6 +1055,9 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY1DropDown
 		GuiControl Disable, dataY2DropDown
 		GuiControl Disable, dataY3DropDown
+		GuiControl Disable, dataY4DropDown
+		GuiControl Disable, dataY5DropDown
+		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
 			if inList(["Driver", "Position", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
@@ -1063,6 +1072,9 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, dataY1DropDown
 				GuiControl Enable, dataY2DropDown
 				GuiControl Enable, dataY3DropDown
+				GuiControl Enable, dataY4DropDown
+				GuiControl Enable, dataY5DropDown
+				GuiControl Enable, dataY6DropDown
 			}
 			else {
 				GuiControl Disable, chartTypeDropDown
@@ -1074,6 +1086,9 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Choose, dataY1DropDown, 0
 				GuiControl Choose, dataY2DropDown, 0
 				GuiControl Choose, dataY3DropDown, 0
+				GuiControl Choose, dataY4DropDown, 0
+				GuiControl Choose, dataY5DropDown, 0
+				GuiControl Choose, dataY6DropDown, 0
 			}
 		}
 		else {
@@ -1083,6 +1098,9 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Choose, dataY1DropDown, 0
 			GuiControl Choose, dataY2DropDown, 0
 			GuiControl Choose, dataY3DropDown, 0
+			GuiControl Choose, dataY4DropDown, 0
+			GuiControl Choose, dataY5DropDown, 0
+			GuiControl Choose, dataY6DropDown, 0
 			
 			GuiControl Disable, chartTypeDropDown
 			GuiControl Choose, chartTypeDropDown, 0
@@ -1103,7 +1121,7 @@ class RaceCenter extends ConfigurationItem {
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
 		use4 := (this.UseTraffic ? "(x) Consider Traffic" : "      Consider Traffic")
 		
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		GuiControl Choose, strategyMenuDropDown, 1
 	}
@@ -2047,18 +2065,6 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 		
 		try {
-			currentStint := this.Connector.GetSessionCurrentStint(session)
-			
-			if currentStint {
-				currentStint := parseObject(this.Connector.GetStint(currentStint))
-				currentStint.Nr := (currentStint.Nr + 0)
-			}
-		}
-		catch exception {
-			currentStint := false
-		}
-		
-		try {
 			lastLap := this.Connector.GetSessionLastLap(session)
 			
 			if lastLap {
@@ -2071,7 +2077,20 @@ class RaceCenter extends ConfigurationItem {
 			lastLap := false
 		}
 		
-		newData := false
+		if !lastLap
+			return false
+		
+		try {
+			currentStint := this.Connector.GetSessionCurrentStint(session)
+			
+			if currentStint {
+				currentStint := parseObject(this.Connector.GetStint(currentStint))
+				currentStint.Nr := (currentStint.Nr + 0)
+			}
+		}
+		catch exception {
+			currentStint := false
+		}
 		
 		first := (!this.CurrentStint || !this.LastLap)
 		
@@ -2086,9 +2105,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		newData := first
-		
-		if !lastLap
-			return false
 		
 		if (!this.LastLap || (lastLap.Nr > this.LastLap.Nr)) {
 			try {
@@ -3473,6 +3489,9 @@ class RaceCenter extends ConfigurationItem {
 		GuiControlGet dataY1DropDown
 		GuiControlGet dataY2DropDown
 		GuiControlGet dataY3DropDown
+		GuiControlGet dataY4DropDown
+		GuiControlGet dataY5DropDown
+		GuiControlGet dataY6DropDown
 		
 		xAxis := this.iXColumns[dataXDropDown]
 		yAxises := Array(this.iY1Columns[dataY1DropDown])
@@ -3482,6 +3501,15 @@ class RaceCenter extends ConfigurationItem {
 		
 		if (dataY3DropDown > 1)
 			yAxises.Push(this.iY3Columns[dataY3DropDown - 1])
+		
+		if (dataY4DropDown > 1)
+			yAxises.Push(this.iY4Columns[dataY4DropDown - 1])
+		
+		if (dataY5DropDown > 1)
+			yAxises.Push(this.iY5Columns[dataY5DropDown - 1])
+		
+		if (dataY6DropDown > 1)
+			yAxises.Push(this.iY6Columns[dataY6DropDown - 1])
 		
 		this.showDataPlot(this.SessionDatabase.Tables["Lap.Data"], xAxis, yAxises)
 		
@@ -3537,6 +3565,8 @@ class RaceCenter extends ConfigurationItem {
 			y2Choices := []
 			y3Choices := []
 			y4Choices := []
+			y5Choices := []
+			y6Choices := []
 		
 			if (report = "Pressures") {
 				xChoices := ["Stint", "Lap", "Lap.Time"]
@@ -3549,6 +3579,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			else if (report = "Temperatures") {
 				xChoices := ["Stint", "Lap", "Lap.Time"]
@@ -3561,6 +3594,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			else if (report = "Free") {
 				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
@@ -3574,21 +3610,33 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			
 			this.iXColumns := xChoices
 			this.iY1Columns := y1Choices
 			this.iY2Columns := y2Choices
 			this.iY3Columns := y3Choices
+			this.iY4Columns := y3Choices
+			this.iY5Columns := y3Choices
+			this.iY6Columns := y3Choices
 			
 			GuiControl, , dataXDropDown, % ("|" . values2String("|", xChoices*))
 			GuiControl, , dataY1DropDown, % ("|" . values2String("|", y1Choices*))
 			GuiControl, , dataY2DropDown, % ("|" . values2String("|", translate("None"), y2Choices*))
 			GuiControl, , dataY3DropDown, % ("|" . values2String("|", translate("None"), y3Choices*))
+			GuiControl, , dataY4DropDown, % ("|" . values2String("|", translate("None"), y4Choices*))
+			GuiControl, , dataY5DropDown, % ("|" . values2String("|", translate("None"), y5Choices*))
+			GuiControl, , dataY6DropDown, % ("|" . values2String("|", translate("None"), y6Choices*))
 		
 			dataY1DropDown := 0
 			dataY2DropDown := 0
 			dataY3DropDown := 0
+			dataY4DropDown := 0
+			dataY5DropDown := 0
+			dataY6DropDown := 0
 			
 			if (report = "Pressures") {
 				GuiControl Choose, chartTypeDropDown, 4
@@ -3599,6 +3647,9 @@ class RaceCenter extends ConfigurationItem {
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
 				dataY2DropDown := inList(y2Choices, "Tyre.Pressure.Cold.Average") + 1
 				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
+				dataY4DropDown := 1
+				dataY5DropDown := 1
+				dataY6DropDown := 1
 			}
 			else if (report = "Temperatures") {
 				GuiControl Choose, chartTypeDropDown, 1
@@ -3609,6 +3660,9 @@ class RaceCenter extends ConfigurationItem {
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
 				dataY2DropDown := inList(y2Choices, "Tyre.Temperature.Front.Average") + 1
 				dataY3DropDown := inList(y3Choices, "Tyre.Temperature.Rear.Average") + 1
+				dataY4DropDown := 1
+				dataY5DropDown := 1
+				dataY6DropDown := 1
 			}
 			else if (report = "Free") {
 				GuiControl Choose, chartTypeDropDown, 1
@@ -3619,12 +3673,18 @@ class RaceCenter extends ConfigurationItem {
 				dataY1DropDown := inList(y1Choices, "Lap.Time")
 				dataY2DropDown := inList(y2Choices, "Temperature.Air") + 1
 				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
+				dataY4DropDown := 1
+				dataY5DropDown := 1
+				dataY6DropDown := 1
 			}
 			
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
 			GuiControl Choose, dataY1DropDown, %dataY1DropDown%
 			GuiControl Choose, dataY2DropDown, %dataY2DropDown%
 			GuiControl Choose, dataY3DropDown, %dataY3DropDown%
+			GuiControl Choose, dataY4DropDown, %dataY4DropDown%
+			GuiControl Choose, dataY5DropDown, %dataY5DropDown%
+			GuiControl Choose, dataY6DropDown, %dataY6DropDown%
 		}
 	}
 	

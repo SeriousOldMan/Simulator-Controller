@@ -144,7 +144,11 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
-To do this, you have to load the strategy, which has been set for the current race using the "Load Strategy..." command from the "Strategy" menu. A summary of this strategy will be displayed in the output area.
+To do this, you have to load the strategy, which have been selected for the current race using the "Load Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. Please note, that it will not be checked, whether this strategy has been accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy, you can use the "Load Strategy..." command.
+
+Important: It is possible by using "Race Center" to activate a race strategy for the current race, even if no strategy has been present at the start of the race. You can switch strategies, discard strategies, activate a different strategy, and so on, as often as necessary or as you like.
+
+A summary of the loaded strategy will be displayed in the output area.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%207.JPG)
 

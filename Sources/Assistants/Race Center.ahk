@@ -863,6 +863,8 @@ class RaceCenter extends ConfigurationItem {
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
 		
+		Gui %window%:Add, Button, x66 ys+279 w160 gplanPitstop, % translate("Instruct Engineer")
+		
 		Gui %window%:Add, ListView, x270 ys+34 w331 h269 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 		
 		this.iPitstopsListView := listHandle
@@ -1101,7 +1103,7 @@ class RaceCenter extends ConfigurationItem {
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
 		use4 := (this.UseTraffic ? "(x) Consider Traffic" : "      Consider Traffic")
 		
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		GuiControl Choose, strategyMenuDropDown, 1
 	}
@@ -1184,61 +1186,74 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	planPitstop() {
-		window := this.Window
-		
-		Gui %window%:Default
-		
-		GuiControlGet pitstopLapEdit
-		GuiControlGet pitstopRefuelEdit
-		GuiControlGet pitstopTyreCompoundDropDown
-		GuiControlGet pitstopTyreSetEdit
-		GuiControlGet pitstopPressureFLEdit
-		GuiControlGet pitstopPressureFREdit
-		GuiControlGet pitstopPressureRLEdit
-		GuiControlGet pitstopPressureRREdit
-		GuiControlGet pitstopRepairsDropDown
-		
-		pitstopPlan := newConfiguration()
-		
-		setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
-		setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
-		
-		if (pitstopTyreCompoundDropDown > 1) {
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
+		if this.SessionActive() {
+			window := this.Window
 			
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"
-								, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
+			Gui %window%:Default
 			
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-								, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
-												   , pitstopPressureRLEdit, pitstopPressureRREdit))
-		}
-		else
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
-		
-		setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", false)
-		setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", false)
+			GuiControlGet pitstopLapEdit
+			GuiControlGet pitstopRefuelEdit
+			GuiControlGet pitstopTyreCompoundDropDown
+			GuiControlGet pitstopTyreSetEdit
+			GuiControlGet pitstopPressureFLEdit
+			GuiControlGet pitstopPressureFREdit
+			GuiControlGet pitstopPressureRLEdit
+			GuiControlGet pitstopPressureRREdit
+			GuiControlGet pitstopRepairsDropDown
 			
-		if ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 4))
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", true)
+			pitstopPlan := newConfiguration()
 			
-		if (pitstopRepairsDropDown > 2)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
-		
-		try {
-			session := this.SelectedSession[true]
+			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
 			
-			lap := this.Connector.GetSessionLastLap(session)
+			if (pitstopTyreCompoundDropDown > 1) {
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
+				
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"
+									, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
+				
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
+									, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
+													   , pitstopPressureRLEdit, pitstopPressureRREdit))
+			}
+			else
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
+			
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", false)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", false)
+				
+			if ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 4))
+				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", true)
+				
+			if (pitstopRepairsDropDown > 2)
+				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
+			
+			try {
+				session := this.SelectedSession[true]
+				
+				lap := this.Connector.GetSessionLastLap(session)
 
-			this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
-			this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
-			
-			showMessage(translate("Race Engineer will be instructed in the next lap."))
+				this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
+				this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
+				
+				showMessage(translate("Race Engineer will be instructed in the next lap."))
+			}
+			catch exception {
+				title := translate("Information")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
+				OnMessage(0x44, "")
+			}
 		}
-		catch exception {
-			showMessage(translate("Session has not been started yet."))
+		else {
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
+			OnMessage(0x44, "")
 		}
 	}
 	
@@ -1336,6 +1351,27 @@ class RaceCenter extends ConfigurationItem {
 			
 		switch line {
 			case 3:
+				fileName := kUserConfigDirectory . "Race.strategy"
+				
+				if FileExist(fileName) {
+					configuration := readConfiguration(fileName)
+					
+					if (configuration.Count() > 0) {
+						this.iStrategy := this.createStrategy(configuration)
+						
+						this.StrategyViewer.showStrategyInfo(this.Strategy)
+						
+						this.iSelectedDetailReport := "Strategy"
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no active Race Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 4:
 				title := translate("Load Race Strategy...")
 				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
@@ -1353,7 +1389,7 @@ class RaceCenter extends ConfigurationItem {
 						this.iSelectedDetailReport := "Strategy"
 					}
 				}
-			case 4: ; "Save Strategy..."
+			case 5: ; "Save Strategy..."
 				if this.Strategy {
 					title := translate("Save Race Strategy...")
 					
@@ -1385,7 +1421,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; Strategy Summary
+			case 7: ; Strategy Summary
 				if this.Strategy {
 					this.StrategyViewer.showStrategyInfo(this.Strategy)
 						
@@ -1398,19 +1434,19 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 8: ; Use Session Data
+			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 				
 				this.updateStrategyMenu()
-			case 9: ; Use Telemetry Database
+			case 10: ; Use Telemetry Database
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
 				
 				this.updateStrategyMenu()
-			case 10: ; Use current Map
+			case 11: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 				
 				this.updateStrategyMenu()
-			case 11: ; Use Traffic
+			case 12: ; Use Traffic
 				/*
 				this.iUseTraffic := !this.UseTraffic
 				
@@ -1422,7 +1458,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				MsgBox 262192, %title%, % translate("Not yet implemented...")
 				OnMessage(0x44, "")
-			case 13: ; Run Simulation
+			case 14: ; Run Simulation
 				if this.Strategy {
 					sessionType := getConfigurationValue(this.Strategy, "Session", "SessionType")
 					
@@ -1435,7 +1471,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 15: ; Discard Strategy
+			case 16: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						title := translate("Strategy")
@@ -1467,7 +1503,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 17: ; Instruct Strategist
+			case 18: ; Instruct Strategist
 				if this.Strategy {
 					if this.SessionActive
 						this.updateStrategy()
@@ -1516,15 +1552,7 @@ class RaceCenter extends ConfigurationItem {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:
-				if this.SessionActive
-					this.planPitstop()
-				else {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
-					OnMessage(0x44, "")
-				}
+				this.planPitstop()
 		}
 	}
 	

@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.7.8-alpha](https://www.dropbox.com/s/fsqiosla0sy01b0/Simulator%20Controller%203.7.8-alpha.zip?dl=1) (Early test version for 3.7.8. New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Optimized assistant support when no voice recognition is enabled. Stable, incl. documentation and update procedure.)
+[3.7.8-beta](https://www.dropbox.com/s/o6o0nl6vsfx592a/Simulator%20Controller%203.7.8-beta.zip?dl=1) (Final test version for 3.7.8. New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Optimized assistant support when no voice recognition is enabled. Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-378) of this version and all the versions you might have skipped, before installing and using this version.
 

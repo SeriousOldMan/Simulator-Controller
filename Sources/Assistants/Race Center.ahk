@@ -1924,13 +1924,32 @@ class RaceCenter extends ConfigurationItem {
 			
 			lap.Stint := stint
 			
+			tries := 10
+			
+			while (tries > 0) {
+				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+				
+				if (!rawData || (rawData == "")) {
+					tries -= 1
+					
+					if (tries <= 0) {
+						newLaps.RemoveAt(A_Index, newLaps.Length() - A_Index + 1)
+						
+						return newLaps
+					}
+					else
+						Sleep 400
+				}
+				else
+					break
+			}
+			
 			if (stint.Laps.Length() == 0)
 				stint.Lap := lap.Nr
 			
 			stint.Laps.Push(lap)
 			stint.Driver.Laps.Push(lap)
-			
-			rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+				
 			data := parseConfiguration(rawData)
 			
 			lap.Telemetry := rawData
@@ -1979,10 +1998,22 @@ class RaceCenter extends ConfigurationItem {
 			lap.Compound := compound
 			
 			try {
-				rawData := this.Connector.GetLapValue(identifier, "Positions Data")
-				
-				if (!rawData || (rawData = ""))
-					throw "No data..."
+				tries := 10
+			
+				while (tries > 0) {
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+					
+					if (!rawData || (rawData = "")) {
+						tries -= 1
+						
+						if (tries <= 0)
+							throw "No data..."
+						else
+							Sleep 400
+					}
+					else
+						break
+				}
 					
 				data := parseConfiguration(rawData)
 				

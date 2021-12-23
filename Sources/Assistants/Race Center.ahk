@@ -839,7 +839,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui Tab, 3
 	
-		Gui %window%:Add, Text, x24 ys+34 w85 h20, % translate("Lap")
+		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
 		
@@ -3670,15 +3670,15 @@ class RaceCenter extends ConfigurationItem {
 			else if (report = "Free") {
 				GuiControl Choose, chartTypeDropDown, 1
 				
-				this.iSelectedChartType := "Scatter"
+				this.iSelectedChartType := "Line"
 				
 				dataXDropDown := inList(xChoices, "Lap")
 				dataY1DropDown := inList(y1Choices, "Lap.Time")
-				dataY2DropDown := inList(y2Choices, "Temperature.Air") + 1
-				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
-				dataY4DropDown := 1
-				dataY5DropDown := 1
-				dataY6DropDown := 1
+				dataY2DropDown := inList(y2Choices, "Tyre.Laps") + 1
+				dataY3DropDown := inList(y3Choices, "Temperature.Air") + 1
+				dataY4DropDown := inList(y4Choices, "Temperature.Track") + 1
+				dataY5DropDown := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
+				dataY6DropDown := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 			
 			GuiControl Choose, dataXDropDown, %dataXDropDown%

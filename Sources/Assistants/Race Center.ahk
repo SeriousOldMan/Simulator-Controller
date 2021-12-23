@@ -1072,9 +1072,12 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, dataY1DropDown
 				GuiControl Enable, dataY2DropDown
 				GuiControl Enable, dataY3DropDown
-				GuiControl Enable, dataY4DropDown
-				GuiControl Enable, dataY5DropDown
-				GuiControl Enable, dataY6DropDown
+				
+				if (this.SelectedChartType != "Bubble") {
+					GuiControl Enable, dataY4DropDown
+					GuiControl Enable, dataY5DropDown
+					GuiControl Enable, dataY6DropDown
+				}
 			}
 			else {
 				GuiControl Disable, chartTypeDropDown

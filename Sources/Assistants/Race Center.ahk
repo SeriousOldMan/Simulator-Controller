@@ -1914,14 +1914,15 @@ class RaceCenter extends ConfigurationItem {
 		
 		bubbleSort(newLaps, "objectOrder")
 		
-		Loop % newLaps.Length()
-		{
+		count := newLaps.Length()
+		
+		Loop %count% {
 			lap := newLaps[A_Index]
 			identifier := lap.Identifier
 			
 			lap.Stint := stint
 			
-			tries := 10
+			tries := ((A_Index == count) ? 10 : 1)
 			
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -1995,7 +1996,7 @@ class RaceCenter extends ConfigurationItem {
 			lap.Compound := compound
 			
 			try {
-				tries := 10
+				tries := ((A_Index == count) ? 10 : 1)
 			
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -2011,7 +2012,7 @@ class RaceCenter extends ConfigurationItem {
 					else
 						break
 				}
-					
+				
 				data := parseConfiguration(rawData)
 				
 				lap.Positions := rawData
@@ -3852,7 +3853,7 @@ class RaceCenter extends ConfigurationItem {
 							sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Front"
 													   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
 													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
+													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
 													   
 							prefix := ("Standings.Lap." . lap . ".Car.")
 							

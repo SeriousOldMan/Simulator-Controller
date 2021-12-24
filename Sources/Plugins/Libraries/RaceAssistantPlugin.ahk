@@ -920,8 +920,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer := this.TeamServer
 			
 			return ((getConfigurationValue(data, "Stint Data", "DriverForname") = teamServer.DriverForName)
-				 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = teamServer.DriverSurName)
-				 && (getConfigurationValue(data, "Stint Data", "DriverNickname") = teamServer.DriverNickName))
+				 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = teamServer.DriverSurName))
 		}
 		else
 			return true

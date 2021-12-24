@@ -623,7 +623,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
 					driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 					
-					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName) || (this.DriverNickName != driverNickName))
+					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
 						throw Exception("Driver inconsistency detected...")
 				}
 				

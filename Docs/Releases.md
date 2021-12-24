@@ -1,4 +1,4 @@
-## 3.7.8-release 12/24/21
+## 3.7.8-release 12/24/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always

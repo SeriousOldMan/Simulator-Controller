@@ -653,6 +653,8 @@ class RaceReportViewer {
 			cars := []
 			rows := []
 			
+			pitstops := string2Values(",", getConfigurationValue(raceData, "Laps", "Pitstops", ""))
+			
 			for ignore, lap in this.getReportLaps(raceData) {
 				compound := translate(compound(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
 											 , getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
@@ -666,6 +668,8 @@ class RaceReportViewer {
 				if (lapTime != "-")
 					lapTime := Round(lapTime / 1000, 1)
 				
+				pitstop := ((pitstops.Length() > 0) ? inList(pitstops, lap) : (getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
+				
 				row := values2String(", "
 									, lap
 									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")) . "'"
@@ -675,7 +679,7 @@ class RaceReportViewer {
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 									, "'" . consumption . "'"
 									, "'" . lapTime . "'"
-									, "'" . (getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false) ? translate("x") : "") . "'")
+									, "'" . (pitstop ? translate("x") : "") . "'")
 											
 				rows.Push("[" . row	. "]")
 			}
@@ -1142,9 +1146,13 @@ editReportSettings(raceReport, report := false, options := false) {
 			else
 				Loop % allDrivers.Length()
 					selectedDrivers.Push(A_Index)
-				
+			
+			sessionDB := new SessionDatabase()
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			
 			for ignore, driver in allDrivers
-				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver
+					 , sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car")))
 			
 			if (!selectedDrivers || (selectedDrivers.Length() == allDrivers.Length()))
 				GuiControl, , driverSelectCheck, 1

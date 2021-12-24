@@ -125,6 +125,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
 			
 			if (strategyUpdate && (strategyUpdate != "")) {
+				this.TeamServer.setSessionValue("Strategy Update", "")
+				
 				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
 				
 				if (strategyUpdate = "CANCEL")
@@ -141,8 +143,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 					this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
 				}
-				
-				this.TeamServer.setSessionValue("Strategy Update", "")
 			}
 		}
 	}
@@ -361,6 +361,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				}
 				
 				count := 0
+				pitstops := false
 				
 				Loop % teamServer.getCurrentLap(session)
 				{
@@ -374,6 +375,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 							
 							for key, value in getConfigurationSectionValues(lapData, "Lap")
 								setConfigurationValue(data, "Laps", key, value)
+							
+							pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
 							
 							times := getConfigurationValue(lapData, "Times", A_Index)
 							positions := getConfigurationValue(lapData, "Positions", A_Index)
@@ -408,6 +411,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				removeConfigurationValue(data, "Laps", "Lap")
 				setConfigurationValue(data, "Laps", "Count", count)
 				
+				setConfigurationValue(data, "Laps", "Pitstops", pitstops)
+				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				
 				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
@@ -420,6 +425,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
 				
 				count := 0
+				pitstops := false
 				
 				Loop {
 					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
@@ -440,6 +446,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						
 						for key, value in getConfigurationSectionValues(lapData, "Lap")
 							setConfigurationValue(data, "Laps", key, value)
+							
+						pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
 						
 						times := getConfigurationValue(lapData, "Times", A_Index)
 						positions := getConfigurationValue(lapData, "Positions", A_Index)
@@ -469,6 +477,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				removeConfigurationValue(data, "Laps", "Lap")
 				setConfigurationValue(data, "Laps", "Count", count)
+				
+				setConfigurationValue(data, "Laps", "Pitstops", pitstops)
 				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				

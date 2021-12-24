@@ -126,7 +126,7 @@ Beside that, you can request several context specific data, which will be shown 
   
      You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2010.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2010.JPG) ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2012.JPG)
 	 
   4. Race Summary
   
@@ -144,7 +144,11 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
-To do this, you have to load the strategy, which has been set for the current race using the "Load Strategy..." command from the "Strategy" menu. A summary of this strategy will be displayed in the output area.
+To do this, you have to load the strategy, which have been selected for the current race using the "Load Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. Please note, that it will not be checked, whether this strategy has been accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy, you can use the "Load Strategy..." command.
+
+Important: It is possible by using "Race Center" to activate a race strategy for the current race, even if no strategy has been present at the start of the race. You can switch strategies, discard strategies, activate a different strategy, and so on, as often as necessary or as you like.
+
+A summary of the loaded strategy will be displayed in the output area.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%207.JPG)
 
@@ -164,9 +168,9 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
      This option chooses only input data for the simulation which is based on the same ECU Map as the currently selected one, even if choosing a different map might supposedly lead to better results.
 
-  4. Include Traffic
+  4. Consider Traffic
   
-     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monta Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development. This algorithm is currently under development and will be available in an upcoming release.
+     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. This algorithm is currently under development and will be available in an upcoming release.
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation.
 

@@ -1232,8 +1232,16 @@ class RaceStrategist extends RaceAssistant {
 			
 			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 				
-			if pitstop
+			if pitstop {
+				pitstops := []
+				
+				Loop %pitstop%
+					pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
+			
+				setConfigurationValue(data, "Pitstop", "Laps", values2String(",", pitstops*))
+				
 				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+			}
 			
 			prefix := "Lap." . lapNumber
 				

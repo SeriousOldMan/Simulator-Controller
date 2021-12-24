@@ -110,6 +110,9 @@ global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
 global dataY3DropDown
+global dataY4DropDown
+global dataY5DropDown
+global dataY6DropDown
 
 global waitViewer
 
@@ -761,6 +764,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataY1DropDown gchooseAxis
 		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY2DropDown gchooseAxis
 		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY3DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY4DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY5DropDown gchooseAxis
+		Gui %window%:Add, DropDownList, x195 yp+24 w191 AltSubmit vdataY6DropDown gchooseAxis
 		
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Plot")
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
@@ -833,7 +839,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui Tab, 3
 	
-		Gui %window%:Add, Text, x24 ys+34 w85 h20, % translate("Lap")
+		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
 		
@@ -862,6 +868,8 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Everything"], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Add, Button, x66 ys+279 w160 gplanPitstop, % translate("Instruct Engineer")
 		
 		Gui %window%:Add, ListView, x270 ys+34 w331 h269 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 		
@@ -1047,6 +1055,9 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY1DropDown
 		GuiControl Disable, dataY2DropDown
 		GuiControl Disable, dataY3DropDown
+		GuiControl Disable, dataY4DropDown
+		GuiControl Disable, dataY5DropDown
+		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
 			if inList(["Driver", "Position", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
@@ -1061,6 +1072,12 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, dataY1DropDown
 				GuiControl Enable, dataY2DropDown
 				GuiControl Enable, dataY3DropDown
+				
+				if (this.SelectedChartType != "Bubble") {
+					GuiControl Enable, dataY4DropDown
+					GuiControl Enable, dataY5DropDown
+					GuiControl Enable, dataY6DropDown
+				}
 			}
 			else {
 				GuiControl Disable, chartTypeDropDown
@@ -1072,6 +1089,9 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Choose, dataY1DropDown, 0
 				GuiControl Choose, dataY2DropDown, 0
 				GuiControl Choose, dataY3DropDown, 0
+				GuiControl Choose, dataY4DropDown, 0
+				GuiControl Choose, dataY5DropDown, 0
+				GuiControl Choose, dataY6DropDown, 0
 			}
 		}
 		else {
@@ -1081,6 +1101,9 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Choose, dataY1DropDown, 0
 			GuiControl Choose, dataY2DropDown, 0
 			GuiControl Choose, dataY3DropDown, 0
+			GuiControl Choose, dataY4DropDown, 0
+			GuiControl Choose, dataY5DropDown, 0
+			GuiControl Choose, dataY6DropDown, 0
 			
 			GuiControl Disable, chartTypeDropDown
 			GuiControl Choose, chartTypeDropDown, 0
@@ -1099,9 +1122,9 @@ class RaceCenter extends ConfigurationItem {
 		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
-		use4 := (this.UseTraffic ? "(x) Include Traffic" : "      Include Traffic")
+		use4 := (this.UseTraffic ? "(x) Consider Traffic" : "      Consider Traffic")
 		
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		GuiControl Choose, strategyMenuDropDown, 1
 	}
@@ -1184,61 +1207,74 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	planPitstop() {
-		window := this.Window
-		
-		Gui %window%:Default
-		
-		GuiControlGet pitstopLapEdit
-		GuiControlGet pitstopRefuelEdit
-		GuiControlGet pitstopTyreCompoundDropDown
-		GuiControlGet pitstopTyreSetEdit
-		GuiControlGet pitstopPressureFLEdit
-		GuiControlGet pitstopPressureFREdit
-		GuiControlGet pitstopPressureRLEdit
-		GuiControlGet pitstopPressureRREdit
-		GuiControlGet pitstopRepairsDropDown
-		
-		pitstopPlan := newConfiguration()
-		
-		setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
-		setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
-		
-		if (pitstopTyreCompoundDropDown > 1) {
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
+		if this.SessionActive() {
+			window := this.Window
 			
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"
-								, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
+			Gui %window%:Default
 			
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-								, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
-												   , pitstopPressureRLEdit, pitstopPressureRREdit))
-		}
-		else
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
-		
-		setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", false)
-		setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", false)
+			GuiControlGet pitstopLapEdit
+			GuiControlGet pitstopRefuelEdit
+			GuiControlGet pitstopTyreCompoundDropDown
+			GuiControlGet pitstopTyreSetEdit
+			GuiControlGet pitstopPressureFLEdit
+			GuiControlGet pitstopPressureFREdit
+			GuiControlGet pitstopPressureRLEdit
+			GuiControlGet pitstopPressureRREdit
+			GuiControlGet pitstopRepairsDropDown
 			
-		if ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 4))
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", true)
+			pitstopPlan := newConfiguration()
 			
-		if (pitstopRepairsDropDown > 2)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
-		
-		try {
-			session := this.SelectedSession[true]
+			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
 			
-			lap := this.Connector.GetSessionLastLap(session)
+			if (pitstopTyreCompoundDropDown > 1) {
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
+				
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"
+									, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
+				
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
+									, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
+													   , pitstopPressureRLEdit, pitstopPressureRREdit))
+			}
+			else
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
+			
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", false)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", false)
+				
+			if ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 4))
+				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", true)
+				
+			if (pitstopRepairsDropDown > 2)
+				setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", true)
+			
+			try {
+				session := this.SelectedSession[true]
+				
+				lap := this.Connector.GetSessionLastLap(session)
 
-			this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
-			this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
-			
-			showMessage(translate("Race Engineer will be instructed in the next lap."))
+				this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
+				this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
+				
+				showMessage(translate("Race Engineer will be instructed in the next lap."))
+			}
+			catch exception {
+				title := translate("Information")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
+				OnMessage(0x44, "")
+			}
 		}
-		catch exception {
-			showMessage(translate("Session has not been started yet."))
+		else {
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
+			OnMessage(0x44, "")
 		}
 	}
 	
@@ -1336,6 +1372,27 @@ class RaceCenter extends ConfigurationItem {
 			
 		switch line {
 			case 3:
+				fileName := kUserConfigDirectory . "Race.strategy"
+				
+				if FileExist(fileName) {
+					configuration := readConfiguration(fileName)
+					
+					if (configuration.Count() > 0) {
+						this.iStrategy := this.createStrategy(configuration)
+						
+						this.StrategyViewer.showStrategyInfo(this.Strategy)
+						
+						this.iSelectedDetailReport := "Strategy"
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no active Race Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 4:
 				title := translate("Load Race Strategy...")
 				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
@@ -1353,7 +1410,7 @@ class RaceCenter extends ConfigurationItem {
 						this.iSelectedDetailReport := "Strategy"
 					}
 				}
-			case 4: ; "Save Strategy..."
+			case 5: ; "Save Strategy..."
 				if this.Strategy {
 					title := translate("Save Race Strategy...")
 					
@@ -1385,7 +1442,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; Strategy Summary
+			case 7: ; Strategy Summary
 				if this.Strategy {
 					this.StrategyViewer.showStrategyInfo(this.Strategy)
 						
@@ -1398,19 +1455,19 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 8: ; Use Session Data
+			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 				
 				this.updateStrategyMenu()
-			case 9: ; Use Telemetry Database
+			case 10: ; Use Telemetry Database
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
 				
 				this.updateStrategyMenu()
-			case 10: ; Use current Map
+			case 11: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 				
 				this.updateStrategyMenu()
-			case 11: ; Use Traffic
+			case 12: ; Use Traffic
 				/*
 				this.iUseTraffic := !this.UseTraffic
 				
@@ -1422,7 +1479,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				MsgBox 262192, %title%, % translate("Not yet implemented...")
 				OnMessage(0x44, "")
-			case 13: ; Run Simulation
+			case 14: ; Run Simulation
 				if this.Strategy {
 					sessionType := getConfigurationValue(this.Strategy, "Session", "SessionType")
 					
@@ -1435,7 +1492,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 15: ; Discard Strategy
+			case 16: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						title := translate("Strategy")
@@ -1467,7 +1524,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 17: ; Instruct Strategist
+			case 18: ; Instruct Strategist
 				if this.Strategy {
 					if this.SessionActive
 						this.updateStrategy()
@@ -1516,15 +1573,7 @@ class RaceCenter extends ConfigurationItem {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:
-				if this.SessionActive
-					this.planPitstop()
-				else {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
-					OnMessage(0x44, "")
-				}
+				this.planPitstop()
 		}
 	}
 	
@@ -1561,7 +1610,7 @@ class RaceCenter extends ConfigurationItem {
 		local strategy := this.Strategy
 		
 		if this.Simulator {
-			simulator := this.Simulator
+			simulator := new SessionDatabase().getSimulatorName(this.Simulator)
 			car := this.Car
 			track := this.Track
 		}
@@ -1856,9 +1905,6 @@ class RaceCenter extends ConfigurationItem {
 		
 		for ignore, identifier in stintLaps
 			if !this.Laps.HasKey(identifier) {
-				if (A_Index == stintLaps.Length())
-					Sleep 10000
-				
 				newLap := parseObject(this.Connector.GetLap(identifier))
 				newLap.Nr := (newLap.Nr + 0)
 				
@@ -1868,20 +1914,40 @@ class RaceCenter extends ConfigurationItem {
 		
 		bubbleSort(newLaps, "objectOrder")
 		
-		Loop % newLaps.Length()
-		{
+		count := newLaps.Length()
+		
+		Loop %count% {
 			lap := newLaps[A_Index]
 			identifier := lap.Identifier
 			
 			lap.Stint := stint
+			
+			tries := ((A_Index == count) ? 10 : 1)
+			
+			while (tries > 0) {
+				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+				
+				if (!rawData || (rawData == "")) {
+					tries -= 1
+					
+					if (tries <= 0) {
+						newLaps.RemoveAt(A_Index, newLaps.Length() - A_Index + 1)
+						
+						return newLaps
+					}
+					else
+						Sleep 400
+				}
+				else
+					break
+			}
 			
 			if (stint.Laps.Length() == 0)
 				stint.Lap := lap.Nr
 			
 			stint.Laps.Push(lap)
 			stint.Driver.Laps.Push(lap)
-			
-			rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+				
 			data := parseConfiguration(rawData)
 			
 			lap.Telemetry := rawData
@@ -1930,11 +1996,23 @@ class RaceCenter extends ConfigurationItem {
 			lap.Compound := compound
 			
 			try {
-				rawData := this.Connector.GetLapValue(identifier, "Positions Data")
-				
-				if (!rawData || (rawData = ""))
-					throw "No data..."
+				tries := ((A_Index == count) ? 10 : 1)
+			
+				while (tries > 0) {
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
 					
+					if (!rawData || (rawData = "")) {
+						tries -= 1
+						
+						if (tries <= 0)
+							throw "No data..."
+						else
+							Sleep 400
+					}
+					else
+						break
+				}
+				
 				data := parseConfiguration(rawData)
 				
 				lap.Positions := rawData
@@ -2019,18 +2097,6 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 		
 		try {
-			currentStint := this.Connector.GetSessionCurrentStint(session)
-			
-			if currentStint {
-				currentStint := parseObject(this.Connector.GetStint(currentStint))
-				currentStint.Nr := (currentStint.Nr + 0)
-			}
-		}
-		catch exception {
-			currentStint := false
-		}
-		
-		try {
 			lastLap := this.Connector.GetSessionLastLap(session)
 			
 			if lastLap {
@@ -2043,12 +2109,25 @@ class RaceCenter extends ConfigurationItem {
 			lastLap := false
 		}
 		
-		newData := false
+		if !lastLap
+			return false
+		
+		try {
+			currentStint := this.Connector.GetSessionCurrentStint(session)
+			
+			if currentStint {
+				currentStint := parseObject(this.Connector.GetStint(currentStint))
+				currentStint.Nr := (currentStint.Nr + 0)
+			}
+		}
+		catch exception {
+			currentStint := false
+		}
 		
 		first := (!this.CurrentStint || !this.LastLap)
 		
 		if (!currentStint
-		 || !lastLap
+		 || (!lastLap && this.CurrentStint && !((currentStint.Nr = (this.CurrentStint.Nr + 1)) && (currentStint.Lap == this.LastLap.Nr)))
 		 || (this.CurrentStint && ((currentStint.Nr < this.CurrentStint.Nr)
 								|| ((currentStint.Nr = this.CurrentStint.Nr) && (currentStint.Identifier != this.CurrentStint.Identifier))))
 		 || (this.LastLap && (lastLap.Nr < this.LastLap.Nr))) {
@@ -2058,9 +2137,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		newData := first
-		
-		if !lastLap
-			return false
 		
 		if (!this.LastLap || (lastLap.Nr > this.LastLap.Nr)) {
 			try {
@@ -2181,6 +2257,7 @@ class RaceCenter extends ConfigurationItem {
 			data := readConfiguration(directory . "Race.data")
 		}
 		
+		pitstops := false
 		newData := false
 		
 		while (lap <= lastLap) {
@@ -2201,6 +2278,8 @@ class RaceCenter extends ConfigurationItem {
 			
 			for key, value in getConfigurationSectionValues(lapData, "Lap")
 				setConfigurationValue(data, "Laps", key, value)
+				
+			pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
 			
 			times := getConfigurationValue(lapData, "Times", lap)
 			positions := getConfigurationValue(lapData, "Positions", lap)
@@ -2233,8 +2312,11 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 		}
 		
-		if newData
+		if newData {
+			setConfigurationValue(data, "Laps", "Pitstops", pitstops)
+				
 			writeConfiguration(directory . "Race.data", data)
+		}
 		
 		return newData
 	}
@@ -2560,6 +2642,9 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 			}
+			catch exception {
+				showMessage(translate("Cannot connect to the Team Server.") . "`n`n" . translate("Retry in 10 seconds."))
+			}
 			finally {
 				Gui %window%:-Disabled
 				
@@ -2818,8 +2903,11 @@ class RaceCenter extends ConfigurationItem {
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
 		
-			if (folder != "")
-				FileCopyDir %directory%, %folder%, 1
+			if (folder != "") {
+				session := this.SelectedSession
+				
+				FileCopyDir %directory%, %folder%\%session%, 1
+			}
 		}
 	}
 	
@@ -3436,6 +3524,9 @@ class RaceCenter extends ConfigurationItem {
 		GuiControlGet dataY1DropDown
 		GuiControlGet dataY2DropDown
 		GuiControlGet dataY3DropDown
+		GuiControlGet dataY4DropDown
+		GuiControlGet dataY5DropDown
+		GuiControlGet dataY6DropDown
 		
 		xAxis := this.iXColumns[dataXDropDown]
 		yAxises := Array(this.iY1Columns[dataY1DropDown])
@@ -3445,6 +3536,15 @@ class RaceCenter extends ConfigurationItem {
 		
 		if (dataY3DropDown > 1)
 			yAxises.Push(this.iY3Columns[dataY3DropDown - 1])
+		
+		if (dataY4DropDown > 1)
+			yAxises.Push(this.iY4Columns[dataY4DropDown - 1])
+		
+		if (dataY5DropDown > 1)
+			yAxises.Push(this.iY5Columns[dataY5DropDown - 1])
+		
+		if (dataY6DropDown > 1)
+			yAxises.Push(this.iY6Columns[dataY6DropDown - 1])
 		
 		this.showDataPlot(this.SessionDatabase.Tables["Lap.Data"], xAxis, yAxises)
 		
@@ -3500,6 +3600,8 @@ class RaceCenter extends ConfigurationItem {
 			y2Choices := []
 			y3Choices := []
 			y4Choices := []
+			y5Choices := []
+			y6Choices := []
 		
 			if (report = "Pressures") {
 				xChoices := ["Stint", "Lap", "Lap.Time"]
@@ -3512,6 +3614,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			else if (report = "Temperatures") {
 				xChoices := ["Stint", "Lap", "Lap.Time"]
@@ -3524,6 +3629,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			else if (report = "Free") {
 				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
@@ -3537,21 +3645,33 @@ class RaceCenter extends ConfigurationItem {
 				
 				y2Choices := y1Choices
 				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
 			}
 			
 			this.iXColumns := xChoices
 			this.iY1Columns := y1Choices
 			this.iY2Columns := y2Choices
 			this.iY3Columns := y3Choices
+			this.iY4Columns := y3Choices
+			this.iY5Columns := y3Choices
+			this.iY6Columns := y3Choices
 			
 			GuiControl, , dataXDropDown, % ("|" . values2String("|", xChoices*))
 			GuiControl, , dataY1DropDown, % ("|" . values2String("|", y1Choices*))
 			GuiControl, , dataY2DropDown, % ("|" . values2String("|", translate("None"), y2Choices*))
 			GuiControl, , dataY3DropDown, % ("|" . values2String("|", translate("None"), y3Choices*))
+			GuiControl, , dataY4DropDown, % ("|" . values2String("|", translate("None"), y4Choices*))
+			GuiControl, , dataY5DropDown, % ("|" . values2String("|", translate("None"), y5Choices*))
+			GuiControl, , dataY6DropDown, % ("|" . values2String("|", translate("None"), y6Choices*))
 		
 			dataY1DropDown := 0
 			dataY2DropDown := 0
 			dataY3DropDown := 0
+			dataY4DropDown := 0
+			dataY5DropDown := 0
+			dataY6DropDown := 0
 			
 			if (report = "Pressures") {
 				GuiControl Choose, chartTypeDropDown, 4
@@ -3562,6 +3682,9 @@ class RaceCenter extends ConfigurationItem {
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
 				dataY2DropDown := inList(y2Choices, "Tyre.Pressure.Cold.Average") + 1
 				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
+				dataY4DropDown := 1
+				dataY5DropDown := 1
+				dataY6DropDown := 1
 			}
 			else if (report = "Temperatures") {
 				GuiControl Choose, chartTypeDropDown, 1
@@ -3572,22 +3695,31 @@ class RaceCenter extends ConfigurationItem {
 				dataY1DropDown := inList(y1Choices, "Temperature.Air")
 				dataY2DropDown := inList(y2Choices, "Tyre.Temperature.Front.Average") + 1
 				dataY3DropDown := inList(y3Choices, "Tyre.Temperature.Rear.Average") + 1
+				dataY4DropDown := 1
+				dataY5DropDown := 1
+				dataY6DropDown := 1
 			}
 			else if (report = "Free") {
 				GuiControl Choose, chartTypeDropDown, 1
 				
-				this.iSelectedChartType := "Scatter"
+				this.iSelectedChartType := "Line"
 				
 				dataXDropDown := inList(xChoices, "Lap")
 				dataY1DropDown := inList(y1Choices, "Lap.Time")
-				dataY2DropDown := inList(y2Choices, "Temperature.Air") + 1
-				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
+				dataY2DropDown := inList(y2Choices, "Tyre.Laps") + 1
+				dataY3DropDown := inList(y3Choices, "Temperature.Air") + 1
+				dataY4DropDown := inList(y4Choices, "Temperature.Track") + 1
+				dataY5DropDown := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
+				dataY6DropDown := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 			
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
 			GuiControl Choose, dataY1DropDown, %dataY1DropDown%
 			GuiControl Choose, dataY2DropDown, %dataY2DropDown%
 			GuiControl Choose, dataY3DropDown, %dataY3DropDown%
+			GuiControl Choose, dataY4DropDown, %dataY4DropDown%
+			GuiControl Choose, dataY5DropDown, %dataY5DropDown%
+			GuiControl Choose, dataY6DropDown, %dataY6DropDown%
 		}
 	}
 	
@@ -3724,7 +3856,7 @@ class RaceCenter extends ConfigurationItem {
 							sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Front"
 													   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
 													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
+													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
 													   
 							prefix := ("Standings.Lap." . lap . ".Car.")
 							

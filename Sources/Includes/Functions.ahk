@@ -449,8 +449,8 @@ trayMessageQueue() {
 		
 				try {
 					duration := message[3]
-					title := message[1]
-					message := message[2]
+					title := StrReplace(message[1], "`n", A_Space)
+					message := StrReplace(message[2], "`n", A_Space)
 		
 					TrayTip %title%, %message%
 		

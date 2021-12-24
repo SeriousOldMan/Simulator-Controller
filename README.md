@@ -31,21 +31,19 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.7.6-release](https://cntr.click/f5Rrfgx) (New features: Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 GT3 to the list of ACC cars.)
+[3.7.8-release](https://cntr.click/cTHTD8m) (New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Supporting more data series in "Race Center" graphs, Optimized assistant support when no voice recognition is enabled.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-376) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-378) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.7.4-release](https://cntr.click/HRJnb7N) (New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration.)
+[3.7.6-release](https://cntr.click/f5Rrfgx) (New features: Full implementation of the "Race Center" (formerly "Team Console"), New action function "openRaceCenter", New *openRaceRenter* plugin arguments for "Race Engineer" and "Race Strategist", Fixed several bugs in "Server Administration", Added BMW M4 GT3 to the list of ACC cars.)
 
-[3.7.2-release](https://cntr.click/2xk5BBK) (New features: Vastly reduced memory consumption of assistants in endurance races, Full refactoring of the setup database, Many fixes for "Team Server", Fixed pitstop handling for ACC 1.8, Fixed a bug for "Tactile Feedback" with actions bound to dials, New "Team Server" administration backend.)
+[3.7.4-release](https://cntr.click/HRJnb7N) (New features: New "Server Administration" application, New "Team Console" application, Added global functions parseConfiguration and printConfiguration.)
 
 #### Latest development build
 
-[3.7.8-rc1](https://www.dropbox.com/s/zfvbm3ap2pfxtlp/Simulator%20Controller%203.7.8-rc1.zip?dl=1) (Release candidate for 3.7.8. New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Supporting more data series in "Race Center" graphs, Optimized assistant support when no voice recognition is enabled. Stable, incl. documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-378) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Discord Community
 

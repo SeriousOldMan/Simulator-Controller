@@ -108,6 +108,36 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
+	class RaceCenterAction extends ControllerAction {
+		iPlugin := false
+		
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
+		
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+			
+			base.__New(function, label, icon)
+		}
+		
+		fireAction(function, trigger) {
+			exePath := kBinariesDirectory . "Race Center.exe"
+			
+			try {
+				Run "%exePath%", %kBinariesDirectory%
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+					
+				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	
 	Connector[] {
 		Get {
 			return this.iConnector
@@ -238,6 +268,16 @@ class TeamServerPlugin extends ControllerPlugin {
 		else
 			this.iTeamServerEnabled := true
 		
+		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
+		
+		if openRaceSettings
+			this.createTeamServerAction(controller, "RaceSettingsOpen", openRaceSettings)
+		
+		openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+		
+		if openRaceCenter
+			this.createTeamServerAction(controller, "RaceCenterOpen", openRaceCenter)
+		
 		if register
 			controller.registerPlugin(this)
 		
@@ -259,6 +299,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			}
+			else if (action = "RaceSettingsOpen") {
+				descriptor := ConfigurationItem.descriptor(action, "Activate")
+				
+				this.registerAction(new this.RaceCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))

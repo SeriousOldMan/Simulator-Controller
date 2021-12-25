@@ -288,8 +288,16 @@ namespace TeamServer.Server {
 			return stint;
 		}
 
-		internal Stint LookupStint(string identifier) {
+		public Stint LookupStint(string identifier) {
 			return LookupStint(new Guid(identifier));
+		}
+		
+		public Stint LookupStint(Session session, int stintNr) {
+			Stint stint = FindStint(session, stintNr);
+			
+			ValidateStint(stint);
+			
+			return stint;
 		}
 
 		public Stint FindStint(Guid identifier) {
@@ -298,6 +306,15 @@ namespace TeamServer.Server {
 
 		public Stint FindStint(string identifier) {
 			return FindStint(new Guid(identifier));
+		}
+		
+		public Stint FindStint(Session session, int stintNr) {
+			Task<List<Stint>> task = ObjectManager.Connection.QueryAsync<Stint>(
+				@"
+                    Select * From Stints Where SessionID = ? And Nr = ?
+                ", session.ID, stintNr);
+			
+			return (task.Result.Count == 0) ? null : task.Result[0];
 		}
 		#endregion
 

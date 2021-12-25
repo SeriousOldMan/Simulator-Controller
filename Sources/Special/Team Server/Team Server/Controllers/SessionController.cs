@@ -206,6 +206,12 @@ namespace TeamServer.Controllers {
 
                     if (lap != null)
                         return lap.Identifier.ToString();
+					else if (stint.Nr > 1) {
+						lap = sessionManager.LookupStint(session, stint.Nr - 1).GetCurrentLap();
+
+						if (lap != null)
+							return lap.Identifier.ToString();
+					}
                 }
 
                 return "";

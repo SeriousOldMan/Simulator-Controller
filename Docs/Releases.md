@@ -1,4 +1,11 @@
-## 3.7.8-release 12/24/21 (planned)
+## 3.8.0-release 12/31/21
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Added support for pre-race stint planning in "Race Center". See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-planning) for more information.
+  4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin.
+
+## 3.7.8-release 12/24/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

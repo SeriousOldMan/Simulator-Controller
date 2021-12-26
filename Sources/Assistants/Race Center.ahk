@@ -57,7 +57,7 @@ global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Driver", "Strategy"
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
-											, "Position.Start", "Position.End"]
+											, "Position.Start", "Position.End", "Time.Start"]
 							 , "Driver.Data": ["Forname", "Surname", "Nickname"]
 							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 										  , "Weather", "Temperature.Air", "Temperature.Track"
@@ -1413,30 +1413,57 @@ class RaceCenter extends ConfigurationItem {
 					LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : pitstop.RefuelAmount)
 					LV_Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 				}
-		}
 		
-		this.updateState()
+			if (this.SelectedDetailReport = "Plan")
+				this.showPlanDetails()
+		
+			this.updateState()
+		}
 	}
 	
-	updatePlan(minutes) {
+	updatePlan(minutesOrStint) {
 		window := this.Window
 			
 		Gui %window%:Default
 		
 		Gui ListView, % this.PlanListView
-			
-		Loop % LV_GetCount()
-		{
-			LV_GetText(time, A_Index, 3)
-			
-			time := string2Values(":", time)
-			time := ("20200101" . time[1] . time[2] . "00")
-			
-			EnvAdd time, %minutes%, Minutes
-			FormatTime time, %time%, HH:mm
+		
+		if IsObject(minutesOrStint) {
+			if (LV_GetCount() > 0) {
+				time := this.computeStartTime(minutesOrStint)
+				
+				FormatTime time, %time%, HH:mm
+				
+				Loop % LV_GetCount()
+				{
+					LV_GetText(stintNr, A_Index)
 					
-			LV_Modify(A_Index, "Col3", time)
+					if (stintNr = minutesOrStint.Nr) {
+						LV_Modify(A_Index, "Col2", minutesOrStint.Driver.FullName)
+						LV_Modify(A_Index, "Col4", time)
+						
+						if (stintNr != 1)
+							LV_Modify(A_Index, "Col6", minutesOrStint.Lap)
+					}
+				}
+			}
 		}
+		else
+			Loop % LV_GetCount()
+			{
+				LV_GetText(time, A_Index, 3)
+				
+				time := string2Values(":", time)
+				time := ("20200101" . time[1] . time[2] . "00")
+				
+				EnvAdd time, %minutesOrStint%, Minutes
+				FormatTime time, %time%, HH:mm
+						
+				LV_Modify(A_Index, "Col3", time)
+			}
+		
+		if (this.SelectedDetailReport = "Plan")
+			this.showPlanDetails()
 		
 		this.updateState()
 	}
@@ -1892,9 +1919,7 @@ class RaceCenter extends ConfigurationItem {
 						setConfigurationValue(info, "Plan", "Date", this.Date)
 						setConfigurationValue(info, "Plan", "Time", this.Time)
 						
-						this.savePlan()
-						
-						this.SessionDatabase.flush("Plan.Data")
+						this.savePlan(true)
 						
 						fileName := (this.SessionDirectory . "Plan.Data.CSV")
 						
@@ -2254,8 +2279,17 @@ class RaceCenter extends ConfigurationItem {
 				if !this.Stints.HasKey(identifier) {
 					newStint := parseObject(this.Connector.GetStint(identifier))
 					newStint.Nr := (newStint.Nr + 0)
-					newStint.Time := (A_Now . "")
-				
+					newStint.Time := false
+					
+					if (newStint.Nr = 1) {
+						time := this.Connector.GetSessionValue(session, "Time")
+						
+						if (!time || (time == ""))
+							time := (A_Now . "")
+						
+						newStint.Time := time
+					}
+					
 					newStints.Push(newStint)
 				}
 			
@@ -2479,9 +2513,12 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui ListView, % this.StintsListView
 		
-		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*), translate(stint.Compound), stint.Laps.Length()
+		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
+							   , translate(stint.Compound), stint.Laps.Length()
 							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
 							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+		
+		this.updatePlan(stint)
 	}
 	
 	syncLaps() {
@@ -3173,6 +3210,34 @@ class RaceCenter extends ConfigurationItem {
 			}
 	}
 	
+	computeStartTime(stint) {
+		if stint.Time
+			return stint.Time
+		else {
+			if (stint.Nr = 1) {
+				stint.Time := (A_Now . "")
+				
+				time := stint.Time
+			}
+			else {
+				lastStint := this.Stints[stint.Nr - 1]
+				duration := 0
+			
+				for ignore, lap in lastStint.Laps
+					duration += lap.LapTime
+				
+				time := this.computeStartTime(lastStint)
+				
+				EnvAdd time, %duration%, Seconds
+			}
+			
+			if (stint != this.CurrentStint)
+				stint.Time := time
+				
+			return time
+		}
+	}
+	
 	computeLapStatistics(driver, laps, ByRef potential, ByRef raceCraft, ByRef speed, ByRef consistency, ByRef carControl) {
 		raceData := true
 		drivers := false
@@ -3318,7 +3383,7 @@ class RaceCenter extends ConfigurationItem {
 	savePlan(flush := false) {
 		sessionDB := this.SessionDatabase
 		
-		sessionDB.Clear("Plan.Data")
+		sessionDB.clear("Plan.Data")
 					
 		window := this.Window
 		
@@ -3344,7 +3409,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		if flush
-			sessionDB.flush()
+			sessionDB.flush("Plan.Data")
 	}
 	
 	saveSession(copy := false) {
@@ -3461,7 +3526,11 @@ class RaceCenter extends ConfigurationItem {
 			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
 					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
 					   , FuelConsumption: stint["Fuel.Consumption"], Accidents: stint.Accidents
-					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]}
+					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
+					   , Time: stint["Time.Start"]}
+					   
+			if (newStint.Time == kNull)
+				newStint.Time := false
 			
 			driver.Stints.Push(newStint)
 			laps := []
@@ -3606,6 +3675,9 @@ class RaceCenter extends ConfigurationItem {
 		
 		Loop % LV_GetCount("Col")
 			LV_ModifyCol(A_Index, "AutoHdr")
+		
+		if (this.SelectedDetailReport = "Plan")
+			this.showPlanDetails()
 	}
 	
 	loadPitstops() {
@@ -4426,7 +4498,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			if forSave
-				this.savePlan()
+				this.savePlan(this.SessionFinished)
 			
 			if (forSave && !this.SessionFinished) {
 				currentStint := this.CurrentStint
@@ -4441,7 +4513,8 @@ class RaceCenter extends ConfigurationItem {
 									, "Driver.Forname": stint.Driver.Forname, "Driver.Surname": stint.Driver.Surname, "Driver.Nickname": stint.Driver.Nickname
 									, "Weather": stint.Weather, "Compound": stint.Compound, "Lap.Time.Average": null(stint.AvgLaptime), "Lap.Time.Best": null(stint.BestLapTime)
 									, "Fuel.Consumption": null(stint.FuelConsumption), "Accidents": stint.Accidents
-									, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)}
+									, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)
+									, "Time.Start": stint.Time}
 						
 						sessionDB.add("Stint.Data", stintData)
 						
@@ -5588,6 +5661,9 @@ updatePlan() {
 		
 		if (stint > 1)
 			LV_Modify(row, "Col5", planLapEdit, actLapEdit, planRefuelEdit, (planTyreCompoundDropDown = 1) ? "" : "x")
+		
+		if (rCenter.SelectedDetailReport = "Plan")
+			rCenter.showPlanDetails()
 	}
 }
 

@@ -60,9 +60,13 @@ class Database {
 						{
 							row := {}
 							values := string2Values(";", A_LoopReadLine)
+							length := values.Length()
 							
 							for ignore, column in schema
-								row[column] := values[A_Index]
+								if (length >= A_Index)
+									row[column] := values[A_Index]
+								else
+									row[column] := kNull
 							
 							data.Push(row)
 						}
@@ -187,7 +191,7 @@ class Database {
 	
 	clear(name, flush := false) {
 		if this.Tables.HasKey(name) {
-			this.Tables[name] := []
+			this.iTables[name] := []
 			this.iTableChanged[name] := true
 			
 			if flush

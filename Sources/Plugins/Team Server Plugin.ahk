@@ -450,6 +450,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			
 			try {
 				this.Connector.StartSession(this.Session, duration, car, track)
+			
+				this.Connector.SetSessionValue(this.Session, "Time", A_Now)
 				
 				this.iSessionActive := true
 			}

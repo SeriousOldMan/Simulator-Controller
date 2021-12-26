@@ -167,6 +167,10 @@ class RaceCenter extends ConfigurationItem {
 	
 	iSessionLoaded := false
 	iSessionFinished := false
+
+	iVersion := false
+	iDate := false
+	iTime := false
 	
 	iSimulator := false
 	iCar := false
@@ -220,12 +224,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		__New(strategyManager, configuration := false) {
 			base.__New(strategyManager, configuration)
-			
-			if !this.Version {
-				Random version, 1, 1000000
-				
-				this.iVersion := Round(version)
-			}
+		}
+		
+		setVersion(version) {
+			this.iVersion := version
 		}
 		
 		loadFromConfiguration(configuration) {
@@ -498,6 +500,24 @@ class RaceCenter extends ConfigurationItem {
 	HasData[] {
 		Get {
 			return (this.SessionActive || this.SessionLoaded)
+		}
+	}
+	
+	Version[] {
+		Get {
+			return this.iVersion
+		}
+	}
+	
+	Date[] {
+		Get {
+			return this.iDate
+		}
+	}
+	
+	Time[] {
+		Get {
+			return this.iTime
 		}
 	}
 	
@@ -856,7 +876,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Clear Plan...", "---------------------------------------------", "Update from Strategy", "Update from Session", "---------------------------------------------", "Plan Summary"], "translate")*)
+		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Clear Plan...", "---------------------------------------------", "Update from Strategy", "Update from Session", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 		
@@ -891,34 +911,34 @@ class RaceCenter extends ConfigurationItem {
 		Gui Tab, 1
 		
 		Gui %window%:Add, Text, x24 ys+33 w90 h23 +0x200, % translate("Session")
-		Gui %window%:Add, DateTime, x106 yp w80 h23 vsessionDateCal
-		Gui %window%:Add, DateTime, x190 yp w50 h23  vsessionTimeEdit 1, HH:mm
+		Gui %window%:Add, DateTime, x106 yp w80 h23 vsessionDateCal gupdateDate
+		Gui %window%:Add, DateTime, x190 yp w50 h23  vsessionTimeEdit gupdateTime 1, HH:mm
 		
-		Gui %window%:Add, ListView, x24 ys+63 w344 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle, % values2String("|", map(["Stint", "Driver", "Time (Plan)", "Time (Act.)", "Lap (Plan)", "Lap (Act.)", "Refuel", "Tyre Change"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+63 w344 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePlan, % values2String("|", map(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], "translate")*)
 		
 		this.iPlanListView := listHandle
 		
 		Gui %window%:Add, Text, x378 ys+68 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vdriverDropDownMenu
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vdriverDropDownMenu gupdatePlan
 		
-		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (Plan / Act.)")
-		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit 1, HH:mm
-		Gui %window%:Add, DateTime, x528 yp w50 h23 vactTimeEdit 1, HH:mm
+		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (est. / act.)")
+		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit gupdatePlan 1, HH:mm
+		Gui %window%:Add, DateTime, x528 yp w50 h23 vactTimeEdit gupdatePlan 1, HH:mm
 		
-		Gui %window%:Add, Text, x378 yp+28 w90 h20, % translate("Lap (Plan / Act.)")
-		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanLapEdit
+		Gui %window%:Add, Text, x378 yp+28 w90 h20, % translate("Lap (est. / act.)")
+		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanLapEdit gupdatePlan
 		Gui %window%:Add, UpDown, x506 yp w18 h20
-		Gui %window%:Add, Edit, x528 yp w50 h20 Limit3 Number vactLapEdit
+		Gui %window%:Add, Edit, x528 yp w50 h20 Limit3 Number vactLapEdit gupdatePlan
 		Gui %window%:Add, UpDown, x560 yp w18 h20
 		
 		Gui %window%:Add, Text, x378 yp+30 w85 h20, % translate("Refuel")
-		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit
+		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit gupdatePlan
 		Gui %window%:Add, UpDown, x506 yp-2 w18 h20
 		Gui %window%:Add, Text, x528 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x378 yp+24 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", "Tyre Change"], "translate")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose1 vplanTyreCompoundDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose1 vplanTyreCompoundDropDown gupdatePlan, % values2String("|", choices*)
 
 			
 		Gui Tab, 2
@@ -1087,20 +1107,31 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	loadSessionDrivers() {
-		window := this.Window
-		
-		Gui %window%:Default
-		
-		teamIdentifier := this.SelectedTeam[true]
-		
-		drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : {})
+		if this.SessionActive {
+			window := this.Window
+			
+			Gui %window%:Default
+			
+			teamIdentifier := this.SelectedTeam[true]
+			
+			drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : {})
+		}
+		else {
+			drivers := {}
+			
+			for ignore, driver in this.Drivers {
+				name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+			
+				drivers[name] := false
+			}
+		}
 		
 		this.iSessionDrivers := drivers
-				
+			
 		names := getKeys(drivers)
 		identifiers := getValues(drivers)
 		
-		GuiControl, , driverDropDownMenu, % ("|" . values2String("|", names*))
+		GuiControl, , driverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
 	}
 	
 	selectSession(identifier) {
@@ -1226,6 +1257,53 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		this.updateStrategyMenu()
+		
+		Gui ListView, % this.PlanListView
+		
+		selected := LV_GetNext(0)
+		
+		if selected {
+			GuiControl Enable, driverDropDownMenu
+			GuiControl Enable, planTimeEdit
+			GuiControl Enable, actTimeEdit
+			
+			LV_GetText(stint, selected)
+			
+			if (stint = 1) {
+				GuiControl Disable, planLapEdit
+				GuiControl Disable, actLapEdit
+				GuiControl Disable, planRefuelEdit
+				GuiControl Disable, planTyreCompoundDropDown
+				
+				GuiControl, , planLapEdit, % ""
+				GuiControl, , actLapEdit, % ""
+				GuiControl, , planRefuelEdit, % ""
+				GuiControl Choose, planTyreCompoundDropDown, 0
+			}
+			else {
+				GuiControl Enable, planLapEdit
+				GuiControl Enable, actLapEdit
+				GuiControl Enable, planRefuelEdit
+				GuiControl Enable, planTyreCompoundDropDown
+			}
+		}
+		else {
+			GuiControl Disable, driverDropDownMenu
+			GuiControl Disable, planTimeEdit
+			GuiControl Disable, actTimeEdit
+			GuiControl Disable, planLapEdit
+			GuiControl Disable, actLapEdit
+			GuiControl Disable, planRefuelEdit
+			GuiControl Disable, planTyreCompoundDropDown
+			
+			GuiControl Choose, driverDropDownMenu, 0
+			GuiControl, , planTimeEdit, 20200101000000
+			GuiControl, , actTimeEdit, 20200101000000
+			GuiControl, , planLapEdit, % ""
+			GuiControl, , actLapEdit, % ""
+			GuiControl, , planRefuelEdit, % ""
+			GuiControl Choose, planTyreCompoundDropDown, 0
+		}
 	}
 	
 	updateStrategyMenu() {
@@ -1251,8 +1329,6 @@ class RaceCenter extends ConfigurationItem {
 			
 			Gui ListView, % this.PlanListView
 		
-			GuiControlGet sessionTimeEdit
-			
 			pitstops := this.Strategy.Pitstops
 			
 			numStints := (pitstops.Length() + 1)
@@ -1295,8 +1371,10 @@ class RaceCenter extends ConfigurationItem {
 						last := 0
 					else
 						LV_GetText(last, LV_GetCount())
-				
-					FormatTime time, %sessionTimeEdit%, HH:mm
+			
+					time := this.Time
+					
+					FormatTime time, %time%, HH:mm
 					
 					if (last = 0)
 						LV_Add("", 1, "", time, "", "-", "-", "-", "-")
@@ -1336,6 +1414,31 @@ class RaceCenter extends ConfigurationItem {
 					LV_Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 				}
 		}
+		
+		this.updateState()
+	}
+	
+	updatePlan(minutes) {
+		window := this.Window
+			
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+			
+		Loop % LV_GetCount()
+		{
+			LV_GetText(time, A_Index, 3)
+			
+			time := string2Values(":", time)
+			time := ("20200101" . time[1] . time[2] . "00")
+			
+			EnvAdd time, %minutes%, Minutes
+			FormatTime time, %time%, HH:mm
+					
+			LV_Modify(A_Index, "Col3", time)
+		}
+		
+		this.updateState()
 	}
 	
 	initializePitstopFromSession() {
@@ -1379,6 +1482,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		if (this.Strategy && this.SessionActive)
 			try {
+				this.Strategy.setVersion(A_Now . "")
+				
 				strategy := newConfiguration()
 							
 				this.Strategy.saveToConfiguration(strategy)
@@ -1392,6 +1497,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Strategy Update", lap)
 				
 				this.Connector.SetSessionValue(session, "Race Strategy", strategy)
+				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
 				
 				
@@ -1415,6 +1521,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Strategy Update", lap)
 				
 				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
+				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
 				this.Connector.SetLapValue(lap, "Race Strategy", "CANCEL")
 				
 				showMessage(translate("Race Strategist will be instructed in the next lap."))
@@ -1770,6 +1877,45 @@ class RaceCenter extends ConfigurationItem {
 				this.updatePlanFromSession()
 			case 8:
 				this.showPlanDetails()
+			case 10:
+				if this.SessionActive
+					try {
+						session := this.SelectedSession[true]
+				
+						version := (A_Now . "")
+						
+						this.iVersion := version
+						
+						info := newConfiguration()
+						
+						setConfigurationValue(info, "Plan", "Version", version)
+						setConfigurationValue(info, "Plan", "Date", this.Date)
+						setConfigurationValue(info, "Plan", "Time", this.Time)
+						
+						this.savePlan()
+						
+						this.SessionDatabase.flush("Plan.Data")
+						
+						fileName := (this.SessionDirectory . "Plan.Data.CSV")
+						
+						FileRead plan, %fileName%
+						
+						this.Connector.setSessionValue(session, "Stint Plan Info", printConfiguration(info))
+						this.Connector.setSessionValue(session, "Stint Plan", plan)
+						this.Connector.setSessionValue(session, "Stint Plan Version", version)
+						
+						showMessage(translate("Plan will be updated on the Team Server."))
+					}
+					catch exception {
+						; ignore
+					}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+					OnMessage(0x44, "")
+				}
 		}
 	}
 	
@@ -2078,6 +2224,12 @@ class RaceCenter extends ConfigurationItem {
 		this.iSelectedChartType := false
 		this.iSelectedDetailReport := false
 
+		GuiControlGet sessionDateCal
+		GuiControlGet sessionTimeEdit
+		
+		this.iDate := sessionDateCal
+		this.iTime := sessionTimeEdit
+		
 		this.iSimulator := false
 		this.iCar := false
 		this.iTrack := false
@@ -2845,13 +2997,39 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			session := this.SelectedSession[true]
 			
-			strategy := this.Connector.getSessionValue(session, "Race Strategy")
+			version := this.Connector.getSessionValue(session, "Race Strategy Version")
 			
-			if (strategy && (strategy != "")) {
-				strategy := parseConfiguration(strategy)
+			if (version && (version != ""))
+				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
+					strategy := this.Connector.getSessionValue(session, "Race Strategy")
 				
-				if (!this.Strategy || (this.Strategy.Version != getConfigurationValue(strategy, "General", "Version")))
-					this.selectStrategy(this.createStrategy(strategy))
+					this.selectStrategy(this.createStrategy(parseConfiguration(strategy)))
+				}
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
+	syncPlan() {
+		try {
+			session := this.SelectedSession[true]
+			
+			version := this.Connector.getSessionValue(session, "Stint Plan Version")
+			
+			if (version && (version != "")) {
+				window := this.Window
+				
+				Gui %window%:Default
+				
+				Gui ListView, % this.PlanListView
+				
+				if ((LV_GetCount() == 0) || !this.Version || (this.Version < version)) {
+					info := this.Connector.getSessionValue(session, "Stint Plan Info")
+					plan := this.Connector.getSessionValue(session, "Stint Plan")
+					
+					this.loadPlan(info, plan)
+				}
 			}
 		}
 		catch exception {
@@ -2874,8 +3052,8 @@ class RaceCenter extends ConfigurationItem {
 			Gui %window%:+Disabled
 	
 			try {
-				if !this.LastLap
-					this.syncStrategy()
+				this.syncPlan()
+				this.syncStrategy()
 				
 				newLaps := false
 				newData := false
@@ -2899,8 +3077,6 @@ class RaceCenter extends ConfigurationItem {
 			
 				if (newData || newLaps)
 					this.updateReports()
-				
-				this.syncStrategy()
 				
 				if (!newLaps && !this.SessionFinished) {
 					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
@@ -2928,6 +3104,9 @@ class RaceCenter extends ConfigurationItem {
 			this.iSelectedReport := "Overview"
 		
 		this.showReport(this.SelectedReport, true)
+		
+		if (!this.SelectedDetailReport && this.Strategy)
+			this.StrategyViewer.showStrategyInfo(this.Strategy)
 	}
 	
 	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
@@ -3183,6 +3362,8 @@ class RaceCenter extends ConfigurationItem {
 				
 				setConfigurationValue(info, "Session", "Team", this.SelectedTeam)
 				setConfigurationValue(info, "Session", "Session", this.SelectedSession)
+				setConfigurationValue(info, "Session", "Date", this.Date)
+				setConfigurationValue(info, "Session", "Time", this.Time)
 				setConfigurationValue(info, "Session", "Simulator", this.Simulator)
 				setConfigurationValue(info, "Session", "Car", this.Car)
 				setConfigurationValue(info, "Session", "Track", this.Track)
@@ -3221,9 +3402,11 @@ class RaceCenter extends ConfigurationItem {
 	loadDrivers() {
 		this.iDrivers := []
 		
-		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"]
-			this.addDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname
-						  , Fullname: computeDriverName(driver.Forname, driver.Surname, driver.Nickname)})
+		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
+			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+		
+			this.addDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name})
+		}
 	}
 			
 	loadLaps() {
@@ -3379,12 +3562,40 @@ class RaceCenter extends ConfigurationItem {
 			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 	
-	loadPlan() {
+	loadPlan(info := false, plan := false) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
+		if info {
+			info := parseConfiguration(info)
+				
+			this.iVersion := getConfigurationValue(info, "Plan", "Version")
+			this.iDate := getConfigurationValue(info, "Plan", "Date")
+			this.iTime := getConfigurationValue(info, "Plan", "Time")
+			
+			GuiControl, , sessionDateCal, % this.Date
+			GuiControl, , sessionTimeEdit, % this.Time
+		}
+		
 		Gui ListView, % this.PlanListView
+		
+		LV_Delete()
+		
+		if plan {
+			this.SessionDatabase.clear("Plan.Data")
+			
+			fileName := (this.SessionDirectory . "Plan.Data.CSV")
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			FileAppend %plan%, %fileName%, UTF-16
+		}
 		
 		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"]
 			LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
@@ -3482,9 +3693,15 @@ class RaceCenter extends ConfigurationItem {
 				this.iSessionName := getConfigurationValue(info, "Session", "Session")
 				this.iSessionIdentifier := false
 			
+				this.iDate := getConfigurationValue(info, "Session", "Date", A_Now)
+				this.iTime := getConfigurationValue(info, "Session", "Time", A_Now)
+				
 				window := this.Window
 		
 				Gui %window%:Default
+				
+				GuiControl, , sessionDateCal, % this.Date
+				GuiControl, , sessionTimeEdit, % this.Time
 				
 				GuiControl, , teamDropDownMenu, % "|" . this.iTeamName
 				GuiControl Choose, teamDropDownMenu, 1
@@ -3493,6 +3710,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Choose, sessionDropDownMenu, 1
 				
 				this.loadDrivers()
+				this.loadSessionDrivers()
 				this.loadPlan()
 				this.loadLaps()
 				this.loadStints()
@@ -3537,6 +3755,8 @@ class RaceCenter extends ConfigurationItem {
 				}
 			
 				this.updateReports()
+				
+				this.updateState()
 			}
 		}
 	}
@@ -5173,6 +5393,120 @@ pitstopMenu() {
 
 openDashboardDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center
+}
+
+updateDate() {
+	rCenter := RaceCenter.Instance
+	
+	GuiControlGet sessionDateCal
+	
+	rCenter.iDate := sessionDateCal
+}
+
+updateTime() {
+	rCenter := RaceCenter.Instance
+	
+	GuiControlGet sessionTimeEdit
+	
+	time := rCenter.Time
+	
+	EnvSub time, %sessionTimeEdit%, Minutes
+	
+	rCenter.iTime := sessionTimeEdit
+	
+	rCenter.updatePlan(-time)
+	
+	Gui ListView, % rCenter.PlanListView
+
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+	
+	rCenter.updateState()
+}
+
+choosePlan() {
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		rCenter := RaceCenter.Instance
+	
+		window := rCenter.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % rCenter.PlanListView
+
+		LV_GetText(stint, A_EventInfo, 1)
+		LV_GetText(driver, A_EventInfo, 2)
+		LV_GetText(timePlanned, A_EventInfo, 3)
+		LV_GetText(timeActual, A_EventInfo, 4)
+		LV_GetText(lapPlanned, A_EventInfo, 5)
+		LV_GetText(lapActual, A_EventInfo, 6)
+		LV_GetText(refuelAmount, A_EventInfo, 7)
+		LV_GetText(tyreChange, A_EventInfo, 8)
+		
+		time := string2Values(":", timePlanned)
+		
+		currentTime := "20200101000000"
+		
+		EnvAdd currentTime, time[1], Hours
+		EnvAdd currentTime, time[2], Minutes
+		
+		timePlanned := currentTime
+		
+		time := string2Values(":", timeActual)
+		
+		currentTime := "20200101000000"
+		
+		EnvAdd currentTime, time[1], Hours
+		EnvAdd currentTime, time[2], Minutes
+		
+		timeActual := currentTime
+		
+		GuiControl Choose, driverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
+		GuiControl, , planTimeEdit, %timePlanned%
+		GuiControl, , actTimeEdit, %timeActual%
+		GuiControl, , planLapEdit, %lapPlanned%
+		GuiControl, , actLapEdit, %lapActual%
+		GuiControl, , planRefuelEdit, %refuelAmount%
+		GuiControl Choose, planTyreCompoundDropDown, % ((tyreChange = "x") ? 2 : 1)
+	
+		rCenter.updateState()
+	}
+}
+
+updatePlan() {
+	rCenter := RaceCenter.Instance
+	
+	Gui ListView, % rCenter.PlanListView
+	
+	row := LV_GetNext(0)
+	
+	if (row > 0) {
+		GuiControlGet driverDropDownMenu
+		GuiControlGet planTimeEdit
+		GuiControlGet actTimeEdit
+		GuiControlGet planLapEdit
+		GuiControlGet actLapEdit
+		GuiControlGet planRefuelEdit
+		GuiControlGet planTyreCompoundDropDown
+		
+		if (driverDropDownMenu = 1)
+			LV_Modify(row, "Col2", "")
+		else
+			LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[driverDropDownMenu - 1])
+
+		FormatTime time, %planTimeEdit%, HH:mm
+		
+		LV_Modify(row, "Col3", ((time = "00:00") ? "" : time))
+		
+		FormatTime time, %actTimeEdit%, HH:mm
+		
+		LV_Modify(row, "Col4", ((time = "00:00") ? "" : time))
+		
+		LV_GetText(stint, row)
+		
+		if (stint > 1)
+			LV_Modify(row, "Col5", planLapEdit, actLapEdit, planRefuelEdit, (planTyreCompoundDropDown = 1) ? "" : "x")
+	}
 }
 
 updateState() {

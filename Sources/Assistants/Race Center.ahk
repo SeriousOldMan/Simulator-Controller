@@ -53,7 +53,7 @@ global kConnect = "Connect"
 global kEvent = "Event"
 
 global kSessionReports = concatenate(kRaceReports, ["Pressures", "Temperatures", "Free"])
-global kDetailReports = ["Stint", "Lap", "Session", "Driver", "Strategy"]
+global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Driver", "Strategy"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
@@ -876,7 +876,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Clear Plan...", "---------------------------------------------", "Update from Strategy", "Update from Session", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
+		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 		
@@ -1321,7 +1321,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Choose, strategyMenuDropDown, 1
 	}
 	
-	initializePlanFromStrategy() {
+	loadPlanFromStrategy() {
 		if this.Strategy {
 			window := this.Window
 			
@@ -1855,6 +1855,8 @@ class RaceCenter extends ConfigurationItem {
 	choosePlanMenu(line) {
 		switch line {
 			case 3:
+				this.loadPlanFromStrategy()
+			case 4:
 				window := this.Window
 				
 				Gui %window%:Default
@@ -1871,13 +1873,11 @@ class RaceCenter extends ConfigurationItem {
 					IfMsgBox Yes
 						LV_Delete()
 				}
-			case 5:
-				this.initializePlanFromStrategy()
 			case 6:
-				this.updatePlanFromSession()
-			case 8:
 				this.showPlanDetails()
-			case 10:
+						
+				this.iSelectedDetailReport := "Plan"
+			case 8:
 				if this.SessionActive
 					try {
 						session := this.SelectedSession[true]
@@ -1904,7 +1904,7 @@ class RaceCenter extends ConfigurationItem {
 						this.Connector.setSessionValue(session, "Stint Plan", plan)
 						this.Connector.setSessionValue(session, "Stint Plan Version", version)
 						
-						showMessage(translate("Plan will be updated on the Team Server."))
+						showMessage(translate("Plan will be updated for this Session."))
 					}
 					catch exception {
 						; ignore
@@ -5121,6 +5121,88 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
 		
 		this.showDetails("Session", html, [1, chart1])
+	}
+	
+	showPlanDetails() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
+		
+		stints := []
+		drivers := []
+		laps := []
+		durations := []
+		numLaps := []
+		positions := []
+		avgLapTimes := []
+		fuelConsumptions := []
+		accidents := []
+		
+		currentStint := this.CurrentStint
+		
+		if currentStint
+			Loop % currentStint.Nr
+			{
+				stint := this.Stints[A_Index]
+				
+				stints.Push("<th class=""th-std"">" . stint.Nr . "</th>")
+				drivers.Push("<td class=""td-std"">" . StrReplace(stint.Driver.Nickname, "'", "\'") . "</td>")
+				laps.Push("<td class=""td-std"">" . stint.Lap . "</td>")
+				
+				duration := 0
+				
+				for ignore, lap in stint.Laps
+					duration += lap.Laptime
+				
+				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
+				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
+				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
+				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
+			}
+		
+		html .= "<br><br><table class=""table-std"">"
+		
+		html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
+			   . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			   . "<th class=""th-std"">" . translate("Time (est.)") . "</th>"
+			   . "<th class=""th-std"">" . translate("Time (act.)") . "</th>"
+			   . "<th class=""th-std"">" . translate("Lap (est.)") . "</th>"
+			   . "<th class=""th-std"">" . translate("Lap (act.)") . "</th>"
+			   . "<th class=""th-std"">" . translate("Refuel") . "</th>"
+			   . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
+			   . "</tr>")
+	
+		Loop % LV_GetCount()
+		{
+			LV_GetText(stint, A_Index, 1)
+			LV_GetText(driver, A_Index, 2)
+			LV_GetText(timePlanned, A_Index, 3)
+			LV_GetText(timeActual, A_Index, 4)
+			LV_GetText(lapPlanned, A_Index, 5)
+			LV_GetText(lapActual, A_Index, 6)
+			LV_GetText(refuelAmount, A_Index, 7)
+			LV_GetText(tyreChange, A_Index, 8)
+			
+			html .= ("<tr><td class=""td-std"">" . stint . "</td>"
+				   . "<td class=""td-std"">" . driver . "</td>"
+				   . "<td class=""td-std"">" . timePlanned . "</td>"
+				   . "<td class=""td-std"">" . timeActual . "</td>"
+				   . "<td class=""td-std"">" . lapPlanned . "</td>"
+				   . "<td class=""td-std"">" . lapActual . "</td>"
+				   . "<td class=""td-std"">" . refuelAmount . "</td>"
+				   . "<td class=""td-std"">" . tyreChange . "</td>"
+				   . "</tr>")
+		}
+		
+		html .= "</table>"
+		
+		this.showDetails("Plan", html)
 	}
 }
 

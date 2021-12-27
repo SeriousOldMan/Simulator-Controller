@@ -25,6 +25,7 @@ Release 3.7.2=Release 3.7.0 -> updateTranslations, updateConfigurationForV372
 Release 3.7.4=Release 3.7.2 -> updateTranslations
 Release 3.7.6=Release 3.7.4 -> updateTranslations, updateActionLabels, updateActionIcons, updateInstallationForV376
 Release 3.7.8=Release 3.7.6 -> updateTranslations, updatePhraseGrammars, updateConfigurationForV378
+Release 3.8.0=Release 3.7.8 -> updateTranslations, updateActionLabels, updateActionIcons
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

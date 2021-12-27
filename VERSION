@@ -1,7 +1,7 @@
 [Development]
 Version=3.8.0-dev
 Target=3.8.0-release
-Date=12/26/2021
+Date=12/27/2021
 Download=
 Changes=Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin
 [Release]

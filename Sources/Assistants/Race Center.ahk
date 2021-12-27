@@ -227,13 +227,13 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		setVersion(version) {
-			this.iVersion := version
+			this.iVersion := (version . "")
 		}
 		
 		loadFromConfiguration(configuration) {
 			base.loadFromConfiguration(configuration)
 			
-			this.iVersion := getConfigurationValue(configuration, "General", "Version", 1)
+			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
 		}
 		
 		saveToConfiguration(configuration) {
@@ -937,8 +937,15 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x528 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x378 yp+24 w85 h23 +0x200, % translate("Tyre Change")
-		choices := map(["No Tyre Change", "Tyre Change"], "translate")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose1 vplanTyreCompoundDropDown gupdatePlan, % values2String("|", choices*)
+		choices := map(["Yes", "No"], "translate")
+		Gui %window%:Add, DropDownList, x474 yp w50 AltSubmit Choose1 vplanTyreCompoundDropDown gupdatePlan, % values2String("|", choices*)
+		
+		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		
+		Gui %window%:Add, Button, x408 ys+279 w160, % translate("Release Plan")
 
 			
 		Gui Tab, 2
@@ -1509,7 +1516,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		if (this.Strategy && this.SessionActive)
 			try {
-				this.Strategy.setVersion(A_Now . "")
+				this.Strategy.setVersion(A_Now)
 				
 				strategy := newConfiguration()
 							
@@ -2002,7 +2009,7 @@ class RaceCenter extends ConfigurationItem {
 	selectStrategy(strategy, show := false) {
 		this.iStrategy := strategy
 		
-		if (show || (this.SelectedDetailReport = "Strategy"))
+		if (show || (this.SelectedDetailReport = "Strategy") || !this.SelectedDetailReport)
 			if strategy {
 				this.StrategyViewer.showStrategyInfo(this.Strategy)
 				
@@ -3037,10 +3044,10 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.getSessionValue(session, "Race Strategy Version")
 			
 			if (version && (version != ""))
-				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
+				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
 					strategy := this.Connector.getSessionValue(session, "Race Strategy")
 				
-					this.selectStrategy(this.createStrategy(parseConfiguration(strategy)))
+					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy)))
 				}
 		}
 		catch exception {
@@ -3652,8 +3659,6 @@ class RaceCenter extends ConfigurationItem {
 		LV_Delete()
 		
 		if plan {
-			this.SessionDatabase.clear("Plan.Data")
-			
 			fileName := (this.SessionDirectory . "Plan.Data.CSV")
 			
 			try {
@@ -3664,6 +3669,8 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			FileAppend %plan%, %fileName%, UTF-16
+			
+			this.SessionDatabase.reload("Plan.Data", false)
 		}
 		
 		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"]
@@ -5622,7 +5629,7 @@ choosePlan() {
 		GuiControl, , planLapEdit, %lapPlanned%
 		GuiControl, , actLapEdit, %lapActual%
 		GuiControl, , planRefuelEdit, %refuelAmount%
-		GuiControl Choose, planTyreCompoundDropDown, % ((tyreChange = "x") ? 2 : 1)
+		GuiControl Choose, planTyreCompoundDropDown, % ((tyreChange = "x") ? 1 : 2)
 	
 		rCenter.updateState()
 	}
@@ -5660,7 +5667,7 @@ updatePlan() {
 		LV_GetText(stint, row)
 		
 		if (stint > 1)
-			LV_Modify(row, "Col5", planLapEdit, actLapEdit, planRefuelEdit, (planTyreCompoundDropDown = 1) ? "" : "x")
+			LV_Modify(row, "Col5", planLapEdit, actLapEdit, planRefuelEdit, (planTyreCompoundDropDown = 2) ? "" : "x")
 		
 		if (rCenter.SelectedDetailReport = "Plan")
 			rCenter.showPlanDetails()

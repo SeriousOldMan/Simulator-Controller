@@ -139,11 +139,11 @@ class Database {
 		return (needsClone ? rows.Clone() : rows)
 	}
 	
-	reload(flush := true) {
+	reload(name, flush := true) {
 		if flush
-			this.flush()
+			this.flush(name)
 		
-		this.iTables := {}
+		this.iTables.Delete(name)
 	}
 	
 	add(name, values, flush := false) {

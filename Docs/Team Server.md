@@ -116,7 +116,7 @@ Beside that, you can request several context specific data, which will be shown 
 
   2. Plan Summary
 
-     The Plan Summary show the details of the stint plan, which had been derived from the strategy or was entered manually. See the section [Session & Stint planning](*) for the details.
+     The Plan Summary show the details of the stint plan, which had been derived from the strategy or was entered manually. See the section [Session & Stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) for the details.
 
   3. Details of a selected stint
   
@@ -184,7 +184,7 @@ If you are satisfied with the new strategy, you can send it to the Virtual Race 
 
 It is quite common for long endurance races to create some kind of stint plan before the race, so that each driver knows, when he has to be on the track. A stint plan is tightly coupled to the race strategy and indeed, you can create a stint plan by using the command "Load From Strategy" from the "Plan" menu. But you can also create a plan manually, as we will see below.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2013.JPG)
 
 Before creating the plan, please enter the date and time of the event into the fields above the list of stints. Then you have two options:
 

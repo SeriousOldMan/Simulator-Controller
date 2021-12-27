@@ -133,6 +133,9 @@ global actLapEdit
 global planRefuelEdit
 global planTyreCompoundDropDown
 
+global addPlanButton
+global deletePlanButton
+
 global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
@@ -940,14 +943,13 @@ class RaceCenter extends ConfigurationItem {
 		choices := map(["Yes", "No"], "translate")
 		Gui %window%:Add, DropDownList, x474 yp w50 AltSubmit Choose1 vplanTyreCompoundDropDown gupdatePlan, % values2String("|", choices*)
 		
-		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton
+		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton vaddPlanButton gaddPlan
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton
+		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeletePlanButton gdeletePlan
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 		
-		Gui %window%:Add, Button, x408 ys+279 w160, % translate("Release Plan")
+		Gui %window%:Add, Button, x408 ys+279 w160 greleasePlan, % translate("Release Plan")
 
-			
 		Gui Tab, 2
 		
 		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
@@ -1273,6 +1275,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Enable, driverDropDownMenu
 			GuiControl Enable, planTimeEdit
 			GuiControl Enable, actTimeEdit
+			GuiControl Enable, deletePlanButton
 			
 			LV_GetText(stint, selected)
 			
@@ -1302,6 +1305,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Disable, actLapEdit
 			GuiControl Disable, planRefuelEdit
 			GuiControl Disable, planTyreCompoundDropDown
+			GuiControl Disable, deletePlanButton
 			
 			GuiControl Choose, driverDropDownMenu, 0
 			GuiControl, , planTimeEdit, 20200101000000
@@ -1473,6 +1477,114 @@ class RaceCenter extends ConfigurationItem {
 			this.showPlanDetails()
 		
 		this.updateState()
+	}
+	
+	addPlan(position := "After") {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		selected := LV_GetNext(0)
+		
+		if selected {
+			position := ((position = "After") ? selected + 1 : selected)
+			
+			if (position > LV_GetCount())
+				position := false
+		}
+		else
+			position := false
+		
+		if position
+			LV_GetText(stintNr, position)
+		else {
+			if (LV_GetCount() > 0) {
+				LV_GetText(stintNr, LV_GetCount())
+				
+				stintNr += 1
+			}
+			else
+				stintNr := 1
+		}
+		
+		initial := ((stintNr = 1) ? "-" : "")
+			
+		if position
+			LV_Insert(position, "Select", stintNr, "", "", "", initial, initial, initial, initial)
+		else
+			LV_Add("Select", stintNr, "", "", "", initial, initial, initial, initial)
+		
+		GuiControl Choose, driverDropDownMenu, 1
+		GuiControl, , planTimeEdit, 20200101000000
+		GuiControl, , actTimeEdit, 20200101000000
+		GuiControl, , planLapEdit, % ""
+		GuiControl, , actLapEdit, % ""
+		GuiControl, , planRefuelEdit, 0
+		GuiControl Choose, planTyreCompoundDropDown, 2
+	
+		LV_GetText(stintNr, 1)
+		
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "", stintNr++)
+		
+		this.updateState()
+	}
+	
+	deletePlan() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		selected := LV_GetNext(0)
+		
+		if selected {
+			LV_Delete(selected)
+		
+			if (selected <= LV_GetCount()) {
+				LV_GetText(stintNr, 1)
+				
+				Loop % LV_GetCount()
+					LV_Modify(A_Index, "", stintNr++)
+			}
+		}
+		
+		this.updateState()
+	}
+	
+	releasePlan() {
+		if this.SessionActive
+			try {
+				session := this.SelectedSession[true]
+		
+				version := (A_Now . "")
+				
+				this.iVersion := version
+				
+				info := newConfiguration()
+				
+				setConfigurationValue(info, "Plan", "Version", version)
+				setConfigurationValue(info, "Plan", "Date", this.Date)
+				setConfigurationValue(info, "Plan", "Time", this.Time)
+				
+				this.savePlan(true)
+				
+				fileName := (this.SessionDirectory . "Plan.Data.CSV")
+				
+				FileRead plan, %fileName%
+				
+				this.Connector.setSessionValue(session, "Stint Plan Info", printConfiguration(info))
+				this.Connector.setSessionValue(session, "Stint Plan", plan)
+				this.Connector.setSessionValue(session, "Stint Plan Version", version)
+				
+				showMessage(translate("Plan will be updated for this Session."))
+			}
+			catch exception {
+				; ignore
+			}
 	}
 	
 	initializePitstopFromSession() {
@@ -1913,34 +2025,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedDetailReport := "Plan"
 			case 8:
 				if this.SessionActive
-					try {
-						session := this.SelectedSession[true]
-				
-						version := (A_Now . "")
-						
-						this.iVersion := version
-						
-						info := newConfiguration()
-						
-						setConfigurationValue(info, "Plan", "Version", version)
-						setConfigurationValue(info, "Plan", "Date", this.Date)
-						setConfigurationValue(info, "Plan", "Time", this.Time)
-						
-						this.savePlan(true)
-						
-						fileName := (this.SessionDirectory . "Plan.Data.CSV")
-						
-						FileRead plan, %fileName%
-						
-						this.Connector.setSessionValue(session, "Stint Plan Info", printConfiguration(info))
-						this.Connector.setSessionValue(session, "Stint Plan", plan)
-						this.Connector.setSessionValue(session, "Stint Plan Version", version)
-						
-						showMessage(translate("Plan will be updated for this Session."))
-					}
-					catch exception {
-						; ignore
-					}
+					this.releasePlan()
 				else {
 					title := translate("Information")
 
@@ -5672,6 +5757,62 @@ updatePlan() {
 		if (rCenter.SelectedDetailReport = "Plan")
 			rCenter.showPlanDetails()
 	}
+}
+
+addPlan() {
+	rCenter := RaceCenter.Instance
+	
+	window := rCenter.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % rCenter.PlanListView
+	
+	if LV_GetNext(0) {
+		title := translate("Insert")
+		
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
+		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+		OnMessage(0x44, "")
+		
+		IfMsgBox Cancel
+			return
+		
+		IfMsgBox Yes
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addPlan", "Before"))
+		
+		IfMsgBox No
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addPlan", "After"))
+	}
+	else
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addPlan"))
+}
+
+deletePlan() {
+	rCenter := RaceCenter.Instance
+	
+	window := rCenter.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % rCenter.PlanListView
+	
+	if LV_GetNext(0) {
+		title := translate("Delete")
+					
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the selected plan entry?")
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "deletePlan"))
+	}
+}
+
+releasePlan() {
+	rCenter := RaceCenter.Instance
+	
+	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "releasePlan"))
 }
 
 updateState() {

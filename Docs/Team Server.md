@@ -90,15 +90,15 @@ Please note, that all the data and graphs shown in the window will be updated dy
 
 #### Connecting to a Session
 
-To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being aan active driver in the session by entering the access token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Data" menu.
+To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being aan active driver in the session by entering the access token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu.
 
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 
-It is no problem, to reuse a session for many races, because the old data will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Data" menu beforehand to erase all current data, if you whish. Please note, that it is **not** a good idea to use the same session in more than one race at the same time.
+It is no problem, to reuse a session for many races, because the old data will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish. Please note, that it is **not** a good idea to use the same session in more than one race at the same time.
 
 #### Session data handling
 
-All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data will be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Data" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
+All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data will be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
 
 #### Data Analysis
 
@@ -110,33 +110,37 @@ The reports at the top of the list are the well known report, wich are also avai
 
 Beside that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
-  1. Details of a selected stint
+  1. Strategy Summary
+
+     This report will display the details of a currently loaded race strategy. See the next section for details.
+
+  2. Plan Summary
+
+     The Plan Summary show the details of the stint plan, which had been derived from the strategy or was entered manually. See the section [Session & Stint planning](*) for the details.
+
+  3. Details of a selected stint
   
      This will give you an overview over the stint, the driven laps, as well as performance figures for the driver. Please select a stint in the list of stints to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%208.JPG)
 
-  2. Details for a given lap
+  4. Details for a given lap
   
      When you select a lap in the *Laps* tab, you will get a detailed table of the standings and the gaps to the cars in front of and behind the drivers car, as well as to the leader.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 
-  3. Driver Statistics
+  5. Driver Statistics
   
-     You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Data" menu to generate this report.
+     You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Session" menu to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2010.JPG) ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2012.JPG)
 	 
-  4. Race Summary
+  6. Race Summary
   
-     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Data" menu.
+     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
-
-  5. Strategy Summary
-
-     This report will display the details of a currently loaded race strategy. See the next section for details.
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 
@@ -144,7 +148,7 @@ All these report documents are HTML-based and can be saved or printed using the 
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
-To do this, you have to load the strategy, which have been selected for the current race using the "Load Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. Please note, that it will not be checked, whether this strategy has been accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy, you can use the "Load Strategy..." command.
+To do this, you have to load the strategy, which have been selected for the current race using the "Load Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. This will be done automatically for your convinience, when you enter the "Race Center" and no strategy has been selected so far. Please note, that it will not be checked, whether this strategy will be accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy by using the "Load Strategy..." command.
 
 Important: It is possible by using "Race Center" to activate a race strategy for the current race, even if no strategy has been present at the start of the race. You can switch strategies, discard strategies, activate a different strategy, and so on, as often as necessary or as you like.
 
@@ -174,7 +178,27 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation.
 
-If you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section.
+If you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Race Center"s of all team members as well.
+
+#### Session & Stint planning
+
+It is quite common for long endurance races to create some kind of stint plan before the race, so that each driver knows, when he has to be on the track. A stint plan is tightly coupled to the race strategy and indeed, you can create a stint plan by using the command "Load From Strategy" from the "Plan" menu. But you can also create a plan manually, as we will see below.
+
+![](*)
+
+Before creating the plan, please enter the date and time of the event into the fields above the list of stints. Then you have two options:
+
+  1. Create the plan from the strategy
+  
+     As mentioned, load a strategy and the select the "Load from Strategy" command from the "Plan" menu and a stint in the plan will be created for each stint in the strategy. After the plan has been created, select each stint and choose the driver which will be responsible for this stint. You can also tweak the estimated starting times and estimated starting laps, if applicable, but be aware, that these has no influence on the real events. The other elements (refuel amount, tyre change, etc.) are there for your information and also will have no impact on the behaviour of the Race Assistants as the selected strategy has. Last, but not least, the *actual* values for time and lap of a stint will be updated autmatically by the "Race Center" when the stint has started, so you can leave them alone as well.
+	 
+	 You can use this command as often, as you like, or whenever the strategy has changed. As long as the number of stints in the strategy is equal or greater to the number of stints in the stint plan, all crucial information entered by you will be preserved. Otherwise you will be asked, where to remove superfluous stints from the plan, at the beginning or at the end.
+
+  2. Create a plan manually
+  
+     If you don't want to use a race strategy for whatever reason, you can enter the stint plan manually. Use the "+" button and create as many stints as necessary. Then enter the values for each stint, as described above. You can also delete superfluous stints by selecting them and clicking on the "-" button.
+
+I recommend that only one person from the team is responsible for the strategy and stint plan. Therefore, if you choose "Release Plan" from the "Plan" menu, your current plan will be updated automatically in all "Race Center"s of your team mates.
 
 #### Planning a Pitstop
 

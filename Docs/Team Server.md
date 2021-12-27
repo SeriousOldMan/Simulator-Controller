@@ -98,7 +98,7 @@ It is no problem, to reuse a session for many races, because the old data will b
 
 #### Session data handling
 
-All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data will be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
+All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
 
 #### Data Analysis
 
@@ -144,7 +144,7 @@ Beside that, you can request several context specific data, which will be shown 
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 
-#### Strategy Handling
+#### Strategy handling
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 

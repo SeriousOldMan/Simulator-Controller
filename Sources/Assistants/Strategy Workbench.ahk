@@ -1173,62 +1173,80 @@ class StrategyWorkbench extends ConfigurationItem {
 				car := this.SelectedCar
 				track := this.SelectedTrack
 				
-				telemetryDB := new TelemetryDatabase(simulator, car, track)
-				simulatorCode := telemetryDB.getSimulatorCode(simulator)
-				
-				dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
-				
-				FileCreateDir %dirName%
-				
-				title := translate("Load Race Settings...")
-						
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
-				OnMessage(0x44, "")
-			
-				if (file != "") {
-					settings := readConfiguration(file)
+				if (simulator && car && track) {
+					telemetryDB := new TelemetryDatabase(simulator, car, track)
+					simulatorCode := telemetryDB.getSimulatorCode(simulator)
 					
-					if (settings.Count() > 0) {
-						GuiControl, , sessionTypeDropDown, 1
-						GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
-						GuiControl, , sessionLengthlabel, % translate("Minutes")
-						GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
-						GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+					dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
+					
+					FileCreateDir %dirName%
+					
+					title := translate("Load Race Settings...")
+							
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+					FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+					OnMessage(0x44, "")
+				
+					if (file != "") {
+						settings := readConfiguration(file)
 						
-						GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
-						GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-						GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-						
-						compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-						compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-						
-						GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
-						
-						GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
-						GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+						if (settings.Count() > 0) {
+							GuiControl, , sessionTypeDropDown, 1
+							GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
+							GuiControl, , sessionLengthlabel, % translate("Minutes")
+							GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
+							GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+							
+							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
+							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+							GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							
+							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+							
+							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
+							
+							GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+							GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+						}
 					}
 				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
 			case 4: ; "Update from Telemetry..."
-				telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-				
-				fastestLapTime := false
-				
-				for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
-					lapTime := row["Lap.Time"]
-				
-					if (!fastestLapTime || (lapTime < fastestLapTime)) {
-						fastestLapTime := lapTime
-						
-						GuiControl, , simMapEdit, % row["Map"]
-						GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
-						GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
+					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+					
+					fastestLapTime := false
+					
+					for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+						lapTime := row["Lap.Time"]
+					
+						if (!fastestLapTime || (lapTime < fastestLapTime)) {
+							fastestLapTime := lapTime
+							
+							GuiControl, , simMapEdit, % row["Map"]
+							GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
+							GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+						}
 					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
 				}
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
 				
-				if simulator {
+				if (simulator && this.SelectedCar && this.SelectedTrack) {
 					switch simulator {
 						case "Assetto Corsa Competizione":
 							prefix := "ACC"
@@ -1272,6 +1290,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , simMapEdit, % Round(map)
 					}
 				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
 			case 6: ; "Load Defaults..."
 			case 8: ; "Save Defaults"
 		}
@@ -1282,12 +1307,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		switch line {
 			case 3: ; "Run Simulation"
-				selectStrategy := GetKeyState("Ctrl")
-				
-				this.runSimulation()
-				
-				if selectStrategy
-					this.chooseSimulationMenu(5)
+				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
+					selectStrategy := GetKeyState("Ctrl")
+					
+					this.runSimulation()
+					
+					if selectStrategy
+						this.chooseSimulationMenu(5)
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
 			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario
 				
@@ -1395,6 +1429,13 @@ class StrategyWorkbench extends ConfigurationItem {
 						; ignore
 					}
 			}
+		}
+		else if inList([3, 4, 6, 8, 9], line) {
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+			OnMessage(0x44, "")
 		}
 	}
 	

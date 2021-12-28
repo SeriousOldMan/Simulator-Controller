@@ -5,6 +5,7 @@
   3. Added support for pre-race stint planning in "Race Center". See the new [Session & Stint planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning) documentation for more information.
   4. New [plugin parameter "openRaceCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for the "Team Server" plugin. This parameter is identical to the same parameter already defined for the "Race Strategist" and "Race Engineer" plugins and is therfore not much more than a convinience feature.
   5. "Strategy Workbench" can now create strategies even without telemetry data for a specific car and track.
+  6. Fixed a bug, where telemetry data were not collected during practice sessions.
 
 ## 3.7.8-release 12/24/21
 

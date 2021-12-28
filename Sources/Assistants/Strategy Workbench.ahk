@@ -1160,9 +1160,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSettingsMenu(line) {
-		if (!this.SelectedSimulator || !this.SelectedCar || !this.SelectedTrack)
-			return
-		
 		window := this.Window
 						
 		Gui %window%:Default
@@ -1246,7 +1243,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
 				
-				if (simulator && this.SelectedCar && this.SelectedTrack) {
+				if simulator {
 					switch simulator {
 						case "Assetto Corsa Competizione":
 							prefix := "ACC"
@@ -1294,7 +1291,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					title := translate("Information")
 
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					MsgBox 262192, %title%, % translate("You must first select a simulation.")
 					OnMessage(0x44, "")
 				}
 			case 6: ; "Load Defaults..."

@@ -1587,6 +1587,55 @@ class RaceCenter extends ConfigurationItem {
 			}
 	}
 	
+	initializePitstopSettings(ByRef lap, ByRef refuel, ByRef compound, ByRef compoundColor) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		currentStint := this.CurrentStint
+				
+		if currentStint {
+			nextStint := (currentStint.Nr + 1)
+		
+			Loop % LV_GetCount()
+			{
+				LV_GetText(stint, A_Index)
+				
+				if (stint = nextStint) {
+					LV_GetText(plannedLap, A_Index, 5)
+					LV_GetText(refuelAmount, A_Index, 7)
+					LV_GetText(tyreChange, A_Index, 8)
+		
+					lap := plannedLap
+					refuel := refuelAmount
+					
+					if (tyreChange != "x") {
+						compound := false
+						compoundColor := false
+					}
+					
+					return
+				}
+			}
+		
+			if this.Strategy
+				for index, pitstop in this.Strategy.Pitstops
+					if (pitstop.ID = currentStint.Nr) {
+						lap := pitstop.Lap
+						refuel := pitstop.RefuelAmount
+			
+						if !pitstop.TyreChange {
+							compound := false
+							compoundColor := false
+						}
+						
+						return
+					}
+		}
+	}			
+	
 	initializePitstopFromSession() {
 		pressuresDB := this.PressuresDatabase
 		
@@ -1598,7 +1647,21 @@ class RaceCenter extends ConfigurationItem {
 			if (last > 0) {
 				pressures := pressuresTable[last]
 				
-				this.initializePitstopTyreSetup(pressures["Compound"], pressures["Compound.Color"]
+				lap := 0
+				refuel := 0
+				compound := pressures["Compound"]
+				compoundColor := pressures["Compound.Color"]
+				
+				this.initializePitstopSettings(lap, refuel, compound, compoundColor)
+				
+				window := this.Window
+		
+				Gui %window%:Default
+				
+				GuiControl, , planLapEdit, %lap%
+				GuiControl, , pitstopRefuelEdit, %refuel%
+				
+				this.initializePitstopTyreSetup(compound, compoundColor
 											  , displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 											  , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
 			}
@@ -1613,7 +1676,7 @@ class RaceCenter extends ConfigurationItem {
 		if (compoundColor != "Black")
 			compound := (compound . " (" . compoundColor . ")")
 		
-		GuiControl Choose, pitstopTyreCompoundDropDown, % inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound)
+		GuiControl Choose, pitstopTyreCompoundDropDown, % (!compound ? 1 : inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound))
 		
 		GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
 		GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
@@ -2017,7 +2080,11 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, "")
 					
 					IfMsgBox Yes
+					{
 						LV_Delete()
+						
+						this.Version := (A_Now . "")
+					}
 				}
 			case 6:
 				this.showPlanDetails()

@@ -94,11 +94,13 @@ To use the "Race Center", you must have a valid connection to a team session. Th
 
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 
-It is no problem, to reuse a session for many races, because the old data will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish. Please note, that it is **not** a good idea to use the same session in more than one race at the same time.
+It is no problem, to reuse a session for many races, because the old data (except the stint plan and the associated strategy, if any) will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish.
+
+It is obvious, that it is **not** a good idea to use the same session in more than one race at the same time.
 
 #### Session data handling
 
-All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) form more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recent session anytime later using the "Load..." command.
+All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load..." command.
 
 #### Data Analysis
 

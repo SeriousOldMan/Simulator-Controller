@@ -205,8 +205,7 @@ namespace TeamServer.Server {
 			FinishSession(new Guid(identifier));
 		}
 
-		public void ClearSession(Session session)
-		{
+		public void ClearSession(Session session) {
 			ValidateSession(session);
 
 			// foreach (Model.Attribute attribute in session.Attributes)
@@ -216,13 +215,11 @@ namespace TeamServer.Server {
 				stint.Delete();
 		}
 
-		public void ClearSession(Guid identifier)
-		{
+		public void ClearSession(Guid identifier) {
 			ClearSession(ObjectManager.GetSessionAsync(identifier).Result);
 		}
 
-		public void ClearSession(string identifier)
-		{
+		public void ClearSession(string identifier) {
 			ClearSession(new Guid(identifier));
 		}
 
@@ -247,8 +244,7 @@ namespace TeamServer.Server {
 					foreach (Model.Attribute attribute in s.Attributes)
 						attribute.Delete();
 
-					foreach (Stint stint in s.Stints)
-					{
+					foreach (Stint stint in s.Stints) {
 						foreach (Model.Attribute attribute in stint.Attributes)
 							attribute.Delete();
 

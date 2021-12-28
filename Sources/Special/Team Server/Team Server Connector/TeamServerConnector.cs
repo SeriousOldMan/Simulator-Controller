@@ -330,7 +330,8 @@ namespace TeamServer {
 		}
 
 		public void DeleteSessionStintValue(string identifier, int stint, string name) {
-			Delete("session/" + identifier + "/stint/" + stint + "/value", arguments: new Parameters() { { "name", name } });
+			Delete("session/" + identifier + "/stint/" + stint + "/value",
+				   arguments: new Parameters() { { "name", name } });
 		}
 
 		public string GetSessionLapValue(string identifier, int lap, string name)

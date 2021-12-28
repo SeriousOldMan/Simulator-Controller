@@ -1658,7 +1658,7 @@ class RaceCenter extends ConfigurationItem {
 		
 				Gui %window%:Default
 				
-				GuiControl, , planLapEdit, %lap%
+				GuiControl, , pitstopLapEdit, %lap%
 				GuiControl, , pitstopRefuelEdit, %refuel%
 				
 				this.initializePitstopTyreSetup(compound, compoundColor
@@ -2440,7 +2440,7 @@ class RaceCenter extends ConfigurationItem {
 					time := this.Connector.GetStintValue(identifier, "Time")
 						
 					if (!time || (time == ""))
-						newStint.Time := ((stint.Nr == 1) ? (A_Now . "") : false)
+						newStint.Time := ((newStint.Nr == 1) ? (A_Now . "") : false)
 					else
 						newStint.Time := time
 					

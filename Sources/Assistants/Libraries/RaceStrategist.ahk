@@ -134,10 +134,12 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	hasEnoughData(inform := true) {
-		if (this.Session == kSessionRace)
+		if !inform
+			return base.hasEnoughData(false)
+		else if (this.Session == kSessionRace)
 			return base.hasEnoughData(inform)
 		else {
-			if (inform && this.Speaker)
+			if this.Speaker
 				this.getSpeaker().speakPhrase("CollectingData")
 			
 			return false
@@ -694,45 +696,43 @@ class RaceStrategist extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 		
-		if this.hasEnoughData(false) {
-			if (this.SaveTelemetry != kNever) {
-				pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+		if (this.hasEnoughData(false) && (this.SaveTelemetry != kNever)) {
+			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+			
+			if pitstop
+				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+			
+			prefix := "Lap." . lapNumber
+			
+			validLap := knowledgeBase.getValue(prefix . ".Valid", true)
+			
+			if (validLap || pitstop) {
+				weather := knowledgeBase.getValue(prefix . ".Weather")
+				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
 				
-				if pitstop
-					pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+				map := knowledgeBase.getValue(prefix . ".Map")
+				tc := knowledgeBase.getValue(prefix . ".TC")
+				abs := knowledgeBase.getValue(prefix . ".ABS")
 				
-				prefix := "Lap." . lapNumber
+				pressures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
 				
-				validLap := knowledgeBase.getValue(prefix . ".Valid", true)
-				
-				if (validLap || pitstop) {
-					weather := knowledgeBase.getValue(prefix . ".Weather")
-					airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-					trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-					compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-					compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-					fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-					fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-					lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
-					
-					map := knowledgeBase.getValue(prefix . ".Map")
-					tc := knowledgeBase.getValue(prefix . ".TC")
-					abs := knowledgeBase.getValue(prefix . ".ABS")
-					
-					pressures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-												  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
-					
-					temperatures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-													 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
-													
-					this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-										 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-										 , compound, compoundColor, pressures, temperatures)
-				}
+				temperatures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
+												
+				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+									 , compound, compoundColor, pressures, temperatures)
 			}
 		}
 		

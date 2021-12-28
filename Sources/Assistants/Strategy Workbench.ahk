@@ -424,7 +424,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x435 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x620 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x620 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -1307,21 +1307,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		switch line {
 			case 3: ; "Run Simulation"
-				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
-					selectStrategy := GetKeyState("Ctrl")
-					
-					this.runSimulation()
-					
-					if selectStrategy
-						this.chooseSimulationMenu(5)
-				}
-				else {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-					OnMessage(0x44, "")
-				}
+				selectStrategy := GetKeyState("Ctrl")
+				
+				this.runSimulation()
+				
+				if selectStrategy
+					this.chooseSimulationMenu(5)
 			case 5: ; "Use as Strategy..."
 				strategy := this.SelectedScenario
 				
@@ -1350,92 +1341,103 @@ class StrategyWorkbench extends ConfigurationItem {
 			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
+		}
+		else
+			dirName := ""
 			
-			switch line {
-				case 3: ; "Load Strategy..."
-					title := translate("Load Race Strategy...")
+		switch line {
+			case 3:
+				fileName := kUserConfigDirectory . "Race.strategy"
+				
+				if FileExist(fileName) {
+					configuration := readConfiguration(fileName)
 					
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-					FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+					if (configuration.Count() > 0)
+						this.selectStrategy(this.createStrategy(configuration))
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no active Race Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 4: ; "Load Strategy..."
+				title := translate("Load Race Strategy...")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+				OnMessage(0x44, "")
+			
+				if (file != "") {
+					configuration := readConfiguration(file)
+					
+					if (configuration.Count() > 0)
+						this.selectStrategy(this.createStrategy(configuration))
+				}
+			case 5: ; "Save Strategy..."
+				if this.SelectedStrategy {
+					title := translate("Save Race Strategy...")
+					
+					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
+					
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
 				
 					if (file != "") {
-						configuration := readConfiguration(file)
+						if !InStr(file, ".")
+							file := (file . ".strategy")
+			
+						SplitPath file, , , , name
 						
-						if (configuration.Count() > 0)
-							this.selectStrategy(this.createStrategy(configuration))
-					}
-				case 4: ; "Save Strategy..."
-					if this.SelectedStrategy {
-						title := translate("Save Race Strategy...")
-						
-						fileName := (dirName . "\" . this.SelectedStrategy.Name . ".strategy")
-						
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-						FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
-						OnMessage(0x44, "")
-					
-						if (file != "") {
-							if !InStr(file, ".")
-								file := (file . ".strategy")
-				
-							SplitPath file, , , , name
+						this.SelectedStrategy.setName(name)
 							
-							this.SelectedStrategy.setName(name)
-								
-							configuration := newConfiguration()
-							
-							this.SelectedStrategy.saveToConfiguration(configuration)
-							
-							writeConfiguration(file, configuration)
-						}
-					}
-				case 6: ; "Compare Strategies..."
-					title := translate("Choose two or more Race Strategies for comparison...")
-				
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
-					FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
-					OnMessage(0x44, "")
-				
-					strategies := []
-					
-					if (files != "") {
-						directory := ""
-						
-						Loop Parse, files, `n
-						{
-							if (A_Index = 1)
-								directory := A_LoopField
-							else
-								strategies.Push(this.createStrategy(readConfiguration(directory . "\" . A_LoopField)))
-						}
-						
-						if (strategies.Count() > 1)
-							this.compareStrategies(strategies*)
-					}
-				case 8: ; "Export Strategy..."
-					if this.SelectedStrategy {
 						configuration := newConfiguration()
 						
 						this.SelectedStrategy.saveToConfiguration(configuration)
 						
-						writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+						writeConfiguration(file, configuration)
 					}
-				case 9: ; "Export Strategy..."
-					try {
-						FileDelete %kUserConfigDirectory%Race.strategy
+				}
+			case 7: ; "Compare Strategies..."
+				title := translate("Choose two or more Race Strategies for comparison...")
+			
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
+				FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
+				OnMessage(0x44, "")
+			
+				strategies := []
+				
+				if (files != "") {
+					directory := ""
+					
+					Loop Parse, files, `n
+					{
+						if (A_Index = 1)
+							directory := A_LoopField
+						else
+							strategies.Push(this.createStrategy(readConfiguration(directory . "\" . A_LoopField)))
 					}
-					catch exception {
-						; ignore
-					}
-			}
-		}
-		else if inList([3, 4, 6, 8, 9], line) {
-			title := translate("Information")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-			OnMessage(0x44, "")
+					
+					if (strategies.Count() > 1)
+						this.compareStrategies(strategies*)
+				}
+			case 9: ; "Export Strategy..."
+				if this.SelectedStrategy {
+					configuration := newConfiguration()
+					
+					this.SelectedStrategy.saveToConfiguration(configuration)
+					
+					writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+				}
+			case 10: ; "Clear Strategy..."
+				try {
+					FileDelete %kUserConfigDirectory%Race.strategy
+				}
+				catch exception {
+					; ignore
+				}
 		}
 	}
 	

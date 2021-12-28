@@ -183,17 +183,19 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
 				
-				pitstopSettings := parseConfiguration(pitstopSettings)
-				
-				this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
-											, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false))
+				if (pitstopSettings && (pitstopSettings != "")) {
+					pitstopSettings := parseConfiguration(pitstopSettings)
+					
+					this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false))
+				}
 			}
 		}
 	}

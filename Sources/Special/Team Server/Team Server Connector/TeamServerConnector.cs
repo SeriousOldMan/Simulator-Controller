@@ -317,6 +317,22 @@ namespace TeamServer {
 			Delete("session/" + identifier + "/value", arguments: new Parameters() { { "name", name } });
 		}
 
+		public string GetSessionStintValue(string identifier, int stint, string name)
+		{
+			return Get("session/" + identifier + "/stint/" + stint + "/value",
+					   arguments: new Parameters() { { "name", name } });
+		}
+
+		public void SetSessionStintValue(string identifier, int stint, string name, string value)
+		{
+			Put("session/" + identifier + "/stint/" + stint + "/value",
+				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public void DeleteSessionStintValue(string identifier, int stint, string name) {
+			Delete("session/" + identifier + "/stint/" + stint + "/value", arguments: new Parameters() { { "name", name } });
+		}
+
 		public string GetSessionLapValue(string identifier, int lap, string name)
 		{
 			return Get("session/" + identifier + "/lap/" + lap + "/value",
@@ -403,6 +419,20 @@ namespace TeamServer {
 
 		public string GetStintDriver(string identifier) {
 			return Get("stint/" + identifier + "/driver");
+		}
+
+		public string GetStintValue(string identifier, string name) {
+			return Get("stint/" + identifier + "/value",
+					   arguments: new Parameters() { { "name", name } });
+		}
+
+		public void SetStintValue(string identifier, string name, string value) {
+			Put("stint/" + identifier + "/value",
+				arguments: new Parameters() { { "name", name } }, body: value);
+		}
+
+		public void DeleteStintValue(string identifier, string name) {
+			Put("stint/" + identifier + "/value", arguments: new Parameters() { { "name", name } });
 		}
 		#endregion
 

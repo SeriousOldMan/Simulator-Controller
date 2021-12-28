@@ -1709,7 +1709,6 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
 				
-				
 				showMessage(translate("Race Strategist will be instructed in the next lap."))
 			}
 			catch exception {
@@ -1731,7 +1730,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
 				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
-				this.Connector.SetLapValue(lap, "Race Strategy", "CANCEL")
 				
 				showMessage(translate("Race Strategist will be instructed in the next lap."))
 			}
@@ -2438,16 +2436,13 @@ class RaceCenter extends ConfigurationItem {
 				if !this.Stints.HasKey(identifier) {
 					newStint := parseObject(this.Connector.GetStint(identifier))
 					newStint.Nr := (newStint.Nr + 0)
-					newStint.Time := false
 					
-					if (newStint.Nr = 1) {
-						time := this.Connector.GetSessionValue(session, "Time")
+					time := this.Connector.GetStintValue(identifier, "Time")
 						
-						if (!time || (time == ""))
-							time := (A_Now . "")
-						
+					if (!time || (time == ""))
+						newStint.Time := ((stint.Nr == 1) ? (A_Now . "") : false)
+					else
 						newStint.Time := time
-					}
 					
 					newStints.Push(newStint)
 				}

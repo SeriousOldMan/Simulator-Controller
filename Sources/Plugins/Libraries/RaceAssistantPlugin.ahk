@@ -862,6 +862,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (teamServer && teamServer.Active) {
 			try {
 				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
+				
+				if (!sessionSettings || (sessionSettings = ""))
+					throw "No data..."
 			}
 			catch exception {
 				return false
@@ -885,6 +888,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (teamServer && teamServer.Active) {
 			try {
 				sessionState := teamServer.getSessionValue(this.Plugin . " State")
+				
+				if (!sessionState || (sessionState = ""))
+					throw "No data..."
 			}
 			catch exception {
 				return false
@@ -1111,12 +1117,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)
 						
 						if firstLap {
-							if this.connectTeamSession()
-								this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
-														  , getConfigurationValue(data, "Session Data", "Track")
-														  , dataLastLap
-														  , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
+							if this.connectTeamSession() {
+								teamServer := this.TeamServer
+								
+								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+													 , getConfigurationValue(data, "Session Data", "Track")
+													 , dataLastLap
+													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 							
+								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
+								this.TeamServer.setSessionValue(this.Plugin . " State", "")
+							}
+								
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")
 							

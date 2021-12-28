@@ -129,20 +129,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				strategyUpdate := this.TeamServer.getLapValue(strategyUpdate, "Strategy Update")
 				
-				if (strategyUpdate = "CANCEL")
-					this.RaceStrategist.updateStrategy(false)
-				else {
-					try {
-						FileDelete %kTempDirectory%Race Strategy.update
-						
-						FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
+				if (strategyUpdate && (strategyUpdate != ""))
+					if (strategyUpdate = "CANCEL")
+						this.RaceStrategist.updateStrategy(false)
+					else {
+						try {
+							FileDelete %kTempDirectory%Race Strategy.update
+							
+							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
+						}
+						catch exception {
+							; ignore
+						}
+					
+						this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
 					}
-					catch exception {
-						; ignore
-					}
-				
-					this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
-				}
 			}
 		}
 	}

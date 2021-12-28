@@ -570,6 +570,58 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 	
+	getStintValue(stint, name, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+		
+		if session {
+			try {
+				if stint is integer
+					value := this.Connector.GetSessionStintValue(session, stint, name)
+				else
+					value := this.Connector.GetStintValue(stint, name)
+
+				if isDebug()
+					showMessage("Fetching value for " . stint . ": " . name . " => " . value)
+			
+				return value
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+		
+		return false
+	}
+	
+	setStintValue(stint, name, value, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+		
+		if session {
+			try {
+				if isDebug()
+					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
+				
+				if (!value || (value == "")) {
+					if stint is integer
+						this.Connector.DeleteSessionStintValue(session, stint, name)
+					else
+						this.Connector.DeleteStintValue(stint, name, value)
+				}
+				else {
+					if stint is integer
+						this.Connector.SetSessionStintValue(session, stint, name, value)
+					else
+						this.Connector.SetStintValue(stint, name, value)
+				}
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+	}
+	
 	getCurrentLap(session := false) {
 		if (!session && this.SessionActive)
 			session := this.Session
@@ -649,7 +701,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
 			
-				return this.Connector.StartStint(this.Session, this.Driver, lapNumber)
+				stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
+			
+				this.Connector.SetStintValue(stint, "Time", A_Now)
+				
+				return stint
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))

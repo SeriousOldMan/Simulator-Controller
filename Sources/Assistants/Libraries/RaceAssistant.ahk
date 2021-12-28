@@ -631,22 +631,33 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	restoreSessionState(settingsFile, stateFile) {
-		sessionSettings := readConfiguration(settingsFile)
-		sessionState := readConfiguration(stateFile)
-		
-		try {
-			FileDelete %settingsFile%
-			FileDelete %stateFile%
+		if stateFile {
+			sessionState := readConfiguration(stateFile)
+			
+			try {
+				FileDelete %stateFile%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
+			
+			this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, DriverFullName: "John Doe (JD)"})
 		}
-		catch exception {
-			; ignore
+		
+		if settingsFile {
+			sessionSettings := readConfiguration(settingsFile)
+		
+			try {
+				FileDelete %settingsFile%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			this.updateSession(sessionSettings)
 		}
-		
-		this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
-		
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, DriverFullName: "John Doe (JD)"})
-		
-		this.updateSession(sessionSettings)
 	}
 	
 	prepareData(lapNumber, data) {

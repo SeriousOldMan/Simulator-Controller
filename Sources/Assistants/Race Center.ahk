@@ -2129,9 +2129,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	withExceptionHandler(function, arguments*) {
-		; try {
+		try {
 			return %function%(arguments*)
-		/*}
+		}
 		catch exception {
 			title := translate("Error")
 		
@@ -2139,7 +2139,6 @@ class RaceCenter extends ConfigurationItem {
 			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
 		}
-		*/
 	}
 	
 	createStrategy(nameOrConfiguration := false) {

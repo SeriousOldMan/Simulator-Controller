@@ -382,8 +382,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.iTeams := {}
 		
-		if this.Token
-			for ignore, identifier in string2Values(";", connector.GetAllTeams())
+		if this.Token {
+			try {
+				identifiers := string2Values(";", connector.GetAllTeams())
+			}
+			catch exception {
+				identifiers := []
+			}
+			
+			for ignore, identifier in identifiers
 				try {
 					team := this.parseObject(connector.GetTeam(identifier))
 					
@@ -392,6 +399,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				catch exception {
 					; ignore
 				}
+		}
 
 		window := this.Editor.Window
 		
@@ -418,8 +426,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.iDrivers := {}
 	
-		if this.SelectedTeam
-			for ignore, identifier in string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam])) {
+		if this.SelectedTeam {
+			try {
+				identifiers := string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam]))
+			}
+			catch exception {
+				identifiers := []
+			}
+			
+			for ignore, identifier in identifiers {
 				try {
 					driver := this.parseObject(connector.GetDriver(identifier))
 				
@@ -430,7 +445,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 				catch exception {
 					; ignore
 				}
-			}			
+			}
+		}			
 		
 		drivers := []
 		
@@ -453,8 +469,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.iSessions := {}
 	
-		if this.SelectedTeam
-			for ignore, identifier in string2Values(";", connector.GetTeamSessions(this.Teams[this.SelectedTeam])) {
+		if this.SelectedTeam {
+			try {
+				identifiers := string2Values(";", connector.GetTeamSessions(this.Teams[this.SelectedTeam]))
+			}
+			catch exception {
+				identifiers := []
+			}
+			
+			for ignore, identifier in identifiers {
 				try {
 					session := this.parseObject(connector.GetSession(identifier))
 					
@@ -463,17 +486,29 @@ class TeamServerConfigurator extends ConfigurationItem {
 				catch exception {
 					; ignore
 				}
-			}			
+			}
+		}
 		
 		sessions := []
 		infos := []
 		
 		for name, identifier in this.Sessions {
-			stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
+			try {
+				stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
+			}
+			catch exception {
+				stints := []
+			}
+			
 			laps := 0
 			
 			if (stints > 0)
-				laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
+				try {
+					laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
+				}
+				catch exception {
+					stints := []
+				}
 				
 			sessions.Push(name)
 			infos.Push(name . translate(" (") . stints . translate(" stints, ") . laps . translate(" laps)"))
@@ -651,6 +686,19 @@ class TeamServerConfigurator extends ConfigurationItem {
 		
 		this.loadSessions()
 	}
+	
+	withExceptionHandler(function, arguments*) {
+		try {
+			return %function%(arguments*)
+		}
+		catch exception {
+			title := translate("Error")
+		
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
+		}
+	}
 }
 
 
@@ -746,9 +794,18 @@ changePassword() {
 			return
 		}
 		
-		configurator.Connector.ChangePassword(firstPassword)
+		try {
+			configurator.Connector.ChangePassword(firstPassword)
 		
-		GuiControl, , teamServerPasswordEdit, % firstPassword
+			GuiControl, , teamServerPasswordEdit, % firstPassword
+		}
+		catch exception {
+			title := translate("Error")
+		
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
+		}
 	}
 	else {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -803,7 +860,7 @@ newTeam() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 	
 	if !ErrorLevel
-		configurator.addTeam(name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "addTeam"), name)
 }
 
 deleteTeam() {
@@ -813,7 +870,7 @@ deleteTeam() {
 	OnMessage(0x44, "")
 	
 	IfMsgBox Yes
-		TeamServerConfigurator.Instance.deleteTeam(TeamServerConfigurator.Instance.SelectedTeam)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteTeam"), TeamServerConfigurator.Instance.SelectedTeam)
 }
 
 renameTeam() {
@@ -831,7 +888,7 @@ renameTeam() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedTeam
 	
 	if !ErrorLevel
-		configurator.renameTeam(configurator.SelectedTeam, name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameTeam"), configurator.SelectedTeam, name)
 }
 
 selectDriver() {
@@ -848,7 +905,7 @@ selectDriver() {
 	for name, ignore in configurator.Drivers
 		drivers.Push(name)
 	
-	configurator.selectDriver(drivers[driverListBox])
+	configurator.withExceptionHandler(ObjBindMethod(configurator, "selectDriver"), drivers[driverListBox])
 }
 
 newDriver() {
@@ -866,7 +923,7 @@ newDriver() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 	
 	if !ErrorLevel
-		configurator.addDriver(name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "addDriver"), name)
 }
 
 deleteDriver() {
@@ -876,7 +933,7 @@ deleteDriver() {
 	OnMessage(0x44, "")
 	
 	IfMsgBox Yes
-		TeamServerConfigurator.Instance.deleteDriver(TeamServerConfigurator.Instance.SelectedDriver)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteDriver"), TeamServerConfigurator.Instance.SelectedDriver)
 }
 
 renameDriver() {
@@ -894,7 +951,7 @@ renameDriver() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedDriver
 	
 	if !ErrorLevel
-		configurator.renameDriver(configurator.SelectedDriver, name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameDriver"), configurator.SelectedDriver, name)
 }
 
 selectSession() {
@@ -911,7 +968,7 @@ selectSession() {
 	for name, ignore in configurator.Sessions
 		sessions.Push(name)
 	
-	configurator.selectSession(sessions[sessionListBox])
+	configurator.withExceptionHandler(ObjBindMethod(configurator, "selectSession"), sessions[sessionListBox])
 }
 
 newSession() {
@@ -929,7 +986,7 @@ newSession() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 	
 	if !ErrorLevel
-		configurator.addSession(name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "addSession"), name)
 }
 
 renameSession() {
@@ -947,7 +1004,7 @@ renameSession() {
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedSession
 	
 	if !ErrorLevel
-		configurator.renameSession(configurator.SelectedSession, name)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameSession"), configurator.SelectedSession, name)
 }
 
 deleteSession() {
@@ -957,7 +1014,7 @@ deleteSession() {
 	OnMessage(0x44, "")
 	
 	IfMsgBox Yes
-		TeamServerConfigurator.Instance.deleteSession(TeamServerConfigurator.Instance.SelectedSession)
+		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteSession"), TeamServerConfigurator.Instance.SelectedSession)
 }
 
 initializeTeamServerConfigurator() {

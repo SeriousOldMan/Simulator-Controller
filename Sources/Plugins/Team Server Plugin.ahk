@@ -703,7 +703,12 @@ class TeamServerPlugin extends ControllerPlugin {
 			
 				stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
 			
-				this.Connector.SetStintValue(stint, "Time", A_Now)
+				try {
+					this.Connector.SetStintValue(stint, "Time", A_Now)
+				}
+				catch exception {
+					; ignore
+				}
 				
 				return stint
 			}

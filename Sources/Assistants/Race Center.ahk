@@ -2437,7 +2437,12 @@ class RaceCenter extends ConfigurationItem {
 					newStint := parseObject(this.Connector.GetStint(identifier))
 					newStint.Nr := (newStint.Nr + 0)
 					
-					time := this.Connector.GetStintValue(identifier, "Time")
+					try {
+						time := this.Connector.GetStintValue(identifier, "Time")
+					}
+					catch exception {
+						time := false
+					}
 						
 					if (!time || (time == ""))
 						newStint.Time := ((newStint.Nr == 1) ? (A_Now . "") : false)

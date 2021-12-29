@@ -1,7 +1,7 @@
 [Development]
 Version=3.8.0-dev
 Target=3.8.0-release
-Date=12/28/2021
+Date=12/29/2021
 Download=https://www.dropbox.com/s/ao3fnikouzfe01p/Simulator%20Controller%203.8.0-dev.zip?dl=1
 Changes=Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions
 [Release]

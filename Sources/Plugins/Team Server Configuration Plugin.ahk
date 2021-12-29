@@ -497,7 +497,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
 			}
 			catch exception {
-				stints := []
+				stints := 0
 			}
 			
 			laps := 0
@@ -507,7 +507,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
 				}
 				catch exception {
-					stints := []
+					; ignore
 				}
 				
 			sessions.Push(name)

@@ -543,10 +543,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				if (default != kUndefined)
-					return default
-				else
-					logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
 		

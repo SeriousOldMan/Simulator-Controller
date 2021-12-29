@@ -327,7 +327,14 @@ parseObject(properties) {
 loadTeams(connector) {
 	teams := {}
 	
-	for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
+	try {
+		identifiers := string2Values(";", connector.GetAllTeams())
+	}
+	catch exception {
+		identifiers := []
+	}
+	
+	for ignore, identifier in identifiers {
 		team := parseObject(connector.GetTeam(identifier))
 		
 		teams[team.Name] := team.Identifier
@@ -339,14 +346,22 @@ loadTeams(connector) {
 loadDrivers(connector, team) {
 	drivers := {}
 	
-	if team
-		for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
+	if team {
+		try {
+			identifiers := string2Values(";", connector.GetTeamDrivers(team))
+		}
+		catch exception {
+			identifiers := []
+		}
+		
+		for ignore, identifier in identifiers {
 			driver := parseObject(connector.GetDriver(identifier))
 
 			name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 			
 			drivers[name] := driver.Identifier
 		}
+	}
 	
 	return drivers
 }
@@ -354,8 +369,15 @@ loadDrivers(connector, team) {
 loadSessions(connector, team) {
 	sessions := {}
 
-	if team
-		for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
+	if team {
+		try {
+			identifiers := string2Values(";", connector.GetTeamSessions(team))
+		}
+		catch exception {
+			identifiers := []
+		}
+		
+		for ignore, identifier in identifiers {
 			try {
 				session := parseObject(connector.GetSession(identifier))
 				
@@ -364,7 +386,8 @@ loadSessions(connector, team) {
 			catch exception {
 				; ignore
 			}
-		}			
+		}
+	}		
 	
 	return sessions
 }

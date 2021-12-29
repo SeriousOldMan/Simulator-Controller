@@ -77,10 +77,15 @@ downloadSimulatorController() {
 		ExitApp 0
 	}
 	
+	cState := GetKeyState("Control", "P")
+	sState := GetKeyState("Shift", "P")
+
+	devVersion := (cState != false)
+				
 	URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
 	release := readConfiguration(kTempDirectory . "VERSION")
-	version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
+	version := getConfigurationValue(release, (devVersion ? "Development" : "Release"), "Version", getConfigurationValue(release, "Version", "Release", false))
 
 	if version {
 		version := StrSplit(version, "-", , 2)
@@ -94,11 +99,11 @@ downloadSimulatorController() {
 		version := values2String("", string2Values(".", version[1])*)
 		current := values2String("", string2Values(".", current[1])*)
 		
-		if GetKeyState("Ctrl", "P") && GetKeyState("Shift", "P")
+		if devVersion
 			download := getConfigurationValue(release, "Development", "Download", false)
 		else
 			download := getConfigurationValue(release, "Release", "Download", false)
-				
+		
 		if download {
 			x := Round((A_ScreenWidth - 300) / 2)
 			y := A_ScreenHeight - 150

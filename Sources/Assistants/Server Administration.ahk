@@ -736,7 +736,7 @@ changePassword() {
 	}
 	else {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Team Server to change your password.")
+		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Server to change your password.")
 		OnMessage(0x44, "")
 	}
 }

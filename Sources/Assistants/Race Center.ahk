@@ -1585,6 +1585,13 @@ class RaceCenter extends ConfigurationItem {
 			catch exception {
 				; ignore
 			}
+		else {
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+			OnMessage(0x44, "")
+		}
 	}
 	
 	initializePitstopSettings(ByRef lap, ByRef refuel, ByRef compound, ByRef compoundColor) {
@@ -3743,6 +3750,8 @@ class RaceCenter extends ConfigurationItem {
 			this.Stints[newStint.Nr] := newStint
 			
 			this.iCurrentStint := newStint
+			
+			this.updatePlan(newStint)
 		}
 		
 		window := this.Window

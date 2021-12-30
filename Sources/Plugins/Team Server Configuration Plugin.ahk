@@ -809,7 +809,7 @@ changePassword() {
 	}
 	else {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Team Server to change your password.")
+		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Server to change your password.")
 		OnMessage(0x44, "")
 	}
 }
@@ -868,6 +868,8 @@ deleteTeam() {
 	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected team?")
 	OnMessage(0x44, "")
+	
+	configurator := TeamServerConfigurator.Instance
 	
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteTeam"), TeamServerConfigurator.Instance.SelectedTeam)
@@ -931,6 +933,8 @@ deleteDriver() {
 	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected driver?")
 	OnMessage(0x44, "")
+	
+	configurator := TeamServerConfigurator.Instance
 	
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteDriver"), TeamServerConfigurator.Instance.SelectedDriver)
@@ -1012,6 +1016,8 @@ deleteSession() {
 	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected session?")
 	OnMessage(0x44, "")
+	
+	configurator := TeamServerConfigurator.Instance
 	
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteSession"), TeamServerConfigurator.Instance.SelectedSession)

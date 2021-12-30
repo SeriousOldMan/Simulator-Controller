@@ -4,7 +4,7 @@
 
 In a few days, a managed server will be available for you and your teams to use. To use it, you have to become a patron of Simulator Controller. Please check the [creator page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
 
-Disclaimer: The current version of the *Team Server* should be considered to be in beta stage. Therefore always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. Also, parts of the handling for shared special data like telemetry data or tyre pressure history are still under development. Currently, I would not recommend to use the setup for races longer than six hours, unless your PC has a lot of internal memory to spare.
+Disclaimer: Although the current version of the *Team Server* is no longer in beta stage, please always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. For obvious reasons, there will be no error messages during the race, when for example the connection to the central server has been lost or other internal error occur, but you might face misbehaviour. You may take a look into the log files afterwards, though.
 
 ## Installation & Configuration
 
@@ -41,6 +41,10 @@ Using the "Accounts" option, you can *preload* accounts into an empty database. 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
 
 If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
+
+## Updating Team Server
+
+Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [up0date notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
 
 ## Managing teams
 

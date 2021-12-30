@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.8.0-beta](https://www.dropbox.com/s/yhevk93n73fnbos/Simulator%20Controller%203.8.0-beta.zip?dl=1) (Stable test build for 3.8.0. New features: Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions. Stable, with documentation and update procedure.)
+[3.8.0-rc1](https://www.dropbox.com/s/eoklcfs5vverram/Simulator%20Controller%203.8.0-rc1.zip?dl=1) (Release candidate for 3.8.0. New features: Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions. Stable, with documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-380) of this version and all the versions you might have skipped, before installing and using this version.
 

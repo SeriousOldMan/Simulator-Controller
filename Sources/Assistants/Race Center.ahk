@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Center                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
 ;;;-------------------------------------------------------------------------;;;
@@ -5354,7 +5354,7 @@ class RaceCenter extends ConfigurationItem {
 			LV_GetText(refuelAmount, A_Index, 7)
 			LV_GetText(tyreChange, A_Index, 8)
 			
-			html .= ("<tr><td class=""td-std"">" . stint . "</td>"
+			html .= ("<tr><th class=""th-std"">" . stint . "</th>"
 				   . "<td class=""td-std"">" . driver . "</td>"
 				   . "<td class=""td-std"">" . timePlanned . "</td>"
 				   . "<td class=""td-std"">" . timeActual . "</td>"

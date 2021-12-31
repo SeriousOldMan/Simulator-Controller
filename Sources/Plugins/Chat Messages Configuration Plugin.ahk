@@ -3,7 +3,7 @@
 ;;;                                         Configuration Plugin            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;

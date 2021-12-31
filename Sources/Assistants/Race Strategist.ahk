@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Strategist                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,7 +53,7 @@ global vRemotePID = 0
 showLogo(name) {
 	static videoPlayer
 
-	info := kVersion . " - 2021, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	logo := kResourcesDirectory . "Rotating Brain.gif"
 	image := "1:" . logo
 

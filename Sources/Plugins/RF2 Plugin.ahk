@@ -56,25 +56,27 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
-		simulator := this.Code
-		arguments := values2String(";", arguments*)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			simulator := this.Code
+			arguments := values2String(";", arguments*)
+			
+			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 		
-		exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	
-		try {
-			if operation
-				RunWait %ComSpec% /c ""%exePath%" -%command% "%operation%:%message%:%arguments%"", , Hide
-			else
-				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
-		}
-		catch exception {
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
-													   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-													   . kBinariesDirectory . translate(")"))
-				
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			try {
+				if operation
+					RunWait %ComSpec% /c ""%exePath%" -%command% "%operation%:%message%:%arguments%"", , Hide
+				else
+					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
+			}
+			catch exception {
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
+														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+														   . kBinariesDirectory . translate(")"))
+					
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 		}
 	}
 	
@@ -91,9 +93,13 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		this.activateRF2Window()
 
 		if this.OpenPitstopMFDHotkey {
-			SendEvent % this.OpenPitstopMFDHotkey
-			
-			return true
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				SendEvent % this.OpenPitstopMFDHotkey
+				
+				return true
+			}
+			else
+				return false
 		}
 		else if !reported {
 			reported := true
@@ -113,7 +119,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		this.activateRF2Window()
 
 		if this.ClosePitstopMFDHotkey {
-			SendEvent % this.ClosePitstopMFDHotkey
+			if (this.OpenPitstopMFDHotkey != "Off")
+				SendEvent % this.ClosePitstopMFDHotkey
 		}
 		else if !reported {
 			reported := true
@@ -143,23 +150,25 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	changePitstopOption(option, action, steps := 1) {
-		switch option {
-			case "Refuel":
-				this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
-			case "Tyre Compound":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
-			case "All Around":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1))
-			case "Front Left":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), 0.0, 0.0, 0.0)
-			case "Front Right":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, Round(steps * 0.1, 1), 0.0, 0.0)
-			case "Rear Left":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, Round(steps * 0.1, 1), 0.0)
-			case "Rear Right":
-				this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, 0.0, Round(steps * 0.1, 1))
-			case "Driver", "Repair":
-				this.sendPitstopCommand("Pitstop", action, option, Round(steps))
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			switch option {
+				case "Refuel":
+					this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
+				case "Tyre Compound":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
+				case "All Around":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1), Round(steps * 0.1, 1))
+				case "Front Left":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", Round(steps * 0.1, 1), 0.0, 0.0, 0.0)
+				case "Front Right":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, Round(steps * 0.1, 1), 0.0, 0.0)
+				case "Rear Left":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, Round(steps * 0.1, 1), 0.0)
+				case "Rear Right":
+					this.sendPitstopCommand("Pitstop", action, "Tyre Pressure", 0.0, 0.0, 0.0, Round(steps * 0.1, 1))
+				case "Driver", "Repair":
+					this.sendPitstopCommand("Pitstop", action, option, Round(steps))
+			}
 		}
 	}
 	
@@ -172,30 +181,32 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	getPitstopOptionValues(option) {
-		switch option {
-			case "Refuel":
-				data := readSimulatorData(this.Code, "-Setup")
-				
-				return [getConfigurationValue(data, "Setup Data", "FuelAmount", 0)]
-			case "Tyre Pressures":
-				data := readSimulatorData(this.Code, "-Setup")
-				
-				return [getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1)
-					  , getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1)]
-			case "Tyre Compound":
-				data := readSimulatorData(this.Code, "-Setup")
-				
-				return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
-			case "Repair Suspension":
-				data := readSimulatorData(this.Code, "-Setup")
-				
-				return [getConfigurationValue(data, "Setup Data", "RepairSuspension", false)]
-			case "Repair Bodywork":
-				data := readSimulatorData(this.Code, "-Setup")
-				
-				return [getConfigurationValue(data, "Setup Data", "RepairBodywork", false)]
-			default:
-				return base.getPitstopOptionValues(option)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			switch option {
+				case "Refuel":
+					data := readSimulatorData(this.Code, "-Setup")
+					
+					return [getConfigurationValue(data, "Setup Data", "FuelAmount", 0)]
+				case "Tyre Pressures":
+					data := readSimulatorData(this.Code, "-Setup")
+					
+					return [getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1)
+						  , getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+				case "Tyre Compound":
+					data := readSimulatorData(this.Code, "-Setup")
+					
+					return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+				case "Repair Suspension":
+					data := readSimulatorData(this.Code, "-Setup")
+					
+					return [getConfigurationValue(data, "Setup Data", "RepairSuspension", false)]
+				case "Repair Bodywork":
+					data := readSimulatorData(this.Code, "-Setup")
+					
+					return [getConfigurationValue(data, "Setup Data", "RepairBodywork", false)]
+				default:
+					return base.getPitstopOptionValues(option)
+			}
 		}
 	}
 	

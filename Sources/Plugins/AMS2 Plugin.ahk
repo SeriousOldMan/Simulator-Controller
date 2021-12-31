@@ -105,30 +105,36 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 		
-		SendEvent % this.OpenPitstopMFDHotkey
-		
-		return true
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			SendEvent % this.OpenPitstopMFDHotkey
+			
+			return true
+		}
+		else
+			return false
 	}
 	
 	closePitstopMFD(option := false) {
-		if (option = "Change Tyres") {
-			SendEvent % this.PreviousOptionHotkey
-		}
-		else if (option = "Refuel") {
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.PreviousOptionHotkey
-		}
-		else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-			Loop 3
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (option = "Change Tyres") {
 				SendEvent % this.PreviousOptionHotkey
+			}
+			else if (option = "Refuel") {
+				SendEvent % this.PreviousOptionHotkey
+				SendEvent % this.PreviousOptionHotkey
+			}
+			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
+				Loop 3
+					SendEvent % this.PreviousOptionHotkey
+			}
+			
+			SendEvent % this.NextChoiceHotkey
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.NextChoiceHotkey
+			SendEvent % this.NextOptionHotkey
+			SendEvent % this.NextChoiceHotkey
 		}
-		
-		SendEvent % this.NextChoiceHotkey
-		SendEvent % this.PreviousOptionHotkey
-		SendEvent % this.PreviousOptionHotkey
-		SendEvent % this.NextChoiceHotkey
-		SendEvent % this.NextOptionHotkey
-		SendEvent % this.NextChoiceHotkey
 	}
 	
 	requirePitstopMFD() {
@@ -136,148 +142,163 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	selectPitstopOption(option) {
-		SendEvent % this.PreviousOptionHotkey
-		SendEvent % this.NextChoiceHotkey
-		SendEvent % this.NextOptionHotkey
-		SendEvent % this.NextOptionHotkey
-		SendEvent % this.NextChoiceHotkey
-		
-		if (option = "Change Tyres") {
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			SendEvent % this.PreviousOptionHotkey
+			SendEvent % this.NextChoiceHotkey
 			SendEvent % this.NextOptionHotkey
+			SendEvent % this.NextOptionHotkey
+			SendEvent % this.NextChoiceHotkey
 			
-			return true
-		}
-		else if (option = "Refuel") {
-			SendEvent % this.NextOptionHotkey
-			SendEvent % this.NextOptionHotkey
-			
-			return true
-		}
-		else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-			Loop 3
+			if (option = "Change Tyres") {
 				SendEvent % this.NextOptionHotkey
-			
-			return true
+				
+				return true
+			}
+			else if (option = "Refuel") {
+				SendEvent % this.NextOptionHotkey
+				SendEvent % this.NextOptionHotkey
+				
+				return true
+			}
+			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
+				Loop 3
+					SendEvent % this.NextOptionHotkey
+				
+				return true
+			}
+			else {
+				SendEvent % this.NextChoiceHotkey
+				SendEvent % this.PreviousOptionHotkey
+				SendEvent % this.PreviousOptionHotkey
+				SendEvent % this.NextChoiceHotkey
+				SendEvent % this.NextOptionHotkey
+				SendEvent % this.NextChoiceHotkey
+				
+				return false
+			}
 		}
-		else {
-			SendEvent % this.NextChoiceHotkey
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.NextChoiceHotkey
-			SendEvent % this.NextOptionHotkey
-			SendEvent % this.NextChoiceHotkey
-			
+		else
 			return false
-		}
 	}
 	
 	changePitstopOption(option, action := "Increase", steps := 1) {
-		if (option = "Refuel") {
-			this.dialPitstopOption("Refuel", action, steps)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (option = "Refuel") {
+				this.dialPitstopOption("Refuel", action, steps)
+				
+				this.closePitstopMFD("Refuel")
+			}
+			else if (option = "Change Tyres") {
+				this.iChangeTyresChosen += 1
 			
-			this.closePitstopMFD("Refuel")
-		}
-		else if (option = "Change Tyres") {
-			this.iChangeTyresChosen += 1
-		
-			if (this.iChangeTyresChosen > 2)
-				this.iChangeTyresChosen := 0
+				if (this.iChangeTyresChosen > 2)
+					this.iChangeTyresChosen := 0
+				
+				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+				
+				if this.iChangeTyresChosen
+					this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+				
+				this.closePitstopMFD("Change Tyres")
+			}
+			else if (option = "Repair Bodywork") {
+				this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
 			
-			this.dialPitstopOption("Change Tyres", "Decrease", 10)
+				this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+				
+				if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
+					this.dialPitstopOption("Repair All", "Increase", 3)
+				else if this.iRepairBodyworkChosen
+					this.dialPitstopOption("Repair Bodywork", "Increase", 1)
+				else if this.iRepairSuspensionChosen
+					this.dialPitstopOption("Repair Suspension", "Increase", 2)
+				
+				this.closePitstopMFD("Repair Bodywork")
+			}
+			else if (option = "Repair Suspension") {
+				this.dialPitstopOption("Repair Suspension", "Decrease", 4)
 			
-			if this.iChangeTyresChosen
-				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
-			
-			this.closePitstopMFD("Change Tyres")
-		}
-		else if (option = "Repair Bodywork") {
-			this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
-		
-			this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-			
-			if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-				this.dialPitstopOption("Repair All", "Increase", 3)
-			else if this.iRepairBodyworkChosen
-				this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-			else if this.iRepairSuspensionChosen
-				this.dialPitstopOption("Repair Suspension", "Increase", 2)
-			
-			this.closePitstopMFD("Repair Bodywork")
-		}
-		else if (option = "Repair Suspension") {
-			this.dialPitstopOption("Repair Suspension", "Decrease", 4)
-		
-			this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-			
-			if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-				this.dialPitstopOption("Repair All", "Increase", 3)
-			else if this.iRepairBodyworkChosen
-				this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-			else if this.iRepairSuspensionChosen
-				this.dialPitstopOption("Repair Suspension", "Increase", 2)
-			
-			this.closePitstopMFD("Repair Suspension")
+				this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+				
+				if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
+					this.dialPitstopOption("Repair All", "Increase", 3)
+				else if this.iRepairBodyworkChosen
+					this.dialPitstopOption("Repair Bodywork", "Increase", 1)
+				else if this.iRepairSuspensionChosen
+					this.dialPitstopOption("Repair Suspension", "Increase", 2)
+				
+				this.closePitstopMFD("Repair Suspension")
+			}
+			else
+				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
 		}
 		else
-			Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+			return false
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {
-		switch action {
-			case "Increase":
-				Loop %steps%
-					SendEvent % this.NextChoiceHotkey
-			case "Decrease":
-				Loop %steps%
-					SendEvent % this.PreviousChoiceHotkey
-			default:
-				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
-		}
+		if (this.OpenPitstopMFDHotkey != "Off")
+			switch action {
+				case "Increase":
+					Loop %steps%
+						SendEvent % this.NextChoiceHotkey
+				case "Decrease":
+					Loop %steps%
+						SendEvent % this.PreviousChoiceHotkey
+				default:
+					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+			}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		this.requirePitstopMFD()
 		
-		if this.selectPitstopOption("Refuel") {
-			this.dialPitstopOption("Refuel", "Decrease", 200)
-			this.dialPitstopOption("Refuel", "Increase", Round(litres))
-			
-			this.closePitstopMFD("Refuel")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if this.selectPitstopOption("Refuel") {
+				this.dialPitstopOption("Refuel", "Decrease", 200)
+				this.dialPitstopOption("Refuel", "Increase", Round(litres))
+				
+				this.closePitstopMFD("Refuel")
+			}
 		}
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		this.requirePitstopMFD()
 		
-		if this.selectPitstopOption("Change Tyres") {
-			this.dialPitstopOption("Change Tyres", "Decrease", 10)
-			
-			if (compound = "Dry")
-				this.iChangeTyresChosen := 1
-			else if (compound = "Wet")
-				this.iChangeTyresChosen := 2
-			else
-				this.iChangeTyresChosen := 0
-			
-			this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if this.selectPitstopOption("Change Tyres") {
+				this.dialPitstopOption("Change Tyres", "Decrease", 10)
 				
-			this.closePitstopMFD("Change Tyres")
+				if (compound = "Dry")
+					this.iChangeTyresChosen := 1
+				else if (compound = "Wet")
+					this.iChangeTyresChosen := 2
+				else
+					this.iChangeTyresChosen := 0
+				
+				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+					
+				this.closePitstopMFD("Change Tyres")
+			}
 		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if (this.iRepairSuspensionChosen != repairSuspension) {
-			this.requirePitstopMFD()
-		
-			if this.selectPitstopOption("Repair Suspension")
-				this.changePitstopOption("Repair Suspension")
-		}
-		
-		if (this.iRepairBodyworkChosen != repairBodywork) {
-			this.requirePitstopMFD()
-		
-			if this.selectPitstopOption("Repair Bodywork")
-				this.changePitstopOption("Repair Bodywork")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (this.iRepairSuspensionChosen != repairSuspension) {
+				this.requirePitstopMFD()
+			
+				if this.selectPitstopOption("Repair Suspension")
+					this.changePitstopOption("Repair Suspension")
+			}
+			
+			if (this.iRepairBodyworkChosen != repairBodywork) {
+				this.requirePitstopMFD()
+			
+				if this.selectPitstopOption("Repair Bodywork")
+					this.changePitstopOption("Repair Bodywork")
+			}
 		}
 	}
 	

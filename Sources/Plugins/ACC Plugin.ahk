@@ -382,18 +382,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.activateACCWindow()
 
 		if this.OpenPitstopMFDHotkey {
-			SendEvent % this.OpenPitstopMFDHotkey
-					
-			wasOpen := this.iPSIsOpen
-			
-			this.iPSIsOpen := true
-			this.iPSSelectedOption := 1
-			
-			if (update || !wasOpen) {
-				if this.updatePitStopState()
-					this.openPitstopMFD(false, false)
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				SendEvent % this.OpenPitstopMFDHotkey
+						
+				wasOpen := this.iPSIsOpen
 				
-				SetTimer updatePitstopState, 5000
+				this.iPSIsOpen := true
+				this.iPSSelectedOption := 1
+				
+				if (update || !wasOpen) {
+					if this.updatePitStopState()
+						this.openPitstopMFD(false, false)
+					
+					SetTimer updatePitstopState, 5000
+				}
 			}
 		}
 		else if !reported {
@@ -412,11 +414,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.activateACCWindow()
 
 		if this.ClosePitstopMFDHotkey {
-			SendEvent % this.ClosePitstopMFDHotkey
-		
-			this.iPSIsOpen := false
-				
-			SetTimer updatePitstopState, Off
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				SendEvent % this.ClosePitstopMFDHotkey
+			
+				this.iPSIsOpen := false
+					
+				SetTimer updatePitstopState, Off
+			}
 		}
 		else if !reported {
 			reported := true
@@ -433,7 +437,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		this.openPitstopMFD()
 		
-		if (!this.iPSIsOpen && !reported) {
+		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
 			reported := true
 			
 			showMessage(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...")

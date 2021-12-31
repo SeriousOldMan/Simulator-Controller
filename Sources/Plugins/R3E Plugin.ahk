@@ -119,9 +119,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	pitstopMFDIsOpen() {
-		this.activateR3EWindow()
-		
-		return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.activateR3EWindow()
+			
+			return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
+		}
+		else
+			return false
 	}
 		
 	openPitstopMFD(descriptor := false) {
@@ -141,25 +145,29 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 
-		this.activateR3EWindow()
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.activateR3EWindow()
 
-		secondTry := false
-		
-		if first
-			SendEvent % this.OpenPitstopMFDHotkey
+			secondTry := false
 			
-		if !this.pitstopMFDIsOpen() {
-			SendEvent % this.OpenPitstopMFDHotkey
+			if first
+				SendEvent % this.OpenPitstopMFDHotkey
+				
+			if !this.pitstopMFDIsOpen() {
+				SendEvent % this.OpenPitstopMFDHotkey
+				
+				secondTry := true
+			}
 			
-			secondTry := true
+			if (first && secondTry)
+				this.pitstopMFDIsOpen()
+			
+			first := false
+			
+			return true
 		}
-		
-		if (first && secondTry)
-			this.pitstopMFDIsOpen()
-		
-		first := false
-		
-		return true
+		else
+			return false
 	}
 	
 	closePitstopMFD() {
@@ -195,6 +203,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	analyzePitstopMFD() {
+		if (this.OpenPitstopMFDHotkey != "Off")
+			return
+		
 		this.iPitstopOptions := []
 		this.iPitstopOptionStates := []
 		
@@ -348,92 +359,102 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {
-		this.activateR3EWindow()
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.activateR3EWindow()
 
-		switch action {
-			case "Accept":
-				SendEvent % this.AcceptChoiceHotkey
-			case "Increase":
-				Loop %steps%
-					SendEvent % this.NextChoiceHotkey
-			case "Decrease":
-				Loop %steps%
-					SendEvent % this.PreviousChoiceHotkey
-			default:
-				Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
+			switch action {
+				case "Accept":
+					SendEvent % this.AcceptChoiceHotkey
+				case "Increase":
+					Loop %steps%
+						SendEvent % this.NextChoiceHotkey
+				case "Decrease":
+					Loop %steps%
+						SendEvent % this.PreviousChoiceHotkey
+				default:
+					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
+			}
 		}
 	}
 	
 	selectPitstopOption(option) {
-		if (option = "Repair Bodywork")
-			return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
-		else if (option = "Change Tyres")
-			return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
-		else {
-			this.activateR3EWindow()
-			
-			index := this.optionIndex(option)
-			
-			if index {
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (option = "Repair Bodywork")
+				return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
+			else if (option = "Change Tyres")
+				return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
+			else {
 				this.activateR3EWindow()
+				
+				index := this.optionIndex(option)
+				
+				if index {
+					this.activateR3EWindow()
 
-				Loop 15
-					SendEvent % this.PreviousOptionHotkey
-				
-				index -= 1
-				
-				if index
-					Loop %index%
-						SendEvent % this.NextOptionHotkey
-				
-				return true
+					Loop 15
+						SendEvent % this.PreviousOptionHotkey
+					
+					index -= 1
+					
+					if index
+						Loop %index%
+							SendEvent % this.NextOptionHotkey
+					
+					return true
+				}
+				else
+					return false
 			}
-			else
-				return false
 		}
 	}
 	
 	changePitstopOption(option, action, steps := 1) {
-		if (option = "Strategy")
-			this.dialPitstopOption(option, action, steps)
-		else if (option = "Refuel")
-			this.changeFuelAmount(action, steps, false, false)
-		else if (option = "Change Tyres") {
-			this.toggleActivity("Change Front Tyres", false, true)
-			this.toggleActivity("Change Rear Tyres", false, true)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (option = "Strategy")
+				this.dialPitstopOption(option, action, steps)
+			else if (option = "Refuel")
+				this.changeFuelAmount(action, steps, false, false)
+			else if (option = "Change Tyres") {
+				this.toggleActivity("Change Front Tyres", false, true)
+				this.toggleActivity("Change Rear Tyres", false, true)
+			}
+			else if (option = "Repair Bodywork") {
+				this.toggleActivity("Repair Bodywork", false, true)
+				this.toggleActivity("Repair Front Aero", false, true)
+				this.toggleActivity("Repair Rear Aero", false, true)
+			}
+			else if (option = "Repair Suspension")
+				this.toggleActivity("Repair Suspension", false, false)
+			else
+				Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.changePitstopOption..."
 		}
-		else if (option = "Repair Bodywork") {
-			this.toggleActivity("Repair Bodywork", false, true)
-			this.toggleActivity("Repair Front Aero", false, true)
-			this.toggleActivity("Repair Rear Aero", false, true)
-		}
-		else if (option = "Repair Suspension")
-			this.toggleActivity("Repair Suspension", false, false)
-		else
-			Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.changePitstopOption..."
 	}
 	
 	toggleActivity(activity, require := true, select := true) {
-		if inList(kBinaryOptions, activity) {
-			if (!require || this.requirePitstopMFD())
-				if  (!select || this.selectPitstopOption(activity))
-					this.dialPitstopOption(activity, "Accept")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if inList(kBinaryOptions, activity) {
+				if (!require || this.requirePitstopMFD())
+					if  (!select || this.selectPitstopOption(activity))
+						this.dialPitstopOption(activity, "Accept")
+			}
+			else
+				Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
 		}
-		else
-			Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
 	}
 
 	changeFuelAmount(direction, litres := 5, require := true, select := true, accept := true) {
-		if (!require || this.requirePitstopMFD())
-			if (!select || this.selectPitstopOption("Refuel")) {
-				if (accept && this.optionChosen("Refuel"))
-					SendEvent % this.AcceptChoiceHotkey
-				
-				this.dialPitstopOption("Refuel", direction, litres)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (!require || this.requirePitstopMFD())
+				if (!select || this.selectPitstopOption("Refuel")) {
+					if (accept && this.optionChosen("Refuel"))
+						SendEvent % this.AcceptChoiceHotkey
+					
+					this.dialPitstopOption("Refuel", direction, litres)
 
-				if accept
-					SendEvent % this.AcceptChoiceHotkey
-			}
+					if accept
+						SendEvent % this.AcceptChoiceHotkey
+				}
+		}
 	}
 	
 	supportsPitstop() {
@@ -445,67 +466,77 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
-		this.requirePitstopMFD()
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.requirePitstopMFD()
 		
-		if this.optionChosen("Request Pitstop")
-			this.toggleActivity("Request Pitstop", false, true)
+			if this.optionChosen("Request Pitstop")
+				this.toggleActivity("Request Pitstop", false, true)
+		}
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		this.activateR3EWindow()
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.activateR3EWindow()
 
-		Loop 10
-			SendEvent % this.NextOptionHotkey
-		
-		SendEvent % this.AcceptChoiceHotkey
-	}
-
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		if this.optionAvailable("Refuel") {
-			if this.optionChosen("Refuel")
-				SendEvent % this.AcceptChoiceHotkey
-			
-			this.changeFuelAmount("Decrease", 120, false, true, false)
-			
-			this.changeFuelAmount("Increase", litres + 3, false, false, false)
+			Loop 10
+				SendEvent % this.NextOptionHotkey
 			
 			SendEvent % this.AcceptChoiceHotkey
 		}
 	}
+
+	setPitstopRefuelAmount(pitstopNumber, litres) {
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if this.optionAvailable("Refuel") {
+				if this.optionChosen("Refuel")
+					SendEvent % this.AcceptChoiceHotkey
+				
+				this.changeFuelAmount("Decrease", 120, false, true, false)
+				
+				this.changeFuelAmount("Increase", litres + 3, false, false, false)
+				
+				SendEvent % this.AcceptChoiceHotkey
+			}
+		}
+	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		if this.optionAvailable("Change Front Tyres")
-			if (compound && !this.chosenOption("Change Front Tyres"))
-				this.toggleActivity("Change Front Tyres", false, true)
-			else if (!compound && this.chosenOption("Change Front Tyres"))
-				this.toggleActivity("Change Front Tyres", false, true)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if this.optionAvailable("Change Front Tyres")
+				if (compound && !this.chosenOption("Change Front Tyres"))
+					this.toggleActivity("Change Front Tyres", false, true)
+				else if (!compound && this.chosenOption("Change Front Tyres"))
+					this.toggleActivity("Change Front Tyres", false, true)
 
-		if this.optionAvailable("Change Rear Tyres")
-			if (compound && !this.chosenOption("Change Rear Tyres"))
-				this.toggleActivity("Change Rear Tyres", false, true)
-			else if (!compound && this.chosenOption("Change Rear Tyres"))
-				this.toggleActivity("Change Rear Tyres", false, true)
+			if this.optionAvailable("Change Rear Tyres")
+				if (compound && !this.chosenOption("Change Rear Tyres"))
+					this.toggleActivity("Change Rear Tyres", false, true)
+				else if (!compound && this.chosenOption("Change Rear Tyres"))
+					this.toggleActivity("Change Rear Tyres", false, true)
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		if this.optionAvailable("Repair Suspension")
-			if (repairSuspension != this.chosenOption("Repair Suspension"))
-				this.toggleActivity("Repair Suspension", false, true)
-		
-		if this.optionAvailable("Repair Bodywork")
-			if (repairBodywork != this.chosenOption("Repair Bodywork"))
-				this.toggleActivity("Repair Bodywork", false, true)
-		
-		if this.optionAvailable("Repair Front Aero")
-			if (repairBodywork != this.chosenOption("Repair Front Aero"))
-				this.toggleActivity("Repair Front Aero", false, true)
-		
-		if this.optionAvailable("Repair Rear Aero")
-			if (repairBodywork != this.chosenOption("Repair Rear Aero"))
-				this.toggleActivity("Repair Rear Aero", false, true)
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if this.optionAvailable("Repair Suspension")
+				if (repairSuspension != this.chosenOption("Repair Suspension"))
+					this.toggleActivity("Repair Suspension", false, true)
+			
+			if this.optionAvailable("Repair Bodywork")
+				if (repairBodywork != this.chosenOption("Repair Bodywork"))
+					this.toggleActivity("Repair Bodywork", false, true)
+			
+			if this.optionAvailable("Repair Front Aero")
+				if (repairBodywork != this.chosenOption("Repair Front Aero"))
+					this.toggleActivity("Repair Front Aero", false, true)
+			
+			if this.optionAvailable("Repair Rear Aero")
+				if (repairBodywork != this.chosenOption("Repair Rear Aero"))
+					this.toggleActivity("Repair Rear Aero", false, true)
+		}
 	}
 	
 	getCarName(carID) {

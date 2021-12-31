@@ -58,25 +58,27 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
-		simulator := this.Code
-		arguments := values2String(";", arguments*)
+		if this.iCurrentPitstopMFD {
+			simulator := this.Code
+			arguments := values2String(";", arguments*)
+			
+			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 		
-		exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	
-		try {
-			if operation
-				RunWait %ComSpec% /c ""%exePath%" -%command% %operation% "%message%:%arguments%"", , Hide
-			else
-				RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
-		}
-		catch exception {
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
-													   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-													   . kBinariesDirectory . translate(")"))
-				
-			showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-										  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			try {
+				if operation
+					RunWait %ComSpec% /c ""%exePath%" -%command% %operation% "%message%:%arguments%"", , Hide
+				else
+					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
+			}
+			catch exception {
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
+														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+														   . kBinariesDirectory . translate(")"))
+					
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 		}
 	}
 	
@@ -93,11 +95,15 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
 			
 			if key {
-				SendEvent % key
+				if (key != "Off") {
+					SendEvent % key
 				
-				this.iCurrentPitstopMFD := descriptor
-				
-				return true
+					this.iCurrentPitstopMFD := descriptor
+					
+					return true
+				}
+				else
+					return false
 			}
 			else if !reported {
 				reported := true
@@ -126,7 +132,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
 			}
 			
-			SendEvent % key
+			if (key != "Off")
+				SendEvent % key
 			
 			this.iCurrentPitstopMFD := false
 		}

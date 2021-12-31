@@ -1,4 +1,4 @@
-## 3.8.0-release 12/31/21 (planned)
+## 3.8.0-release 12/31/21
 
   1. Bugfixes, as always
   2. Documentation updates, as always

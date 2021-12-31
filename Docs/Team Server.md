@@ -2,9 +2,9 @@
 
 *Team Server* is a server-based solution, which enables you to use the services of the Virtual Race Assistants in a team race, e.g. a 24h race. Without the *Team Server* these services are only available to the driver of the first stint, for all other drivers the Race Assistants do not even start because they do not have the data from the first laps. With the help of *Team Server*, a central server that manages the data of all drivers in a database, this critical knowledge can now be shared between all drivers. The connection to this server is established by the individual applications of teh Simulator Controller suite ("Simulator Controller", "Race Engineer", "Race Strategist", ...) using Web APIs over HTTPS. This ensures the greatest possible interoperability and flexibility when setting up the central server.
 
-In a few days, a managed server will be available for you and your teams to use. To use it, you have to become a patron of Simulator Controller. Please check the [creator page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
+A managed server is available for you and your teams to use. To use it, you have to become a patron of Simulator Controller. Please check the [creator page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
 
-Disclaimer: Although the current version of the *Team Server* is no longer in beta stage, please always double-check the recommendations and actions of your race assistants after picking up the from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the history of the race concerns. For obvious reasons, there will be no error messages during the race, when for example the connection to the central server has been lost or other internal error occur, but you might face misbehaviour. You may take a look into the log files afterwards, though.
+Disclaimer: Although the current version of the *Team Server* is no longer to be considered Beta, please always double-check the recommendations and actions of your race assistants after picking up the car from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the recent history of the race concerns. For obvious reasons, there will be no error messages during the race, when for example the connection to the central server has been temporarily lost or other internal error occured, but you might face substantial misbehaviour. You may take a look into the log files afterwards, though.
 
 ## Installation & Configuration
 
@@ -36,13 +36,13 @@ You first have to decide, where to locate the database, where all stuff will be 
 
 The next option, "TokenLifeTime", specifies, how long an access token for your team mates will be valid. Access tokens will be described in detail in a later chapter. The life time will be specified in minutes, the 10080 minutes from the example above are exactly 7 days.
 
-Using the "Accounts" option, you can *preload* accounts into an empty database. This cannot be empty, or you won't be able to connect to the *Team Server*. So make sure, that at least one administrator account will be created, since only these accounts will have access to the server administration tools. The number of "Minutes" specifies the amount of time, this account has left for team sessions (necessary for a managed pay-per-use model, which might come in the future). Last, but not least, you can create accounts, that will reset with each restart of the server, for example for test purposes. If you are the only one, who will createa and manage teams, this is it, otherwise hand over the corresponding account name and password to your mates.
+Using the "Accounts" option, you can *preload* accounts into an empty database. This cannot be empty, or you won't be able to connect to the *Team Server*. So make sure, that at least one administrator account will be created, since only these accounts will have access to the server administration tools. The number of "Minutes" specifies the amount of time, this account has left for team sessions (necessary for the managed pay-per-use model). Last, but not least, you can create accounts, that will reset with each restart of the server, for example for test purposes. If you are the only one, who will createa and manage teams, this is it, otherwise hand over the corresponding account name and password to your mates.
 
 Last, but not least, you have to communicate the web URI to all team managers and drivers, which will use the *Team Server*. An URI for your local PC will look like "https://localhost:5001", one for an Azure might look like "https://teamserver.thebigo.azurewebsites.com". This depends on your chosen host environment.
 
 If you want to setup and operate a server, which is not only used by your direct team members, but also by other teams and drivers, for example a server for a community or a league, you can do this as well. Please consult the special section on [server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) down below to learn more about the concept of accounts, contingent renewal and administrative tasks.
 
-## Updating Team Server
+### Updating Team Server
 
 Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [up0date notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
 
@@ -102,7 +102,7 @@ It is no problem, to reuse a session for many races, because the old data (excep
 
 It is obvious, that it is **not** a good idea to use the same session in more than one race at the same time.
 
-#### Session data handling
+##### Session Data Management
 
 All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load..." command.
 
@@ -150,7 +150,7 @@ Beside that, you can request several context specific data, which will be shown 
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 
-#### Strategy handling
+#### Strategy Handling
 
 If you are running a race based on a predefined strategy developed using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development), you can adopt this strategy when necessary after important race events, for example after an accident, or after or just before significant weather changes.
 
@@ -186,7 +186,7 @@ After you dialed the options, you can select "Adjust Strategy (Simulation)" from
 
 If you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Race Center"s of all team members as well.
 
-#### Session & Stint planning
+#### Session & Stint Planning
 
 It is quite common for long endurance races to create some kind of stint plan before the race, so that each driver knows, when he has to be on the track. A stint plan is tightly coupled to the race strategy and indeed, you can create a stint plan by using the command "Load From Strategy" from the "Plan" menu. But you can also create a plan manually, as we will see below.
 

@@ -1,16 +1,16 @@
 [Development]
-Version=3.8.0-release
-Target=3.8.0-release
+Version=3.8.2-VGR
+Target=3.8.2-release
 Date=12/31/2021
-Download=https://cntr.click/cdD66cL
-Changes=Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions
+Download=
+Changes=
 [Release]
 Version=3.8.0-release
 Date=12/31/2021
 Download=https://cntr.click/cdD66cL
 Changes=Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.8.0-release
-Development=3.8.0-release
+Development=3.8.2-VGR

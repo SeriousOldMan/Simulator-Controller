@@ -81,19 +81,21 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	activateRF2Window() {
-		window := this.Simulator.WindowTitle
-		
-		if !WinActive(window)
-			WinActivate %window%
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			window := this.Simulator.WindowTitle
+			
+			if !WinActive(window)
+				WinActivate %window%
+		}
 	}
 		
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 		
-		this.activateRF2Window()
-
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
+				this.activateRF2Window()
+
 				SendEvent % this.OpenPitstopMFDHotkey
 				
 				return true
@@ -116,11 +118,12 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	closePitstopMFD() {
 		static reported := false
 		
-		this.activateRF2Window()
-
 		if this.ClosePitstopMFDHotkey {
-			if (this.OpenPitstopMFDHotkey != "Off")
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				this.activateRF2Window()
+
 				SendEvent % this.ClosePitstopMFDHotkey
+			}
 		}
 		else if !reported {
 			reported := true
@@ -208,6 +211,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 					return base.getPitstopOptionValues(option)
 			}
 		}
+		else
+			return false
 	}
 	
 	setPitstopRefuelAmount(pitstopNumber, litres) {

@@ -2599,7 +2599,7 @@ class RaceCenter extends ConfigurationItem {
 						tries -= 1
 						
 						if (tries <= 0)
-							throw "No data..."
+							Throw "No data..."
 						else
 							Sleep 400
 					}
@@ -2616,7 +2616,7 @@ class RaceCenter extends ConfigurationItem {
 				if car
 					lap.Position := getConfigurationValue(data, "Position Data", "Car." . car . ".Position")
 				else
-					throw "No data..."
+					Throw "No data..."
 			}
 			catch exception {
 				if (lap.Nr > 1)
@@ -2864,7 +2864,7 @@ class RaceCenter extends ConfigurationItem {
 				if (lapData && (lapData != ""))
 					lapData := parseConfiguration(lapData)
 				else
-					throw "No data..."
+					Throw "No data..."
 			}
 			catch exception {
 				return newData
@@ -2954,7 +2954,7 @@ class RaceCenter extends ConfigurationItem {
 							tries -= 1
 							
 							if (tries <= 0)
-								throw "No data..."
+								Throw "No data..."
 							else
 								Sleep 400
 						}
@@ -3076,7 +3076,7 @@ class RaceCenter extends ConfigurationItem {
 							tries -= 1
 							
 							if (tries <= 0)
-								throw "No data..."
+								Throw "No data..."
 							else
 								Sleep 400
 						}
@@ -4607,7 +4607,7 @@ class RaceCenter extends ConfigurationItem {
 									tries -= 1
 									
 									if (tries <= 0)
-										throw "No data..."
+										Throw "No data..."
 									else
 										Sleep 400
 								}

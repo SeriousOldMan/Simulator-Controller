@@ -232,8 +232,6 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			else
 				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
 		}
-		else
-			return false
 	}
 	
 	dialPitstopOption(option, action, steps := 1) {

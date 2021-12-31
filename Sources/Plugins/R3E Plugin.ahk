@@ -203,7 +203,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	analyzePitstopMFD() {
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey = "Off")
 			return
 		
 		this.iPitstopOptions := []

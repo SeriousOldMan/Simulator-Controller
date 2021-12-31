@@ -864,7 +864,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
 				
 				if (!sessionSettings || (sessionSettings = ""))
-					throw "No data..."
+					Throw "No data..."
 			}
 			catch exception {
 				return false
@@ -890,7 +890,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				sessionState := teamServer.getSessionValue(this.Plugin . " State")
 				
 				if (!sessionState || (sessionState = ""))
-					throw "No data..."
+					Throw "No data..."
 			}
 			catch exception {
 				return false

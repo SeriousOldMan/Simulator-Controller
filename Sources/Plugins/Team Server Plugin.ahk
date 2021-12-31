@@ -693,7 +693,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					throw Exception("Cannot start add a stint to an inactive session...")
+					Throw Exception("Cannot start add a stint to an inactive session...")
 				
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
@@ -729,7 +729,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 					
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
-						throw Exception("Driver inconsistency detected...")
+						Throw Exception("Driver inconsistency detected...")
 				}
 				
 				stint := false

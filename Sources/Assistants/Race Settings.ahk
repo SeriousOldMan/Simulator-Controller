@@ -532,7 +532,7 @@ restart:
 				GuiControl Choose, sessionDropDownMenu, % chosen
 				
 				if exception
-					throw exception
+					Throw exception
 			}
 			else if (arguments[1] == "Driver") {
 				GuiControlGet driverDropDownMenu
@@ -581,7 +581,7 @@ restart:
 					showMessage(translate("Successfully connected to the team server."))
 				}
 				else
-					throw Exception("Invalid or missing token...")
+					Throw Exception("Invalid or missing token...")
 			}
 			catch exception {
 				title := translate("Error")

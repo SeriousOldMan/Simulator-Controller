@@ -611,7 +611,7 @@ restartSettings:
 				Sleep 200
 			} until (result || vRestart)
 			
-			if vRestart {
+			if (vRestart && (result != kCancel)) {
 				vRestart := false
 				
 				Gui SE:Destroy

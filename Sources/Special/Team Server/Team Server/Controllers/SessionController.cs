@@ -58,6 +58,25 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/stint/{stint:int}/value")]
+        public string GetSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
+                                           [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
+                    @"
+                        Select * From Stints Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, stint).Result.FirstOrDefault<Stint>();
+
+                return sessionManager.GetStintValue(theStint, name);
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/lap/{lap:int}/value")]
         public string GetSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
                                          [FromQuery(Name = "name")] string name) {
@@ -93,6 +112,26 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpPut("{identifier}/stint/{stint:int}/value")]
+        public string SetSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
+                                           [FromQuery(Name = "name")] string name, [FromBody] string value) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
+                    @"
+                        Select * From Stints Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, stint).Result.FirstOrDefault<Stint>();
+
+                sessionManager.SetStintValue(theStint, name, value);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpPut("{identifier}/lap/{lap:int}/value")]
         public string SetSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
                                          [FromQuery(Name = "name")] string name, [FromBody] string value) {
@@ -120,6 +159,26 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteSessionValue(identifier, name);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpDelete("{identifier}/stint/{stint:int}/value")]
+        public string DeleteSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
+                                            [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
+                    @"
+                        Select * From Stints Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, stint).Result.FirstOrDefault<Stint>();
+
+                sessionManager.DeleteStintValue(theStint, name);
 
                 return "Ok";
             }
@@ -403,6 +462,52 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupStint(identifier).Laps.OrderBy(l => l.Nr).Select(l => l.Identifier));
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/value")]
+        public string GetStintValue([FromQuery(Name = "token")] string token, string identifier,
+                                    [FromQuery(Name = "name")] string name)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                return sessionManager.GetStintValue(identifier, name);
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpPut("{identifier}/value")]
+        public string SetStintValue([FromQuery(Name = "token")] string token, string identifier,
+									[FromQuery(Name = "name")] string name, [FromBody] string value) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.SetStintValue(identifier, name, value);
+
+                return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpDelete("{identifier}/value")]
+        public string DeleteStintValue([FromQuery(Name = "token")] string token, string identifier,
+									   [FromQuery(Name = "name")] string name) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                sessionManager.DeleteStintValue(identifier, name);
+
+                return "Ok";
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

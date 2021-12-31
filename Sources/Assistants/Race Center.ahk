@@ -877,7 +877,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm cBlack, Arial
 		
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -1585,7 +1585,63 @@ class RaceCenter extends ConfigurationItem {
 			catch exception {
 				; ignore
 			}
+		else {
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+			OnMessage(0x44, "")
+		}
 	}
+	
+	initializePitstopSettings(ByRef lap, ByRef refuel, ByRef compound, ByRef compoundColor) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		currentStint := this.CurrentStint
+				
+		if currentStint {
+			nextStint := (currentStint.Nr + 1)
+		
+			Loop % LV_GetCount()
+			{
+				LV_GetText(stint, A_Index)
+				
+				if (stint = nextStint) {
+					LV_GetText(plannedLap, A_Index, 5)
+					LV_GetText(refuelAmount, A_Index, 7)
+					LV_GetText(tyreChange, A_Index, 8)
+		
+					lap := plannedLap
+					refuel := refuelAmount
+					
+					if (tyreChange != "x") {
+						compound := false
+						compoundColor := false
+					}
+					
+					return
+				}
+			}
+		
+			if this.Strategy
+				for index, pitstop in this.Strategy.Pitstops
+					if (pitstop.ID = currentStint.Nr) {
+						lap := pitstop.Lap
+						refuel := pitstop.RefuelAmount
+			
+						if !pitstop.TyreChange {
+							compound := false
+							compoundColor := false
+						}
+						
+						return
+					}
+		}
+	}			
 	
 	initializePitstopFromSession() {
 		pressuresDB := this.PressuresDatabase
@@ -1598,7 +1654,21 @@ class RaceCenter extends ConfigurationItem {
 			if (last > 0) {
 				pressures := pressuresTable[last]
 				
-				this.initializePitstopTyreSetup(pressures["Compound"], pressures["Compound.Color"]
+				lap := 0
+				refuel := 0
+				compound := pressures["Compound"]
+				compoundColor := pressures["Compound.Color"]
+				
+				this.initializePitstopSettings(lap, refuel, compound, compoundColor)
+				
+				window := this.Window
+		
+				Gui %window%:Default
+				
+				GuiControl, , pitstopLapEdit, %lap%
+				GuiControl, , pitstopRefuelEdit, %refuel%
+				
+				this.initializePitstopTyreSetup(compound, compoundColor
 											  , displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 											  , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
 			}
@@ -1613,7 +1683,7 @@ class RaceCenter extends ConfigurationItem {
 		if (compoundColor != "Black")
 			compound := (compound . " (" . compoundColor . ")")
 		
-		GuiControl Choose, pitstopTyreCompoundDropDown, % inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound)
+		GuiControl Choose, pitstopTyreCompoundDropDown, % (!compound ? 1 : inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound))
 		
 		GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
 		GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
@@ -1646,7 +1716,6 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
 				
-				
 				showMessage(translate("Race Strategist will be instructed in the next lap."))
 			}
 			catch exception {
@@ -1668,7 +1737,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
 				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
-				this.Connector.SetLapValue(lap, "Race Strategy", "CANCEL")
 				
 				showMessage(translate("Race Strategist will be instructed in the next lap."))
 			}
@@ -2017,7 +2085,11 @@ class RaceCenter extends ConfigurationItem {
 					OnMessage(0x44, "")
 					
 					IfMsgBox Yes
+					{
 						LV_Delete()
+						
+						this.Version := (A_Now . "")
+					}
 				}
 			case 6:
 				this.showPlanDetails()
@@ -2064,9 +2136,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	withExceptionHandler(function, arguments*) {
-		; try {
+		try {
 			return %function%(arguments*)
-		/*}
+		}
 		catch exception {
 			title := translate("Error")
 		
@@ -2074,7 +2146,6 @@ class RaceCenter extends ConfigurationItem {
 			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
 		}
-		*/
 	}
 	
 	createStrategy(nameOrConfiguration := false) {
@@ -2371,16 +2442,18 @@ class RaceCenter extends ConfigurationItem {
 				if !this.Stints.HasKey(identifier) {
 					newStint := parseObject(this.Connector.GetStint(identifier))
 					newStint.Nr := (newStint.Nr + 0)
-					newStint.Time := false
 					
-					if (newStint.Nr = 1) {
-						time := this.Connector.GetSessionValue(session, "Time")
-						
-						if (!time || (time == ""))
-							time := (A_Now . "")
-						
-						newStint.Time := time
+					try {
+						time := this.Connector.GetStintValue(identifier, "Time")
 					}
+					catch exception {
+						time := false
+					}
+						
+					if (!time || (time == ""))
+						newStint.Time := ((newStint.Nr == 1) ? (A_Now . "") : false)
+					else
+						newStint.Time := time
 					
 					newStints.Push(newStint)
 				}
@@ -3677,6 +3750,8 @@ class RaceCenter extends ConfigurationItem {
 			this.Stints[newStint.Nr] := newStint
 			
 			this.iCurrentStint := newStint
+			
+			this.updatePlan(newStint)
 		}
 		
 		window := this.Window

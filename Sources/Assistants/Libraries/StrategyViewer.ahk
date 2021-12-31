@@ -47,9 +47,9 @@ class StrategyViewer {
 	
 	createStrategyInfo(strategy) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . strategy.Simulator . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . new SessionDatabase().getCarName(strategy.Simulator, strategy.Car) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . strategy.Track . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (strategy.Simulator ? strategy.Simulator : translate("Unknown")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . (strategy.Car ? new SessionDatabase().getCarName(strategy.Simulator, strategy.Car) : translate("Unknown")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . (strategy.Track ? strategy.Track : translate("Unknown")) . "</td></tr>")
 		
 		if (strategy.SessionType = "Duration") {
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")

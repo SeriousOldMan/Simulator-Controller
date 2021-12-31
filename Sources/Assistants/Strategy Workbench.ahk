@@ -424,7 +424,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x435 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
-		Gui %window%:Add, DropDownList, x620 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
+		Gui %window%:Add, DropDownList, x620 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown gstrategyMenu, % values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], "translate")*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -553,7 +553,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x0 := x - 4
 		x1 := x + 74
 		x2 := x1 + 22
-		x3 := x2 + 26
+		x3 := x2 + 28
 		x4 := x1 + 16
 		x5 := x3 + 44
 		
@@ -577,25 +577,25 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundDropDown, % values2String("|", choices*)
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Tyre Usage")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 Number VsimMaxTyreLapsEdit, %simMaxTyreLapsEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimMaxTyreLapsEdit, %simMaxTyreLapsEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMaxTyreLapsEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Laps")
+		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Laps")
 				
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Fuel Amount")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 Number VsimInitialFuelAmountEdit, %simInitialFuelAmountEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimInitialFuelAmountEdit, %simInitialFuelAmountEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simInitialFuelAmountEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w47 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Liter")
 		
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w40 h20 VsimMapEdit, %simMapEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 VsimMapEdit, %simMapEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
-		Gui %window%:Add, Edit, x%x1% yp w40 h20 Limit3 Number VsimAvgLapTimeEdit, %simAvgLapTimeEdit%
+		Gui %window%:Add, Edit, x%x1% yp w45 h20 Limit3 Number VsimAvgLapTimeEdit, %simAvgLapTimeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h20 VsimFuelConsumptionEdit, %simFuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit, %simFuelConsumptionEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
 		
 		x := 222
@@ -1160,9 +1160,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSettingsMenu(line) {
-		if (!this.SelectedSimulator || !this.SelectedCar || !this.SelectedTrack)
-			return
-		
 		window := this.Window
 						
 		Gui %window%:Default
@@ -1173,57 +1170,75 @@ class StrategyWorkbench extends ConfigurationItem {
 				car := this.SelectedCar
 				track := this.SelectedTrack
 				
-				telemetryDB := new TelemetryDatabase(simulator, car, track)
-				simulatorCode := telemetryDB.getSimulatorCode(simulator)
-				
-				dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
-				
-				FileCreateDir %dirName%
-				
-				title := translate("Load Race Settings...")
-						
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
-				OnMessage(0x44, "")
-			
-				if (file != "") {
-					settings := readConfiguration(file)
+				if (simulator && car && track) {
+					telemetryDB := new TelemetryDatabase(simulator, car, track)
+					simulatorCode := telemetryDB.getSimulatorCode(simulator)
 					
-					if (settings.Count() > 0) {
-						GuiControl, , sessionTypeDropDown, 1
-						GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
-						GuiControl, , sessionLengthlabel, % translate("Minutes")
-						GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
-						GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+					dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
+					
+					FileCreateDir %dirName%
+					
+					title := translate("Load Race Settings...")
+							
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+					FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+					OnMessage(0x44, "")
+				
+					if (file != "") {
+						settings := readConfiguration(file)
 						
-						GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
-						GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-						GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-						
-						compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-						compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-						
-						GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
-						
-						GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
-						GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+						if (settings.Count() > 0) {
+							GuiControl, , sessionTypeDropDown, 1
+							GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
+							GuiControl, , sessionLengthlabel, % translate("Minutes")
+							GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
+							GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+							
+							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
+							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+							GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							
+							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+							
+							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
+							
+							GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+							GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+						}
 					}
 				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
 			case 4: ; "Update from Telemetry..."
-				telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-				
-				fastestLapTime := false
-				
-				for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
-					lapTime := row["Lap.Time"]
-				
-					if (!fastestLapTime || (lapTime < fastestLapTime)) {
-						fastestLapTime := lapTime
-						
-						GuiControl, , simMapEdit, % row["Map"]
-						GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
-						GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
+					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+					
+					fastestLapTime := false
+					
+					for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+						lapTime := row["Lap.Time"]
+					
+						if (!fastestLapTime || (lapTime < fastestLapTime)) {
+							fastestLapTime := lapTime
+							
+							GuiControl, , simMapEdit, % row["Map"]
+							GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
+							GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+						}
 					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
 				}
 			case 5: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
@@ -1272,6 +1287,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , simMapEdit, % Round(map)
 					}
 				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a simulation.")
+					OnMessage(0x44, "")
+				}
 			case 6: ; "Load Defaults..."
 			case 8: ; "Save Defaults"
 		}
@@ -1316,85 +1338,103 @@ class StrategyWorkbench extends ConfigurationItem {
 			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
+		}
+		else
+			dirName := ""
 			
-			switch line {
-				case 3: ; "Load Strategy..."
-					title := translate("Load Race Strategy...")
+		switch line {
+			case 3:
+				fileName := kUserConfigDirectory . "Race.strategy"
+				
+				if FileExist(fileName) {
+					configuration := readConfiguration(fileName)
 					
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-					FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+					if (configuration.Count() > 0)
+						this.selectStrategy(this.createStrategy(configuration))
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no active Race Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 4: ; "Load Strategy..."
+				title := translate("Load Race Strategy...")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+				OnMessage(0x44, "")
+			
+				if (file != "") {
+					configuration := readConfiguration(file)
+					
+					if (configuration.Count() > 0)
+						this.selectStrategy(this.createStrategy(configuration))
+				}
+			case 5: ; "Save Strategy..."
+				if this.SelectedStrategy {
+					title := translate("Save Race Strategy...")
+					
+					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
+					
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
 				
 					if (file != "") {
-						configuration := readConfiguration(file)
+						if !InStr(file, ".")
+							file := (file . ".strategy")
+			
+						SplitPath file, , , , name
 						
-						if (configuration.Count() > 0)
-							this.selectStrategy(this.createStrategy(configuration))
-					}
-				case 4: ; "Save Strategy..."
-					if this.SelectedStrategy {
-						title := translate("Save Race Strategy...")
-						
-						fileName := (dirName . "\" . this.SelectedStrategy.Name . ".strategy")
-						
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-						FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
-						OnMessage(0x44, "")
-					
-						if (file != "") {
-							if !InStr(file, ".")
-								file := (file . ".strategy")
-				
-							SplitPath file, , , , name
+						this.SelectedStrategy.setName(name)
 							
-							this.SelectedStrategy.setName(name)
-								
-							configuration := newConfiguration()
-							
-							this.SelectedStrategy.saveToConfiguration(configuration)
-							
-							writeConfiguration(file, configuration)
-						}
-					}
-				case 6: ; "Compare Strategies..."
-					title := translate("Choose two or more Race Strategies for comparison...")
-				
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
-					FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
-					OnMessage(0x44, "")
-				
-					strategies := []
-					
-					if (files != "") {
-						directory := ""
-						
-						Loop Parse, files, `n
-						{
-							if (A_Index = 1)
-								directory := A_LoopField
-							else
-								strategies.Push(this.createStrategy(readConfiguration(directory . "\" . A_LoopField)))
-						}
-						
-						if (strategies.Count() > 1)
-							this.compareStrategies(strategies*)
-					}
-				case 8: ; "Export Strategy..."
-					if this.SelectedStrategy {
 						configuration := newConfiguration()
 						
 						this.SelectedStrategy.saveToConfiguration(configuration)
 						
-						writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+						writeConfiguration(file, configuration)
 					}
-				case 9: ; "Export Strategy..."
-					try {
-						FileDelete %kUserConfigDirectory%Race.strategy
+				}
+			case 7: ; "Compare Strategies..."
+				title := translate("Choose two or more Race Strategies for comparison...")
+			
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
+				FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
+				OnMessage(0x44, "")
+			
+				strategies := []
+				
+				if (files != "") {
+					directory := ""
+					
+					Loop Parse, files, `n
+					{
+						if (A_Index = 1)
+							directory := A_LoopField
+						else
+							strategies.Push(this.createStrategy(readConfiguration(directory . "\" . A_LoopField)))
 					}
-					catch exception {
-						; ignore
-					}
-			}
+					
+					if (strategies.Count() > 1)
+						this.compareStrategies(strategies*)
+				}
+			case 9: ; "Export Strategy..."
+				if this.SelectedStrategy {
+					configuration := newConfiguration()
+					
+					this.SelectedStrategy.saveToConfiguration(configuration)
+					
+					writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
+				}
+			case 10: ; "Clear Strategy..."
+				try {
+					FileDelete %kUserConfigDirectory%Race.strategy
+				}
+				catch exception {
+					; ignore
+				}
 		}
 	}
 	

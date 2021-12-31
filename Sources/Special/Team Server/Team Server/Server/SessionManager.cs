@@ -205,24 +205,21 @@ namespace TeamServer.Server {
 			FinishSession(new Guid(identifier));
 		}
 
-		public void ClearSession(Session session)
-		{
+		public void ClearSession(Session session) {
 			ValidateSession(session);
 
-			foreach (Model.Attribute attribute in session.Attributes)
-				attribute.Delete();
+			// foreach (Model.Attribute attribute in session.Attributes)
+			//	attribute.Delete();
 
 			foreach (Stint stint in session.Stints)
 				stint.Delete();
 		}
 
-		public void ClearSession(Guid identifier)
-		{
+		public void ClearSession(Guid identifier) {
 			ClearSession(ObjectManager.GetSessionAsync(identifier).Result);
 		}
 
-		public void ClearSession(string identifier)
-		{
+		public void ClearSession(string identifier) {
 			ClearSession(new Guid(identifier));
 		}
 
@@ -247,8 +244,7 @@ namespace TeamServer.Server {
 					foreach (Model.Attribute attribute in s.Attributes)
 						attribute.Delete();
 
-					foreach (Stint stint in s.Stints)
-					{
+					foreach (Stint stint in s.Stints) {
 						foreach (Model.Attribute attribute in stint.Attributes)
 							attribute.Delete();
 
@@ -357,6 +353,47 @@ namespace TeamServer.Server {
 		#endregion
 
 		#region Operations
+		public string GetStintValue(Stint stint, string name) {
+			ValidateStint(stint);
+
+			return ObjectManager.GetAttribute(stint, name);
+		}
+
+		public string GetStintValue(Guid identifier, string name) {
+			return GetStintValue(ObjectManager.GetStintAsync(identifier).Result, name);
+		}
+
+		public string GetStintValue(string identifier, string name) {
+			return GetStintValue(new Guid(identifier), name);
+		}
+
+		public void SetStintValue(Stint stint, string name, string value) {
+			ValidateStint(stint);
+
+			ObjectManager.SetAttribute(stint, name, value);
+		}
+
+		public void SetStintValue(Guid identifier, string name, string value) {
+			SetStintValue(ObjectManager.GetStintAsync(identifier).Result, name, value);
+		}
+
+		public void SetStintValue(string identifier, string name, string value) {
+			SetStintValue(new Guid(identifier), name, value);
+		}
+
+		public void DeleteStintValue(Stint stint, string name) {
+			ValidateStint(stint);
+
+			ObjectManager.DeleteAttribute(stint, name);
+		}
+
+		public void DeleteStintValue(Guid identifier, string name) {
+			DeleteStintValue(ObjectManager.GetStintAsync(identifier).Result, name);
+		}
+
+		public void DeleteStintValue(string identifier, string name) {
+			DeleteStintValue(new Guid(identifier), name);
+		}
 		#endregion
 		#endregion
 

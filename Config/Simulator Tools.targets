@@ -107,6 +107,7 @@ Simulator Controller=%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDi
 Voice Server=%kBinariesDirectory%Voice Server.exe <- %kSourcesDirectory%Controller\Voice Server.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kHomeDirectory%VERSION
 Race Engineer=%kBinariesDirectory%Race Engineer.exe <- %kSourcesDirectory%Assistants\Race Engineer.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Strategist=%kBinariesDirectory%Race Strategist.exe <- %kSourcesDirectory%Assistants\Race Strategist.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
+Race Spotter=%kBinariesDirectory%Race Spotter.exe <- %kSourcesDirectory%Assistants\Race Spotter.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Settings=%kBinariesDirectory%Race Settings.exe <- %kSourcesDirectory%Assistants\Race Settings.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
 Setup Database=%kBinariesDirectory%Setup Database.exe <- %kSourcesDirectory%Assistants\Setup Database.ahk; %kIncludesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION
 Race Reports=%kBinariesDirectory%Race Reports.exe <- %kSourcesDirectory%Assistants\Race Reports.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Assistants\Libraries\, %kHomeDirectory%VERSION

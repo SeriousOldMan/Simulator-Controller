@@ -1370,7 +1370,7 @@ updatePitstopState() {
 	protectionOn()
 	
 	try {
-		SimulatorController.Instance.findPlugin(kACCPlugin).updatePitstopState(false, true)
+		SimulatorController.Instance.findPlugin(kACCPlugin).updatePitstopState(true)
 	}
 	finally {
 		protectionOff()

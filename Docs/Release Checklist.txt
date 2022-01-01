@@ -27,6 +27,9 @@ Release 3.8.2 Checklist
 2. New Plugin "Race Spotter"
    a. Translations
    b. Documentation
+3. Support keyboard trigger in "Simulator Setup"
+   a. Translations
+   b. Help texts in Simulator Setup
 
 Release 3.8.0 Checklist
 =======================

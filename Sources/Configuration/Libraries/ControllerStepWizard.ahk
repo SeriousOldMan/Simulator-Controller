@@ -493,6 +493,87 @@ class ControllerStepWizard extends StepWizard {
 		}
 	}
 	
+	updateFunctionHotkeys(row) {
+		local function
+		
+		wizard := this.SetupWizard
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		Gui ListView, % this.iFunctionsListView
+		
+		LV_GetText(trigger, row, 5)
+		
+		if (trigger != translate("n/a")) {
+			LV_GetText(type, row, 3)
+			LV_GetText(key, row, 4)
+			
+			double := false
+			
+			switch type {
+				case translate(k2WayToggleType):
+					type := k2WayToggleType
+					double := true
+				case translate(kDialType):
+					type := kDialType
+					double := true
+				case translate(k1WayToggleType):
+					type := k1WayToggleType
+				case translate(kButtonType):
+					type := kButtonType
+			}
+			
+			function := (type . "." . number)
+			
+			trigger := this.iFunctionTriggers[function]
+			
+			title := translate("Modular Simulator Controller System")
+			prompt := translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
+			
+			locale := ((getLanguage() = "en") ? "" : "Locale")
+			
+			key1 := ""
+			key2 := ""
+			
+			if trigger {
+				if (trigger.Length() > 0)
+					key1 := trigger[1]
+				
+				if (trigger.Length() > 1)
+					key2 := trigger[2]
+			}
+					
+			InputBox key1, %title%, %prompt%, , 200, 150, , , %locale%, , %key1%
+
+			if ErrorLevel
+				return
+			
+			if double {
+				prompt := translate("Please enter the second Hotkey:")
+		
+				InputBox key2, %title%, %prompt%, , 200, 150, , , %locale%, , %key2%
+				
+				if ErrorLevel
+					return
+				
+				this.iFunctionTriggers[function] := [key1, key2]
+			}
+			else
+				this.iFunctionTriggers[function] := [key1]
+		
+			this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+							 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"))
+			
+			window := this.Window
+			
+			Gui %window%:Default
+			Gui ListView, % this.iFunctionsListView
+			
+			LV_Modify(row, "Vis")
+		}
+	}
+	
 	registerHotKey(function, row, firstHotkey, hotkey) {
 		local controller
 		local number
@@ -1405,6 +1486,13 @@ updateFunctionTriggers() {
 			
 			menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
 			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
+			
+			Menu ContextMenu, Add, %menuItem%, %handler%
+			
+			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+			
+			menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
+			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
 			
 			Menu ContextMenu, Add, %menuItem%, %handler%
 			

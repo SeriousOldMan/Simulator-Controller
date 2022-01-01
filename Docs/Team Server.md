@@ -2,7 +2,9 @@
 
 *Team Server* is a server-based solution, which enables you to use the services of the Virtual Race Assistants in a team race, e.g. a 24h race. Without the *Team Server* these services are only available to the driver of the first stint, for all other drivers the Race Assistants do not even start because they do not have the data from the first laps. With the help of *Team Server*, a central server that manages the data of all drivers in a database, this critical knowledge can now be shared between all drivers. The connection to this server is established by the individual applications of teh Simulator Controller suite ("Simulator Controller", "Race Engineer", "Race Strategist", ...) using Web APIs over HTTPS. This ensures the greatest possible interoperability and flexibility when setting up the central server.
 
-A managed server is available for you and your teams to use. To use it, you have to become a patron of Simulator Controller. Please check the [creator page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
+A public test server can be used for a test ride with with the Tean Server and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), to see what it can do for you and your team. See the [description](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#test-session) below for more information on how to connect to the server and load a test session.
+
+To give you a quick start with the Team Server, a managed server is available for you and your teams to use. To get access, you have to become a patron of Simulator Controller. Please check the [home page](https://www.patreon.com/simulatorcontroller) on www.patreon.com for more information. But you can also host your own instance of the Team Server, which is described in detail in the section below.
 
 Disclaimer: Although the current version of the *Team Server* is no longer to be considered Beta, please always double-check the recommendations and actions of your race assistants after picking up the car from a different driver. There still might be situations, where the handover of the required data might fail and you might end up with your assistants as dumb as bread, at least what the recent history of the race concerns. For obvious reasons, there will be no error messages during the race, when for example the connection to the central server has been temporarily lost or other internal error occured, but you might face substantial misbehaviour. You may take a look into the log files afterwards, though.
 
@@ -62,6 +64,8 @@ Note: Sessions can be *used* many times. If you start a session, which has been 
 
 That's it for team administration.
 
+### Connecting
+
 ## Preparing a team session
 
 First of all, it is absolutely important to note that a team session can only function properly if all members of the team are using simulator controllers and have configured the same virtual racing assistants (either Jona or Cato or both). In order to participate in a team meeting, each member must prepare the settings for this upcoming team meeting. This is done using the "Race Settings" application.
@@ -105,6 +109,10 @@ It is obvious, that it is **not** a good idea to use the same session in more th
 ##### Session Data Management
 
 All data of an active session is stored on the Team Server. It is therefore possible to start the "Race Center" anytime, even late into the race. The data might be kept for a finished session on Team Server as well, depending on the settings chosen by the server administrator. See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) for more information. To secure the session data on your local PC, you can use the "Save" and "Save a copy..." commands from the "Session" menu at the end of the session and you can load a recently saved session anytime later using the "Load..." command.
+
+##### Test Session
+
+A public test server is available for your first test ride with "Race Center". Use the Server URL "https://sc-teamserver-test.azurewebsites.net" and connect to the "demo" account using the password "demo". The generated token, which is valid for seven days, can be used in the "Race Center" together with the Server URL to open the demo session. The server also has ten slots ("test1" - "test10", all with an empty password), which you can use to run your own tests. Only two hours of session time are available on each account but this is enough for a short test race. The accounts will be reset each day.
 
 #### Data Analysis
 

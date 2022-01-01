@@ -884,7 +884,7 @@ class SetupWizard extends ConfigurationItem {
 	getGeneralConfiguration(ByRef language, ByRef startWithWindows, ByRef silentMode) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		language := knowledgeBase.getValue("General.Language", "EN")
+		language := knowledgeBase.getValue("General.Language", getLanguage())
 		startWithWindows := knowledgeBase.getValue("General.Start With Windows", true)
 		silentMode := knowledgeBase.getValue("General.Silent Mode", false)
 	}

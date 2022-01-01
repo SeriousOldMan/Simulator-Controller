@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.8.2
+
+A new plugin "Race Spotter" was introduced with this release as an interface for the upcoming Virtual Race Spotter. The plugin will be automatically added to your configuration, but it will be deactivated. You can activate it later on.
+
+***
+
 ## Release 3.8.0
 
 Nothing special, only some new plugin labels and icon slots have been added to the "Team Server" plugin. If you are using your own labels and icons, for example for integration with Stream Deck, you may want to check the [*Labels & Icon Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) in "Simulator Configuration".

@@ -1,3 +1,10 @@
+## 3.8.2-release 01/14/21 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New plugin "Race Spotter" as interface for the Virtual Race Spotter.
+  4. Monte-Carlo simulation implemented for "Race Center". See the updated [documentation](*) for more information.
+
 ## 3.8.0-release 12/31/21
 
   1. Bugfixes, as always

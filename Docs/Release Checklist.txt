@@ -21,6 +21,12 @@ Release 3.8.2 Checklist
 =======================
 
 0. Search for new links (*)
+1. Update Procedure
+   a. Integrate "Race Spotter" into configuration
+   b. Translations
+2. New Plugin "Race Spotter"
+   a. Translations
+   b. Documentation
 
 Release 3.8.0 Checklist
 =======================

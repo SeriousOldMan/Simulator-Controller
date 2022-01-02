@@ -243,7 +243,7 @@ Beside using the standard Hotkey syntax of AutoHotkey, you can use a special *Ho
 | Example | Description |
 | ------ | ------ |
 | ?Next mode | This voice hotkey will most likely used to switch the mode on the controller. You simply have to say: "Next Mode". |
-| ?{Please} activate motion | This voice hot key can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
+| ?{Please} activate motion | This voice hotkey can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
 
 Note: The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to user Push-To-Talk and also activation commands, if you have more than one voice dialog partner configured, for example the Virtual Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 

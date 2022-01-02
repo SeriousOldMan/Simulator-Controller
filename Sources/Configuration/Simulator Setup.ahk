@@ -542,6 +542,28 @@ class SetupWizard extends ConfigurationItem {
 							setConfigurationValue(configuration, section, key, value)
 					
 				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+	
+				try {
+					FileDelete %kUserConfigDirectory%Simulator Controller.config
+				}
+				catch exception {
+					; Ignore
+				}
+	
+				startupLink := A_Startup . "\Simulator Startup.lnk"
+				
+				if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {
+					startupExe := kBinariesDirectory . "Simulator Startup.exe"
+					
+					FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
+				}
+				else
+					try {
+						FileDelete %startupLink%
+					}
+					catch exception {
+						; ignore
+					}
 				
 				if this.isModuleSelected("Controller") {
 					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")

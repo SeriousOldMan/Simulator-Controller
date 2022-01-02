@@ -489,6 +489,13 @@ saveConfiguration(configurationFile, editor) {
 
 	writeConfiguration(configurationFile, configuration)
 	
+	try {
+		FileDelete %kUserConfigDirectory%Simulator Controller.config
+	}
+	catch exception {
+		; Ignore
+	}
+	
 	startupLink := A_Startup . "\Simulator Startup.lnk"
 	
 	if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {

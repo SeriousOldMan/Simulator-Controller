@@ -98,7 +98,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
 			}
 			else
-				new Plugin(code, false, true, simulator, "").saveToConfiguration(configuration)
+				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 		}
 	}
 	

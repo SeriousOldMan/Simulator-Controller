@@ -1071,27 +1071,29 @@ class SimulatorController extends ConfigurationItem {
 		configuration := newConfiguration()
 		
 		for ignore, thePlugin in this.Plugins {
-			modes := []
-		
-			if isInstance(thePlugin, SimulatorPlugin) {
-				states := []
+			if (this.isActive(thePlugin)) {
+				modes := []
+			
+				if isInstance(thePlugin, SimulatorPlugin) {
+					states := []
+					
+					for ignore, name in thePlugin.SessionStates[true]
+						states.Push(name)
+					
+					setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
+										, thePlugin.Plugin . "|" . values2String(",", states*))
+				}
 				
-				for ignore, name in thePlugin.SessionStates[true]
-					states.Push(name)
+				for ignore, theMode in thePlugin.Modes
+					modes.Push(theMode.Mode)
 				
-				setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
-									, thePlugin.Plugin . "|" . values2String(",", states*))
+				simulators := []
+				
+				for ignore, simulator in thePlugin.Simulators
+					simulators.Push(simulator)
+				
+				setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse), values2String(",", simulators*), values2String(",", modes*)))
 			}
-			
-			for ignore, theMode in thePlugin.Modes
-				modes.Push(theMode.Mode)
-			
-			simulators := []
-			
-			for ignore, simulator in thePlugin.Simulators
-				simulators.Push(simulator)
-			
-			setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse), values2String(",", simulators*), values2String(",", modes*)))
 		}
 		
 		for ignore, fnController in this.FunctionController

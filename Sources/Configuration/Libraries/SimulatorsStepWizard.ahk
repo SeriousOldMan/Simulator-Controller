@@ -56,7 +56,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
 			
-			if (wizard.isApplicationSelected(simulator) && wizard.isModuleSelected("Controller")) {
+			if wizard.isApplicationSelected(simulator) {
 				arguments := ""
 				
 				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
@@ -69,32 +69,31 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					arguments .= (key . ": " . value)
 				}
 				
-				if wizard.isModuleSelected("Controller")
-					for ignore, mode in ["Pitstop", "Assistant"] {
-						actions := ""
-					
-						for ignore, action in this.getActions(mode, simulator)
-							if wizard.simulatorActionAvailable(simulator, mode, action) {
-								function := wizard.getSimulatorActionFunction(simulator, mode, action)
+				for ignore, mode in ["Pitstop", "Assistant"] {
+					actions := ""
+				
+					for ignore, action in this.getActions(mode, simulator)
+						if wizard.simulatorActionAvailable(simulator, mode, action) {
+							function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
-								if !IsObject(function)
-									function := ((function != "") ? Array(function) : [])
-								
-								if (function.Length() > 0) {
-									if (actions != "")
-										actions .= ", "
-									
-									actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
-								}
-							}
-					
-						if (actions != "") {
-							if (arguments != "")
-								arguments .= "; "
+							if !IsObject(function)
+								function := ((function != "") ? Array(function) : [])
 							
-							arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
+							if (function.Length() > 0) {
+								if (actions != "")
+									actions .= ", "
+								
+								actions .= (StrReplace(action, "InformationRequest.", "InformationRequest ") . A_Space . values2String(A_Space, function*))
+							}
 						}
+				
+					if (actions != "") {
+						if (arguments != "")
+							arguments .= "; "
+						
+						arguments .= (((mode = "Pitstop") ? "pitstopCommands: " : "assistantCommands: ") . actions)
 					}
+				}
 				
 				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
 			}

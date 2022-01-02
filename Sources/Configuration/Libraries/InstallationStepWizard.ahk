@@ -174,9 +174,14 @@ class InstallationStepWizard extends StepWizard {
 	
 	installSoftware(software) {
 		wizard := this.SetupWizard
-			
-		if !getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true) {
-			RunWait % substituteVariables(getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software))
+		
+		locatable := getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
+		installer := substituteVariables(getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software))
+		
+		SplitPath installer, , , extension
+		
+		if (!locatable || (extension = "EXE") || (extension = "MSI")) {
+			RunWait %installer%
 			
 			wizard.locateSoftware(software)
 	
@@ -199,7 +204,7 @@ class InstallationStepWizard extends StepWizard {
 			}
 		}
 		else
-			Run % substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+			Run %installer%
 	}
 	
 	locateSoftware(software, executable) {

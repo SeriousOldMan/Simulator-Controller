@@ -587,9 +587,18 @@ class RaceReports extends ConfigurationItem {
 					case "Car":
 						this.showCarReport(reportDirectory)
 					case "Driver":
-						if !this.Settings.HasKey("Drivers")
-							this.Settings["Drivers"] := [1, 2, 3, 4, 5]
+						raceData := true
 						
+						this.ReportViewer.loadReportData(false, raceData, false, false, false)
+						
+						drivers := []
+						
+						Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+							drivers.Push(A_Index)
+						
+						if !this.ReportViewer.Settings.HasKey("Drivers")
+							this.ReportViewer.Settings["Drivers"] := drivers
+				
 						this.showDriverReport(reportDirectory)
 					case "Position":
 						this.showPositionReport(reportDirectory)

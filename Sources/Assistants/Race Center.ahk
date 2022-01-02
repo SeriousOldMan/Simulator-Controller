@@ -1640,6 +1640,13 @@ class RaceCenter extends ConfigurationItem {
 						
 						return
 					}
+			
+			lastLap := this.LastLap
+			
+			if lastLap {
+				lap := (lastLap.Nr + 2)
+				refuel := Round(this.CurrentStint.FuelConsumption + (lastLap.FuelConsumption * 2))
+			}
 		}
 	}			
 	
@@ -1683,7 +1690,9 @@ class RaceCenter extends ConfigurationItem {
 		if (compoundColor != "Black")
 			compound := (compound . " (" . compoundColor . ")")
 		
-		GuiControl Choose, pitstopTyreCompoundDropDown, % (!compound ? 1 : inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound))
+		chosen := inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound)
+		
+		GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 		
 		GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
 		GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
@@ -4289,8 +4298,17 @@ class RaceCenter extends ConfigurationItem {
 			case "Car":
 				this.showCarReport()
 			case "Driver":
+				raceData := true
+				
+				this.ReportViewer.loadReportData(false, raceData, false, false, false)
+				
+				drivers := []
+				
+				Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+					drivers.Push(A_Index)
+				
 				if !this.ReportViewer.Settings.HasKey("Drivers")
-					this.ReportViewer.Settings["Drivers"] := [1, 2, 3, 4, 5]
+					this.ReportViewer.Settings["Drivers"] := drivers
 				
 				this.showDriverReport()
 			case "Position":

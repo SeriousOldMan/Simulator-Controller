@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. New plugin "Race Spotter" as interface for the Virtual Race Spotter.
   4. Monte-Carlo simulation implemented for "Race Center". See the updated [documentation](*) for more information.
+  5. Defining keyboard and other generic triggers are now supported in "Simulator Setup".
 
 ## 3.8.0-release 12/31/21
 

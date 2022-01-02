@@ -725,7 +725,12 @@ class RaceReportViewer {
 			
 			allDrivers := this.getDrivers(raceData, drivers)
 			
-			cars := this.Settings["Drivers"]
+			cars := []
+			
+			for ignore, car in this.Settings["Drivers"]
+				if allDrivers.HasKey(car)
+					cars.Push(car)
+				
 			drivers := []
 			
 			for ignore, car in cars

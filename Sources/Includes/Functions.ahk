@@ -1289,7 +1289,7 @@ moveByMouse(window) {
 	
 	CoordMode Mouse, Screen
 		
-	try {	
+	try {
 		MouseGetPos anchorX, anchorY
 		WinGetPos winX, winY, w, h, A
 		

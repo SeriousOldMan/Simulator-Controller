@@ -684,12 +684,14 @@ class RaceStrategist extends RaceAssistant {
 		
 		lastLap := lapNumber
 		
-		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy && this.Speaker) {
-			this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
+		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy) {
+			if this.Speaker {
+				this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "reportStrategy"))
+			}
 	
 			this.updateDynamicValues({StrategyReported: lapNumber})
-			
-			this.setContinuation(ObjBindMethod(this, "reportStrategy"))
 		}
 		
 		simulator := knowledgeBase.getValue("Session.Simulator")
@@ -1195,8 +1197,8 @@ class RaceStrategist extends RaceAssistant {
 		if this.RemoteHandler {
 			Random postfix, 1, 1000000
 				
-			driver := knowledgeBase.getValue("Driver.Car")
-			carCount := knowledgeBase.getValue("Car.Count")
+			driver := knowledgeBase.getValue("Driver.Car", 0)
+			carCount := knowledgeBase.getValue("Car.Count", 0)
 			
 			if ((driver == 0) || (carCount == 0))
 				return

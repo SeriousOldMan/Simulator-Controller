@@ -87,7 +87,7 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 ;;;-------------------------------------------------------------------------;;;
 
 global vToken := false
-global vWait := 0
+global vWorking := 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -215,6 +215,8 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	
 	iStrategyViewer := false
+	
+	iTasks := []
 	
 	class SessionStrategy extends Strategy {
 		iVersion := false
@@ -873,7 +875,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		waitViewer.Navigate("about:blank")
 		
-		this.showWait(false)
+		this.startWorking(false)
 		
 		Gui %window%:Font, s8 Norm cBlack, Arial
 		
@@ -1008,9 +1010,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	connect(silent := false) {
+		this.pushTask(ObjBindMethod(this, "connectAsync", silent))
+	}
+	
+	connectAsync(silent) {
 		window := this.Window
 		
-		Gui %window%:+Disabled
+		Gui %window%:Default
 		
 		try {
 			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
@@ -1039,9 +1045,6 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			this.loadTeams()
-		}
-		finally {
-			Gui %window%:-Disabled
 		}
 	}
 	
@@ -2009,11 +2012,8 @@ class RaceCenter extends ConfigurationItem {
 				MsgBox 262192, %title%, % translate("Not yet implemented...")
 				OnMessage(0x44, "")
 			case 14: ; Run Simulation
-				if this.Strategy {
-					sessionType := getConfigurationValue(this.Strategy, "Session", "SessionType")
-					
-					new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
-				}
+				if this.Strategy
+					this.runSimulation(getConfigurationValue(this.Strategy, "Session", "SessionType"))
 				else {
 					title := translate("Information")
 
@@ -2157,6 +2157,10 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	pushTask(task) {
+		this.iTasks.Push(task)
+	}
+	
 	createStrategy(nameOrConfiguration := false) {
 		name := nameOrConfiguration
 		
@@ -2185,6 +2189,27 @@ class RaceCenter extends ConfigurationItem {
 			
 				this.iSelectedDetailReport := false
 			}
+	}
+	
+	runSimulation(sessionType) {
+		this.pushTask(ObjBindMethod(this, "runSimulationAsync", sessionType))
+	}
+	
+	runSimulationAsync(sessionType) {
+		new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+	}
+	
+	getPreviousLap(lap) {
+		lap := (lap.Nr - 1)
+		laps := this.Laps
+		
+		while (lap > 0)
+			if laps.HasKey(lap)
+				return laps[lap]
+			else
+				lap -= 1
+		
+		return false
 	}
 	
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
@@ -2333,18 +2358,27 @@ class RaceCenter extends ConfigurationItem {
 			this.selectStrategy(strategy, true)
 	}
 	
-	showWait(state := true) {
+	startWorking(state := true) {
 		if state
-			vWait += 1
+			vWorking += 1
 		else {
-			vWait -= 1
+			vWorking -= 1
 		
-			if (vWait > 0)
+			if (vWorking > 0)
 				return
 			else
-				vWait := 0
+				vWorking := 0
 		}
 		
+		window := this.Window
+		
+		Gui %window%:Default
+
+		if state
+			Gui %window%:+Disabled
+		else
+			Gui %window%:-Disabled
+	
 		waitViewer.Document.Open()
 
 		html := (state ? ("<img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>") : "")
@@ -2354,8 +2388,8 @@ class RaceCenter extends ConfigurationItem {
 		waitViewer.Document.Close()
 	}
 	
-	hideWait() {
-		this.showWait(false)
+	finishWorking() {
+		this.startWorking(false)
 	}
 	
 	initializeSession() {
@@ -2567,7 +2601,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			if ((lap.Nr == 1) && (damage > 0))
 				lap.Accident := true
-			else if ((lap.Nr > 1) && (damage > this.Laps[lap.Nr - 1].Damage))
+			else if ((lap.Nr > 1) && (damage > this.getPreviousLap(lap).Damage))
 				lap.Accident := true
 			else
 				lap.Accident := false
@@ -2577,7 +2611,7 @@ class RaceCenter extends ConfigurationItem {
 			if ((lap.Nr == 1) || (stint.Laps[1] == lap))
 				lap.FuelConsumption := "-"
 			else
-				lap.FuelConsumption := Round((this.Laps[lap.Nr - 1].FuelRemaining - lap.FuelRemaining), 1)
+				lap.FuelConsumption := Round((this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining), 1)
 			
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 			
@@ -2629,7 +2663,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			catch exception {
 				if (lap.Nr > 1)
-					lap.Position := this.Laps[lap.Nr - 1].Position
+					lap.Position := this.getPreviousLap(lap).Position
 			}
 			
 			this.Laps[identifier] := lap
@@ -2658,7 +2692,7 @@ class RaceCenter extends ConfigurationItem {
 				consumption := lap.FuelConsumption
 					
 				if consumption is number
-					stint.FuelConsumption += ((this.Laps[lap.Nr - 1].FuelConsumption = "-") ? (consumption * 2) : consumption)
+					stint.FuelConsumption += ((this.getPreviousLap(lap).FuelConsumption = "-") ? (consumption * 2) : consumption)
 			}
 				
 			if lap.Accident
@@ -2678,7 +2712,7 @@ class RaceCenter extends ConfigurationItem {
 			if (stint.Weather = "")
 				stint.Weather := weather
 			else if !inList(string2Values(",", stint.Weather), weather)
-				stint.Weather .= (", ", weather)
+				stint.Weather .= (", " . weather)
 		}
 		
 		stint.AvgLaptime := Round(average(laptimes), 1)
@@ -2845,7 +2879,10 @@ class RaceCenter extends ConfigurationItem {
 		if (lap == 1) {
 			try {
 				try {
-					raceInfo := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Info")
+					if this.Laps.HasKey(lap)
+						raceInfo := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Info")
+					else
+						raceInfo := false
 				}
 				catch exception {
 					raceInfo := false
@@ -2853,14 +2890,21 @@ class RaceCenter extends ConfigurationItem {
 
 				if (!raceInfo || (raceInfo == ""))
 					return
-					
-				FileAppend %raceInfo%, %directory%Race.data
+				
+				if !FileExist(directory . "Race.data")
+					FileAppend %raceInfo%, %directory%Race.data
 			}
 			catch exception {
 				; ignore
 			}
 				
 			data := readConfiguration(directory . "Race.data")
+			
+			if (getConfigurationValue(data, "Cars", "Count") = "__NotInitialized__")
+				setConfigurationValue(data, "Cars", "Count", 0)
+			
+			if (getConfigurationValue(data, "Cars", "Driver") = "__NotInitialized__")
+				setConfigurationValue(data, "Cars", "Driver", 0)
 		}
 		
 		pitstops := false
@@ -2868,7 +2912,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		while (lap <= lastLap) {
 			try {
-				lapData := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap")
+				if this.Laps.HasKey(lap)
+					lapData := this.Connector.getLapValue(this.Laps[lap].Identifier, "Race Strategist Race Lap")
+				else
+					lapData := false
 				
 				if (lapData && (lapData != ""))
 					lapData := parseConfiguration(lapData)
@@ -2953,6 +3000,12 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 			
 			while (lap <= lastLap) {
+				if !this.Laps.HasKey(lap) {
+					lap += 1
+					
+					continue
+				}
+				
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
 			
@@ -3013,6 +3066,13 @@ class RaceCenter extends ConfigurationItem {
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 									   , telemetryData[7], telemetryData[8], telemetryData[9])
 				
+				Gui ListView, % this.LapsListView
+			
+				LV_GetText(lapPressures, lap, 10)
+				
+				if (lapPressures = "-, -, -, -")
+					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", pressures*))
+					
 				newData := true
 				lap += 1
 			}
@@ -3023,35 +3083,43 @@ class RaceCenter extends ConfigurationItem {
 	
 	syncTyrePressures(load := false) {
 		if load {
-			Gui ListView, % this.LapsListView
-			
 			lastLap := this.LastLap
 			
 			if lastLap
 				lastLap := (lastLap.Nr + 0)
 			
+			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+			
 			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Setup.Pressures"] {
-				if (A_Index > lastLap)
-					break
+				if !this.Laps.HasKey(A_Index)
+					continue
 				
 				pressureFL := pressureData["Tyre.Pressure.Hot.Front.Left"]
 				pressureFR := pressureData["Tyre.Pressure.Hot.Front.Right"]
 				pressureRL := pressureData["Tyre.Pressure.Hot.Rear.Left"]
 				pressureRR := pressureData["Tyre.Pressure.Hot.Rear.Right"]
+			
+				if (tyresTable.Length() >= lastLap) {
+					tyres := tyresTable[lastLap]
 				
-				if (pressureFL == kNull)
-					pressureFL := "-"
+					if (pressureFL = kNull)
+						pressureFL := tyres["Tyre.Pressure.Front.Left"]
+					if (pressureFR = kNull)
+						pressureFR := tyres["Tyre.Pressure.Front.Right"]
+					if (pressureRL = kNull)
+						pressureRL := tyres["Tyre.Pressure.Rear.Left"]
+					if (pressureRR = kNull)
+						pressureRR := tyres["Tyre.Pressure.Rear.Right"]
+				}
 				
-				if (pressureFR == kNull)
-					pressureFR := "-"
-				
-				if (pressureRL == kNull)
-					pressureRL := "-"
-				
-				if (pressureRR == kNull)
-					pressureRR := "-"
-				
-				LV_Modify(this.Laps[A_Index].Row, "Col10", values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR))
+				if this.Laps.HasKey(A_Index) {
+					Gui ListView, % this.LapsListView
+			
+					row := this.Laps[A_Index].Row
+					
+					LV_Modify(row, "Col10", values2String(", ", displayValue(pressureFL), displayValue(pressureFR)
+															  , displayValue(pressureRL), displayValue(pressureRR)))
+				}
 			}
 			
 			return false
@@ -3075,6 +3143,12 @@ class RaceCenter extends ConfigurationItem {
 			flush := (Abs(lastLap - lap) <= 2)
 			
 			while (lap <= lastLap) {
+				if !this.Laps.HasKey(lap) {
+					lap += 1
+					
+					continue
+				}
+				
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
 			
@@ -3256,12 +3330,6 @@ class RaceCenter extends ConfigurationItem {
 			
 			Gui %window%:Default
 	
-			this.showWait()
-			
-			Sleep 200
-			
-			Gui %window%:+Disabled
-	
 			try {
 				this.syncPlan()
 				this.syncStrategy()
@@ -3301,11 +3369,6 @@ class RaceCenter extends ConfigurationItem {
 			}
 			catch exception {
 				showMessage(translate("Cannot connect to the Team Server.") . "`n`n" . translate("Retry in 10 seconds."))
-			}
-			finally {
-				Gui %window%:-Disabled
-				
-				this.hideWait(false)
 			}
 		}
 	}
@@ -3587,33 +3650,24 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	saveSession(copy := false) {
+		this.pushTask(ObjBindMethod(this, "saveSessionAsync", copy))
+	}
+	
+	saveSessionAsync(copy := false) {
 		if this.SessionActive {
-			window := this.Window
+			this.syncSessionDatabase(true)
 			
-			Gui %window%:+Disabled
+			info := newConfiguration()
 			
-			this.showWait()
+			setConfigurationValue(info, "Session", "Team", this.SelectedTeam)
+			setConfigurationValue(info, "Session", "Session", this.SelectedSession)
+			setConfigurationValue(info, "Session", "Date", this.Date)
+			setConfigurationValue(info, "Session", "Time", this.Time)
+			setConfigurationValue(info, "Session", "Simulator", this.Simulator)
+			setConfigurationValue(info, "Session", "Car", this.Car)
+			setConfigurationValue(info, "Session", "Track", this.Track)
 			
-			try {
-				this.syncSessionDatabase(true)
-				
-				info := newConfiguration()
-				
-				setConfigurationValue(info, "Session", "Team", this.SelectedTeam)
-				setConfigurationValue(info, "Session", "Session", this.SelectedSession)
-				setConfigurationValue(info, "Session", "Date", this.Date)
-				setConfigurationValue(info, "Session", "Time", this.Time)
-				setConfigurationValue(info, "Session", "Simulator", this.Simulator)
-				setConfigurationValue(info, "Session", "Car", this.Car)
-				setConfigurationValue(info, "Session", "Track", this.Track)
-				
-				writeConfiguration(this.SessionDirectory . "Session.info", info)
-			}
-			finally {
-				Gui %window%:-Disabled
-			
-				this.hideWait()
-			}
+			writeConfiguration(this.SessionDirectory . "Session.info", info)
 		}
 		else {
 			this.savePlan()
@@ -3773,15 +3827,15 @@ class RaceCenter extends ConfigurationItem {
 		
 		if currentStint
 			Loop % currentStint.Nr
-			{
-				stint := this.Stints[A_Index]
-				stint.Row := A_Index
-				
-				LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
-						 , translate(stint.Compound), stint.Laps.Length()
-						 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
-						 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
-			}
+				if this.Stints.HasKey(A_Index) {
+					stint := this.Stints[A_Index]
+					stint.Row := (LV_GetCount() + 1)
+					
+					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
+							 , translate(stint.Compound), stint.Laps.Length()
+							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+				}
 				
 		LV_ModifyCol()
 		
@@ -3794,12 +3848,12 @@ class RaceCenter extends ConfigurationItem {
 		
 		if lastLap
 			Loop % lastLap.Nr
-			{
-				lap := this.Laps[A_Index]
-				lap.Row := A_Index
-				
-				LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
-			}
+				if this.Laps.HasKey(A_Index) {
+					lap := this.Laps[A_Index]
+					lap.Row := (LV_GetCount() + 1)
+					
+					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+				}
 				
 		LV_ModifyCol()
 		
@@ -3891,6 +3945,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	clearSession() {
+		this.pushTask(ObjBindMethod(this, "clearSessionAsync"))
+	}
+	
+	clearSessionAsync() {
 		session := this.SelectedSession[true]
 		
 		if session {
@@ -3906,6 +3964,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	loadSession() {
+		this.pushTask(ObjBindMethod(this, "loadSessionAsync"))
+	}
+	
+	loadSessionAsync() {
 		title := translate("Select Session folder...")
 		
 		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
@@ -4527,171 +4589,198 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	syncSessionDatabase(forSave := false) {
-		this.showWait()
+		session := this.SelectedSession[true]
+		sessionDB := this.SessionDatabase
+		lastLap := this.LastLap
 		
-		try {
-			session := this.SelectedSession[true]
-			sessionDB := this.SessionDatabase
-			lastLap := this.LastLap
+		if lastLap
+			lastLap := lastLap.Nr
+		
+		if lastLap {
+			pressuresTable := this.PressuresDatabase.Database.Tables["Setup.Pressures"]
+			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+					
+			newLap := (sessionDB.Tables["Lap.Data"].Length() + 1)
 			
-			if lastLap
-				lastLap := lastLap.Nr
-			
-			if lastLap {
-				pressuresTable := this.PressuresDatabase.Database.Tables["Setup.Pressures"]
-				tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
-						
-				newLap := (sessionDB.Tables["Lap.Data"].Length() + 1)
-				
-				while (newLap <= lastLap) {
-					lap := this.Laps[newLap]
-					
-					if ((pressuresTable.Length() < newLap) || (tyresTable.Length() < newLap))
-						return
-					
-					lapData := {Nr: newLap, Lap: newLap, Stint: lap.Stint.Nr, "Lap.Time": null(lap.Laptime), Position: null(lap.Position)
-							  , Damage: lap.Damage, Accident: lap.Accident
-							  , "Fuel.Consumption": null(lap.FuelConsumption), "Fuel.Remaining": null(lap.FuelRemaining)
-							  , Weather: lap.Weather, "Temperature.Air": null(lap.AirTemperature), "Temperature.Track": null(lap.TrackTemperature)
-							  , Grip: lap.Grip, Map: null(lap.Map), TC: null(lap.TC), ABS: null(lap.ABS)
-							  , "Tyre.Compound": compound(lap.Compound), "Tyre.Compound.Color": compoundColor(lap.Compound)}				
-					
-					pressures := pressuresTable[newLap]
-					
-					pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
-					pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
-					pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
-					pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
-					
-					lapData["Tyre.Pressure.Cold.Front.Left"] := null(pressureFL)
-					lapData["Tyre.Pressure.Cold.Front.Right"] := null(pressureFR)
-					lapData["Tyre.Pressure.Cold.Rear.Left"] := null(pressureRL)
-					lapData["Tyre.Pressure.Cold.Rear.Right"] := null(pressureRR)
-					lapData["Tyre.Pressure.Cold.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-					lapData["Tyre.Pressure.Cold.Front.Average"] := null(average([pressureFL, pressureFR]))
-					lapData["Tyre.Pressure.Cold.Rear.Average"] := null(average([pressureRL, pressureRR]))
-					
-					pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
-					pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
-					pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
-					pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
-					
-					lapData["Tyre.Pressure.Hot.Front.Left"] := null(pressureFL)
-					lapData["Tyre.Pressure.Hot.Front.Right"] := null(pressureFR)
-					lapData["Tyre.Pressure.Hot.Rear.Left"] := null(pressureRL)
-					lapData["Tyre.Pressure.Hot.Rear.Right"] := null(pressureRR)
-					lapData["Tyre.Pressure.Hot.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
-					lapData["Tyre.Pressure.Hot.Front.Average"] := null(average([pressureFL, pressureFR]))
-					lapData["Tyre.Pressure.Hot.Rear.Average"] := null(average([pressureRL, pressureRR]))
-			
-					tyres := tyresTable[newLap]
-					
-					lapData["Tyre.Laps"] := null(tyres["Tyre.Laps"])
-					
-					temperatureFL := tyres["Tyre.Temperature.Front.Left"]
-					temperatureFR := tyres["Tyre.Temperature.Front.Right"]
-					temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
-					temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
-					
-					lapData["Tyre.Temperature.Front.Left"] := null(temperatureFL)
-					lapData["Tyre.Temperature.Front.Right"] := null(temperatureFR)
-					lapData["Tyre.Temperature.Rear.Left"] := null(temperatureRL)
-					lapData["Tyre.Temperature.Rear.Right"] := null(temperatureRR)
-					lapData["Tyre.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
-					lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
-					lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
-					
-					sessionDB.add("Lap.Data", lapData)
-					
+			while (newLap <= lastLap) {
+				if !this.Laps.HasKey(newLap) {
 					newLap += 1
+					
+					continue
 				}
-			
-				if this.SessionActive {
-					lap := 0
 				
-					for ignore, entry in sessionDB.Tables["Delta.Data"]
-						lap := Max(lap, entry.Lap)
+				lap := this.Laps[newLap]
+				
+				if ((pressuresTable.Length() < newLap) || (tyresTable.Length() < newLap))
+					return
+				
+				lapData := {Nr: newLap, Lap: newLap, Stint: lap.Stint.Nr, "Lap.Time": null(lap.Laptime), Position: null(lap.Position)
+						  , Damage: lap.Damage, Accident: lap.Accident
+						  , "Fuel.Consumption": null(lap.FuelConsumption), "Fuel.Remaining": null(lap.FuelRemaining)
+						  , Weather: lap.Weather, "Temperature.Air": null(lap.AirTemperature), "Temperature.Track": null(lap.TrackTemperature)
+						  , Grip: lap.Grip, Map: null(lap.Map), TC: null(lap.TC), ABS: null(lap.ABS)
+						  , "Tyre.Compound": compound(lap.Compound), "Tyre.Compound.Color": compoundColor(lap.Compound)}				
+				
+				pressures := pressuresTable[newLap]
+				tyres := tyresTable[newLap]
+				
+				pressureFL := pressures["Tyre.Pressure.Cold.Front.Left"]
+				pressureFR := pressures["Tyre.Pressure.Cold.Front.Right"]
+				pressureRL := pressures["Tyre.Pressure.Cold.Rear.Left"]
+				pressureRR := pressures["Tyre.Pressure.Cold.Rear.Right"]
+				
+				lapData["Tyre.Pressure.Cold.Front.Left"] := null(pressureFL)
+				lapData["Tyre.Pressure.Cold.Front.Right"] := null(pressureFR)
+				lapData["Tyre.Pressure.Cold.Rear.Left"] := null(pressureRL)
+				lapData["Tyre.Pressure.Cold.Rear.Right"] := null(pressureRR)
+				lapData["Tyre.Pressure.Cold.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+				lapData["Tyre.Pressure.Cold.Front.Average"] := null(average([pressureFL, pressureFR]))
+				lapData["Tyre.Pressure.Cold.Rear.Average"] := null(average([pressureRL, pressureRR]))
+				
+				pressureFL := pressures["Tyre.Pressure.Hot.Front.Left"]
+				pressureFR := pressures["Tyre.Pressure.Hot.Front.Right"]
+				pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
+				pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
+				
+				if (pressureFL = kNull)
+					pressureFL := tyres["Tyre.Pressure.Front.Left"]
+				if (pressureFR = kNull)
+					pressureFR := tyres["Tyre.Pressure.Front.Right"]
+				if (pressureRL = kNull)
+					pressureRL := tyres["Tyre.Pressure.Rear.Left"]
+				if (pressureRR = kNull)
+					pressureRR := tyres["Tyre.Pressure.Rear.Right"]
+				
+				lapData["Tyre.Pressure.Hot.Front.Left"] := null(pressureFL)
+				lapData["Tyre.Pressure.Hot.Front.Right"] := null(pressureFR)
+				lapData["Tyre.Pressure.Hot.Rear.Left"] := null(pressureRL)
+				lapData["Tyre.Pressure.Hot.Rear.Right"] := null(pressureRR)
+				lapData["Tyre.Pressure.Hot.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
+				lapData["Tyre.Pressure.Hot.Front.Average"] := null(average([pressureFL, pressureFR]))
+				lapData["Tyre.Pressure.Hot.Rear.Average"] := null(average([pressureRL, pressureRR]))
+		
+				tyres := tyresTable[newLap]
+				
+				lapData["Tyre.Laps"] := null(tyres["Tyre.Laps"])
+				
+				temperatureFL := tyres["Tyre.Temperature.Front.Left"]
+				temperatureFR := tyres["Tyre.Temperature.Front.Right"]
+				temperatureRL := tyres["Tyre.Temperature.Rear.Left"]
+				temperatureRR := tyres["Tyre.Temperature.Rear.Right"]
+				
+				lapData["Tyre.Temperature.Front.Left"] := null(temperatureFL)
+				lapData["Tyre.Temperature.Front.Right"] := null(temperatureFR)
+				lapData["Tyre.Temperature.Rear.Left"] := null(temperatureRL)
+				lapData["Tyre.Temperature.Rear.Right"] := null(temperatureRR)
+				lapData["Tyre.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
+				lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
+				lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
+				
+				sessionDB.add("Lap.Data", lapData)
+			
+				Gui ListView, % this.LapsListView
+		
+				LV_GetText(lapPressures, lap.Row, 10)
+				
+				if (lapPressures = "-, -, -, -")
+					LV_Modify(lap.Row, "Col10", values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR))
+			
+				newLap += 1
+			}
+		
+			if this.SessionActive {
+				lap := 0
+			
+				for ignore, entry in sessionDB.Tables["Delta.Data"]
+					lap := Max(lap, entry.Lap)
 
-					lap += 1
-					
-					while (lap <= lastLap) {
-						try {
-							tries := ((lap == lastLap) ? 10 : 1)
-					
-							while (tries > 0) {
-								standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")
-								
-								if (!standingsData || (standingsData == "")) {
-									tries -= 1
-									
-									if (tries <= 0)
-										Throw "No data..."
-									else
-										Sleep 400
-								}
-								else
-									break
-							}
-							
-							standingsData := parseConfiguration(standingsData)
-						}
-						catch exception {
-							standingsData := newConfiguration()
-						}
-						
-						if (standingsData.Count() > 0) {
-							sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
-													   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
-													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
-							sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Front"
-													   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Car")
-													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Distance"), 2)})
-							sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
-													   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
-													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Distance"), 2)})
-							sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
-													   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
-													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
-							sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Front"
-													   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
-													   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
-													   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
-													   
-							prefix := ("Standings.Lap." . lap . ".Car.")
-							
-							Loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
-							{
-								driver := computeDriverName(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
-														  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
-														  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
-								
-								sessionDB.add("Standings.Data", {Lap: lap, Car: A_Index, Driver: driver
-															   , Position: getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Position")
-															   , Time: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
-															   , Laps: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
-															   , Delta: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2)})
-							}
-						}
-						
+				lap += 1
+				
+				while (lap <= lastLap) {
+					if !this.Laps.HasKey(lap) {
 						lap += 1
+						
+						continue
 					}
+					
+					try {
+						tries := ((lap == lastLap) ? 10 : 1)
+				
+						while (tries > 0) {
+							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")
+							
+							if (!standingsData || (standingsData == "")) {
+								tries -= 1
+								
+								if (tries <= 0)
+									Throw "No data..."
+								else
+									Sleep 400
+							}
+							else
+								break
+						}
+						
+						standingsData := parseConfiguration(standingsData)
+					}
+					catch exception {
+						standingsData := newConfiguration()
+					}
+					
+					if (standingsData.Count() > 0) {
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Front"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Front"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
+												   
+						prefix := ("Standings.Lap." . lap . ".Car.")
+						
+						Loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
+						{
+							driver := computeDriverName(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
+													  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
+													  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
+							
+							sessionDB.add("Standings.Data", {Lap: lap, Car: A_Index, Driver: driver
+														   , Position: getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Position")
+														   , Time: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
+														   , Laps: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
+														   , Delta: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2)})
+						}
+					}
+					
+					lap += 1
 				}
 			}
+		}
+		
+		if forSave {
+			this.savePlan(this.SessionFinished)
 			
-			if forSave
-				this.savePlan(this.SessionFinished)
+			currentStint := this.CurrentStint
 			
-			if (forSave && !this.SessionFinished) {
-				currentStint := this.CurrentStint
+			if currentStint {
+				sessionDB.clear("Stint.Data")
+				newStint := 1
 				
-				if currentStint {
-					newStint := (sessionDB.Tables["Stint.Data"].Length() + 1)
-					
-					while (newStint <= currentStint.Nr) {
+				while (newStint <= currentStint.Nr) {
+					if this.Stints.HasKey(newStint) {
 						stint := this.Stints[newStint]
 					
 						stintData := {Nr: newStint, Lap: stint.Lap
@@ -4702,23 +4791,20 @@ class RaceCenter extends ConfigurationItem {
 									, "Time.Start": stint.Time}
 						
 						sessionDB.add("Stint.Data", stintData)
-						
-						newStint += 1
 					}
-				}
-				
-				if (this.Drivers.Length() != sessionDB.Tables["Driver.Data"].Length()) {
-					sessionDB.clear("Driver")
 					
-					for ignore, driver in this.Drivers
-						sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
+					newStint += 1
 				}
-				
-				sessionDB.flush()
 			}
-		}
-		finally {
-			this.hideWait()
+			
+			if (this.Drivers.Length() != sessionDB.Tables["Driver.Data"].Length()) {
+				sessionDB.clear("Driver")
+				
+				for ignore, driver in this.Drivers
+					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
+			}
+			
+			sessionDB.flush()
 		}
 	}
 	
@@ -4747,18 +4833,23 @@ class RaceCenter extends ConfigurationItem {
 	
 	showReport(report, force := false) {
 		if (force || (report != this.SelectedReport)) {
-			this.syncSessionDatabase()
-			this.updateSeriesSelector(report)
-			
-			if inList(kRaceReports, report)
-				this.showRaceReport(report)
-			else if (report = "Pressures")
-				this.showPressuresReport()
-			else if (report = "Temperatures")
-				this.showTemperaturesReport()
-			else if (report = "Free")
-				this.showCustomReport()
+			this.pushTask(ObjBindMethod(this, "syncSessionDatabase"))
+		
+			this.pushTask(ObjBindMethod(this, "showReportAsync", report))
 		}
+	}
+	
+	showReportAsync(report) {
+		this.updateSeriesSelector(report)
+		
+		if inList(kRaceReports, report)
+			this.showRaceReport(report)
+		else if (report = "Pressures")
+			this.showPressuresReport()
+		else if (report = "Temperatures")
+			this.showTemperaturesReport()
+		else if (report = "Free")
+			this.showCustomReport()
 	}
 	
 	selectChartType(chartType, force := false) {
@@ -4884,6 +4975,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	showStintDetails(stint) {
+		this.pushTask(ObjBindMethod(this, "syncSessionDatabase"))
+		
+		this.pushTask(ObjBindMethod(this, "showStintDetailsAsync", stint))
+	}
+	
+	showStintDetailsAsync(stint) {
 		html := ("<div id=""header""><b>" . translate("Stint: ") . stint.Nr . "</b></div>")
 			
 		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
@@ -4901,8 +4998,6 @@ class RaceCenter extends ConfigurationItem {
 		lapTimes := []
 		fuelConsumptions := []
 		temperatures := []
-		
-		this.syncSessionDatabase()
 		
 		lapTable := this.SessionDatabase.Tables["Lap.Data"]
 		
@@ -4944,6 +5039,19 @@ class RaceCenter extends ConfigurationItem {
 												   
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
+												  
+				if (hotPressures = "-, -, -, -") {
+					tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
+	
+					if (tyresTable.Length() >= lap.Nr) {
+						tyres := tyresTable[lap.Nr]
+						
+						hotPressures := values2String(", ", displayValue(tyres["Tyre.Pressure.Front.Left"])
+														  , displayValue(tyres["Tyre.Pressure.Front.Right"])
+														  , displayValue(tyres["Tyre.Pressure.Rear.Left"])
+														  , displayValue(tyres["Tyre.Pressure.Rear.Right"]))
+					}
+				}
 			}
 		}
 		
@@ -5068,8 +5176,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	showLapDetails(lap) {
-		this.syncSessionDatabase()
+		this.pushTask(ObjBindMethod(this, "syncSessionDatabase"))
 		
+		this.pushTask(ObjBindMethod(this, "showLapDetailsAsync", lap))
+	}
+	
+	showLapDetailsAsync(lap) {
 		html := ("<div id=""header""><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 			
 		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
@@ -5814,6 +5926,9 @@ choosePlan() {
 }
 
 updatePlan() {
+	if vWorking
+		return
+	
 	rCenter := RaceCenter.Instance
 	
 	Gui ListView, % rCenter.PlanListView
@@ -5945,6 +6060,9 @@ chooseLap() {
 }
 
 choosePitstop() {
+	if vWorking
+		return
+	
 	rCenter := RaceCenter.Instance
 	
 	Gui ListView, % rCenter.PitstopsListView
@@ -5954,6 +6072,9 @@ choosePitstop() {
 }
 
 chooseReport() {
+	if vWorking
+		return
+	
 	rCenter := RaceCenter.Instance
 	
 	Gui ListView, % reportsListView
@@ -5990,11 +6111,32 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 syncSession() {
 	rCenter := RaceCenter.Instance
 	
-	try {
-		rCenter.syncSession()
-	}
-	finally {
-		SetTimer syncSession, -10000
+	if !inList(rCenter.iTasks, "syncSessionAsync")
+		rCenter.pushTask("syncSessionAsync")
+	
+	SetTimer syncSession, -10000
+}
+
+syncSessionAsync() {
+	RaceCenter.Instance.syncSession()
+}
+
+runTasks() {
+	rCenter := RaceCenter.Instance
+	
+	if !vWorking {
+		rCenter.startWorking()
+		
+		try {
+			if (rCenter.iTasks.Length() > 0) {
+				task := rCenter.iTasks.RemoveAt(1)
+			
+				%task%()
+			}
+		}
+		finally {
+			rCenter.finishWorking()
+		}
 	}
 }
 
@@ -6015,7 +6157,11 @@ startupRaceCenter() {
 		
 		registerEventHandler("Setup", "functionEventHandler")
 		
+		SetTimer runTasks, 500
+		
 		rCenter.show()
+		
+		SetTimer runTasks, Off
 		
 		ExitApp 0
 	}

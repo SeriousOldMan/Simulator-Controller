@@ -3100,7 +3100,7 @@ class RaceCenter extends ConfigurationItem {
 				pressureRR := pressureData["Tyre.Pressure.Hot.Rear.Right"]
 			
 				if (tyresTable.Length() >= lastLap) {
-					tyres := tyresTable[lastLap]
+					tyres := tyresTable[A_Index]
 				
 					if (pressureFL = kNull)
 						pressureFL := tyres["Tyre.Pressure.Front.Left"]
@@ -3573,6 +3573,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	updateStatistics() {
+		this.pushTask(ObjBindMethod(this, "updateStatisticsAsync"))
+	}
+	
+	updateStatisticsAsync() {
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 			
@@ -3586,17 +3590,19 @@ class RaceCenter extends ConfigurationItem {
 			Loop %count% {
 				showProgress({progress: Round((A_Index / count) * 50), color: "Green", message: translate("Stint: ") . A_Index})
 			
-				stint := this.Stints[A_Index]
-				
-				this.updateStintStatistics(stint)
+				if this.Stints.HasKey(A_Index) {
+					stint := this.Stints[A_Index]
 					
-				window := this.Window
-				
-				Gui %window%:Default
-				
-				Gui ListView, % this.StintsListView
+					this.updateStintStatistics(stint)
+					
+					window := this.Window
+					
+					Gui %window%:Default
+					
+					Gui ListView, % this.StintsListView
 
-				LV_Modify(stint.Row, "Col11", stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+					LV_Modify(stint.Row, "Col11", stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+				}
 				
 				Sleep 200
 			}
@@ -4531,6 +4537,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl, , dataY5DropDown, % ("|" . values2String("|", translate("None"), y5Choices*))
 			GuiControl, , dataY6DropDown, % ("|" . values2String("|", translate("None"), y6Choices*))
 		
+			dataXDropDown := 0
 			dataY1DropDown := 0
 			dataY2DropDown := 0
 			dataY3DropDown := 0
@@ -6128,7 +6135,7 @@ runTasks() {
 		rCenter.startWorking()
 		
 		try {
-			if (rCenter.iTasks.Length() > 0) {
+			while (rCenter.iTasks.Length() > 0) {
 				task := rCenter.iTasks.RemoveAt(1)
 			
 				%task%()

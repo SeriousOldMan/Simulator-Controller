@@ -376,6 +376,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	activateACCWindow() {
 		window := this.Simulator.WindowTitle
 		
+		if !WinExist(window)
+			if isDebug()
+				showMessage("ACC not found...")
+		
 		if !WinActive(window)
 			WinActivate %window%
 	}

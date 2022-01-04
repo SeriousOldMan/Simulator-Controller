@@ -28,6 +28,8 @@ global kIRCPlugin = "IRC"
 class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	iCurrentPitstopMFD := false
 	
+	iCommandMode := "Event"
+	
 	iPitstopFuelMFDHotkey := false
 	iPitstopTyreMFDHotkey := false
 	
@@ -45,6 +47,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
+		
+		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 		
 		this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
 		this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
@@ -82,6 +86,21 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	sendWindowCommand(command) {
+		switch this.iCommandMode {
+			case "Event":
+				SendEvent %command%
+			case "Input":
+				SendInput %command%
+			case "Play":
+				SendPlay %command%
+			case "Raw":
+				SendRaw %command%
+			default:
+				Send %command%
+		}
+	}
+	
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 		key := false
@@ -96,7 +115,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			if key {
 				if (key != "Off") {
-					SendEvent % key
+					this.sendWindowCommand(key)
 				
 					this.iCurrentPitstopMFD := descriptor
 					
@@ -133,7 +152,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			
 			if (key != "Off")
-				SendEvent % key
+				this.sendWindowCommand(key)
 			
 			this.iCurrentPitstopMFD := false
 		}

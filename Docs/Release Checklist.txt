@@ -30,6 +30,9 @@ Release 3.8.2 Checklist
 3. Support keyboard trigger in "Simulator Setup"
    a. Translations
    b. Help texts in Simulator Setup
+4. New parameter "pitstopMFDMode"
+   a. Full Test
+   b. Documentation
 
 Release 3.8.0 Checklist
 =======================

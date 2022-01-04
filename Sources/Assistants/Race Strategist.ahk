@@ -125,7 +125,7 @@ startRaceStrategist() {
 				strategistName := A_Args[index + 1]
 				index += 2
 			case "-Logo":
-				strategistLogo := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
+				strategistLogo := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true) || (A_Args[index + 1] = "On")) ? true : false)
 				index += 2
 			case "-Language":
 				strategistLanguage := A_Args[index + 1]

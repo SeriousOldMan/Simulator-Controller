@@ -422,13 +422,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 		
-		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse)) {
-			this.iRaceAssistantSpeaker := ((assistantSpeaker = kTrue) ? true : assistantSpeaker)
+		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
+			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 		
 			assistantListener := this.getArgumentValue("raceAssistantListener", false)
 			
-			if ((assistantListener != false) && (assistantListener != kFalse))
-				this.iRaceAssistantListener := ((assistantListener = kTrue) ? true : assistantListener)
+			if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
+				this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 		}
 		
 		controller.registerPlugin(this)

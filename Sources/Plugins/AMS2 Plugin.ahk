@@ -26,6 +26,8 @@ global kAMS2Plugin = "AMS2"
 ;;;-------------------------------------------------------------------------;;;
 
 class AMS2Plugin extends RaceAssistantSimulatorPlugin {
+	iCommandMode := "Event"
+	
 	iOpenPitstopMFDHotkey := false
 	
 	iPreviousOptionHotkey := false
@@ -70,6 +72,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
+		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
+		
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
 		
 		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
@@ -89,6 +93,21 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	sendPitstopCommand(command) {
+		switch this.iCommandMode {
+			case "Event":
+				SendEvent %command%
+			case "Input":
+				SendInput %command%
+			case "Play":
+				SendPlay %command%
+			case "Raw":
+				SendRaw %command%
+			default:
+				Send %command%
+		}
+	}
+	
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 		
@@ -106,7 +125,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 		
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			SendEvent % this.OpenPitstopMFDHotkey
+			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 			
 			return true
 		}
@@ -116,24 +135,23 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	
 	closePitstopMFD(option := false) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Change Tyres") {
-				SendEvent % this.PreviousOptionHotkey
-			}
+			if (option = "Change Tyres")
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
 			else if (option = "Refuel") {
-				SendEvent % this.PreviousOptionHotkey
-				SendEvent % this.PreviousOptionHotkey
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
 				Loop 3
-					SendEvent % this.PreviousOptionHotkey
+					this.sendPitstopCommand(this.PreviousOptionHotkey)
 			}
 			
-			SendEvent % this.NextChoiceHotkey
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.NextChoiceHotkey
-			SendEvent % this.NextOptionHotkey
-			SendEvent % this.NextChoiceHotkey
+			this.sendPitstopCommand(this.NextChoiceHotkey)
+			this.sendPitstopCommand(this.PreviousOptionHotkey)
+			this.sendPitstopCommand(this.PreviousOptionHotkey)
+			this.sendPitstopCommand(this.NextChoiceHotkey)
+			this.sendPitstopCommand(this.NextOptionHotkey)
+			this.sendPitstopCommand(this.NextChoiceHotkey)
 		}
 	}
 	
@@ -143,36 +161,36 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			SendEvent % this.PreviousOptionHotkey
-			SendEvent % this.NextChoiceHotkey
-			SendEvent % this.NextOptionHotkey
-			SendEvent % this.NextOptionHotkey
-			SendEvent % this.NextChoiceHotkey
+			this.sendPitstopCommand(this.PreviousOptionHotkey)
+			this.sendPitstopCommand(this.NextChoiceHotkey)
+			this.sendPitstopCommand(this.NextOptionHotkey)
+			this.sendPitstopCommand(this.NextOptionHotkey)
+			this.sendPitstopCommand(this.NextChoiceHotkey)
 			
 			if (option = "Change Tyres") {
-				SendEvent % this.NextOptionHotkey
+				this.sendPitstopCommand(this.NextOptionHotkey)
 				
 				return true
 			}
 			else if (option = "Refuel") {
-				SendEvent % this.NextOptionHotkey
-				SendEvent % this.NextOptionHotkey
+				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendPitstopCommand(this.NextOptionHotkey)
 				
 				return true
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
 				Loop 3
-					SendEvent % this.NextOptionHotkey
+					this.sendPitstopCommand(this.NextOptionHotkey)
 				
 				return true
 			}
 			else {
-				SendEvent % this.NextChoiceHotkey
-				SendEvent % this.PreviousOptionHotkey
-				SendEvent % this.PreviousOptionHotkey
-				SendEvent % this.NextChoiceHotkey
-				SendEvent % this.NextOptionHotkey
-				SendEvent % this.NextChoiceHotkey
+				this.sendPitstopCommand(this.NextChoiceHotkey)
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendPitstopCommand(this.NextChoiceHotkey)
+				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendPitstopCommand(this.NextChoiceHotkey)
 				
 				return false
 			}
@@ -239,10 +257,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			switch action {
 				case "Increase":
 					Loop %steps%
-						SendEvent % this.NextChoiceHotkey
+						this.sendPitstopCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					Loop %steps%
-						SendEvent % this.PreviousChoiceHotkey
+						this.sendPitstopCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}

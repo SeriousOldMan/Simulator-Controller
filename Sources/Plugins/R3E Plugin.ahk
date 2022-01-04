@@ -36,6 +36,8 @@ global kUseImageRecognition = true
 ;;;-------------------------------------------------------------------------;;;
 
 class R3EPlugin extends RaceAssistantSimulatorPlugin {
+	iCommandMode := "Event"
+	
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
@@ -94,6 +96,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 		
+		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
+		
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
@@ -116,6 +120,21 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if !WinActive(window)
 			WinActivate %window%
+	}
+	
+	sendPitstopCommand(command) {
+		switch this.iCommandMode {
+			case "Event":
+				SendEvent %command%
+			case "Input":
+				SendInput %command%
+			case "Play":
+				SendPlay %command%
+			case "Raw":
+				SendRaw %command%
+			default:
+				Send %command%
+		}
 	}
 	
 	pitstopMFDIsOpen() {
@@ -151,10 +170,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			secondTry := false
 			
 			if first
-				SendEvent % this.OpenPitstopMFDHotkey
+				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 				
 			if !this.pitstopMFDIsOpen() {
-				SendEvent % this.OpenPitstopMFDHotkey
+				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 				
 				secondTry := true
 			}
@@ -177,7 +196,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.pitstopMFDIsOpen() {
 			if this.ClosePitstopMFDHotkey {
-				SendEvent % this.ClosePitstopMFDHotkey
+				this.sendPitstopCommand(this.ClosePitstopMFDHotkey)
 				
 				Sleep 50
 			}
@@ -212,7 +231,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		this.activateR3EWindow()
 
 		Loop 15
-			SendEvent % this.NextOptionHotkey
+			this.sendPitstopCommand(this.NextOptionHotkey)
 			
 		if kUseImageRecognition {
 			if this.searchMFDImage("Strategy") {
@@ -364,13 +383,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 			switch action {
 				case "Accept":
-					SendEvent % this.AcceptChoiceHotkey
+					this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				case "Increase":
 					Loop %steps%
-						SendEvent % this.NextChoiceHotkey
+						this.sendPitstopCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					Loop %steps%
-						SendEvent % this.PreviousChoiceHotkey
+						this.sendPitstopCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 			}
@@ -392,13 +411,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					this.activateR3EWindow()
 
 					Loop 15
-						SendEvent % this.PreviousOptionHotkey
+						this.sendPitstopCommand(this.PreviousOptionHotkey)
 					
 					index -= 1
 					
 					if index
 						Loop %index%
-							SendEvent % this.NextOptionHotkey
+							this.sendPitstopCommand(this.NextOptionHotkey)
 					
 					return true
 				}
@@ -447,12 +466,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if (!require || this.requirePitstopMFD())
 				if (!select || this.selectPitstopOption("Refuel")) {
 					if (accept && this.optionChosen("Refuel"))
-						SendEvent % this.AcceptChoiceHotkey
+						this.sendPitstopCommand(this.AcceptChoiceHotkey)
 					
 					this.dialPitstopOption("Refuel", direction, litres)
 
 					if accept
-						SendEvent % this.AcceptChoiceHotkey
+						this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				}
 		}
 	}
@@ -479,9 +498,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			this.activateR3EWindow()
 
 			Loop 10
-				SendEvent % this.NextOptionHotkey
+				this.sendPitstopCommand(this.NextOptionHotkey)
 			
-			SendEvent % this.AcceptChoiceHotkey
+			this.sendPitstopCommand(this.AcceptChoiceHotkey)
 		}
 	}
 
@@ -489,13 +508,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
 				if this.optionChosen("Refuel")
-					SendEvent % this.AcceptChoiceHotkey
+					this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				
 				this.changeFuelAmount("Decrease", 120, false, true, false)
 				
 				this.changeFuelAmount("Increase", litres + 3, false, false, false)
 				
-				SendEvent % this.AcceptChoiceHotkey
+				this.sendPitstopCommand(this.AcceptChoiceHotkey)
 			}
 		}
 	}

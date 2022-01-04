@@ -26,6 +26,8 @@ global kRF2Plugin = "RF2"
 ;;;-------------------------------------------------------------------------;;;
 
 class RF2Plugin extends RaceAssistantSimulatorPlugin {
+	iCommandMode := "Event"
+		
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
@@ -43,6 +45,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
+		
+		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 		
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
@@ -88,6 +92,21 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				WinActivate %window%
 		}
 	}
+	
+	sendWindowCommand(command) {
+		switch this.iCommandMode {
+			case "Event":
+				SendEvent %command%
+			case "Input":
+				SendInput %command%
+			case "Play":
+				SendPlay %command%
+			case "Raw":
+				SendRaw %command%
+			default:
+				Send %command%
+		}
+	}
 		
 	openPitstopMFD(descriptor := false) {
 		static reported := false
@@ -96,7 +115,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				this.activateRF2Window()
 
-				SendEvent % this.OpenPitstopMFDHotkey
+				this.sendWindowCommand(this.OpenPitstopMFDHotkey)
 				
 				return true
 			}
@@ -122,7 +141,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				this.activateRF2Window()
 
-				SendEvent % this.ClosePitstopMFDHotkey
+				this.sendWindowCommand(this.ClosePitstopMFDHotkey)
 			}
 		}
 		else if !reported {

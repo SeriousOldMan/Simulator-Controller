@@ -108,15 +108,15 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments .= ("; assistantCommands: " . actions)
 				
 				if wizard.isModuleSelected("Voice Control") {
-					arguments .= "; raceAssistantSpeaker: true"
+					arguments .= "; raceAssistantSpeaker: On"
 					
 					if wizard.isSoftwareInstalled("MSSpeechRuntime")
-						arguments .= "; raceAssistantListener: true"
+						arguments .= "; raceAssistantListener: On"
 					else
-						arguments .= "; raceAssistantListener: false"
+						arguments .= "; raceAssistantListener: Off"
 				}
 				else
-					arguments .= "; raceAssistantSpeaker: false"
+					arguments .= "; raceAssistantSpeaker: Off"
 				
 				for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))
 					if wizard.assistantActionAvailable(assistant, action) {

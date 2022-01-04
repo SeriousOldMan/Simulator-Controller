@@ -384,7 +384,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			WinActivate %window%
 	}
 	
-	sendACCCommand(command) {
+	sendPitstopCommand(command) {
 		switch this.iCommandMode {
 			case "Event":
 				SendEvent %command%
@@ -406,7 +406,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				this.activateACCWindow()
 
-				this.sendACCCommand(this.OpenPitstopMFDHotkey)
+				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 				
 				wasOpen := this.iPSIsOpen
 				
@@ -438,7 +438,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				this.activateACCWindow()
 
-				this.sendACCCommand(this.ClosePitstopMFDHotkey)
+				this.sendPitstopCommand(this.ClosePitstopMFDHotkey)
 			
 				this.iPSIsOpen := false
 					
@@ -510,7 +510,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					{
 						this.activateACCWindow()
 
-						this.sendACCCommand("{Down}")
+						this.sendPitstopCommand("{Down}")
 						
 						Sleep 50
 					}
@@ -519,7 +519,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					{
 						this.activateACCWindow()
 
-						this.sendACCCommand("{Up}")
+						this.sendPitstopCommand("{Up}")
 						
 						Sleep 50
 					}
@@ -542,7 +542,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					Loop % steps {
 						this.activateACCWindow()
 
-						this.sendACCCommand("{Right}")
+						this.sendPitstopCommand("{Right}")
 
 						Sleep 50
 					}
@@ -550,7 +550,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					Loop % steps {
 						this.activateACCWindow()
 
-						this.sendACCCommand("{Left}")
+						this.sendPitstopCommand("{Left}")
 						
 						Sleep 50
 					}

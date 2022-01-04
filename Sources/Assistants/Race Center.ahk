@@ -2901,7 +2901,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 
 				if (!raceInfo || (raceInfo == ""))
-					return
+					return false
 				
 				if !FileExist(directory . "Race.data")
 					FileAppend %raceInfo%, %directory%Race.data
@@ -2935,16 +2935,20 @@ class RaceCenter extends ConfigurationItem {
 					Throw "No data..."
 			}
 			catch exception {
+				if newData
+					writeConfiguration(directory . "Race.data", data)
+		
 				return newData
 			}
 			
 			if (lapData.Count() == 0)
-				return
+				return newData
 			
 			for key, value in getConfigurationSectionValues(lapData, "Lap")
 				setConfigurationValue(data, "Laps", key, value)
 				
 			pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
+			setConfigurationValue(data, "Laps", "Pitstops", pitstops)
 			
 			times := getConfigurationValue(lapData, "Times", lap)
 			positions := getConfigurationValue(lapData, "Positions", lap)
@@ -2977,11 +2981,8 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 		}
 		
-		if newData {
-			setConfigurationValue(data, "Laps", "Pitstops", pitstops)
-				
+		if newData
 			writeConfiguration(directory . "Race.data", data)
-		}
 		
 		return newData
 	}
@@ -3083,7 +3084,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(lapPressures, lap, 10)
 				
 				if (lapPressures = "-, -, -, -")
-					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", pressures*))
+					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", map(pressures, "displayValue")*))
 					
 				newData := true
 				lap += 1
@@ -3191,8 +3192,14 @@ class RaceCenter extends ConfigurationItem {
 					this.iTrack := lapPressures[3]
 				}
 				
+				coldPressures := string2Values(",", lapPressures[9])
+				hotPressures := string2Values(",", lapPressures[10])
+				
+				coldPressures := map(coldPressures, "null")
+				hotPressures := map(hotPressures, "null")
+				
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), flush)
+										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
 				
 				Gui ListView, % this.LapsListView
 				
@@ -4702,7 +4709,8 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(lapPressures, lap.Row, 10)
 				
 				if (lapPressures = "-, -, -, -")
-					LV_Modify(lap.Row, "Col10", values2String(", ", pressureFL, pressureFR, pressureRL, pressureRR))
+					LV_Modify(lap.Row, "Col10", values2String(", ", displayValue(pressureFL), displayValue(pressureFR)
+																  , displayValue(pressureRL), displayValue(pressureRR)))
 			
 				newLap += 1
 			}

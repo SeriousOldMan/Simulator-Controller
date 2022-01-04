@@ -859,6 +859,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	createSessionSettingsFile(ByRef sessionSettings) {
 		teamServer := this.TeamServer
 		
+		parse := (sessionSettings != false)
+		
 		if (teamServer && teamServer.Active) {
 			try {
 				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
@@ -876,6 +878,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			FileAppend %sessionSettings%, %settingsFile%, UTF-16
 			
+			if parse
+				sessionSettings := parseConfiguration(sessionSettings)
+			
 			return settingsFile
 		}
 		else
@@ -884,6 +889,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	
 	createSessionStateFile(ByRef sessionState) {
 		teamServer := this.TeamServer
+		
+		parse := (sessionState != false)
 		
 		if (teamServer && teamServer.Active) {
 			try {
@@ -902,6 +909,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			FileAppend %sessionState%, %stateFile%, UTF-16
 			
+			if parse
+				sessionState := parseConfiguration(sessionState)
+			
 			return stateFile
 		}
 		else
@@ -916,8 +926,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if isDebug()
 					showMessage("Restoring session state for " . this.RaceAssistantName)
 				
-				sessionSettings := false
-				sessionState := false
+				sessionSettings := true
+				sessionState := true
 				
 				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(sessionSettings), this.createSessionStateFile(sessionState))
 				

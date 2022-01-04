@@ -780,13 +780,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if !this.iPSImageSearchArea {
 				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				if (getLogLevel() < kLogInfo)
+				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
 			}
 			else {
 				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
-				if (getLogLevel() < kLogInfo)
+				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
 			}
 			
@@ -854,7 +854,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		if (getLogLevel() < kLogInfo)
+		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
 				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 			else
@@ -873,7 +873,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			lastY := imageY
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
@@ -888,7 +888,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				reload := true
 			}
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
@@ -929,7 +929,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		if (getLogLevel() < kLogInfo)
+		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
 				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
 			else
@@ -950,7 +950,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			lastY := imageY
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
@@ -963,7 +963,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				reload := true
 			}
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
@@ -1055,7 +1055,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		
-		if (getLogLevel() < kLogInfo)
+		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
 				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 			else
@@ -1067,13 +1067,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			lastY := imageY
 			
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("Pitstop: Tyres are selected for change"))
 		}
 		else {
 			this.iPSChangeTyres := false
 			
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("Pitstop: Tyres are not selected for change"))
 		}
 		
@@ -1114,7 +1114,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		
-		if (getLogLevel() < kLogInfo)
+		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
 				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 			else 
@@ -1124,13 +1124,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		{
 			this.iPSChangeBrakes := true
 			
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("Pitstop: Brakes are selected for change"))
 		}
 		else {
 			this.iPSChangeBrakes := false
 			
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("Pitstop: Brakes are not selected for change"))
 		}
 		
@@ -1171,7 +1171,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		
-		if (getLogLevel() < kLogInfo)
+		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
 				logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 			else
@@ -1185,7 +1185,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				reload := true
 			}
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		else {
@@ -1197,7 +1197,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				reload := true
 			}
 		
-			if (getLogLevel() < kLogInfo)
+			if (getLogLevel() <= kLogInfo)
 				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pit stop options: " . values2String(", ", this.iPSOptions*)))
 		}
 		
@@ -1224,7 +1224,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	
 				reload := (this.searchDriverLabel(lastY, images) || reload)
 				
-				if (getLogLevel() < kLogInfo)
+				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
 				
 				if isDebug()

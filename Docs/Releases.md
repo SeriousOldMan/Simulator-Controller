@@ -1,10 +1,12 @@
-## 3.8.2-release 01/14/21 (planned)
+## 3.8.2-release 01/07/21 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. New plugin "Race Spotter" as interface for the Virtual Race Spotter.
-  4. Monte-Carlo simulation implemented for "Race Center". See the updated [documentation](*) for more information.
-  5. Defining keyboard and other generic triggers are now supported in "Simulator Setup".
+  3. Defining keyboard and other generic triggers are now supported in "Simulator Setup".
+  4. Fixed Pitstop automation blocking Alt-Tab in ACC.
+  5. Optical enhancements in "Race Center" HTML output.
+  6. Support keyboard and generic trigger in "Simulator Setup".
+  7. New parameter "pitstopMFDMode" for all simulator plugins, which gives you several different communication modes between Simulator Controller and the various simulation games. this greatly enhances the compatibility and stability of the pitstop automation. See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4) for more information.
 
 ## 3.8.0-release 12/31/21
 

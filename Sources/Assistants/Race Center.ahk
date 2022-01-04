@@ -1018,6 +1018,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
+		SetTimer syncSession, Off
+		
 		try {
 			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
 	
@@ -1027,11 +1029,11 @@ class RaceCenter extends ConfigurationItem {
 			
 			this.loadTeams()
 			
+			syncSession()
+			
 			SetTimer syncSession, -50
 		}
 		catch exception {
-			SetTimer syncSession, Off
-			
 			this.iServerToken := "__INVALID__"
 			
 			GuiControl, , serverTokenEdit, % ""
@@ -2359,8 +2361,16 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	startWorking(state := true) {
-		if state
+		start := false
+		
+		if state {
+			start := (vWorking == 0)
+			
 			vWorking += 1
+			
+			if !start
+				return false
+		}
 		else {
 			vWorking -= 1
 		
@@ -2386,10 +2396,12 @@ class RaceCenter extends ConfigurationItem {
 		
 		waitViewer.Document.Write(html)
 		waitViewer.Document.Close()
+		
+		return (start || (vWorking == 0))
 	}
 	
 	finishWorking() {
-		this.startWorking(false)
+		return this.startWorking(false)
 	}
 	
 	initializeSession() {
@@ -6131,13 +6143,11 @@ syncSessionAsync() {
 runTasks() {
 	rCenter := RaceCenter.Instance
 	
-	if !vWorking {
-		rCenter.startWorking()
-		
+	if rCenter.startWorking() {
 		try {
 			while (rCenter.iTasks.Length() > 0) {
 				task := rCenter.iTasks.RemoveAt(1)
-			
+				
 				%task%()
 			}
 		}

@@ -1335,11 +1335,29 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.toggleActivity("Repair Bodywork")
 	}
 	
-	restoreSessionState() {
-		base.restoreSessionState()
+	restoreSessionState(sessionSettings, sessionState) {
+		base.restoreSessionState(sessionSettings, sessionState)
 		
-		this.iRepairSuspensionChosen := true
-		this.iRepairBodyworkChosen := true
+		if sessionState {
+			sessionState := getConfigurationSectionValues(sessionState, "Session State")
+			
+			if sessionState.HasKey("Pitstop.Last") {
+				pitstop := sessionState["Pitstop.Last"]
+				
+				this.iRepairSuspensionChosen := sessionState["Pitstop." . pitstop . ".Repair.Suspension"]
+				this.iRepairBodyworkChosen := sessionState["Pitstop." . pitstop . ".Repair.Bodywork"]
+				
+				if (this.iRepairSuspensionChosen = kTrue)
+					this.iRepairSuspensionChosen := true
+				else if (this.iRepairSuspensionChosen = kFalse)
+					this.iRepairSuspensionChosen := false
+				
+				if (this.iRepairBodyworkChosen = kTrue)
+					this.iRepairBodyworkChosen := true
+				else if (this.iRepairBodyworkChosen = kFalse)
+					this.iRepairBodyworkChosen := false
+			}
+		}
 	}
 }
 

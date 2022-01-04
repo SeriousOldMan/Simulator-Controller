@@ -677,6 +677,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	
 	updateSessionData(data) {
 	}
+	
+	restoreSessionState(sessionSettings, sessionState) {
+	}
 }
 
 

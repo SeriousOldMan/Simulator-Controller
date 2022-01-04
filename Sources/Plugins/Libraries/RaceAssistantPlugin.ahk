@@ -856,7 +856,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
-	createSessionSettingsFile() {
+	createSessionSettingsFile(ByRef sessionSettings) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.Active) {
@@ -882,7 +882,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			return false
 	}
 	
-	createSessionStateFile() {
+	createSessionStateFile(ByRef sessionState) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.Active) {
@@ -916,7 +916,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if isDebug()
 					showMessage("Restoring session state for " . this.RaceAssistantName)
 				
-				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(), this.createSessionStateFile())
+				sessionSettings := false
+				sessionState := false
+				
+				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(sessionSettings), this.createSessionStateFile(sessionState))
+				
+				if (sessionSettings || sessionState)
+					this.Simulator.restoreSessionState(sessionSettings, sessionState)
 			}
 		}
 	}

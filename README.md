@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.8.2-dev]() (Early build for 3.8.2. New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server. Stable, incl. update procedure and documentation.)
+[3.8.2-dev](https://www.dropbox.com/s/zwqdhs5lb4dlaaz/Simulator%20Controller%203.8.2-dev.zip?dl=1) (Early build for 3.8.2. New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server. Stable, incl. update procedure and documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-382) of this version and all the versions you might have skipped, before installing and using this version.
 

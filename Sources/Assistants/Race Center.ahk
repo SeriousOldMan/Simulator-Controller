@@ -4591,7 +4591,7 @@ class RaceCenter extends ConfigurationItem {
 				dataY6DropDown := 1
 			}
 			else if (report = "Free") {
-				GuiControl Choose, chartTypeDropDown, 1
+				GuiControl Choose, chartTypeDropDown, 4
 				
 				this.iSelectedChartType := "Line"
 				

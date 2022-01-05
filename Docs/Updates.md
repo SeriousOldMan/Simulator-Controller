@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.8.2
 
-A new plugin "Race Spotter" was introduced with this release as an interface for the upcoming Virtual Race Spotter. The plugin will be automatically added to your configuration, but it will be deactivated. You can activate it later on, but there is no functionality yet, so it is Ok to wait.
+A new parameter *pitstopMFDMode* has been introduced for all simulator plugins. With this paramater, you can specify the method with which Simulator Controller communicates with the simulation game. Trying different communication modes might help in situations where the communication for the handling of the Pitstop MFD fails.
 
 ***
 

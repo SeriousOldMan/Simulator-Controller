@@ -35,7 +35,6 @@ An automated update mechanism for local configuration databases exists since Rel
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-380) of this version and all the versions you might have skipped, before installing and using this version.
 
-
 ##### Earlier release builds
 
 [3.7.8-release](https://cntr.click/cTHTD8m) (New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Supporting more data series in "Race Center" graphs, Optimized assistant support when no voice recognition is enabled.)
@@ -44,7 +43,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.8.2-dev]() (Early build for 3.8.2. New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server. Stable, incl. update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-382) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

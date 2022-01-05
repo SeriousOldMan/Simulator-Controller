@@ -348,7 +348,7 @@ class RaceReports extends ConfigurationItem {
 	getSimulators() {
 		simulators := []
 		
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object()) {
+		for ignore, simulator in new SessionDatabase().getSimulators() {
 			hasReports := false
 			
 			Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
@@ -366,33 +366,11 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	getSimulatorName(simulatorCode) {
-		if (simulatorCode = "Unknown")
-			return "Unknown"
-		else {
-			for name, description in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
-				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
-					return name
-				
-			return false
-		}
+		return new SessionDatabase().getSimulatorName(simulatorCode)
 	}
 
 	getSimulatorCode(simulatorName) {
-		if (simulatorName = "Unknown")
-			return "Unknown"
-		else {
-			code := getConfigurationValue(getControllerConfiguration(), "Simulators", simulatorName, false)
-		
-			if code
-				return string2Values("|", code)[1]
-			else {
-				for name, description in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
-					if (simulatorName = string2Values("|", description)[1])
-						return simulatorName
-				
-				return false
-			}
-		}
+		return new SessionDatabase().getSimulatorCode(simulatorName)
 	}
 
 	getCars(simulator) {

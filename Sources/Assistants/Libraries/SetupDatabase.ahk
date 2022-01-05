@@ -76,7 +76,14 @@ class SessionDatabase {
 	}
 	
 	__New(controllerConfiguration := false) {
-		this.iControllerConfiguration := (controllerConfiguration ? controllerConfiguration : getControllerConfiguration())
+		if !controllerConfiguration {
+			controllerConfiguration := getControllerConfiguration()
+		
+			if !controllerConfiguration
+				controllerConfiguration := {}
+		}
+		
+		this.iControllerConfiguration := controllerConfiguration
 	}
 	
 	setUseGlobalDatabase(useGlobalDatabase) {
@@ -100,9 +107,17 @@ class SessionDatabase {
 	getSimulatorName(simulatorCode) {
 		if (simulatorCode = "Unknown")
 			return "Unknown"
-		else {
+		else if (this.ControllerConfiguration.Count() > 0) {
 			for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
 				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
+					return name
+				
+			return false
+		}
+		else {
+			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+				if ((simulatorCode = name) || (simulatorCode = code))
 					return name
 				
 			return false
@@ -122,6 +137,11 @@ class SessionDatabase {
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 				
+				for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
+								 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+					if ((simulatorName = name) || (simulatorName = code))
+						return code
+				
 				return false
 			}
 		}
@@ -132,6 +152,12 @@ class SessionDatabase {
 		
 		for simulator, ignore in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
 			simulators.Push(simulator)
+		
+		if (simulators.Length() = 0)
+			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+				if FileExist(kDatabaseDirectory . "Local\" . code)
+					simulators.Push(name)
 				
 		return simulators
 	}

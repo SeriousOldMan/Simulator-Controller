@@ -1,9 +1,9 @@
 [Development]
 Version=3.8.2-dev
 Target=3.8.2-release
-Date=01/04/2022
+Date=01/05/2022
 Download=
-Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins
+Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server
 [Release]
 Version=3.8.0-release
 Date=12/31/2021

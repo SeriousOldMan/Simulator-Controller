@@ -7,6 +7,7 @@
   5. Optical enhancements in "Race Center" HTML output.
   6. Support keyboard and generic trigger in "Simulator Setup".
   7. New parameter "pitstopMFDMode" for all simulator plugins, which gives you several different communication modes between Simulator Controller and the various simulation games. this greatly enhances the compatibility and stability of the pitstop automation. See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4) for more information.
+  8. Lots of small fixes for Team Server and "Race Center". Handling of incomplete data, for example missing stints and/or laps due to connection issues, has been greatly improved.
 
 ## 3.8.0-release 12/31/21
 

@@ -1,16 +1,16 @@
 [Development]
 Version=3.8.2-dev
 Target=3.8.2-release
-Date=01/05/2022
-Download=https://www.dropbox.com/s/zwqdhs5lb4dlaaz/Simulator%20Controller%203.8.2-dev.zip?dl=1
+Date=01/07/2022
+Download=https://cntr.click/GRhtV2C
 Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server
 [Release]
-Version=3.8.0-release
-Date=12/31/2021
-Download=https://cntr.click/cdD66cL
-Changes=Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions
+Version=3.8.2-release
+Date=01/07/2022
+Download=https://cntr.click/GRhtV2C
+Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.8.0-release
+Release=3.8.2-release
 Development=3.8.2-dev

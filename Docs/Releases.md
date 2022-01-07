@@ -1,4 +1,4 @@
-## 3.8.2-release 01/07/21 (planned)
+## 3.8.2-release 01/07/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

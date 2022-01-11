@@ -2,12 +2,12 @@
 Version=3.8.2-dev
 Target=3.8.2-release
 Date=01/07/2022
-Download=https://cntr.click/GRhtV2C
+Download=https://www.dropbox.com/s/oof5z3w71x85ilt/Simulator%20Controller.3.8.2-release.zip?dl=1
 Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server
 [Release]
 Version=3.8.2-release
 Date=01/07/2022
-Download=https://cntr.click/GRhtV2C
+Download=https://www.dropbox.com/s/oof5z3w71x85ilt/Simulator%20Controller.3.8.2-release.zip?dl=1
 Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server
 [Current]
 Type=Release

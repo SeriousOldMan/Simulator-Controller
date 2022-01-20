@@ -821,8 +821,14 @@ class RaceReportViewer {
 			for ignore, lap in this.getReportLaps(raceData) {
 				drawChartFunction := drawChartFunction . (",`n[" . lap)
 				
-				Loop % cars.Length()
-					drawChartFunction := drawChartFunction . (", " . positions[lap][A_Index])
+				Loop % cars.Length() {
+					lapPositions := positions[lap]
+				
+					if lapPositions.HasKey(A_Index)
+						drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
+					else
+						drawChartFunction := (drawChartFunction . ", null")
+				}
 				
 				drawChartFunction := drawChartFunction . "]"
 			}

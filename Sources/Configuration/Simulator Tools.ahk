@@ -1422,6 +1422,34 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV384() {
+	setupDB := new SetupDatabase()
+	
+	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+		
+		if (simulator = "0")
+			FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
+		else
+			Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
+			{
+				car := A_LoopFileName
+				
+				if (car = "0")
+					FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
+				else
+					Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
+					{
+						track := A_LoopFileName
+						
+						if (track = "0")
+							FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
+					}
+			}
+	}
+}
+
 updateConfigurationForV378() {
 	if FileExist(kDatabaseDirectory . "Local\ACC\iexus_rc_f_gt3")
 		FileMoveDir %kDatabaseDirectory%Local\ACC\iexus_rc_f_gt3, %kDatabaseDirectory%Local\ACC\lexus_rc_f_gt3, R

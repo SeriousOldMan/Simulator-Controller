@@ -127,11 +127,20 @@ class TelemetryDatabase extends SessionDatabase {
 			return []
 	}
 	
-	getLapTimes(weather, compound, compoundColor) {
+	getMapLapTimes(weather, compound, compoundColor) {
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 													 , Transform: "removeInvalidLaps"
 													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+		else
+			return []
+	}
+	
+	getTyreLapTimes(weather, compound, compoundColor) {
+		if this.Database
+			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
+											   , Transform: "removeInvalidLaps"
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}

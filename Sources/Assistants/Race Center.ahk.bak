@@ -2426,7 +2426,7 @@ class RaceCenter extends ConfigurationItem {
 			xValues := []
 			yValues := []
 			
-			for ignore, entry in tyreLaps {
+			for ignore, entry in tyreLaps
 				xValues.Push(entry["Tyre.Laps"])
 				yValues.Push(entry["Lap.Time"])
 			}
@@ -2439,7 +2439,7 @@ class RaceCenter extends ConfigurationItem {
 		count := 0
 		avgLapTime := 0
 		
-		Loop %numLaps% {
+		loop %numLaps% {
 			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
 			
 			if lapTime {

@@ -1643,7 +1643,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	getAvgLapTime(map, remainingFuel, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		window := this.Window
 			
 		Gui %window%:Default
@@ -1651,14 +1651,51 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simInputDropDown
 		GuiControlGet simAvgLapTimeEdit
 		
-		if (simInputDropDown > 1)
-			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		a := false
+		b := false
+			
+		if (simInputDropDown > 1) {
+			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			
+			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+			tyreLaps := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+				
+			if (tyreLaps.Length() > 1) {
+				xValues := []
+				yValues := []
+				
+				for ignore, entry in tyreLaps {
+					xValues.Push(entry["Tyre.Laps"])
+					yValues.Push(entry["Lap.Time"])
+				}
+				
+				linRegression(xValues, yValues, a, b)
+			}
+		}
 		else
 			lapTimes := []
 		
-		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+		baseLapTime := ((a && b) ? ((a * tyreLaps) + b) : false)
+			
+		count := 0
+		avgLapTime := 0
 		
-		return lapTime ? lapTime : (default ? default : simAvgLapTimeEdit)
+		Loop %numLaps% {
+			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+			
+			if lapTime {
+				if baseLapTime
+					lapTime += (((a * (tyreLaps + A_Index)) + b) - baseLapTime)
+					
+				avgLapTime += lapTime
+				count += 1
+			}
+		}
+		
+		if (avgLapTime > 0)
+			avgLapTime := (avgLapTime / count)
+			
+		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
@@ -1677,7 +1714,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 1:
 				pitstopRequired := false
 			case 2:
-				pitstopRequired := true
+				if pitstopWindowEdit is Integer
+					pitstopRequired := pitstopWindowEdit
+				else {
+					pitstopRequired := true
+				
+					result := false
+				}
 			case 3:
 				window := string2Values("-", pitstopWindowEdit)
 				
@@ -2041,10 +2084,25 @@ chooseSessionType() {
 
 choosePitstopRequirements() {
 	GuiControlGet pitstopRequirementsDropDown
+	GuiControlGet pitstopWindowEdit
 	
 	if (pitstopRequirementsDropDown = 3) {
 		GuiControl Show, pitstopWindowEdit
 		GuiControl Show, pitstopWindowLabel
+		
+		GuiControl, , pitstopWindowLabel, % translate("Minute (From - To)")
+		
+		if !InStr(pitstopWindowEdit, "-")
+			GuiControl, , pitstopWindowEdit, 25-35
+	}
+	else if (pitstopRequirementsDropDown = 2) {
+		GuiControl Show, pitstopWindowEdit
+		GuiControl Show, pitstopWindowLabel
+		
+		GuiControl, , pitstopWindowLabel, % ""
+		
+		if InStr(pitstopWindowEdit, "-")
+			GuiControl, , pitstopWindowEdit, 1
 	}
 	else {
 		GuiControl Hide, pitstopWindowEdit

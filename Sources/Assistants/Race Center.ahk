@@ -972,7 +972,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Button, x574 y756 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
 		
@@ -1026,6 +1026,60 @@ class RaceCenter extends ConfigurationItem {
 		this.iLapsListView := listHandle
 		
 		Gui Tab, 4
+		
+		Gui %window%:Add, GroupBox, -Theme x24 ys+33 w260 h124, % translate("Simulation")
+		
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("# Scenarios")
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Variation")
+		Gui %window%:Add, Text, x150 yp w18 h23 +0x200, % translate("+/-")
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
+
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Random Factor")
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("%")
+		
+		Gui %window%:Add, GroupBox, -Theme x304 ys+33 w296 h124, % translate("Settings")
+		
+		Gui %window%:Add, Text, x312 yp+24 w130 h23, % translate("Use Session Data")
+		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		
+		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Use Telemetry Database")
+		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		
+		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Keep current Map")
+		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		
+		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Consider Traffic")
+		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		
+		Gui %window%:Add, GroupBox, -Theme x24 yp+37 w576 h148, % translate("Traffic Analysis (Monte Carlo)")
+		
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Laptime Variation")
+		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x220 yp+2 w290 h20, % translate("according to driver consistency")
+		
+		Gui %window%:Add, Text, x32 yp+22 w85 h23 +0x200, % translate("Driver Errors")
+		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x220 yp+2 w290 h20, % translate("according to driver car control")
+		
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Overtake")
+		Gui %window%:Add, Text, x132 yp w28 h23 +0x200, % translate("Abs(")
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit3 Number ; VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-999 0x80 ;, %overtakeDeltaEdit%
+		Gui %window%:Add, Text, x220 yp+4 w340 h20, % translate("/ laptime difference) = additional seconds for each passed car")
+
+		Gui %window%:Add, Text, x32 yp+20 w85 h23 +0x200, % translate("Traffic")
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit3 Number ; VtrafficConsideredEdit, %trafficConsideredEdit%
+		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-100 0x80 ;, %trafficConsideredEdit%
+		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length considered")
+		
+		Gui Tab, 5
 	
 		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
@@ -2415,18 +2469,18 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		lapTimes := this.TelemetryDatabase.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
-		tyresLaps := this.TelemetryDatabase.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		tyreLapTimes := this.TelemetryDatabase.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
 		
 		a := false
 		b := false
 		
-		if (tyreLaps.Length() > 1) {
+		if (tyreLapTimes.Length() > 1) {
 			xValues := []
 			yValues := []
 			
-			for ignore, entry in tyreLaps {
+			for ignore, entry in tyreLapTimes {
 				xValues.Push(entry["Tyre.Laps"])
 				yValues.Push(entry["Lap.Time"])
 			}
@@ -2434,17 +2488,25 @@ class RaceCenter extends ConfigurationItem {
 			linRegression(xValues, yValues, a, b)
 		}
 		
-		baseLapTime := ((a && b) ? ((a * tyreLaps) + b) : false)
+		baseLapTime := ((a && b) ? (a + (tyreLaps * b)) : false)
 		
 		count := 0
 		avgLapTime := 0
+		lapTime := false
 		
 		Loop %numLaps% {
-			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+			
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
 			
 			if lapTime {
 				if baseLapTime
-					lapTime += (((a * (tyreLaps + A_Index)) + b) - baseLapTime)
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
 				
 				avgLapTime += lapTime
 				count += 1

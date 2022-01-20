@@ -74,11 +74,11 @@ class StrategySimulation {
 		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
 	}
 	
-	getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		if this.iFixedLapTime
 			return this.iFixedLapTime
 		else
-			return this.StrategyManager.getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, default)
+			return this.StrategyManager.getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default)
 	}
 	
 	setFixedLapTime(lapTime) {
@@ -368,11 +368,6 @@ class VariationSimulation extends StrategySimulation {
 		scenarios := {}
 		variation := 1
 		
-		if (useTelemetryData)
-			lapTimes := this.TelemetryDatabase.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
-		else
-			lapTimes := []
-		
 		Loop { ; consumption
 			Loop { ; initialFuel
 				Loop { ; tyreUsage
@@ -392,15 +387,15 @@ class VariationSimulation extends StrategySimulation {
 							try {
 								strategy := this.createStrategy(name)
 						
-								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
-								lapTime := lookupLapTime(lapTimes, map, startFuelAmount)
+								currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
 								
-								if !lapTime
-									lapTime := simAvgLapTimeEdit
+								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption,
+															, tyreCompound, tyreCompoundColor, 0, simAvgLapTimeEdit)
 							
 								strategy.createStints(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-													, fuelConsumption - (fuelConsumption / 100 * consumption), lapTime)
+													, currentConsumption, lapTime)
 							}
 							finally {
 								this.setFixedLapTime(false)
@@ -432,15 +427,15 @@ class VariationSimulation extends StrategySimulation {
 								
 								strategy := this.createStrategy(name)
 							
-								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
-								lapTime := lookupLapTime(lapTimes, scenarioMap, startFuelAmount)
+								currentConsumption :=(scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
 								
-								if !lapTime
-									lapTime := scenarioAvgLapTime
+								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
+															, tyreCompound, tyreCompoundColor, 0, simAvgLapTimeEdit)
 							
 								strategy.createStints(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
-													, scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption), lapTime)
+													, currentConsumption, lapTime)
 								
 								scenarios[name . translate(":") . variation++] := strategy
 								
@@ -710,8 +705,9 @@ class Strategy extends ConfigurationItem {
 					this.iRemainingTyreLaps := strategy.MaxTyreLaps
 				}
 				
-				this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel
-														 , strategy.TyreCompound, strategy.TyreCompoundColor, this.RemainingTyreLaps)
+				this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel, fuelConsumption
+														 , strategy.TyreCompound, strategy.TyreCompoundColor
+														 , (strategy.MaxTyreLaps - this.RemainingTyreLaps))
 				
 				this.iRefuelAmount := refuelAmount
 				this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
@@ -1340,8 +1336,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
-	getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps) {
-		return this.StrategyManager.getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime)
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps) {
+		return this.StrategyManager.getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption
+												, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime)
 	}
 	
 	getMaxFuelLaps(fuelConsumption) {
@@ -1581,7 +1578,7 @@ splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
 lookupLapTime(lapTimes, map, remainingFuel) {
 	selected := false
 	
-	for ignore, candidate in lapTimes[1]
+	for ignore, candidate in lapTimes
 		if ((candidate.Map = map) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
 			selected := candidate
 

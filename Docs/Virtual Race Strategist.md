@@ -218,7 +218,7 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
 
-Notes: If you specify a required pitstop window, this will be applied for the first pitstop. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
+Notes: If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
 
 #### Pitstop & Service
 

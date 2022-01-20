@@ -1643,7 +1643,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	getAvgLapTime(numLaps, map, remainingFuel, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		window := this.Window
 			
 		Gui %window%:Default
@@ -1658,13 +1658,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 			
 			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-			tyreLaps := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
 				
-			if (tyreLaps.Length() > 1) {
+			if (tyreLapTimes.Length() > 1) {
 				xValues := []
 				yValues := []
 				
-				for ignore, entry in tyreLaps {
+				for ignore, entry in tyreLapTimes {
 					xValues.Push(entry["Tyre.Laps"])
 					yValues.Push(entry["Lap.Time"])
 				}
@@ -1675,19 +1675,26 @@ class StrategyWorkbench extends ConfigurationItem {
 		else
 			lapTimes := []
 		
-		baseLapTime := ((a && b) ? ((a * tyreLaps) + b) : false)
+		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
 			
 		count := 0
 		avgLapTime := 0
+		lapTime := false
 		
 		Loop %numLaps% {
-			lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+			
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
 			
 			if lapTime {
 				if baseLapTime
-					lapTime += (((a * (tyreLaps + A_Index)) + b) - baseLapTime)
-					
-				avgLapTime += lapTime
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
+				
 				count += 1
 			}
 		}

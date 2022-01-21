@@ -145,6 +145,11 @@ global useTelemetryDataDropDown
 global keepMapDropDown
 global considerTrafficDropDown
 
+global lapTimeVariationDropDown
+global driverErrorsDropDown
+global overtakeDeltaEdit = 2
+global trafficConsideredEdit = 7
+
 global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
@@ -1097,22 +1102,22 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Laptime Variation")
-		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1 vlapTimeVariationDropDown, % values2String("|", map(["Yes", "No"], "translate")*)
 		Gui %window%:Add, Text, x220 yp+2 w290 h20, % translate("according to driver consistency")
 		
 		Gui %window%:Add, Text, x32 yp+22 w85 h23 +0x200, % translate("Driver Errors")
-		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1 vdriverErrorsDropDown, % values2String("|", map(["Yes", "No"], "translate")*)
 		Gui %window%:Add, Text, x220 yp+2 w290 h20, % translate("according to driver car control")
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Overtake")
 		Gui %window%:Add, Text, x132 yp w28 h23 +0x200, % translate("Abs(")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number ; VovertakeDeltaEdit, %overtakeDeltaEdit%
-		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-999 0x80 ;, %overtakeDeltaEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %overtakeDeltaEdit%
 		Gui %window%:Add, Text, x220 yp+4 w340 h20, % translate("/ laptime difference) = additional seconds for each passed car")
 
 		Gui %window%:Add, Text, x32 yp+20 w85 h23 +0x200, % translate("Traffic")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number ; VtrafficConsideredEdit, %trafficConsideredEdit%
-		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-100 0x80 ;, %trafficConsideredEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number VtrafficConsideredEdit, %trafficConsideredEdit%
+		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %trafficConsideredEdit%
 		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length")
 		
 		Gui Tab, 5
@@ -1471,6 +1476,19 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl, , actLapEdit, % ""
 			GuiControl, , planRefuelEdit, % ""
 			GuiControl Choose, planTyreCompoundDropDown, 0
+		}
+		
+		if this.UseTraffic {
+			GuiControl Enable, lapTimeVariationDropDown
+			GuiControl Enable, driverErrorsDropDown
+			GuiControl Enable, overtakeDeltaEdit
+			GuiControl Enable, trafficConsideredEdit
+		}
+		else {
+			GuiControl Disable, lapTimeVariationDropDown
+			GuiControl Disable, driverErrorsDropDown
+			GuiControl Disable, overtakeDeltaEdit
+			GuiControl Disable, trafficConsideredEdit
 		}
 	}
 	
@@ -6366,6 +6384,7 @@ chooseSimulationSettings() {
 	rCenter.iUseTraffic := (considerTrafficDropDown == 1)
 	
 	rCenter.updateStrategyMenu()
+	rCenter.updateState()
 }
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {

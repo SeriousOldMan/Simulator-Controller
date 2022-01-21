@@ -136,6 +136,15 @@ global planTyreCompoundDropDown
 global addPlanButton
 global deletePlanButton
 
+global numScenariosEdit = 80
+global variationLapsEdit = 3
+global randomFactorEdit = 10
+
+global useSessionDataDropDown
+global useTelemetryDataDropDown
+global keepMapDropDown
+global considerTrafficDropDown
+
 global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
@@ -364,6 +373,20 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, entry in newEntries
 					entries.Push(entry)
+			}
+			
+			if this.iRaceCenter.UseCurrentMap {
+				lastLap := this.iRaceCenter.LastLap
+				
+				if lastLap {
+					result := []
+					
+					for ignore, entry in entries
+						if (entry.Map = lastLap.Map)
+							result.Push(entry)
+					
+					return result
+				}
 			}
 			
 			return entries
@@ -946,8 +969,6 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 		
-		this.updateStrategyMenu()
-		
 		Gui %window%:Add, DropDownList, x750 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Setup Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
 		Gui %window%:Font, s8 Norm, Arial
@@ -1027,38 +1048,53 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui Tab, 4
 		
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+
 		Gui %window%:Add, GroupBox, -Theme x24 ys+33 w260 h124, % translate("Simulation")
+
+		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("# Scenarios")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VnumScenariosEdit, %numScenariosEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20, %numScenariosEdit%
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Variation")
 		Gui %window%:Add, Text, x150 yp w18 h23 +0x200, % translate("+/-")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VvariationLapsEdit, %variationLapsEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationLapsEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
 
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Random Factor")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number ; VextrapolationLapsEdit, %extrapolationLapsEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20 ;, %extrapolationLapsEdit%
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VrandomFactorEdit, %randomFactorEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20, %randomFactorEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("%")
+
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
 		
 		Gui %window%:Add, GroupBox, -Theme x304 ys+33 w296 h124, % translate("Settings")
+
+		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x312 yp+24 w130 h23, % translate("Use Session Data")
-		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x312 yp+24 w160 h23, % translate("Use Session Data")
+		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose1 vuseSessionDataDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
 		
-		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Use Telemetry Database")
-		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Use Telemetry Database")
+		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose2 vuseTelemetryDataDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
 		
-		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Keep current Map")
-		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Keep current Map")
+		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose1 vkeepMapDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
 		
-		Gui %window%:Add, Text, x312 yp+27 w130 h23, % translate("Consider Traffic")
-		Gui %window%:Add, DropDownList, x450 yp-3 w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
+		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Consider Traffic")
+		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose2 vconsiderTrafficDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
+
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
 		
 		Gui %window%:Add, GroupBox, -Theme x24 yp+37 w576 h148, % translate("Traffic Analysis (Monte Carlo)")
+
+		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Laptime Variation")
 		Gui %window%:Add, DropDownList, x162 yp w50 AltSubmit Choose1, % values2String("|", map(["Yes", "No"], "translate")*)
@@ -1070,14 +1106,14 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Overtake")
 		Gui %window%:Add, Text, x132 yp w28 h23 +0x200, % translate("Abs(")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit3 Number ; VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number ; VovertakeDeltaEdit, %overtakeDeltaEdit%
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-999 0x80 ;, %overtakeDeltaEdit%
 		Gui %window%:Add, Text, x220 yp+4 w340 h20, % translate("/ laptime difference) = additional seconds for each passed car")
 
 		Gui %window%:Add, Text, x32 yp+20 w85 h23 +0x200, % translate("Traffic")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit3 Number ; VtrafficConsideredEdit, %trafficConsideredEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number ; VtrafficConsideredEdit, %trafficConsideredEdit%
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-100 0x80 ;, %trafficConsideredEdit%
-		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length considered")
+		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length")
 		
 		Gui Tab, 5
 	
@@ -1122,6 +1158,7 @@ class RaceCenter extends ConfigurationItem {
 		this.initializeSession()
 		
 		this.updateState()
+		this.updateStrategyMenu()
 	}
 	
 	connect(silent := false) {
@@ -1450,6 +1487,11 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
 		GuiControl Choose, strategyMenuDropDown, 1
+		
+		GuiControl Choose, useSessionDataDropDown, % (this.UseSessionData ? 1 : 2)
+		GuiControl Choose, useTelemetryDataDropDown, % (this.UseTelemetryDatabase ? 1 : 2)
+		GuiControl Choose, keepMapDropDown, % (this.UseCurrentMap ? 1 : 2)
+		GuiControl Choose, considerTrafficDropDown, % (this.UseTraffic ? 1 : 2)
 	}
 	
 	loadPlanFromStrategy() {
@@ -2444,6 +2486,7 @@ class RaceCenter extends ConfigurationItem {
 		useTelemetryData := true
 		
 		consumptionWeight := 0
+		initialFuelWeight := 0
 		initialFuelWeight := 0
 		tyreUsageWeight := 0
 		
@@ -6306,6 +6349,23 @@ reportSettings() {
 	rCenter := RaceCenter.Instance
 	
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "reportSettings", rCenter.SelectedReport))
+}
+
+
+chooseSimulationSettings() {
+	GuiControlGet useSessionDataDropDown
+	GuiControlGet useTelemetryDataDropDown
+	GuiControlGet keepMapDropDown
+	GuiControlGet considerTrafficDropDown
+	
+	rCenter := RaceCenter.Instance
+	
+	rCenter.iUseSessionData := (useSessionDataDropDown == 1)
+	rCenter.iUseTelemetryDatabase := (useTelemetryDataDropDown == 1)
+	rCenter.iUseCurrentMap := (keepMapDropDown == 1)
+	rCenter.iUseTraffic := (considerTrafficDropDown == 1)
+	
+	rCenter.updateStrategyMenu()
 }
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {

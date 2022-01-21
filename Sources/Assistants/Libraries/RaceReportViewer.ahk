@@ -291,7 +291,7 @@ class RaceReportViewer {
 		result := []
 		
 		for ignore, lap in this.getReportLaps(raceData)
-			result.Push(positions[lap][car])
+			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : "null")
 		
 		return result
 	}
@@ -306,7 +306,7 @@ class RaceReportViewer {
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := Round(times[lap][car] / 1000, 1)
+				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
 				
 				if (time > 0) {
 					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
@@ -325,7 +325,7 @@ class RaceReportViewer {
 		validTimes := []
 		
 		for ignore, lap in this.getReportLaps(raceData) {
-			time := times[lap][car]
+			time := (times[lap].HasKey(car) ? times[lap][car] : 0)
 			
 			if (time > 0)
 				validTimes.Push(time)
@@ -423,7 +423,7 @@ class RaceReportViewer {
 			threshold := (avg + ((max - avg) / 4))
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := Round(times[lap][car] / 1000, 1)
+				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
 			
 				if (time > 0)
 					if (time > threshold)
@@ -562,7 +562,7 @@ class RaceReportViewer {
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap][car] > 0)
+					if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
 						valid := true
 					else
 						positions[lap][car] := "null" ; carsCount
@@ -798,7 +798,7 @@ class RaceReportViewer {
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap][car] > 0) {
+					if (positions[lap].HasKey(car) && (positions[lap][car] > 0)) {
 						valid := true
 						
 						break

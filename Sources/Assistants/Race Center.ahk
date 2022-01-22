@@ -138,7 +138,7 @@ global deletePlanButton
 
 global numScenariosEdit = 80
 global variationLapsEdit = 3
-global randomFactorEdit = 10
+global randomFactorEdit = 0
 
 global useSessionDataDropDown
 global useTelemetryDataDropDown
@@ -149,7 +149,7 @@ global lapTimeVariationDropDown
 global driverErrorsDropDown
 global overtakeDeltaEdit = 2
 global trafficConsideredEdit = 7
-
+												  
 global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
@@ -231,36 +231,6 @@ class RaceCenter extends ConfigurationItem {
 	iStrategyViewer := false
 	
 	iTasks := []
-	
-	class SessionStrategy extends Strategy {
-		iVersion := false
-		
-		Version[] {
-			Get {
-				return this.iVersion
-			}
-		}
-		
-		__New(strategyManager, configuration := false) {
-			base.__New(strategyManager, configuration)
-		}
-		
-		setVersion(version) {
-			this.iVersion := (version . "")
-		}
-		
-		loadFromConfiguration(configuration) {
-			base.loadFromConfiguration(configuration)
-			
-			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
-		}
-		
-		saveToConfiguration(configuration) {
-			base.saveToConfiguration(configuration)
-			
-			setConfigurationValue(configuration, "General", "Version", this.iVersion)
-		}
-	}
 	
 	class SessionTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
@@ -1162,8 +1132,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.initializeSession()
 		
-		this.updateState()
 		this.updateStrategyMenu()
+		this.updateState()
 	}
 	
 	connect(silent := false) {
@@ -2179,19 +2149,19 @@ class RaceCenter extends ConfigurationItem {
 			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 				
-				this.updateStrategyMenu()
+				this.updateState()
 			case 10: ; Use Telemetry Database
 				this.iUseTelemetryDatabase := !this.UseTelemetryDatabase
 				
-				this.updateStrategyMenu()
+				this.updateState()
 			case 11: ; Use current Map
 				this.iUseCurrentMap := !this.UseCurrentMap
 				
-				this.updateStrategyMenu()
+				this.updateState()
 			case 12: ; Use Traffic
 				this.iUseTraffic := !this.UseTraffic
 				
-				this.updateStrategyMenu()
+				this.updateState()
 			case 14: ; Run Simulation
 				if this.Strategy
 					this.runSimulation(getConfigurationValue(this.Strategy, "Session", "SessionType"))
@@ -2348,7 +2318,7 @@ class RaceCenter extends ConfigurationItem {
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 		
-		theStrategy := new this.SessionStrategy(this, nameOrConfiguration)
+		theStrategy := (this.UseTraffic ? new MonteCarloStrategy(this, nameOrConfiguration) : new SessionStrategy(this, nameOrConfiguration))
 		
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -2377,6 +2347,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	runSimulationAsync(sessionType) {
+		
 		if this.UseTraffic
 			new MonteCarloSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
 		else
@@ -2468,6 +2439,31 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else
 			return false
+	}
+	
+	getMonteCarloSettings(ByRef randomFactor, ByRef numScenarios, ByRef lapVariation
+						, ByRef useLapTimeVariation, ByRef useDriverErrors, ByRef overTakeDelta, ByRef consideredTraffic) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet numScenariosEdit
+		GuiControlGet variationLapsEdit
+		GuiControlGet randomFactorEdit
+		
+		randomFactor := randomFactorEdit
+		numScenarios := numScenariosEdit
+		lapVariation := variationLapsEdit
+		
+		GuiControlGet lapTimeVariationDropDown
+		GuiControlGet driverErrorsDropDown
+		GuiControlGet overtakeDeltaEdit
+		GuiControlGet trafficConsideredEdit
+		
+		useLapTimeVariation := (lapTimeVariationDropDown == 1)
+		useDriverErrors := (driverErrorsDropDown == 1)
+		overTakeDelta := overtakeDeltaEdit
+		consideredTraffic := trafficConsideredEdit
 	}
 	
 	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
@@ -2585,7 +2581,6 @@ class RaceCenter extends ConfigurationItem {
 				else
 					avgLapTime += lapTime
 				
-				avgLapTime += lapTime
 				count += 1
 			}
 		}
@@ -5858,6 +5853,251 @@ class RaceCenter extends ConfigurationItem {
 		html .= "</table>"
 		
 		this.showDetails("Plan", html)
+	}
+}
+	
+class SessionStrategy extends Strategy {
+	iVersion := false
+	
+	Version[] {
+		Get {
+			return this.iVersion
+		}
+	}
+	
+	__New(strategyManager, configuration := false) {
+		base.__New(strategyManager, configuration)
+	}
+	
+	setVersion(version) {
+		this.iVersion := (version . "")
+	}
+	
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+		
+		this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
+	}
+	
+	saveToConfiguration(configuration) {
+		base.saveToConfiguration(configuration)
+		
+		setConfigurationValue(configuration, "General", "Version", this.iVersion)
+	}
+}
+
+class MonteCarloStrategy extends SessionStrategy {
+	iRandomFactor := false
+	iLapVariation := false
+	iUseLapTimeVariation := false
+	iUseDriverErrors := false
+	iOverTakeDelta := false
+	iConsideredTraffic := false
+	
+	setMonteCarloSettings(randomFactor, lapVariation, useLapTimeVariation, useDriverErrors, overTakeDelta, consideredTraffic) {
+		this.iRandomFactor := randomFactor
+		this.iLapVariation := lapVariation
+		this.iUseLapTimeVariation := useLapTimeVariation
+		this.iUseDriverErrors := useDriverErrors
+		this.iOverTakeDelta := overTakeDelta
+		this.iConsideredTraffic := consideredTraffic
+	}
+		
+	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
+		targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
+		
+		if ((pitstopNr = 1) && this.PitstopRequired)
+			return targetLap
+		else {
+			fuelConsumption := this.FuelConsumption[true]
+			fuelLaps := (remainingFuel / fuelConsumption)
+			moreLaps := Min(this.iLapVariation, Min(fuelLaps, this.getMaxFuelLaps(fuelConsumption, false)) - (targetLap - currentLap))
+		
+			Random rnd, -1, 1
+			
+			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * this.iLapVariation)))
+		}
+	}
+}
+
+class MonteCarloSimulation extends StrategySimulation {
+	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+		local strategy
+
+		simulator := false
+		car := false
+		track := false
+		weather := false
+		airTemperature := false
+		trackTemperature := false
+		sessionType := false
+		sessionLength := false
+		maxTyreLaps := false
+		tyreCompound := false
+		tyreCompoundColor := false
+		tyrePressures := false
+		
+		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
+							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+		
+		stintLength := false
+		formationLap := false
+		postRaceLap := false
+		fuelCapacity := false
+		safetyFuel := false
+		pitstopDelta := false
+		pitstopFuelService := false
+		pitstopTyreService := false
+		
+		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService)
+	
+		randomFactor := false
+		numScenarios := false
+		lapVariation := false
+		useLapTimeVariation := false
+		useDriverErrors := false
+		overTakeDelta := false
+		consideredTraffic := false
+		
+		this.StrategyManager.getMonteCarloSettings(randomFactor, numScenarios, lapVariation, useLapTimeVariation, useDriverErrors, overTakeDelta, consideredTraffic)
+		
+		if ((randomFactor == 0) && (lapVariation == 0) && !useLapTimeVariation && !useDriverErrors)
+			numScenarios := 1
+	
+		initialLap := false
+		initialStintTime := false
+		initialTyreLaps := false
+		initialFuelAmount := false
+		map := false
+		fuelConsumption := false
+		avgLapTime := false
+	
+		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		
+		useStartConditions := false
+		useTelemetryData := false
+		consumption := 0
+		tyreUsage := 0
+		initialFuel := 0
+		
+		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+		
+		consumptionStep := (consumption / 4)
+		tyreUsageStep := (tyreUsage / 4)
+		initialFuelStep := (initialFuel / 4)
+		
+		scenarios := {}
+		variation := 1
+		
+		Loop {
+			if (variation > numScenarios)
+				break
+			
+			Loop { ; consumption
+				Loop { ; initialFuel
+					Loop { ; tyreUsage
+						if useStartConditions {
+							if map is number
+							{
+								message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+									
+								showProgress({progress: progress, message: message})
+								
+								stintLaps := Floor((stintLength * 60) / avgLapTime)
+								
+								name := (translate("Initial Conditions - Map ") . map)
+								
+								this.setFixedLapTime(avgLapTime)
+								
+								try {
+									strategy := this.createStrategy(name)
+									
+									strategy.setMonteCarloSettings(randomFactor, lapVariation, useLapTimeVariation, useDriverErrors
+																 , overTakeDelta, consideredTraffic)
+							
+									currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
+									
+									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
+																, tyreCompound, tyreCompoundColor, 0, avgLapTime)
+								
+									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+													, currentConsumption, lapTime)
+								}
+								finally {
+									this.setFixedLapTime(false)
+								}
+								
+								scenarios[name . translate(":") . variation++] := strategy
+									
+								Sleep 100
+									
+								progress += 1
+							}
+						}
+						
+						if useTelemetryData
+							for ignore, mapData in electronicsData {
+								scenarioMap := mapData["Map"]
+								scenarioFuelConsumption := mapData["Fuel.Consumption"]
+								scenarioAvgLapTime := mapData["Lap.Time"]
+
+								if scenarioMap is number
+								{
+									message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate("..."))
+									
+									showProgress({progress: progress, message: message})
+								
+									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+									
+									name := (translate("Telemetry - Map ") . scenarioMap)
+									
+									strategy := this.createStrategy(name)
+									
+									strategy.setMonteCarloSettings(randomFactor, lapVariation, useLapTimeVariation, useDriverErrors
+																 , overTakeDelta, consideredTraffic)
+								
+									currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+									
+									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
+																, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
+								
+									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
+													, currentConsumption, lapTime)
+									
+									scenarios[name . translate(":") . variation++] := strategy
+									
+									Sleep 100
+									
+									progress += 1
+								}
+							}
+				
+						if (tyreUsage = 0)
+							break
+						else
+							tyreUsage := Max(0, tyreUsage - tyreUsageStep)
+					}
+							
+					if (initialFuel = 0)
+						break
+					else
+						initialFuel := Max(0, initialFuel - initialFuelStep)
+				}
+				
+				if (consumption = 0)
+					break
+				else
+					consumption := Max(0, consumption - consumptionStep)
+			}
+		}
+		
+		progress := Floor(progress + 10)
+		
+		return scenarios
 	}
 }
 

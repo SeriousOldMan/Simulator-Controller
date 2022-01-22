@@ -335,7 +335,7 @@ class VariationSimulation extends StrategySimulation {
 		tyreCompoundColor := false
 		tyrePressures := false
 		
-		this.getStrategySettings(simulator, car, track,weather, airTemperature, trackTemperature
+		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
 		
 		stintLength := false
@@ -396,7 +396,7 @@ class VariationSimulation extends StrategySimulation {
 								currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
 								
 								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
-								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption,
+								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 															, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 							
 								this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount

@@ -101,8 +101,8 @@ class StrategySimulation {
 		tyreCompoundColor := false
 		tyrePressures := false
 		
-		this.StrategyManager.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
-											   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
+							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
 		
 		if verbose {
 			message := translate("Reading Electronics Data...")
@@ -131,6 +131,12 @@ class StrategySimulation {
 	
 	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
 		Throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
+	}
+	
+	createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+			   , stintLaps, maxTyreLaps, map, consumption, lapTime) {
+		strategy.createStints(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+							, stintLaps, maxTyreLaps, map, consumption, lapTime)
 	}
 	
 	optimizeScenarios(scenarios, verbose, ByRef progress) {
@@ -329,8 +335,8 @@ class VariationSimulation extends StrategySimulation {
 		tyreCompoundColor := false
 		tyrePressures := false
 		
-		this.StrategyManager.getStrategySettings(simulator, car, track,weather, airTemperature, trackTemperature
-											   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+		this.getStrategySettings(simulator, car, track,weather, airTemperature, trackTemperature
+							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
 		
 		stintLength := false
 		formationLap := false
@@ -341,7 +347,7 @@ class VariationSimulation extends StrategySimulation {
 		pitstopFuelService := false
 		pitstopTyreService := false
 		
-		this.StrategyManager.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService)
+		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService)
 	
 		initialLap := false
 		initialStintTime := false
@@ -351,7 +357,7 @@ class VariationSimulation extends StrategySimulation {
 		fuelConsumption := false
 		avgLapTime := false
 	
-		this.StrategyManager.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 		
 		useStartConditions := false
 		useTelemetryData := false
@@ -391,11 +397,11 @@ class VariationSimulation extends StrategySimulation {
 								
 								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
 								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption,
-															, tyreCompound, tyreCompoundColor, 0, simAvgLapTimeEdit)
+															, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 							
-								strategy.createStints(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-													, currentConsumption, lapTime)
+								this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+												, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+												, currentConsumption, lapTime)
 							}
 							finally {
 								this.setFixedLapTime(false)
@@ -431,11 +437,11 @@ class VariationSimulation extends StrategySimulation {
 								
 								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
 								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
-															, tyreCompound, tyreCompoundColor, 0, simAvgLapTimeEdit)
+															, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 							
-								strategy.createStints(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
-													, currentConsumption, lapTime)
+								this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+												, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
+												, currentConsumption, lapTime)
 								
 								scenarios[name . translate(":") . variation++] := strategy
 								
@@ -467,6 +473,14 @@ class VariationSimulation extends StrategySimulation {
 		
 		return scenarios
 	}
+}
+
+class MonteCarloSimulation extends StrategySimulation {
+/*
+	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+		return []
+	}
+*/
 }
 
 class Strategy extends ConfigurationItem {

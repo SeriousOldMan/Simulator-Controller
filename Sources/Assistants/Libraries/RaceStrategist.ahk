@@ -794,7 +794,12 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 			
 			this.finishSession()
-		}	
+		}
+		else {
+			callback := ObjBindMethod(this, "forceFinishSession")
+					
+			SetTimer %callback%, -5000
+		}
 	}
 	
 	prepareData(lapNumber, data) {

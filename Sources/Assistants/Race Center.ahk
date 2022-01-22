@@ -283,10 +283,10 @@ class RaceCenter extends ConfigurationItem {
 			if this.iRaceCenter.UseSessionData
 				entries := base.getMapData(weather, compound, compoundColor)
 			
-			if this.iRaceCenter.UseTelemetryDatabase {
+			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
 				newEntries := []
 			
-				for ignore, entry in this.iTelemetryDatabse.getMapData(weather, compound, compoundColor) {
+				for ignore, entry in this.iTelemetryDatabase.getMapData(weather, compound, compoundColor) {
 					found := false
 				
 					for ignore, candidate in entries
@@ -328,10 +328,10 @@ class RaceCenter extends ConfigurationItem {
 			if this.iRaceCenter.UseSessionData
 				entries := base.getTyreData(weather, compound, compoundColor)
 			
-			if this.iRaceCenter.UseTelemetryDatabase {
+			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
 				newEntries := []
 			
-				for ignore, entry in this.iTelemetryDatabse.getTyreData(weather, compound, compoundColor) {
+				for ignore, entry in this.iTelemetryDatabase.getTyreData(weather, compound, compoundColor) {
 					found := false
 				
 					for ignore, candidate in entries
@@ -358,10 +358,10 @@ class RaceCenter extends ConfigurationItem {
 			if this.iRaceCenter.UseSessionData
 				entries := base.getMapLapTimes(weather, compound, compoundColor)
 			
-			if this.iRaceCenter.UseTelemetryDatabase {
+			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
 				newEntries := []
 			
-				for ignore, entry in this.iTelemetryDatabse.getMapLapTimes(weather, compound, compoundColor) {
+				for ignore, entry in this.iTelemetryDatabase.getMapLapTimes(weather, compound, compoundColor) {
 					found := false
 				
 					for ignore, candidate in entries
@@ -403,10 +403,10 @@ class RaceCenter extends ConfigurationItem {
 			if this.iRaceCenter.UseSessionData
 				entries := base.getTyreLapTimes(weather, compound, compoundColor)
 			
-			if this.iRaceCenter.UseTelemetryDatabase {
+			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
 				newEntries := []
 			
-				for ignore, entry in this.iTelemetryDatabse.getTyreLapTimes(weather, compound, compoundColor) {
+				for ignore, entry in this.iTelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
 					found := false
 				
 					for ignore, candidate in entries
@@ -1059,8 +1059,13 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x24 ys+33 w260 h124, % translate("Simulation")
 
 		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Random Factor")
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VrandomFactorEdit, %randomFactorEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20, %randomFactorEdit%
+		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("%")
 		
-		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("# Scenarios")
+		Gui %window%:Add, Text, x32 yp+22 w85 h23 +0x200, % translate("# Scenarios")
 		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VnumScenariosEdit, %numScenariosEdit%
 		Gui %window%:Add, UpDown, x202 yp w18 h20, %numScenariosEdit%
 		
@@ -1069,11 +1074,6 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VvariationLapsEdit, %variationLapsEdit%
 		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationLapsEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
-
-		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Random Factor")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VrandomFactorEdit, %randomFactorEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20, %randomFactorEdit%
-		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("%")
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -1479,12 +1479,18 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		if this.UseTraffic {
+			GuiControl Enable, numScenariosEdit
+			GuiControl Enable, variationLapsEdit
+			
 			GuiControl Enable, lapTimeVariationDropDown
 			GuiControl Enable, driverErrorsDropDown
 			GuiControl Enable, overtakeDeltaEdit
 			GuiControl Enable, trafficConsideredEdit
 		}
 		else {
+			GuiControl Disable, numScenariosEdit
+			GuiControl Disable, variationLapsEdit
+			
 			GuiControl Disable, lapTimeVariationDropDown
 			GuiControl Disable, driverErrorsDropDown
 			GuiControl Disable, overtakeDeltaEdit
@@ -2183,11 +2189,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.updateStrategyMenu()
 			case 12: ; Use Traffic
-				title := translate("Information")
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262192, %title%, % translate("Not yet implemented...")
-				OnMessage(0x44, "")
+				this.iUseTraffic := !this.UseTraffic
+				
+				this.updateStrategyMenu()
 			case 14: ; Run Simulation
 				if this.Strategy
 					this.runSimulation(getConfigurationValue(this.Strategy, "Session", "SessionType"))
@@ -2373,7 +2377,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	runSimulationAsync(sessionType) {
-		new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+		if this.UseTraffic
+			new MonteCarloSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+		else
+			new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
 	}
 	
 	getPreviousLap(lap) {
@@ -2505,8 +2512,17 @@ class RaceCenter extends ConfigurationItem {
 		
 		consumptionWeight := 0
 		initialFuelWeight := 0
-		initialFuelWeight := 0
 		tyreUsageWeight := 0
+
+		if !this.UseTraffic {
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			GuiControlGet randomFactorEdit
+			
+			tyreUsageWeight := randomFactorEdit
+		}
 		
 		return true
 	}

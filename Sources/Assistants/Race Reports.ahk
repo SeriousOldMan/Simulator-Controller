@@ -638,11 +638,15 @@ chooseSimulator() {
 }
 
 chooseCar() {
+	sessionDB := new SessionDatabase()
 	reports := RaceReports.Instance
+	simulator := reports.SelectedSimulator
 	
 	GuiControlGet carDropDown
 	
-	reports.loadCar(carDropDown)
+	for index, car in reports.getCars(simulator)
+		if (sessionDB.getCarName(simulator, car) = carDropDown)
+			reports.loadCar(car)
 }
 
 chooseTrack() {

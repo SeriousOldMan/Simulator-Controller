@@ -137,7 +137,7 @@ global addPlanButton
 global deletePlanButton
 
 global numScenariosEdit = 80
-global variationLapsEdit = 3
+global variationWindowEdit = 3
 global randomFactorEdit = 0
 
 global useSessionDataDropDown
@@ -1042,8 +1042,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Variation")
 		Gui %window%:Add, Text, x150 yp w18 h23 +0x200, % translate("+/-")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VvariationLapsEdit, %variationLapsEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationLapsEdit%
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VvariationWindowEdit, %variationWindowEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationWindowEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
 
 		Gui %window%:Font, Norm, Arial
@@ -1455,7 +1455,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		if this.UseTraffic {
 			GuiControl Enable, numScenariosEdit
-			GuiControl Enable, variationLapsEdit
+			GuiControl Enable, variationWindowEdit
 			
 			GuiControl Enable, lapTimeVariationDropDown
 			GuiControl Enable, driverErrorsDropDown
@@ -1465,7 +1465,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			GuiControl Disable, numScenariosEdit
-			GuiControl Disable, variationLapsEdit
+			GuiControl Disable, variationWindowEdit
 			
 			GuiControl Disable, lapTimeVariationDropDown
 			GuiControl Disable, driverErrorsDropDown
@@ -2461,7 +2461,7 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	getMonteCarloSettings(ByRef randomFactor, ByRef numScenarios, ByRef lapVariation
+	getMonteCarloSettings(ByRef randomFactor, ByRef numScenarios, ByRef variationWindow
 						, ByRef useLapTimeVariation, ByRef useDriverErrors, ByRef usePitstops
 						, ByRef overTakeDelta, ByRef consideredTraffic) {
 		window := this.Window
@@ -2469,12 +2469,12 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 		
 		GuiControlGet numScenariosEdit
-		GuiControlGet variationLapsEdit
+		GuiControlGet variationWindowEdit
 		GuiControlGet randomFactorEdit
 		
 		randomFactor := randomFactorEdit
 		numScenarios := numScenariosEdit
-		lapVariation := variationLapsEdit
+		variationWindow := variationWindowEdit
 		
 		GuiControlGet lapTimeVariationDropDown
 		GuiControlGet driverErrorsDropDown
@@ -5877,6 +5877,37 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.showDetails("Plan", html)
 	}
+	
+	createTrafficScenarios(targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+		return []
+	}
+	
+	getTrafficPositions(trafficScenario, targetLap, ByRef driver, ByRef positions, ByRef runnings) {
+		if (trafficScenario && trafficScenario[2].HasKey(targetLap)) {
+			if driver
+				driver := trafficScenario[1]
+			
+			if positions
+				positions := trafficScenario[2][targetLap]
+			
+			if runnings
+				runnings := trafficScenario[3][targetLap]
+			
+			return true
+		}
+		else {
+			if driver
+				driver := false
+		
+			if positions
+				positions := []
+			
+			if runnings
+				runnings := []
+			
+			return false
+		}
+	}
 }
 	
 class SessionStrategy extends Strategy {
@@ -5910,78 +5941,65 @@ class SessionStrategy extends Strategy {
 }
 
 class MonteCarloStrategy extends SessionStrategy {
-	iRandomFactor := false
-	iLapVariation := false
-	iUseLapTimeVariation := false
-	iUseDriverErrors := false
-	iUsePitstops := false
-	iOverTakeDelta := false
-	iConsideredTraffic := false
+	iTrafficScenario := false
 	
-	iTrafficModel := false
-	
-	class MonteCarloPitstop extends Strategy.Pitstop {
-		getPosition() {
-			strategyManager := this.Strategy.StrategyManager
-			
-			driver := true
-			positions := true
-			runnings := true
-			
-			strategyManager.getPositions(this.Strategy.iTrafficModel, this.Lap + 1, driver, positions, runnings)
-			
-			return positions[driver]
-		}
-		
-		getTrafficDensity() {
-			strategyManager := this.Strategy.StrategyManager
-			
-			driver := true
-			positions := true
-			runnings := true
-			
-			strategyManager.getPositions(this.Strategy.iTrafficModel, this.Lap + 1, driver, positions, runnings)
-			
-			begin := runnings[driver]
-			end := (begin + (this.iConsideredTraffic / 100))
-			
-			wrap := false
-			
-			if (end > 1) {
-				wrap := true
-				
-				end -= 1
-			}				
-			
-			numCars := 0
-			
-			Loop % runnings.Length()
-				if (A_Index != driver)
-					if (wrap && ((runnings[A_Index] > begin) || (runnings[A_Index] <= end)))
-						numCars += 1
-					else if (!wrap && (runnings[A_Index] > begin) && (runnings[A_Index] < end))
-						numCars += 1
-					
-			return (numCars / runnings.Length())
+	TrafficScenario[] {
+		Get {
+			return this.iTrafficScenario
 		}
 	}
 	
-	setTrafficSettings(randomFactor, lapVariation, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta, consideredTraffic) {
-		this.iRandomFactor := randomFactor
-		this.iLapVariation := lapVariation
-		this.iUseLapTimeVariation := useLapTimeVariation
-		this.iUseDriverErrors := useDriverErrors
-		this.iUsePitstops := usePitstops
-		this.iOverTakeDelta := overTakeDelta
-		this.iConsideredTraffic := consideredTraffic
+	class MonteCarloPitstop extends Strategy.Pitstop {
+		getPosition() {
+			driver := true
+			positions := true
+			runnings := true
+			
+			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
+			
+			return (driver ? positions[driver] : false)
+		}
+		
+		getTrafficDensity() {
+			driver := true
+			positions := true
+			runnings := true
+			
+			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
+			
+			if driver {
+				begin := runnings[driver]
+				end := (begin + (this.Strategy.StrategyManager.ConsideredTraffic / 100))
+				
+				wrap := false
+				
+				if (end > 1) {
+					wrap := true
+					
+					end -= 1
+				}				
+				
+				numCars := 0
+				
+				Loop % runnings.Length()
+					if (A_Index != driver)
+						if (wrap && ((runnings[A_Index] > begin) || (runnings[A_Index] <= end)))
+							numCars += 1
+						else if (!wrap && (runnings[A_Index] > begin) && (runnings[A_Index] < end))
+							numCars += 1
+						
+				return (numCars / runnings.Length())
+			}
+			else
+				return 0.0
+		}
 	}
 	
 	createPitstop(id, lap, configuration := false, adjustments := false) {
 		pitstop := new this.MonteCarloPitstop(this, id, lap, configuration, adjustments)
 		
-		this.iTrafficModel := this.StrategyManager.createTrafficModel(pitstop.Lap + 1, this.iRandomFactor
-																	, this.iUseLapTimeVariation, this.iUseDriverErrors, this.iUsePitstops,
-																	, this.iOverTakeDelta)
+		if ((id == 1) && !this.TrafficScenario)
+			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
 	
 		return pitstop
 	}
@@ -5992,18 +6010,103 @@ class MonteCarloStrategy extends SessionStrategy {
 		if ((pitstopNr = 1) && this.PitstopRequired)
 			return targetLap
 		else {
-			fuelConsumption := this.FuelConsumption[true]
-			fuelLaps := (remainingFuel / fuelConsumption)
-			moreLaps := Min(this.iLapVariation, Min(fuelLaps, this.getMaxFuelLaps(fuelConsumption, false)) - (targetLap - currentLap))
+			moreLaps := Min(this.StrategyManager.VariationWindow, (remainingFuel / this.FuelConsumption[true]))
 		
 			Random rnd, -1, 1
 			
-			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * this.iLapVariation)))
+			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * this.VariationWindow)))
 		}
 	}
 }
 
 class MonteCarloSimulation extends StrategySimulation {
+	iRandomFactor := false
+	iNumScenarios := false
+	iVariationWindow := false
+	iUseLapTimeVariation := false
+	iUseDriverErrors := false
+	iUsePitstops := false
+	iOverTakeDelta := false
+	iConsideredTraffic := false
+	
+	iTrafficScenarios := false
+	
+	RandomFactor[] {
+		Get {
+			return this.iRandomFactor
+		}
+	}
+	
+	NumScenarios[] {
+		Get {
+			return this.iNumScenarios
+		}
+	}
+	
+	VariationWindow[] {
+		Get {
+			return this.iVariationWindow
+		}
+	}
+	
+	UseLapTimeVariation[] {
+		Get {
+			return this.iUseLapTimeVariation
+		}
+	}
+	
+	UseDriverErrors[] {
+		Get {
+			return this.iUseDriverErrors
+		}
+	}
+	
+	UsePitstops[] {
+		Get {
+			return this.iUsePitstops
+		}
+	}
+	
+	OverTakeDelta[] {
+		Get {
+			return this.iOverTakeDelta
+		}
+	}
+	
+	ConsideredTraffic[] {
+		Get {
+			return this.iConsideredTraffic
+		}
+	}
+	
+	setTrafficSettings(randomFactor, numScenarios, variationWindow, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta, consideredTraffic) {
+		this.iRandomFactor := randomFactor
+		this.iNumScenarios := numScenarios
+		this.iVariationWindow := variationWindow
+		this.iUseLapTimeVariation := useLapTimeVariation
+		this.iUseDriverErrors := useDriverErrors
+		this.iUsePitstops := usePitstops
+		this.iOverTakeDelta := overTakeDelta
+		this.iConsideredTraffic := consideredTraffic
+	}
+	
+	getTrafficScenario(strategy, pitstop) {
+		if !this.iTrafficScenarios
+			this.iTrafficScenarios := this.StrategyManager.createTrafficScenarios(pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
+																				, this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
+																				, this.OverTakeDelta)
+		
+		count := this.iTrafficScenarios.Length()
+		
+		if (count > 0) {
+			Random rnd, 1, %count%
+			
+			return this.iTrafficScenarios[Round(rnd)]
+		}
+		else
+			return false
+	}
+	
 	compareScenarios(scenario1, scenario2) {
 		if ((scenario1.Pitstops.Length() > 0) && (scenario2.Pitstops.Length() > 0)) {
 			pitstop1 := scenario1.Pitstops[1]
@@ -6056,19 +6159,23 @@ class MonteCarloSimulation extends StrategySimulation {
 	
 		randomFactor := false
 		numScenarios := false
-		lapVariation := false
+		variationWindow := false
 		useLapTimeVariation := false
 		useDriverErrors := false
 		usePitstops := false
 		overTakeDelta := false
 		consideredTraffic := false
 		
-		this.StrategyManager.getMonteCarloSettings(randomFactor, numScenarios, lapVariation
+		this.StrategyManager.getMonteCarloSettings(randomFactor, numScenarios, variationWindow
 												 , useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta, consideredTraffic)
 		
-		if ((randomFactor == 0) && (lapVariation == 0) && !useLapTimeVariation && !useDriverErrors && !usePitstops)
+		if ((randomFactor == 0) && (variationWindow == 0) && !useLapTimeVariation && !useDriverErrors && !usePitstops)
 			numScenarios := 1
 	
+		this.setTrafficSettings(randomFactor, numScenarios, variationWindow
+							  , useLapTimeVariation, useDriverErrors, usePitstops
+							  , overTakeDelta, consideredTraffic)
+
 		initialLap := false
 		initialStintTime := false
 		initialTyreLaps := false
@@ -6117,10 +6224,6 @@ class MonteCarloSimulation extends StrategySimulation {
 								try {
 									strategy := this.createStrategy(name)
 									
-									strategy.setTrafficSettings(randomFactor, lapVariation
-															  , useLapTimeVariation, useDriverErrors, usePitstops
-															  , overTakeDelta, consideredTraffic)
-							
 									currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
 									
 									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
@@ -6161,10 +6264,6 @@ class MonteCarloSimulation extends StrategySimulation {
 									
 									strategy := this.createStrategy(name)
 									
-									strategy.setTrafficSettings(randomFactor, lapVariation
-															  , useLapTimeVariation, useDriverErrors, usePitstops
-															  , overTakeDelta, consideredTraffic)
-								
 									currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
 									
 									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))

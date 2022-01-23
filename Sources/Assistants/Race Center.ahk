@@ -138,7 +138,7 @@ global deletePlanButton
 
 global numScenariosEdit = 80
 global variationLapsEdit = 3
-global randomFactorEdit = 10
+global randomFactorEdit = 0
 
 global useSessionDataDropDown
 global useTelemetryDataDropDown

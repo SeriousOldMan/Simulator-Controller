@@ -185,6 +185,33 @@ class StrategySimulation {
 		return scenarios
 	}
 	
+	compareScenarios(scenario1, scenario2) {
+		if (this.SessionType = "Duration") {
+			sLaps := scenario1.getSessionLaps()
+			cLaps := scenario2.getSessionLaps()
+			sTime := scenario1.getSessionDuration()
+			cTime := scenario2.getSessionDuration()
+			
+			if (sLaps > cLaps)
+				return scenario1
+			else if ((sLaps = cLaps) && (sTime < cTime))
+				return scenario1
+			else if ((sLaps = cLaps) && (sTime = cTime) && (scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true] ))
+				return scenario1
+			else
+				return scenario2
+		}
+		else {
+			if (scenario1.getSessionDuration() < scenario2.getSessionDuration())
+				return scenario1
+			else if ((scenario1.getSessionDuration() = scenario2.getSessionDuration())
+				  && (scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true] ))
+				return scenario1
+			else
+				return scenario2
+		}
+	}
+	
 	evaluateScenarios(scenarios, verbose, ByRef progress) {
 		local strategy
 		
@@ -199,23 +226,8 @@ class StrategySimulation {
 			
 			if !candidate
 				candidate := strategy
-			else {
-				if (this.SessionType = "Duration") {
-					sLaps := strategy.getSessionLaps()
-					cLaps := candidate.getSessionLaps()
-					sTime := strategy.getSessionDuration()
-					cTime := candidate.getSessionDuration()
-					
-					if (sLaps > cLaps)
-						candidate := strategy
-					else if ((sLaps = cLaps) && (sTime < cTime))
-						candidate := strategy
-					else if ((sLaps = cLaps) && (sTime = cTime) && (candidate.FuelConsumption[true] > strategy.FuelConsumption[true] ))
-						candidate := strategy
-				}
-				else if (strategy.getSessionDuration() < candidate.getSessionDuration())
-					candidate := strategy
-			}
+			else
+				candidate := this.compareScenarios(strategy, candidate)
 			
 			if verbose {
 				progress += 1
@@ -1063,7 +1075,7 @@ class Strategy extends ConfigurationItem {
 		Get {
 			length := this.Pitstops.Length()
 			
-			return ((length = 0) ? false : this.iPitstops[length])
+			return ((length = 0) ? false : this.Pitstops[length])
 		}
 	}
 	

@@ -433,7 +433,7 @@ class VariationSimulation extends StrategySimulation {
 								
 								strategy := this.createStrategy(name)
 							
-								currentConsumption :=(scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+								currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
 								
 								startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
 								lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
@@ -473,14 +473,6 @@ class VariationSimulation extends StrategySimulation {
 		
 		return scenarios
 	}
-}
-
-class MonteCarloSimulation extends StrategySimulation {
-/*
-	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
-		return []
-	}
-*/
 }
 
 class Strategy extends ConfigurationItem {
@@ -1355,8 +1347,8 @@ class Strategy extends ConfigurationItem {
 												, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime)
 	}
 	
-	getMaxFuelLaps(fuelConsumption) {
-		return Floor((this.FuelCapacity - this.SafetyFuel) / fuelConsumption)
+	getMaxFuelLaps(fuelConsumption, withSafety := true) {
+		return Floor((this.FuelCapacity - (withSafety ? this.SafetyFuel : 0)) / fuelConsumption)
 	}
 	
 	calcSessionLaps(avgLapTime := false, formationLap := true, postRaceLap := true) {

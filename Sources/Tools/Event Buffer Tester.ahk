@@ -46,6 +46,8 @@ global selectedSimulator
 global eventMode
 global hotkey
 
+global dismissed
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
@@ -53,7 +55,6 @@ global hotkey
 
 selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", width := 300, height := 200) {
 	static hasWindow := false
-	static dismissed := false
 	
 	static titleField
 	
@@ -124,16 +125,30 @@ selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", widt
 		Gui EBT:+AlwaysOnTop
 		Gui EBT:Show, X%x% Y%y% W%width% H%height% NoActivate
 	}
+	
+	while !dismissed
+		Sleep 100
+	
+	GUI EBT:Hide
+	
+	Sleep 2500
+	
+	selectCommand()
 }
 
 activateSimulatorWindow(selectedSimulator) {
 	window := new Application(selectedSimulator, kSimulatorConfiguration).WindowTitle
 		
-	if !WinExist(window)
+	if !WinExist(window) {
 		showMessage(selectedSimulator . " not found...")
+		
+		return false
+	}
 	
 	if !WinActive(window)
 		WinActivate %window%
+	
+	return true
 }
 
 sendSimulatorCommand(eventMode, command) {
@@ -158,7 +173,7 @@ sendCommand() {
 	GuiControlGet eventMode
 	GuiControlGet hotkey
 	
-	Gui EBT:Hide
+	dismissed := true
 	
 	if activateSimulatorWindow(selectedSimulator)
 		sendSimulatorCommand(["Event", "Input", "Play", "Raw", "Default"][eventMode], hotkey)
@@ -178,11 +193,7 @@ runEventBufferTester() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Event Buffer Tester
 	
-	Loop {
-		selectCommand()
-	
-		Sleep 2500
-	}
+	selectCommand()
 }
 
 

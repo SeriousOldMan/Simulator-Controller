@@ -587,19 +587,28 @@ class RaceReportViewer {
 				car := A_Index
 				
 				result := (positions[lapsCount][car] = "null" ? "DNF" : positions[lapsCount][car])
-				bestLap := 1000000
 				lapTimes := []
 				
 				Loop % lapsCount
 				{
 					lapTime := times[A_Index][car]
-					
+				
 					if (lapTime > 0)
 						lapTimes.Push(lapTime)
 					else
 						result := "DNF"
 				}
 				
+				min := minimum(lapTimes)
+				avg := average(lapTimes)
+				
+				filteredLapTimes := lapTimes
+				lapTimes := []
+				
+				for ignore, lapTime in filteredLapTimes
+					if (lapTime < (avg + (avg - min)))
+						lapTimes.Push(lapTime)
+					
 				min := Round(minimum(lapTimes) / 1000, 1)
 				avg := Round(average(lapTimes) / 1000, 1)
 				

@@ -2840,7 +2840,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			lap.Stint := stint
 			
-			tries := ((A_Index == count) ? 10 : 1)
+			tries := ((A_Index == count) ? 30 : 1)
 			
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -2914,7 +2914,7 @@ class RaceCenter extends ConfigurationItem {
 			lap.Compound := compound
 			
 			try {
-				tries := ((A_Index == count) ? 10 : 1)
+				tries := ((A_Index == count) ? 30 : 1)
 			
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -2949,6 +2949,8 @@ class RaceCenter extends ConfigurationItem {
 					lap.Positions := pLap.Positions
 					lap.Position := pLap.Position
 				}
+				else
+					lap.Position := "-"
 			}
 			
 			this.Laps[identifier] := lap
@@ -6206,7 +6208,7 @@ class MonteCarloStrategy extends SessionStrategy {
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
 		targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
 		
-		if ((pitstopNr = 1) && this.PitstopRequired)
+		if ((pitstopNr = 1) && IsObject(this.PitstopRequired))
 			return targetLap
 		else {
 			variationWindow := this.StrategyManager.VariationWindow
@@ -6214,7 +6216,7 @@ class MonteCarloStrategy extends SessionStrategy {
 		
 			Random rnd, -1.0, 1.0
 			
-			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow)))
+			return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
 		}
 	}
 }
@@ -6298,17 +6300,28 @@ class MonteCarloSimulation extends StrategySimulation {
 		if ((scenario1.Pitstops.Length() > 0) && (scenario2.Pitstops.Length() > 0)) {
 			pitstop1 := scenario1.Pitstops[1]
 			pitstop2 := scenario2.Pitstops[1]
+			position1 := pitstop1.getPosition()
+			position2 := pitstop2.getPosition()
 			
-			if (pitstop1.getPosition() < pitstop2.getPosition())
+			if (position1 < position2)
 				return scenario1
-			else if (pitstop1.getPosition() > pitstop2.getPosition())
+			else if (position1 > position2)
 				return scenario2
-			else if (pitstop1.getTrafficDensity() < pitstop2.getTrafficDensity())
+			else if (pitstop1.Lap < pitstop2.Lap)
 				return scenario1
-			else if (pitstop1.getTrafficDensity() > pitstop2.getTrafficDensity())
+			else if (pitstop1.Lap > pitstop2.Lap)
 				return scenario2
-			else
-				return base.compareScenarios(scenario1, scenario2)
+			else {
+				density1 := pitstop1.getTrafficDensity()
+				density2 := pitstop1.getTrafficDensity()
+				
+				if (density1 < density2)
+					return scenario1
+				else if (density1 > density2)
+					return scenario2
+				else
+					return base.compareScenarios(scenario1, scenario2)
+			}
 		}
 		else
 			return base.compareScenarios(scenario1, scenario2)
@@ -6486,6 +6499,9 @@ class MonteCarloSimulation extends StrategySimulation {
 				else
 					consumption := Max(0, consumption - consumptionStep)
 			}
+			
+			if (scenarios.Count() == 0)
+				break
 		}
 		
 		progress := Floor(progress + 10)

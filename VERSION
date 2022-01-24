@@ -1,7 +1,7 @@
 [Development]
 Version=3.8.4-dev
 Target=3.8.4-release
-Date=01/23/2022
+Date=01/24/2022
 Download=
 Changes=Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center"
 [Release]

@@ -670,7 +670,7 @@ class Strategy extends ConfigurationItem {
 				remainingFuel := strategy.RemainingFuel[true]
 				remainingLaps := strategy.RemainingLaps[true]
 				fuelConsumption := strategy.FuelConsumption[true]
-				lastStintLaps := Floor(Min(strategy.StintLaps[true], remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap))
+				lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap)) ; strategy.StintLaps[true], 
 				
 				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("RemainingLaps"))
 					remainingLaps := (adjustments[id].RemainingLaps + lastStintLaps)
@@ -1489,7 +1489,7 @@ class Strategy extends ConfigurationItem {
 			
 			currentLap := pitstopLap
 		
-			if (numPitstops || ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || (pitstop.TyreChange))))
+			if ((numPitstops && (A_Index <= numPitstops)) || ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || (pitstop.TyreChange))))
 				this.Pitstops.Push(pitstop)
 			else
 				break

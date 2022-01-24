@@ -1042,7 +1042,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Variation")
 		Gui %window%:Add, Text, x150 yp w18 h23 +0x200, % translate("+/-")
-		Gui %window%:Add, Edit, x170 yp w50 h20 Limit1 Number VvariationWindowEdit, %variationWindowEdit%
+		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VvariationWindowEdit, %variationWindowEdit%
 		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationWindowEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
 
@@ -6297,30 +6297,39 @@ class MonteCarloSimulation extends StrategySimulation {
 	}
 	
 	compareScenarios(scenario1, scenario2) {
-		if ((scenario1.Pitstops.Length() > 0) && (scenario2.Pitstops.Length() > 0)) {
-			pitstop1 := scenario1.Pitstops[1]
-			pitstop2 := scenario2.Pitstops[1]
-			position1 := pitstop1.getPosition()
-			position2 := pitstop2.getPosition()
-			
-			if (position1 < position2)
+		pitstops1 := scenario1.Pitstops.Length()
+		pitstops2 := scenario2.Pitstops.Length()
+		
+		if ((pitstops1 > 0) && (pitstops2 > 0)) {
+			if (pitstops1 < pitstops2)
 				return scenario1
-			else if (position1 > position2)
-				return scenario2
-			else if (pitstop1.Lap < pitstop2.Lap)
-				return scenario1
-			else if (pitstop1.Lap > pitstop2.Lap)
+			else if (pitstops1 > pitstops2)
 				return scenario2
 			else {
-				density1 := pitstop1.getTrafficDensity()
-				density2 := pitstop1.getTrafficDensity()
+				pitstop1 := scenario1.Pitstops[1]
+				pitstop2 := scenario2.Pitstops[1]
+				position1 := pitstop1.getPosition()
+				position2 := pitstop2.getPosition()
 				
-				if (density1 < density2)
+				if (position1 < position2)
 					return scenario1
-				else if (density1 > density2)
+				else if (position1 > position2)
 					return scenario2
-				else
-					return base.compareScenarios(scenario1, scenario2)
+				else if (pitstop1.Lap < pitstop2.Lap)
+					return scenario1
+				else if (pitstop1.Lap > pitstop2.Lap)
+					return scenario2
+				else {
+					density1 := pitstop1.getTrafficDensity()
+					density2 := pitstop1.getTrafficDensity()
+					
+					if (density1 < density2)
+						return scenario1
+					else if (density1 > density2)
+						return scenario2
+					else
+						return base.compareScenarios(scenario1, scenario2)
+				}
 			}
 		}
 		else

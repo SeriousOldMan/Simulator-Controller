@@ -281,7 +281,7 @@ The complete position information is requested from the simulation gane every 10
 After the data has been gathered, it is then transfered to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
 
 	[Position Data]
-	Car.Driver=1
+	Driver.Car=1
 	Car.Count=20
 	Car.1.Car = Mazda MX-5 Cup
 	Car.1.Driver.Forname = The

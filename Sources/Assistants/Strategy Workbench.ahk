@@ -99,7 +99,7 @@ global refuelRequirementsLabel
 
 global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
-global pitstopRefuelServiceEdit = 1.2
+global pitstopFuelServiceEdit = 1.2
 global fuelCapacityEdit = 125
 global safetyFuelEdit = 5
 
@@ -535,7 +535,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Fuel Capacity")
@@ -1196,7 +1196,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-							GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -1747,7 +1747,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1760,7 +1760,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 		GuiControlGet pitstopDeltaEdit
 		GuiControlGet pitstopTyreServiceEdit
-		GuiControlGet pitstopRefuelServiceEdit
+		GuiControlGet pitstopFuelServiceEdit
 		
 		stintLength := stintLengthEdit
 		formationLap := formationLapCheck
@@ -1768,7 +1768,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		fuelCapacity := fuelCapacityEdit
 		safetyFuel := safetyFuelEdit
 		pitstopDelta := pitstopDeltaEdit
-		pitstopFuelService := pitstopRefuelServiceEdit
+		pitstopFuelService := pitstopFuelServiceEdit
 		pitstopTyreService := pitstopTyreServiceEdit
 	}
 	

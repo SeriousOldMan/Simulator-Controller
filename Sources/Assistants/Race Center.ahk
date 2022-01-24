@@ -136,9 +136,9 @@ global planTyreCompoundDropDown
 global addPlanButton
 global deletePlanButton
 
-global numScenariosEdit = 80
+global numScenariosEdit = 20
 global variationWindowEdit = 3
-global randomFactorEdit = 0
+global randomFactorEdit = 5
 
 global useSessionDataDropDown
 global useTelemetryDataDropDown
@@ -1062,7 +1062,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Keep current Map")
 		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose1 vkeepMapDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
 		
-		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Consider Traffic")
+		Gui %window%:Add, Text, x312 yp+27 w160 h23, % translate("Analyze Traffic")
 		Gui %window%:Add, DropDownList, x480 yp-3 w50 AltSubmit Choose2 vconsiderTrafficDropDown gchooseSimulationSettings, % values2String("|", map(["Yes", "No"], "translate")*)
 
 		Gui %window%:Font, Norm, Arial
@@ -1483,7 +1483,7 @@ class RaceCenter extends ConfigurationItem {
 		use1 := (this.UseSessionData ? "(x) Use Session Data" : "      Use Session Data")
 		use2 := (this.UseTelemetryDatabase ? "(x) Use Telemetry Database" : "      Use Telemetry Database")
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
-		use4 := (this.UseTraffic ? "(x) Consider Traffic" : "      Consider Traffic")
+		use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
 		
 		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 		
@@ -2442,7 +2442,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
 		if this.Strategy {
 			stintLength := this.Strategy.StintLength
 			formationLap := this.Strategy.FormationLap
@@ -2509,7 +2509,7 @@ class RaceCenter extends ConfigurationItem {
 			initialFuelAmount := lastLap.FuelRemaining
 			initialMap := lastLap.Map
 			initialFuelConsumption := lastLap.FuelConsumption
-			initialAvgLapTime := lastLap.AvgLapTime
+			initialAvgLapTime := this.CurrentStint.AvgLapTime
 			
 			Loop % lastLap.nr
 				initialStintTime += lastLap.Laptime
@@ -2554,9 +2554,15 @@ class RaceCenter extends ConfigurationItem {
 			
 			if pitstopRequired is Integer
 				if (pitstopRequired > 1) {
+					window := this.Window
+					
+					Gui %window%:Default
+					
 					Gui ListView, % this.PitstopsListView
 					
-					pitstopRequired := Max(0, pitstopRequired - LV_GetCount())
+					pitstops := LV_GetCount()
+					
+					pitstopRequired := Max(0, pitstopRequired - pitstops)
 				}
 				
 			return true
@@ -2937,8 +2943,12 @@ class RaceCenter extends ConfigurationItem {
 					Throw "No data..."
 			}
 			catch exception {
-				if (lap.Nr > 1)
-					lap.Position := this.getPreviousLap(lap).Position
+				if (lap.Nr > 1) {
+					pLap := this.getPreviousLap(lap)
+					
+					lap.Positions := pLap.Positions
+					lap.Position := pLap.Position
+				}
 			}
 			
 			this.Laps[identifier] := lap
@@ -3790,7 +3800,7 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				this.ReportViewer.Settings["Laps"] := laps
 				
-				this.ReportViewer.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+				this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
 			}
 			finally {
 				if oldLapSettings
@@ -3804,6 +3814,13 @@ class RaceCenter extends ConfigurationItem {
 			speed := Round(speeds[car], 2)
 			consistency := Round(consistencies[car], 2)
 			carControl := Round(carControls[car], 2)
+		}
+		else {
+			potential := 0.0
+			raceCraft := 0.0
+			speed := 0.0
+			consistency := 0.0
+			carControl := 0.0
 		}
 	}
 	
@@ -5878,20 +5895,202 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails("Plan", html)
 	}
 	
-	createTrafficScenarios(targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
-		return []
+	computeCarStatistics(car, laps, ByRef lapTime, ByRef potential, ByRef raceCraft, ByRef speed, ByRef consistency, ByRef carControl) {
+		raceData := true
+		drivers := false
+		positions := true
+		times := true
+		
+		this.ReportViewer.loadReportData(laps, raceData, drivers, positions, times)
+			
+		cars := []
+		
+		Loop % getConfigurationValue(raceData, "Cars", "Count")
+			cars.Push(A_Index)
+	
+		lapTime := 0
+		count := 0
+		
+		Loop % laps.Length()
+			if times[A_Index].HasKey(car) {
+				lapTime += times[A_Index][car]
+				count += 1
+			}
+		
+		if (count > 0)
+			lapTime := ((lapTime / count) / 1000)
+		
+		potentials := false
+		raceCrafts := false
+		speeds := false
+		consistencies := false
+		carControls := false
+		
+		count := laps.Length()
+		laps := []
+		
+		Loop %count%
+			laps.Push(A_Index)
+		
+		oldLapSettings := (this.ReportViewer.Settings.HasKey("Laps") ? this.ReportViewer.Settings["Laps"] : false)
+		
+		try {
+			this.ReportViewer.Settings["Laps"] := laps
+			
+			this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+		}
+		finally {
+			if oldLapSettings
+				this.ReportViewer.Settings["Laps"] := oldLapSettings
+			else
+				this.ReportViewer.Settings.Delete("Laps")
+		}
+		
+		potential := Round(potentials[car], 2)
+		raceCraft := Round(raceCrafts[car], 2)
+		speed := Round(speeds[car], 2)
+		consistency := Round(consistencies[car], 2)
+		carControl := Round(carControls[car], 2)
+	}
+	
+	createTrafficScenario(targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+		lastLap := this.LastLap
+		
+		if (this.SessionActive && lastLap) {
+			positions := lastLap.Positions
+			
+			if positions {
+				startLap := lastLap.Nr
+				endLap := targetLap
+				avgLapTime := Min(lastLap.Laptime, this.CurrentStint.AvgLapTime)
+				
+				positions := parseConfiguration(positions)
+				
+				driver := getConfigurationValue(positions, "Position Data", "Driver.Car")
+				
+				stintLength := false
+				formationLap := false
+				postRaceLap := false
+				fuelCapacity := false
+				safetyFuel := false
+				pitstopDelta := false
+				pitstopFuelService := false
+				pitstopTyreService := false
+								 
+				this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
+									  , pitstopDelta, pitstopFuelService, pitstopTyreService)
+			
+				lastPositions := []
+				lastRunnings := []
+				
+				count := getConfigurationValue(positions, "Position Data", "Car.Count", 0)
+				
+				Loop %count% {
+					lastPositions.Push(getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0))
+					lastRunnings.Push(getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Lap", 0)
+									+ getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
+				}
+				
+				laps := {}
+				
+				consideredLaps := []
+				
+				Loop % Min(startLap, 10)
+					consideredLaps.Push(startLap - (A_Index - 1))
+					
+				Loop % endLap - startLap
+				{
+					curLap := A_Index
+					
+					carPositions := []
+					nextRunnings := []
+					
+					Loop %count% {
+						lapTime := true
+						potential := true
+						raceCraft := true
+						speed := true
+						consistency := true
+						carControl := true
+						
+						this.computeCarStatistics(A_Index, consideredLaps, lapTime, potential, raceCraft, speed, consistency, carControl)
+						
+						if useLapTimeVariation {
+							Random rnd, -1.0, 1.0
+						
+							lapTime += (rnd * ((5 - consistency) / 5) * (randomFactor / 100))
+						}
+						
+						if useDriverErrors {
+							Random, rnd, 0.0, 1.0
+						
+							lapTime += (rnd * ((5 - carControl) / 5) * (randomFactor / 100))
+						}
+						
+						if (usePitstops && ((startLap + curLap) == targetLap) && (A_Index != driver)) {
+							Random rnd, 0.0, 1.0
+							
+							if (rnd < (randomFactor / 100))
+								lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+						}
+						else if ((A_Index == driver) && ((startLap + curLap) == targetLap))
+							lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+						
+						delta := (((avgLapTime + lapTime) / lapTime) - 1)
+						
+						running := (lastRunnings[A_Index] + delta)
+						
+						nextRunnings.Push(running)
+						carPositions.Push(Array(A_Index, lapTime, running))
+					}
+					
+					bubbleSort(carPositions, "positionsOrder")
+					
+					for nr, position in carPositions
+						position[3] += ((lastPositions[position[1]] - nr) * (overTakeDelta / position[2]))
+					
+					bubbleSort(carPositions, "positionsOrder")
+					
+					nextPositions := []
+					
+					Loop %count%
+						nextPositions.Push(false)
+					
+					for nr, position in carPositions {
+						car := position[1]
+					
+						nextPositions[car] := nr
+						nextRunnings[car] := position[3]
+					}
+							
+					runnings := []
+					
+					for ignore, running in nextRunnings
+						runnings.Push(running - Floor(running))
+					
+					laps[startLap + A_Index] := {Positions: nextPositions, Runnings: runnings}
+					
+					lastPositions := nextPositions
+					lastRunnings := nextRunnings
+				}
+				
+				return {Driver: driver, Laps: laps}
+			}
+		}
+		
+		return false
 	}
 	
 	getTrafficPositions(trafficScenario, targetLap, ByRef driver, ByRef positions, ByRef runnings) {
-		if (trafficScenario && trafficScenario[2].HasKey(targetLap)) {
+		if (trafficScenario && trafficScenario.Laps.HasKey(targetLap)) {
 			if driver
-				driver := trafficScenario[1]
+				driver := trafficScenario.Driver
 			
 			if positions
-				positions := trafficScenario[2][targetLap]
+				positions := trafficScenario.Laps[targetLap].Positions
 			
 			if runnings
-				runnings := trafficScenario[3][targetLap]
+				runnings := trafficScenario.Laps[targetLap].Runnings
 			
 			return true
 		}
@@ -6010,11 +6209,12 @@ class MonteCarloStrategy extends SessionStrategy {
 		if ((pitstopNr = 1) && this.PitstopRequired)
 			return targetLap
 		else {
-			moreLaps := Min(this.StrategyManager.VariationWindow, (remainingFuel / this.FuelConsumption[true]))
+			variationWindow := this.StrategyManager.VariationWindow
+			moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
 		
-			Random rnd, -1, 1
+			Random rnd, -1.0, 1.0
 			
-			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * this.VariationWindow)))
+			return Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow)))
 		}
 	}
 }
@@ -6028,8 +6228,6 @@ class MonteCarloSimulation extends StrategySimulation {
 	iUsePitstops := false
 	iOverTakeDelta := false
 	iConsideredTraffic := false
-	
-	iTrafficScenarios := false
 	
 	RandomFactor[] {
 		Get {
@@ -6091,26 +6289,15 @@ class MonteCarloSimulation extends StrategySimulation {
 	}
 	
 	getTrafficScenario(strategy, pitstop) {
-		if !this.iTrafficScenarios
-			this.iTrafficScenarios := this.StrategyManager.createTrafficScenarios(pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
-																				, this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
-																				, this.OverTakeDelta)
-		
-		count := this.iTrafficScenarios.Length()
-		
-		if (count > 0) {
-			Random rnd, 1, %count%
-			
-			return this.iTrafficScenarios[Round(rnd)]
-		}
-		else
-			return false
+		return this.StrategyManager.createTrafficScenario(pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
+														, this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
+														, this.OverTakeDelta)
 	}
 	
 	compareScenarios(scenario1, scenario2) {
 		if ((scenario1.Pitstops.Length() > 0) && (scenario2.Pitstops.Length() > 0)) {
 			pitstop1 := scenario1.Pitstops[1]
-			pitstop2 := scenario1.Pitstops[2]
+			pitstop2 := scenario2.Pitstops[1]
 			
 			if (pitstop1.getPosition() < pitstop2.getPosition())
 				return scenario1
@@ -6211,7 +6398,7 @@ class MonteCarloSimulation extends StrategySimulation {
 						if useStartConditions {
 							if map is number
 							{
-								message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+								message := (translate("Creating Initial Scenario with Map ") . simMapEdit  . translate(":") . variation++ . translate("..."))
 									
 								showProgress({progress: progress, message: message})
 								
@@ -6238,7 +6425,7 @@ class MonteCarloSimulation extends StrategySimulation {
 									this.setFixedLapTime(false)
 								}
 								
-								scenarios[name . translate(":") . variation++] := strategy
+								scenarios[name . translate(":") . variation] := strategy
 									
 								Sleep 100
 									
@@ -6254,7 +6441,7 @@ class MonteCarloSimulation extends StrategySimulation {
 
 								if scenarioMap is number
 								{
-									message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate("..."))
+									message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
 									
 									showProgress({progress: progress, message: message})
 								
@@ -6274,7 +6461,7 @@ class MonteCarloSimulation extends StrategySimulation {
 													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
 													, currentConsumption, lapTime)
 									
-									scenarios[name . translate(":") . variation++] := strategy
+									scenarios[name . translate(":") . variation] := strategy
 									
 									Sleep 100
 									
@@ -6391,6 +6578,10 @@ null(value) {
 
 objectOrder(a, b) {
 	return (a.Nr > b.Nr)
+}
+
+positionsOrder(a, b) {
+	return (a[3] < b[3])
 }
 
 parseObject(properties) {

@@ -55,9 +55,9 @@ class StrategySimulation {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
 		return this.StrategyManager.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
-													 , pitstopDelta, pitstopRefuelService, pitstopTyreService)
+													 , pitstopDelta, pitstopFuelService, pitstopTyreService)
 	}
 	
 	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
@@ -371,6 +371,9 @@ class VariationSimulation extends StrategySimulation {
 	
 		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 		
+		if initialLap
+			formationLap := false
+		
 		useStartConditions := false
 		useTelemetryData := false
 		consumption := 0
@@ -392,7 +395,7 @@ class VariationSimulation extends StrategySimulation {
 					if useStartConditions {
 						if map is number
 						{
-							message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate("..."))
+							message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate(":") . variation++ . translate("..."))
 								
 							showProgress({progress: progress, message: message})
 							
@@ -419,7 +422,7 @@ class VariationSimulation extends StrategySimulation {
 								this.setFixedLapTime(false)
 							}
 							
-							scenarios[name . translate(":") . variation++] := strategy
+							scenarios[name . translate(":") . variation] := strategy
 								
 							Sleep 100
 								
@@ -435,7 +438,7 @@ class VariationSimulation extends StrategySimulation {
 
 							if scenarioMap is number
 							{
-								message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate("..."))
+								message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
 								
 								showProgress({progress: progress, message: message})
 							
@@ -455,7 +458,7 @@ class VariationSimulation extends StrategySimulation {
 												, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
 												, currentConsumption, lapTime)
 								
-								scenarios[name . translate(":") . variation++] := strategy
+								scenarios[name . translate(":") . variation] := strategy
 								
 								Sleep 100
 								
@@ -526,7 +529,7 @@ class Strategy extends ConfigurationItem {
 	iSafetyFuel := 0
 	
 	iPitstopDelta := 0
-	iPitstopRefuelService := 0.0
+	iPitstopFuelService := 0.0
 	iPitstopTyreService := 0.0
 	
 	iPitstopRequired := false
@@ -954,9 +957,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
-	PitstopRefuelService[] {
+	PitstopFuelService[] {
 		Get {
-			return this.iPitstopRefuelService
+			return this.iPitstopFuelService
 		}
 	}
 	
@@ -1398,7 +1401,7 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcPitstopDuration(refuelAmount, changeTyres) {
-		return (this.PitstopDelta + (changeTyres ? this.PitstopTyreService : 0) + ((refuelAmount / 10) * this.PitstopRefuelService))
+		return (this.PitstopDelta + (changeTyres ? this.PitstopTyreService : 0) + ((refuelAmount / 10) * this.PitstopFuelService))
 	}
 	
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
@@ -1411,7 +1414,7 @@ class Strategy extends ConfigurationItem {
 			if (((targetLap >= remainingLaps) && pitstopRequired) || IsObject(pitstopRequired)) {
 				if (pitstopRequired == true)
 					targetLap := remainingLaps - 2
-				else {
+				else if IsObject(pitstopRequired) {
 					closingLap := (pitstopRequired[2] * 60 / this.AvgLapTime)
 				
 					if (currentLap < closingLap)
@@ -1444,8 +1447,15 @@ class Strategy extends ConfigurationItem {
 		
 		if numPitstops is Integer
 		{
-			if numPitstops > 1
-				this.iStintLaps := Round(sessionLaps / (numPitstops + 1))
+			if (numPitstops > 1) {
+				fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
+				canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))
+				
+				if (fuelLaps < canonicalStintLaps)
+					this.iStintLaps := Min(stintLaps, Round((sessionLaps - fuelLaps) / numPitstops))
+				else
+					this.iStintLaps := Min(stintLaps, canonicalStintLaps)
+			}
 			else
 				numPitstops := false
 		}

@@ -2,8 +2,8 @@
 Version=3.8.4-dev
 Target=3.8.4-release
 Date=01/25/2022
-Download=
-Changes=Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center"
+Download=https://www.dropbox.com/s/ojj9h361vhct6zp/Simulator%20Controller%203.8.4-dev.zip?dl=1
+Changes=Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center"
 [Release]
 Version=3.8.2-release
 Date=01/07/2022

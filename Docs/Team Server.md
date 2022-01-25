@@ -198,9 +198,9 @@ If you have selected the *Analyze Traffic* option before running the strategy si
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2014.JPG)
 
-The Monte-Carlo simulation is based on stochiastic approach, where the future development of the race is predicted using the capabilities (laptime, consistency, error rate) of the different drivers on the one hand and by introducing random events like a premature pitstop of one of the opponents on the other hand. You can choose the number of traffic models generated for each strategy candidate using the "# Scenarios" input field and the random impact with "Random Factor" field. The number of possible strategy candidates is derived implicitly by the "Variation" field, wich determines up to which extent the strategy might be altered compared to the "ideal" strategy without traffic.
+The Monte-Carlo simulation is based on a stochiastic approach, where the future development of the race is predicted using the capabilities (laptime, consistency, error rate) of the different drivers on the one hand and by introducing random events like a premature pitstop or an accident of one of the opponents on the other hand. You can choose the number of traffic models generated for each strategy candidate using the "# Scenarios" input field and the random impact with "Random Factor" field. The number of possible strategy candidates is derived implicitly by the "Variation" field, wich determines up to which extent the strategy might be altered compared to the "ideal" strategy without traffic.
 
-In the lower area, you can fine-control the traffic model generation by choosing which type of variations are generated and how these will impact the evaluation score of the resulting model. At the end the resulting strategy with best score regarding 1. gained position, 2. least amount of traffic after a pitstop and 3. the least overall amount of pitstops will be chosen as the future strategy.
+In the lower area, you can fine-control the traffic model generation by choosing which type of variations are generated and how these will impact the evaluation score of the resulting model. At the end, the resulting strategy with best score regarding 1. gained position, 2. least amount of traffic after a pitstop and 3. the least overall amount of pitstops will be chosen as the future strategy.
 
 ##### Altering the current race strategy
 
@@ -262,7 +262,7 @@ On the second page, you start a couple of background jobs on the server, which w
 
 ## How it works
 
-When you start a team session as described above, Jona and Cato will act and behave as in a single driver session, though you might notice subtle differences. For example, a new driver will be greated by the assistants after a driver swap or a returning driver will get a warm welcome. But the important differences are all below the waterline.
+To get the best possible reesults in "Race Center", the Virtual Race Engineer as well as the Virtual Race Strategist must be enabled in your configuration. Jona will take care of the pitstops and the corresponding data like tyre pressures, fuel level, etc. and Cato is responsible to acquire all performance related telemetry data and the critical knowledge about the performance of your oppenents. When you start a team session as described above, Jona and Cato will act and behave as in a single driver session, though you might notice subtle differences. For example, a new driver will be greated by the assistants after a driver swap or a returning driver will get a warm welcome. But the important differences are all below the waterline.
 
   1. Handover of the Knowledgebase
   

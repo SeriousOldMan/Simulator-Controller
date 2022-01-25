@@ -186,13 +186,25 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
      This option chooses only input data for the simulation which is based on the same ECU Map as the currently selected one, even if choosing a different map might supposedly lead to better results.
 
-  4. Consider Traffic
+  4. Analyze Traffic
   
-     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. This algorithm is currently under development and will be available in an upcoming release.
+     Selecting this option will run a probalistic traffic analysis based on a stochiastic model using the Monte-Carlo analysis method. It will result in a pitstop strategy with the greatest benefit regarding the probable future traffic development, thus giving you the maximum possible clean air track time. See the [dedicated section](*) for more information.
 
-After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation.
+After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The result strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation, so please double check, whether the resulting strategy is in accordance with the rules.
 
-If you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Race Center"s of all team members as well.
+##### Monte-Carlo traffic model
+
+If you have selected the *Analyze Traffic* option before running the strategy simulation, you can dial further options for the simulation on the "Strategy" tab.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2014.JPG)
+
+The Monte-Carlo simulation is based on stochiastic approach, where the future development of the race is predicted using the capabilities (laptime, consistency, error rate) of the different drivers on the one hand and by introducing random events like a premature pitstop of one of the opponents on the other hand. You can choose the number of traffic models generated for each strategy candidate using the "# Scenarios" input field and the random impact with "Random Factor" field. The number of possible strategy candidates is derived implicitly by the "Variation" field, wich determines up to which extent the strategy might be altered compared to the "ideal" strategy without traffic.
+
+In the lower area, you can fine-control the traffic model generation by choosing which type of variations are generated and how these will impact the evaluation score of the resulting model. At the end the resulting strategy with best score regarding 1. gained position, 2. least amount of traffic after a pitstop and 3. the least overall amount of pitstops will be chosen as the future strategy.
+
+##### Altering the current race strategy
+
+You can run as many strategy simulations, with or without traffic anaylsis as you like. You can even go back to the "Strategy Workbench" and create a complete new strategy after a severe weather change, for example, and the adopt this base strategy in the "Race Center" to the current race situation. Once you are satisfied with the new strategy, you can send it to the Virtual Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Race Center"s of all team members as well.
 
 #### Session & Stint Planning
 

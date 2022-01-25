@@ -218,7 +218,7 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
 
-Notes: If you specify a required pitstop window, this will be applied for the first pitstop. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
+Notes: If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
 
 #### Pitstop & Service
 
@@ -281,7 +281,7 @@ The complete position information is requested from the simulation gane every 10
 After the data has been gathered, it is then transfered to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
 
 	[Position Data]
-	Car.Driver=1
+	Driver.Car=1
 	Car.Count=20
 	Car.1.Car = Mazda MX-5 Cup
 	Car.1.Driver.Forname = The

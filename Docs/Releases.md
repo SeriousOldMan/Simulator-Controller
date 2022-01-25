@@ -1,3 +1,11 @@
+## 3.8.4-release 01/28/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Strategy Simulation now includes a tyre degradation model based on telemetry data.
+  4. A fixed number of required pitstops can be defined for a strategy simulation, when a required pitstop is chosen in the "Rules & Settings" tab.
+  5. Introduction of a traffic model using Monte Carlo alogrithms for taffic density prediction as well as over- and undercut optimization in "Race Center". See the all new [documentation](*) for more information.
+
 ## 3.8.2-release 01/07/22
 
   1. Bugfixes, as always

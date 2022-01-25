@@ -641,8 +641,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		this.iRaceAssistant := false
 		
-		if raceAssistant
+		if raceAssistant {
+			this.iWaitPeriod := (A_TickCount + (90 * 1000))
+			
 			raceAssistant.shutdown()
+		}
 	}
 	
 	prepareSettings(data) {
@@ -1034,11 +1037,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					this.iFinished := false
 					this.iInPit := false
 			
-					if this.RaceAssistant {
+					if this.RaceAssistant
 						this.finishSession()
-						
-						this.iWaitPeriod := (A_TickCount + (90 * 1000))
-					}
 				}
 				
 				if this.RaceAssistantEnabled {

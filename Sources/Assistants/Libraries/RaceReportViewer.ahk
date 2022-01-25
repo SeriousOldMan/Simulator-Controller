@@ -291,7 +291,7 @@ class RaceReportViewer {
 		result := []
 		
 		for ignore, lap in this.getReportLaps(raceData)
-			result.Push(positions[lap][car])
+			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : "null")
 		
 		return result
 	}
@@ -306,7 +306,7 @@ class RaceReportViewer {
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := Round(times[lap][car] / 1000, 1)
+				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
 				
 				if (time > 0) {
 					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
@@ -325,7 +325,7 @@ class RaceReportViewer {
 		validTimes := []
 		
 		for ignore, lap in this.getReportLaps(raceData) {
-			time := times[lap][car]
+			time := (times[lap].HasKey(car) ? times[lap][car] : 0)
 			
 			if (time > 0)
 				validTimes.Push(time)
@@ -423,7 +423,7 @@ class RaceReportViewer {
 			threshold := (avg + ((max - avg) / 4))
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := Round(times[lap][car] / 1000, 1)
+				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
 			
 				if (time > 0)
 					if (time > threshold)
@@ -472,7 +472,7 @@ class RaceReportViewer {
 		return result
 	}
 	
-	getDriverStats(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef carControls) {
+	getDriverStatistics(raceData, cars, positions, times, ByRef potentials, ByRef raceCrafts, ByRef speeds, ByRef consistencies, ByRef carControls) {
 		consistencies := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverConsistency", raceData, times)), 5)
 		carControls := this.normalizeValues(map(cars, ObjBindMethod(this, "getDriverCarControl", raceData, times)), 5)
 		speeds := this.normalizeSpeedValues(map(cars, ObjBindMethod(this, "getDriverSpeed", raceData, times)), 5)
@@ -562,7 +562,7 @@ class RaceReportViewer {
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap][car] > 0)
+					if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
 						valid := true
 					else
 						positions[lap][car] := "null" ; carsCount
@@ -587,19 +587,28 @@ class RaceReportViewer {
 				car := A_Index
 				
 				result := (positions[lapsCount][car] = "null" ? "DNF" : positions[lapsCount][car])
-				bestLap := 1000000
 				lapTimes := []
 				
 				Loop % lapsCount
 				{
 					lapTime := times[A_Index][car]
-					
+				
 					if (lapTime > 0)
 						lapTimes.Push(lapTime)
 					else
 						result := "DNF"
 				}
 				
+				min := minimum(lapTimes)
+				avg := average(lapTimes)
+				
+				filteredLapTimes := lapTimes
+				lapTimes := []
+				
+				for ignore, lapTime in filteredLapTimes
+					if (lapTime < (avg + (avg - min)))
+						lapTimes.Push(lapTime)
+					
 				min := Round(minimum(lapTimes) / 1000, 1)
 				avg := Round(average(lapTimes) / 1000, 1)
 				
@@ -742,7 +751,7 @@ class RaceReportViewer {
 			consistencies := false
 			carControls := false
 			
-			this.getDriverStats(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+			this.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
 			
 			drawChartFunction := ""
 			
@@ -798,7 +807,7 @@ class RaceReportViewer {
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap][car] > 0) {
+					if (positions[lap].HasKey(car) && (positions[lap][car] > 0)) {
 						valid := true
 						
 						break
@@ -821,8 +830,14 @@ class RaceReportViewer {
 			for ignore, lap in this.getReportLaps(raceData) {
 				drawChartFunction := drawChartFunction . (",`n[" . lap)
 				
-				Loop % cars.Length()
-					drawChartFunction := drawChartFunction . (", " . positions[lap][A_Index])
+				Loop % cars.Length() {
+					lapPositions := positions[lap]
+				
+					if lapPositions.HasKey(A_Index)
+						drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
+					else
+						drawChartFunction := (drawChartFunction . ", null")
+				}
 				
 				drawChartFunction := drawChartFunction . "]"
 			}

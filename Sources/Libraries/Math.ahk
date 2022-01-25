@@ -52,3 +52,22 @@ stdDeviation(numbers) {
 count(values) {
 	return values.Length()
 }
+
+linRegression(xValues, yValues, ByRef a, ByRef b) {
+	xAverage := average(xValues)
+	yAverage := average(yValues)
+	
+	dividend := 0
+	divisor := 0
+	
+	for index, xValue in xValues {
+		xDelta := (xValue - xAverage)
+		yDelta := (yValues[index] - yAverage)
+		
+		dividend += (xDelta * yDelta)
+		divisor += (xDelta * xDelta)
+	}
+	
+	b := (dividend / divisor)
+	a := (yAverage - (b * xAverage))
+}

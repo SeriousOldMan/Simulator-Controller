@@ -127,7 +127,7 @@ class RaceEngineer extends RaceAssistant {
 		base.updateDynamicValues(values)
 		
 		if values.HasKey("HasPressureData")
-			this.iSetupData := values["HasPressureData"]
+			this.iHasPressureData := values["HasPressureData"]
 	}
 	
 	handleVoiceCommand(grammar, words) {
@@ -830,15 +830,20 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 
-		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, HasPressureData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, SessionTime: false})
 	}
 	
 	forceFinishSession() {
 		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
+			this.updateDynamicValues({KnowledgeBase: false})
 			
 			this.finishSession()
+		}
+		else {
+			callback := ObjBindMethod(this, "forceFinishSession")
+					
+			SetTimer %callback%, -5000
 		}
 	}
 	
@@ -1028,7 +1033,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		try {
 			if this.RemoteHandler {
-				this.iHasPressureData := true
+				this.updateDynamicValues({HasPressureData: true})
 				
 				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 												  , compound, compoundColor, coldPressures, hotPressures)

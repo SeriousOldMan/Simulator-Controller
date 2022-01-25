@@ -99,7 +99,7 @@ global refuelRequirementsLabel
 
 global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
-global pitstopRefuelServiceEdit = 1.2
+global pitstopFuelServiceEdit = 1.2
 global fuelCapacityEdit = 125
 global safetyFuelEdit = 5
 
@@ -535,7 +535,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Fuel Capacity")
@@ -1196,7 +1196,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-							GuiControl, , pitstopRefuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -1643,7 +1643,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	getAvgLapTime(map, remainingFuel, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		window := this.Window
 			
 		Gui %window%:Default
@@ -1651,14 +1651,58 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simInputDropDown
 		GuiControlGet simAvgLapTimeEdit
 		
-		if (simInputDropDown > 1)
-			lapTimes := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).getLapTimes(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
+		a := false
+		b := false
+			
+		if (simInputDropDown > 1) {
+			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			
+			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+				
+			if (tyreLapTimes.Length() > 1) {
+				xValues := []
+				yValues := []
+				
+				for ignore, entry in tyreLapTimes {
+					xValues.Push(entry["Tyre.Laps"])
+					yValues.Push(entry["Lap.Time"])
+				}
+				
+				linRegression(xValues, yValues, a, b)
+			}
+		}
 		else
 			lapTimes := []
 		
-		lapTime := lookupLapTime(lapTimes, map, remainingFuel)
+		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
+			
+		count := 0
+		avgLapTime := 0
+		lapTime := false
 		
-		return lapTime ? lapTime : (default ? default : simAvgLapTimeEdit)
+		Loop %numLaps% {
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+			
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
+			
+			if lapTime {
+				if baseLapTime
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
+				
+				count += 1
+			}
+		}
+		
+		if (avgLapTime > 0)
+			avgLapTime := (avgLapTime / count)
+			
+		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
@@ -1677,7 +1721,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 1:
 				pitstopRequired := false
 			case 2:
-				pitstopRequired := true
+				if pitstopWindowEdit is Integer
+					pitstopRequired := pitstopWindowEdit
+				else {
+					pitstopRequired := true
+				
+					result := false
+				}
 			case 3:
 				window := string2Values("-", pitstopWindowEdit)
 				
@@ -1697,7 +1747,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopRefuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1710,7 +1760,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 		GuiControlGet pitstopDeltaEdit
 		GuiControlGet pitstopTyreServiceEdit
-		GuiControlGet pitstopRefuelServiceEdit
+		GuiControlGet pitstopFuelServiceEdit
 		
 		stintLength := stintLengthEdit
 		formationLap := formationLapCheck
@@ -1718,7 +1768,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		fuelCapacity := fuelCapacityEdit
 		safetyFuel := safetyFuelEdit
 		pitstopDelta := pitstopDeltaEdit
-		pitstopFuelService := pitstopRefuelServiceEdit
+		pitstopFuelService := pitstopFuelServiceEdit
 		pitstopTyreService := pitstopTyreServiceEdit
 	}
 	
@@ -2041,10 +2091,25 @@ chooseSessionType() {
 
 choosePitstopRequirements() {
 	GuiControlGet pitstopRequirementsDropDown
+	GuiControlGet pitstopWindowEdit
 	
 	if (pitstopRequirementsDropDown = 3) {
 		GuiControl Show, pitstopWindowEdit
 		GuiControl Show, pitstopWindowLabel
+		
+		GuiControl, , pitstopWindowLabel, % translate("Minute (From - To)")
+		
+		if !InStr(pitstopWindowEdit, "-")
+			GuiControl, , pitstopWindowEdit, 25-35
+	}
+	else if (pitstopRequirementsDropDown = 2) {
+		GuiControl Show, pitstopWindowEdit
+		GuiControl Show, pitstopWindowLabel
+		
+		GuiControl, , pitstopWindowLabel, % ""
+		
+		if InStr(pitstopWindowEdit, "-")
+			GuiControl, , pitstopWindowEdit, 1
 	}
 	else {
 		GuiControl Hide, pitstopWindowEdit

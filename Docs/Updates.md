@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.8.4
+
+Everything is handled automatically.
+
+***
+
 ## Release 3.8.2
 
 A new parameter *pitstopMFDMode* has been introduced for all simulator plugins. With this paramater, you can specify the method with which Simulator Controller communicates with the simulation game. Trying different communication modes might help in situations where the communication for the handling of the Pitstop MFD fails.

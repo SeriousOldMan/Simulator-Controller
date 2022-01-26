@@ -100,6 +100,7 @@ global refuelRequirementsLabel
 global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
 global pitstopFuelServiceEdit = 1.2
+global pitstopServiceDropDown
 global fuelCapacityEdit = 125
 global safetyFuelEdit = 5
 
@@ -537,8 +538,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
+		
+		Gui %window%:Add, Text, x%x% yp+24 w160 h23, % translate("Service")
+		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
-		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Fuel Capacity")
+		Gui %window%:Add, Text, x%x% yp+27 w85 h20 +0x200, % translate("Fuel Capacity")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number VfuelCapacityEdit, %fuelCapacityEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
 		
@@ -1197,6 +1201,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -1747,7 +1752,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1761,6 +1766,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet pitstopDeltaEdit
 		GuiControlGet pitstopTyreServiceEdit
 		GuiControlGet pitstopFuelServiceEdit
+		GuiControlGet pitstopServiceDropDown
 		
 		stintLength := stintLengthEdit
 		formationLap := formationLapCheck
@@ -1770,6 +1776,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopDelta := pitstopDeltaEdit
 		pitstopFuelService := pitstopFuelServiceEdit
 		pitstopTyreService := pitstopTyreServiceEdit
+		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 	
 	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount

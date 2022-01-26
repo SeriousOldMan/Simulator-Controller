@@ -5,8 +5,10 @@
   3. Last version introduced a critical bug in "Race Reports" when switching cars. This has been fixed.
   4. Introduced data filtering in "Race Reports" for spurios average laptimes, which origin from formation and post race laps.
   5. Strategy Simulation now includes a tyre degradation model based on telemetry data.
-  6. A fixed number of required pitstops can be defined for a strategy simulation, when a required pitstop is chosen in the "Rules & Settings" tab.
-  7. Introduction of a traffic model using Monte Carlo alogrithms for taffic density prediction as well as over- and undercut optimization in "Race Center". See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model) for more information.
+  6. Improved control for pitstop service time calculation.
+  7. Improved calculation of overtake deltas.
+  8. A fixed number of required pitstops can be defined for a strategy simulation, when a required pitstop is chosen in the "Rules & Settings" tab.
+  9. Introduction of a traffic model using Monte Carlo alogrithms for taffic density prediction as well as over- and undercut optimization in "Race Center". See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model) for more information.
 
 ## 3.8.2-release 01/07/22
 

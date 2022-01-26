@@ -451,7 +451,7 @@ pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=												
 
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime), 						\
 														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),							\
-														 ?temp1 = ?refuelServiceTime + ?tyreServiceTime,										\
+														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?temp1),						\
 														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=																						\
@@ -468,6 +468,11 @@ pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,															\
 		?remainingLaps > 5, ! 
 pitstopTyreServiceTime(?, ?, 0)
+
+pitstopServiceTime(?refuelTime, ?tyreChangeTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = "Simultaneous",						\
+																  max(?refuelTime, ?tyreChangeTime, ?serviceTime)
+pitstopServiceTime(?refuelTime, ?tyreChangeTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = "Sequential",						\
+																  ?serviceTime = ?refuelTime + ?tyreChangeTime
 
 evaluatePosition(?lap, ?position, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Position, ?position),						\
 											   trafficDensity(?lap, ?density)

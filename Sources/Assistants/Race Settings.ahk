@@ -441,6 +441,7 @@ editSettings(ByRef settingsOrCommand, arguments*) {
 	static pitstopDeltaEdit
 	static pitstopTyreServiceEdit
 	static pitstopRefuelServiceEdit
+	static pitstopServiceDropDown
 	static safetyFuelEdit
 	
 	static serverURLEdit
@@ -667,6 +668,7 @@ restart:
 		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", pitstopRefuelServiceEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Traffic.Considered", trafficConsideredEdit)
@@ -750,6 +752,7 @@ restart:
 		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 		pitstopTyreServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
 		pitstopRefuelServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5)
+		pitstopServiceDropDown := ((getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
 		trafficConsideredEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
@@ -1048,9 +1051,10 @@ restart:
 		Gui RES:Add, Text, x184 yp+2 w290 h20, % translate("simulated future laps")
 
 		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Overtake")
+		Gui RES:Add, Text, x100 yp w28 h23 +0x200, % translate("Abs(")
 		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80, %overtakeDeltaEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("additional seconds for each passed car")
+		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("/ laptime difference) Seconds")
 
 		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Traffic")
 		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit, %trafficConsideredEdit%
@@ -1077,6 +1081,9 @@ restart:
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Refuel Service")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
+
+		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
+		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		if vTeamMode {
 			Gui RES:Tab, 4

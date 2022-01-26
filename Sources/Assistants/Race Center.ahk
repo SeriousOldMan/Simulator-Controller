@@ -2442,18 +2442,21 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
-		if this.Strategy {
-			stintLength := this.Strategy.StintLength
-			formationLap := this.Strategy.FormationLap
-			postRaceLap := this.Strategy.PostRaceLap
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
+		local strategy := this.Strategy
+		
+		if strategy {
+			stintLength := strategy.StintLength
+			formationLap := strategy.FormationLap
+			postRaceLap := strategy.PostRaceLap
 			
-			fuelCapacity := this.Strategy.FuelCapacity
-			safetyFuel := this.Strategy.SafetyFuel
+			fuelCapacity := strategy.FuelCapacity
+			safetyFuel := strategy.SafetyFuel
 			
-			pitstopDelta := this.Strategy.PitstopDelta
-			pitstopFuelService := this.Strategy.PitstopFuelService
-			pitstopTyreService := this.Strategy.PitstopTyreService
+			pitstopDelta := strategy.PitstopDelta
+			pitstopFuelService := strategy.PitstopFuelService
+			pitstopTyreService := strategy.PitstopTyreService
+			pitstopServiceOrder := strategy.PitstopServiceOrder
 			
 			return true
 		}
@@ -2547,10 +2550,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
-		if this.Strategy {
-			pitstopRequired := this.Strategy.PitstopRequired
-			refuelRequired := this.Strategy.RefuelRequired
-			tyreChangeRequired := this.Strategy.TyreChangeRequired
+		local strategy := this.Strategy
+		
+		if strategy {
+			pitstopRequired := strategy.PitstopRequired
+			refuelRequired := strategy.RefuelRequired
+			tyreChangeRequired := strategy.TyreChangeRequired
 			
 			if pitstopRequired is Integer
 				if (pitstopRequired > 1) {
@@ -5955,7 +5960,7 @@ class RaceCenter extends ConfigurationItem {
 		carControl := Round(carControls[car], 2)
 	}
 	
-	createTrafficScenario(targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+	createTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
 		lastLap := this.LastLap
 		
 		if (this.SessionActive && lastLap) {
@@ -5978,9 +5983,10 @@ class RaceCenter extends ConfigurationItem {
 				pitstopDelta := false
 				pitstopFuelService := false
 				pitstopTyreService := false
+				pitstopServiceOrder := "Simultaneous"
 								 
 				this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
-									  , pitstopDelta, pitstopFuelService, pitstopTyreService)
+									  , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 			
 				lastPositions := []
 				lastRunnings := []
@@ -6033,7 +6039,7 @@ class RaceCenter extends ConfigurationItem {
 							Random rnd, 0.0, 1.0
 							
 							if (rnd < (randomFactor / 100))
-								lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+								lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 						}
 						else if ((A_Index == driver) && ((startLap + curLap) == targetLap))
 							lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
@@ -6291,7 +6297,7 @@ class MonteCarloSimulation extends StrategySimulation {
 	}
 	
 	getTrafficScenario(strategy, pitstop) {
-		return this.StrategyManager.createTrafficScenario(pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
+		return this.StrategyManager.createTrafficScenario(strategy, pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
 														, this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
 														, this.OverTakeDelta)
 	}
@@ -6363,8 +6369,9 @@ class MonteCarloSimulation extends StrategySimulation {
 		pitstopDelta := false
 		pitstopFuelService := false
 		pitstopTyreService := false
+		pitstopServiceOrder := "Simultaneous"
 		
-		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService)
+		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 	
 		randomFactor := false
 		numScenarios := false

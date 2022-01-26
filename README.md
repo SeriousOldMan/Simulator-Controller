@@ -43,7 +43,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.8.4-dev](https://www.dropbox.com/s/ojj9h361vhct6zp/Simulator%20Controller%203.8.4-dev.zip?dl=1) (Early build for 3.8.4. New features: Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting. Stable, incl. documentation and update procedure.)
+[3.8.4-alpha](https://www.dropbox.com/s/c225lkd1almyxpl/Simulator%20Controller%203.8.4-alpha.zip?dl=1) (Test build for 3.8.4. New features: Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting. Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-384) of this version and all the versions you might have skipped, before installing and using this version.
 

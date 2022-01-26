@@ -101,8 +101,6 @@ class BasicReporting extends Assert {
 				break
 		}
 		
-		msgbox break
-		
 		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Position"), "Unexpected position detected in lap 1...")
 		this.AssertEqual(117417, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time"), "Unexpected time detected in lap 1...")
 		this.AssertEqual(117417, Round(strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time.Average")), "Unexpected average time detected in lap 1...")

@@ -451,7 +451,7 @@ pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=												
 
 pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTime(?lap, ?targetLap, ?refuelServiceTime), 						\
 														 pitstopTyreServiceTime(?lap, ?targetLap, ?tyreServiceTime),							\
-														 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?temp1),						\
+														 ?temp1 = ?refuelServiceTime + ?tyreServiceTime,										\
 														 ?temp2 = !Session.Settings.Pitstop.Delta + ?temp1, ?pitstopDeltaTime = ?temp2 * 1000
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=																						\
@@ -469,10 +469,10 @@ pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres
 		?remainingLaps > 5, ! 
 pitstopTyreServiceTime(?, ?, 0)
 
-pitstopServiceTime(?refuelTime, ?tyreChangeTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = "Simultaneous",						\
-																  max(?refuelTime, ?tyreChangeTime, ?serviceTime)
-pitstopServiceTime(?refuelTime, ?tyreChangeTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = "Sequential",						\
-																  ?serviceTime = ?refuelTime + ?tyreChangeTime
+pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Simultaneous,				\
+																		  max(?refuelServiceTime, ?tyreServiceTime, ?serviceTime)
+pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Sequential,					\
+																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime
 
 evaluatePosition(?lap, ?position, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Position, ?position),						\
 											   trafficDensity(?lap, ?density)
@@ -550,7 +550,7 @@ validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs
 ;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
+; priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 
 clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
 
@@ -565,7 +565,7 @@ clearLaps(?lap) <= clearLap(?lap), ?pLap = ?lap - 1, clearLaps(?pLap)
 ;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
+; priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
 
 clearStandings() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearStandings(?clearLap)
 

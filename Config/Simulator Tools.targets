@@ -100,6 +100,10 @@ Race Strategist Configuration.3=%kGrammarsDirectory%Race Strategist.grammars.en 
 Race Strategist Configuration.4=%kResourcesDirectory%Templates\Race Strategist.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.en
 Race Strategist Configuration.5=%kGrammarsDirectory%Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
 Race Strategist Configuration.6=%kResourcesDirectory%Templates\Race Strategist.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Strategist.grammars.de
+Race Spotter Configuration.1=%kGrammarsDirectory%Race Spotter.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.en
+Race Spotter Configuration.2=%kResourcesDirectory%Templates\Race Spotter.grammars.en <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.en
+Race Spotter Configuration.3=%kGrammarsDirectory%Race Spotter.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.de
+Race Spotter Configuration.4=%kResourcesDirectory%Templates\Race Spotter.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.de
 Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
 Team Server.2=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
 [Build]

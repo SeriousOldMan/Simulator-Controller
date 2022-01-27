@@ -1,8 +1,8 @@
 [Development]
-Version=3.8.4-alpha
+Version=3.8.4-rc1
 Target=3.8.4-release
 Date=01/26/2022
-Download=https://www.dropbox.com/s/c225lkd1almyxpl/Simulator%20Controller%203.8.4-alpha.zip?dl=1
+Download=https://www.dropbox.com/s/6vc6nrcdixofhq1/Simulator%20Controller%203.8.4-rc1.zip?dl=1
 Changes=Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting
 [Release]
 Version=3.8.2-release
@@ -13,4 +13,4 @@ Changes=Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pits
 Type=Development
 [Version]
 Release=3.8.2-release
-Development=3.8.4-alpha
+Development=3.8.4-rc1

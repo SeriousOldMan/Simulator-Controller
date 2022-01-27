@@ -33,7 +33,7 @@ Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
 Temp Folder=%kUserHomeDirectory%Temp\
 Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
-Simulator Tools.ini=%kUserConfigDirectory%Simulator Tools.ini
+Tools Settings.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Copy]
 Data Provider.1=%kBinariesDirectory%ACC SHM Provider.exe <- %kSourcesDirectory%Special\ACC SHM Provider\Release\ACC SHM Provider.exe

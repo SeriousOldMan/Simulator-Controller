@@ -458,6 +458,36 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	class SessionStrategy extends Strategy {
+		iVersion := false
+		
+		Version[] {
+			Get {
+				return this.iVersion
+			}
+		}
+		
+		__New(strategyManager, configuration := false) {
+			base.__New(strategyManager, configuration)
+		}
+		
+		setVersion(version) {
+			this.iVersion := (version . "")
+		}
+		
+		loadFromConfiguration(configuration) {
+			base.loadFromConfiguration(configuration)
+			
+			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
+		}
+		
+		saveToConfiguration(configuration) {
+			base.saveToConfiguration(configuration)
+			
+			setConfigurationValue(configuration, "General", "Version", this.iVersion)
+		}
+	}
+	
 	Window[] {
 		Get {
 			return "RaceCenter"
@@ -2338,7 +2368,7 @@ class RaceCenter extends ConfigurationItem {
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 		
-		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration) : new SessionStrategy(this, nameOrConfiguration))
+		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration) : new this.SessionStrategy(this, nameOrConfiguration))
 		
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -6116,38 +6146,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 }
-	
-class SessionStrategy extends Strategy {
-	iVersion := false
-	
-	Version[] {
-		Get {
-			return this.iVersion
-		}
-	}
-	
-	__New(strategyManager, configuration := false) {
-		base.__New(strategyManager, configuration)
-	}
-	
-	setVersion(version) {
-		this.iVersion := (version . "")
-	}
-	
-	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
-		
-		this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
-	}
-	
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
-		
-		setConfigurationValue(configuration, "General", "Version", this.iVersion)
-	}
-}
 
-class TrafficStrategy extends SessionStrategy {
+class TrafficStrategy extends RaceCenter.SessionStrategy {
 	iTrafficScenario := false
 	
 	TrafficScenario[] {

@@ -425,8 +425,8 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.P
 priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>																	\
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
-reportNewDamage(?) <= !Damage.Reported > !Damage.Analysis.Reported, !
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
+reportNewDamage(?) <= !Damage.Reported > !Damage.Analysis.Reported, !
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
 						 lastPitstopDamageRepair(Suspension, ?suspensionRepaired), lastPitstopDamageRepair(Bodywork, ?bodyworkRepaired),		\
 						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\

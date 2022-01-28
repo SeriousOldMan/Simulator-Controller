@@ -89,7 +89,7 @@ You will find settings for the race strategy analysis and simulation in the thir
 Using the fields in the first group, you can customize the projection of current race positions into a model of future race standings. Cato will calculate this model each lap and will store the future standings for a given number of laps in the working memory and use them for strategy decisions. You can control the number of laps calculated for future standings by changing the value in the field *Race positions*. Greater numbers will yield better predictions, but take care, it might cost a lot of computing power.
 With the second field, *Overtake Delta*, you specify the number of seconds as time discount for each overtake for the passing and for the passed car, whereas you specify the percentage of track length in front of the car, which will be taken into account for traffic density analysis.
 
-The second group of fields specify the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on.
+The second group of fields specify the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on, as well as these times are combined into an overall pitstop service time.
 
 ### How it works
 
@@ -117,7 +117,7 @@ The following statistical models are currently implemented:
   
      Cato can import a prepared strategy model at the start of a race session and will automatically call you to the pit and collaborate with Jona to give you a real life like race crew experience. Please see the dedicated chapters on [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
 
-### Race Reports
+## Race Reports
 
 Cato allows you to save most of the data that is acquired during a race to an external database as a report for later analysis. You can configure, where and also when these reports are stored, using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). If a report has been saved for a given race, you use the "Race Reports" application to open this race from the database. After the race report has been opened, the "Race Reports" tool gives you several different views, which you can use to analyze the data.
 
@@ -161,7 +161,7 @@ Some reports allow you to control the amount and type of data, which will be inc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Report%20Settings.JPG)
 
-### Strategy Development
+## Strategy Development
 
 Another valuable tool, which is supported by Cato is the "Strategy Workbench". With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past stints, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as thiis has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.
 
@@ -171,7 +171,7 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 
-#### Rules & Settings
+### Rules & Settings
 
 In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the setup Database or the from the currently active simulation.
 
@@ -220,15 +220,15 @@ Loading of settings is supported for:
 
 Notes: If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
 
-#### Pitstop & Service
+### Pitstop & Service
 
 In this tab you have to enter the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of Pitstop Delta, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on. As you can see, this is very similar to the settings in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the Race Settings described above. In fact, the values you enter here will be used later on, if you export the strategy to be used for the upcoming race.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
 
-#### Simulation
+### Simulation
 
-This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. These scenarios together with all additional scenarios created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
+This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. A complex tyre degredation model as well as the improvement of the lap times, as the car gets lighter with decreasing fuel level, are taken into account as well. These scenarios together with all additional scenarios created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%203.JPG)
 
@@ -252,7 +252,7 @@ You can use the commands in the *Simulation* drop down menu to start a simulatio
 
 Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, especially for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. The telemtry data is stored lap by lap in the CSV files "Electronics.CSV" and "Tyres.CSV", which are located in the folder *Database\Local\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. Another approach is to use the "Cleanup Data" command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value.
 
-#### Strategy
+### Strategy
 
 The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. Normally this will be based on the last chosen simulation result, but you may adjust some of the settings and values using the fields in this tab. The *Strategy* allows you to save the current strategy, you can load a strategy from the database and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
 
@@ -262,7 +262,7 @@ Good to know: The document shown on the right side can be printed using the righ
 
 Note: Exported strategies will be saved in the file "Race.strategy", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. There can only be one currently active strategey. Please see the next chapter for information, how Cato uses such a predefined strategy during a race.
 
-### Strategy Handling
+## Strategy Handling
 
 When a race session starts, Cato looks for a currently defined strategy and checks, whether this strategy has been defined for the same car and track in the same conditions and whether the duration of the upcoming session is identical to that defined in the strategy. If all these aspects match, Cato will use the strategy during the race. If there is a pitstop upcoming, Cato will actively inform you and will, as long as you accept it, hand over all settings for the pitstop to Jona for further handling. The pitstop will be planned and prepared for a specific lap and if you are in this lap, all settings will be entered into the Pitstop MFD of the current simulation, without any necessary interaction from your side.
 

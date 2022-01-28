@@ -578,6 +578,7 @@ class RaceStrategist extends RaceAssistant {
 		facts["Session.Settings.Standings.Extrapolation.Overtake.Delta"] := Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
 		facts["Session.Settings.Strategy.Traffic.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
 		facts["Session.Settings.Pitstop.Service.Refuel"] := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+		facts["Session.Settings.Pitstop.Service.Order"] := getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous")
 		facts["Session.Settings.Pitstop.Service.Tyres"] := getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 		facts["Session.Settings.Pitstop.Strategy.Window.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)
 				
@@ -598,6 +599,7 @@ class RaceStrategist extends RaceAssistant {
 					, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
 					, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
 					, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+					, "Session.Settings.Pitstop.Service.Order": getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous")
 					, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
 			
 			for key, value in facts

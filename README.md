@@ -31,21 +31,20 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.8.2-release](https://www.dropbox.com/s/oof5z3w71x85ilt/Simulator%20Controller.3.8.2-release.zip?dl=1) (New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server.)
+[3.8.4-release](https://cntr.click/CtL5w85) (New features: Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-382) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-384) of this version and all the versions you might have skipped, before installing and using this version.
+
 
 ##### Earlier release builds
 
-[3.8.0-release](https://cntr.click/cdD66cL) (New features: Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions.)
+[3.8.2-release](https://www.dropbox.com/s/oof5z3w71x85ilt/Simulator%20Controller.3.8.2-release.zip?dl=1) (New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server.)
 
-[3.7.8-release](https://cntr.click/cTHTD8m) (New features: Lap detail report for "Race Center", Pretty table formatting in HTML views, Using display car names for ACC cars instead of internal names, Fixed ACC Telemetry Provider, when to not leave the session when going temporarily to replay, Full refactoring of strategy development and handling, Added strategy handling and updating to "Race Center", Supporting more data series in "Race Center" graphs, Optimized assistant support when no voice recognition is enabled.)
+[3.8.0-release](https://cntr.click/cdD66cL) (New features: Support for pre-race stint planning in "Race Center", Added *openRaceCenter* plugin parameter to "Team Server" plugin, Strategy Workbench supports creation of strategies without telemetry, Fix for collecting telemetry data during practice sessions.)
 
 #### Latest development build
 
-[3.8.2-dev](https://www.dropbox.com/s/zwqdhs5lb4dlaaz/Simulator%20Controller%203.8.2-dev.zip?dl=1) (Early build for 3.8.2. New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server. Stable, incl. update procedure and documentation.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-382) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Discord Community
 

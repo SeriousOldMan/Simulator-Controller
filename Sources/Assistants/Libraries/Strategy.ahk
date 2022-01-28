@@ -55,9 +55,9 @@ class StrategySimulation {
 	}
 	
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
-					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService) {
+					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
 		return this.StrategyManager.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
-													 , pitstopDelta, pitstopFuelService, pitstopTyreService)
+													 , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 	}
 	
 	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
@@ -358,8 +358,9 @@ class VariationSimulation extends StrategySimulation {
 		pitstopDelta := false
 		pitstopFuelService := false
 		pitstopTyreService := false
+		pitstopServiceOrder := "Simultaneous"
 		
-		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService)
+		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 	
 		initialLap := false
 		initialStintTime := false
@@ -531,6 +532,7 @@ class Strategy extends ConfigurationItem {
 	iPitstopDelta := 0
 	iPitstopFuelService := 0.0
 	iPitstopTyreService := 0.0
+	iPitstopSeviceOrder := "Simultaneous"
 	
 	iPitstopRequired := false
 	iRefuelRequired := false
@@ -969,6 +971,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	PitstopServiceOrder[] {
+		Get {
+			return this.iPitstopServiceOrder
+		}
+	}
+	
 	PitstopRequired[] {
 		Get {
 			return this.iPitstopRequired
@@ -1131,9 +1139,10 @@ class Strategy extends ConfigurationItem {
 			pitstopDelta := false
 			pitstopFuelService := false
 			pitstopTyreService := false
+			pitstopServiceOrder := "Simultaneous"
 			
 			this.StrategyManager.getSessionSettings(stintLength, formationLap, postRacelap, fuelCapacity, safetyFuel
-												  , pitstopDelta, pitstopFuelService, pitstopTyreService)
+												  , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 			
 			this.iStintLength := stintLength
 			this.iFormationLap := formationLap
@@ -1144,6 +1153,7 @@ class Strategy extends ConfigurationItem {
 			this.iPitstopDelta := pitstopDelta
 			this.iPitstopFuelService := pitstopFuelService
 			this.iPitstopTyreService := pitstopTyreService
+			this.iPitstopServiceOrder := pitstopServiceOrder
 			
 			pitstopRequired := false
 			refuelRequired := false
@@ -1192,6 +1202,7 @@ class Strategy extends ConfigurationItem {
 		this.iPitstopDelta := getConfigurationValue(configuration, "Settings", "PitstopDelta", 0)
 		this.iPitstopFuelService := getConfigurationValue(configuration, "Settings", "PitstopFuelService", 0.0)
 		this.iPitstopTyreService := getConfigurationValue(configuration, "Settings", "PitstopTyreService", 0.0)
+		this.iPitstopServiceOrder := getConfigurationValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
 		
 		this.iPitstopRequired := getConfigurationValue(configuration, "Settings", "PitstopRequired", false)
 		
@@ -1240,9 +1251,10 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Settings", "FuelCapacity", this.FuelCapacity)
 		setConfigurationValue(configuration, "Settings", "SafetyFuel", this.SafetyFuel)
 		
-		setConfigurationValue(configuration, "Settings", "PitstopDelta", this.iPitstopDelta)
-		setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.iPitstopFuelService)
-		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.iPitstopTyreService)
+		setConfigurationValue(configuration, "Settings", "PitstopDelta", this.PitstopDelta)
+		setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
+		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
+		setConfigurationValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
 		
 		pitstopRequired := this.PitstopRequired
 		
@@ -1401,7 +1413,10 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcPitstopDuration(refuelAmount, changeTyres) {
-		return (this.PitstopDelta + (changeTyres ? this.PitstopTyreService : 0) + ((refuelAmount / 10) * this.PitstopFuelService))
+		tyreService := (changeTyres ? this.PitstopTyreService : 0)
+		refuelService := ((refuelAmount / 10) * this.PitstopFuelService)
+		
+		return (this.PitstopDelta + ((this.PitstopServiceOrder = "Simultaneous") ? Max(tyreService, refuelService) : (tyreService + refuelService)))
 	}
 	
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {

@@ -442,6 +442,10 @@ reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap,
 						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
 						 
 reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
+						 bound?(!Damage.Reported), !Damage.Reported > !Damage.Analysis.Reported, !,												\
+						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
+						 any?(true, [?sGreater, ?bGreater]), setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
+reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
 						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
 						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),											\
 						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)

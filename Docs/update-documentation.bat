@@ -1,6 +1,7 @@
 copy "Backlog.md" ..\..\Controller.Wiki\Backlog.md
 copy "Classes Reference.md" ..\..\Controller.Wiki\Classes-Reference.md
 copy "Constants Reference.md" ..\..\Controller.Wiki\Constants-Reference.md
+copy "Functions Reference.md" ..\..\Controller.Wiki\Functions-Reference.md
 copy "Development Overview & Concepts.md" "..\..\Controller.Wiki\Development-Overview-&-Concepts.md"
 copy "Footer.md" ..\..\Controller.Wiki\_Footer.md
 copy "Home.md" ..\..\Controller.Wiki\Home.md

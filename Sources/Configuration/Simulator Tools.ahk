@@ -1117,12 +1117,12 @@ editTargets(command := "") {
 	
 		Gui TE:Font, Bold, Arial
 		
-		Gui TE:Add, Text, w220 Center gmoveEditor, % translate("Modular Simulator Controller System") 
+		Gui TE:Add, Text, w410 Center gmoveEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 	
-		Gui TE:Add, Text, YP+20 w220 Center, % translate("Targets")
+		Gui TE:Add, Text, YP+20 w410 Center, % translate("Targets")
 	
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
@@ -1158,7 +1158,7 @@ editTargets(command := "") {
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 			
-		Gui TE:Add, GroupBox, -Theme %cleanupPosOption% YP+30 w220 h%cleanupHeight%, % translate("Cleanup")
+		Gui TE:Add, GroupBox, -Theme %cleanupPosOption% YP+30 w200 h%cleanupHeight% Section, % translate("Cleanup")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -1182,7 +1182,7 @@ editTargets(command := "") {
 		if (copyHeight == 20)
 			copydHeight := 40
 			
-		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%copyHeight%, % translate("Copy")
+		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w200 h%copyHeight%, % translate("Copy")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -1206,7 +1206,8 @@ editTargets(command := "") {
 		if (buildHeight == 20)
 			buildHeight := 40
 			
-		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
+		; Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
+		Gui TE:Add, GroupBox, -Theme X220 YS w200 h%buildHeight%, % translate("Compile")
 	
 		Gui TE:Font, Norm, Arial
 	
@@ -1229,11 +1230,13 @@ editTargets(command := "") {
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := (translate("None") . "|" . values2String("|", themes*))
 		
-		Gui TE:Add, Text, X10 Y+20, % translate("Theme")
-		Gui TE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
+		yPos := (Max(cleanupHeight + copyHeight, buildHeight) + 80)
 		
-		Gui TE:Add, Button, Default X10 y+20 w100 gsaveTargets, % translate("Run")
-		Gui TE:Add, Button, X+20 w100 gcancelTargets, % translate("&Cancel")
+		Gui TE:Add, Text, X10 Y%yPos%, % translate("Theme")
+		Gui TE:Add, DropDownList, X110 YP-5 w310 Choose%chosen% vsplashTheme, %themes%
+		
+		Gui TE:Add, Button, Default X110 y+20 w100 gsaveTargets, % translate("Run")
+		Gui TE:Add, Button, X+10 w100 gcancelTargets, % translate("&Cancel")
 	
 		Gui TE:Margin, 10, 10
 		Gui TE:Show, AutoSize Center

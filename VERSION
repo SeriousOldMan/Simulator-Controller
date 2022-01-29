@@ -1,9 +1,9 @@
 [Development]
 Version=3.8.6-dev
 Target=3.8.4-release
-Date=01/28/2022
+Date=01/29/2022
 Download=
-Changes=New plugin "Race Spotter"
+Changes=New plugin "Race Spotter", Memory management optimization for Race Assistants
 [Release]
 Version=3.8.4-release
 Date=01/28/2022

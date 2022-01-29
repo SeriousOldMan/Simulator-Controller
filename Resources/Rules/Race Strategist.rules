@@ -179,6 +179,7 @@ updateStandingsPositions(?lap, !Driver.Car) <= carPosition(!Driver.Car, ?positio
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Forname, ?forname),							\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Surname, ?surname),							\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Nickname, ?nickname),							\
+											   carAvgLapTime(?lap, !Driver.Car, ?),																\
 											   ?nextCar = !Driver.Car - 1, updateStandingsPositions(?lap, ?nextCar), !
 updateStandingsPositions(?lap, ?car) <= carPosition(?car, ?position),																			\
 										carLaps(?car, FULL, ?carLaps), carLaps(!Driver.Car, FULL, ?driverLaps),									\
@@ -194,6 +195,7 @@ updateStandingsPositions(?lap, ?car) <= carPosition(?car, ?position),											
 										updateStandingsFront(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsBehind(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsLeader(?lap, ?car, ?distance, ?delta),													\
+										carAvgLapTime(?lap, ?car, ?),																			\
 										?nextCar = ?car - 1, updateStandingsPositions(?lap, ?nextCar), !
 updateStandingsPositions(?lap, ?car) <= ?nextCar = ?car - 1, updateStandingsPositions(?lap, ?nextCar)
 
@@ -308,12 +310,12 @@ clearExtrapolatedLap(?lap, ?car)  <= Clear(Standings.Extrapolated, ?lap, Car, ?c
 									 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps),														\
 									 ?nextCar = ?car - 1, clearExtrapolatedLap(?lap, ?nextCar)
 
-priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =>																\
-		(Prove: extrapolatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),													\
-		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),															\
-		(Prove: correctPositions(?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
-									   ?Session.Settings.Standings.Extrapolation.Laps)),														\
-		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps))
+;priority: -20, {All: [?Lap], [?Session.Settings.Standings.Extrapolation.Laps]} =>																\
+;		(Prove: extrapolatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),													\
+;		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps)),															\
+;		(Prove: correctPositions(?Lap, !Session.Settings.Standings.Extrapolation.Overtake.Delta,												\
+;									   ?Session.Settings.Standings.Extrapolation.Laps)),														\
+;		(Prove: updatePositions(?Lap, ?Session.Settings.Standings.Extrapolation.Laps))
 		
 extrapolatePositions(?, ?lapDelta) <= =<(?lapDelta, 0), !
 extrapolatePositions(?lap, ?lapDelta) <= carAvgLapTime(?lap, !Driver.Car, 0),																	\
@@ -573,16 +575,20 @@ clearStandings(0) <= !
 clearStandings(?lap) <= ?lap < 0, !
 clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
 
-clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), Get(?fact, ?carCount), Clear(?fact),						\
+clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),					\
 					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),														\
 					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),											\
 					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),												\
-					   clearStanding(?lap, ?carCount)
+					   clearStanding(?lap, ?carCount), clearExtrapolatedLap(?lap, ?carCount)
+clearStanding(?)
 
 clearStanding(?, 0) <= !
 clearStanding(?, ?car) <= ?car < 0, !
 clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,														\
 														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),							\
+							 Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),															\
+							 Clear(Standings.Extrapolated, ?lap, Car, ?car, Sequence),															\
+							 Clear(Standings.Extrapolated, ?lap, Car, ?car, Laps),																\
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 
 clearStanding(?, ?, []) <= !

@@ -1430,21 +1430,36 @@ updateConfigurationForV384() {
 		simulator := A_LoopFileName
 		
 		if (simulator = "0")
-			FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
+			try {
+				FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
+			}
+			catch exception {
+				; ignore
+			}
 		else
 			Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
 			{
 				car := A_LoopFileName
 				
 				if (car = "0")
-					FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
+					try {
+						FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
+					}
+					catch exception {
+						; ignore
+					}
 				else
 					Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
 					{
 						track := A_LoopFileName
 						
 						if (track = "0")
-							FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
+							try {
+								FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
+							}
+							catch exception {
+								; ignore
+							}
 					}
 			}
 	}

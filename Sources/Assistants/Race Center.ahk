@@ -6428,7 +6428,18 @@ class TrafficSimulation extends StrategySimulation {
 		scenarios := {}
 		variation := 1
 		
+		first := true
+		numScenarios += 1
+		
 		Loop {
+			if first {
+				first := false
+				
+				this.iRandomFactor := 0
+			}
+			else
+				this.iRandomFactor := randomFactor
+			
 			if (variation > numScenarios)
 				break
 			

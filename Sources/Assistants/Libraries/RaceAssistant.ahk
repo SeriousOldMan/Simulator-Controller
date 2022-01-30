@@ -846,8 +846,8 @@ class RaceAssistant extends ConfigurationItem {
 			
 			Random postfix, 1, 1000000
 				
-			settingsFile := (kTempDirectory . "Race Strategist " . postfix . ".settings")
-			stateFile := (kTempDirectory . "Race Strategist " . postfix . ".state")
+			settingsFile := (kTempDirectory . "Race Assistant " . postfix . ".settings")
+			stateFile := (kTempDirectory . "Race Assistant " . postfix . ".state")
 			
 			writeConfiguration(settingsFile, this.Settings)
 			writeConfiguration(stateFile, savedKnowledgeBase)

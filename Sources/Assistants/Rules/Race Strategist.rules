@@ -179,7 +179,6 @@ updateStandingsPositions(?lap, !Driver.Car) <= carPosition(!Driver.Car, ?positio
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Forname, ?forname),							\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Surname, ?surname),							\
 											   Set(Standings.Lap, ?lap, Car, !Driver.Car, Driver.Nickname, ?nickname),							\
-											   carAvgLapTime(?lap, !Driver.Car, ?),																\
 											   ?nextCar = !Driver.Car - 1, updateStandingsPositions(?lap, ?nextCar), !
 updateStandingsPositions(?lap, ?car) <= carPosition(?car, ?position),																			\
 										carLaps(?car, FULL, ?carLaps), carLaps(!Driver.Car, FULL, ?driverLaps),									\
@@ -195,7 +194,6 @@ updateStandingsPositions(?lap, ?car) <= carPosition(?car, ?position),											
 										updateStandingsFront(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsBehind(?lap, ?car, ?distance, ?delta),													\
 										updateStandingsLeader(?lap, ?car, ?distance, ?delta),													\
-										carAvgLapTime(?lap, ?car, ?),																			\
 										?nextCar = ?car - 1, updateStandingsPositions(?lap, ?nextCar), !
 updateStandingsPositions(?lap, ?car) <= ?nextCar = ?car - 1, updateStandingsPositions(?lap, ?nextCar)
 
@@ -512,7 +510,7 @@ bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestP
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap)), (Set: Cleanup, Laps)
+[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
 
 updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !
@@ -547,25 +545,20 @@ validPitstopLap(?pitstopLap) <= ?diff = !Strategy.Pitstop.Lap - ?pitstopLap, abs
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                            Lap Memory Cleanup                           ;;;
+;;;                              Memory Cleanup                             ;;;
 ;;;                                                                         ;;;
 ;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
+[?Lap] => (Set: Cleanup, Laps)
+
+priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Set: Cleanup, Standings)
 
 clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
 
 clearLaps(0) <= !
 clearLaps(?lap) <= ?lap < 0, !
 clearLaps(?lap) <= clearLap(?lap), ?pLap = ?lap - 1, clearLaps(?pLap)
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Standings Memory Cleanup                        ;;;
-;;;                                                                         ;;;
-;;; These rules remove knowledge that is no longer needed.					;;;
-;;;-------------------------------------------------------------------------;;;
 
 priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
 

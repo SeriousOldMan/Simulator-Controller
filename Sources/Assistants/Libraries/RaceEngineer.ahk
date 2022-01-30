@@ -1416,9 +1416,9 @@ class RaceEngineer extends RaceAssistant {
 		
 		result := knowledgeBase.produce()
 		
-		if this.Debug[kDebugKnowledgeBase]
+		if (true || this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledge(knowledgeBase)
-		
+	
 		if result
 			this.finishPitstop(lapNumber)
 		

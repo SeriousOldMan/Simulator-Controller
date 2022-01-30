@@ -819,7 +819,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateLap(lapNumber, data) {
-		this.KnowledgeBase.addFact("Sector", true)
+		; this.KnowledgeBase.addFact("Sector", true)
 		
 		return base.updateLap(lapNumber, data)
 	}
@@ -1297,9 +1297,6 @@ class RaceStrategist extends RaceAssistant {
 			writeConfiguration(fileName, data)
 			
 			this.RemoteHandler.saveRaceLap(lapNumber, fileName)
-			
-			if !knowledgeBase.getValue("Cleanup", false)
-				knowledgeBase.addFact("Cleanup", "Standings")
 		}
 		
 		this.saveLapStandings(lapNumber, simulator, car, track)

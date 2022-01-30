@@ -885,7 +885,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 12 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", "de", "Windows", true, true)
 
@@ -1170,6 +1170,33 @@ else {
 					}
 					
 					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+			}
+		} until done
+	}
+	else if (raceNr = 18) {
+		done := false
+		
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (lap == 82)
+						done := true
+					
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, data)
+					else
+						engineer.updateLap(lap, data)
+					
+					if (isDebug() && (A_Index == 1))
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}

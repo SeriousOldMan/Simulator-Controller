@@ -103,22 +103,14 @@ class BasicReporting extends Assert {
 		
 		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Position"), "Unexpected position detected in lap 1...")
 		this.AssertEqual(117417, strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time"), "Unexpected time detected in lap 1...")
-		this.AssertEqual(117417, Round(strategist.KnowledgeBase.getValue("Standings.Lap.1.Car.13.Time.Average")), "Unexpected average time detected in lap 1...")
 		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Position"), "Unexpected position detected in lap 2...")
 		this.AssertEqual(105939, strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Time"), "Unexpected time detected in lap 2...")
-		this.AssertEqual(110530, Round(strategist.KnowledgeBase.getValue("Standings.Lap.2.Car.13.Time.Average")), "Unexpected average time detected in lap 2...")
 		this.AssertEqual(7, strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Position"), "Unexpected position detected in lap 3...")
 		this.AssertEqual(104943, strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Time"), "Unexpected time detected in lap 3...")
-		this.AssertEqual(107703, Round(strategist.KnowledgeBase.getValue("Standings.Lap.3.Car.13.Time.Average")), "Unexpected average time detected in lap 3...")
 		this.AssertEqual(6, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Position"), "Unexpected position detected in lap 4...")
 		this.AssertEqual(103383, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time"), "Unexpected time detected in lap 4...")
-		this.AssertEqual(105482, Round(strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time.Average")), "Unexpected average time detected in lap 4...")
 		this.AssertEqual(5, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Position"), "Unexpected position detected in lap 5...")
 		this.AssertEqual(103032, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time"), "Unexpected time detected in lap 5...")
-		
-		avgLapTime := Round(strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time.Average"))
-		
-		this.AssertTrue(((avgLapTime == 103680) || (avgLapTime == 104125)), "Unexpected average time detected in lap 5...")
 	}
 }
 
@@ -290,7 +282,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.Run()
 }
 else {
-	raceNr := 16
+	raceNr := 17
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "de", "Windows", true, true)
 
@@ -364,6 +356,38 @@ else {
 				
 				if (A_Index = 1)
 					break
+			}
+		} until done
+		
+		strategist.finishSession()
+		
+		while strategist.KnowledgeBase
+			Sleep 1000
+	}
+	else if (raceNr == 17) {
+		done := false
+		
+		Loop {
+			lap := A_Index
+		
+			Loop {
+				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+			
+				if (data.Count() == 0) {
+					if (lap == 82)
+						done := true
+					
+					break
+				}
+				else {
+					if (A_Index == 1)
+						strategist.addLap(lap, data)
+					else
+						strategist.updateLap(lap, data)
+					
+					if (isDebug() && (A_Index == 1))
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
 			}
 		} until done
 		

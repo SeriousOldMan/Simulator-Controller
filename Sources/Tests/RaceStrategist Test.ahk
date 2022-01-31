@@ -82,6 +82,8 @@ class BasicReporting extends Assert {
 			if (A_Index >= 5)
 				break
 		}
+		
+		strategist.finishSession(false)
 	}
 	
 	StandingsMemoryTest() {
@@ -111,6 +113,8 @@ class BasicReporting extends Assert {
 		this.AssertEqual(103383, strategist.KnowledgeBase.getValue("Standings.Lap.4.Car.13.Time"), "Unexpected time detected in lap 4...")
 		this.AssertEqual(5, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Position"), "Unexpected position detected in lap 5...")
 		this.AssertEqual(103032, strategist.KnowledgeBase.getValue("Standings.Lap.5.Car.13.Time"), "Unexpected time detected in lap 5...")
+		
+		strategist.finishSession(false)
 	}
 }
 
@@ -168,6 +172,8 @@ class GapReporting extends Assert {
 			if (A_Index >= 5)
 				break
 		}
+		
+		strategist.finishSession(false)
 	}
 		
 	TrackGapTest() {
@@ -199,6 +205,8 @@ class GapReporting extends Assert {
 			if (A_Index >= 5)
 				break
 		}
+		
+		strategist.finishSession(false)
 	}
 }
 
@@ -238,6 +246,8 @@ class PositionProjection extends Assert {
 			if (A_Index >= 5)
 				break
 		}
+		
+		strategist.finishSession(false)
 	}
 }
 
@@ -266,6 +276,8 @@ class PitstopRecommendation extends Assert {
 			if (A_Index >= 5)
 				break
 		}
+		
+		strategist.finishSession(false)
 	}
 }
 

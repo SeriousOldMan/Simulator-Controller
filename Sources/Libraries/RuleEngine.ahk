@@ -1738,6 +1738,9 @@ class ChoicePoint {
 	}
 	
 	dispose() {
+		this.iResultSet := false
+		this.iGoal := false
+		
 		vDisposedChoicePoints.Push(this)
 	}
 	
@@ -1838,11 +1841,17 @@ class RulesChoicePoint extends ChoicePoint {
 		}
 	}
 	
-	dispose() {
+	disposeSubChoicePoints() {
+		this.removeSubChoicePoints()
+		
 		for ignore, cp in this.iSubChoicePoints
 			vDisposedChoicePoints.Push(cp)
 		
 		this.iSubChoicePoints := []
+	}
+	
+	dispose() {
+		this.disposeSubChoicePoints()
 		
 		base.dispose()
 	}
@@ -1916,6 +1925,12 @@ class RulesChoicePoint extends ChoicePoint {
 		this.removeSubChoicePoints()
 		
 		base.reset()
+	}
+	
+	remove() {
+		this.disposeSubChoicePoints()
+		
+		base.remove()
 	}
 	
 	cut() {

@@ -1206,7 +1206,6 @@ editTargets(command := "") {
 		if (buildHeight == 20)
 			buildHeight := 40
 			
-		; Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%buildHeight%, % translate("Compile")
 		Gui TE:Add, GroupBox, -Theme X220 YS w200 h%buildHeight%, % translate("Compile")
 	
 		Gui TE:Font, Norm, Arial

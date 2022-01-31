@@ -909,7 +909,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		for key, value in knowledgeBase.Facts.Facts {
-			text := key . " = " . value . "`n"
+			text := (key . " = " . value . "`n")
 		
 			FileAppend %text%, %kTempDirectory%%prefix%.knowledge
 		}

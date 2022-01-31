@@ -1873,7 +1873,7 @@ writeConfiguration(configFile, configuration) {
 			value := StrReplace(value, "=", "\=")
 			value := StrReplace(value, "`n", "\n")
 			
-			pairs := pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value))
+			pairs := (pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value)))
 		}
 			
 		section := "[" . section . "]" . pairs . "`n"

@@ -210,6 +210,8 @@ class FuelReporting extends Assert {
 		this.AssertEqual(true, vFuelWarnings.HasKey(3), "No fuel warning in lap 3...")
 		this.AssertEqual(true, vFuelWarnings.HasKey(4), "No fuel warning in lap 4...")
 		this.AssertEqual(true, vFuelWarnings.HasKey(5), "No fuel warning in lap 5...")
+		
+		engineer.finishSession(false)
 	}
 
 	RemainingFuelTest() {
@@ -231,6 +233,8 @@ class FuelReporting extends Assert {
 		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
 		this.AssertEqual(1, vFuelWarnings[4], "Unexpected remaining fuel reported in lap 4...")
 		this.AssertEqual(1, vFuelWarnings[5], "Unexpected remaining fuel reported in lap 5...")
+		
+		engineer.finishSession(false)
 	}
 }
 
@@ -264,6 +268,8 @@ class DamageReporting extends Assert {
 			
 			engineer.dumpKnowledge(engineer.KnowledgeBase)
 		}
+		
+		engineer.finishSession(false)
 	}
 }
 
@@ -337,6 +343,8 @@ class DamageAnalysis extends Assert {
 				this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
 			}
 		} until done
+		
+		engineer.finishSession(false)
 	}
 	
 	DamageRace3ReportingTest() {
@@ -413,6 +421,8 @@ class DamageAnalysis extends Assert {
 				}
 			}
 		} until done
+		
+		engineer.finishSession(false)
 	}
 	
 	DamageRace4ReportingTest() {
@@ -489,6 +499,8 @@ class DamageAnalysis extends Assert {
 				}
 			}
 		} until done
+		
+		engineer.finishSession(false)
 	}
 }
 
@@ -546,6 +558,8 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopPlanLap4Test() {
@@ -590,6 +604,8 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopPlanLap5Test() {
@@ -637,6 +653,8 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopPrepare3Test() {
@@ -689,6 +707,8 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
 		
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.4, 26.6, 26.1]), "Unexpected tyre pressures...")
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopPrepare5Test() {
@@ -741,6 +761,8 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
 		
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.1]), "Unexpected tyre pressures...")
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopPerformedTest() {
@@ -807,6 +829,8 @@ class PitstopHandling extends Assert {
 				}
 			}
 		}
+		
+		engineer.finishSession(false)
 	}
 	
 	PitstopMultipleTest() {
@@ -865,6 +889,8 @@ class PitstopHandling extends Assert {
 			
 			engineer.dumpKnowledge(engineer.KnowledgeBase)
 		}
+		
+		engineer.finishSession(false)
 	}
 }
 

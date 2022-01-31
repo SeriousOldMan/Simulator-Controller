@@ -315,7 +315,8 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
+	    , service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
@@ -330,6 +331,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["Language"] := ((language != false) ? language : options["Language"])
 			options["Service"] := ((service == true) ? options["Service"] : service)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
+			options["Vocalics"] := (vocalics ? string2Values(",", vocalics) : options["Vocalics"])
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 		}
@@ -345,9 +347,9 @@ class RaceAssistant extends ConfigurationItem {
 		options["Language"] := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
 		options["Service"] := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
 		options["Speaker"] := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		options["SpeakerVolume"] := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		options["SpeakerPitch"] := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		options["SpeakerSpeed"] := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		options["Vocalics"] := Array(getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
+								   , getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
+								   , getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0))
 		options["Listener"] := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 	}

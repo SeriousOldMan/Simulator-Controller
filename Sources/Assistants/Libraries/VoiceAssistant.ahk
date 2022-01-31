@@ -325,6 +325,19 @@ class VoiceAssistant {
 	}
 	
 	initialize(options) {
+		if options.HasKey("Vocalics") {
+			vocalics := options["Vocalics"]
+			
+			if !options.HasKey("SpeakerVolume")
+				options["SpeakerVolume"] := vocalics[1]
+			
+			if !options.HasKey("SpeakerPitch")
+				options["SpeakerPitch"] := vocalics[2]
+			
+			if !options.HasKey("SpeakerSpeed")
+				options["SpeakerSpeed"] := vocalics[3]
+		}
+		
 		if options.HasKey("Language")
 			this.iLanguage := options["Language"]
 		

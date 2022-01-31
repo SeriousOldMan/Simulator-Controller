@@ -24,6 +24,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantLanguage := false
 	iRaceAssistantService := false
 	iRaceAssistantSpeaker := false
+	iRaceAssistantSpeakerVocalics := false
 	iRaceAssistantListener := false
 	
 	iRaceAssistant := false
@@ -332,6 +333,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceAssistantSpeakerVocalics[] {
+		Get {
+			return this.iRaceAssistantSpeakerVocalics
+		}
+	}
+	
 	RaceAssistantListener[] {
 		Get {
 			return this.iRaceAssistantListener
@@ -424,6 +431,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
 			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
+		
+			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
 		
 			assistantListener := this.getArgumentValue("raceAssistantListener", false)
 			
@@ -610,6 +619,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if this.RaceAssistantSpeaker
 					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
+				
+				if this.RaceAssistantSpeakerVocalics
+					options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
 				
 				if this.RaceAssistantListener
 					options .= " -Listener """ . this.RaceAssistantListener . """"

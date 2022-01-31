@@ -37,7 +37,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, listener, voiceServer)
+		base.__New(configuration, remoteHandler, name, language, service, speaker, false, listener, voiceServer)
 		
 		this.updateConfigurationValues({Settings: settings})
 	}

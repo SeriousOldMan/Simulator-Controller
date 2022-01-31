@@ -107,6 +107,7 @@ startRaceStrategist() {
 	strategistLanguage := false
 	strategistService := true
 	strategistSpeaker := false
+	strategistSpeakerVocalics := false
 	strategistListener := false
 	debug := false
 	
@@ -135,6 +136,9 @@ startRaceStrategist() {
 				index += 2
 			case "-Speaker":
 				strategistSpeaker := A_Args[index + 1]
+				index += 2
+			case "-SpeakerVocalics":
+				strategistSpeakerVocalics := A_Args[index + 1]
 				index += 2
 			case "-Listener":
 				strategistListener := A_Args[index + 1]
@@ -165,7 +169,8 @@ startRaceStrategist() {
 	
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration
 												, remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
-												, strategistName, strategistLanguage, strategistService, strategistSpeaker, strategistListener, voiceServer)
+												, strategistName, strategistLanguage
+												, strategistService, strategistSpeaker, strategistSpeakerVocalics, strategistListener, voiceServer)
 
 	registerEventHandler("Race Strategist", "handleStrategistRemoteCalls")
 	

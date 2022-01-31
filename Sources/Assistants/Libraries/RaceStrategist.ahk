@@ -102,8 +102,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", remoteHandler, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
+		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Strategist", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
 	}
 	
 	updateConfigurationValues(values) {

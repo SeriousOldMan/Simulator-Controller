@@ -27,6 +27,11 @@ Release 3.8.6 Checklist
 2. New Plugin "Race Spotter"
    a. Translations
    b. Documentation
+3. New Race Spotter Assistant
+   a. Documentation
+   b. Phrase Grammars
+4. New "raceAssistantSpeakerVocalics" parameter
+   a. Documentation
 
 Release 3.8.4 Checklist
 =======================

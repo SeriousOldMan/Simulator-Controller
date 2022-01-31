@@ -60,8 +60,9 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
+		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
 	}
 	
 	createVoiceAssistant(name, options) {

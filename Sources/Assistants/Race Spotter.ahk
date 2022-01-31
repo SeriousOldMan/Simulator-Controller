@@ -102,11 +102,11 @@ startRaceSpotter() {
 	Menu Tray, Tip, Race Spotter
 	
 	remotePID := 0
-	spotterName := "Jona"
+	spotterName := "Elisa"
 	spotterLogo := false
 	spotterLanguage := false
-	spotterService := true
-	spotterSpeaker := false
+	spotterService := "Windows"
+	spotterSpeaker := true
 	spotterListener := false
 	debug := false
 	

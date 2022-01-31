@@ -268,7 +268,7 @@ receiveWindowMessage(wParam, lParam) {
 		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
 		data    := StrGet(lpData, length)           ; DATA string from pointer
 	}
-	else if (request = "SD") {
+	else if ((request = "RS") || (request = "SD")) {
 		length  := (cbData - 1)						; length of DATA string (excl ZERO)
 		data    := StrGet(lpData, length, "")       ; DATA string from pointer
 	}
@@ -285,7 +285,10 @@ receiveWindowMessage(wParam, lParam) {
 	
 	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
 	
-	vIncomingMessages.Push(Array(eventHandler, event, data[2]))
+	if (request = "RS")
+		withProtection(eventHandler, event, data[2])
+	else
+		vIncomingMessages.Push(Array(eventHandler, event, data[2]))
 }
 
 sendWindowMessage(target, event, data) {

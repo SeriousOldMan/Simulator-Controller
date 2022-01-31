@@ -27,6 +27,27 @@
 class RaceSpotter extends RaceAssistant {
 	iSessionDataActive := false
 	
+	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
+		iFastSpeechSynthesizer := false
+			
+		getSpeaker(fast := false) {
+			if fast {
+				if !this.iFastSpeechSynthesizer {
+					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				
+					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
+					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)
+					this.iFastSpeechSynthesizer.setRate(this.SpeakerSpeed)
+				}
+			
+				return this.iFastSpeechSynthesizer
+			}
+			else
+				return base.getSpeaker()
+		}
+	}
+	
 	class RaceSpotterRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			base.__New("Race Spotter", remotePID)
@@ -41,6 +62,10 @@ class RaceSpotter extends RaceAssistant {
 	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, listener, voiceServer)
+	}
+	
+	createVoiceAssistant(name, options) {
+		return new this.SpotterVoiceAssistant(this, name, options)
 	}
 	
 	updateConfigurationValues(values) {
@@ -60,6 +85,26 @@ class RaceSpotter extends RaceAssistant {
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
+	}
+	
+	getSpeaker(fast := false) {
+		return this.VoiceAssistant.getSpeaker(fast)
+	}
+	
+	alert(phrase, variables := false) {
+		if (variables && !IsObject(variables)) {
+			values := {}
+			
+			for ignore, value in string2Values(",", variables) {
+				value := string2Values(":", value)
+			
+				values[value[1]] := value[2]
+			}
+			
+			variables := values
+		}
+		
+		this.getSpeaker(true).speakPhrase(phrase, variables)
 	}
 				
 	createSession(settings, data) {

@@ -334,7 +334,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["VoiceServer"] := voiceServer
 		}
 		
-		this.iVoiceAssistant := new this.RaceVoiceAssistant(this, name, options)
+		this.iVoiceAssistant := this.createVoiceAssistant(name, options)
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -350,6 +350,10 @@ class RaceAssistant extends ConfigurationItem {
 		options["SpeakerSpeed"] := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 		options["Listener"] := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+	}
+	
+	createVoiceAssistant(name, options) {
+		return new this.RaceVoiceAssistant(this, name, options)
 	}
 	
 	updateConfigurationValues(values) {

@@ -248,6 +248,24 @@ class VoiceAssistant {
 		}
 	}
 	
+	SpeakerVolume[] {
+		Get {
+			return this.iSpeakerVolume
+		}
+	}
+	
+	SpeakerPitch[] {
+		Get {
+			return this.iSpeakerPitch
+		}
+	}
+	
+	SpeakerSpeed[] {
+		Get {
+			return this.iSpeakerSpeed
+		}
+	}
+	
 	Grammars[] {
 		Get {
 			return this.iGrammars

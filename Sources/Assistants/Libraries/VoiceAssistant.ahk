@@ -404,10 +404,12 @@ class VoiceAssistant {
 				
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
-																							
-				raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", this.Name, processID
-																							, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized",
-																							, this.Language, this.Service, this.Speaker, this.Listener), this.VoiceServer)
+				
+				raiseEvent(kFileMessage, "Voice"
+						 , "registerVoiceClient:" . values2String(";", this.Name, processID
+																, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																, this.Language, this.Service, this.Speaker, this.Listener
+																, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed), this.VoiceServer)
 																						
 				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Service, this.Speaker, this.Language
 																, this.buildFragments(this.Language), this.buildPhrases(this.Language))
@@ -416,9 +418,9 @@ class VoiceAssistant {
 				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
 															   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
-				this.iSpeechSynthesizer.setVolume(this.iSpeakerVolume)
-				this.iSpeechSynthesizer.setPitch(this.iSpeakerPitch)
-				this.iSpeechSynthesizer.setRate(this.iSpeakerSpeed)
+				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
+				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
+				this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
 			}
 				
 			this.startListener()

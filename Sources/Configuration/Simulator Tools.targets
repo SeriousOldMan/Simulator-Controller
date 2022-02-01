@@ -43,6 +43,7 @@ Data Provider.4=%kBinariesDirectory%IRC SHM Provider.exe <- %kSourcesDirectory%S
 Data Provider.5=%kBinariesDirectory%ACC UDP Provider.exe <- %kSourcesDirectory%Special\ACC UDP Provider\Release\ACC UDP Provider.exe
 Data Provider.6=%kBinariesDirectory%ksBroadcastingNetwork.dll <- %kSourcesDirectory%Special\ACC UDP Provider\Release\ksBroadcastingNetwork.dll
 Data Provider.7=%kBinariesDirectory%AMS2 SHM Provider.exe <- %kSourcesDirectory%Special\AMS2 SHM Provider\Release\AMS2 SHM Provider.exe
+Data Provider.8=%kBinariesDirectory%ACC SHM Spotter.exe <- %kSourcesDirectory%Special\ACC SHM Spotter\Release\ACC SHM Spotter.exe
 Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Speech Recognizer.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Microsoft.Speech.dll
 Speech Interface.3=%kBinariesDirectory%Speech.Synthesizer.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Speech Synthesizer.dll

@@ -120,7 +120,7 @@ inline const string getSession(AC_SESSION_TYPE session) {
 	}
 }
 
-const float distanceThreshold = 1.0;
+const float distanceThreshold = 2.0;
 
 const int CLEAR = 0;
 const int LEFT = 1;
@@ -194,7 +194,7 @@ float vectorAngle(float x, float y) {
 	float scalar = (x * 0) + (y * 1);
 	float length = sqrt((x * x) + (y * y));
 	
-	float angle = acos(scalar / length);
+	float angle = (length > 0) ? acos(scalar / length) : 0;
 
 	if (x < 0)
 		angle = 360 - angle;
@@ -272,7 +272,10 @@ int main(int argc, char* argv[])
 	initStatic();
 
 	while (true) {
-		checkPositions();
+		if (((SPageFileGraphic*)m_graphics.mapFileBuffer)->status == AC_LIVE)
+			checkPositions();
+		else
+			lastSituation = CLEAR;
 
 		Sleep(200);
 	}

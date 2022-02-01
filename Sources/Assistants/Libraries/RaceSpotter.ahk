@@ -113,12 +113,10 @@ class RaceSpotter extends RaceAssistant {
 	startupSpotter() {
 		code := this.SessionDatabase.getSimulatorCode(this.Simulator)
 		
-		exePath := (code . " SHM Spotter.exe")
+		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 		
-		if FileExist(kBinariesDirectory . exePath) {
+		if FileExist(exePath) {
 			this.shutdownSpotter()
-			
-			exePath := (kBinariesDirectory . exePath)
 			
 			Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
 			
@@ -134,7 +132,9 @@ class RaceSpotter extends RaceAssistant {
 			Process Close, %spotterPID%
 		}
 		
-		Process Exist %exePath%
+		processName := (this.SessionDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+		
+		Process Exist, %processName%
 			
 		if ErrorLevel
 			Process Close, %ErrorLevel%

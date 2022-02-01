@@ -490,6 +490,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	
 	iRaceEngineer := false
 	iRaceStrategist := false
+	iRaceSpotter := false
 	
 	RaceEngineer[] {
 		Get {
@@ -500,6 +501,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	RaceStrategist[] {
 		Get {
 			return this.iRaceStrategist
+		}
+	}
+	
+	RaceSpotter[] {
+		Get {
+			return this.iRaceSpotter
 		}
 	}
 	
@@ -571,6 +578,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				
 				this.iRaceStrategist := raceStrategist
 			}
+			
+			raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
+			
+			if (raceSpotter && raceSpotter.isActive()) {
+				raceSpotter.startSimulation(this)
+				
+				this.iRaceSpotter := raceSpotter
+			}
 		}
 	}
 	
@@ -592,6 +607,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				raceStrategist.stopSimulation(this)
 				
 				this.iRaceStrategist := false
+			}
+			
+			raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
+			
+			if (raceSpotter && raceSpotter.isActive()) {
+				raceSpotter.stopSimulation(this)
+				
+				this.iRaceSpotter := false
 			}
 		}
 	}

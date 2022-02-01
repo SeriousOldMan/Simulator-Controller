@@ -315,6 +315,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	SessionDatabase[] {
+		Get {
+			return this.SetupDatabase
+		}
+	}
+	
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
 	    , service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
@@ -529,7 +535,7 @@ class RaceAssistant extends ConfigurationItem {
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
 		
 		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":

@@ -599,7 +599,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			
 			controllerPID := ErrorLevel
 			raceAssistantPID := 0
-								
+			
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 				

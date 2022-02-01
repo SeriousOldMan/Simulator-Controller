@@ -99,101 +99,8 @@ void sendMessage(string message) {
 	if (winHandle == 0)
 		FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
 
-	if (winHandle != 0) {
-		/*
-		message = ("Race Spotter:" + message);
-
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		std::wstring wide = converter.from_bytes(message);
-		*/
-
+	if (winHandle != 0)
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
-	}
-}
-
-void printData(string name, float value)
-{
-	wcout << name.c_str() << "=" << value << endl;
-}
-
-void printNAData(string name, long value)
-{
-	if (value == -1)
-		wcout << name.c_str() << "=" << "n/a" << endl;
-	else
-		wcout << name.c_str() << "=" << value << endl;
-}
-
-void printData(string name, string value)
-{
-	wcout << name.c_str() << "=" << value.c_str() << endl;
-}
-
-template <typename T, unsigned S>
-inline void printData(const string name, const T(&v)[S])
-{
-	wcout << name.c_str() << "=";
-    
-    for (int i = 0; i < S; i++)
-    {
-        wcout << v[i];
-
-        if (i < S - 1)
-			wcout << ", ";
-    }
-
-	wcout << endl;
-}
-
-template <typename T, unsigned S, unsigned S2>
-inline void printData2(const string name, const T(&v)[S][S2])
-{
-    wcout << name.c_str() << "=";
-
-    for (int i = 0; i < S; i++)
-    {
-        wcout << i << ": ";
-    
-		for (int j = 0; j < S2; j++) {
-            wcout << v[i][j];
-        
-			if (j < S2 - 1)
-                wcout << ", ";
-        }
-
-		if (i < (S - 1))
-			wcout << "; ";
-       
-    }
-
-	wcout << endl;
-
-}
-
-inline const string getWeather(ACC_RAIN_INTENSITY weather) {
-	switch (weather) {
-	case ACC_NO_RAIN:
-		return "Dry";
-		break;
-	case ACC_DRIZZLE:
-		return "Drizzle";
-		break;
-	case ACC_LIGHT_RAIN:
-		return "LightRain";
-		break;
-	case ACC_MEDIUM_RAIN:
-		return "MediumRain";
-		break;
-	case ACC_HEAVY_RAIN:
-		return "HeavyRain";
-		break;
-	case ACC_THUNDERSTORM:
-		return "Thunderstorm";
-		break;
-	default:
-		return "Unknown";
-		break;
-	}
 }
 
 inline const string getSession(AC_SESSION_TYPE session) {
@@ -213,142 +120,161 @@ inline const string getSession(AC_SESSION_TYPE session) {
 	}
 }
 
+const float distanceThreshold = 1.0;
+
+const int CLEAR = 0;
+const int LEFT = 1;
+const int RIGHT = 2;
+const int BOTH = 3;
+
+int lastSituation = CLEAR;
+int situationCount = 0;
+const int situationRepeat = 2;
+
+bool carBehind = false;
+
+const string noAlert = "NoAlert";
+
+string computeAlert(int newSituation) {
+	string alert = noAlert;
+
+	if (lastSituation && (lastSituation == newSituation)) {
+		if (situationCount++ > situationRepeat) {
+			situationCount = 0;
+
+			alert = "Hold";
+		}
+	}
+	else {
+		situationCount = 0;
+
+		if (!lastSituation) {
+			switch (newSituation) {
+			case LEFT:
+				alert = "Left";
+				break;
+			case RIGHT:
+				alert = "Right";
+				break;
+			case BOTH:
+				alert = "Three";
+				break;
+			}
+		}
+		else {
+			switch (newSituation) {
+			case CLEAR:
+				if (lastSituation == BOTH)
+					alert = "ClearAll";
+				else
+					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+				break;
+			case LEFT:
+				if (lastSituation == BOTH)
+					alert = "ClearRight";
+				else
+					alert = "Three";
+				break;
+			case RIGHT:
+				if (lastSituation == BOTH)
+					alert = "ClearLeft";
+				else
+					alert = "Three";
+				break;
+			}
+		}
+	}
+
+	lastSituation = newSituation;
+
+	return alert;
+}
+
+float vectorAngle(float x, float y) {
+	float scalar = (x * 0) + (y * 1);
+	float length = sqrt((x * x) + (y * y));
+	
+	float angle = acos(scalar / length);
+
+	if (x < 0)
+		angle = 360 - angle;
+
+	return angle;
+}
+
+bool nearBy(float car1X, float car1Y, float car1Z,
+			float car2X, float car2Y, float car2Z) {
+	return (abs(car1X - car2X) < distanceThreshold) &&
+		   (abs(car1Y - car2Y) < distanceThreshold) &&
+		   (abs(car1Y - car2Y) < distanceThreshold);
+}
+
+void rotateBy(float* x, float* y, float angle) {
+	float sinus = sin(angle);
+	float cosinus = cos(angle);
+
+	*x = (*x * cosinus) - (*y * sinus);
+	*y = (*x * sinus) - (*y * cosinus);
+}
+
+int checkCarPosition(float carX, float carY, float carZ, float angle,
+					 float otherX, float otherY, float otherZ) {
+	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
+		otherX -= carX;
+		otherY -= carY;
+		
+		rotateBy(&otherX, &otherY, angle);
+
+		return (otherX > 0) ? RIGHT : LEFT;
+	}
+	else
+		return CLEAR;
+}
+
+void checkPositions() {
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float velocityX = pf->velocity[0];
+	float velocityY = pf->velocity[1];
+
+	float angle = vectorAngle(velocityX, velocityY);
+
+	int carID = gf->playerCarID;
+	float coordinateX = gf->carCoordinates[carID][0];
+	float coordinateY = gf->carCoordinates[carID][1];
+	float coordinateZ = gf->carCoordinates[carID][2];
+
+	int newSituation = CLEAR;
+
+	for (int id = 0; id < gf->activeCars; id++) {
+		if (id != carID)
+			newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
+											 gf->carCoordinates[id][0],
+											 gf->carCoordinates[id][1],
+											 gf->carCoordinates[id][2]);
+
+		if (newSituation == BOTH)
+			break;
+	}
+
+	string alert = computeAlert(newSituation);
+
+	if (alert != noAlert)
+		sendMessage("alert:" + alert);
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
 	initGraphics();
 	initStatic();
 
-	sendMessage("alert:Behind");
+	while (true) {
+		checkPositions();
 
-	return 0;
-
- 	if ((argc == 1) || strchr(argv[1], 'C'))
-	{
-		wcout << "[Car Data]" << endl;
-
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		_bstr_t tc(gf->tyreCompound);
-		std::string tyreCompound(tc);
-
-		printNAData("MAP", gf->EngineMap + 1);
-		printNAData("TC", gf->TC);
-		printNAData("ABS", gf->ABS);
-
-		printData("BodyworkDamage", pf->carDamage);
-		printData("SuspensionDamage", pf->suspensionDamage);
-		printData("FuelRemaining", pf->fuel);
-		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
-		wcout << "TyreCompoundColor=Black" << endl;
-		printData("TyreTemperature", pf->tyreCoreTemperature);
-		printData("TyrePressure", pf->wheelsPressure);
-	}
-
-	if ((argc == 1) || (argv[1][0] == 'D'))
-	{
-		wcout << "[Stint Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-		
-		wcout << "DriverForname=" << sf->playerName << endl;
-		wcout << "DriverSurname=" << sf->playerSurname << endl;
-		wcout << "DriverNickname=" << sf->playerNick << endl;
-		printData("Laps", gf->completedLaps);
-		
-		printData("LapValid", gf->isValidLap ? "true" : "false");
-		printData("LapLastTime", gf->iLastTime);
-		printData("LapBestTime", gf->iBestTime);
-
-		double timeLeft = gf->sessionTimeLeft;
-
-		if (timeLeft < 0) {
-			timeLeft = 3600.0 * 1000;
-		}
-
-		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
-		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
-		printData("InPit", gf->isInPit ? "true" : "false");
-
-	}
-
-	if ((argc == 1) || strchr(argv[1], 'T'))
-	{
-		wcout << "[Track Data]" << endl;
-
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		printData("Temperature", pf->roadTemp);
-
-		_bstr_t ts(gf->trackStatus);
-		char* trackStatus = ts;
-		
-		trackStatus[0] = toupper(trackStatus[0]);
-		for (int i = 1; trackStatus[i] != '\0'; ++i)
-			trackStatus[i] = tolower(trackStatus[i]);
-
-		printData("Grip", trackStatus);
-	}
-	
-	if ((argc == 1) || (argv[1][0] == 'W'))
-	{
-		wcout << "[Weather Data]" << endl;
-
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		printData("Temperature", pf->airTemp);
-		printData("Weather", getWeather(gf->rainIntensity));
-		printData("Weather10min", getWeather(gf->rainIntensityIn10min));
-		printData("Weather30min", getWeather(gf->rainIntensityIn30min));
-	}
-
-	if ((argc == 1) || (argv[1][0] == 'S'))
-	{
-		wcout << "[Session Data]" << endl;
-
-		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Session", getSession(gf->session));
-		wcout << "Car=" << sf->carModel << endl;
-		wcout << "Track=" << sf->track << endl;
-		wcout << "SessionFormat=Time" << endl;
-		printData("FuelAmount", sf->maxFuel);
-
-		double timeLeft = gf->sessionTimeLeft;
-
-		if (timeLeft < 0) {
-			timeLeft = 3600.0 * 1000;
-		}
-		
-		printData("SessionTimeRemaining", timeLeft);
-		printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
-
-	}
-
-	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))
-	{
-		wcout << "[Setup Data]" << endl;
-
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-		_bstr_t tc(gf->tyreCompound);
-		std::string tyreCompound(tc);
-
-		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
-		wcout << "TyreCompoundColor=Black" << endl;
-		printData("TyreSet", gf->mfdTyreSet + 1);
-		printData("FuelAmount", gf->mfdFuelToAdd);
-		printData("TyrePressureFL", gf->mfdTyrePressureFL);
-		printData("TyrePressureFR", gf->mfdTyrePressureFR);
-		printData("TyrePressureRL", gf->mfdTyrePressureRL);
-		printData("TyrePressureRR", gf->mfdTyrePressureRR);
+		Sleep(200);
 	}
 
 	dismiss(m_graphics);

@@ -529,7 +529,7 @@ class RaceStrategist extends RaceAssistant {
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 		
-		simulatorName := this.SetupDatabase.getSimulatorName(facts["Session.Simulator"])
+		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
 		
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			strategy := readConfiguration(kUserConfigDirectory . "Race.strategy")
@@ -620,7 +620,9 @@ class RaceStrategist extends RaceAssistant {
 			data := readConfiguration(data)
 		
 		facts := this.createSession(settings, data)
+		
 		simulatorName := this.Simulator
+		configuration := this.Configuration
 		
 		Process Exist, Race Engineer.exe
 		
@@ -629,14 +631,14 @@ class RaceStrategist extends RaceAssistant {
 		if raceEngineer
 			saveSettings := kNever
 		else
-			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
+			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
 		
 		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
-									  , SessionReportsDatabase: getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
-									  , SaveRaceReport: getConfigurationValue(this.Configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
+									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
 									  , SaveSettings: saveSettings})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)

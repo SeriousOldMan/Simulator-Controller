@@ -670,7 +670,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		configuration := this.Configuration
 		
-		simulatorName := this.SetupDatabase.getSimulatorName(facts["Session.Simulator"])
+		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
 		
 		facts["Session.Settings.Pitstop.Delta"] := getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
@@ -1066,48 +1066,6 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
 			
 			this.finishSession()
-		}
-	}
-	
-	saveSessionSettings() {
-		local knowledgeBase := this.KnowledgeBase
-		local compound
-		
-		if knowledgeBase {
-			setupDB := this.SetupDatabase
-			
-			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Now")
-			compound := knowledgeBase.getValue("Tyre.Compound")
-			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
-			
-			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
-			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
-		
-			duration := (Round((duration / 60) / 5) * 300)
-			
-			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
-			
-			lapTime := Round(this.BestLapTime / 1000)
-			
-			if (lapTime > 10)
-				values["AvgLapTime"] := lapTime
-			
-			if (loadSettings = "SetupDatabase")
-				setupDB.updateSettings(simulatorName, car, track
-									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
-			else {
-				fileName := getFileName("Race.settings", kUserConfigDirectory)
-				
-				settings := readConfiguration(fileName)
-				
-				setupDB.updateSettingsValues(settings, values)
-				
-				writeConfiguration(fileName, settings)
-			}
 		}
 	}
 

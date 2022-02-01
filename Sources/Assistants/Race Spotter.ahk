@@ -106,7 +106,7 @@ startRaceSpotter() {
 	spotterLogo := false
 	spotterLanguage := false
 	spotterService := true
-	spotterSpeaker := true
+	spotterSpeaker := false
 	spotterSpeakerVocalics := false
 	spotterListener := false
 	debug := false

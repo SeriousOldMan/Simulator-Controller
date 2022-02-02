@@ -211,16 +211,12 @@ class RaceSpotter extends RaceAssistant {
 		
 		Process Exist, Race Engineer.exe
 		
-		raceEngineer := (ErrorLevel > 0)
-		
-		if raceEngineer
+		if (ErrorLevel > 0)
 			saveSettings := kNever
 		else {
 			Process Exist, Race Strategist.exe
 		
-			raceStrategist := (ErrorLevel > 0)
-		
-			if raceStrategist
+			if (ErrorLevel > 0)
 				saveSettings := kNever
 			else
 				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
@@ -236,7 +232,7 @@ class RaceSpotter extends RaceAssistant {
 		this.startupSpotter()
 		
 		if this.Speaker
-			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
+			this.getSpeaker().speakPhrase("Greeting")
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

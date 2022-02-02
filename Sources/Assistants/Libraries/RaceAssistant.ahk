@@ -634,6 +634,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	prepareSession(ByRef settings, ByRef data) {
+		if !IsObject(settings)
+			settings := readConfiguration(settings)
+		
+		if !IsObject(data)
+			data := readConfiguration(data)
+	}
+	
 	startSession(settings, data) {
 		Throw "Virtual method RaceAssistant.startSession must be implemented in a subclass..."
 	}

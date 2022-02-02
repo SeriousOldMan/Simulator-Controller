@@ -94,6 +94,8 @@ int sendStringMessage(HWND hWnd, int wParam, string msg) {
 }
 
 void sendMessage(string message) {
+	wcout << message.c_str() << endl;
+	return;
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
 
 	if (winHandle == 0)
@@ -144,17 +146,21 @@ const string noAlert = "NoAlert";
 string computeAlert(int newSituation) {
 	string alert = noAlert;
 
-	if (lastSituation && (lastSituation == newSituation)) {
-		if (situationCount++ > situationRepeat) {
-			situationCount = 0;
+	if (lastSituation == newSituation) {
+		if (lastSituation > CLEAR) {
+			if (situationCount++ > situationRepeat) {
+				situationCount = 0;
 
-			alert = "Hold";
+				alert = "Hold";
+			}
 		}
+		else
+			situationCount = 0;
 	}
 	else {
 		situationCount = 0;
 
-		if (!lastSituation) {
+		if (lastSituation == CLEAR) {
 			switch (newSituation) {
 			case LEFT:
 				alert = "Left";
@@ -229,15 +235,15 @@ void rotateBy(float* x, float* y, float angle) {
 int checkCarPosition(float carX, float carY, float carZ, float angle,
 					 float otherX, float otherY, float otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
-		otherX -= carX;
-		otherY -= carY;
-		
-		rotateBy(&otherX, &otherY, angle);
+		float transX = (otherX - carX);
+		float transY = (otherY - carY);
 
-		if ((abs(otherY) < longitudinalDistance) && (abs(otherX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
-			return (otherX > 0) ? RIGHT : LEFT;
+		rotateBy(&transX, &transY, angle);
+
+		if ((abs(transY) < longitudinalDistance) && (abs(transX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
+			return (transX > 0) ? RIGHT : LEFT;
 		else {
-			if (otherY < 0)
+			if (transY < 0)
 				carBehind = true;
 
 			return CLEAR;
@@ -254,49 +260,54 @@ void checkPositions() {
 
 	float velocityX = pf->velocity[0];
 	float velocityY = pf->velocity[1];
+	
+	if ((velocityX > 0) || (velocityY > 0)) {
+		float angle = vectorAngle(velocityX, velocityY);
+		
+		int carID = gf->playerCarID;
+		float coordinateX = gf->carCoordinates[carID][0];
+		float coordinateY = gf->carCoordinates[carID][1];
+		float coordinateZ = gf->carCoordinates[carID][2];
 
-	float angle = vectorAngle(velocityX, velocityY);
+		int newSituation = CLEAR;
 
-	int carID = gf->playerCarID;
-	float coordinateX = gf->carCoordinates[carID][0];
-	float coordinateY = gf->carCoordinates[carID][1];
-	float coordinateZ = gf->carCoordinates[carID][2];
+		carBehind = false;
 
-	int newSituation = CLEAR;
+		for (int id = 0; id < gf->activeCars; id++) {
+			// wcout << id << "; " << carCoordinates[id][0] << "; " << carCoordinates[id][1] << "; " << carCoordinates[id][2] << endl;
 
-	carBehind = false;
+			if (id != carID)
+				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
+												 gf->carCoordinates[id][0], gf->carCoordinates[id][1], gf->carCoordinates[id][2]);
 
-	for (int id = 0; id < gf->activeCars; id++) {
-		wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
-
-		if (id != carID)
-			newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-											 gf->carCoordinates[id][0],
-											 gf->carCoordinates[id][1],
-											 gf->carCoordinates[id][2]);
-
-		if ((newSituation == BOTH) && carBehind)
-			break;
-	}
-
-	exit(0);
-
-	string alert = computeAlert(newSituation);
-
-	if (alert != noAlert) {
-		carBehindReported = false;
-
-		sendMessage("alert:" + alert);
-	}
-	else if (carBehind) {
-		if (!carBehindReported) {
-			carBehindReported = true;
-
-			sendMessage("alert:Behind");
+			if ((newSituation == BOTH) && carBehind)
+				break;
 		}
+
+		string alert = computeAlert(newSituation);
+
+		if (alert != noAlert) {
+			carBehindReported = false;
+
+			sendMessage("alert:" + alert);
+		}
+		else if (carBehind) {
+			if (!carBehindReported) {
+				carBehindReported = true;
+
+				sendMessage("alert:Behind");
+			}
+		}
+		else
+			carBehindReported = false;
 	}
-	else
+	else {
+		wcout << "!!!!!!" << endl;
+
+		lastSituation = CLEAR;
+		carBehind = false;
 		carBehindReported = false;
+	}
 }
 
 int main(int argc, char* argv[])

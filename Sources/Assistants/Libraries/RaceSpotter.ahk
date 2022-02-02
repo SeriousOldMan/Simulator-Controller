@@ -116,7 +116,7 @@ class RaceSpotter extends RaceAssistant {
 		code := this.SessionDatabase.getSimulatorCode(this.Simulator)
 		
 		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
-		
+		showMessage(exePath)
 		if FileExist(exePath) {
 			this.shutdownSpotter()
 			
@@ -171,6 +171,28 @@ class RaceSpotter extends RaceAssistant {
 			
 			base.updateSession(settings)
 		}
+	}
+	
+	prepareSession(settings, data) {
+		base.prepareSession(settings, data)
+		
+		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		
+		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
+			case "Practice":
+				session := kSessionPractice
+			case "Qualification":
+				session := kSessionQualification
+			case "Race":
+				session := kSessionRace
+			default:
+				session := kSessionOther
+		}
+		
+		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now})
+		showMessage("PS " . simulatorName)
+		this.startupSpotter()
 	}
 	
 	startSession(settings, data) {

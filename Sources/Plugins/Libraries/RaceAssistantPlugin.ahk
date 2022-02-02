@@ -64,6 +64,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("shutdown", arguments*)
 		}
 		
+		prepareSession(arguments*) {
+			this.callRemote("prepareSession", arguments*)
+		}
+		
 		startSession(arguments*) {
 			this.callRemote("startSession", arguments*)
 		}
@@ -736,6 +740,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 	
+	prepareSession(settingsFile, dataFile) {
+		if this.RaceAssistant
+			this.RaceAssistant.prepareSession(settingsFile, dataFile)
+	}
+	
 	startSession(settingsFile, dataFile, teamSession) {
 		if this.Simulator {
 			code := this.Simulator.Code
@@ -1033,6 +1042,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					; Not in a supported session
 				
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 			
@@ -1046,6 +1056,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					; Start of new race without finishing previous race first
 				
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 			
@@ -1058,7 +1069,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 					if !this.RaceAssistant
 						this.startupRaceAssistant()
-						
+					
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
@@ -1068,9 +1079,24 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.iInPit := dataLastLap
 						}
 					}
-					; else if (dataLastLap == 0) {
+					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
-					; }
+					
+						if (this.iLastLapCounter == 0) {
+							this.iLastLapCounter := this.iLastLapCounter + 1
+							
+							dataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap 0.0.data"
+								
+							writeConfiguration(dataFile, data)
+							
+							settings := this.prepareSettings(data)
+							settingsFile := (kTempDirectory . this.Plugin . ".settings")
+							
+							writeConfiguration(settingsFile, settings)
+							
+							this.prepareSession(settingsFile, dataFile)
+						}
+					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 					
@@ -1122,6 +1148,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if newLap {
 							if this.iFinished {
 								this.iLastLap := 0
+								this.iLastLapCounter := 0
 								this.iFinished := false
 								this.iInPit := false
 						
@@ -1156,7 +1183,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
 								this.TeamServer.setSessionValue(this.Plugin . " State", "")
 							}
-								
+							
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")
 							
@@ -1194,6 +1221,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 				else {
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 				}
@@ -1212,6 +1240,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			
 			this.iLastLap := 0
+			this.iLastLapCounter := 0
 			this.iFinished := false
 			this.iInPit := false
 		

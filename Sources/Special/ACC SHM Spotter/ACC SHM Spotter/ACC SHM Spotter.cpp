@@ -94,8 +94,8 @@ int sendStringMessage(HWND hWnd, int wParam, string msg) {
 }
 
 void sendMessage(string message) {
-	wcout << message.c_str() << endl;
-	return;
+	// wcout << message.c_str() << endl;
+	// return;
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
 
 	if (winHandle == 0)
@@ -125,14 +125,14 @@ inline const string getSession(AC_SESSION_TYPE session) {
 #define PI 3.14159265
 
 const float nearByDistance = 8.0;
-const float longitudinalDistance = 3.5;
-const float lateralDistance = 5;
+const float longitudinalDistance = 4;
+const float lateralDistance = 6;
 const float verticalDistance = 4;
 
 const int CLEAR = 0;
 const int LEFT = 1;
 const int RIGHT = 2;
-const int BOTH = 3;
+const int THREE = 3;
 
 int lastSituation = CLEAR;
 int situationCount = 0;
@@ -168,7 +168,7 @@ string computeAlert(int newSituation) {
 			case RIGHT:
 				alert = "Right";
 				break;
-			case BOTH:
+			case THREE:
 				alert = "Three";
 				break;
 			}
@@ -176,22 +176,25 @@ string computeAlert(int newSituation) {
 		else {
 			switch (newSituation) {
 			case CLEAR:
-				if (lastSituation == BOTH)
+				if (lastSituation == THREE)
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
 				break;
 			case LEFT:
-				if (lastSituation == BOTH)
+				if (lastSituation == THREE)
 					alert = "ClearRight";
 				else
 					alert = "Three";
 				break;
 			case RIGHT:
-				if (lastSituation == BOTH)
+				if (lastSituation == THREE)
 					alert = "ClearLeft";
 				else
 					alert = "Three";
+				break;
+			case THREE:
+				alert = "Three";
 				break;
 			}
 		}
@@ -241,7 +244,7 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		rotateBy(&transX, &transY, angle);
 
 		if ((abs(transY) < longitudinalDistance) && (abs(transX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
-			return (transX > 0) ? RIGHT : LEFT;
+			return (transX < 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0)
 				carBehind = true;
@@ -259,28 +262,40 @@ void checkPositions() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	float velocityX = pf->velocity[0];
-	float velocityY = pf->velocity[1];
-	
-	if ((velocityX > 0) || (velocityY > 0)) {
+	float velocityY = pf->velocity[2];
+	float velocityZ = pf->velocity[1];
+
+	// wcout << velocityX << "; " << velocityY << "; " << velocityZ << endl;
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		float angle = vectorAngle(velocityX, velocityY);
-		
+
 		int carID = gf->playerCarID;
+
+		int index = 0;
+
+		for (int i = 0; i < gf->activeCars; i++)
+			if (gf->carID[i] == carID) {
+				carID = i;
+				break;
+			}
+
 		float coordinateX = gf->carCoordinates[carID][0];
-		float coordinateY = gf->carCoordinates[carID][1];
-		float coordinateZ = gf->carCoordinates[carID][2];
+		float coordinateY = gf->carCoordinates[carID][2];
+		float coordinateZ = gf->carCoordinates[carID][1];
 
 		int newSituation = CLEAR;
 
 		carBehind = false;
 
 		for (int id = 0; id < gf->activeCars; id++) {
-			// wcout << id << "; " << carCoordinates[id][0] << "; " << carCoordinates[id][1] << "; " << carCoordinates[id][2] << endl;
+			// wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
 
 			if (id != carID)
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-												 gf->carCoordinates[id][0], gf->carCoordinates[id][1], gf->carCoordinates[id][2]);
+												 gf->carCoordinates[id][0], gf->carCoordinates[id][2], gf->carCoordinates[id][1]);
 
-			if ((newSituation == BOTH) && carBehind)
+			if ((newSituation == THREE) && carBehind)
 				break;
 		}
 
@@ -302,8 +317,6 @@ void checkPositions() {
 			carBehindReported = false;
 	}
 	else {
-		wcout << "!!!!!!" << endl;
-
 		lastSituation = CLEAR;
 		carBehind = false;
 		carBehindReported = false;

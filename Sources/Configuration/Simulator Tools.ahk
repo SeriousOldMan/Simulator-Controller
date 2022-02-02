@@ -1251,12 +1251,12 @@ editTargets(command := "") {
 updatePhraseGrammars() {
 	languages := availableLanguages()
 	
-	for ignore, filePrefix in ["Race Engineer.grammars.*", "Race Strategist.grammars.*"]
-		for ignore, grammarFileName in getFileNames(filePrefix, kUserGrammarsDirectory, kUserConfigDirectory) {
+	for ignore, filePrefix in ["Race Engineer.grammars.", "Race Strategist.grammars.", "Race Spotter.grammars."]
+		for ignore, grammarFileName in getFileNames(filePrefix . "*", kUserGrammarsDirectory, kUserConfigDirectory) {
 			SplitPath grammarFileName, , , languageCode
 			
 			userGrammars := readConfiguration(grammarFileName)
-			bundledGrammars := readConfiguration(getFileName("Race Engineer.grammars." . languageCode, kGrammarsDirectory, kConfigDirectory))
+			bundledGrammars := readConfiguration(getFileName(filePrefix . languageCode, kGrammarsDirectory, kConfigDirectory))
 		
 			for section, keyValues in bundledGrammars
 				for key, value in keyValues
@@ -1605,6 +1605,21 @@ updateConfigurationForV310() {
 		catch exception {
 			; ignore
 		}
+}
+
+updatePluginsForV386() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false) {
+			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistantName: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
+			
+			raceSpotter.saveToConfiguration(userConfiguration)
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
 }
 
 updatePluginsForV370() {

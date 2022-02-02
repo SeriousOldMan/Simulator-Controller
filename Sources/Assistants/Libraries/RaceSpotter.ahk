@@ -176,21 +176,8 @@ class RaceSpotter extends RaceAssistant {
 	prepareSession(settings, data) {
 		base.prepareSession(settings, data)
 		
-		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
-		
-		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
-			case "Practice":
-				session := kSessionPractice
-			case "Qualification":
-				session := kSessionQualification
-			case "Race":
-				session := kSessionRace
-			default:
-				session := kSessionOther
-		}
-		
-		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now})
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Greeting")
 		
 		this.startupSpotter()
 	}
@@ -222,7 +209,7 @@ class RaceSpotter extends RaceAssistant {
 				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
 		
-		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 									  , SaveSettings: saveSettings})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
@@ -230,9 +217,6 @@ class RaceSpotter extends RaceAssistant {
 								, EnoughData: false})
 		
 		this.startupSpotter()
-		
-		if this.Speaker
-			this.getSpeaker().speakPhrase("Greeting")
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

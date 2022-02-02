@@ -525,8 +525,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	createSession(ByRef settings, ByRef data) {
-		local facts
+	prepareSession(ByRef settings, ByRef data) {
+		if (settings && !IsObject(settings))
+			settings := readConfiguration(settings)
+		
+		if (data && !IsObject(data))
+			data := readConfiguration(data)
 		
 		if settings
 			this.updateConfigurationValues({Settings: settings})
@@ -548,14 +552,49 @@ class RaceAssistant extends ConfigurationItem {
 				session := kSessionOther
 		}
 		
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+		
 		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
-								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)})
+								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+	}
+	
+	createSession(ByRef settings, ByRef data) {
+		local facts
+		
+		if (settings && !IsObject(settings))
+			settings := readConfiguration(settings)
+		
+		if (data && !IsObject(data))
+			data := readConfiguration(data)
+		
+		if settings
+			this.updateConfigurationValues({Settings: settings})
+		
+		configuration := this.Configuration
+		settings := this.Settings
+		
+		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		
+		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
+			case "Practice":
+				session := kSessionPractice
+			case "Qualification":
+				session := kSessionQualification
+			case "Race":
+				session := kSessionRace
+			default:
+				session := kSessionOther
+		}
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 		
-		this.updateSessionValues({DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
+								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
@@ -632,14 +671,6 @@ class RaceAssistant extends ConfigurationItem {
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledge(knowledgeBase)
 		}
-	}
-	
-	prepareSession(ByRef settings, ByRef data) {
-		if !IsObject(settings)
-			settings := readConfiguration(settings)
-		
-		if !IsObject(data)
-			data := readConfiguration(data)
 	}
 	
 	startSession(settings, data) {

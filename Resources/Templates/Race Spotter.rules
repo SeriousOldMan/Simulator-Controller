@@ -95,6 +95,31 @@ clearLaps(0) <= !
 clearLaps(?lap) <= ?lap < 0, !
 clearLaps(?lap) <= clearLap(?lap), ?pLap = ?lap - 1, clearLaps(?pLap)
 
+priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
+
+clearStandings() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearStandings(?clearLap)
+
+clearStandings(0) <= !
+clearStandings(?lap) <= ?lap < 0, !
+clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
+
+clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),					\
+					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),														\
+					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),											\
+					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),												\
+					   clearStanding(?lap, ?carCount), clearExtrapolatedLap(?lap, ?carCount)
+clearStanding(?)
+
+clearStanding(?, 0) <= !
+clearStanding(?, ?car) <= ?car < 0, !
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,														\
+														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),							\
+							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
+
+clearStanding(?, ?, []) <= !
+clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),						\
+											   clearStanding(?lap, ?car, ?names)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Car Information Retrieval                       ;;;

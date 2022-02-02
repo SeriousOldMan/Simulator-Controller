@@ -120,7 +120,12 @@ inline const string getSession(AC_SESSION_TYPE session) {
 	}
 }
 
-const float distanceThreshold = 2.0;
+#define PI 3.14159265
+
+const float nearByDistance = 8.0;
+const float longitudinalDistance = 3.5;
+const float lateralDistance = 5;
+const float verticalDistance = 4;
 
 const int CLEAR = 0;
 const int LEFT = 1;
@@ -129,9 +134,10 @@ const int BOTH = 3;
 
 int lastSituation = CLEAR;
 int situationCount = 0;
-const int situationRepeat = 2;
+const int situationRepeat = 5;
 
 bool carBehind = false;
+bool carBehindReported = false;
 
 const string noAlert = "NoAlert";
 
@@ -196,6 +202,8 @@ float vectorAngle(float x, float y) {
 	
 	float angle = (length > 0) ? acos(scalar / length) : 0;
 
+	angle = angle * 180 / PI;
+
 	if (x < 0)
 		angle = 360 - angle;
 
@@ -204,14 +212,14 @@ float vectorAngle(float x, float y) {
 
 bool nearBy(float car1X, float car1Y, float car1Z,
 			float car2X, float car2Y, float car2Z) {
-	return (abs(car1X - car2X) < distanceThreshold) &&
-		   (abs(car1Y - car2Y) < distanceThreshold) &&
-		   (abs(car1Y - car2Y) < distanceThreshold);
+	return (abs(car1X - car2X) < nearByDistance) &&
+		   (abs(car1Y - car2Y) < nearByDistance) &&
+		   (abs(car1Y - car2Y) < nearByDistance);
 }
 
 void rotateBy(float* x, float* y, float angle) {
-	float sinus = sin(angle);
-	float cosinus = cos(angle);
+	float sinus = sin(angle * PI / 180);
+	float cosinus = cos(angle * PI / 180);
 
 	*x = (*x * cosinus) - (*y * sinus);
 	*y = (*x * sinus) - (*y * cosinus);
@@ -225,7 +233,14 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		
 		rotateBy(&otherX, &otherY, angle);
 
-		return (otherX > 0) ? RIGHT : LEFT;
+		if ((abs(otherY) < longitudinalDistance) && (abs(otherX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
+			return (otherX > 0) ? RIGHT : LEFT;
+		else {
+			if (otherY < 0)
+				carBehind = true;
+
+			return CLEAR;
+		}
 	}
 	else
 		return CLEAR;
@@ -248,6 +263,8 @@ void checkPositions() {
 
 	int newSituation = CLEAR;
 
+	carBehind = false;
+
 	for (int id = 0; id < gf->activeCars; id++) {
 		if (id != carID)
 			newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
@@ -255,14 +272,26 @@ void checkPositions() {
 											 gf->carCoordinates[id][1],
 											 gf->carCoordinates[id][2]);
 
-		if (newSituation == BOTH)
+		if ((newSituation == BOTH) && carBehind)
 			break;
 	}
 
 	string alert = computeAlert(newSituation);
 
-	if (alert != noAlert)
+	if (alert != noAlert) {
+		carBehindReported = false;
+
 		sendMessage("alert:" + alert);
+	}
+	else if (carBehind) {
+		if (!carBehindReported) {
+			carBehindReported = true;
+
+			sendMessage("alert:Behind");
+		}
+	}
+	else
+		carBehindReported = false;
 }
 
 int main(int argc, char* argv[])
@@ -271,8 +300,10 @@ int main(int argc, char* argv[])
 	initGraphics();
 	initStatic();
 
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
 	while (true) {
-		if (((SPageFileGraphic*)m_graphics.mapFileBuffer)->status == AC_LIVE)
+		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane)
 			checkPositions();
 		else
 			lastSituation = CLEAR;

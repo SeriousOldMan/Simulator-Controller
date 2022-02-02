@@ -221,8 +221,11 @@ void rotateBy(float* x, float* y, float angle) {
 	float sinus = sin(angle * PI / 180);
 	float cosinus = cos(angle * PI / 180);
 
-	*x = (*x * cosinus) - (*y * sinus);
-	*y = (*x * sinus) - (*y * cosinus);
+	float newX = (*x * cosinus) - (*y * sinus);
+	float newY = (*x * sinus) - (*y * cosinus);
+
+	*x = newX;
+	*y = newY;
 }
 
 int checkCarPosition(float carX, float carY, float carZ, float angle,

@@ -200,9 +200,7 @@ float vectorAngle(float x, float y) {
 	float scalar = (x * 0) + (y * 1);
 	float length = sqrt((x * x) + (y * y));
 	
-	float angle = (length > 0) ? acos(scalar / length) : 0;
-
-	angle = angle * 180 / PI;
+	float angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
 
 	if (x < 0)
 		angle = 360 - angle;
@@ -222,7 +220,7 @@ void rotateBy(float* x, float* y, float angle) {
 	float cosinus = cos(angle * PI / 180);
 
 	float newX = (*x * cosinus) - (*y * sinus);
-	float newY = (*x * sinus) - (*y * cosinus);
+	float newY = (*x * sinus) + (*y * cosinus);
 
 	*x = newX;
 	*y = newY;

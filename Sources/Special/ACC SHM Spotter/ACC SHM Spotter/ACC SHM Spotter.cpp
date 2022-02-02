@@ -214,7 +214,7 @@ bool nearBy(float car1X, float car1Y, float car1Z,
 			float car2X, float car2Y, float car2Z) {
 	return (abs(car1X - car2X) < nearByDistance) &&
 		   (abs(car1Y - car2Y) < nearByDistance) &&
-		   (abs(car1Y - car2Y) < nearByDistance);
+		   (abs(car1Z - car2Z) < nearByDistance);
 }
 
 void rotateBy(float* x, float* y, float angle) {
@@ -266,6 +266,8 @@ void checkPositions() {
 	carBehind = false;
 
 	for (int id = 0; id < gf->activeCars; id++) {
+		wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
+
 		if (id != carID)
 			newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
 											 gf->carCoordinates[id][0],
@@ -275,6 +277,8 @@ void checkPositions() {
 		if ((newSituation == BOTH) && carBehind)
 			break;
 	}
+
+	exit(0);
 
 	string alert = computeAlert(newSituation);
 

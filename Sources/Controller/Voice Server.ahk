@@ -207,9 +207,9 @@ class VoiceServer extends ConfigurationItem {
 				if (create && this.Speaker && !this.iSpeechSynthesizer) {
 					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Service, this.Speaker, this.Language)
 					
-					this.iSpeechSynthesizer.setVolume(this.iSpeakerVolume)
-					this.iSpeechSynthesizer.setPitch(this.iSpeakerPitch)
-					this.iSpeechSynthesizer.setRate(this.iSpeakerSpeed)
+					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
+					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
+					this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
 				}
 				
 				return this.iSpeechSynthesizer
@@ -416,6 +416,24 @@ class VoiceServer extends ConfigurationItem {
 	Listening[] {
 		Get {
 			return this.iIsListening
+		}
+	}
+	
+	SpeakerVolume[] {
+		Get {
+			return this.iSpeakerVolume
+		}
+	}
+	
+	SpeakerPitch[] {
+		Get {
+			return this.iSpeakerPitch
+		}
+	}
+	
+	SpeakerSpeed[] {
+		Get {
+			return this.iSpeakerSpeed
 		}
 	}
 	
@@ -634,25 +652,25 @@ class VoiceServer extends ConfigurationItem {
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
-			speakerVolume := this.iSpeakerVolume
+			speakerVolume := this.SpeakerVolume
 		
 		if (speakerPitch = kUndefined)
-			speakerPitch := this.iSpeakerPitch
+			speakerPitch := this.SpeakerPitch
 		
 		if (speakerSpeed = kUndefined)
-			speakerSpeed := this.iSpeakerSpeed
+			speakerSpeed := this.SpeakerSpeed
 		
 		if (service == true)
-			service := this.iService
+			service := this.Service
 		
 		if (speaker == true)
-			speaker := this.iSpeaker
+			speaker := this.Speaker
 		
 		if (listener == true)
-			listener := this.iListener
+			listener := this.Listener
 		
 		if (language == false)
-			language := this.iLanguage
+			language := this.Language
 		
 		client := this.VoiceClients[descriptor]
 		

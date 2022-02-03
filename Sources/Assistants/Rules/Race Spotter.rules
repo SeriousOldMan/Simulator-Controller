@@ -1,0 +1,177 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Race Spotter Rules              ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Global Trigger                              ;;;
+;;;                                                                         ;;;
+;;; Entry points for the surrounding script code. Typically, the rule       ;;;
+;;; will be triggered by setting a target fact and call "produce()" on the  ;;;
+;;; KnowledgeBase instance.                                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;; Each lap, after all the lap data has been copied to the knowledge base, ;;;
+;;; all target data for race positions, lap times and strategy will be      ;;;
+;;; recomputed upon the data of the last laps, and so on.                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Lap] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;; "Cleanup" can be set to remove unnecessary knowledge from the memory.   ;;;
+;;; Set "Cleanup" to "Laps" to remove all recent laps, that are outside the ;;;
+;;; the statistical window. This is done automatically after a pitstop.     ;;;
+;;; You can also set it to "Standings", which will remove all standings     ;;;
+;;; from the memory, which are "older" than									;;;
+;;; "Session.Settings.Lap.History.Considered".								;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Cleanup] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Lap & Fuel Calculation                         ;;;
+;;;                                                                         ;;;
+;;; Updates the remaining laps with the current amount of fuel and the      ;;;
+;;; remaining stint time for the current driver.                            ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
+
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
+updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
+
+priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],																				\
+					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],																			\
+					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
+priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],																				\
+					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                           Lap Time Calculation                          ;;;
+;;;                                                                         ;;;
+;;; Updates the laptimes for all cars each lap.                             ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
+
+updateLapTimes(?, ?car) <= =<(?car, 0), !
+updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),									\
+							  ?nextCar = ?car - 1, updateLapTimes(?lap, ?nextCar)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                      Position & Lap Delta Calculation                   ;;;
+;;;                                                                         ;;;
+;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Standings Computations.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                              Memory Cleanup                             ;;;
+;;;                                                                         ;;;
+;;; These rules remove knowledge that is no longer needed.					;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Lap] => (Set: Cleanup, Laps)
+
+priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Set: Cleanup, Standings)
+
+clearLaps() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearLaps(?clearLap)
+
+clearLaps(0) <= !
+clearLaps(?lap) <= ?lap < 0, !
+clearLaps(?lap) <= clearLap(?lap), ?pLap = ?lap - 1, clearLaps(?pLap)
+
+priority: -40, [?Cleanup = Standings] => (Prove: clearStandings()), (Clear: Cleanup)
+
+clearStandings() <= ?lap = !Lap - 1, ?clearLap = ?lap - !Session.Settings.Lap.History.Considered, clearStandings(?clearLap)
+
+clearStandings(0) <= !
+clearStandings(?lap) <= ?lap < 0, !
+clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
+
+clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),					\
+					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),														\
+					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),											\
+					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),												\
+					   clearStanding(?lap, ?carCount), clearExtrapolatedLap(?lap, ?carCount)
+clearStanding(?)
+
+clearStanding(?, 0) <= !
+clearStanding(?, ?car) <= ?car < 0, !
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,														\
+														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),							\
+							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
+
+clearStanding(?, ?, []) <= !
+clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),						\
+											   clearStanding(?lap, ?car, ?names)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Car Information Retrieval                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Car Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Tyre Information Retrieval                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Tyre Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Lap Information Retrieval                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Lap Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Pitstop Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                       Weather Information Retrieval                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Weather Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Session & Stint Information Retrieval                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Session Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Statistical Computations                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Statistical Computations.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                               Utilities                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Utilities.rules

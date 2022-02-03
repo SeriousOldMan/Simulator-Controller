@@ -3613,12 +3613,23 @@ class RaceCenter extends ConfigurationItem {
 			
 			version := this.Connector.getSessionValue(session, "Race Strategy Version")
 			
-			if (version && (version != ""))
+			if (version && (version != "")) {
 				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
 					strategy := this.Connector.getSessionValue(session, "Race Strategy")
 				
 					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy)))
 				}
+			}
+			else if (!this.Strategy && !this.LastLap) {
+				fileName := kUserConfigDirectory . "Race.strategy"
+				
+				if FileExist(fileName) {
+					configuration := readConfiguration(fileName)
+					
+					if (configuration.Count() > 0)
+						this.selectStrategy(this.createStrategy(configuration), true)
+				}
+			}
 		}
 		catch exception {
 			; ignore
@@ -6417,7 +6428,18 @@ class TrafficSimulation extends StrategySimulation {
 		scenarios := {}
 		variation := 1
 		
+		first := true
+		numScenarios += 1
+		
 		Loop {
+			if first {
+				first := false
+				
+				this.iRandomFactor := 0
+			}
+			else
+				this.iRandomFactor := randomFactor
+			
 			if (variation > numScenarios)
 				break
 			

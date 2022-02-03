@@ -1,14 +1,13 @@
 #### Driving
-  1. [Target: V3.9] Configuration of assistant verbosity and overhaul (shortening) of phrases.
-  2. [Target: V3.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
-  3. [Target: V3.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
+  1. [Target: V3.9.x] Configuration of assistant verbosity and overhaul (shortening) of phrases.
+  2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
+  3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
-  5. [Target: V4.x] Third assistant, a spotter
+  5. [Target: V3.9.x] Add spooter engines for RF2, R3E, AMS2 and iRacing
 
 #### Strategy
   1. [Target: V3.x - V4.0] Using the technology of Jona, implement a Race Strategy Expert
      - Adjust pitstop strategy depending on upcoming weather conditions
-  2. [Target: V3.9] Implement Monte-Carlo analysis for inrace strategy updates in Race Center
 
 #### Setup Database
   1. [Target: V3.x - V4.0] Consolidating the shared setup database and build a distribution process

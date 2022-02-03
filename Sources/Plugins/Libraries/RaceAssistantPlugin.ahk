@@ -24,6 +24,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantLanguage := false
 	iRaceAssistantService := false
 	iRaceAssistantSpeaker := false
+	iRaceAssistantSpeakerVocalics := false
 	iRaceAssistantListener := false
 	
 	iRaceAssistant := false
@@ -61,6 +62,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		shutdown(arguments*) {
 			this.callRemote("shutdown", arguments*)
+		}
+		
+		prepareSession(arguments*) {
+			this.callRemote("prepareSession", arguments*)
 		}
 		
 		startSession(arguments*) {
@@ -332,6 +337,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceAssistantSpeakerVocalics[] {
+		Get {
+			return this.iRaceAssistantSpeakerVocalics
+		}
+	}
+	
 	RaceAssistantListener[] {
 		Get {
 			return this.iRaceAssistantListener
@@ -424,6 +435,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
 			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
+		
+			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
 		
 			assistantListener := this.getArgumentValue("raceAssistantListener", false)
 			
@@ -590,7 +603,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			
 			controllerPID := ErrorLevel
 			raceAssistantPID := 0
-								
+			
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 				
@@ -610,6 +623,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 				if this.RaceAssistantSpeaker
 					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
+				
+				if this.RaceAssistantSpeakerVocalics
+					options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
 				
 				if this.RaceAssistantListener
 					options .= " -Listener """ . this.RaceAssistantListener . """"
@@ -722,6 +738,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		if (teamServer && teamServer.TeamServerEnabled)
 			teamServer.disconnect()
+	}
+	
+	prepareSession(settingsFile, dataFile) {
+		if this.RaceAssistant
+			this.RaceAssistant.prepareSession(settingsFile, dataFile)
 	}
 	
 	startSession(settingsFile, dataFile, teamSession) {
@@ -1021,6 +1042,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					; Not in a supported session
 				
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 			
@@ -1034,6 +1056,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					; Start of new race without finishing previous race first
 				
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 			
@@ -1046,7 +1069,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				
 					if !this.RaceAssistant
 						this.startupRaceAssistant()
-						
+					
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 						
@@ -1056,9 +1079,24 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.iInPit := dataLastLap
 						}
 					}
-					; else if (dataLastLap == 0) {
+					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
-					; }
+					
+						if (this.iLastLapCounter == 0) {
+							this.iLastLapCounter := this.iLastLapCounter + 1
+							
+							dataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap 0.0.data"
+								
+							writeConfiguration(dataFile, data)
+							
+							settings := this.prepareSettings(data)
+							settingsFile := (kTempDirectory . this.Plugin . ".settings")
+							
+							writeConfiguration(settingsFile, settings)
+							
+							this.prepareSession(settingsFile, dataFile)
+						}
+					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 					
@@ -1110,6 +1148,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if newLap {
 							if this.iFinished {
 								this.iLastLap := 0
+								this.iLastLapCounter := 0
 								this.iFinished := false
 								this.iInPit := false
 						
@@ -1144,7 +1183,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
 								this.TeamServer.setSessionValue(this.Plugin . " State", "")
 							}
-								
+							
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")
 							
@@ -1182,6 +1221,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 				else {
 					this.iLastLap := 0
+					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 				}
@@ -1200,6 +1240,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			
 			this.iLastLap := 0
+			this.iLastLapCounter := 0
 			this.iFinished := false
 			this.iInPit := false
 		

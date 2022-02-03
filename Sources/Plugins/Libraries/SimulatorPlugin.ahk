@@ -490,6 +490,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	
 	iRaceEngineer := false
 	iRaceStrategist := false
+	iRaceSpotter := false
 	
 	RaceEngineer[] {
 		Get {
@@ -500,6 +501,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	RaceStrategist[] {
 		Get {
 			return this.iRaceStrategist
+		}
+	}
+	
+	RaceSpotter[] {
+		Get {
+			return this.iRaceSpotter
 		}
 	}
 	
@@ -571,6 +578,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				
 				this.iRaceStrategist := raceStrategist
 			}
+			
+			if this.supportsSpotter() {
+				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
+				
+				if (raceSpotter && raceSpotter.isActive()) {
+					raceSpotter.startSimulation(this)
+					
+					this.iRaceSpotter := raceSpotter
+				}
+			}
 		}
 	}
 	
@@ -593,7 +610,21 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				
 				this.iRaceStrategist := false
 			}
+			
+			if this.supportsSpotter() {
+				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
+				
+				if (raceSpotter && raceSpotter.isActive()) {
+					raceSpotter.stopSimulation(this)
+					
+					this.iRaceSpotter := false
+				}
+			}
 		}
+	}
+	
+	supportsSpotter() {
+		return FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe")
 	}
 	
 	supportsPitstop() {

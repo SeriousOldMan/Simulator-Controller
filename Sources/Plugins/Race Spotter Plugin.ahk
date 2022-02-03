@@ -51,6 +51,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	createRaceAssistant(pid) {
 		return new this.RemoteRaceSpotter(pid)
 	}
+	
+	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		data := base.acquireSessionData(telemetryData, positionsData)
+		
+		this.updatePositionsData(data)
+		
+		if positionsData
+			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
+		
+		return data
+	}
 }
 
 

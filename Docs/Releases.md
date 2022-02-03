@@ -1,3 +1,12 @@
+## 3.8.6-release 02/04/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Extensive memory consumption reduction of all Race Assistants, especially when using the Team Server.
+  4. Initial implementation of a new Virtual Race Assistant, the [Spotter Elisa](*). The first version only supports ACC for the moment, all other Simulations will follow with the next releases.
+  5. New plugin ["Race Spotter"](*) as the configuration interface for the Spotter. Support for "Simulator Setup" will also follow with one of the next releases.
+  6. New plugin parameter "raceAssistantSpeakerVocalics" to set pitch, speed, etc. individually for each Race Assistant. See the [revised documentation](*) for more details.
+
 ## 3.8.4-release 01/28/22
 
   1. Bugfixes, as always

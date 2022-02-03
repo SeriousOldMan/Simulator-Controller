@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Engineer Rules             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2021) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -729,7 +729,7 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,			
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
+[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap))
 
 priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																					\
 								 (Clear: Pitstop.Planned.Fuel),																					\
@@ -768,6 +768,8 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 ;;;                                                                         ;;;
 ;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
+
+[?Pitstop.Lap] => (Set: Cleanup, Laps)
 
 priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 

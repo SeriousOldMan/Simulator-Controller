@@ -315,7 +315,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
+	SessionDatabase[] {
+		Get {
+			return this.SetupDatabase
+		}
+	}
+	
+	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
+	    , service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
@@ -330,11 +337,12 @@ class RaceAssistant extends ConfigurationItem {
 			options["Language"] := ((language != false) ? language : options["Language"])
 			options["Service"] := ((service == true) ? options["Service"] : service)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
+			options["Vocalics"] := (vocalics ? string2Values(",", vocalics) : options["Vocalics"])
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 		}
 		
-		this.iVoiceAssistant := new this.RaceVoiceAssistant(this, name, options)
+		this.iVoiceAssistant := this.createVoiceAssistant(name, options)
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -345,11 +353,15 @@ class RaceAssistant extends ConfigurationItem {
 		options["Language"] := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
 		options["Service"] := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
 		options["Speaker"] := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		options["SpeakerVolume"] := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		options["SpeakerPitch"] := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		options["SpeakerSpeed"] := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		options["Vocalics"] := Array(getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
+								   , getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
+								   , getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0))
 		options["Listener"] := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+	}
+	
+	createVoiceAssistant(name, options) {
+		return new this.RaceVoiceAssistant(this, name, options)
 	}
 	
 	updateConfigurationValues(values) {
@@ -513,8 +525,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	createSession(ByRef settings, ByRef data) {
-		local facts
+	prepareSession(ByRef settings, ByRef data) {
+		if (settings && !IsObject(settings))
+			settings := readConfiguration(settings)
+		
+		if (data && !IsObject(data))
+			data := readConfiguration(data)
 		
 		if settings
 			this.updateConfigurationValues({Settings: settings})
@@ -523,7 +539,7 @@ class RaceAssistant extends ConfigurationItem {
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SetupDatabase.getSimulatorName(simulator)
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
 		
 		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":
@@ -536,14 +552,49 @@ class RaceAssistant extends ConfigurationItem {
 				session := kSessionOther
 		}
 		
+		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
+		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+		
 		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
-								, Driver: getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)})
+								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+	}
+	
+	createSession(ByRef settings, ByRef data) {
+		local facts
+		
+		if (settings && !IsObject(settings))
+			settings := readConfiguration(settings)
+		
+		if (data && !IsObject(data))
+			data := readConfiguration(data)
+		
+		if settings
+			this.updateConfigurationValues({Settings: settings})
+		
+		configuration := this.Configuration
+		settings := this.Settings
+		
+		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		
+		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
+			case "Practice":
+				session := kSessionPractice
+			case "Qualification":
+				session := kSessionQualification
+			case "Race":
+				session := kSessionRace
+			default:
+				session := kSessionOther
+		}
 		
 		driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 		
-		this.updateSessionValues({DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
+								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 		
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 		
@@ -846,8 +897,8 @@ class RaceAssistant extends ConfigurationItem {
 			
 			Random postfix, 1, 1000000
 				
-			settingsFile := (kTempDirectory . "Race Strategist " . postfix . ".settings")
-			stateFile := (kTempDirectory . "Race Strategist " . postfix . ".state")
+			settingsFile := (kTempDirectory . "Race Assistant " . postfix . ".settings")
+			stateFile := (kTempDirectory . "Race Assistant " . postfix . ".state")
 			
 			writeConfiguration(settingsFile, this.Settings)
 			writeConfiguration(stateFile, savedKnowledgeBase)
@@ -909,7 +960,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		for key, value in knowledgeBase.Facts.Facts {
-			text := key . " = " . value . "`n"
+			text := (key . " = " . value . "`n")
 		
 			FileAppend %text%, %kTempDirectory%%prefix%.knowledge
 		}

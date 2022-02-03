@@ -338,6 +338,8 @@ GapToFrontTrack.Activate=
 GapToBehindTrack.Activate=
 StrategyOverview.Activate=
 NextPitstop.Activate=
+[Race Spotter]
+RaceAssistant.Toggle=
 [Team Server]
 TeamServer.Toggle=
 RaceSettingsOpen.Activate=

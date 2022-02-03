@@ -27,6 +27,29 @@
 class RaceSpotter extends RaceAssistant {
 	iSessionDataActive := false
 	
+	iSpotterPID := false
+	
+	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
+		iFastSpeechSynthesizer := false
+			
+		getSpeaker(fast := false) {
+			if fast {
+				if !this.iFastSpeechSynthesizer {
+					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+				
+					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
+					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)
+					this.iFastSpeechSynthesizer.setRate(this.SpeakerSpeed)
+				}
+			
+				return this.iFastSpeechSynthesizer
+			}
+			else
+				return base.getSpeaker()
+		}
+	}
+	
 	class RaceSpotterRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			base.__New("Race Spotter", remotePID)
@@ -39,8 +62,15 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	__New(configuration, remoteHandler, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, listener, voiceServer)
+	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
+		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		
+		OnExit(ObjBindMethod(this, "shutdownSpotter"))
+	}
+	
+	createVoiceAssistant(name, options) {
+		return new this.SpotterVoiceAssistant(this, name, options)
 	}
 	
 	updateConfigurationValues(values) {
@@ -61,10 +91,68 @@ class RaceSpotter extends RaceAssistant {
 				base.handleVoiceCommand(grammar, words)
 		}
 	}
+	
+	getSpeaker(fast := false) {
+		return this.VoiceAssistant.getSpeaker(fast)
+	}
+	
+	alert(phrase, variables := false) {
+		if (variables && !IsObject(variables)) {
+			values := {}
+			
+			for ignore, value in string2Values(",", variables) {
+				value := string2Values(":", value)
+			
+				values[value[1]] := value[2]
+			}
+			
+			variables := values
+		}
+		
+		this.getSpeaker(true).speakPhrase(phrase, variables)
+	}
+	
+	startupSpotter() {
+		code := this.SessionDatabase.getSimulatorCode(this.Simulator)
+		
+		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+		
+		if FileExist(exePath) {
+			this.shutdownSpotter()
+			
+			Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+			
+			if ((ErrorLevel != "Error") && spotterPID)
+				this.iSpotterPID := spotterPID
+		}
+	}
+	
+	shutdownSpotter() {
+		if this.iSpotterPID {
+			spotterPID := this.iSpotterPID
+			
+			Process Close, %spotterPID%
+		}
+		
+		processName := (this.SessionDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+		
+		Process Exist, %processName%
+			
+		if ErrorLevel
+			Process Close, %ErrorLevel%
+	}
 				
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
-				
+		
+		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
+		configuration := this.Configuration
+		settings := this.Settings
+		
+		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Lap.History.Considered"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+		facts["Session.Settings.Lap.History.Damping"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+		
 		return facts
 	}
 	
@@ -85,6 +173,15 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
+	prepareSession(settings, data) {
+		base.prepareSession(settings, data)
+		
+		if this.Speaker
+			this.getSpeaker().speakPhrase("Greeting")
+		
+		this.startupSpotter()
+	}
+	
 	startSession(settings, data) {
 		local facts
 		
@@ -95,74 +192,40 @@ class RaceSpotter extends RaceAssistant {
 			data := readConfiguration(data)
 		
 		facts := this.createSession(settings, data)
+		
 		simulatorName := this.Simulator
+		configuration := this.Configuration
 		
 		Process Exist, Race Engineer.exe
 		
-		raceEngineer := (ErrorLevel > 0)
-		
-		if raceEngineer
+		if (ErrorLevel > 0)
 			saveSettings := kNever
-		else
-			saveSettings := getConfigurationValue(this.Configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
+		else {
+			Process Exist, Race Strategist.exe
 		
-		this.updateConfigurationValues({SaveSettings: saveSettings})
+			if (ErrorLevel > 0)
+				saveSettings := kNever
+			else
+				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
+		}
+		
+		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+									  , SaveSettings: saveSettings})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false})
 		
-		if this.Speaker
-			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
+		this.startupSpotter()
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
-	}
-	
-	addLap(lapNumber, data) {
-		local knowledgeBase := this.KnowledgeBase
-		local driverForname := ""
-		local driverSurname := ""
-		local driverNickname := ""
-		
-		static lastLap := 0
-		
-		if (lapNumber <= lastLap)
-			lastLap := 0
-		else if ((lastLap == 0) && (lapNumber > 1))
-			lastLap := (lapNumber - 1)
-		
-		if (this.Speaker && (lapNumber > 1)) {
-			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
-			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
-		}
-		
-		result := base.addLap(lapNumber, data)
-		
-		if !result
-			return false
-		
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
-			Process Exist, Race Engineer.exe
-			
-			exists := ErrorLevel
-			
-			this.getSpeaker().speakPhrase(exists ? "" : "WelcomeBack")
-		}
-		
-		return result
 	}
 	
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if knowledgeBase {
-			Process Exist, Race Engineer.exe
-			
-			if (!ErrorLevel && this.Speaker)
-				this.getSpeaker().speakPhrase("Bye")
-			
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 				
@@ -188,6 +251,8 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			
+			this.shutdownSpotter()
+			
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 		
@@ -200,7 +265,12 @@ class RaceSpotter extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 			
 			this.finishSession()
-		}	
+		}
+		else {
+			callback := ObjBindMethod(this, "forceFinishSession")
+					
+			SetTimer %callback%, -5000
+		}
 	}
 	
 	prepareData(lapNumber, data) {
@@ -208,10 +278,18 @@ class RaceSpotter extends RaceAssistant {
 		
 		data := base.prepareData(lapNumber, data)
 		
+		knowledgeBase := this.KnowledgeBase
+		
+		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			if ((lapNumber = 1) || (key != "Driver.Car"))
+				knowledgeBase.setFact(key, value)
+		
 		return data
 	}
 	
 	updateLap(lapNumber, data) {
+		; this.KnowledgeBase.addFact("Sector", true)
+		
 		return base.updateLap(lapNumber, data)
 	}
 	

@@ -107,6 +107,7 @@ startRaceEngineer() {
 	engineerLanguage := false
 	engineerService := true
 	engineerSpeaker := false
+	engineerSpeakerVocalics := false
 	engineerListener := false
 	debug := false
 	
@@ -135,6 +136,9 @@ startRaceEngineer() {
 				index += 2
 			case "-Speaker":
 				engineerSpeaker := A_Args[index + 1]
+				index += 2
+			case "-SpeakerVocalics":
+				engineerSpeakerVocalics := A_Args[index + 1]
 				index += 2
 			case "-Listener":
 				engineerListener := A_Args[index + 1]
@@ -165,7 +169,8 @@ startRaceEngineer() {
 	
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
 											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-											, engineerName, engineerLanguage, engineerService, engineerSpeaker, engineerListener, voiceServer)
+											, engineerName, engineerLanguage
+											, engineerService, engineerSpeaker, engineerSpeakerVocalics, engineerListener, voiceServer)
 	
 	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")
 	

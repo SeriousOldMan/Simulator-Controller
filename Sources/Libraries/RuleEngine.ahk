@@ -56,6 +56,13 @@ global kTraceOff = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variables Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vDisposedChoicePoints = []
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -707,10 +714,14 @@ class ProveAction extends CallAction {
 		
 		resultSet := knowledgeBase.prove(goal)
 		
-		if (resultSet && this.iProveAll)
-			Loop
-				if !resultSet.nextResult()
-					break
+		if resultSet {
+			if this.iProveAll
+				Loop
+					if !resultSet.nextResult()
+						break
+					
+			resultSet.dispose()
+		}
 	}
 }
 
@@ -1482,6 +1493,26 @@ class ResultSet {
 		
 		this.iChoicePoint := this.createChoicePoint(goal)
 	}
+	
+	dispose() {
+		if this.iChoicePoint
+			this.iChoicePoint.dispose()
+		
+		while (vDisposedChoicePoints.Length() > 0) {
+			cp := vDisposedChoicePoints.Pop()
+		
+			if cp.iNextChoicePoint
+				cp.iNextChoicePoint.dispose()
+			
+			if cp.iPreviousChoicePoint
+				cp.iPreviousChoicePoint.dispose()
+			
+			cp.iNextChoicePoint := false
+			cp.iPreviousChoicePoint := false
+		}
+		
+		this.iChoicePoint := false
+	}
 		
 	resetChoicePoint(choicePoint) {
 	}
@@ -1706,6 +1737,13 @@ class ChoicePoint {
 		this.iEnvironment := environment
 	}
 	
+	dispose() {
+		this.iResultSet := false
+		this.iGoal := false
+		
+		vDisposedChoicePoints.Push(this)
+	}
+	
 	nextChoice() {
 		Throw "Virtual method ChoicePoint.nextChoice must be implemented in a subclass..."
 	}
@@ -1803,6 +1841,21 @@ class RulesChoicePoint extends ChoicePoint {
 		}
 	}
 	
+	disposeSubChoicePoints() {
+		this.removeSubChoicePoints()
+		
+		for ignore, cp in this.iSubChoicePoints
+			vDisposedChoicePoints.Push(cp)
+		
+		this.iSubChoicePoints := []
+	}
+	
+	dispose() {
+		this.disposeSubChoicePoints()
+		
+		base.dispose()
+	}
+	
 	nextChoice() {
 		local rule
 		local resultSet
@@ -1872,6 +1925,12 @@ class RulesChoicePoint extends ChoicePoint {
 		this.removeSubChoicePoints()
 		
 		base.reset()
+	}
+	
+	remove() {
+		this.disposeSubChoicePoints()
+		
+		base.remove()
 	}
 	
 	cut() {

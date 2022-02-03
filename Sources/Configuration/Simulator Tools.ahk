@@ -1127,13 +1127,15 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 		
+		updateHeight := 0
+		
 		if (vUpdateSettings.Count() > 0) {
 			updateHeight := (20 + (Min(vUpdateSettings.Count(), 1) * 20))
 			
 			if (updateHeight == 20)
 				updateHeight := 40
 				
-			Gui TE:Add, GroupBox, -Theme YP+30 w220 h%updateHeight%, % translate("Update")
+			Gui TE:Add, GroupBox, -Theme YP+30 w200 h%updateHeight%, % translate("Update")
 		
 			Gui TE:Font, Norm, Arial
 		
@@ -1229,7 +1231,7 @@ editTargets(command := "") {
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := (translate("None") . "|" . values2String("|", themes*))
 		
-		yPos := (Max(cleanupHeight + copyHeight, buildHeight) + 80)
+		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
 		
 		Gui TE:Add, Text, X10 Y%yPos%, % translate("Theme")
 		Gui TE:Add, DropDownList, X110 YP-5 w310 Choose%chosen% vsplashTheme, %themes%

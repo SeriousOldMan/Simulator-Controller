@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.8.6-beta](https://www.dropbox.com/s/zn8mm777dp6x0kc/Simulator%20Controller%203.8.6-beta.zip?dl=1) (Test build for 3.8.6. New features: New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants. Stable, with documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-384) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

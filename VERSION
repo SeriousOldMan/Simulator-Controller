@@ -1,9 +1,9 @@
 [Development]
-Version=3.8.6-dev
+Version=3.8.6-beta
 Target=3.8.4-release
-Date=02/02/2022
-Download=
-Changes=New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set pitch, speed, etc. individually for each assistant, Memory management optimization for Race Assistants
+Date=02/03/2022
+Download=https://www.dropbox.com/s/zn8mm777dp6x0kc/Simulator%20Controller%203.8.6-beta.zip?dl=1
+Changes=New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants
 [Release]
 Version=3.8.4-release
 Date=01/28/2022
@@ -13,4 +13,4 @@ Changes=Several bugfixes in "Race Reports", Inclusion of tyre degradation model 
 Type=Development
 [Version]
 Release=3.8.4-release
-Development=3.8.6-dev
+Development=3.8.6-beta

@@ -17,7 +17,7 @@
 #Include ..\Plugins\Team Server Plugin.ahk				; Must be loaded before the Race Assistant Plugins
 #Include ..\Plugins\Race Engineer Plugin.ahk			; Must be loaded before any other Simulator Plugins
 #Include ..\Plugins\Race Strategist Plugin.ahk			; Must be loaded before any other Simulator Plugins
-#Include ..\Plugins\Race Spotter Plugin.ahk			; Must be loaded before any other Simulator Plugins
+#Include ..\Plugins\Race Spotter Plugin.ahk				; Must be loaded before any other Simulator Plugins
 #Include ..\Plugins\AC Plugin.ahk
 #Include ..\Plugins\AMS2 Plugin.ahk
 #Include ..\Plugins\ACC Plugin.ahk

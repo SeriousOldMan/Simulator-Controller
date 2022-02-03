@@ -62,7 +62,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		x3 := x + 176
 		
 		w1 := width - (x1 - x + 8)
-		w3 := width - (x3 - x + 16)
+		w3 := width - (x3 - x + 16) + 10
 		
 		w2 := w1 - 24
 		x4 := x1 + w2 + 1

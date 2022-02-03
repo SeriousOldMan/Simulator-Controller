@@ -105,23 +105,6 @@ void sendMessage(string message) {
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
-inline const string getSession(AC_SESSION_TYPE session) {
-	switch (session) {
-	case AC_PRACTICE:
-		return "Practice";
-		break;
-	case AC_QUALIFY:
-		return "Qualification";
-		break;
-	case AC_RACE:
-		return "Race";
-		break;
-	default:
-		return "Other";
-		break;
-	}
-}
-
 #define PI 3.14159265
 
 const float nearByDistance = 8.0;
@@ -134,14 +117,15 @@ const int LEFT = 1;
 const int RIGHT = 2;
 const int THREE = 3;
 
+const int situationRepeat = 5;
+
+const string noAlert = "NoAlert";
+
 int lastSituation = CLEAR;
 int situationCount = 0;
-const int situationRepeat = 5;
 
 bool carBehind = false;
 bool carBehindReported = false;
-
-const string noAlert = "NoAlert";
 
 string computeAlert(int newSituation) {
 	string alert = noAlert;
@@ -334,8 +318,11 @@ int main(int argc, char* argv[])
 	while (true) {
 		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane)
 			checkPositions();
-		else
+		else {
 			lastSituation = CLEAR;
+			carBehind = false;
+			carBehindReported = false;
+		}
 
 		Sleep(200);
 	}

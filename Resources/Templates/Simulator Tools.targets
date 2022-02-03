@@ -28,7 +28,7 @@ Release 3.7.8=Release 3.7.6 -> updateTranslations, updatePhraseGrammars, updateC
 Release 3.8.0=Release 3.7.8 -> updateTranslations, updateActionLabels, updateActionIcons
 Release 3.8.2=Release 3.8.0 -> updateTranslations
 Release 3.8.4=Release 3.8.2 -> updateTranslations, updateConfigurationForV384
-; Release 3.8.6=Release 3.8.4 -> updateTranslations, updateActionLabels, updateActionIcons, updatePluginsForV386
+Release 3.8.6=Release 3.8.4 -> updateTranslations, updateActionLabels, updateActionIcons, updatePluginsForV386
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

@@ -1628,7 +1628,7 @@ updatePluginsForV386() {
 	
 	if (userConfiguration.Count() > 0) {
 		if !getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false) {
-			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistantName: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
+			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
 			
 			raceSpotter.saveToConfiguration(userConfiguration)
 			

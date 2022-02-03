@@ -823,11 +823,14 @@ Calling this method will ask Jona to plan an upcoming pitstop.
 #### *preparePitstop()*
 Calling this method will ask Jona to prepare the last planned pitstop.
 
+#### *supportsSpotter()*
+If this method returns *true*, this plugin supports a spotter protocol together with the Virtual Race Spotter. The default implementation returns *true*, if a "xxx SHM Spotter.exe" exists in the *Binaries* folder, where xxx is equal to the plugin identifier. If the protocol uses a different data acquisition method rather than the shared memory reader process, an extension must be made to the implementation of the Virtual Race Spotter as well.
+
 #### *supportsPitstop()*
 If this method returns *true*, this plugin supports automated pitstop handling together with the Virtual Race Engineer. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, it will implement at least some of the following methods as well.
 
 #### *supportsSetupImport()*
-If this method returns *true*, this plugin supports loading setup information from the underlying . The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, the telemetry provider must implement the "-Setup" protocol.
+If this method returns *true*, this plugin supports loading setup information from the underlying simulation. The default implementation returns *false*. Whenever a subclass of *RaceAssistantSimulatorPlugin* returns *true* here, the telemetry provider must implement the "-Setup" protocol.
 
 #### *pitstopPlanned(pitstopNumber :: Integer, plannedLap :: Integer := false)*
 *pitstopPlanned* is called by the Race Engineer, whenever there is an updated plan for an upcoming pitstop. If the pitstop is planned for a specific lap, the lap number is supplied as the second argument. The default method does nothing here.

@@ -100,6 +100,10 @@
     - [Data acquisition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)
 
+[Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction)
+
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#introduction)

@@ -73,7 +73,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
 		
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-									  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
+									  , "Race Strategist Startup", "Race Strategist Shutdown"
+									  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
 					subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 					
 					if subConfiguration
@@ -84,6 +85,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments := "raceAssistantName: Jona"
 				else if (assistant = "Race Strategist")
 					arguments := "raceAssistantName: Khato"
+				else if (assistant = "Race Spotter")
+					arguments := "raceAssistantName: Elisa"
 				else
 					Throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 				
@@ -110,7 +113,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if wizard.isModuleSelected("Voice Control") {
 					arguments .= "; raceAssistantSpeaker: On"
 					
-					if wizard.isSoftwareInstalled("MSSpeechRuntime")
+					if ((assistant != "Race Spotter") && wizard.isSoftwareInstalled("MSSpeechRuntime"))
 						arguments .= "; raceAssistantListener: On"
 					else
 						arguments .= "; raceAssistantListener: Off"
@@ -223,6 +226,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator := new RaceEngineerConfigurator(this)
 			else if (assistant = "Race Strategist")
 				configurator := new RaceStrategistConfigurator(this)
+			else if (assistant = "Race Spotter")
+				configurator := new RaceSpotterConfigurator(this)
 			else
 				configurator := false
 			
@@ -284,7 +289,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
 		
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-							  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
+							  , "Race Strategist Startup", "Race Strategist Shutdown"
+							  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
 			subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 			
 			if subConfiguration
@@ -307,13 +313,14 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			assistantConfiguration := newConfiguration()
 	
 			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
-								  , "Race Strategist Startup", "Race Strategist Shutdown", "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"] {
+								  , "Race Strategist Startup", "Race Strategist Shutdown"
+								  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
 				subConfiguration := getConfigurationSectionValues(configuration, section, false)
 				
 				if subConfiguration
 					setConfigurationSectionValues(assistantConfiguration, section, subConfiguration)
 			}
-				
+			
 			writeConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
 			
 			return true

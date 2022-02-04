@@ -44,6 +44,7 @@ ListLines Off					; Disable execution history
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
 #Include ..\Plugins\Race Strategist Configuration Plugin.ahk
+#Include ..\Plugins\Race Spotter Configuration Plugin.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

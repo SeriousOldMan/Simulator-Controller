@@ -66,7 +66,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		x3 := x + 176
 		
 		w1 := width - (x1 - x + 8)
-		w3 := width - (x3 - x + 16)
+		w3 := width - (x3 - x + 16) + 10
 		
 		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		

@@ -47,9 +47,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.8.6
 
-This release introduces the new Virtual Race Spotter. A new [plugin "Race Spotter"](*) will be added to your configuration, but it will be initially deactivated. Beside that, it is now possible to control volume, pitch and speech rate for each assistant individually by using the new [plugin parameter "raceAssistantSpeakerVocalics"](*). A higher speech rate (speed) will be especially helpful for the Spotter.
+This release introduces the new Virtual Race Spotter. A new [plugin "Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) will be added to your configuration, but it will be initially deactivated. Beside that, it is now possible to control volume, pitch and speech rate for each assistant individually by using the new [plugin parameter "raceAssistantSpeakerVocalics"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A higher speech rate (speed) will be especially helpful for the Spotter.
 
-A new action label and action icon slot has been introduced for the Spotter. See the [plugin documentation](*) for more information.
+A new action label and action icon slot has been introduced for the Spotter. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
 
 ***
 

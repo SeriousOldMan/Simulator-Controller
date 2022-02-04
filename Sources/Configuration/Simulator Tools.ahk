@@ -1127,13 +1127,15 @@ editTargets(command := "") {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic, Arial
 		
+		updateHeight := 0
+		
 		if (vUpdateSettings.Count() > 0) {
 			updateHeight := (20 + (Min(vUpdateSettings.Count(), 1) * 20))
 			
 			if (updateHeight == 20)
 				updateHeight := 40
 				
-			Gui TE:Add, GroupBox, -Theme YP+30 w220 h%updateHeight%, % translate("Update")
+			Gui TE:Add, GroupBox, -Theme YP+30 w200 h%updateHeight%, % translate("Update")
 		
 			Gui TE:Font, Norm, Arial
 		
@@ -1229,7 +1231,7 @@ editTargets(command := "") {
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := (translate("None") . "|" . values2String("|", themes*))
 		
-		yPos := (Max(cleanupHeight + copyHeight, buildHeight) + 80)
+		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
 		
 		Gui TE:Add, Text, X10 Y%yPos%, % translate("Theme")
 		Gui TE:Add, DropDownList, X110 YP-5 w310 Choose%chosen% vsplashTheme, %themes%
@@ -1432,21 +1434,36 @@ updateConfigurationForV384() {
 		simulator := A_LoopFileName
 		
 		if (simulator = "0")
-			FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
+			try {
+				FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
+			}
+			catch exception {
+				; ignore
+			}
 		else
 			Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
 			{
 				car := A_LoopFileName
 				
 				if (car = "0")
-					FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
+					try {
+						FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
+					}
+					catch exception {
+						; ignore
+					}
 				else
 					Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
 					{
 						track := A_LoopFileName
 						
 						if (track = "0")
-							FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
+							try {
+								FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
+							}
+							catch exception {
+								; ignore
+							}
 					}
 			}
 	}
@@ -1613,7 +1630,7 @@ updatePluginsForV386() {
 	
 	if (userConfiguration.Count() > 0) {
 		if !getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false) {
-			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistantName: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
+			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
 			
 			raceSpotter.saveToConfiguration(userConfiguration)
 			

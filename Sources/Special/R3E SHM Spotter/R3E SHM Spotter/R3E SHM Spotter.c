@@ -67,406 +67,251 @@ int getPlayerCarID() {
     return -1;
 }
 
-inline double normalize(double value) {
-    return (value < 0) ? 0.0 : value;
+int sendStringMessage(HWND hWnd, int wParam, char* msg) {
+	int result = 0;
+
+	if (hWnd > 0) {
+		COPYDATASTRUCT cds;
+		cds.dwData = (256 * 'R' + 'S');
+		cds.cbData = sizeof(char) * (strlen(msg) + 1);
+		cds.lpData = msg;
+
+		result = SendMessage(hWnd, WM_COPYDATA, wParam, (LPARAM)(LPVOID)&cds);
+	}
+
+	return result;
 }
 
-inline double normalizeDamage(double value) {
-    if (value < 0)
-        return 0.0;
-    else
-        return ((1.0 - value) * 100);
+void sendMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
+
+	if (winHandle == 0)
+		FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Race Spotter:");
+		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
 }
 
-long getRemainingTime();
+#define PI 3.14159265
 
-long getRemainingLaps() {
-    if (map_buffer->session_iteration < 1)
-        return 0;
+#define nearByDistance 8.0
+#define longitudinalDistance 4
+#define lateralDistance 6
+#define verticalDistance 4
 
-    if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
-        return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
-    }
-    else {
-        long time = (long)map_buffer->lap_time_previous_self;
+#define CLEAR 0
+#define LEFT 1
+#define RIGHT 2
+#define THREE 3
 
-        if (time > 0)
-            return (long)(getRemainingTime() / time);
-        else
-            return 0;
-    }
-}
+#define situationRepeat 5
 
-long getRemainingTime() {
-    if (map_buffer->session_iteration < 1)
-        return 0;
+char* noAlert = "NoAlert";
 
-    if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        return (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-                      (normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
-    }
-    else {
-        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
-    }
-}
+int lastSituation = CLEAR;
+int situationCount = 0;
 
-void substring(char s[], char sub[], int p, int l) {
-   int c = 0;
-   
-   while (c < l) {
-      sub[c] = s[p + c];
+BOOL carBehind = FALSE;
+BOOL carBehindReported = FALSE;
 
-      c++;
-   }
-   sub[c] = '\0';
-}
+char* computeAlert(int newSituation) {
+	char* alert = noAlert;
 
-void printNAValue(long value) {
-	if (value == -1)
-		wprintf_s(L"n/a\n");
-	else
-		wprintf_s(L"%d\n", value);
-}
+	if (lastSituation == newSituation) {
+		if (lastSituation > CLEAR) {
+			if (situationCount++ > situationRepeat) {
+				situationCount = 0;
 
-int main(int argc, char* argv[])
-{
-    int err_code = 0;
-    BOOL mapped_r3e = FALSE;
-
-    if (!mapped_r3e && map_exists())
-    {
-        err_code = map_init();
-        
-        if (err_code)
-            return err_code;
-
-        mapped_r3e = TRUE;
-    }
-	
-	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
-		wprintf_s(L"[Position Data]\n");
-		
-		if (!mapped_r3e) {
-			wprintf_s(L"Car.Count=%d\n", 0);
-			wprintf_s(L"Driver.Car=%d\n", 0);
-		}
-		else {
-			wprintf_s(L"Car.Count=%d\n", map_buffer->num_cars);
-			wprintf_s(L"Driver.Car=%d\n", getPlayerCarID() + 1);
-			
-			for (int i = 1; i <= map_buffer->num_cars; ++i) {
-				r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
-
-				wprintf_s(L"Car.%d.Nr=%d\n", i, i);
-				wprintf_s(L"Car.%d.Position=%d\n", i, vehicle.place);
-				wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
-				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
-				wprintf_s(L"Car.%d.Time=%ld\n", i, (long)((vehicle.sector_time_previous_self[0] + vehicle.sector_time_previous_self[1] + vehicle.sector_time_previous_self[2]) * 1000));
-				
-				char buffer[33];
-
-				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
-
-				wprintf_s(L"Car.%d.Car=%S\n", i, buffer);
-				
-				char* name = (char*)vehicle.driver_info.name;
-				
-				if (strchr((char *)name, ' ')) {		
-					char forName[100];
-					char surName[100];
-					char nickName[3];
-
-					size_t length = strcspn(name, " ");
-
-					substring(name, forName, 0, length);
-					substring(name, surName, length + 1, strlen(name) - length - 1);
-					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, forName);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, surName);
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, nickName);
-				}
-				else {
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, name);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
-				}
+				alert = "Hold";
 			}
 		}
+		else
+			situationCount = 0;
 	}
 	else {
-		wprintf_s(L"[Session Data]\n");
-		wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
-		if (mapped_r3e) {
-			wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
-			if (map_buffer->session_type == R3E_SESSION_QUALIFY)
-				wprintf_s(L"Session=Qualification\n");
-			else if (map_buffer->session_type == R3E_SESSION_RACE)
-				wprintf_s(L"Session=Race\n");
-			else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
-				wprintf_s(L"Session=Practice\n");
-			else
-				wprintf_s(L"Session=Other\n");
-			
-			char buffer[33];
+		situationCount = 0;
 
-			_itoa_s(map_buffer->vehicle_info.model_id, buffer, 32, 10);
-
-			wprintf_s(L"Car=%S\n", buffer);
-			wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
-			wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
-			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
-
-			long timeRemaining = (getRemainingTime() * 1000);
-
-			wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
-
-			wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+		if (lastSituation == CLEAR) {
+			switch (newSituation) {
+			case LEFT:
+				alert = "Left";
+				break;
+			case RIGHT:
+				alert = "Right";
+				break;
+			case THREE:
+				alert = "Three";
+				break;
+			}
 		}
-
-		wprintf_s(L"[Car Data]\n");
-		if (mapped_r3e) {
-			double suspDamage = normalizeDamage(map_buffer->car_damage.suspension);
-
-			wprintf_s(L"MAP="); printNAValue(map_buffer->engine_map_setting);
-			wprintf_s(L"TC="); printNAValue(map_buffer->aid_settings.tc);
-			wprintf_s(L"ABS="); printNAValue(map_buffer->aid_settings.abs);
-
-			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
-			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
-			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
-			
-			char tyreCompoundColor[11] = "Black";
-			
-			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_SOFT)
-				strcpy_s(tyreCompoundColor, 10, "Red");
-			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_MEDIUM)
-				strcpy_s(tyreCompoundColor, 10, "White");
-			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_HARD)
-				strcpy_s(tyreCompoundColor, 10, "Blue");
-				
-			wprintf_s(L"TyreCompound=Dry\n");
-			wprintf_s(L"TyreCompoundColor=%S\n", tyreCompoundColor);
-			wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
-				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
-				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
-				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
-				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER]);
-			wprintf_s(L"TyrePressure = %f, %f, %f, %f\n",
-				map_buffer->tire_pressure[R3E_TIRE_FRONT_LEFT] / 6.895,
-				map_buffer->tire_pressure[R3E_TIRE_FRONT_RIGHT] / 6.895,
-				map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895,
-				map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895);
-		}
-
-		wprintf_s(L"[Stint Data]\n");
-		if (mapped_r3e) {
-			if (strchr((char *)map_buffer->player_name, ' ')) {		
-				char forName[100];
-				char surName[100];
-				char nickName[3];
-
-				size_t length = strcspn((char *)map_buffer->player_name, " ");
-
-				substring((char *)map_buffer->player_name, forName, 0, length);
-				substring((char *)map_buffer->player_name, surName, length + 1, strlen((char *)map_buffer->player_name) - length - 1);
-				nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
-
-				wprintf_s(L"DriverForname=%S\n", forName);
-				wprintf_s(L"DriverSurname=%S\n", surName);
-				wprintf_s(L"DriverNickname=%S\n", nickName);
+		else {
+			switch (newSituation) {
+			case CLEAR:
+				if (lastSituation == THREE)
+					alert = "ClearAll";
+				else
+					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+				break;
+			case LEFT:
+				if (lastSituation == THREE)
+					alert = "ClearRight";
+				else
+					alert = "Three";
+				break;
+			case RIGHT:
+				if (lastSituation == THREE)
+					alert = "ClearLeft";
+				else
+					alert = "Three";
+				break;
+			case THREE:
+				alert = "Three";
+				break;
 			}
-			else {
-				wprintf_s(L"DriverForname=%S\n", map_buffer->player_name);
-				wprintf_s(L"DriverSurname=%S\n", "");
-				wprintf_s(L"DriverNickname=%S\n", "");
-			}
-
-			wprintf_s(L"LapValid=%S\n", map_buffer->current_lap_valid ? "true" : "false");
-
-			wprintf_s(L"LapLastTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
-
-			if (normalize(map_buffer->lap_time_best_self))
-				wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_best_self) * 1000));
-			else
-				wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
-
-			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
-
-			long timeRemaining = (getRemainingTime() * 1000);
-
-			wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
-			wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
-			wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
-		}
-
-		wprintf_s(L"[Track Data]\n");
-		wprintf_s(L"Temperature=26\n");
-		wprintf_s(L"Grip=Optimum\n");
-
-		wprintf_s(L"[Weather Data]\n");
-		wprintf_s(L"Temperature=24\n");
-		wprintf_s(L"Weather=Dry\n");
-		wprintf_s(L"Weather10Min=Dry\n");
-		wprintf_s(L"Weather30Min=Dry\n");
-
-		wprintf_s(L"[Pit Menu State]\n");
-		if (mapped_r3e) {
-			wprintf(L"Selected=");
-
-			switch (map_buffer->pit_menu_selection) {
-				case R3E_PIT_MENU_UNAVAILABLE:
-					wprintf(L"Unavailable\n");
-
-					break;
-				case R3E_PIT_MENU_PRESET:
-					wprintf(L"Strategy\n");
-
-					break;
-				case R3E_PIT_MENU_PENALTY:
-					wprintf(L"Serve Penalty\n");
-
-					break;
-				case R3E_PIT_MENU_DRIVERCHANGE:
-					wprintf(L"Driver\n");
-
-					break;
-				case R3E_PIT_MENU_FUEL:
-					wprintf(L"Refuel\n");
-
-					break;
-				case R3E_PIT_MENU_FRONTTIRES:
-					wprintf(L"Change Front Tyres\n");
-
-					break;
-				case R3E_PIT_MENU_REARTIRES:
-					wprintf(L"Change Rear Tyres\n");
-
-					break;
-				case R3E_PIT_MENU_FRONTWING:
-					wprintf(L"Repair Front Aero\n");
-
-					break;
-				case R3E_PIT_MENU_REARWING:
-					wprintf(L"Repair Rear Aero\n");
-
-					break;
-				/*
-				case R3E_PIT_MENU_SUSPENSION:
-					wprintf(L"Repair Suspension\n");
-
-					break;
-				*/
-				case R3E_PIT_MENU_BUTTON_TOP:
-					wprintf(L"Top Button\n");
-
-					break;
-				case R3E_PIT_MENU_BUTTON_BOTTOM:
-					wprintf(L"Bottom Button\n");
-
-					break;
-				case R3E_PIT_MENU_MAX:
-					wprintf(L"false\n");
-
-					break;
-				default:
-					wprintf(L"false\n");
-
-					break;
-			}
-
-			for (int i = 0; i < R3E_PIT_MENU_MAX; i++) {
-				switch (i) {
-					case R3E_PIT_MENU_PRESET:
-						wprintf(L"Strategy=");
-
-						break;
-					case R3E_PIT_MENU_PENALTY:
-						wprintf(L"Serve Penalty=");
-
-						break;
-					case R3E_PIT_MENU_DRIVERCHANGE:
-						wprintf(L"Driver=");
-
-						break;
-					case R3E_PIT_MENU_FUEL:
-						wprintf(L"Refuel=");
-
-						break;
-					case R3E_PIT_MENU_FRONTTIRES:
-						wprintf(L"Change Front Tyres=");
-
-						break;
-					case R3E_PIT_MENU_REARTIRES:
-						wprintf(L"Change Rear Tyres=");
-
-						break;
-					case R3E_PIT_MENU_FRONTWING:
-						wprintf(L"Repair Front Aero=");
-
-						break;
-					case R3E_PIT_MENU_REARWING:
-						wprintf(L"Repair Rear Aero=");
-
-						break;
-					/*
-					case R3E_PIT_MENU_SUSPENSION:
-						wprintf(L"Repair Suspension=");
-
-						break;
-					*/
-					case R3E_PIT_MENU_BUTTON_TOP:
-						wprintf(L"Top Button=");
-
-						break;
-					case R3E_PIT_MENU_BUTTON_BOTTOM:
-						wprintf(L"Bottom Button=");
-
-						break;
-					default:
-						wprintf(L"Unknown=");
-
-						break;
-				}
-
-				switch (map_buffer->pit_menu_state[i]) {
-					case 0:
-						wprintf(L"false\n");
-
-						break;
-					case 1:
-						wprintf(L"true\n");
-
-						break;
-					default:
-						wprintf(L"Unavailable\n");
-
-						break;
-				}
-			}
-
-			wprintf(L"\n");
-		}
-
-		wprintf_s(L"[Test Data]\n");
-		if (mapped_r3e) {
-			wprintf_s(L"Aero Damage=%f\n", map_buffer->car_damage.aerodynamics);
-			wprintf_s(L"Susp Damage=%f\n", map_buffer->car_damage.suspension);
-			wprintf_s(L"Lap Time=%f\n", map_buffer->lap_time_current_self);
-			wprintf_s(L"Best Lap Time=%f\n", map_buffer->lap_time_best_self);
-			wprintf_s(L"Prev Lap Time=%f\n", map_buffer->lap_time_previous_self);
-			wprintf_s(L"Session Index=%d\n", map_buffer->session_iteration);
-			if (map_buffer->session_iteration >= 0) {
-				wprintf_s(L"Session Minutes=%d\n", map_buffer->race_session_minutes[map_buffer->session_iteration - 1]);
-				wprintf_s(L"Session Laps=%d\n", map_buffer->race_session_laps[map_buffer->session_iteration - 1]);
-			}
-			wprintf_s(L"Completed Laps=%d\n", map_buffer->completed_laps);
-			wprintf_s(L"Session Format=%d\n", map_buffer->session_length_format);
-			wprintf_s(L"Pit State=%d\n", map_buffer->pit_state);
-			wprintf_s(L"Tyre Type=%d\n", map_buffer->tire_type_front);
-			wprintf_s(L"Tyre Subtype=%d\n", map_buffer->tire_subtype_front);
 		}
 	}
+
+	lastSituation = newSituation;
+
+	return alert;
+}
+
+r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
+	r3e_float64 scalar = (x * 0) + (y * 1);
+	r3e_float64 length = sqrt((x * x) + (y * y));
+
+	r3e_float64 angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
+
+	if (x < 0)
+		angle = 360 - angle;
+
+	return (r3e_float32)angle;
+}
+
+int nearBy(r3e_float64 car1X, r3e_float64 car1Y, r3e_float64 car1Z,
+		   r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
+	return (fabs(car1X - car2X) < nearByDistance) &&
+		   (fabs(car1Y - car2Y) < nearByDistance) &&
+		   (fabs(car1Z - car2Z) < nearByDistance);
+}
+
+void rotateBy(r3e_float64* x, r3e_float64* y, r3e_float64 angle) {
+	r3e_float64 sinus = sin(angle * PI / 180);
+	r3e_float64 cosinus = cos(angle * PI / 180);
+
+	r3e_float64 newX = (*x * cosinus) - (*y * sinus);
+	r3e_float64 newY = (*x * sinus) + (*y * cosinus);
+
+	*x = newX;
+	*y = newY;
+}
+
+int checkCarPosition(r3e_float64 carX, r3e_float64 carY, r3e_float64 carZ, r3e_float64 angle,
+					 r3e_float32 otherX, r3e_float32 otherY, r3e_float32 otherZ) {
+	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
+		r3e_float64 transX = (otherX - carX);
+		r3e_float64 transY = (otherY - carY);
+
+		rotateBy(&transX, &transY, angle);
+
+		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
+			return (transX < 0) ? RIGHT : LEFT;
+		else {
+			if (transY < 0)
+				carBehind = TRUE;
+
+			return CLEAR;
+		}
+	}
+	else
+		return CLEAR;
+}
+
+void checkPositions() {
+	r3e_float64 velocityX = map_buffer->player.velocity.x;
+	r3e_float64 velocityY = map_buffer->player.velocity.y;
+	r3e_float64 velocityZ = map_buffer->player.velocity.z;
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		r3e_float64 angle = vectorAngle(velocityX, velocityY);
+
+		int carID = getPlayerCarID();
+
+		r3e_float64 coordinateX = map_buffer->player.position.x;
+		r3e_float64 coordinateY = map_buffer->player.position.y;
+		r3e_float64 coordinateZ = map_buffer->player.position.z;
+
+		int newSituation = CLEAR;
+
+		carBehind = FALSE;
+
+		for (int id = 0; id < map_buffer->num_cars; id++) {
+			// wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
+
+			if (id != carID)
+				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
+												 map_buffer->all_drivers_data_1->position.x,
+												 map_buffer->all_drivers_data_1->position.y,
+												 map_buffer->all_drivers_data_1->position.z);
+
+			if ((newSituation == THREE) && carBehind)
+				break;
+		}
+
+		char* alert = computeAlert(newSituation);
+
+		if (alert != noAlert) {
+			carBehindReported = FALSE;
+
+			char buffer[128];
+
+			strcpy_s(buffer, 128, "alert:");
+			strcpy_s(buffer + strlen("alert:"), 128 - strlen("alert:"), alert);
+
+			sendMessage(buffer);
+		}
+		else if (carBehind) {
+			if (!carBehindReported) {
+				carBehindReported = FALSE;
+
+				sendMessage("alert:Behind");
+			}
+		}
+		else
+			carBehindReported = FALSE;
+	}
+	else {
+		lastSituation = CLEAR;
+		carBehind = FALSE;
+		carBehindReported = FALSE;
+	}
+}
+
+int main()
+{
+    BOOL mapped_r3e = FALSE;
+	
+	while (TRUE) {
+		if (!mapped_r3e && map_exists())
+			if (!map_init())
+				mapped_r3e = TRUE;
+
+		if (mapped_r3e && ((map_buffer->completed_laps >= 0)) && !map_buffer->game_paused)
+            checkPositions();
+        else {
+            lastSituation = CLEAR;
+            carBehind = FALSE;
+            carBehindReported = FALSE;
+        }
+
+        Sleep(200);
+    }
 
     map_close();
 

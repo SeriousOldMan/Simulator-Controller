@@ -1,16 +1,16 @@
 [Development]
-Version=3.8.6-release
-Target=3.8.6-release
+Version=3.8.8-dev
+Target=3.8.8-release
 Date=02/04/2022
-Download=https://cntr.click/rXJ3gJM
-Changes=New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants
+Download=
+Changes=Spotter implementation for iRacing, Spotter implementation for RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time
 [Release]
 Version=3.8.6-release
 Date=02/04/2022
 Download=https://cntr.click/rXJ3gJM
 Changes=New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.8.6-release
-Development=3.8.6-release
+Development=3.8.8-dev

@@ -57,10 +57,10 @@ void map_close()
     if (map_handle) CloseHandle(map_handle);
 }
 
-int getPlayerCarID() {
+int getPlayerID() {
     for (int i = 0; i < map_buffer->num_cars; i++) {
         if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
-            return i;
+            return map_buffer->all_drivers_data_1[i].driver_info.user_id;
          }
     }
 
@@ -182,7 +182,7 @@ char* computeAlert(int newSituation) {
 	return alert;
 }
 
-r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
+r3e_float64 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	r3e_float64 scalar = (x * 0) + (y * 1);
 	r3e_float64 length = sqrt((x * x) + (y * y));
 
@@ -191,7 +191,7 @@ r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	if (x < 0)
 		angle = 360 - angle;
 
-	return (r3e_float32)angle;
+	return angle;
 }
 
 int nearBy(r3e_float64 car1X, r3e_float64 car1Y, r3e_float64 car1Z,
@@ -233,15 +233,13 @@ int checkCarPosition(r3e_float64 carX, r3e_float64 carY, r3e_float64 carZ, r3e_f
 		return CLEAR;
 }
 
-void checkPositions() {
+void checkPositions(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
 	r3e_float64 velocityY = map_buffer->player.velocity.y;
 	r3e_float64 velocityZ = map_buffer->player.velocity.z;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		r3e_float64 angle = vectorAngle(velocityX, velocityY);
-
-		int carID = getPlayerCarID();
 
 		r3e_float64 coordinateX = map_buffer->player.position.x;
 		r3e_float64 coordinateY = map_buffer->player.position.y;
@@ -254,11 +252,11 @@ void checkPositions() {
 		for (int id = 0; id < map_buffer->num_cars; id++) {
 			// wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
 
-			if (id != carID)
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID)
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-												 map_buffer->all_drivers_data_1->position.x,
-												 map_buffer->all_drivers_data_1->position.y,
-												 map_buffer->all_drivers_data_1->position.z);
+												 map_buffer->all_drivers_data_1[id].position.x,
+												 map_buffer->all_drivers_data_1[id].position.y,
+												 map_buffer->all_drivers_data_1[id].position.z);
 
 			if ((newSituation == THREE) && carBehind)
 				break;
@@ -296,14 +294,18 @@ void checkPositions() {
 int main()
 {
     BOOL mapped_r3e = FALSE;
+	int playerID = 0;
 	
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
-			if (!map_init())
+			if (!map_init()) {
 				mapped_r3e = TRUE;
 
-		if (mapped_r3e && ((map_buffer->completed_laps >= 0)) && !map_buffer->game_paused)
-            checkPositions();
+				playerID = getPlayerID();
+			}
+
+		if (mapped_r3e && (map_buffer->completed_laps >= 0) /* && !map_buffer->game_paused */)
+            checkPositions(playerID);
         else {
             lastSituation = CLEAR;
             carBehind = FALSE;

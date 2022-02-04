@@ -20,6 +20,7 @@
     - [Chat](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat)
 	- [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer)
 	- [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist)
+	- [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter)
 	- [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-team-server)
   - [Themes Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor)
   - [Translations Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor)

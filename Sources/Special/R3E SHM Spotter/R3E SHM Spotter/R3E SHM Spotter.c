@@ -182,7 +182,7 @@ char* computeAlert(int newSituation) {
 	return alert;
 }
 
-r3e_float64 vectorAngle(r3e_float64 x, r3e_float64 y) {
+r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	r3e_float64 scalar = (x * 0) + (y * 1);
 	r3e_float64 length = sqrt((x * x) + (y * y));
 
@@ -191,37 +191,37 @@ r3e_float64 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	if (x < 0)
 		angle = 360 - angle;
 
-	return angle;
+	return (r3e_float32)angle;
 }
 
-int nearBy(r3e_float64 car1X, r3e_float64 car1Y, r3e_float64 car1Z,
-		   r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
+BOOL nearBy(r3e_float32 car1X, r3e_float32 car1Y, r3e_float32 car1Z,
+			r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
 	return (fabs(car1X - car2X) < nearByDistance) &&
 		   (fabs(car1Y - car2Y) < nearByDistance) &&
 		   (fabs(car1Z - car2Z) < nearByDistance);
 }
 
-void rotateBy(r3e_float64* x, r3e_float64* y, r3e_float64 angle) {
-	r3e_float64 sinus = sin(angle * PI / 180);
-	r3e_float64 cosinus = cos(angle * PI / 180);
+void rotateBy(r3e_float32* x, r3e_float32* y, r3e_float64 angle) {
+	r3e_float32 sinus = (r3e_float32)sin(angle * PI / 180);
+	r3e_float32 cosinus = (r3e_float32)cos(angle * PI / 180);
 
-	r3e_float64 newX = (*x * cosinus) - (*y * sinus);
-	r3e_float64 newY = (*x * sinus) + (*y * cosinus);
+	r3e_float32 newX = (*x * cosinus) - (*y * sinus);
+	r3e_float32 newY = (*x * sinus) + (*y * cosinus);
 
 	*x = newX;
 	*y = newY;
 }
 
-int checkCarPosition(r3e_float64 carX, r3e_float64 carY, r3e_float64 carZ, r3e_float64 angle,
+int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_float32 angle,
 					 r3e_float32 otherX, r3e_float32 otherY, r3e_float32 otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
-		r3e_float64 transX = (otherX - carX);
-		r3e_float64 transY = (otherY - carY);
+		r3e_float32 transX = (otherX - carX);
+		r3e_float32 transY = (otherY - carY);
 
 		rotateBy(&transX, &transY, angle);
 
 		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
-			return (transX < 0) ? RIGHT : LEFT;
+			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0)
 				carBehind = TRUE;
@@ -239,11 +239,19 @@ void checkPositions(int playerID) {
 	r3e_float64 velocityZ = map_buffer->player.velocity.z;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		r3e_float64 angle = vectorAngle(velocityX, velocityY);
+		r3e_float32 angle = vectorAngle(velocityX, velocityY);
 
-		r3e_float64 coordinateX = map_buffer->player.position.x;
-		r3e_float64 coordinateY = map_buffer->player.position.y;
-		r3e_float64 coordinateZ = map_buffer->player.position.z;
+		int index = 0;
+
+		for (int id = 0; id < map_buffer->num_cars; id++)
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+				index = id;
+				break;
+			}
+
+		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
+		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.y;
+		r3e_float32 coordinateZ = map_buffer->all_drivers_data_1[index].position.z;
 
 		int newSituation = CLEAR;
 

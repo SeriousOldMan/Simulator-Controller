@@ -402,9 +402,10 @@ int main()
 				playerID = getPlayerID();
 			}
 
-		if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused)
+		if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
 			if (!checkFlagState())
 				checkPositions(playerID);
+		}
         else {
             lastSituation = CLEAR;
             carBehind = FALSE;

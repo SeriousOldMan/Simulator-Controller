@@ -314,7 +314,7 @@ void checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if (gf->GlobalYellow) {
+	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_FULL) == 0) {
 			sendMessage("yellowFlag:Full");
 
@@ -373,9 +373,10 @@ int main(int argc, char* argv[])
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	while (true) {
-		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane)
+		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
 			if (!checkFlagState())
 				checkPositions();
+		}
 		else {
 			lastSituation = CLEAR;
 			carBehind = false;

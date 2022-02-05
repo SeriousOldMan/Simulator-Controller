@@ -323,12 +323,14 @@ bool checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if (gf->flag == AC_BLUE_FLAG && (lastFlagState & BLUE) == 0) {
-		sendMessage("blueFlag");
+	if (gf->flag == AC_BLUE_FLAG) {
+		if ((lastFlagState & BLUE) == 0) {
+			sendMessage("blueFlag");
 
-		lastFlagState |= BLUE;
+			lastFlagState |= BLUE;
 
-		return true;
+			return true;
+		}
 	}
 	else
 		lastFlagState &= ~BLUE;

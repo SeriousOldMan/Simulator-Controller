@@ -319,7 +319,7 @@ bool checkFlagState() {
 
 		lastFlagState |= BLUE;
 
-		return TRUE;
+		return true;
 	}
 	else
 		lastFlagState &= ~BLUE;

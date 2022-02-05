@@ -120,6 +120,16 @@ int situationCount = 0;
 BOOL carBehind = FALSE;
 BOOL carBehindReported = FALSE;
 
+#define YELLOW_SECTOR_1 1
+#define YELLOW_SECTOR_2 2
+#define YELLOW_SECTOR_3 4
+
+#define YELLOW_FULL (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3)
+
+#define BLUE 16
+
+int lastFlagState = CLEAR;
+
 char* computeAlert(int newSituation) {
 	char* alert = noAlert;
 
@@ -258,8 +268,6 @@ void checkPositions(int playerID) {
 		carBehind = FALSE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++) {
-			// wcout << id << "; " << gf->carCoordinates[id][0] << "; " << gf->carCoordinates[id][1] << "; " << gf->carCoordinates[id][2] << endl;
-
 			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID)
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
 												 map_buffer->all_drivers_data_1[id].position.x,
@@ -277,8 +285,8 @@ void checkPositions(int playerID) {
 
 			char buffer[128];
 
-			strcpy_s(buffer, 128, "alert:");
-			strcpy_s(buffer + strlen("alert:"), 128 - strlen("alert:"), alert);
+			strcpy_s(buffer, 128, "proximityAlert:");
+			strcpy_s(buffer + strlen("proximityAlert:"), 128 - strlen("proximityAlert:"), alert);
 
 			sendMessage(buffer);
 		}
@@ -286,7 +294,7 @@ void checkPositions(int playerID) {
 			if (!carBehindReported) {
 				carBehindReported = FALSE;
 
-				sendMessage("alert:Behind");
+				sendMessage("proximityAlert:Behind");
 			}
 		}
 		else
@@ -297,6 +305,88 @@ void checkPositions(int playerID) {
 		carBehind = FALSE;
 		carBehindReported = FALSE;
 	}
+}
+
+BOOL checkFlagState() {
+	int sector = 0;
+	int distance = (int)map_buffer->flags.closest_yellow_distance_into_track;
+
+	if (distance > 1000 || distance < 0)
+		distance = 0;
+
+	if (map_buffer->flags.yellow &&
+		map_buffer->flags.sector_yellow[1] == 1 &&
+		map_buffer->flags.sector_yellow[2] == 1 &&
+		map_buffer->flags.sector_yellow[3] == 1) {
+		if ((lastFlagState & YELLOW_FULL) == 0) {
+			sendMessage("yellowFlag:Full");
+
+			lastFlagState |= YELLOW_FULL;
+
+			return TRUE;
+		}
+	}
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[1] == 1) {
+		if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
+			sector = 1;
+
+			lastFlagState |= YELLOW_SECTOR_1;
+		}
+	}
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[2] == 1) {
+		if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
+			sector = 2;
+
+			lastFlagState |= YELLOW_SECTOR_2;
+		}
+	}
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[3] == 1) {
+		if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
+			sector = 3;
+
+			lastFlagState |= YELLOW_SECTOR_3;
+		}
+	}
+	else {
+		if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
+			(lastFlagState & YELLOW_SECTOR_3) != 0) {
+			sendMessage("yellowFlag:Clear");
+
+			lastFlagState &= ~YELLOW_FULL;
+
+			return TRUE;
+		}
+	}
+
+	if (sector) {
+		char buffer[128];
+		char buffer2[10];
+		int offset = 0;
+
+		strcpy_s(buffer, 128, "yellowFlag:Sector;");
+
+		offset = strlen("yellowFlag:Sector;");
+		_itoa_s(sector, buffer2, 10, 10);
+
+		strcpy_s(buffer + offset, 128 - offset, buffer2);
+
+		if (distance) {
+			offset += strlen(buffer2);
+
+			strcpy_s(buffer + offset, 128 - offset, ";");
+
+			offset += 1;
+			_itoa_s(distance, buffer2, 10, 10);
+
+			strcpy_s(buffer + offset, 128 - offset, buffer2);
+		}
+		
+		sendMessage(buffer);
+
+		return TRUE;
+	}
+	else
+		return FALSE;
 }
 
 int main()
@@ -312,12 +402,15 @@ int main()
 				playerID = getPlayerID();
 			}
 
-		if (mapped_r3e && (map_buffer->completed_laps >= 0) /* && !map_buffer->game_paused */)
-            checkPositions(playerID);
+		if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused)
+			if (!checkFlagState())
+				checkPositions(playerID);
         else {
             lastSituation = CLEAR;
             carBehind = FALSE;
             carBehindReported = FALSE;
+
+			lastFlagState = CLEAR;
         }
 
         Sleep(200);

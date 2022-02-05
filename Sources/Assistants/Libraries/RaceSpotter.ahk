@@ -96,7 +96,7 @@ class RaceSpotter extends RaceAssistant {
 		return this.VoiceAssistant.getSpeaker(fast)
 	}
 	
-	alert(phrase, variables := false) {
+	proximityAlert(phrase, variables := false) {
 		if (variables && !IsObject(variables)) {
 			values := {}
 			
@@ -109,7 +109,23 @@ class RaceSpotter extends RaceAssistant {
 			variables := values
 		}
 		
-		this.getSpeaker(true).speakPhrase(phrase, variables)
+		if this.Speaker
+			this.getSpeaker(true).speakPhrase(phrase, variables)
+	}
+	
+	yellowFlag(type, arguments*) {
+		if this.Speaker
+			switch type {
+				case "Full":
+					this.getSpeaker(true).speakPhrase("YellowFull")
+				case "Sector":
+					if (arguments.Length() > 1)
+						this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
+					else
+						this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
+				case "Clear":
+					this.getSpeaker(true).speakPhrase("YellowClear")
+			}
 	}
 	
 	startupSpotter() {

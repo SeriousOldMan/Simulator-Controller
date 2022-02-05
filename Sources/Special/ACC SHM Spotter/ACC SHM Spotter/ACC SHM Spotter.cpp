@@ -135,6 +135,9 @@ const int BLUE = 16;
 
 int lastFlagState = CLEAR;
 
+bool pitWindowOpenReported = false;
+bool pitWindowClosedReported = false;
+
 string computeAlert(int newSituation) {
 	string alert = noAlert;
 
@@ -248,7 +251,7 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		return CLEAR;
 }
 
-void checkPositions() {
+bool checkPositions() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -293,12 +296,16 @@ void checkPositions() {
 			carBehindReported = false;
 
 			sendMessage("proximityAlert:" + alert);
+
+			return true;
 		}
 		else if (carBehind) {
 			if (!carBehindReported) {
 				carBehindReported = true;
 
 				sendMessage("proximityAlert:Behind");
+
+				return true;
 			}
 		}
 		else
@@ -309,6 +316,8 @@ void checkPositions() {
 		carBehind = false;
 		carBehindReported = false;
 	}
+
+	return false;
 }
 
 bool checkFlagState() {
@@ -374,6 +383,24 @@ bool checkFlagState() {
 	return false;
 }
 
+void checkPitWindow() {
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	if ((sf->PitWindowStart < gf->Clock) && (sf->PitWindowEnd > gf->Clock) && !pitWindowOpenReported) {
+		pitWindowOpenReported = true;
+		pitWindowClosedReported = false;
+
+		sendMessage("pitWindow:Open");
+	}
+	else if ((sf->PitWindowEnd > gf->Clock) && !pitWindowClosedReported) {
+		pitWindowClosedReported = true;
+		pitWindowOpenReported = false;
+
+		sendMessage("pitWindow:Closed");
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
@@ -384,8 +411,8 @@ int main(int argc, char* argv[])
 
 	while (true) {
 		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-			if (!checkFlagState())
-				checkPositions();
+			if (!checkFlagState() && !checkPositions())
+				checkPitWindow();
 		}
 		else {
 			lastSituation = CLEAR;

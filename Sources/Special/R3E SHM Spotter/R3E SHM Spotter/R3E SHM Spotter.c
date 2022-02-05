@@ -130,6 +130,9 @@ BOOL carBehindReported = FALSE;
 
 int lastFlagState = CLEAR;
 
+BOOL pitWindowOpenReported = FALSE;
+BOOL pitWindowClosedReported = FALSE;
+
 char* computeAlert(int newSituation) {
 	char* alert = noAlert;
 
@@ -243,7 +246,7 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 		return CLEAR;
 }
 
-void checkPositions(int playerID) {
+BOOL checkPositions(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
 	r3e_float64 velocityY = map_buffer->player.velocity.y;
 	r3e_float64 velocityZ = map_buffer->player.velocity.z;
@@ -289,12 +292,16 @@ void checkPositions(int playerID) {
 			strcpy_s(buffer + strlen("proximityAlert:"), 128 - strlen("proximityAlert:"), alert);
 
 			sendMessage(buffer);
+
+			return TRUE;
 		}
 		else if (carBehind) {
 			if (!carBehindReported) {
 				carBehindReported = FALSE;
 
 				sendMessage("proximityAlert:Behind");
+
+				return TRUE;
 			}
 		}
 		else
@@ -305,6 +312,8 @@ void checkPositions(int playerID) {
 		carBehind = FALSE;
 		carBehindReported = FALSE;
 	}
+
+	return FALSE;
 }
 
 BOOL checkFlagState() {
@@ -399,6 +408,21 @@ BOOL checkFlagState() {
 		return FALSE;
 }
 
+void checkPitWindow() {
+	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported) {
+		pitWindowOpenReported = TRUE;
+		pitWindowClosedReported = FALSE;
+
+		sendMessage("pitWindow:Open");
+	}
+	else if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_CLOSED) && !pitWindowClosedReported) {
+		pitWindowClosedReported = TRUE;
+		pitWindowOpenReported = FALSE;
+
+		sendMessage("pitWindow:Closed");
+	}
+}
+
 int main()
 {
     BOOL mapped_r3e = FALSE;
@@ -413,8 +437,8 @@ int main()
 			}
 
 		if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-			if (!checkFlagState())
-				checkPositions(playerID);
+			if (!checkFlagState() && !checkPositions(playerID))
+				checkPitWindow();
 		}
         else {
             lastSituation = CLEAR;

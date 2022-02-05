@@ -139,6 +139,14 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
+	pitWindow(state) {
+		if this.Speaker
+			if (state = "Open")
+				this.getSpeaker().speakPhrase("PitWindowOpen")
+			else if (state = "Closed")
+				this.getSpeaker().speakPhrase("PitWindowClosed")
+	}
+	
 	startupSpotter() {
 		code := this.SessionDatabase.getSimulatorCode(this.Simulator)
 		

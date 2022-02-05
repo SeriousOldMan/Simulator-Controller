@@ -23,8 +23,16 @@ Release 3.8.8 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Plugin Actions & Labels
+   c. Phrase Grammars
 2. New Spotter IRC and R3E
    a. Documentation Update for Spotter in Wiki
+3. New InformationRequest Action "Time"
+   a. Plugin Actions & Labels
+   b. Phrase Grammars
+   c. Documentation
+4. New Spotter Alert for Yellow Flags
+   a. Documentation
 
 Release 3.8.6 Checklist
 =======================

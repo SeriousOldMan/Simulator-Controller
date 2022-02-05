@@ -250,6 +250,7 @@ Please see the following table for available information commands.
 
 | Command | Description |
 | ------ | ------ |
+| Time | You will be told the current time of your local computer. |
 | LapsRemaining | Jona will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | Weather | You will get information about the current and upcoming weather. |
 | TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
@@ -303,6 +304,7 @@ Please see the following table for available information commands.
 
 | Command | Description |
 | ------ | ------ |
+| Time | You will be told the current time of your local computer. |
 | LapsRemaining | Cato will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |

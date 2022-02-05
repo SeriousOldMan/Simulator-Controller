@@ -149,6 +149,8 @@ class RaceStrategist extends RaceAssistant {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "Time":
+				this.timeRecognized(words)
 			case "LapsRemaining":
 				this.lapsRemainingRecognized(words)
 			case "Weather":
@@ -196,6 +198,12 @@ class RaceStrategist extends RaceAssistant {
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
+	}
+	
+	timeRecognized(words) {
+		FormatTime time, %A_Now%, Time
+		
+		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
 	
 	lapsRemainingRecognized(words) {

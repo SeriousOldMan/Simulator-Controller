@@ -314,6 +314,16 @@ void checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+	if (gf->flag == AC_BLUE_FLAG && (lastFlagState & BLUE) == 0) {
+		sendMessage("blueFlag");
+
+		lastFlagState |= BLUE;
+
+		return TRUE;
+	}
+	else
+		lastFlagState &= ~BLUE;
+
 	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_FULL) == 0) {
 			sendMessage("yellowFlag:Full");

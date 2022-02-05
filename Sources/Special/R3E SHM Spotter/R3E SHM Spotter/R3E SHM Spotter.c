@@ -308,6 +308,16 @@ void checkPositions(int playerID) {
 }
 
 BOOL checkFlagState() {
+	if (map_buffer->flags.blue && (lastFlagState & BLUE) == 0) {
+		sendMessage("blueFlag");
+
+		lastFlagState |= BLUE;
+
+		return TRUE;
+	}
+	else
+		lastFlagState &= ~BLUE;
+
 	int sector = 0;
 	int distance = (int)map_buffer->flags.closest_yellow_distance_into_track;
 

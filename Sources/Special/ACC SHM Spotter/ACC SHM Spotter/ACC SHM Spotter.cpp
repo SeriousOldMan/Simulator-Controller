@@ -136,7 +136,7 @@ const int BLUE = 16;
 int lastFlagState = CLEAR;
 
 bool pitWindowOpenReported = false;
-bool pitWindowClosedReported = false;
+bool pitWindowClosedReported = true;
 
 string computeAlert(int newSituation) {
 	string alert = noAlert;

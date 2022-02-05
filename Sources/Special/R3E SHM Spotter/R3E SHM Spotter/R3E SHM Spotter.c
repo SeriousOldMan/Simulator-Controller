@@ -131,7 +131,7 @@ BOOL carBehindReported = FALSE;
 int lastFlagState = CLEAR;
 
 BOOL pitWindowOpenReported = FALSE;
-BOOL pitWindowClosedReported = FALSE;
+BOOL pitWindowClosedReported = TRUE;
 
 char* computeAlert(int newSituation) {
 	char* alert = noAlert;

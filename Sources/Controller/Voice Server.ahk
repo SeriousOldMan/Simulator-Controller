@@ -590,7 +590,7 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
-				if VoiceServer.PushToTalk
+				if this.PushToTalk
 					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 			
 				this.iIsListening := true

@@ -314,12 +314,14 @@ void checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if (gf->flag == AC_BLUE_FLAG && (lastFlagState & BLUE) == 0) {
-		sendMessage("blueFlag");
+	if (gf->flag == AC_BLUE_FLAG) {
+		if ((lastFlagState & BLUE) == 0) {
+			sendMessage("blueFlag");
 
-		lastFlagState |= BLUE;
+			lastFlagState |= BLUE;
 
-		return true;
+			return true;
+		}
 	}
 	else
 		lastFlagState &= ~BLUE;
@@ -383,7 +385,7 @@ int main(int argc, char* argv[])
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	while (true) {
-		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+		if (true || (gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
 			if (!checkFlagState())
 				checkPositions();
 		}

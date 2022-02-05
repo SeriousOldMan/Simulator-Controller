@@ -308,12 +308,14 @@ void checkPositions(int playerID) {
 }
 
 BOOL checkFlagState() {
-	if (map_buffer->flags.blue && (lastFlagState & BLUE) == 0) {
-		sendMessage("blueFlag");
+	if (map_buffer->flags.blue) {
+		if ((lastFlagState & BLUE) == 0) {
+			sendMessage("blueFlag");
 
-		lastFlagState |= BLUE;
+			lastFlagState |= BLUE;
 
-		return TRUE;
+			return TRUE;
+		}
 	}
 	else
 		lastFlagState &= ~BLUE;

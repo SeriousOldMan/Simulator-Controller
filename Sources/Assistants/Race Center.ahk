@@ -3231,6 +3231,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		pitstops := false
 		newData := false
+		missingLaps := 0
 		
 		while (lap <= lastLap) {
 			try {
@@ -3241,8 +3242,14 @@ class RaceCenter extends ConfigurationItem {
 				
 				if (lapData && (lapData != ""))
 					lapData := parseConfiguration(lapData)
-				else
+				else if (lap = lastLap)
 					Throw "No data..."
+				else {
+					missingLaps +=1
+					lap += 1
+				
+					continue
+				}
 			}
 			catch exception {
 				if newData
@@ -3264,6 +3271,15 @@ class RaceCenter extends ConfigurationItem {
 			positions := getConfigurationValue(lapData, "Positions", lap)
 			laps := getConfigurationValue(lapData, "Laps", lap)
 			drivers := getConfigurationValue(lapData, "Drivers", lap)
+			
+			Loop %missingLaps% {
+				times .= ("`n" . times)
+				positions .= ("`n" . positions)
+				laps .= ("`n" . laps)
+				drivers .= ("`n" . drivers)
+			}
+			
+			missingLaps := 0
 			
 			newLine := ((lap > 1) ? "`n" : "")
 			
@@ -5628,8 +5644,8 @@ class RaceCenter extends ConfigurationItem {
 		lapTimes := []
 		
 		for ignore, driver in drivers {
-			driverTimes := Array("'" . driver.Nickname . "'")
-			
+			driverTimes := []
+		
 			for ignore, lap in driver.Laps {
 				if (A_Index > length)
 					break
@@ -5639,6 +5655,28 @@ class RaceCenter extends ConfigurationItem {
 				if (value != "null")
 					driverTimes.Push(value)
 			}
+			
+			Loop 2 {
+				avg := average(driverTimes)
+				stdDev := stdDeviation(driverTimes)
+				
+				for index, time in driverTimes
+					if ((time <= 0) || ((time > avg) && (Abs(time - avg) > (stdDev / 2))))
+						driverTimes[index] := false
+
+				validTimes := []
+				
+				for ignore, time in driverTimes
+					if time
+						validTimes.Push(time)
+					
+				driverTimes := validTimes
+			}
+			
+			length := Min(length, driverTimes.Length())
+			
+			driverTimes.InsertAt(1, "'" . driver.Nickname . "'")
+			
 			lapTimes.Push("[" . values2String(", ", driverTimes*) . "]")
 		}
 		

@@ -556,24 +556,29 @@ class RaceReportViewer {
 			
 			sessionDB := new SessionDatabase()
 			
-			Loop % carsCount
-			{
+			Loop %carsCount% {
 				car := A_Index
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
-						valid := true
+					if (positions.Length() >= lap) {
+						if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
+							valid := true
+						else
+							positions[lap][car] := "null" ; carsCount
+					}
 					else
-						positions[lap][car] := "null" ; carsCount
+						valid := false
 				
 				if valid
 					cars.Push(Array(getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"), getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")))
 				else
 					for ignore, lap in this.getReportLaps(raceData) {
-						drivers[lap].RemoveAt(car)
-						positions[lap].RemoveAt(car)
-						times[lap].RemoveAt(car)
+						if (drivers.Length() >= lap) {
+							drivers[lap].RemoveAt(car)
+							positions[lap].RemoveAt(car)
+							times[lap].RemoveAt(car)
+						}
 					}
 			}
 			
@@ -828,18 +833,20 @@ class RaceReportViewer {
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				drawChartFunction := drawChartFunction . (",`n[" . lap)
-				
-				Loop % cars.Length() {
-					lapPositions := positions[lap]
-				
-					if lapPositions.HasKey(A_Index)
-						drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
-					else
-						drawChartFunction := (drawChartFunction . ", null")
+				if (positions.Length() >= lap) {
+					drawChartFunction := drawChartFunction . (",`n[" . lap)
+					
+					Loop % cars.Length() {
+						lapPositions := positions[lap]
+					
+						if lapPositions.HasKey(A_Index)
+							drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
+						else
+							drawChartFunction := (drawChartFunction . ", null")
+					}
+					
+					drawChartFunction := drawChartFunction . "]"
 				}
-				
-				drawChartFunction := drawChartFunction . "]"
 			}
 			
 			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")

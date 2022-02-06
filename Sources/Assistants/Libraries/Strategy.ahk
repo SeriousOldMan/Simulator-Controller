@@ -680,7 +680,7 @@ class Strategy extends ConfigurationItem {
 				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("StintLaps"))
 					stintLaps := adjustments[id].StintLaps
 				else
-					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(fuelConsumption)))
+					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(this.FuelCapacity, fuelConsumption)))
 				
 				this.iStintLaps := stintLaps
 				this.iMap := strategy.Map[true]
@@ -1374,8 +1374,8 @@ class Strategy extends ConfigurationItem {
 												, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime)
 	}
 	
-	getMaxFuelLaps(fuelConsumption, withSafety := true) {
-		return Floor((this.FuelCapacity - (withSafety ? this.SafetyFuel : 0)) / fuelConsumption)
+	getMaxFuelLaps(remainingFuel, fuelConsumption, withSafety := true) {
+		return Floor((remainingFuel - (withSafety ? this.SafetyFuel : 0)) / fuelConsumption)
 	}
 	
 	calcSessionLaps(avgLapTime := false, formationLap := true, postRaceLap := true) {
@@ -1421,7 +1421,7 @@ class Strategy extends ConfigurationItem {
 	
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
 		fuelConsumption := this.FuelConsumption[true]
-		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(fuelConsumption))))
+		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
 		
 		if (pitstopNr = 1) {
 			pitstopRequired := this.PitstopRequired

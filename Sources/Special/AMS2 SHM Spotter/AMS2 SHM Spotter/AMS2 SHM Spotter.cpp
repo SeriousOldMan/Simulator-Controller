@@ -307,17 +307,16 @@ bool checkFlagState(const SharedMemory* sharedData) {
 	return false;
 }
 
-void checkPitWindow() {
-	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
-	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-	if ((sf->PitWindowStart < gf->Clock) && (sf->PitWindowEnd > gf->Clock) && !pitWindowOpenReported) {
+void checkPitWindow(const SharedMemory* sharedData) {
+	if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+		!pitWindowOpenReported) {
 		pitWindowOpenReported = true;
 		pitWindowClosedReported = false;
 
 		sendMessage("pitWindow:Open");
 	}
-	else if ((sf->PitWindowEnd > gf->Clock) && !pitWindowClosedReported) {
+	else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+		!pitWindowClosedReported) {
 		pitWindowClosedReported = true;
 		pitWindowOpenReported = false;
 
@@ -375,7 +374,19 @@ int main(int argc, char* argv[]) {
 				continue;
 			}
 
-			break;
+			if (localCopy->mGameState != GAME_INGAME_PAUSED && !localCopy->mPitMode != PIT_MODE_NONE) {
+				if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+					checkPitWindow(localCopy);
+			}
+			else {
+				lastSituation = CLEAR;
+				carBehind = false;
+				carBehindReported = false;
+
+				lastFlagState = CLEAR;
+			}
+
+			Sleep(200);
 		}
 	}
 

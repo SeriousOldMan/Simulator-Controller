@@ -828,7 +828,7 @@ writeUninstallerInfo(installLocation) {
 	
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % installLocation
-	RegWrite REG_SZ, HKLM, %kUninstallKey%, IsntallDate, %A_YYYY%%A_MM%%A_DD%
+	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallDate, %A_YYYY%%A_MM%%A_DD%
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, UninstallString, "%installLocation%\Binaries\Simulator Tools.exe" -Uninstall
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, QuietUninstallString, "%installLocation%\Binaries\Simulator Tools.exe" -Uninstall -Quiet
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayIcon, "%installLocation%\Resources\Icons\Artificial Intelligence.ico"

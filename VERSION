@@ -3,7 +3,7 @@ Version=3.8.8-dev
 Target=3.8.8-release
 Date=02/06/2022
 Download=
-Changes=Spotter implementation for iRacing, Spotter implementation for RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings
+Changes=Spotter implementation for iRacing, Spotter implementation for iRacing, Automobilista 2 and RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings
 [Release]
 Version=3.8.6-release
 Date=02/04/2022

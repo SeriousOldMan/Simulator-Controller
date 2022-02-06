@@ -123,7 +123,6 @@ int main(int argc, char* argv[]) {
 			//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
 			memcpy(localCopy, sharedData, sizeof(SharedMemory));
 
-
 			if (localCopy->mSequenceNumber != updateIndex)
 			{
 				// More writes had happened during the read. Should be rare, but can happen.

@@ -234,10 +234,10 @@ const float longitudinalDistance = 4;
 const float lateralDistance = 6;
 const float verticalDistance = 4;
 
-const int CLEAR = 0;
-const int LEFT = 1;
-const int RIGHT = 2;
-const int THREE = 3;
+const int CLEAR = 1;
+const int LEFT = 2;
+const int RIGHT = 3;
+const int THREE = 4;
 
 const int situationRepeat = 5;
 
@@ -316,9 +316,6 @@ const char* computeAlert(int newSituation) {
 
 	lastSituation = newSituation;
 
-	if (strcmp(alert, "Three") == 0)
-		alert = "Side";
-
 	return alert;
 }
 
@@ -327,11 +324,14 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 
 	getDataValue(buffer, header, data, "CarLeftRight");
 
-	int proximity = atoi(buffer);
-	int newSituation = CLEAR;
+	int newSituation = atoi(buffer);
 
-	if (proximity)
-		newSituation |= (LEFT + RIGHT);
+	if (newSituation < CLEAR)
+		newSituation = CLEAR;
+	else if (newSituation == 5)
+		newSituation = LEFT;
+	else if (newSituation == 6)
+		newSituation = RIGHT;
 
 	const char* alert = computeAlert(newSituation);
 
@@ -344,10 +344,6 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 		strcpy_s(buffer2, 128, "proximityAlert:");
 		offset = strlen("proximityAlert:");
 		strcpy_s(buffer2 + offset, 128 - offset, alert);
-		offset += strlen(alert);
-		strcpy_s(buffer2 + offset, 128 - offset, "-");
-		offset += 1;
-		strcpy_s(buffer2 + offset, 128 - offset, buffer);
 
 		sendMessage(buffer2);
 

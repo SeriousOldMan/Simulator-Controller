@@ -97,14 +97,6 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	proximityAlert(type, variables := false) {
-		if (InStr(type, "Side") = 1) {
-			type := string2Values("-", type)
-			
-			showMessage(type[2])
-			
-			type := type[1]
-		}
-			
 		if (variables && !IsObject(variables)) {
 			values := {}
 			

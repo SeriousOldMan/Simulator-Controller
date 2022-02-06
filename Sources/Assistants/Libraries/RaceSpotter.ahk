@@ -97,6 +97,14 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	proximityAlert(type, variables := false) {
+		if (InStr(type, "Side") = 1) {
+			type := string2Values("-", type)
+			
+			showMessage(type[2])
+			
+			type := type[1]
+		}
+			
 		if (variables && !IsObject(variables)) {
 			values := {}
 			
@@ -125,6 +133,8 @@ class RaceSpotter extends RaceAssistant {
 						this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
 				case "Clear":
 					this.getSpeaker(true).speakPhrase("YellowClear")
+				case "Ahead":
+					this.getSpeaker(true).speakPhrase("YellowAhead")
 			}
 	}
 	

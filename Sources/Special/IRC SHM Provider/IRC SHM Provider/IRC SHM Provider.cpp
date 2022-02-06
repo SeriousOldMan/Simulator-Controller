@@ -668,8 +668,33 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 		else {
 			printf("[Session Data]\n");
 
+			bool running = false;
+			char* paused = "false";
+
+			getDataValue(result, header, data, "IsInGarage");
+			if (atoi(result))
+				running = true;
+
+			getDataValue(result, header, data, "IsOnTrack");
+			if (atoi(result))
+				running = true;
+
+			getDataValue(result, header, data, "IsOnTrackCar");
+			if (atoi(result))
+				running = true;
+
+			if (running) {
+				getDataValue(result, header, data, "IsReplayPlaying");
+
+				if (atoi(result))
+					paused = "true";
+			}
+			else
+				paused = "true";
+
+
 			printf("Active=true\n");
-			printf("Paused=false\n"); // Not yet implemented
+			printf("Paused=%s\n", paused);
 
 			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
 				if (strstr(result, "Practice"))

@@ -31,7 +31,12 @@ Release 3.8.8 Checklist
    a. Plugin Actions & Labels
    b. Phrase Grammars
    c. Documentation
+   d. Commands in Discord updaten
 4. New Spotter Alert for Yellow Flags
+   a. Documentation
+5. New Spotter Alert for Blue Flags
+   a. Documentation
+6. New Spotter Info for Pit Window
    a. Documentation
 
 Release 3.8.6 Checklist

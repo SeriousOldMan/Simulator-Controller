@@ -252,6 +252,8 @@ bool carBehindReported = false;
 const int YELLOW = 1;
 const int BLUE = 16;
 
+int blueCount = 0;
+
 int lastFlagState = CLEAR;
 
 bool pitWindowOpenReported = false;
@@ -368,9 +370,17 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 			return true;
 		}
+		else if (blueCount++ > 100) {
+			lastFlagState &= ~BLUE;
+
+			blueCount = 0;
+		}
 	}
-	else
+	else {
 		lastFlagState &= ~BLUE;
+
+		blueCount = 0;
+	}
 
 	if ((flags & irsdk_yellow) != 0 || (flags & irsdk_yellowWaving) != 0) {
 		if ((lastFlagState & YELLOW) == 0) {

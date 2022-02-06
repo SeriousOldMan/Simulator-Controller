@@ -133,6 +133,8 @@ const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 
 const int BLUE = 16;
 
+int blueCount = 0;
+
 int lastFlagState = CLEAR;
 
 bool pitWindowOpenReported = false;
@@ -331,9 +333,17 @@ bool checkFlagState() {
 
 			return true;
 		}
+		else if (blueCount++ > 100) {
+			lastFlagState &= ~BLUE;
+
+			blueCount = 0;
+		}
 	}
-	else
+	else {
 		lastFlagState &= ~BLUE;
+
+		blueCount = 0;
+	}
 
 	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_FULL) == 0) {

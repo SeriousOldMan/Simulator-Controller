@@ -128,6 +128,8 @@ BOOL carBehindReported = FALSE;
 
 #define BLUE 16
 
+int blueCount = 0;
+
 int lastFlagState = CLEAR;
 
 BOOL pitWindowOpenReported = FALSE;
@@ -325,9 +327,17 @@ BOOL checkFlagState() {
 
 			return TRUE;
 		}
+		else if (blueCount++ > 100) {
+			lastFlagState &= ~BLUE;
+
+			blueCount = 0;
+		}
 	}
-	else
+	else {
 		lastFlagState &= ~BLUE;
+
+		blueCount = 0;
+	}
 
 	int sector = 0;
 	int distance = (int)map_buffer->flags.closest_yellow_distance_into_track;

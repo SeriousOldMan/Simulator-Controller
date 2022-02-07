@@ -374,7 +374,7 @@ int main(int argc, char* argv[]) {
 				continue;
 			}
 
-			if (localCopy->mGameState != GAME_INGAME_PAUSED && !localCopy->mPitMode != PIT_MODE_NONE) {
+			if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
 				if (!checkFlagState(localCopy) && !checkPositions(localCopy))
 					checkPitWindow(localCopy);
 			}

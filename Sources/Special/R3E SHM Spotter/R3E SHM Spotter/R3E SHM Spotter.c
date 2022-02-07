@@ -421,7 +421,7 @@ BOOL checkFlagState() {
 }
 
 void checkPitWindow() {
-	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported) {
+	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported && !map_buffer->in_pitlane) {
 		pitWindowOpenReported = TRUE;
 		pitWindowClosedReported = FALSE;
 

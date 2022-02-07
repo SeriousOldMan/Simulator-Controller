@@ -453,7 +453,23 @@ int main(int argc, char* argv[])
 					if (atoi(result))
 						running = false;
 
-					if (running) {
+					bool inPit = false;
+
+					char* rawValue;
+					char playerCarIdx[10] = "";
+					
+					getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+					getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
+
+					if (!((bool*)rawValue)[atoi(playerCarIdx)]) {
+						getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
+
+						irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
+
+						inPit = (trkLoc & irsdk_InPitStall) || (trkLoc & irsdk_AproachingPits);
+					}
+
+					if (running && !inPit) {
 						if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
 							checkPitWindow(pHeader, g_data);
 

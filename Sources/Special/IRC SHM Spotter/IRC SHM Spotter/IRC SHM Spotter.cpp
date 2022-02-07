@@ -437,11 +437,16 @@ int main(int argc, char* argv[])
 
 					char result[64];
 					bool running = true;
-					/*
+
 					getDataValue(result, pHeader, g_data, "IsInGarage");
 					if (atoi(result))
-						running = true;
-					
+						running = false;
+
+					getDataValue(result, pHeader, g_data, "IsReplayPlaying");
+					if (atoi(result))
+						running = false;
+
+					/*
 					getDataValue(result, pHeader, g_data, "IsOnTrack");
 					if (!atoi(result))
 						running = false;
@@ -450,10 +455,6 @@ int main(int argc, char* argv[])
 					if (atoi(result))
 						running = true;
 					*/
-
-					getDataValue(result, pHeader, g_data, "IsReplayPlaying");
-					if (atoi(result))
-						running = false;
 
 					bool inPit = false;
 
@@ -465,7 +466,6 @@ int main(int argc, char* argv[])
 
 					if (((bool*)rawValue)[atoi(playerCarIdx)])
 						inPit = true;
-
 					/*
 					else {
 						getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");

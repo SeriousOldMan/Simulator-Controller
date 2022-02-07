@@ -234,8 +234,6 @@ namespace RF2SHMSpotter {
 
 		const double PI = 3.14159265;
 
-		int sessionDuration = 0;
-
 		const double nearByDistance = 8;
 		const double longitudinalDistance = 4;
 		const double lateralDistance = 6;
@@ -267,9 +265,6 @@ namespace RF2SHMSpotter {
 		int blueCount = 0;
 
 		int lastFlagState = 0;
-
-		bool pitWindowOpenReported = false;
-		bool pitWindowClosedReported = true;
 
 		string computeAlert(int newSituation) {
 			string alert = noAlert;

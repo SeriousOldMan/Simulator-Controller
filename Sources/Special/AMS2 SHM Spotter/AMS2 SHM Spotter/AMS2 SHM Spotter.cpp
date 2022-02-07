@@ -41,10 +41,10 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 }
 
 void sendMessage(char* message) {
-	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
+	HWND winHandle = FindWindowExA(0, 0, 0, "Race Spotter.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
+		FindWindowExA(0, 0, 0, "Race Spotter.ahk");
 
 	if (winHandle != 0) {
 		char buffer[128];
@@ -190,7 +190,7 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		rotateBy(&transX, &transY, angle);
 
 		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
-			return (transX < 0) ? RIGHT : LEFT;
+			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0)
 				carBehind = true;
@@ -204,8 +204,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 
 bool checkPositions(const SharedMemory* sharedData) {
 	float velocityX = sharedData->mWorldVelocity[VEC_X];
-	float velocityY = sharedData->mWorldVelocity[VEC_Y];
-	float velocityZ = sharedData->mWorldVelocity[VEC_Z];
+	float velocityY = sharedData->mWorldVelocity[VEC_Z];
+	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		float angle = vectorAngle(velocityX, velocityY);
@@ -213,19 +213,19 @@ bool checkPositions(const SharedMemory* sharedData) {
 		int carID = sharedData->mViewedParticipantIndex;
 
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
-		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Y];
-		float coordinateZ = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+		float coordinateZ = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Y];
 
 		int newSituation = CLEAR;
 
 		carBehind = false;
 
-		for (int id = 0; sharedData->mNumParticipants; id++) {
+		for (int id = 0; id < sharedData->mNumParticipants; id++) {
 			if (id != carID)
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
 												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y],
-												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
+												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z],
+												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y]);
 
 			if ((newSituation == THREE) && carBehind)
 				break;

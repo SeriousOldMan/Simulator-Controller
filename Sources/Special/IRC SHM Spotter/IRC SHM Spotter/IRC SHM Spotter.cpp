@@ -254,7 +254,7 @@ const int BLUE = 16;
 
 int blueCount = 0;
 
-int lastFlagState = CLEAR;
+int lastFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -334,6 +334,8 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 		newSituation = LEFT;
 	else if (newSituation == 6)
 		newSituation = RIGHT;
+	else if (newSituation > CLEAR)
+		newSituation = newSituation;
 
 	const char* alert = computeAlert(newSituation);
 
@@ -434,22 +436,22 @@ int main(int argc, char* argv[])
 						tries = 0;
 
 					char result[64];
-					bool running = false;
-
+					bool running = true;
+					/*
 					getDataValue(result, pHeader, g_data, "IsInGarage");
 					if (atoi(result))
 						running = true;
-
+					
 					getDataValue(result, pHeader, g_data, "IsOnTrack");
-					if (atoi(result))
-						running = true;
+					if (!atoi(result))
+						running = false;
 
 					getDataValue(result, pHeader, g_data, "IsOnTrackCar");
 					if (atoi(result))
 						running = true;
+					*/
 
 					getDataValue(result, pHeader, g_data, "IsReplayPlaying");
-
 					if (atoi(result))
 						running = false;
 
@@ -461,14 +463,19 @@ int main(int argc, char* argv[])
 					getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
 					getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
 
-					if (!((bool*)rawValue)[atoi(playerCarIdx)]) {
+					if (((bool*)rawValue)[atoi(playerCarIdx)])
+						inPit = true;
+
+					/*
+					else {
 						getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
 
 						irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
 
-						inPit = (trkLoc & irsdk_InPitStall) || (trkLoc & irsdk_AproachingPits);
+						inPit = (trkLoc & irsdk_InPitStall);
 					}
-
+					*/
+					
 					if (running && !inPit) {
 						if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
 							checkPitWindow(pHeader, g_data);
@@ -480,7 +487,7 @@ int main(int argc, char* argv[])
 						carBehind = false;
 						carBehindReported = false;
 
-						lastFlagState = CLEAR;
+						lastFlagState = 0;
 
 						Sleep(1000);
 					}

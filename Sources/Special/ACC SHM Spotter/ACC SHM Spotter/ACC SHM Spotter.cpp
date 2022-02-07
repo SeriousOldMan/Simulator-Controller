@@ -105,6 +105,8 @@ void sendMessage(string message) {
 
 #define PI 3.14159265
 
+int sessionDuration = 0;
+
 const float nearByDistance = 8.0;
 const float longitudinalDistance = 4;
 const float lateralDistance = 6;
@@ -399,13 +401,15 @@ void checkPitWindow() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if ((sf->PitWindowStart < gf->Clock) && (sf->PitWindowEnd > gf->Clock) && !pitWindowOpenReported) {
+	int currentTime = sessionDuration - gf->sessionTimeLeft;
+	
+	if (sf->PitWindowStart < currentTime && sf->PitWindowEnd > currentTime && !pitWindowOpenReported) {
 		pitWindowOpenReported = true;
 		pitWindowClosedReported = false;
 
 		sendMessage("pitWindow:Open");
 	}
-	else if ((sf->PitWindowEnd > gf->Clock) && !pitWindowClosedReported) {
+	else if (sf->PitWindowEnd > currentTime && !pitWindowClosedReported) {
 		pitWindowClosedReported = true;
 		pitWindowOpenReported = false;
 
@@ -419,9 +423,13 @@ int main(int argc, char* argv[])
 	initGraphics();
 	initStatic();
 
+	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	while (true) {
+		if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
+			sessionDuration = gf->sessionTimeLeft;
+		
 		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
 			if (!checkFlagState() && !checkPositions())
 				checkPitWindow();

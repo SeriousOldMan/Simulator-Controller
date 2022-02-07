@@ -182,7 +182,7 @@ void rotateBy(float* x, float* y, float angle) {
 }
 
 int checkCarPosition(float carX, float carY, float carZ, float angle,
-	float otherX, float otherY, float otherZ) {
+					 float otherX, float otherY, float otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
 		float transX = (otherX - carX);
 		float transY = (otherY - carY);
@@ -308,20 +308,21 @@ bool checkFlagState(const SharedMemory* sharedData) {
 }
 
 void checkPitWindow(const SharedMemory* sharedData) {
-	if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
-		!pitWindowOpenReported) {
-		pitWindowOpenReported = true;
-		pitWindowClosedReported = false;
+	if (sharedData->mEnforcedPitStopLap > 0)
+		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+			!pitWindowOpenReported) {
+			pitWindowOpenReported = true;
+			pitWindowClosedReported = false;
 
-		sendMessage("pitWindow:Open");
-	}
-	else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
-		!pitWindowClosedReported) {
-		pitWindowClosedReported = true;
-		pitWindowOpenReported = false;
+			sendMessage("pitWindow:Open");
+		}
+		else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+			!pitWindowClosedReported) {
+			pitWindowClosedReported = true;
+			pitWindowOpenReported = false;
 
-		sendMessage("pitWindow:Closed");
-	}
+			sendMessage("pitWindow:Closed");
+		}
 }
 
 int main(int argc, char* argv[]) {

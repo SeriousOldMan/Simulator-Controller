@@ -130,7 +130,7 @@ BOOL carBehindReported = FALSE;
 
 int blueCount = 0;
 
-int lastFlagState = CLEAR;
+int lastFlagState = 0;
 
 BOOL pitWindowOpenReported = FALSE;
 BOOL pitWindowClosedReported = TRUE;
@@ -457,7 +457,7 @@ int main()
             carBehind = FALSE;
             carBehindReported = FALSE;
 
-			lastFlagState = CLEAR;
+			lastFlagState = 0;
         }
 
         Sleep(200);

@@ -137,7 +137,7 @@ const int BLUE = 16;
 
 int blueCount = 0;
 
-int lastFlagState = CLEAR;
+int lastFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -439,7 +439,7 @@ int main(int argc, char* argv[])
 			carBehind = false;
 			carBehindReported = false;
 
-			lastFlagState = CLEAR;
+			lastFlagState = 0;
 		}
 
 		Sleep(200);

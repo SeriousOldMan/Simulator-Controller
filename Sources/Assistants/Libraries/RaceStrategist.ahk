@@ -25,6 +25,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategist extends RaceAssistant {
+	iRaceInfo := false
+	
 	iStrategy := false
 	iStrategyReported := false
 	
@@ -63,6 +65,12 @@ class RaceStrategist extends RaceAssistant {
 		
 		createRaceReport(arguments*) {
 			this.callRemote("createRaceReport", arguments*)
+		}
+	}
+	
+	RaceInfo[] {
+		Get {
+			return this.iRaceInfo
 		}
 	}
 	
@@ -125,6 +133,9 @@ class RaceStrategist extends RaceAssistant {
 		
 		if values.HasKey("Strategy")
 			this.iStrategy := values["Strategy"]
+		
+		if values.HasKey("RaceInfo")
+			this.iRaceInfo := values["RaceInfo"]
 	}
 	
 	updateDynamicValues(values) {
@@ -799,7 +810,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 		
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, StrategyReported: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, RaceInfo: false, Strategy: false, SessionTime: false})
 	}
 	
 	forceFinishSession() {
@@ -823,6 +834,7 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			transform nr => index
 			if ((lapNumber = 1) || (key != "Driver.Car"))
 				knowledgeBase.setFact(key, value)
 		
@@ -1188,7 +1200,7 @@ class RaceStrategist extends RaceAssistant {
 			if ((driver == 0) || (carCount == 0))
 				return
 			
-			fileName := (kTempDirectory . "Race Strategist Lap.standings")
+			fileName := (kTempDirectory . "Race Strategist Lap " . postfix . ".standings")
 			data := newConfiguration()
 			
 			setConfigurationValue(data, "Lap", "Lap", lapNumber)
@@ -1207,6 +1219,18 @@ class RaceStrategist extends RaceAssistant {
 			
 			this.RemoteHandler.saveStandingsData(lapNumber, fileName)
 		}
+	}
+	
+	updateRaceInfo(raceData) {
+		raceInfo := {}
+		
+		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
+		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
+		
+		Loop % raceInfo["Cars"]
+			raceInfo[getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")] := A_Index
+		
+		this.updateSessionValues({RaceInfo: raceInfo])
 	}
 	
 	saveStandingsData(lapNumber, simulator, car, track) {
@@ -1245,6 +1269,8 @@ class RaceStrategist extends RaceAssistant {
 				
 				writeConfiguration(fileName, data)
 			
+				this.updateRaceInfo(data)
+				
 				this.RemoteHandler.saveRaceInfo(lapNumber, fileName)
 			}
 			
@@ -1311,6 +1337,17 @@ class RaceStrategist extends RaceAssistant {
 		}
 		
 		this.saveLapStandings(lapNumber, simulator, car, track)
+	}
+	
+	restoreRaceInfo(raceInfoFile) {
+		this.updateRaceInfo(readConfiguration(raceInfoFile))
+			
+		try {
+			FileDelete %raceInfoFile%
+		}
+		catch exception {
+			; ignore
+		}
 	}
 	
 	createRaceReport() {

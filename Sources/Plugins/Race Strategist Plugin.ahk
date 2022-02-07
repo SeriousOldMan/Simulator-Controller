@@ -50,13 +50,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		cancelStrategy(arguments*) {
 			this.callRemote("cancelStrategy", arguments*)
 		}
+		
+		restoreRaceInfo(arguments*) {
+			this.callRemote("restoreRaceInfo", arguments*)
+		}
 	}
 
 	class RaceStrategistAction extends RaceAssistantPlugin.RaceAssistantAction {
 		fireAction(function, trigger) {
-			if (this.Plugin.RaceAssistant && (this.Action = "PitstopRecommend"))
+			if (this.Plugin.RaceStrategist && (this.Action = "PitstopRecommend"))
 				this.Plugin.recommendPitstop()
-			else if (this.Plugin.RaceAssistant && (this.Action = "StrategyCancel"))
+			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyCancel"))
 				this.Plugin.cancelStrategy()
 			else
 				base.fireAction(function, trigger)
@@ -298,13 +302,28 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		
 		if (teamServer && teamServer.SessionActive)
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
+			
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
 	}
 	
 	saveRaceInfo(lapNumber, fileName) {
 		teamServer := this.TeamServer
-		
-		if (teamServer && teamServer.SessionActive)
+	
+		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
 		else {
 			try {
 				FileRemoveDir %kTempDirectory%Race Report, 1
@@ -322,10 +341,53 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	saveRaceLap(lapNumber, fileName) {
 		teamServer := this.TeamServer
 		
-		if (teamServer && teamServer.SessionActive)
+		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
+			
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+		}
 		else 
 			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%
+	}
+	
+	restoreRaceInfo() {
+		teamServer := this.TeamServer
+		
+		if (teamServer && teamServer.Active) {
+			try {
+				raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
+	
+				if (!raceInfo || (raceInfo == ""))
+					return
+				
+				Random postfix, 1, 1000000
+				
+				fileName := (kTempDirectory . this.Plugin . " Race " . postfix . ".info")
+				
+				FileAppend %raceInfo%, %fileName%
+				
+				this.RaceStrategist.restoreRaceInfo(fileName)
+			}
+			catch exception {
+				return
+			}
+		}
+	}
+	
+	restoreSessionState() {
+		if this.RaceStrategist {
+			teamServer := this.TeamServer
+		
+			if (teamServer && teamServer.Active)
+				this.restoreRaceInfo()
+		}
+		
+		base.restoreSessionState()
 	}
 	
 	createRaceReport() {

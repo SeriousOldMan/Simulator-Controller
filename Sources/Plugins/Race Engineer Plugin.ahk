@@ -52,9 +52,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	class RaceEngineerAction extends RaceAssistantPlugin.RaceAssistantAction {
 		fireAction(function, trigger) {
-			if (this.Plugin.RaceAssistant && (this.Action = "PitstopPlan"))
+			if (this.Plugin.RaceEngineer && (this.Action = "PitstopPlan"))
 				this.Plugin.planPitstop()
-			else if (this.Plugin.RaceAssistant && (this.Action = "PitstopPrepare"))
+			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
 				this.Plugin.preparePitstop()
 			else
 				base.fireAction(function, trigger)

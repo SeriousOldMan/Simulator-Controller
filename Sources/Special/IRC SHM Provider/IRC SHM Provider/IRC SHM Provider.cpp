@@ -671,10 +671,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			bool running = false;
 			char* paused = "false";
 
-			getDataValue(result, header, data, "IsInGarage");
-			if (atoi(result))
-				running = true;
-
 			getDataValue(result, header, data, "IsOnTrack");
 			if (atoi(result))
 				running = true;
@@ -682,6 +678,10 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			getDataValue(result, header, data, "IsOnTrackCar");
 			if (atoi(result))
 				running = true;
+
+			getDataValue(result, header, data, "IsInGarage");
+			if (atoi(result))
+				running = false;
 
 			if (running) {
 				getDataValue(result, header, data, "IsReplayPlaying");

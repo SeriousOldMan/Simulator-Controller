@@ -543,7 +543,7 @@ namespace RF2SHMSpotter {
 			return false;
 		}
 
-		void checkPitWindow()
+		void checkPitWindow(ref rF2VehicleScoring playerScoring)
 		{
 			// No support by rFactor 2
 		}
@@ -553,9 +553,24 @@ namespace RF2SHMSpotter {
 				if (!connected)
 					Connect();
 
-				if (connected)
-				{
+				if (connected) {
+					rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
+					if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase != (byte)PausedOrHeartbeat &&
+						playerScoring.mPitState < (byte)Entering) {
+						if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+							checkPitWindow(ref playerScoring);
+					}
+					else
+					{
+						lastSituation = CLEAR;
+						carBehind = false;
+						carBehindReported = false;
+
+						lastFlagState = 0;
+					}
+
+					Thread.Sleep(200);
 				}
 				else
 					Thread.Sleep(1000);

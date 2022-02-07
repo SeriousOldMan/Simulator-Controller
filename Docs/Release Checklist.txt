@@ -25,8 +25,9 @@ Release 3.8.8 Checklist
    a. Translations
    b. Plugin Actions & Labels
    c. Phrase Grammars
-2. New Spotter IRC, AMS2 and R3E
+2. New Spotter IRC, RF2, AMS2 and R3E
    a. Documentation Update for Spotter in Wiki
+   b. Mention support in Plugins list
 3. New InformationRequest Action "Time"
    a. Plugin Actions & Labels
    b. Phrase Grammars

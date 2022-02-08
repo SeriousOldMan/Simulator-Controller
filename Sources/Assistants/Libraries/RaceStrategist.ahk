@@ -588,6 +588,8 @@ class RaceStrategist extends RaceAssistant {
 			}
 		}
 		
+		this.updateSessionValues({RaceInfo: false})
+		
 		configuration := this.Configuration
 		settings := this.Settings
 		

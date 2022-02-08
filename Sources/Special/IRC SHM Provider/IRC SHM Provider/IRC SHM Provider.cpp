@@ -270,7 +270,7 @@ void printDataNAFloat(const irsdk_header* header, const char* data, const char* 
 	if (getDataValue(result, header, data, variable))
 		printf("%s\n", result);
 	else
-		printf("n/a\n", result);
+		printf("n/a\n");
 }
 
 void setPitstopRefuelAmount(float fuelAmount) {

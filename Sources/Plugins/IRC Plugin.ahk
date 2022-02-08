@@ -105,6 +105,12 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		static reported := false
 		key := false
 		
+		if !descriptor
+			descriptor := "Fuel"
+		
+		if (this.iCurrentPitstopMFD && (this.iCurrentPitstopMFD != descriptor))
+			this.closePitstopMFD()
+		
 		if !this.iCurrentPitstopMFD {
 			if (!descriptor || (descriptor = "Fuel"))
 				key := this.PitstopFuelMFDHotkey
@@ -112,7 +118,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				key := this.PitstopTyreMFDHotkey
 			else
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
-			
+		
 			if key {
 				if (key != "Off") {
 					this.sendWindowCommand(key)
@@ -176,36 +182,62 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	changePitstopOption(option, action, steps := 1) {
-		if this.iCurrentPitstopMFD
-			switch option {
-				case "Refuel":
-					this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
-				case "Change Tyres":
-					this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
-				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-					this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
-				case "Repair":
-					this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
-			}
+		switch option {
+			case "Refuel":
+				if (steps == 1)
+					steps := 4
+				
+				this.openPitstopMFD("Fuel")
+	
+				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
+			case "Change Tyres":
+				this.openPitstopMFD("Tyre")
+	
+				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
+			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+				this.openPitstopMFD("Tyre")
+	
+				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
+			case "Repair":
+				this.openPitstopMFD("Fuel")
+	
+				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
+		}
 	}
 	
 	supportsPitstop() {
 		return true
 	}
 	
+	startPitstopSetup(pitstopNumber) {
+		openPitstopMFD()
+	}
+	
+	finishPitstopSetup(pitstopNumber) {
+		closePitstopMFD()
+	}
+	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		this.openPitstopMFD("Fuel")
+		
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		this.openPitstopMFD("Tyre")
+		
 		this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		this.openPitstopMFD("Tyre")
+		
 		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+		this.openPitstopMFD("Fuel")
+		
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
 	

@@ -159,7 +159,6 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	handleVoiceCommand(grammar, words) {
-		showMessage(grammar)
 		switch grammar {
 			case "Time":
 				this.timeRecognized(words)

@@ -2,10 +2,49 @@
 
 Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simulator Controller. As a spotter, Elisa watches over your car and all the cars around you. Elisa will warn you about critical situations, for example, when a car appears in your blind spot, or when a car is chasing you from behind. Furthermore, Elisa will inform you periodically about other aspects of the traffic around you, for example, when one of the leading cars is closing in from behind and you are getting a blue flag.
 
-Please note, that this is the first release of Elisa. Only ACC is supported and much of the planned functionality is still missing. But the general proximity calculations are all there and Elisa will give you all critical information about the nearby cars. The functionality will be completed with the next releases and support for other simulations will be introduced as well.
+Please note, that this assistant is currently under development. Much of the planned functionality is still missing and the integration with the different simulation games will be optimized with future releases as well. This documentation will be updated and expanded with each release reflecting added functionality or added support for simulation features.
 
 Since Elisa does not support any voice commands yet, it will be best to provide *false* for *raceAssistantListener*, so that Elisa does not interfere with voice commands for Jona and/or Cato. So you can use the following plugin arguments for the plugin in "Simulator Configuration" for the moment:
 
     raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false
 
-To be continued...
+## Alerts & Information
+
+The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:
+
+1. Proximity Alerts
+
+This real time information will highlight other cars on your side and directly behind you. Elisa will warn you about cars on your left and on your right (as well as three wide situations) and will also inform you, when the situation has cleared up. A warning will also be issued, when a car is very near to your back of your car, typically closing in for a pass maneuver. This may give you the opportunity to respond with countermeasures.
+
+2. Yellow Flag Warnings
+
+When a yellow flag has been raised, you will get a warning from Elisa. Typically, you will get information about the sector, which is under yellow and sometimes also the distance into the track, where the incident happend. You will get a special warning for full course yellow and Elisa will also information you, when the yellow phase hase ended and the track is green again.
+
+3. Blue Flag Warnings
+
+Once a lapping car appears behind, you will get a blue flag warning. This typically appears, when the faster car is less than 2 seconds behind. If there is also a direct opponent currently behind you, you will be informed about that as well, so that you can be cautios to not let this car pass together with the lapping car.
+
+4. Pit Window Information
+
+Elisa will inform you when the timed window or the designated lap for a required pitstop arrived. Elisa will inform you also, when the pit closes again.
+
+Please note, that not every simulation will support all these capabilities and that the bahaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
+
+## Simulator Integration
+
+As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
+
+| Capability                 | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience |
+| -------------------------- | -------------------------- | --------------- | ------- | -------------------------- |
+| Side Alert                 | Yes                        | Yes             | Yes     | Yes (*)                    |
+| Behind Alert               | Yes                        | Yes             | No (**) | Yes                        |
+| Yellow Flag                | Yes                        | Yes             | Yes     | Yes                        |
+| Full Course Yellow         | Yes                        | No              | No      | Yes                        |
+| Sector Yellow              | Yes                        | No              | No      | Yes                        |
+| Yellow Distance            | No                         | No              | No      | Yes                        |
+| Blue Flag                  | Yes                        | Yes             | Yes     | Yes                        |
+| Pit Window                 | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      |
+
+(*) The position information seems to be a littls bit wonky in RaceRoom Racing Experience. You may get a left side alert, when the car is actually on your right and vice versa. I will try to work around this in a future release.
+
+(**) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.

@@ -105,6 +105,8 @@
 [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction)
+  - [Alerts & Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information)
+  - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

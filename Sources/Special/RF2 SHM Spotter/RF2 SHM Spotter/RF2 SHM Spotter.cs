@@ -396,16 +396,19 @@ namespace RF2SHMSpotter {
 		bool checkPositions(ref rF2VehicleScoring playerScoring)
 		{
 			double velocityX = playerScoring.mLocalVel.x;
-			double velocityY = playerScoring.mLocalVel.y;
-			double velocityZ = playerScoring.mLocalVel.z;
+			double velocityY = playerScoring.mLocalVel.z;
+			double velocityZ = playerScoring.mLocalVel.y;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
+				double yaw = Math.Atan2(playerScoring.mOri[2].x, playerScoring.mOri[2].z);
 				double angle = vectorAngle(velocityX, velocityY);
 
+				Console.Write(yaw); Console.Write(" "); Console.WriteLine(angle);
+
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = playerScoring.mPos.y;
-				double coordinateZ = playerScoring.mPos.z; ;
+				double coordinateY = playerScoring.mPos.z;
+				double coordinateZ = playerScoring.mPos.y;
 
 				int newSituation = CLEAR;
 
@@ -415,9 +418,12 @@ namespace RF2SHMSpotter {
 				{
 					var vehicle = scoring.mVehicles[i];
 
+					// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
+					// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
+
 					if (vehicle.mIsPlayer != 0)
 						newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-														 vehicle.mPos.x, vehicle.mPos.y, vehicle.mPos.z);
+														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
 
 					if ((newSituation == THREE) && carBehind)
 						break;

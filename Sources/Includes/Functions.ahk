@@ -1595,7 +1595,7 @@ substituteVariables(string, values := false) {
 			endPos := InStr(result, "%", false, startPos)
 			
 			if endPos {
-				variable := SubStr(result, startPos, endPos - startPos)
+				variable := Trim(SubStr(result, startPos, endPos - startPos))
 				
 				value := (values && values.HasKey(variable)) ? values[variable] : %variable%
 				

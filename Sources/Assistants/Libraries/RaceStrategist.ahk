@@ -159,6 +159,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	handleVoiceCommand(grammar, words) {
+		showMessage(grammar)
 		switch grammar {
 			case "Time":
 				this.timeRecognized(words)
@@ -234,7 +235,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		weather10Min := knowledgeBase.getValue("Weather.Weather.10Min", false)
+		weather10Min := (knowledgeBase ? knowledgeBase.getValue("Weather.Weather.10Min", false) : false)
 		
 		if !weather10Min
 			this.getSpeaker().speakPhrase("Later")
@@ -848,6 +849,8 @@ class RaceStrategist extends RaceAssistant {
 	
 	requestInformation(category, arguments*) {
 		switch category {
+			case "Time":
+				this.timeRecognized([])
 			case "LapsRemaining":
 				this.lapsRemainingRecognized([])
 			case "Weather":
@@ -1229,7 +1232,7 @@ class RaceStrategist extends RaceAssistant {
 		Loop % raceInfo["Cars"]
 			raceInfo[getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")] := A_Index
 		
-		this.updateSessionValues({RaceInfo: raceInfo])
+		this.updateSessionValues({RaceInfo: raceInfo})
 	}
 	
 	saveStandingsData(lapNumber, simulator, car, track) {

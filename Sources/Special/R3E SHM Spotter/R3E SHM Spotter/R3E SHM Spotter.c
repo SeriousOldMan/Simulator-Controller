@@ -319,7 +319,7 @@ BOOL checkPositions(int playerID) {
 }
 
 BOOL checkFlagState() {
-	if (map_buffer->flags.blue) {
+	if (map_buffer->flags.blue == 1) {
 		if ((lastFlagState & BLUE) == 0) {
 			sendMessage("blueFlag");
 
@@ -345,10 +345,10 @@ BOOL checkFlagState() {
 	if (distance > 1000 || distance < 0)
 		distance = 0;
 
-	if (map_buffer->flags.yellow &&
+	if ((map_buffer->flags.yellow == 1) &&
+		map_buffer->flags.sector_yellow[0] == 1 &&
 		map_buffer->flags.sector_yellow[1] == 1 &&
-		map_buffer->flags.sector_yellow[2] == 1 &&
-		map_buffer->flags.sector_yellow[3] == 1) {
+		map_buffer->flags.sector_yellow[2] == 1) {
 		if ((lastFlagState & YELLOW_FULL) == 0) {
 			sendMessage("yellowFlag:Full");
 
@@ -357,21 +357,21 @@ BOOL checkFlagState() {
 			return TRUE;
 		}
 	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[1] == 1) {
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[0] == 1) {
 		if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
 			sector = 1;
 
 			lastFlagState |= YELLOW_SECTOR_1;
 		}
 	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[2] == 1) {
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[1] == 1) {
 		if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
 			sector = 2;
 
 			lastFlagState |= YELLOW_SECTOR_2;
 		}
 	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[3] == 1) {
+	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[2] == 1) {
 		if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
 			sector = 3;
 

@@ -49,6 +49,7 @@ Data Provider.8=%kBinariesDirectory%ACC SHM Spotter.exe <- %kSourcesDirectory%Sp
 Data Provider.9=%kBinariesDirectory%IRC SHM Spotter.exe <- %kSourcesDirectory%Special\IRC SHM Spotter\Release\Win32\IRC SHM Spotter.exe
 Data Provider.10=%kBinariesDirectory%R3E SHM Spotter.exe <- %kSourcesDirectory%Special\R3E SHM Spotter\Release\R3E SHM Spotter.exe
 Data Provider.11=%kBinariesDirectory%AMS2 SHM Spotter.exe <- %kSourcesDirectory%Special\AMS2 SHM Spotter\Release\AMS2 SHM Spotter.exe
+; Data Provider.12=%kBinariesDirectory%RF2 SHM Spotter.exe <- %kSourcesDirectory%Special\RF2 SHM Spotter\Release\RF2 SHM Spotter.exe
 Speech Interface.1=%kBinariesDirectory%Speech.Recognizer.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Speech Recognizer.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft.Speech.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Microsoft.Speech.dll
 Speech Interface.3=%kBinariesDirectory%Speech.Synthesizer.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Speech Synthesizer.dll

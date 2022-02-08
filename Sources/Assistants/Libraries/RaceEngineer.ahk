@@ -281,7 +281,8 @@ class RaceEngineer extends RaceAssistant {
 	weatherRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		weather10Min := knowledgeBase.getValue("Weather.Weather.10Min", false)
+		weather10Min := (knowledgeBase ? knowledgeBase.getValue("Weather.Weather.10Min", false) : false)
+		weather10Min := (knowledgeBase ? knowledgeBase.getValue("Weather.Weather.10Min", false) : false)
 		
 		if !weather10Min
 			this.getSpeaker().speakPhrase("Later")
@@ -1098,6 +1099,8 @@ class RaceEngineer extends RaceAssistant {
 	
 	requestInformation(category, arguments*) {
 		switch category {
+			case "Time":
+				this.timeRecognized([])
 			case "LapsRemaining":
 				this.lapInfoRecognized([])
 			case "Weather":

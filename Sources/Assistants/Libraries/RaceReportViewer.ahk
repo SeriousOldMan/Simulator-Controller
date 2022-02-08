@@ -27,6 +27,8 @@ global kRaceReports = ["Overview", "Car", "Driver", "Position", "Pace"]
 global kOk = "Ok"
 global kCancel = "Cancel"
 
+global kNull = "null"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -291,7 +293,7 @@ class RaceReportViewer {
 		result := []
 		
 		for ignore, lap in this.getReportLaps(raceData)
-			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : "null")
+			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
 		
 		return result
 	}
@@ -306,7 +308,8 @@ class RaceReportViewer {
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
+				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+				time := ((time = kNull) ? 0 : Round(times[lap][car] / 1000, 1))
 				
 				if (time > 0) {
 					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
@@ -326,7 +329,8 @@ class RaceReportViewer {
 		
 		for ignore, lap in this.getReportLaps(raceData) {
 			time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-			
+			time := ((time = kNull) ? 0 : Round(time, 1))
+				
 			if (time > 0)
 				validTimes.Push(time)
 		}
@@ -423,8 +427,9 @@ class RaceReportViewer {
 			threshold := (avg + ((max - avg) / 4))
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				time := (times[lap].HasKey(car) ? Round(times[lap][car] / 1000, 1) : 0)
-			
+				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+				time := ((time = kNull) ? 0 : Round(times[lap][car] / 1000, 1))
+				
 				if (time > 0)
 					if (time > threshold)
 						carControl *= 0.90
@@ -503,20 +508,29 @@ class RaceReportViewer {
 			FileEncoding UTF-8
 			
 			try {
-				if drivers
+				if drivers {
 					Loop Read, % report . "\Drivers.CSV"
 						if (!laps || inList(laps, A_Index))
 							drivers.Push(string2Values(";", A_LoopReadLine))
+
+					drivers := correctEmptyValues(drivers)
+				}
 				
-				if positions
+				if positions {
 					Loop Read, % report . "\Positions.CSV"
 						if (!laps || inList(laps, A_Index))
 							positions.Push(string2Values(";", A_LoopReadLine))
+
+					positions := correctEmptyValues(positions, kNull)
+				}
 				
-				if times
+				if times {
 					Loop Read, % report . "\Times.CSV"
 						if (!laps || inList(laps, A_Index))
 							times.Push(string2Values(";", A_LoopReadLine))
+
+					times := correctEmptyValues(times, kNull)
+				}
 			}
 			finally {
 				FileEncoding %oldEncoding%
@@ -565,7 +579,7 @@ class RaceReportViewer {
 						if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
 							valid := true
 						else
-							positions[lap][car] := "null" ; carsCount
+							positions[lap][car] := kNull ; carsCount
 					}
 					else
 						valid := false
@@ -591,14 +605,14 @@ class RaceReportViewer {
 			{
 				car := A_Index
 				
-				result := (positions[lapsCount][car] = "null" ? "DNF" : positions[lapsCount][car])
+				result := (positions[lapsCount][car] = kNull ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
 				
 				Loop % lapsCount
 				{
 					lapTime := times[A_Index][car]
 				
-					if (lapTime > 0)
+					if ((lapTime != kNull) && (lapTime > 0))
 						lapTimes.Push(lapTime)
 					else
 						result := "DNF"
@@ -670,14 +684,21 @@ class RaceReportViewer {
 			pitstops := string2Values(",", getConfigurationValue(raceData, "Laps", "Pitstops", ""))
 			
 			for ignore, lap in this.getReportLaps(raceData) {
-				compound := translate(compound(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
-											 , getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+				weather := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")
+				weather := (weather ? translate(weather) : "n/a")
+			
+				if getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
+					compound := translate(compound(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
+												 , getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+				else
+					compound := "-"
+				
 				consumption := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 				
 				if (consumption == 0)
 					consumption := translate("n/a")
 				
-				lapTime := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
+				lapTime := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".LapTime", "n/a")
 				
 				if (lapTime != "-")
 					lapTime := Round(lapTime / 1000, 1)
@@ -686,7 +707,7 @@ class RaceReportViewer {
 				
 				row := values2String(", "
 									, lap
-									, "'" . translate(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")) . "'"
+									, "'" . weather . "'"
 									, "'" . compound . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
@@ -818,7 +839,7 @@ class RaceReportViewer {
 						break
 					}
 					else
-						positions[A_Index][car] := "null" ; carsCount
+						positions[A_Index][car] := kNull ; carsCount
 				
 				if valid
 					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
@@ -1054,6 +1075,20 @@ getPaceJSFunctions() {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+correctEmptyValues(table, default := "__Undefined__") {
+	Loop % table.Length()
+	{
+		line := A_Index
+		
+		if (line > 1)
+			Loop % table[line].Length()
+				if (table[line][A_Index] = "-")
+					table[line][A_Index] := ((default == kUndefined) ? table[line][A_Index - 1] : default)
+	}
+	
+	return table
+}
+
 global rangeLapsEdit
 global driverSelectCheck
 
@@ -1082,14 +1117,18 @@ editReportSettings(raceReport, report := false, options := false) {
 		try {
 			Loop Read, % report . "\Drivers.CSV"
 				drivers.Push(string2Values(";", A_LoopReadLine))
-						
+			
+			drivers := correctEmptyValues(drivers)
+			
 			Loop Read, % report . "\Laps.CSV"
 				laps.Push(string2Values(";", A_LoopReadLine))
+			
+			laps := correctEmptyValues(laps)
 		}
 		finally {
 			FileEncoding %oldEncoding%
 		}
-	
+
 		owner := raceReport.Window
 		
 		Gui RRS:Default

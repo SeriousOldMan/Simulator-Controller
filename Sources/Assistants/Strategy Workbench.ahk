@@ -892,7 +892,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			value := values[xAxis]
 			
 			if ((value = "n/a") || (value == kNull))
-				value := "null"
+				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
 				drawChartFunction .= ("['', " . value)
@@ -903,7 +903,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				value := values[yAxis]
 			
 				if ((value = "n/a") || (value == kNull))
-					value := "null"
+					value := kNull
 				
 				drawChartFunction .= (", " . value)
 			}
@@ -1537,7 +1537,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 				hasData := (sLaps.Length() >= index)
 			
-				chart .= (", " . (hasData ? sLaps[index] : "null"))
+				chart .= (", " . (hasData ? sLaps[index] : kNull))
 				
 				if hasData
 					exhausted := false

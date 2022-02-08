@@ -3521,8 +3521,8 @@ class RaceCenter extends ConfigurationItem {
 				coldPressures := string2Values(",", lapPressures[9])
 				hotPressures := string2Values(",", lapPressures[10])
 				
-				coldPressures := map(coldPressures, "null")
-				hotPressures := map(hotPressures, "null")
+				coldPressures := map(coldPressures, kNull)
+				hotPressures := map(hotPressures, kNull)
 				
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
@@ -4542,7 +4542,7 @@ class RaceCenter extends ConfigurationItem {
 			value := values[xAxis]
 			
 			if ((value = "n/a") || (value == kNull))
-				value := "null"
+				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
 				drawChartFunction .= ("['', " . value)
@@ -4553,7 +4553,7 @@ class RaceCenter extends ConfigurationItem {
 				value := values[yAxis]
 			
 				if ((value = "n/a") || (value == kNull))
-					value := "null"
+					value := kNull
 				
 				drawChartFunction .= (", " . value)
 			}
@@ -5652,7 +5652,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				value := chartValue(null(lap.Laptime))
 				
-				if (value != "null")
+				if (value != kNull)
 					driverTimes.Push(value)
 			}
 			
@@ -6661,7 +6661,7 @@ displayValue(value) {
 }
 
 chartValue(value) {
-	return ((value == kNull) ? "null" : value)
+	return ((value == kNull) ? kNull : value)
 }
 
 null(value) {

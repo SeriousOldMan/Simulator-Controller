@@ -834,7 +834,6 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			transform nr => index
 			if ((lapNumber = 1) || (key != "Driver.Car"))
 				knowledgeBase.setFact(key, value)
 		
@@ -1303,27 +1302,44 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
 			setConfigurationValue(data, "Lap", prefix . ".Pitstop", pitstop)
 
+			raceInfo := this.RaceInfo
+			
+			carCount := raceInfo["Cars"]
+			
 			times := []
 			positions := []
 			drivers := []
 			laps := []
 			
 			Loop %carCount% {
-				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
-				
-				times.Push(knowledgeBase.getValue(carPrefix . ".Time", -1))
-				positions.Push(knowledgeBase.getValue(carPrefix . ".Position", 0))
-				laps.Push(Floor(knowledgeBase.getValue(carPrefix . ".Laps", 0)))
-				
-				driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
-				driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
-				driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
-				
-				drivers.Push(computeDriverName(driverForname, driverSurname, driverNickname))
+				times.Push("-")
+				positions.Push("-")
+				drivers.Push("-")
+				laps.Push("-")
 			}
+			
+			Loop {
+				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
+				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
 				
-				newLine := ((lapNumber > 1) ? "`n" : "")
+				if (carNr == kUndefined)
+					break
 				
+				if raceInfo.HasKey(carNr) {
+					carIndex := raceInfo[carNr]
+					
+					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
+					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
+					times[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
+					
+					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
+					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
+					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
+					
+					times[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
+				}
+			}
+			
 			setConfigurationValue(data, "Times", lapNumber, values2String(";", times*))
 			setConfigurationValue(data, "Positions", lapNumber, values2String(";", positions*))
 			setConfigurationValue(data, "Laps", lapNumber, values2String(";", laps*))

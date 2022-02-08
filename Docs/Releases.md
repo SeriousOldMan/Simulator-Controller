@@ -5,7 +5,9 @@
   3. Support for the new Spotter Assistant has been added for iRacing, Automobilista 2 and RaceRoom Racing Experience.
   4. The capabilities of the Spotter has been extended. It now supports yellow flag and blue flag warnings as well as information about pit window events. See the [expanded documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction) for the Spotter for more information.
   5. New InformationRequest Action for Jona and Cato to request the current time. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
-  6. Improved handling in Race Reports when drivers leave before the end of the session
+  6. Improved handling in Race Reports when drivers leave before the end of the session.
+  7. Fixed several bugs in iRacing Pitstop MFD control.
+  8. Fixed several bugs in Automobilista 2 Pitstop MFD control.
 
 ## 3.8.6-release 02/04/22
 

@@ -1334,14 +1334,14 @@ class RaceStrategist extends RaceAssistant {
 					carIndex := raceInfo[carNr]
 					
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
-					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
-					times[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
+					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
+					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
 					
 					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
 					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
 					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
 					
-					times[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
+					drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
 				}
 			}
 			

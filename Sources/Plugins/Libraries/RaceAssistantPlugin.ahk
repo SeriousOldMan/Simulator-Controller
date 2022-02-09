@@ -1082,10 +1082,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 					
-						if (this.iLastLapCounter == 0) {
-							this.iLastLapCounter := this.iLastLapCounter + 1
-							
-							dataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap 0.0.data"
+						if (this.iLastLapCounter = 5) {
+							dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
 								
 							writeConfiguration(dataFile, data)
 							
@@ -1096,6 +1094,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							
 							this.prepareSession(settingsFile, dataFile)
 						}
+						
+						this.iLastLapCounter := this.iLastLapCounter + 1
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap

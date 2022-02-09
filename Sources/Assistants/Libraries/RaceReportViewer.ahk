@@ -292,6 +292,11 @@ class RaceReportViewer {
 	getDriverPositions(raceData, positions, car) {
 		result := []
 		
+		gridPosition := getConfigurationValue(raceData, "Cars", "Car." . car . ".Position", kUndefined)
+		
+		if (gridPosition != kUndefined)
+			result.Push(gridPosition)
+			
 		for ignore, lap in this.getReportLaps(raceData)
 			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
 		

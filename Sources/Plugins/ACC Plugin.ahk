@@ -466,12 +466,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			showMessage(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			
-			iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-						 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-						 , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
+			this.activateACCWindow()
+			
+			this.iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
+							  , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+							  , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
 				
-			iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-			iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+			this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+			
+			this.iPSChangeTyres := true
+			this.iPSChangeBrakes := false
 			
 			return true
 		}
@@ -745,8 +750,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				fileNames.Push(fileName)
 		}
 		
-		if (fileNames.Length() == 0)
-			Throw "Unknown label '" . labelName . "' detected in ACCPlugin.getLabelFileName..."
+		if (fileNames.Length() == 0) {
+			if isDebug()
+				showMessage("Unknown label '" . labelName . "' detected in ACCPlugin.getLabelFileName...")
+		}
 		else {
 			if isDebug()
 				showMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)

@@ -544,6 +544,26 @@ class RaceStrategist extends RaceAssistant {
 		
 		facts["Strategy.Pitstop.Count"] := count
 	}
+	
+	prepareSession(settings, data) {
+		this.updateSessionValues({RaceInfo: false})
+		
+		base.prepareSession(settings, data)
+				
+		raceData := newConfiguration()
+		
+		carCount := getConfigurationValue(data, "Position Data", "Car.Count")
+		
+		setConfigurationValue(raceData, "Cars", "Count", carCount)
+		setConfigurationValue(raceData, "Cars", "Driver", getConfigurationValue(data, "Position Data", "Driver.Car"))
+		
+		Loop %carCount% {
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
+		}
+		
+		this.updateRaceInfo(raceData)
+	}
 				
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
@@ -586,8 +606,6 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 		}
-		
-		this.updateSessionValues({RaceInfo: false})
 		
 		configuration := this.Configuration
 		settings := this.Settings
@@ -1229,9 +1247,17 @@ class RaceStrategist extends RaceAssistant {
 		
 		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
+
+		grid := []
 		
 		Loop % raceInfo["Cars"]
+		{
+			grid.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position"))
+			
 			raceInfo[getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")] := A_Index
+		}
+		
+		raceInfo["Grid"] := grid
 		
 		this.updateSessionValues({RaceInfo: raceInfo})
 	}
@@ -1267,6 +1293,16 @@ class RaceStrategist extends RaceAssistant {
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", knowledgeBase.getValue("Car." . A_Index . ".Nr", A_Index))
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
 				}
+				
+				if this.RaceInfo {
+					grid := this.RaceInfo["Grid"]
+					
+					Loop %carCount%
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[this.RaceInfo[getConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr")]])
+				}
+				else
+					Loop %carCount%
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
 				
 				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")
 				

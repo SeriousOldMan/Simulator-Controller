@@ -826,6 +826,7 @@ class RaceReportViewer {
 			simulator := getConfigurationValue(raceData, "Session", "Simulator")
 			
 			sessionDB := new SessionDatabase()
+			carIndices := []
 			
 			Loop % carsCount
 			{
@@ -841,9 +842,12 @@ class RaceReportViewer {
 					else
 						positions[A_Index][car] := kNull ; carsCount
 				
-				if valid
+				if valid {
+					carIndices.Push(car)
+					
 					cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
 								   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+				}
 				else
 					for ignore, lap in this.getReportLaps(raceData)
 						positions[lap].RemoveAt(car)
@@ -853,9 +857,18 @@ class RaceReportViewer {
 			
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
+			if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
+				drawChartFunction .= ",`n[0"
+					
+				Loop % cars.Length()
+					drawChartFunction := (drawChartFunction . ", " . getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position"))
+				
+				drawChartFunction .= "]"
+			}
+			
 			for ignore, lap in this.getReportLaps(raceData) {
 				if (positions.Length() >= lap) {
-					drawChartFunction := drawChartFunction . (",`n[" . lap)
+					drawChartFunction .= (",`n[" . lap)
 					
 					Loop % cars.Length() {
 						lapPositions := positions[lap]
@@ -866,7 +879,7 @@ class RaceReportViewer {
 							drawChartFunction := (drawChartFunction . ", null")
 					}
 					
-					drawChartFunction := drawChartFunction . "]"
+					drawChartFunction .= "]"
 				}
 			}
 			

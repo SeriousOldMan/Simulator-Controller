@@ -216,7 +216,9 @@ class RaceSpotter extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
 		
-		this.startupSpotter()
+		callback := ObjBindMethod(this, "startupSpotter")
+		
+		SetTimer %callback%, -10000
 	}
 	
 	startSession(settings, data) {

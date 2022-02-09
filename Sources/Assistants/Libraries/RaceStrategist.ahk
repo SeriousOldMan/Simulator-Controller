@@ -1260,8 +1260,6 @@ class RaceStrategist extends RaceAssistant {
 			raceInfo[carNr . ""] := A_Index
 		}
 		
-		showMessage(values2String("; ", grid*))
-		
 		raceInfo["Grid"] := grid
 		
 		this.updateSessionValues({RaceInfo: raceInfo})
@@ -1373,8 +1371,8 @@ class RaceStrategist extends RaceAssistant {
 				if (carNr == kUndefined)
 					break
 				
-				if raceInfo.HasKey(carNr) {
-					carIndex := raceInfo[carNr]
+				if raceInfo.HasKey(carNr . "") {
+					carIndex := raceInfo[carNr . ""]
 					
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")

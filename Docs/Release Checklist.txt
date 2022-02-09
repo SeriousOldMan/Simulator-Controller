@@ -28,6 +28,7 @@ Release 3.8.8 Checklist
 2. New Spotter IRC, RF2, AMS2 and R3E
    a. Documentation Update for Spotter in Wiki
    b. Mention support in Plugins list
+   c. Delete RF2 Spotter from Binaries folder
 3. New InformationRequest Action "Time"
    a. Plugin Actions & Labels
    b. Phrase Grammars

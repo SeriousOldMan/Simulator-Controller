@@ -465,9 +465,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			showMessage(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			
+			iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
+						 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+						 , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
+				
+			iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+			iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+			
+			return true
 		}
-						  
-		return this.iPSIsOpen
+		else if reported
+			return true
+		else if (this.OpenPitstopMFDHotkey != "Off")
+			return false
+		else
+			return this.iPSIsOpen
 	}
 	
 	selectPitstopOption(option, retry := true) {

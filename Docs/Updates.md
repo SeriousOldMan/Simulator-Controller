@@ -45,6 +45,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 3.8.8
+
+Everything is handled automatically, but you might want to have a look at new plugin information request action “TIME”, which is available for the Race Assistant plugins (and also as a voice command). 
+
+***
+
 ## Release 3.8.6
 
 This release introduces the new Virtual Race Spotter. A new [plugin "Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) will be added to your configuration, but it will be initially deactivated. Beside that, it is now possible to control volume, pitch and speech rate for each assistant individually by using the new [plugin parameter "raceAssistantSpeakerVocalics"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A higher speech rate (speed) will be especially helpful for the Spotter.
@@ -143,7 +149,7 @@ Nothing to do for this release.
 
 Beginning with this release, the Virtual Race Strategist will also be active during a Practice session, but only as a passive observer in order to collect the telemetry data for future strategy development. Using the “Simulator Configuration”, you can [configure when to save this telemetry data for the different simulations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). More important, a new tool „Strategy Workbench“ is introduced with this release. Although the “Strategy” part of this tool is non-functional yet and documentation is not available as well, it can already be used to analyze the telemetry data. Active “Strategy” development using this tool will be completed step by step with the next releases.
 
-A new controller action function “openStrategyWorkbench” has been defined, which might be triggered by an external event source to open the “Strategy Workbench”. Similar, a new plugin action “StrategyWorkbenchOpen” is available in several plugins to open the “Strategy Workbench” from your controller by a press of a button.
+A new controller action function “openStrategyWorkbench” has been defined, which might be triggered by an external event source to open the “Strategy Workbench”. Similar, and a new plugin action “StrategyWorkbenchOpen” is available in several plugins to open the “Strategy Workbench” from your controller by a press of a button.
 
 The local folder for the *Setup Database* has been renamed from “Setup Database” to “Database” in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
 

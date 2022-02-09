@@ -8,6 +8,8 @@
   6. Improved handling in Race Reports when drivers leave before the end of the session.
   7. Fixed several bugs in iRacing Pitstop MFD control.
   8. Fixed several bugs in Automobilista 2 Pitstop MFD control.
+  9. Start grid positions will be correctly reported in Race Reports.
+  10. Implemented a falbback algorithm for ACC Pitstop MFD control.
 
 ## 3.8.6-release 02/04/22
 

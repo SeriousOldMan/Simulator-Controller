@@ -680,7 +680,7 @@ class Strategy extends ConfigurationItem {
 				if (adjustments && adjustments.HasKey(id) && adjustments[id].HasKey("StintLaps"))
 					stintLaps := adjustments[id].StintLaps
 				else
-					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(this.FuelCapacity, fuelConsumption)))
+					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
 				
 				this.iStintLaps := stintLaps
 				this.iMap := strategy.Map[true]

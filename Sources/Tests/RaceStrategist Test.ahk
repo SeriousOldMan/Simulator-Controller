@@ -385,6 +385,9 @@ else {
 			Loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 			
+				if (lap == 1 && A_Index == 1)
+					strategist.prepareSession(false, data)
+				
 				if (data.Count() == 0) {
 					if (lap == 82)
 						done := true

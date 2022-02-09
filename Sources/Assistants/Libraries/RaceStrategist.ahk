@@ -1295,7 +1295,7 @@ class RaceStrategist extends RaceAssistant {
 				setConfigurationValue(data, "Cars", "Driver", driver)
 				
 				raceInfo := this.RaceInfo
-				grid := (raceInfo ? this.RaceInfo["Grid"] : false)
+				grid := (raceInfo ? raceInfo["Grid"] : false)
 				
 				Loop %carCount% {
 					carNr := (knowledgeBase.getValue("Car." . A_Index . ".Nr", kUndefined) . "")

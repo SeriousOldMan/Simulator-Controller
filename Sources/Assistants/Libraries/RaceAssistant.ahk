@@ -531,6 +531,8 @@ class RaceAssistant extends ConfigurationItem {
 		
 		if (data && !IsObject(data))
 			data := readConfiguration(data)
+		else if !data
+			data := newConfiguration()
 		
 		if settings
 			this.updateConfigurationValues({Settings: settings})

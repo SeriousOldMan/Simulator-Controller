@@ -360,7 +360,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		
 		if (teamServer && teamServer.Active) {
 			try {
-				raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", session)
+				raceInfo := teamServer.getLapValue(1, this.Plugin . " Race Info", this.TeamSession)
 	
 				if (!raceInfo || (raceInfo == ""))
 					return

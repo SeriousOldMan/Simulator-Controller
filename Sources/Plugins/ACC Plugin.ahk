@@ -482,7 +482,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else if reported
 			return true
-		else if (this.OpenPitstopMFDHotkey != "Off")
+		else if (this.OpenPitstopMFDHotkey == "Off")
 			return false
 		else
 			return this.iPSIsOpen

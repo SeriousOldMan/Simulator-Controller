@@ -576,7 +576,7 @@ namespace RF2SHMSpotter {
 						lastFlagState = 0;
 					}
 
-					Thread.Sleep(200);
+					Thread.Sleep(50);
 				}
 				else
 					Thread.Sleep(1000);

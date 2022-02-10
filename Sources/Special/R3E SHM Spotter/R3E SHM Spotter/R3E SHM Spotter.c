@@ -421,7 +421,7 @@ BOOL checkFlagState() {
 }
 
 void checkPitWindow() {
-	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported && !map_buffer->in_pitlane) {
+	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported) {
 		pitWindowOpenReported = TRUE;
 		pitWindowClosedReported = FALSE;
 
@@ -460,7 +460,7 @@ int main()
 			lastFlagState = 0;
         }
 
-        Sleep(200);
+        Sleep(50);
     }
 
     map_close();

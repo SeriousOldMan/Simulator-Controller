@@ -387,7 +387,7 @@ int main(int argc, char* argv[]) {
 				lastFlagState = 0;
 			}
 
-			Sleep(200);
+			Sleep(50);
 		}
 	}
 

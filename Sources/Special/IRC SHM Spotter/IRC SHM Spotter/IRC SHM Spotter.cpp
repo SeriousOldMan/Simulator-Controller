@@ -497,7 +497,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		Sleep(200);
+		Sleep(50);
 	}
 
 	irsdk_shutdown();

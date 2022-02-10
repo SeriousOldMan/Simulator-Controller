@@ -9,7 +9,8 @@
   7. Fixed several bugs in iRacing Pitstop MFD control.
   8. Fixed several bugs in Automobilista 2 Pitstop MFD control.
   9. Start grid positions will be correctly reported in Race Reports.
-  10. Implemented a falbback algorithm for ACC Pitstop MFD control.
+  10. Implemented a fallback algorithm for ACC Pitstop MFD control, when the image recognition fails. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) for more information.
+  11. Fuel requirements calculation in strategy development has been improved to always take the fuel reserve into account.
 
 ## 3.8.6-release 02/04/22
 

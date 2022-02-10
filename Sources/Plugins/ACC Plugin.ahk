@@ -463,8 +463,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
 			reported := true
 			
-			showMessage(translate("Cannot locate the Pitstop MFD - please read the Update 2.0 documentation...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
+			
+			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
 			this.activateACCWindow()
 			

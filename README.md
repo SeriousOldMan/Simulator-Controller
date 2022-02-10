@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.8.8-beta](https://www.dropbox.com/s/x2m6n7xl9g0bckl/Simulator%20Controller%203.8.8-beta.zip?dl=1) (Test build for 3.8.8. New features: Spotter implementation for iRacing, Automobilista 2 and RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings, Improved handling in Race Reports when drivers leave before the end of the session, Start grid positions in Race Reports, Falbback for ACC Pitstop MFD control when image recognition fails, Improved fuel requirements calculation in strategy development. Stable, with documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-388) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

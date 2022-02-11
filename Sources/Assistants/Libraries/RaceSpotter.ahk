@@ -35,8 +35,10 @@ class RaceSpotter extends RaceAssistant {
 	iSessionUpdateLaps := false
 	
 	iLastPositionReportLap := false
-	iRaceStartReported := false
-	iLastLapsReported := false
+	iPositionInfo := {}
+	
+	iRaceStartSummarized := false
+	iFinalLapsAnnounced := false
 	
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
 		iFastSpeechSynthesizer := false
@@ -89,6 +91,12 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
+	PositionInfo {
+		Get {
+			return this.iPositionInfo
+		}
+	}
+	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
 		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
@@ -109,9 +117,10 @@ class RaceSpotter extends RaceAssistant {
 		
 		if (this.Session == kSessionFinished) {
 			this.iLastPositionReportLap := false
+			this.iPositionInfo := {}
 			
-			this.iRaceStartReported := false
-			this.iLastLapsReported := false
+			this.iRaceStartSummarized := false
+			this.iFinalLapsAnnounced := false
 		}
 	}
 	
@@ -130,6 +139,42 @@ class RaceSpotter extends RaceAssistant {
 		return this.VoiceAssistant.getSpeaker(fast)
 	}
 	
+	updatePositionInfo(lastLap) {
+		local knowledgeBase = this.KnowledgeBase
+		
+		positionInfo := this.PositionInfo
+		
+		driver := knowledgeBase.getValue("Driver.Car")
+		driverLapTime := Round(knowledgeBase.getValue("Car." . driver . ".Time") / 1000, 1)
+		position := Round(knowledgeBase.getValue("Position", 0))
+		
+		frontStandingsDelta := Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0))
+		
+		if ((frontStandingsDelta = 0) || (position = 1))
+			positionInfo.Delete("Front")
+		else {
+			car := knowledgeBase.getValue("Position.Standings.Front.Car")
+			frontLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+			
+			difference := (positionInfo.HasKey("Front") ? (positionInfo["Front"].Delta - frontStandingsDelta) : false)
+			
+			positionInfo["Front"] := {Car: car, Delta: frontStandingsDelta, DeltaDifference: difference, LapTimeDifference: frontLapTime - driverLapTime}
+		}
+		
+		behindStandingsDelta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0))
+		
+		if ((behindStandingsDelta = 0) || (position = Round(knowledgeBase.getValue("Car.Count", 0))))
+			positionInfo.Delete("Behind")
+		else {
+			car := knowledgeBase.getValue("Position.Standings.Behind.Car")
+			behindLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+			
+			difference := (positionInfo.HasKey("Behind") ? (positionInfo["Behind"].Delta - behindStandingsDelta) : false)
+			
+			positionInfo["Behind"] := {Car: car, Delta: behindStandingsDelta, DeltaDifference: difference, LapTimeDifference: behindLapTime - driverLapTime}
+		}
+	}
+
 	raceStartSummary(lastLap) {
 		local knowledgeBase = this.KnowledgeBase
 		
@@ -156,10 +201,18 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	standingsUpdate(lastLap) {
+	positionReport(lastLap) {
+		positionInfo := this.PositionInfo
+		
+		if (positionInfo.HasKey("Front") && (positionInfo["Front"].DeltaDifference > 0))
+			speaker.speakPhrase("GainedFront", {delta: Round(positionInfo["Front"].Delta), gained: Round(positionInfo["Front"].DeltaDifference, 1)})
+		
+		if (positionInfo.HasKey("Behind") && (positionInfo["Behind"].DeltaDifference > 0))
+			speaker.speakPhrase("LostBehind", {delta: Round(positionInfo["Behind"].Delta), lost: Round(positionInfo["Behind"].DeltaDifference, 1)
+											 , lapTime: Round(positionInfo["Behind"].LapTimeDifference, 1)})
 	}
 	
-	lastLapsAnnouncement(lastLap) {
+	finalLapsAnnouncement(lastLap) {
 		local knowledgeBase = this.KnowledgeBase
 		
 		speaker := this.getSpeaker(true)
@@ -189,22 +242,22 @@ class RaceSpotter extends RaceAssistant {
 				try {
 					lastLap := knowledgeBase.getValue("Lap", 0)
 						
-					if (!this.iLastLapsReported && (knowledgeBase.getValue("Session.Lap.Remaining") <= 2)) {
-						this.iLastLapsReported := true
+					if (!this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 2)) {
+						this.iFinalLapsAnnounced := true
 						
-						this.lastLapsAnnouncement(lastLap)
+						this.finalLapsAnnouncement(lastLap)
 					}
 					else {
 						updateLaps := this.SessionUpdateLaps
 						
 						if (updateLaps && (lastLap >= (this.iLastPositionReportLap + updateLaps))) {
-							if !this.iRaceStartReported {
-								this.iRaceStartReported := true
+							if !this.iRaceStartSummarized {
+								this.iRaceStartSummarized := true
 								
 								this.raceStartSummary(lastLap)
 							}
 							else
-								this.standingsUpdate(lastLap)
+								this.positionReport(lastLap)
 							
 							this.iLastPositionReportLap := lastLap
 						}
@@ -487,8 +540,7 @@ class RaceSpotter extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			if ((lapNumber = 1) || (key != "Driver.Car"))
-				knowledgeBase.setFact(key, value)
+			knowledgeBase.setFact(key, value)
 		
 		return data
 	}
@@ -497,6 +549,8 @@ class RaceSpotter extends RaceAssistant {
 		result := base.addLap(lapNumber, data)
 		
 		if result {
+			this.updatePositionInfo(lapNumber)
+			
 			callback := ObjBindMethod(this, "driverUpdate")
 			
 			SetTimer %callback%, -60000

@@ -36,17 +36,15 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 | Capability                 | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience |
 | -------------------------- | -------------------------- | --------------- | ------- | -------------------------- |
-| Side Alert                 | Yes                        | Yes             | Yes     | Yes (1)                    |
-| Behind Alert               | Yes                        | Yes             | No (2)  | Yes                        |
+| Side Alert                 | Yes                        | Yes             | Yes     | Yes                        |
+| Behind Alert               | Yes                        | Yes             | No (1)  | Yes                        |
 | Yellow Flag                | Yes                        | Yes             | Yes     | Yes                        |
 | Full Course Yellow         | Yes                        | No              | No      | Yes                        |
 | Sector Yellow              | Yes                        | No              | No      | Yes                        |
 | Yellow Distance            | No                         | No              | No      | Yes                        |
-| Blue Flag                  | Yes                        | Yes             | Yes (3) | Yes                        |
+| Blue Flag                  | Yes                        | Yes             | Yes (2) | Yes                        |
 | Pit Window                 | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      |
 
-(1) The position information seems to be a little bit wonky in RaceRoom Racing Experience. You may get a left side alert, when the car is actually on your right and vice versa. I will try to work around this in a future release.
+(1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
 
-(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
-
-(3) For whatever reason, you might get one spurios blue flag warning at race start.
+(2) For whatever reason, you might get one spurios blue flag warning at race start.

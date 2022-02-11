@@ -61,7 +61,7 @@ void sendMessage(char* message) {
 const float nearByDistance = 8.0;
 const float longitudinalDistance = 4;
 const float lateralDistance = 6;
-const float verticalDistance = 4;
+const float verticalDistance = 2;
 
 const int CLEAR = 0;
 const int LEFT = 1;

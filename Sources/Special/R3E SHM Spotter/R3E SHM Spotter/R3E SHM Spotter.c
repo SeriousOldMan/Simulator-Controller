@@ -250,8 +250,8 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 
 BOOL checkPositions(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
-	r3e_float64 velocityY = map_buffer->player.velocity.y;
-	r3e_float64 velocityZ = map_buffer->player.velocity.z;
+	r3e_float64 velocityY = map_buffer->player.velocity.z;
+	r3e_float64 velocityZ = map_buffer->player.velocity.y;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		r3e_float32 angle = vectorAngle(velocityX, velocityY);
@@ -265,8 +265,8 @@ BOOL checkPositions(int playerID) {
 			}
 
 		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
-		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.y;
-		r3e_float32 coordinateZ = map_buffer->all_drivers_data_1[index].position.z;
+		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+		r3e_float32 coordinateZ = map_buffer->all_drivers_data_1[index].position.y;
 
 		int newSituation = CLEAR;
 
@@ -276,8 +276,8 @@ BOOL checkPositions(int playerID) {
 			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID)
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
 												 map_buffer->all_drivers_data_1[id].position.x,
-												 map_buffer->all_drivers_data_1[id].position.y,
-												 map_buffer->all_drivers_data_1[id].position.z);
+												 map_buffer->all_drivers_data_1[id].position.z,
+												 map_buffer->all_drivers_data_1[id].position.y);
 
 			if ((newSituation == THREE) && carBehind)
 				break;

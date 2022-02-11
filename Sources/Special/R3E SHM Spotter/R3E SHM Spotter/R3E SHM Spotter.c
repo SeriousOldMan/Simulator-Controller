@@ -103,7 +103,7 @@ void sendMessage(char* message) {
 #define nearByDistance 8.0
 #define longitudinalDistance 4
 #define lateralDistance 6
-#define verticalDistance 4
+#define verticalDistance 2
 
 #define CLEAR 0
 #define LEFT 1

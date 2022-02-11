@@ -51,20 +51,6 @@ namespace RF2SHMSpotter {
 		public SHMSpotter() {
 			if (!this.connected)
 				this.Connect();
-
-			try {
-				extendedBuffer.GetMappedData(ref extended);
-				scoringBuffer.GetMappedData(ref scoring);
-				telemetryBuffer.GetMappedData(ref telemetry);
-				rulesBuffer.GetMappedData(ref rules);
-				forceFeedbackBuffer.GetMappedDataUnsynchronized(ref forceFeedback);
-				graphicsBuffer.GetMappedDataUnsynchronized(ref graphics);
-				pitInfoBuffer.GetMappedData(ref pitInfo);
-				weatherBuffer.GetMappedData(ref weather);
-			}
-			catch (Exception) {
-				this.Disconnect();
-			}
 		}
 
 		private static string GetStringFromBytes(byte[] bytes) {
@@ -237,7 +223,7 @@ namespace RF2SHMSpotter {
 		const double nearByDistance = 8;
 		const double longitudinalDistance = 4;
 		const double lateralDistance = 6;
-		const double verticalDistance = 4;
+		const double verticalDistance = 2;
 
 		const int CLEAR = 0;
 		const int LEFT = 1;
@@ -395,16 +381,21 @@ namespace RF2SHMSpotter {
 
 		bool checkPositions(ref rF2VehicleScoring playerScoring)
 		{
-			double velocityX = playerScoring.mLocalVel.x;
-			double velocityY = playerScoring.mLocalVel.z;
-			double velocityZ = playerScoring.mLocalVel.y;
+			double lVelocityX = playerScoring.mLocalVel.x;
+			double lVelocityY = playerScoring.mLocalVel.z;
+			double lVelocityZ = playerScoring.mLocalVel.y;
+
+			var ori = playerScoring.mOri;
+
+			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
-				double yaw = Math.Atan2(playerScoring.mOri[2].x, playerScoring.mOri[2].z);
 				double angle = vectorAngle(velocityX, velocityY);
 
-				Console.Write(yaw); Console.Write(" "); Console.WriteLine(angle);
+				Console.WriteLine(angle);
 
 				double coordinateX = playerScoring.mPos.x;
 				double coordinateY = playerScoring.mPos.z;
@@ -418,12 +409,12 @@ namespace RF2SHMSpotter {
 				{
 					var vehicle = scoring.mVehicles[i];
 
-					// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
-					// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
+					Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
+					Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
 
 					if (vehicle.mIsPlayer != 0)
 						newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
+														 vehicle.mPos.x, vehicle.mPos.y, vehicle.mPos.z);
 
 					if ((newSituation == THREE) && carBehind)
 						break;
@@ -500,7 +491,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else if (scoring.mScoringInfo.mSectorFlag[0] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector1] > 0)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
 				{
@@ -511,7 +502,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else if (scoring.mScoringInfo.mSectorFlag[1] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector2] > 0)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_2) == 0)
 				{
@@ -522,7 +513,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else if (scoring.mScoringInfo.mSectorFlag[2] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector3] > 0)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_3) == 0)
 				{
@@ -559,24 +550,39 @@ namespace RF2SHMSpotter {
 				if (!connected)
 					Connect();
 
-				if (connected) {
-					rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+				if (connected)
+				{
+					try
+					{
+						extendedBuffer.GetMappedData(ref extended);
+						scoringBuffer.GetMappedData(ref scoring);
+					}
+					catch (Exception)
+					{
+						this.Disconnect();
+					}
 
-					if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase != (byte)PausedOrHeartbeat &&
-						playerScoring.mPitState < (byte)Entering) {
-						if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-							checkPitWindow(ref playerScoring);
+					if (connected) {
+						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+
+						if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase != (byte)PausedOrHeartbeat &&
+							playerScoring.mPitState < (byte)Entering) {
+							if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+								checkPitWindow(ref playerScoring);
+						}
+						else
+						{
+							lastSituation = CLEAR;
+							carBehind = false;
+							carBehindReported = false;
+
+							lastFlagState = 0;
+						}
+
+						Thread.Sleep(50);
 					}
 					else
-					{
-						lastSituation = CLEAR;
-						carBehind = false;
-						carBehindReported = false;
-
-						lastFlagState = 0;
-					}
-
-					Thread.Sleep(50);
+						Thread.Sleep(1000);
 				}
 				else
 					Thread.Sleep(1000);

@@ -854,8 +854,7 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			if ((lapNumber = 1) || (key != "Driver.Car"))
-				knowledgeBase.setFact(key, value)
+			knowledgeBase.setFact(key, value)
 		
 		return data
 	}

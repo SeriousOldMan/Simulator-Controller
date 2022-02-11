@@ -25,9 +25,18 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceSpotter extends RaceAssistant {
-	iSessionDataActive := false
-	
 	iSpotterPID := false
+	
+	iSessionDataActive := false
+	iSpotterSpeaking := false
+	
+	iGridPosition := false
+
+	iSessionUpdateLaps := false
+	
+	iLastPositionReportLap := false
+	iRaceStartReported := false
+	iLastLapsReported := false
 	
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
 		iFastSpeechSynthesizer := false
@@ -62,6 +71,24 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
+	SpotterSpeaking[] {
+		Get {
+			return this.iSpotterSpeaking
+		}
+	}
+	
+	SessionUpdateLaps[] {
+		Get {
+			return this.iSessionUpdateLaps
+		}
+	}
+	
+	GridPosition[] {
+		Get {
+			return this.iGridPosition
+		}
+	}
+	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
 		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
@@ -79,6 +106,13 @@ class RaceSpotter extends RaceAssistant {
 	
 	updateSessionValues(values) {
 		base.updateSessionValues(values)
+		
+		if (this.Session == kSessionFinished) {
+			this.iLastPositionReportLap := false
+			
+			this.iRaceStartReported := false
+			this.iLastLapsReported := false
+		}
 	}
 	
 	updateDynamicValues(values) {
@@ -96,6 +130,98 @@ class RaceSpotter extends RaceAssistant {
 		return this.VoiceAssistant.getSpeaker(fast)
 	}
 	
+	raceStartSummary(currentLap) {
+		local knowledgeBase = this.KnowledgeBase
+		
+		if (this.Session == kSessionRace) {
+			speaker := this.getSpeaker(true)
+			driver := knowledgeBase.getValue("Driver.Car", false)
+			
+			if (driver && this.GridPosition) {
+				currentPosition := knowledgeBase.getValue("Car." . driver . ".Position")
+			
+				if (currentPosition < this.GridPosition) {
+					speaker.speak("GreatStart")
+					
+					speaker.speak("PositionsGained", {positions: Abs(currentPosition - this.GridPosition)})
+				}
+				else if (currentPosition > this.GridPosition) {
+					speaker.speak("BadStart")
+					
+					speaker.speak("PositionsLost", {positions: Abs(currentPosition - this.GridPosition)})
+					
+					speaker.speak("Fight")
+				}
+			}
+		}
+	}
+	
+	standingsUpdate(currentLap) {
+	}
+	
+	lastLapsAnnouncement(currentLap) {
+		local knowledgeBase = this.KnowledgeBase
+		
+		speaker := this.getSpeaker(true)
+		position := Round(knowledgeBase.getValue("Position", 0))
+		
+		speaker.speak("LastLaps")
+		
+		if (position <= 3) {
+			if (position == 1)
+				speaker.speak("Leader")
+			else 
+				speaker.speak("Position", {position: position})
+			
+			speaker.speak("BringItHome")
+		}
+		else
+			speaker.speak("Focus")
+	}
+	
+	driverUpdate() {
+		local knowledgeBase = this.KnowledgeBase
+		
+		if (this.Speaker)
+			if !this.SpotterSpeaking {
+				this.iSpotterSpeaking := true
+				
+				try {
+					currentLap := knowledgeBase.getValue("Lap", 0)
+						
+					if (!this.iLastLapsReported && knowledgeBase.getValue("Session.Lap.Remaining") == 2) {
+						this.iLastLapsReported := true
+						
+						this.lastLapsAnnouncement(currentLap)
+					}
+					else {
+						updateLaps := this.SessionUpdateLaps
+						
+						if (updateLaps && (currentLap > (this.iLastPositionReportLap + updateLaps))) {
+							if !this.iRaceStartReported {
+								this.iRaceStartReported := true
+								
+								this.raceStartSummary(currentLap)
+							}
+							else
+								this.standingsUpdate(currentLap)
+							
+							this.iLastPositionReportLap := currentLap
+						}
+					}
+				}
+				finally {
+					this.iSpotterSpeaking := false
+				}
+			}
+			else {
+				callback := ObjBindMethod(this, "driverUpdate")
+			
+				SetTimer %callback%, -1000
+			}
+		}
+	}
+	
 	proximityAlert(type, variables := false) {
 		if (variables && !IsObject(variables)) {
 			values := {}
@@ -109,44 +235,74 @@ class RaceSpotter extends RaceAssistant {
 			variables := values
 		}
 		
-		if this.Speaker
-			this.getSpeaker(true).speakPhrase(type, variables)
+		if (this.Speaker && !this.SpotterSpeaking) {
+			this.iSpotterSpeaking := true
+			
+			try {
+				this.getSpeaker(true).speakPhrase(type, variables)
+			}
+			finally {
+				this.iSpotterSpeaking := false
+			}
+		}
 	}
 	
 	yellowFlag(type, arguments*) {
-		if this.Speaker
-			switch type {
-				case "Full":
-					this.getSpeaker(true).speakPhrase("YellowFull")
-				case "Sector":
-					if (arguments.Length() > 1)
-						this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
-					else
-						this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
-				case "Clear":
-					this.getSpeaker(true).speakPhrase("YellowClear")
-				case "Ahead":
-					this.getSpeaker(true).speakPhrase("YellowAhead")
+		if (this.Speaker && !this.SpotterSpeaking)
+			this.iSpotterSpeaking := true
+			
+			try {
+				switch type {
+					case "Full":
+						this.getSpeaker(true).speakPhrase("YellowFull")
+					case "Sector":
+						if (arguments.Length() > 1)
+							this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
+						else
+							this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
+					case "Clear":
+						this.getSpeaker(true).speakPhrase("YellowClear")
+					case "Ahead":
+						this.getSpeaker(true).speakPhrase("YellowAhead")
+				}
 			}
+			finally {
+				this.iSpotterSpeaking := false
+			}
+		}
 	}
 	
 	blueFlag() {
-		if this.Speaker {
-			delta := this.KnowledgeBase.getValue("Position.Standings.Behind.Delta", false)
+		if (this.Speaker && !this.SpotterSpeaking) {
+			this.iSpotterSpeaking := true
 			
-			if (delta && (delta < 2000))
-				this.getSpeaker().speakPhrase("BlueForPosition")
-			else
-				this.getSpeaker().speakPhrase("Blue")
+			try {
+				delta := this.KnowledgeBase.getValue("Position.Standings.Behind.Delta", false)
+				
+				if (delta && (delta < 2000))
+					this.getSpeaker().speakPhrase("BlueForPosition")
+				else
+					this.getSpeaker().speakPhrase("Blue")
+			}
+			finally {
+				this.iSpotterSpeaking := false
+			}
 		}
 	}
 	
 	pitWindow(state) {
-		if this.Speaker
-			if (state = "Open")
-				this.getSpeaker().speakPhrase("PitWindowOpen")
-			else if (state = "Closed")
-				this.getSpeaker().speakPhrase("PitWindowClosed")
+		if (this.Speaker && !this.SpotterSpeaking)
+			this.iSpotterSpeaking := true
+			
+			try {
+				if (state = "Open")
+					this.getSpeaker().speakPhrase("PitWindowOpen")
+				else if (state = "Closed")
+					this.getSpeaker().speakPhrase("PitWindowClosed")
+			}
+			finally {
+				this.iSpotterSpeaking := false
+			}
 	}
 	
 	startupSpotter() {
@@ -212,6 +368,16 @@ class RaceSpotter extends RaceAssistant {
 	
 	prepareSession(settings, data) {
 		base.prepareSession(settings, data)
+		
+		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		
+		this.iSessionUpdateLaps := getConfigurationValue(this.Configuration, "Race Spotter Updates", simulatorName . ".UpdateLaps", 2)
+		
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+		
+		if driver
+			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -324,6 +490,18 @@ class RaceSpotter extends RaceAssistant {
 				knowledgeBase.setFact(key, value)
 		
 		return data
+	}
+	
+	addLap(lapNumber, data) {
+		result := base.addLap(lapNumber, data)
+		
+		if result {
+			callback := ObjBindMethod(this, "driverUpdate")
+			
+			SetTimer %callback%, -60000
+		}
+	
+		return result
 	}
 	
 	updateLap(lapNumber, data) {

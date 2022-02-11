@@ -537,7 +537,6 @@ class RaceAssistant extends ConfigurationItem {
 		if settings
 			this.updateConfigurationValues({Settings: settings})
 		
-		configuration := this.Configuration
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")

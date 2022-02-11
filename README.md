@@ -33,21 +33,19 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.8.6-release](https://cntr.click/rXJ3gJM) (New features: New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants.)
+[3.8.8-release](https://cntr.click/jtWPQ7s) (New features: Spotter implementation for iRacing, Automobilista 2 and RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings, Improved handling in Race Reports when drivers leave before the end of the session, Start grid positions in Race Reports, Falbback for ACC Pitstop MFD control when image recognition fails, Improved fuel requirements calculation in strategy development.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-386) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-388) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.8.4-release](https://cntr.click/CtL5w85) (New features: Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting.)
+[3.8.6-release](https://cntr.click/rXJ3gJM) (New features: New plugin "Race Spotter", New "Race Spooter" application, Initial implementation of a race spotter for ACC, New plugin parameter "raceAssistantSpeakerVocalics" to set voice pitch, speed, etc. individually for each Race Assistant, Memory management optimization for all Race Assistants.)
 
-[3.8.2-release](https://www.dropbox.com/s/oof5z3w71x85ilt/Simulator%20Controller.3.8.2-release.zip?dl=1) (New features: Fixed Pitstop automation blocking Alt-Tab in ACC, *Shadow Mode* for Pitstop Automation, Optical enhancements in "Race Center" HTML output, Support keyboard and generic trigger in "Simulator Setup", New parameter "pitstopMFDMode" for all simulator plugins, Dealing with incomplete data in Team Server.)
+[3.8.4-release](https://cntr.click/CtL5w85) (New features: Several bugfixes in "Race Reports", Inclusion of tyre degradation model into strategy simulation, Support for required minimum pitstops in strategy simulation, Monte Carlo traffic analysis in "Race Center", Improved control for pitstop service time calculation, Improved calculation of overtake deltas, Reduced frequency of damage reporting.)
 
 #### Latest development build
 
-[3.8.8-beta](https://www.dropbox.com/s/x2m6n7xl9g0bckl/Simulator%20Controller%203.8.8-beta.zip?dl=1) (Test build for 3.8.8. New features: Spotter implementation for iRacing, Automobilista 2 and RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings, Improved handling in Race Reports when drivers leave before the end of the session, Start grid positions in Race Reports, Falbback for ACC Pitstop MFD control when image recognition fails, Improved fuel requirements calculation in strategy development. Stable, with documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-388) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Discord Community
 

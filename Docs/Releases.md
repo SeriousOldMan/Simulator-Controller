@@ -1,4 +1,4 @@
-## 3.8.8-release 02/11/22 (planned)
+## 3.8.8-release 02/11/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

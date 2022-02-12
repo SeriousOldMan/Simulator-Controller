@@ -1,3 +1,11 @@
+## 3.9.0-release 02/18/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support for the new Spotter Assistant has been added for rFactor 2.
+  4. The capabilities of the Spotter has been extended again. It now informs about your performance after the first few laps and also periodically during the race. It also announces you the final laps. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  5. Fix for wonky Spotter side alerts in RaceRoom Racing Experience.
+
 ## 3.8.8-release 02/11/22
 
   1. Bugfixes, as always

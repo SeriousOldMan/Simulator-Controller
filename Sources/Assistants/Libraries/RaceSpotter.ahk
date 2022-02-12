@@ -148,12 +148,16 @@ class RaceSpotter extends RaceAssistant {
 		driverLapTime := Round(knowledgeBase.getValue("Car." . driver . ".Time") / 1000, 1)
 		position := Round(knowledgeBase.getValue("Position", 0))
 		
-		frontStandingsDelta := Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0))
+		frontStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0)) / 1000, 1)
 		
 		if ((frontStandingsDelta = 0) || (position = 1))
 			positionInfo.Delete("Front")
 		else {
 			car := knowledgeBase.getValue("Position.Standings.Front.Car")
+			
+			if (positionInfo.HasKey("Front") && (positionInfo["Front"].Car != car))
+				positionInfo.Delete("Front")
+			
 			frontLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 			
 			difference := (positionInfo.HasKey("Front") ? (positionInfo["Front"].Delta - frontStandingsDelta) : false)
@@ -161,12 +165,16 @@ class RaceSpotter extends RaceAssistant {
 			positionInfo["Front"] := {Car: car, Delta: frontStandingsDelta, DeltaDifference: difference, LapTimeDifference: frontLapTime - driverLapTime}
 		}
 		
-		behindStandingsDelta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0))
+		behindStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0)) / 1000, 1)
 		
 		if ((behindStandingsDelta = 0) || (position = Round(knowledgeBase.getValue("Car.Count", 0))))
 			positionInfo.Delete("Behind")
 		else {
 			car := knowledgeBase.getValue("Position.Standings.Behind.Car")
+			
+			if (positionInfo.HasKey("Behind") && (positionInfo["Behind"].Car != car))
+				positionInfo.Delete("Behind")
+			
 			behindLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 			
 			difference := (positionInfo.HasKey("Behind") ? (positionInfo["Behind"].Delta - behindStandingsDelta) : false)
@@ -262,7 +270,7 @@ class RaceSpotter extends RaceAssistant {
 				try {
 					lastLap := knowledgeBase.getValue("Lap", 0)
 						
-					if (!this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 2)) {
+					if (!this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 						
 						this.finalLapsAnnouncement(lastLap)

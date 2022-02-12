@@ -202,14 +202,34 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	positionReport(lastLap) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		speaker := this.getSpeaker(true)
 		positionInfo := this.PositionInfo
 		
-		if (positionInfo.HasKey("Front") && (positionInfo["Front"].DeltaDifference > 0))
-			speaker.speakPhrase("GainedFront", {delta: Round(positionInfo["Front"].Delta), gained: Round(positionInfo["Front"].DeltaDifference, 1)})
+		cheered := false
 		
-		if (positionInfo.HasKey("Behind") && (positionInfo["Behind"].DeltaDifference > 0))
+		if (positionInfo.HasKey("Front") && (positionInfo["Front"].DeltaDifference > 0)) {
+			delta := positionInfo["Front"].Delta
+			lapTimeDifference := Round(positionInfo["Behind"].LapTimeDifference, 1)
+			
+			speaker.speakPhrase("GainedFront", {delta: Round(delta), gained: Round(positionInfo["Front"].DeltaDifference, 1), lapTime: lapTimeDifference})
+			
+			if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference))
+				speaker.speakPhrase("CanDoIt")
+			else
+				speaker.speakPhrase("CantDoIt")
+			
+			cheered := true
+		}
+		
+		if (positionInfo.HasKey("Behind") && (positionInfo["Behind"].DeltaDifference > 0)) {
 			speaker.speakPhrase("LostBehind", {delta: Round(positionInfo["Behind"].Delta), lost: Round(positionInfo["Behind"].DeltaDifference, 1)
 											 , lapTime: Round(positionInfo["Behind"].LapTimeDifference, 1)})
+			
+			if !cheered
+				speaker.speakPhrase("Focus")
+		}
 	}
 	
 	finalLapsAnnouncement(lastLap) {

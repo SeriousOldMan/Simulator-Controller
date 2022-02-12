@@ -388,8 +388,8 @@ namespace RF2SHMSpotter {
 			var ori = playerScoring.mOri;
 
 			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+			double velocityY = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+			double velocityZ = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{

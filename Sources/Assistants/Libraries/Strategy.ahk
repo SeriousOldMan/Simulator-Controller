@@ -1654,12 +1654,10 @@ splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
 	
 	if (index == 1)
 		compound := "Wet"
-	else {
+	else
 		compound := "Dry"
 	
-		if (index > 2)
-			compoundColor := ["Red", "White", "Blue"][index - 2]
-	}
+	compoundColor := kQualifiedTyreCompoundColors[index]
 }
 
 lookupLapTime(lapTimes, map, remainingFuel) {

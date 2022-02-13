@@ -99,11 +99,11 @@ class TelemetryDatabase extends SessionDatabase {
 			return []
 	}
 	
-	getMapsCount(weather, compound, compoundColor) {
+	getMapsCount(weather) {
 		if this.Database
-			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: "Map"
+			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , Where: {Weather: weather}})
 		else
 			return []
 	}
@@ -145,11 +145,11 @@ class TelemetryDatabase extends SessionDatabase {
 			return []
 	}
 	
-	getPressuresCount(weather, compound, compoundColor) {
+	getPressuresCount(weather) {
 		if this.Database {
-			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: "Tyre.Pressure"
+			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
 											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Weather: weather}})
 		}
 		else
 			return []
@@ -318,6 +318,11 @@ removeInvalidLaps(rows) {
 	cStdDev := false
 	
 	computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
+	
+	if (rows < 20) {
+		ltStdDev *= 2
+		cStdDev *= 2
+	}
 	
 	result := []
 	

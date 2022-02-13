@@ -141,6 +141,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedCar := false
 	iSelectedTrack := false
 	iSelectedWeather := "Dry"
+	
+	iAvailableCompounds := kQualifiedTyreCompounds
+	
 	iSelectedCompound := "Dry"
 	iSelectedCompoundColor := "Black"
 	
@@ -195,6 +198,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedWeather[] {
 		Get {
 			return this.iSelectedWeather
+		}
+	}
+	
+	AvailableCompounds[index := false] {
+		Get {
+			return (index ? this.iAvailableCompounds[index] : this.iAvailableCompounds)
 		}
 	}
 	
@@ -362,7 +371,20 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		this.setTemperatures(airTemperature, trackTemperature)
 		
-		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, Text, x16 yp+32 w364 0x10
+		
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, Text, x16 yp+10 w364 h23 Center +0x200, % translate("Chart")
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, DropDownList, x12 yp+28 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres", "-----------------", "Cleanup Data"], "translate")*)
+		
+		Gui %window%:Add, ListView, x12 yp+24 w170 h123 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Compound", "Map", "#"], "translate")*)
+		
+		this.iDataListView := dataListView
 		
 		compound := this.SelectedCompound[true]
 		choices := map(kQualifiedTyreCompounds, "translate")
@@ -373,24 +395,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 		
-		Gui %window%:Add, DropDownList, x90 yp w120 AltSubmit Choose%chosen% gchooseCompound vcompoundDropDown, % values2String("|", choices*)
+		Gui %window%:Add, Text, x200 yp w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% gchooseCompound vcompoundDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Text, x16 yp+32 w364 0x10
-		
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
-
-		Gui %window%:Add, Text, x16 yp+10 w364 h23 Center +0x200, % translate("Chart")
-		
-		Gui %window%:Font, Norm, Arial
-		
-		Gui %window%:Add, DropDownList, x12 yp+32 w76 AltSubmit Choose1 vdataTypeDropDown gchooseDataType +0x200, % values2String("|", map(["Electronics", "Tyres", "-----------------", "Cleanup Data"], "translate")*)
-		
-		Gui %window%:Add, ListView, x90 yp-2 w100 h97 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdataListView gchooseData, % values2String("|", map(["Map", "Count"], "translate")*)
-		
-		this.iDataListView := dataListView
-		
-		Gui %window%:Add, Text, x200 yp+2 w70 h23 +0x200, % translate("X-Axis")
+		Gui %window%:Add, Text, x200 yp+28 w70 h23 +0x200, % translate("X-Axis")
 		
 		schema := filterSchema(new TelemetryDatabase().getSchema("Electronics", true))
 		
@@ -408,11 +416,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200 vchartSourceDropDown gchooseChartSource, % values2String("|", map(["Telemetry", "Comparison"], "translate")*)
 		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
-		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x400 yp+24 w800 h302 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
-		Gui %window%:Add, Text, x8 yp+286 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+310 w1200 0x10
 
 		Gui %window%:Font, s10 Bold, Arial
 			
@@ -442,9 +450,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y650 w1200 0x10
+		Gui %window%:Add, Text, x8 y676 w1200 0x10
 		
-		Gui %window%:Add, Button, x574 y656 w80 h23 GcloseWorkbench, % translate("Close")
+		Gui %window%:Add, Button, x574 y684 w80 h23 GcloseWorkbench, % translate("Close")
 
 		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
 		
@@ -810,7 +818,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: 798px; height: 248px"></div>
+					<div id="chart_id" style="width: 798px; height: 285px"></div>
 				</body>
 			</html>
 			)
@@ -1033,7 +1041,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather)
 			
-			this.loadCompound(this.SelectedCompound[true], true)
+			this.loadDataType(this.SelectedDataType, true)
 		}
 	}
 	
@@ -1042,30 +1050,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iTrackTemperature := trackTemperature
 	}
 	
-	loadCompound(compound, force := false) {
-		if (force || (this.SelectedCompound[true] != compound)) {
-			this.showWorkbenchChart(false)
-			
-			compoundString := compound
-			
-			compound := string2Values(A_Space, compound)
-		
-			if (compound.Length() == 1)
-				compoundColor := "Black"
-			else
-				compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
-			
-			compound := compound[1]
-			
-			this.iSelectedCompound := compound
-			this.iSelectedCompoundColor := compoundColor
-			
-			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-			weather := this.SelectedWeather
+	loadDataType(dataType, force := false) {
+		if (force || (this.SelectedDataType != dataType)) {
+			this.showTelemetryChart(false)
 			
 			window := this.Window
 		
 			Gui %window%:Default
+			
+			this.iSelectedDataType := dataType
+			
+			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			
 			Gui ListView, % this.DataListView
 			
 			LV_Delete()
@@ -1074,25 +1070,21 @@ class StrategyWorkbench extends ConfigurationItem {
 				ignore := 1
 			
 			if (this.SelectedDataType = "Electronics") {
-				for ignore, column in map(["Map", "Count"], "translate")
+				for ignore, column in map(["Compound", "Map", "#"], "translate")
 					LV_InsertCol(A_Index, "", column)
 			
-				categories := telemetryDB.getMapsCount(weather, compound, compoundColor)
+				categories := telemetryDB.getMapsCount(this.SelectedWeather)
 				field := "Map"
-				
-				records := telemetryDB.getElectronicEntries(weather, compound, compoundColor)
 			}
 			else if (this.SelectedDataType = "Tyres") {
-				for ignore, column in map(["Pressure", "Count"], "translate")
+				for ignore, column in map(["Compound", "Pressure", "#"], "translate")
 					LV_InsertCol(A_Index, "", column)
 			
-				categories := telemetryDB.getPressuresCount(weather, compound, compoundColor)
+				categories := telemetryDB.getPressuresCount(this.SelectedWeather)
 				field := "Tyre.Pressure"
-				
-				records := telemetryDB.getTyreEntries(weather, compound, compoundColor)
 			}
-			else
-				records := []
+			
+			availableCompounds := []
 			
 			for ignore, category in categories {
 				value := category[field]
@@ -1100,13 +1092,80 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (value = "n/a")
 					value := translate(value)
 				
-				LV_Add("", value, category.Count)
+				compound := category["Tyre.Compound"]
+				compoundColor := category["Tyre.Compound.Color"]
+				
+				LV_Add("", translateQualifiedCompound(compound, compoundColor), value, category.Count)
+				
+				availableCompounds.Push(qualifiedCompound(compound, compoundColor))
 			}
+			
+			this.iAvailableCompounds := availableCompounds
 
+			GuiControl, , compoundDropDown, % "|" . values2String("|", map(availableCompounds, "translate")*)
+			
 			LV_ModifyCol(1, "AutoHdr")
 			LV_ModifyCol(2, "AutoHdr")
 			
-			this.loadChart(this.SelectedChartType)
+			if (availableCompounds.Length() == 0) {
+				GuiControl, , dataXDropDown, |
+				GuiControl, , dataY1DropDown, |
+				GuiControl, , dataY2DropDown, |
+				GuiControl, , dataY3DropDown, |
+			}
+			else {
+				schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
+					
+				GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
+				GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
+				GuiControl, , dataY2DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
+				GuiControl, , dataY3DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
+				
+				if (dataType = "Electronics") {
+					GuiControl Choose, dataXDropDown, % inList(schema, "Map")
+					GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
+					
+					GuiControl Choose, dataY2DropDown, 1
+				}
+				else if (dataType = "Tyres") {
+					GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
+					GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
+					GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature") + 1
+				}
+					
+				GuiControl Choose, dataY3DropDown, 1
+			}
+					
+			this.loadCompound((availableCompounds.Length() > 0) ? availableCompounds[1] : false, true)
+		}
+	}
+	
+	loadCompound(compound, force := false) {
+		if (force || (this.SelectedCompound[true] != compound)) {
+			window := this.Window
+				
+			Gui %window%:Default
+		
+			if compound {
+				GuiControl Choose, compoundDropDown, % inList(this.AvailableCompounds, compound)
+				
+				compoundString := compound
+				
+				splitQualifiedCompound(compound, compound, compoundColor)
+				
+				this.iSelectedCompound := compound
+				this.iSelectedCompoundColor := compoundColor
+				
+				this.loadChart(this.SelectedChartType)
+			}
+			else {
+				GuiControl Choose, compoundDropDown, 0
+			
+				this.showTelemetryChart(false)
+			
+				this.iSelectedCompound := false
+				this.iSelectedCompoundColor := false
+			}
 		}
 	}
 	
@@ -1988,7 +2047,7 @@ chooseCompound() {
 	
 	GuiControlGet compoundDropDown
 	
-	workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown])
+	workbench.loadCompound(workbench.AvailableCompounds[compoundDropDown])
 }
 
 chooseDataType() {
@@ -1997,7 +2056,6 @@ chooseDataType() {
 	
 	Gui %window%:Default
 	
-	GuiControlGet compoundDropDown
 	GuiControlGet dataTypeDropDown
 	
 	if (dataTypeDropDown > 2) {
@@ -2021,37 +2079,8 @@ chooseDataType() {
 		
 		GuiControl Choose, dataTypeDropDown, % inList(["Electronics", "Tyres"], workbench.SelectedDataType)
 	}
-	else {
-		dataType := ["Electronics", "Tyres"][dataTypeDropDown]
-		schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
-		
-		workbench.iSelectedDataType := dataType
-		
-		GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
-		GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
-		GuiControl, , dataY2DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
-		GuiControl, , dataY3DropDown, % "|" . translate("None") . "|" . values2String("|", map(schema, "translate")*)
-		
-		if (dataType = "Electronics") {
-			GuiControl Choose, dataXDropDown, % inList(schema, "Map")
-			GuiControl Choose, dataY1DropDown, % inList(schema, "Fuel.Consumption")
-			
-			GuiControl Choose, dataY2DropDown, 1
-		}
-		else if (dataType = "Tyres") {
-			GuiControl Choose, dataXDropDown, % inList(schema, "Tyre.Laps")
-			GuiControl Choose, dataY1DropDown, % inList(schema, "Tyre.Pressure")
-			GuiControl Choose, dataY2DropDown, % inList(schema, "Tyre.Temperature") + 1
-		}
-		
-		GuiControl Choose, dataY3DropDown, 1
-		
-		workbench.loadChart(workbench.SelectedChartType)
-		
-		GuiControlGet compoundDropDown
-		
-		workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
-	}
+	else
+		workbench.loadDataType(["Electronics", "Tyres"][dataTypeDropDown], true)
 }
 
 chooseData() {

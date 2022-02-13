@@ -491,6 +491,18 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
+			else
+			{
+				if ((lastFlagState & YELLOW_FULL) != 0)
+				{
+					SendMessage("yellowFlag:Clear");
+
+					lastFlagState &= ~YELLOW_FULL;
+
+					return true;
+				}
+			}
+			/*
 			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector1] > 0)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
@@ -536,6 +548,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
+			*/
 
 			return false;
 		}

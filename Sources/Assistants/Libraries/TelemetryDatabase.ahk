@@ -145,6 +145,15 @@ class TelemetryDatabase extends SessionDatabase {
 			return []
 	}
 	
+	getFuelLapTimes(weather, compound, compoundColor) {
+		if this.Database
+			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
+											   , Transform: "removeInvalidLaps"
+											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+		else
+			return []
+	}
+	
 	getPressuresCount(weather) {
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]

@@ -1,9 +1,9 @@
 [Development]
 Version=3.9.0-dev
 Target=3.9.0-release
-Date=02/12/2022
+Date=02/13/2022
 Download=
-Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow)
+Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench"
 [Release]
 Version=3.8.8-release
 Date=02/11/2022

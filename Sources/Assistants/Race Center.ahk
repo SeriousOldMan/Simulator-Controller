@@ -1137,7 +1137,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
-		choices := map(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
+		choices := map(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x24 yp+26 w85 h20, % translate("Tyre Set")
@@ -1883,7 +1883,7 @@ class RaceCenter extends ConfigurationItem {
 		if (compoundColor != "Black")
 			compound := (compound . " (" . compoundColor . ")")
 		
-		chosen := inList(["No Tyre Change", "Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], compound)
+		chosen := inList(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), compound)
 		
 		GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 		
@@ -1973,8 +1973,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
-				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color"
-									, ["Black", "Black", "Red", "White", "Blue"][pitstopTyreCompoundDropDown - 1])
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", kQualifiedTyreCompoundColors[pitstopTyreCompoundDropDown - 1])
 				
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
 									, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit

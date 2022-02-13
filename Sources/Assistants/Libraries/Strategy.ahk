@@ -556,6 +556,8 @@ class Strategy extends ConfigurationItem {
 		iDuration := 0
 		iRefuelAmount := 0
 		iTyreChange := false
+		iTyreCompound := false
+		iTyreCompoundColor := false
 		
 		iStintLaps := 0
 		iMap := 1
@@ -600,6 +602,18 @@ class Strategy extends ConfigurationItem {
 		TyreChange[] {
 			Get {
 				return this.iTyreChange
+			}
+		}
+		
+		TyreCompound[] {
+			Get {
+				return this.iTyreCompound
+			}
+		}
+		
+		TyreCompoundColor[] {
+			Get {
+				return this.iTyreCompoundColor
 			}
 		}
 		
@@ -728,6 +742,11 @@ class Strategy extends ConfigurationItem {
 					this.iRemainingTyreLaps := strategy.MaxTyreLaps
 				}
 				
+				if this.iTyreChange {
+					this.iTyreCompound := strategy.TyreCompound
+					this.iTyreCompoundColor := strategy.TyreCompoundColor
+				}
+				
 				this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel, fuelConsumption
 														 , strategy.TyreCompound, strategy.TyreCompoundColor
 														 , (strategy.MaxTyreLaps - this.RemainingTyreLaps))
@@ -760,6 +779,11 @@ class Strategy extends ConfigurationItem {
 			this.iRefuelAmount := getConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, 0)
 			this.iTyreChange := getConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, false)
 		
+			if this.iTyreChange {
+				this.iTyreCompound := getConfigurationValue(configuration, "Pitstop", "TyreCompound." . lap, this.Strategy.TyreCompound)
+				this.iTyreCompoundColor := getConfigurationValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.Strategy.TyreCompoundColor)
+			}
+				
 			this.iStintLaps := getConfigurationValue(configuration, "Pitstop", "StintLaps." . lap, 0)
 
 			this.iMap := getConfigurationValue(configuration, "Pitstop", "Map." . lap, 0)
@@ -781,6 +805,11 @@ class Strategy extends ConfigurationItem {
 			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
 			setConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, Ceil(this.RefuelAmount))
 			setConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, this.TyreChange)
+			
+			if this.iTyreChange {
+				setConfigurationValue(configuration, "Pitstop", "TyreCompound." . lap, this.TyreCompound)
+				setConfigurationValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.TyreCompoundColor)
+			}
 			
 			setConfigurationValue(configuration, "Pitstop", "StintLaps." . lap, this.StintLaps)
 			
@@ -1599,8 +1628,23 @@ qualifiedCompound(compound, compoundColor) {
 		else
 			return ("Dry (" . compoundColor . ")")
 	}
-	else
+	else if (compoundColor = "Black")
 		return "Wet"
+	else
+		return ("Wet (" . compoundColor . ")")
+}
+
+translateQualifiedCompound(compound, compoundColor) {
+	if (compound= "Dry") {
+		if (compoundColor = "Black")
+			return translate("Dry")
+		else
+			return (translate("Dry") . translate(" (") . translate(compoundColor) . translate(")"))
+	}
+	else if (compoundColor = "Black")
+		return translate("Wet")
+	else
+		return (translate("Wet") . translate(" (") . translate(compoundColor) . translate(")"))
 }
 
 splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {

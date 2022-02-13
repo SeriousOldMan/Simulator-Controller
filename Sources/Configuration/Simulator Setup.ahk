@@ -509,77 +509,82 @@ class SetupWizard extends ConfigurationItem {
 	
 			Gui %window%:Default
 			
+			Gui %window%:+Disabled
+			
 			GuiControl Disable, previousPageButton
 			GuiControl Disable, nextPageButton
 			GuiControl Disable, finishButton
 			
 			vWorking := true
 			
-			if save {
-				if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
-					FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
-				
-				if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
-					FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
-				
-				if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-					settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-				else
-					settings := newConfiguration()
-				
-				if FileExist(kUserHomeDirectory . "Setup\Settings Patch.ini")
-					for section, values in readConfiguration(kUserHomeDirectory . "Setup\Settings Patch.ini")
-						for key, value in values
-							setConfigurationValue(settings, section, key, value)
-				
-				if (settings.Count() > 0)
-					writeConfiguration(kUserConfigDirectory . "Simulator Settings.ini", settings)
-				
-				configuration := this.getSimulatorConfiguration()
-				
-				if FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")
-					for section, values in readConfiguration(kUserHomeDirectory . "Setup\Configuration Patch.ini")
-						for key, value in values
-							setConfigurationValue(configuration, section, key, value)
+			try {
+				if save {
+					if FileExist(kUserConfigDirectory . "Simulator Configuration.ini")
+						FileMove %kUserConfigDirectory%Simulator Configuration.ini, %kUserConfigDirectory%Simulator Configuration.ini.bak, 1
 					
-				writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
-	
-				try {
-					FileDelete %kUserConfigDirectory%Simulator Controller.config
-				}
-				catch exception {
-					; Ignore
-				}
-	
-				startupLink := A_Startup . "\Simulator Startup.lnk"
-				
-				if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {
-					startupExe := kBinariesDirectory . "Simulator Startup.exe"
+					if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
+						FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
 					
-					FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
-				}
-				else
+					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+						settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+					else
+						settings := newConfiguration()
+					
+					if FileExist(kUserHomeDirectory . "Setup\Settings Patch.ini")
+						for section, values in readConfiguration(kUserHomeDirectory . "Setup\Settings Patch.ini")
+							for key, value in values
+								setConfigurationValue(settings, section, key, value)
+					
+					if (settings.Count() > 0)
+						writeConfiguration(kUserConfigDirectory . "Simulator Settings.ini", settings)
+					
+					configuration := this.getSimulatorConfiguration()
+					
+					if FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+						for section, values in readConfiguration(kUserHomeDirectory . "Setup\Configuration Patch.ini")
+							for key, value in values
+								setConfigurationValue(configuration, section, key, value)
+						
+					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+		
 					try {
-						FileDelete %startupLink%
+						FileDelete %kUserConfigDirectory%Simulator Controller.config
 					}
 					catch exception {
-						; ignore
+						; Ignore
 					}
-				
-				if this.isModuleSelected("Controller") {
-					if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
-						FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+		
+					startupLink := A_Startup . "\Simulator Startup.lnk"
 					
-					FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+					if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {
+						startupExe := kBinariesDirectory . "Simulator Startup.exe"
+						
+						FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
+					}
+					else
+						try {
+							FileDelete %startupLink%
+						}
+						catch exception {
+							; ignore
+						}
 					
-					if FileExist(kUserConfigDirectory . "Stream Deck Configuration.ini")
-						FileMove %kUserConfigDirectory%Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini.bak, 1
-					
-					FileCopy %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini
+					if this.isModuleSelected("Controller") {
+						if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
+							FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
+						
+						FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+						
+						if FileExist(kUserConfigDirectory . "Stream Deck Configuration.ini")
+							FileMove %kUserConfigDirectory%Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini.bak, 1
+						
+						FileCopy %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini
+					}
 				}
 			}
-			
-			vWorking := false
+			finally {
+				vWorking := false
+			}
 			
 			return true
 		}
@@ -679,7 +684,9 @@ class SetupWizard extends ConfigurationItem {
 		window := this.WizardWindow
 	
 		Gui %window%:Default
-			
+		
+		Gui %window%:+Disabled
+		
 		GuiControl Disable, previousPageButton
 		GuiControl Disable, nextPageButton
 		GuiControl Disable, finishButton
@@ -776,6 +783,8 @@ class SetupWizard extends ConfigurationItem {
 				GuiControl Enable, nextPageButton
 				GuiControl Disable, finishButton
 			}
+			
+			Gui %window%:-Disabled
 		}
 	}
 	

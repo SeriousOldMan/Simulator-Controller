@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include Libraries\SetupDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -646,11 +647,13 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
 		
-		if (spSetupTyreCompoundDropDown == 1)
+		if (spSetupTyreCompoundDropDown == 1) {
 			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Wet")
+			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", "Black")
+		}
 		else {
 			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry")
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", ["Black", "Red", "White", "Blue"][spSetupTyreCompoundDropDown - 1])
+			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", kQualifiedTyreCompoundColors[spSetupTyreCompoundDropDown])
 		}
 		
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
@@ -958,9 +961,9 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 		
-		choices := map(["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], "translate")
+		choices := map(kQualifiedTyreCompounds, "translate")
 		
-		spSetupTyreCompoundDropDown := inList(["Wet", "Dry", "Dry (Red)", "Dry (White)", "Dry (Blue)"], spSetupTyreCompoundDropDown)
+		spSetupTyreCompoundDropDown := inList(kQualifiedTyreCompounds, spSetupTyreCompoundDropDown)
 		
 		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
 
@@ -1285,20 +1288,12 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				}
 			}
 			else {
-				choice := 2
-			
-				switch getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black") {
-					case "Black":
-						GuiControl Choose, spSetupTyreCompoundDropDown, 2
-					case "Red":
-						GuiControl Choose, spSetupTyreCompoundDropDown, 3
-					case "White":
-						GuiControl Choose, spSetupTyreCompoundDropDown, 4
-					case "Blue":
-						GuiControl Choose, spSetupTyreCompoundDropDown, 5
-					default:
-						Throw "Unknow tyre compound color detected in importFromSimulation..."
-				}
+				compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
+				
+				if (compoundColor = "Black")
+					GuiControl Choose, spSetupTyreCompoundDropDown, 2
+				else
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompoundColors, compoundColor)
 				
 				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%

@@ -141,7 +141,7 @@ class StrategyViewer {
 				lastLapTime := pitstop.AvgLapTime
 				lastRefuel := pitstop.RefuelAmount
 				lastPitstopLap := pitstop.Lap
-				lastTyreChange := (pitstop.TyreChange ? translate("Yes") : translate("No"))
+				lastTyreChange := (pitstop.TyreChange ? translateQualifiedCompound(pitstop.TyreCompound, pitstop.TyreCompoundColor) : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 				
 				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)

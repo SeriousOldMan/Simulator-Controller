@@ -1100,12 +1100,13 @@ class StrategyWorkbench extends ConfigurationItem {
 				availableCompounds.Push(qualifiedCompound(compound, compoundColor))
 			}
 			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			LV_ModifyCol(3, "AutoHdr")
+			
 			this.iAvailableCompounds := availableCompounds
 
 			GuiControl, , compoundDropDown, % "|" . values2String("|", map(availableCompounds, "translate")*)
-			
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
 			
 			if (availableCompounds.Length() == 0) {
 				GuiControl, , dataXDropDown, |

@@ -72,7 +72,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w2 := w1 - 24
 		x4 := x1 + w2 + 1
 		
-		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		Gui %window%:Add, Text, x%x0% y%y% w120 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 		
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -94,48 +94,48 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget6 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
 		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number vrspLapsConsideredEdit HWNDwidget9 Hidden
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget10 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
-		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
+		Gui %window%:Add, Text, x%x0% ys+24 w120 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
 		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit HWNDwidget13 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 		
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h202 HWNDwidget15 Hidden, % translate("Spotter Announcements")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h202 HWNDwidget15 Hidden, % translate("Announcements")
 		
 		Gui %window%:Font, Norm, Arial
 		
 		x3 := x + 186
 		w3 := width - (x3 - x + 16) + 10
 		
-		Gui %window%:Add, Text, x%x0% yp+20 w105 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
+		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Disabled Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget20 Hidden, % translate("Yellow Flags")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget20 Hidden, % translate("Yellow Flags")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vyellowFlagsDropDown HWNDwidget21 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget22 Hidden, % translate("Blue Flags")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget22 Hidden, % translate("Blue Flags")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget26 Hidden, % translate("Performace Updates")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Performance Updates all")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose3 vperformanceUpdatesDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), 1, 2, 3, 4)
-		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget32 Hidden, % translate("Laps")
+		Gui %window%:Add, Text, x%x3% yp+4 w80 h20 HWNDwidget32 Hidden, % translate("Laps")
 		
-		Gui %window%:Add, Text, x%x0% yp+24 w105 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
+		Gui %window%:Add, Text, x%x0% yp+22 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget30 Hidden, % translate("Pit Window")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget30 Hidden, % translate("Pit Window")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vpitWindowDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
 		Gui %window%:Font, Norm, Arial

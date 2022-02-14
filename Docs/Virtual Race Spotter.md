@@ -46,19 +46,19 @@ Please note, that not every simulation will support all these capabilities and t
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                  | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience |
-| --------------------------- | -------------------------- | --------------- | ------- | -------------------------- |
-| Side Alert                  | Yes                        | Yes             | Yes     | Yes                        |
-| Behind Alert                | Yes                        | Yes             | No (1)  | Yes                        |
-| Yellow Flag                 | Yes                        | Yes             | Yes     | Yes                        |
-| Full Course Yellow          | Yes                        | No              | No      | Yes                        |
-| Sector Yellow               | Yes                        | No              | No      | Yes                        |
-| Yellow Distance             | No                         | No              | No      | Yes                        |
-| Blue Flag                   | Yes                        | Yes             | Yes (2) | Yes                        |
-| Pit Window                  | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      |
-| Start Performance Summary   | Yes                        | Yes             | Yes     | Yes                        |
-| Periodic Performance Update | Yes                        | Yes             | Yes     | Yes                        |
-| Final Laps Announcement     | Yes                        | Yes             | Yes     | Yes                        |
+| Capability                  | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
+| --------------------------- | -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| Side Alert                  | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert                | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Yellow Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Full Course Yellow          | Yes                        | No              | No      | Yes                        | Yes       |
+| Sector Yellow               | Yes                        | No              | No      | Yes                        | No        |
+| Yellow Distance             | No                         | No              | No      | Yes                        | No        |
+| Blue Flag                   | Yes                        | Yes             | Yes (2) | Yes                        | Yes       |
+| Pit Window                  | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
+| Start Performance Summary   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Periodic Performance Update | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Final Laps Announcement     | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
 

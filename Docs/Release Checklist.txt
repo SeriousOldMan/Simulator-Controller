@@ -34,6 +34,7 @@ Release 3.9.0 Checklist
    a. Documentation
    b. Translations
    c. Doc Images
+   d. Mention in Virtual Race Spotter.md
 6. Overhaul of Strategy Workbench
    a. Doc Images
    b. Documentation

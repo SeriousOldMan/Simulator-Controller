@@ -2376,6 +2376,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	selectStrategy(strategy, show := false) {
+		if this.Strategy
+			this.Strategy.dipose()
+		
 		this.iStrategy := strategy
 		
 		if (show || (this.SelectedDetailReport = "Strategy") || !this.SelectedDetailReport)

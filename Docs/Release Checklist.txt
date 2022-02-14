@@ -23,11 +23,21 @@ Release 3.9.0 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Phrase Grammars
+   b. Translations
 2. New Spotter Info: Start Performance Summary
    a. Documentation
 3. New Spotter Info: Periodic Performance & Position Update
    a. Documentation
 4. New Spotter Info: Final Laps Announcement
+   a. Documentation
+5. Updated Race Spotter Configuration
+   a. Documentation
+   b. Translations
+   c. Doc Images
+6. Overhaul of Strategy Workbench
+   a. Doc Images
+   b. Documentation
+7. New Tyre Compound Colors
    a. Documentation
 
 Release 3.8.8 Checklist

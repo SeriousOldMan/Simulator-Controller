@@ -1888,6 +1888,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
+		if this.SelectedStrategy
+			this.SelectedStrategy.dispose()
+		
 		if strategy {
 			numPitstops := 0
 			numTyreChanges := 0

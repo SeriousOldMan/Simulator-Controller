@@ -315,6 +315,10 @@ class StrategySimulation {
 		else
 			this.chooseScenario(false)
 		
+		for ignore, disposable in scenarios
+			if (disposable != scenario)
+				disposable.dispose()
+		
 		if verbose {
 			message := translate("Finished...")
 			
@@ -1199,6 +1203,10 @@ class Strategy extends ConfigurationItem {
 			this.iRefuelRequired := refuelRequired
 			this.iTyreChangeRequired := tyreChangeRequired
 		}
+	}
+	
+	dispose() {
+		this.iPitstops := []
 	}
 	
 	setStrategyManager(strategyManager) {

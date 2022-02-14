@@ -366,7 +366,7 @@ namespace RF2SHMSpotter {
 				rotateBy(ref transX, ref transY, angle);
 
 				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
-					return (transX < 0) ? RIGHT : LEFT;
+					return (transX > 0) ? RIGHT : LEFT;
 				else
 				{
 					if (transY < 0)
@@ -382,24 +382,26 @@ namespace RF2SHMSpotter {
 		bool checkPositions(ref rF2VehicleScoring playerScoring)
 		{
 			double lVelocityX = playerScoring.mLocalVel.x;
-			double lVelocityY = playerScoring.mLocalVel.z;
-			double lVelocityZ = playerScoring.mLocalVel.y;
+			double lVelocityY = playerScoring.mLocalVel.y;
+			double lVelocityZ = playerScoring.mLocalVel.z;
 
 			var ori = playerScoring.mOri;
 
 			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-			double velocityY = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
-			double velocityZ = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
-				double angle = vectorAngle(velocityX, velocityY);
+				double angle = vectorAngle(velocityX, velocityZ);
 
-				Console.WriteLine(angle);
+				// Console.WriteLine(vectorAngle(lVelocityX, lVelocityY));
+				// Console.WriteLine(angle);
+				// Console.WriteLine();
 
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = playerScoring.mPos.z;
-				double coordinateZ = playerScoring.mPos.y;
+				double coordinateY = playerScoring.mPos.y;
+				double coordinateZ = playerScoring.mPos.z;
 
 				int newSituation = CLEAR;
 
@@ -409,12 +411,12 @@ namespace RF2SHMSpotter {
 				{
 					var vehicle = scoring.mVehicles[i];
 
-					Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
-					Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
+					// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
+					// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
 
-					if (vehicle.mIsPlayer != 0)
-						newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-														 vehicle.mPos.x, vehicle.mPos.y, vehicle.mPos.z);
+					if (vehicle.mIsPlayer == 0)
+						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle,
+														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
 
 					if ((newSituation == THREE) && carBehind)
 						break;

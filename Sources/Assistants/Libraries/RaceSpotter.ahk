@@ -79,9 +79,9 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	AnnouncementSettings[] {
+	AnnouncementSettings[key := false] {
 		Get {
-			return this.iAnnouncementSettings
+			return (key ? this.iAnnouncementSettings[key] : this.iAnnouncementSettings)
 		}
 	}
 	
@@ -465,12 +465,12 @@ class RaceSpotter extends RaceAssistant {
 			announcementSettings := {}
 			
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "FinalLaps", "PitWindow"] 
 				announcementSettings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 				
 			announcementSettings["PerformanceUpdates"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
 			
-			this.updateConfigurationValues({AccouncementSettings: announcementSettings})
+			this.updateConfigurationValues({AnnouncementSettings: announcementSettings})
 			
 		}
 		

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.9.0-dev](https://www.dropbox.com/s/txah1zemihpfrz5/Simulator%20Controller%203.9.0-dev.zip?dl=1) (Early build for Release 3.9.0. New features: Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration. Stable, with update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-390) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

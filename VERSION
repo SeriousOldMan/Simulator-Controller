@@ -1,8 +1,8 @@
 [Development]
 Version=3.9.0-dev
 Target=3.9.0-release
-Date=02/14/2022
-Download=
+Date=02/15/2022
+Download=https://www.dropbox.com/s/txah1zemihpfrz5/Simulator%20Controller%203.9.0-dev.zip?dl=1
 Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration
 [Release]
 Version=3.8.8-release

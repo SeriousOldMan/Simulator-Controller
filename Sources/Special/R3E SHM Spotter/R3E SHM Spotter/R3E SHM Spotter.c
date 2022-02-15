@@ -344,6 +344,8 @@ BOOL checkFlagState() {
 
 	if (distance > 1000 || distance < 0)
 		distance = 0;
+	else
+		distance = (int)round(distance / 10.0) * 10;
 
 	if ((map_buffer->flags.yellow == 1) &&
 		map_buffer->flags.sector_yellow[0] == 1 &&

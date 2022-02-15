@@ -359,12 +359,24 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 
 bool checkFlagState(const irsdk_header* header, const char* data) {
 	char buffer[64];
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char playerCarIdx[10] = "";
+	char sessionID[10] = "";
+
+	getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+	
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	int laps = 0;
+	
+	if (getYamlValue(buffer, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+		laps = atoi(buffer);
 
 	getDataValue(buffer, header, data, "SessionFlags");
 
 	int flags = atoi(buffer);
 
-	if ((flags & irsdk_blue) != 0) {
+	if (laps > 0 && (flags & irsdk_blue) != 0) {
 		if ((lastFlagState & BLUE) == 0) {
 			sendMessage("blueFlag");
 

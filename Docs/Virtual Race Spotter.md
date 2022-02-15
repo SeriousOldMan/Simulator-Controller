@@ -40,7 +40,7 @@ Elisa observes your direct opponents behind and in front of you and informs you,
 
 You will get an announcement a few laps before the end of the race.
 
-Please note, that not every simulation will support all these capabilities and that the bahaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
+Please note, that not every simulation will support all these capabilities and that the behaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
 
 ## Simulator Integration
 
@@ -52,14 +52,12 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Behind Alert                | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
 | Yellow Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Full Course Yellow          | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow               | Yes                        | No              | No      | Yes                        | No        |
+| Sector Yellow               | Yes                        | No              | No      | Yes                        | Yes       |
 | Yellow Distance             | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                   | Yes                        | Yes             | Yes (2) | Yes                        | Yes       |
+| Blue Flag                   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Pit Window                  | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
 | Start Performance Summary   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Periodic Performance Update | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement     | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
-
-(2) For whatever reason, you might get one spurios blue flag warning at race start.

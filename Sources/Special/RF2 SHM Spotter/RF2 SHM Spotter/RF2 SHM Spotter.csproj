@@ -7,7 +7,7 @@
     <ProjectGuid>{17FC2626-EA21-43ED-BC84-BE0B8545FC2D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RF2 SHM Spotter</RootNamespace>
+    <RootNamespace>RF2SHMSpotter</RootNamespace>
     <AssemblyName>RF2 SHM Spotter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

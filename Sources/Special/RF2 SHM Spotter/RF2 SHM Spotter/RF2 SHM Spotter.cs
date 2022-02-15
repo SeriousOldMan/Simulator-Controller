@@ -17,36 +17,12 @@ namespace RF2SHMSpotter {
 		bool connected = false;
 
 		// Read buffers:
-		MappedBuffer<rF2Telemetry> telemetryBuffer = new MappedBuffer<rF2Telemetry>(rFactor2Constants.MM_TELEMETRY_FILE_NAME, true /*partial*/, true /*skipUnchanged*/);
 		MappedBuffer<rF2Scoring> scoringBuffer = new MappedBuffer<rF2Scoring>(rFactor2Constants.MM_SCORING_FILE_NAME, true /*partial*/, true /*skipUnchanged*/);
-		MappedBuffer<rF2Rules> rulesBuffer = new MappedBuffer<rF2Rules>(rFactor2Constants.MM_RULES_FILE_NAME, true /*partial*/, true /*skipUnchanged*/);
-		MappedBuffer<rF2ForceFeedback> forceFeedbackBuffer = new MappedBuffer<rF2ForceFeedback>(rFactor2Constants.MM_FORCE_FEEDBACK_FILE_NAME, false /*partial*/, false /*skipUnchanged*/);
-		MappedBuffer<rF2Graphics> graphicsBuffer = new MappedBuffer<rF2Graphics>(rFactor2Constants.MM_GRAPHICS_FILE_NAME, false /*partial*/, false /*skipUnchanged*/);
-		MappedBuffer<rF2PitInfo> pitInfoBuffer = new MappedBuffer<rF2PitInfo>(rFactor2Constants.MM_PITINFO_FILE_NAME, false /*partial*/, true /*skipUnchanged*/);
-		MappedBuffer<rF2Weather> weatherBuffer = new MappedBuffer<rF2Weather>(rFactor2Constants.MM_WEATHER_FILE_NAME, false /*partial*/, true /*skipUnchanged*/);
 		MappedBuffer<rF2Extended> extendedBuffer = new MappedBuffer<rF2Extended>(rFactor2Constants.MM_EXTENDED_FILE_NAME, false /*partial*/, true /*skipUnchanged*/);
 
-		// Write buffers:
-		MappedBuffer<rF2HWControl> hwControlBuffer = new MappedBuffer<rF2HWControl>(rFactor2Constants.MM_HWCONTROL_FILE_NAME);
-		MappedBuffer<rF2WeatherControl> weatherControlBuffer = new MappedBuffer<rF2WeatherControl>(rFactor2Constants.MM_WEATHER_CONTROL_FILE_NAME);
-		MappedBuffer<rF2RulesControl> rulesControlBuffer = new MappedBuffer<rF2RulesControl>(rFactor2Constants.MM_RULES_CONTROL_FILE_NAME);
-		MappedBuffer<rF2PluginControl> pluginControlBuffer = new MappedBuffer<rF2PluginControl>(rFactor2Constants.MM_PLUGIN_CONTROL_FILE_NAME);
-
 		// Marshalled views:
-		rF2Telemetry telemetry;
 		rF2Scoring scoring;
-		rF2Rules rules;
-		rF2ForceFeedback forceFeedback;
-		rF2Graphics graphics;
-		rF2PitInfo pitInfo;
-		rF2Weather weather;
 		rF2Extended extended;
-
-		// Marashalled output views:
-		rF2HWControl hwControl;
-		rF2WeatherControl weatherControl;
-		rF2RulesControl rulesControl;
-		rF2PluginControl pluginControl;
 
 		public SHMSpotter() {
 			if (!this.connected)
@@ -83,39 +59,7 @@ namespace RF2SHMSpotter {
 				try {
 					// Extended buffer is the last one constructed, so it is an indicator RF2SM is ready.
 					this.extendedBuffer.Connect();
-
-					this.telemetryBuffer.Connect();
 					this.scoringBuffer.Connect();
-					this.rulesBuffer.Connect();
-					this.forceFeedbackBuffer.Connect();
-					this.graphicsBuffer.Connect();
-					this.pitInfoBuffer.Connect();
-					this.weatherBuffer.Connect();
-
-					this.hwControlBuffer.Connect();
-					this.hwControlBuffer.GetMappedData(ref this.hwControl);
-					this.hwControl.mLayoutVersion = rFactor2Constants.MM_HWCONTROL_LAYOUT_VERSION;
-
-					this.weatherControlBuffer.Connect();
-					this.weatherControlBuffer.GetMappedData(ref this.weatherControl);
-					this.weatherControl.mLayoutVersion = rFactor2Constants.MM_WEATHER_CONTROL_LAYOUT_VERSION;
-
-					this.rulesControlBuffer.Connect();
-					this.rulesControlBuffer.GetMappedData(ref this.rulesControl);
-					this.rulesControl.mLayoutVersion = rFactor2Constants.MM_RULES_CONTROL_LAYOUT_VERSION;
-
-					this.pluginControlBuffer.Connect();
-					this.pluginControlBuffer.GetMappedData(ref this.pluginControl);
-					this.pluginControl.mLayoutVersion = rFactor2Constants.MM_PLUGIN_CONTROL_LAYOUT_VERSION;
-
-					// Scoring cannot be enabled on demand.
-					this.pluginControl.mRequestEnableBuffersMask = /*(int)SubscribedBuffer.Scoring | */(int)SubscribedBuffer.Telemetry | (int)SubscribedBuffer.Rules
-					| (int)SubscribedBuffer.ForceFeedback | (int)SubscribedBuffer.Graphics | (int)SubscribedBuffer.Weather | (int)SubscribedBuffer.PitInfo;
-					this.pluginControl.mRequestHWControlInput = 1;
-					this.pluginControl.mRequestRulesControlInput = 1;
-					this.pluginControl.mRequestWeatherControlInput = 1;
-					this.pluginControl.mVersionUpdateBegin = this.pluginControl.mVersionUpdateEnd = this.pluginControl.mVersionUpdateBegin + 1;
-					this.pluginControlBuffer.PutMappedData(ref this.pluginControl);
 
 					this.connected = true;
 				}
@@ -128,17 +72,6 @@ namespace RF2SHMSpotter {
 		private void Disconnect() {
 			this.extendedBuffer.Disconnect();
 			this.scoringBuffer.Disconnect();
-			this.rulesBuffer.Disconnect();
-			this.telemetryBuffer.Disconnect();
-			this.forceFeedbackBuffer.Disconnect();
-			this.pitInfoBuffer.Disconnect();
-			this.weatherBuffer.Disconnect();
-			this.graphicsBuffer.Disconnect();
-
-			this.hwControlBuffer.Disconnect();
-			this.weatherControlBuffer.Disconnect();
-			this.rulesControlBuffer.Disconnect();
-			this.pluginControlBuffer.Disconnect();
 
 			this.connected = false;
 		}
@@ -493,19 +426,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else
-			{
-				if ((lastFlagState & YELLOW_FULL) != 0)
-				{
-					SendMessage("yellowFlag:Clear");
-
-					lastFlagState &= ~YELLOW_FULL;
-
-					return true;
-				}
-			}
-			/*
-			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector1] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[0] == 1)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
 				{
@@ -516,7 +437,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector2] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[1] == 1)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_2) == 0)
 				{
@@ -527,7 +448,7 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			else if (scoring.mScoringInfo.mSectorFlag[(int)rF2Sector.Sector3] > 0)
+			else if (scoring.mScoringInfo.mSectorFlag[2] == 1)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_3) == 0)
 				{
@@ -550,7 +471,6 @@ namespace RF2SHMSpotter {
 					return true;
 				}
 			}
-			*/
 
 			return false;
 		}
@@ -580,7 +500,7 @@ namespace RF2SHMSpotter {
 					if (connected) {
 						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
-						if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase != (byte)PausedOrHeartbeat &&
+						if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
 							playerScoring.mPitState < (byte)Entering) {
 							if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
 								checkPitWindow(ref playerScoring);

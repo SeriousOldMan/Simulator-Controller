@@ -196,7 +196,9 @@ class RaceSpotter extends RaceAssistant {
 			if (driver && this.GridPosition) {
 				currentPosition := knowledgeBase.getValue("Car." . driver . ".Position")
 			
-				if (currentPosition < this.GridPosition) {
+				if (currentPosition = this.GridPosition)
+					speaker.speakPhrase("GoodStart")
+				else if (currentPosition < this.GridPosition) {
 					speaker.speakPhrase("GreatStart")
 					
 					speaker.speakPhrase("PositionsGained", {positions: Abs(currentPosition - this.GridPosition)})
@@ -284,7 +286,7 @@ class RaceSpotter extends RaceAssistant {
 						if this.AnnouncementSettings["StartSummary"]
 							this.summarizeRaceStart(lastLap)
 					}
-					else {
+					else if (lastLap > 2) {
 						performanceUpdates := this.AnnouncementSettings["PerformanceUpdates"]
 						
 						if (performanceUpdates && (lastLap >= (this.iLastPerformanceUpdateLap + performanceUpdates))) {

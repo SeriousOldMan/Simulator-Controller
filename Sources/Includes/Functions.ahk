@@ -1951,7 +1951,21 @@ removeConfigurationSection(configuration, section) {
 getControllerConfiguration(configuration := false) {
 	Process Exist, Simulator Controller.exe
 	
-	if (!ErrorLevel && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
+	pid := ErrorLevel
+	
+	if (pid && !configuration && !FileExist(kUserConfigDirectory . "Simulator Controller.config")) {
+		raiseEvent(kFileMessage, "Controller", "writeControllerConfiguration", pid)
+		
+		tries := 10
+		
+		while (tries > 0) {
+			Sleep 200
+		
+			if FileExist(kUserConfigDirectory . "Simulator Controller.config")
+				break
+		}
+	}
+	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
 				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)

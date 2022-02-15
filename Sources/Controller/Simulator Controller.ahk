@@ -1850,7 +1850,6 @@ externalCommandManager() {
 	SetTimer externalCommandManager, -50
 }
 
-
 initializeSimulatorController() {
 	icon := kIconsDirectory . "Gear.ico"
 	
@@ -1888,6 +1887,7 @@ initializeSimulatorController() {
 		protectionOff()
 	}
 	
+	registerEventHandler("Controller", "functionEventHandler")
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
 }
 
@@ -1996,6 +1996,10 @@ setMode(actionOrPlugin, mode := false) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+writeControllerConfiguration() {
+	SimulatorController.Instance.writeControllerConfiguration()
+}
 
 handleVoiceRemoteCalls(event, data) {
 	if InStr(data, ":") {

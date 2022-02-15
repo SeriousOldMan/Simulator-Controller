@@ -395,17 +395,17 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 		
-		Gui %window%:Add, Text, x200 yp w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, Text, x195 yp w70 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% gchooseCompound vcompoundDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Text, x200 yp+28 w70 h23 +0x200, % translate("X-Axis")
+		Gui %window%:Add, Text, x195 yp+28 w70 h23 +0x200, % translate("X-Axis")
 		
 		schema := filterSchema(new TelemetryDatabase().getSchema("Electronics", true))
 		
 		chosen := inList(schema, "Map")
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% vdataXDropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
 		
-		Gui %window%:Add, Text, x200 yp+24 w70 h23 +0x200, % translate("Series")
+		Gui %window%:Add, Text, x195 yp+24 w70 h23 +0x200, % translate("Series")
 		
 		chosen := inList(schema, "Fuel.Consumption")
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% vdataY1DropDown gchooseAxis, % values2String("|", map(schema, "translate")*)
@@ -1097,7 +1097,10 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				LV_Add("", translateQualifiedCompound(compound, compoundColor), value, category.Count)
 				
-				availableCompounds.Push(qualifiedCompound(compound, compoundColor))
+				compound := qualifiedCompound(compound, compoundColor)
+				
+				if !inList(availableCompounds, compound)
+					availableCompounds.Push(compound)
 			}
 			
 			LV_ModifyCol(1, "AutoHdr")

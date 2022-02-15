@@ -1240,6 +1240,8 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				prefix := "R3E"
 			case "rFactor 2":
 				prefix := "RF2"
+			case "iRacing":
+				prefix := "IRC"
 			default:
 				return
 		}

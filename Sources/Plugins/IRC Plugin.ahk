@@ -209,6 +209,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 	
+	supportsSetupImport() {
+		return true
+	}
+	
 	startPitstopSetup(pitstopNumber) {
 		openPitstopMFD()
 	}

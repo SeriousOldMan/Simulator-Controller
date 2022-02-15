@@ -239,11 +239,11 @@ int main(int argc, char* argv[])
 			char tyreCompoundColor[11] = "Black";
 			
 			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_SOFT)
-				strcpy_s(tyreCompoundColor, 10, "Red");
+				strcpy_s(tyreCompoundColor, 10, "Soft");
 			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_MEDIUM)
-				strcpy_s(tyreCompoundColor, 10, "White");
+				strcpy_s(tyreCompoundColor, 10, "Medium");
 			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_HARD)
-				strcpy_s(tyreCompoundColor, 10, "Blue");
+				strcpy_s(tyreCompoundColor, 10, "Hard");
 				
 			wprintf_s(L"TyreCompound=Dry\n");
 			wprintf_s(L"TyreCompoundColor=%S\n", tyreCompoundColor);

@@ -206,12 +206,22 @@ namespace RF2SHMProvider {
 
 				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
 
-				if (compound.Contains("Soft"))
+				if (compound.Contains("Red"))
 					Console.WriteLine("TyreCompoundColor=Red");
-				else if (compound.Contains("Medium"))
+				else if (compound.Contains("Yellow"))
+					Console.WriteLine("TyreCompoundColor=Yellow");
+				else if (compound.Contains("White"))
 					Console.WriteLine("TyreCompoundColor=White");
-				else if (compound.Contains("Hard"))
+				else if (compound.Contains("Green"))
+					Console.WriteLine("TyreCompoundColor=Green");
+				else if (compound.Contains("Blue"))
 					Console.WriteLine("TyreCompoundColor=Blue");
+				else if (compound.Contains("Soft"))
+					Console.WriteLine("TyreCompoundColor=Soft");
+				else if (compound.Contains("Medium"))
+					Console.WriteLine("TyreCompoundColor=Medium");
+				else if (compound.Contains("Hard"))
+					Console.WriteLine("TyreCompoundColor=Hard");
 				else
 					Console.WriteLine("TyreCompoundColor=Black");
 

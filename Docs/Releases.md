@@ -2,9 +2,13 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Support for the new Spotter Assistant has been added for rFactor 2.
+  3. Support for rFactor 2 has been added for the new Spotter Assistant.
   4. The capabilities of the Spotter has been extended again. It now informs about your performance after the first few laps and also periodically during the race. It also announces you the final laps. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   5. Fix for wonky Spotter side alerts in RaceRoom Racing Experience.
+  6. Improved the Strategy Simulation by introducing an alorithm which includes tyre wear, fuel level induced laptime variations and the effects of ECU maps at the same time.
+  7. Introduced new tyre compound types (colors) in all applications. Yellow, Green, Soft, Medium and Hard compounds are now supported, when the corresponding simulation supports them.
+  8. The Race Spotter can now be fully configured with regards to the issued warnings and announcements. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
+  9. Import of cold tyre pressures is now supported for iRacing in "Race Settings" and the Race Assistants.
 
 ## 3.8.8-release 02/11/22
 

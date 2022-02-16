@@ -1186,7 +1186,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
 		
-		knowledgeBase.setFact("Pitstop.Planned.Lap", plannedLap)
+		knowledgeBase.setFact("Pitstop.Planned.Lap", plannedLap ? (plannedLap - 1) : false)
 		
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -1457,7 +1457,7 @@ class RaceEngineer extends RaceAssistant {
 					
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
-				else if !(this.KnowledgeBase.getValue("Pitstop.Planned.Lap", 0) >= this.KnowledgeBase.getValue("Lap")) {
+				else {
 					speaker.speakPhrase("ConfirmPrepare", false, true)
 					
 					this.setContinuation(ObjBindMethod(this, "preparePitstop"))

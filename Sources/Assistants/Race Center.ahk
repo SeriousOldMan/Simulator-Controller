@@ -3602,7 +3602,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				Gui ListView, % this.PitstopsListView
 				
-				LV_Add("", nextStop, lap, fuel, translate(compound(compound, compoundColor)), tyreSet, pressures, repairs)
+				LV_Add("", nextStop, lap + 1, fuel, translate(compound(compound, compoundColor)), tyreSet, pressures, repairs)
 				
 				if (nextStop = 1) {
 					LV_ModifyCol()
@@ -4304,7 +4304,7 @@ class RaceCenter extends ConfigurationItem {
 			pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
 										   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
 				
-			LV_Add("", A_Index, pitstop.Lap, pitstop.Fuel
+			LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
 					 , translate(compound(pitstop["Tyre.Compound"], pitstop["Tyre.Compound.Color"]))
 					 , pitstop["Tyre.Set"], pressures, repairs)
 		}

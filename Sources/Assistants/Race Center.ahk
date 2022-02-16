@@ -1767,7 +1767,10 @@ class RaceCenter extends ConfigurationItem {
 				
 				fileName := (this.SessionDirectory . "Plan.Data.CSV")
 				
-				FileRead plan, %fileName%
+				if FileExist(fileName)
+					FileRead plan, %fileName%
+				else
+					plan := "CLEAR"
 				
 				this.Connector.setSessionValue(session, "Stint Plan Info", printConfiguration(info))
 				this.Connector.setSessionValue(session, "Stint Plan", plan)
@@ -3667,11 +3670,16 @@ class RaceCenter extends ConfigurationItem {
 				
 				Gui ListView, % this.PlanListView
 				
-				if ((LV_GetCount() == 0) || !this.Version || (this.Version < version)) {
+				if (!this.Version || (this.Version < version)) {
 					info := this.Connector.getSessionValue(session, "Stint Plan Info")
 					plan := this.Connector.getSessionValue(session, "Stint Plan")
 					
-					this.loadPlan(info, plan)
+					if (plan = "CLEAR") {
+						if this.Version
+							LV_Delete()
+					}
+					else
+						this.loadPlan(info, plan)
 				}
 			}
 		}

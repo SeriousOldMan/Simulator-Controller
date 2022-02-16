@@ -696,7 +696,7 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 ;;; Transfers the previously planned pitstop settings to the simulation.    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap = ?Lap]} => (Set: Pitstop.Prepare)
+{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
 priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)

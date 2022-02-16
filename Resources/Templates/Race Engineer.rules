@@ -696,7 +696,7 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 ;;; Transfers the previously planned pitstop settings to the simulation.    ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap = ?Lap]} => (Set: Pitstop.Prepare)
+{All: [?Pitstop.Planned], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
 priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
@@ -729,7 +729,7 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,			
 ;;; history memory as a reference for future calculations.                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap))
+[?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
 
 priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																					\
 								 (Clear: Pitstop.Planned.Fuel),																					\
@@ -768,8 +768,6 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pi
 ;;;                                                                         ;;;
 ;;; These rules remove knowledge that is no longer needed.					;;;
 ;;;-------------------------------------------------------------------------;;;
-
-[?Pitstop.Lap] => (Set: Cleanup, Laps)
 
 priority: -40, [?Cleanup = Laps] => (Prove: clearLaps()), (Clear: Cleanup)
 

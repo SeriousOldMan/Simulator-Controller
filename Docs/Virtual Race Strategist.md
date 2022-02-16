@@ -167,7 +167,11 @@ Another valuable tool, which is supported by Cato is the "Strategy Workbench". W
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
-The "Strategy Workbench" is divided into two main areas. The upper area allows you to analyze the available telemetry information for a given car / track / conditions combination using several available graphical charts. Telemetry information are divided into an *Electronics* and *Tyres* group. In each group you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+The "Strategy Workbench" is divided into two main areas. The upper area allows you to analyze the available telemetry information for a given car / track / conditions combination using several available graphical charts. Telemetry information are divided into an *Electronics* and *Tyres* group.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector.JPG)
+
+Each group provide data sets for all tyre compounds which have been used in the seelected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 

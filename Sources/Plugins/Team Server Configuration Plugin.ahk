@@ -592,7 +592,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 	
 	deleteTeam(name) {
-		this.Connector.DeleteTeam(this.Teams[name])
+		window := this.Editor.Window
+
+		Gui %window%:+Disabled
+		
+		try {
+			this.Connector.DeleteTeam(this.Teams[name])
+		}
+		finally {
+			Gui %window%:-Disabled
+		}
 		
 		this.loadTeams()
 	}
@@ -656,7 +665,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 	
 	deleteDriver(name) {
-		this.Connector.DeleteDriver(this.Drivers[name])
+		window := this.Editor.Window
+
+		Gui %window%:+Disabled
+		
+		try {
+			this.Connector.DeleteDriver(this.Drivers[name])
+		}
+		finally {
+			Gui %window%:-Disabled
+		}
 		
 		this.loadDrivers()
 	}
@@ -682,7 +700,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 	
 	deleteSession(name) {
-		this.Connector.DeleteSession(this.Sessions[name])
+		window := this.Editor.Window
+
+		Gui %window%:+Disabled
+		
+		try {
+			this.Connector.DeleteSession(this.Sessions[name])
+		}
+		finally {
+			Gui %window%:-Disabled
+		}
 		
 		this.loadSessions()
 	}

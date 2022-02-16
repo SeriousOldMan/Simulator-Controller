@@ -1625,6 +1625,31 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	clearPlan() {
+		window := this.Window
+				
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		if (LV_GetCount() > 0) {
+			title := translate("Delete")
+			
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+			MsgBox 262436, %title%, % translate("Do you really want to delete the current plan?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox Yes
+			{
+				this.Version := (A_Now . "")
+				
+				LV_Delete()
+				
+				this.updateState()
+			}
+		}
+	}
+	
 	updatePlan(minutesOrStint) {
 		window := this.Window
 			
@@ -2281,28 +2306,9 @@ class RaceCenter extends ConfigurationItem {
 	choosePlanMenu(line) {
 		switch line {
 			case 3:
-				this.loadPlanFromStrategy()
+				this.pushTask(ObjBindMethod(this, "loadPlanFromStrategyAsync"))
 			case 4:
-				window := this.Window
-				
-				Gui %window%:Default
-				
-				Gui ListView, % this.PlanListView
-				
-				if (LV_GetCount() > 0) {
-					title := translate("Delete")
-					
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					MsgBox 262436, %title%, % translate("Do you really want to delete the current plan?")
-					OnMessage(0x44, "")
-					
-					IfMsgBox Yes
-					{
-						LV_Delete()
-						
-						this.Version := (A_Now . "")
-					}
-				}
+				this.pushTask(ObjBindMethod(this, "clearPlanAsync"))
 			case 6:
 				this.showPlanDetails()
 						
@@ -2345,6 +2351,14 @@ class RaceCenter extends ConfigurationItem {
 			case 6:
 				this.planPitstop()
 		}
+	}
+	
+	loadPlanFromStrategyAsync() {
+		this.loadPlanFromStrategy()
+	}
+	
+	clearPlanAsync() {
+		this.clearPlan()
 	}
 	
 	withExceptionHandler(function, arguments*) {
@@ -6950,9 +6964,10 @@ choosePlan() {
 }
 
 updatePlan() {
-	if vWorking
-		return
-	
+	RaceCenter.Instance.pushTask("updatePlanAsync")
+}
+
+updatePlanAsync() {
 	rCenter := RaceCenter.Instance
 	
 	Gui ListView, % rCenter.PlanListView

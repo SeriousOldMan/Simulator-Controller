@@ -290,7 +290,7 @@ class RaceSpotter extends RaceAssistant {
 				try {
 					lastLap := knowledgeBase.getValue("Lap", 0)
 						
-					if (this.AnnouncementSettings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
+					if ((lastLap > 5) && this.AnnouncementSettings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 						
 						this.announceFinalLaps(lastLap)
@@ -305,9 +305,9 @@ class RaceSpotter extends RaceAssistant {
 						performanceUpdates := this.AnnouncementSettings["PerformanceUpdates"]
 						
 						if (performanceUpdates && (lastLap >= (this.iLastPerformanceUpdateLap + performanceUpdates))) {
-							this.updatePerformance(lastLap)
-						
 							this.iLastPerformanceUpdateLap := lastLap
+							
+							this.updatePerformance(lastLap)
 						}
 					}
 				}

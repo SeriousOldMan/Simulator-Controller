@@ -163,9 +163,9 @@ class RaceSpotter extends RaceAssistant {
 			
 			frontLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 			
-			difference := (positionInfo.HasKey("Front") ? (positionInfo["Front"].Delta - frontStandingsDelta) : false)
+			difference := Round(positionInfo.HasKey("Front") ? (positionInfo["Front"].Delta - frontStandingsDelta) : false, 1)
 			
-			positionInfo["Front"] := {Car: car, Delta: frontStandingsDelta, DeltaDifference: difference, LapTimeDifference: frontLapTime - driverLapTime}
+			positionInfo["Front"] := {Car: car, Delta: frontStandingsDelta, DeltaDifference: difference, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
 		}
 		
 		behindStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0)) / 1000, 1)
@@ -180,9 +180,9 @@ class RaceSpotter extends RaceAssistant {
 			
 			behindLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
 			
-			difference := (positionInfo.HasKey("Behind") ? (positionInfo["Behind"].Delta - behindStandingsDelta) : false)
+			difference := Round(positionInfo.HasKey("Behind") ? (positionInfo["Behind"].Delta - behindStandingsDelta) : false, 1)
 			
-			positionInfo["Behind"] := {Car: car, Delta: behindStandingsDelta, DeltaDifference: difference, LapTimeDifference: behindLapTime - driverLapTime}
+			positionInfo["Behind"] := {Car: car, Delta: behindStandingsDelta, DeltaDifference: difference, LapTimeDifference: Round(behindLapTime - driverLapTime, 1)}
 		}
 	}
 
@@ -224,23 +224,30 @@ class RaceSpotter extends RaceAssistant {
 		
 		if (positionInfo.HasKey("Front") && (positionInfo["Front"].DeltaDifference > 0)) {
 			delta := positionInfo["Front"].Delta
-			lapTimeDifference := Round(positionInfo["Behind"].LapTimeDifference, 1)
+			lapTimeDifference := positionInfo["Behind"].LapTimeDifference
 			
-			speaker.speakPhrase("GainedFront", {delta: Round(delta), gained: Round(positionInfo["Front"].DeltaDifference, 1), lapTime: lapTimeDifference})
+			if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {
+				speaker.speakPhrase((delta < 1) ? "GotHim" : "GainedFront", {delta: (delta > 5) ? Round(delta) : delta
+																		   , gained: positionInfo["Front"].DeltaDifference, lapTime: lapTimeDifference})
 			
-			if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference))
-				speaker.speakPhrase("CanDoIt")
-			else
+				if (delta >= 1)
+					speaker.speakPhrase("CanDoIt")
+			}
+			else {
+				speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : delta, gained: positionInfo["Front"].DeltaDifference, lapTime: lapTimeDifference})
+			
 				speaker.speakPhrase("CantDoIt")
+			}
 			
 			cheered := true
 		}
 		
 		if (positionInfo.HasKey("Behind") && (positionInfo["Behind"].DeltaDifference > 0)) {
-			speaker.speakPhrase("LostBehind", {delta: Round(positionInfo["Behind"].Delta), lost: Round(positionInfo["Behind"].DeltaDifference, 1)
-											 , lapTime: Round(positionInfo["Behind"].LapTimeDifference, 1)})
+			speaker.speakPhrase((delta < 1) ? "ClosingIn" : "LostBehind", {delta: (delta > 5) ? Round(positionInfo["Behind"].Delta): delta
+																		 , lost: positionInfo["Behind"].DeltaDifference
+																		 , lapTime: positionInfo["Behind"].LapTimeDifference})
 			
-			if !cheered
+			if (!cheered && (delta >= 1))
 				speaker.speakPhrase("Focus")
 		}
 	}
@@ -606,7 +613,7 @@ class RaceSpotter extends RaceAssistant {
 			
 			callback := ObjBindMethod(this, "updateDriver")
 			
-			SetTimer %callback%, -60000
+			SetTimer %callback%, -20000
 		}
 	
 		return result

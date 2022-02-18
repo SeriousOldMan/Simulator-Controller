@@ -48,6 +48,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
+	iImageMode := true
+	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 				 , "Change Brakes", "Front Brake", "Rear Brake", "Repair Suspension", "Repair Bodywork"]
@@ -412,13 +414,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
-				
-				if (update || !wasOpen) {
-					if this.updatePitStopState()
-						this.openPitstopMFD(false, false)
-					
-					SetTimer updatePitstopState, 5000
-				}
+			
+				if this.iImageMode
+					if (update || !wasOpen) {
+						if this.updatePitStopState()
+							this.openPitstopMFD(false, false)
+						
+						SetTimer updatePitstopState, 5000
+					}
 			}
 		}
 		else if !reported {
@@ -441,8 +444,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.sendPitstopCommand(this.ClosePitstopMFDHotkey)
 			
 				this.iPSIsOpen := false
-					
-				SetTimer updatePitstopState, Off
+				
+				if this.iImageMode
+					SetTimer updatePitstopState, Off
 			}
 		}
 		else if !reported {
@@ -466,6 +470,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
 			
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
+			
+			this.iImageMode := false
 			
 			this.activateACCWindow()
 			
@@ -835,7 +841,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		else {
 			this.iPSIsOpen := false
 			
-			SetTimer updatePitstopState, Off
+			if this.iImageMode
+				SetTimer updatePitstopState, Off
 		}
 		
 		return lastY

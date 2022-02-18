@@ -1287,9 +1287,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 		}
 		
-		if (result && this.RemoteHandler) {
+		if (result && this.RemoteHandler)
 			this.RemoteHandler.pitstopPlanned(pitstopNumber, plannedLap)
-		}
 		
 		return result
 	}

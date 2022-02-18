@@ -1,16 +1,16 @@
 [Development]
-Version=3.9.0-release
-Target=3.9.0-release
+Version=3.9.1-release
+Target=3.9.1-release
 Date=02/18/2022
-Download=https://cntr.click/dWSqF3q
+Download=https://cntr.click/XvAN9vj
 Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration, Bugfix for ACC image search fallback algorithm
 [Release]
-Version=3.9.0-release
+Version=3.9.1-release
 Date=02/18/2022
-Download=https://cntr.click/dWSqF3q
+Download=https://cntr.click/XvAN9vj
 Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration, Bugfix for ACC image search fallback algorithm
 [Current]
 Type=Release
 [Version]
-Release=3.9.0-release
-Development=3.9.0-release
+Release=3.9.1-release
+Development=3.9.1-release

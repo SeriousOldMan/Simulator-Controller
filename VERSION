@@ -1,16 +1,16 @@
 [Development]
-Version=3.9.0-rc1
+Version=3.9.0-release
 Target=3.9.0-release
-Date=02/17/2022
-Download=https://www.dropbox.com/s/i1odzkle687redu/Simulator%20Controller%203.9.0-rc1.zip?dl=1
-Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration
+Date=02/18/2022
+Download=https://cntr.click/dWSqF3q
+Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration, Bugfix for ACC image search fallback algorithm
 [Release]
-Version=3.8.8-release
-Date=02/11/2022
-Download=https://cntr.click/jtWPQ7s
-Changes=Spotter implementation for iRacing, Automobilista 2 and RaceRoom Racing Experience, New InformationRequest Action for Jona and Cato to request the current time, Spotter improvements: Yellow flag handling, Blue flag handling, Pit window warnings, Improved handling in Race Reports when drivers leave before the end of the session, Start grid positions in Race Reports, Falbback for ACC Pitstop MFD control when image recognition fails, Improved fuel requirements calculation in strategy development
+Version=3.9.0-release
+Date=02/18/2022
+Download=https://cntr.click/dWSqF3q
+Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration, Bugfix for ACC image search fallback algorithm
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.8.8-release
-Development=3.9.0-rc1
+Release=3.9.0-release
+Development=3.9.0-release

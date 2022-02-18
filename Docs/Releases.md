@@ -1,4 +1,4 @@
-## 3.9.0-release 02/18/22 (planned)
+## 3.9.0-release 02/18/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -9,6 +9,7 @@
   7. Introduced new tyre compound types (colors) in all applications. Yellow, Green, Soft, Medium and Hard compounds are now supported, when the corresponding simulation supports them.
   8. The Race Spotter can now be fully configured with regards to the issued warnings and announcements. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
   9. Import of cold tyre pressures is now supported for iRacing in "Race Settings" and the Race Assistants.
+  10. Fixed a bug in the new image search fallback algorithm for the ACC Pitstop control, where the data input took almost a minute.
 
 ## 3.8.8-release 02/11/22
 

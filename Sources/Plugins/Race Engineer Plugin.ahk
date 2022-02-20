@@ -172,9 +172,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 	
-	addLap(lapNumber, dataFile, telemetryData, positionsData) {
-		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
-		
+	checkPitstopPlan() {
 		if (this.TeamSession && this.RaceEngineer) {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
 			
@@ -198,6 +196,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
+	}
+	
+	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+		
+		this.checkPitstopPlan()
+	}
+	
+	updateLap(lapNumber, dataFile) {
+		base.updateLap(lapNumber, dataFile)
+		
+		this.checkPitstopPlan()
 	}
 	
 	requestInformation(arguments*) {

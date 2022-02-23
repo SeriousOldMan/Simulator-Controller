@@ -51,17 +51,80 @@ global kCancel = "cancel"
 ;;;-------------------------------------------------------------------------;;;
 
 class SetupAdvisor extends ConfigurationItem {
+	iDebug := kDebugOff
 	
-	createKnowledgeBase(facts, simulatorRules) {
+	iSelectedSimulator := false
+	iSelectedCar := false
+	iSelectedTrack := false
+	iSelectedWeather := "Dry"
+	
+	iKnowledgeBase := false
+	
+	Debug[option] {
+		Get {
+			return (this.iDebug & option)
+		}
+	}
+	
+	SelectedSimulator[] {
+		Get {
+			return this.iSelectedSimulator
+		}
+	}
+	
+	SelectedCar[] {
+		Get {
+			return this.iSelectedCar
+		}
+	}
+	
+	SelectedTrack[] {
+		Get {
+			return this.iSelectedTrack
+		}
+	}
+	
+	SelectedWeather[] {
+		Get {
+			return this.iSelectedWeather
+		}
+	}
+	
+	KnowledgeBase[] {
+		Get {
+			return this.iKnowledgeBase
+		}
+	}
+	
+	setDebug(option, enabled) {
+		if enabled
+			this.iDebug := (this.iDebug | option)
+		else if (this.Debug[option] == option)
+			this.iDebug := (this.iDebug - option)
+	}
+	
+	loadRules(definition, ByRef productions, ByRef reductions) {
 		local rules
 		
-		FileRead rules, % kResourcesDirectory . "Advisor\Setup Advisor.rules"
+		FileRead rules, % kResourcesDirectory . "Advisor\Rules\Setup Advisor.rules"
 		
 		productions := false
 		reductions := false
 
-		new RuleCompiler().compileRules(rules, productions, reductions)
+		compiler := new RuleCompiler()
 		
+		compiler.compileRules(rules, productions, reductions)
+		
+		fileName := substituteVariables(getConfigurationValue(definition, "Simulator", "Rules", ""))
+		
+		if (fileName && (fileName != "")) {
+			FileRead rules, %fileName%
+			
+			compiler.compileRules(rules, productions, reductions)
+		}
+	}
+	
+	createKnowledgeBase(facts, productions, reductions) {
 		engine := new RuleEngine(productions, reductions, facts)
 		
 		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
@@ -77,83 +140,16 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			this.iSelectedSimulator := simulator
 			
-			if !definition
-				definition := this.Definition
+			definition := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
 			
-			this.iKnowledgeBase := this.createKnowledgeBase({})
+			productions := false
+			reductions := false
+		
+			this.loadRules(definition, productions, reductions)
 			
-			this.iSteps := {}
-			this.iStep := 0
-			this.iPage := 0
+			this.iKnowledgeBase := this.createKnowledgeBase({}, productions, reductions)
 			
-			count := 0
-			
-			for descriptor, step in getConfigurationSectionValues(definition, "Setup.Steps") {
-				descriptor := ConfigurationItem.splitDescriptor(descriptor)
-			
-				stepWizard := this.StepWizards[step]
-				
-				if stepWizard {
-					this.Steps[step] := stepWizard
-					this.Steps[descriptor[2]] := stepWizard
-					this.Steps[stepWizard] := descriptor[2]
-				
-					count := Max(count, descriptor[2])
-				}
-			}
-			
-			Loop %count% {
-				step := this.Steps[A_Index]
-			
-				vProgressCount += 2
-				
-				showProgress({progress: vProgressCount})
-			
-				if step {
-					stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
-					
-					setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
-					
-					step.loadDefinition(definition, getConfigurationValue(definition, "Setup." . step.Step, step.Step . ".Definition", Object()))
-				}
-			}
-			
-			this.iCount := count
-			
-			if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-				title := translate("Setup")
-				MsgBox 262436, %title%, % translate("Do you really want to start with a fresh configuration?")
-				OnMessage(0x44, "")
-				
-				IfMsgBox Yes
-					initialize := true
-				else
-					initialize := false
-			}
-			else
-				initialize  := false
-
-			showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
-			
-			if initialize {
-				for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
-					try {
-						FileDelete %kUserHomeDirectory%Setup\%fileName%
-					}
-					catch exception {
-						; ignore
-					}
-				
-				this.KnowledgeBase.addFact("Initialize", true)
-			}
-			else if !this.loadKnowledgeBase()
-				this.KnowledgeBase.addFact("Initialize", true)
-			
-			if isDebug()
-				Sleep 1000
-
-			showProgress({progress: ++vProgressCount, message: translate("Starting AI kernel...")})
+			this.KnowledgeBase.addFact("Initialize", true)
 				
 			this.KnowledgeBase.produce()
 						

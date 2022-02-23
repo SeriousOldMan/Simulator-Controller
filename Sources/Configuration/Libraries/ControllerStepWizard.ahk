@@ -213,6 +213,8 @@ class ControllerStepWizard extends StepWizard {
 	}
 	
 	hidePage(page) {
+		local function
+		
 		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 		
@@ -230,7 +232,18 @@ class ControllerStepWizard extends StepWizard {
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
 		
-		if (LV_GetCount() != this.iFunctionTriggers.Count()) {
+		streamDeckFunctions := 0
+		
+		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+			controller := ConfigurationItem.splitDescriptor(controller)
+		
+			if ((controller[2] != "Layout") && (controller[2] != "Visible")) 
+				for ignore, function in string2Values(";", definition)
+					if (function != "")
+						streamDeckFunctions += 1
+		}
+		
+		if ((LV_GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count()) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 			title := translate("Warning")
 			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")

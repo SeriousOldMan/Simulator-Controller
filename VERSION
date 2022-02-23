@@ -1,9 +1,9 @@
 [Development]
 Version=3.9.2-dev
 Target=3.9.2-release
-Date=02/20/2022
+Date=02/23/2022
 Download=
-Changes=Pitstop settings are synchronized in Race Center every 10 seconds now
+Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, Fixed a crash when using ICON instead of JPEG or PNG files for icons in Stream Deck
 [Release]
 Version=3.9.1-release
 Date=02/18/2022

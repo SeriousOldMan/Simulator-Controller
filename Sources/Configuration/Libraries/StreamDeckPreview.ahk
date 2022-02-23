@@ -317,7 +317,7 @@ class StreamDeckPreview extends ControllerPreview {
 		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
-			Menu ControMenu, DeleteAll
+			Menu MainMenu, DeleteAll
 		}
 		catch exception {
 			; ignore
@@ -327,9 +327,9 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		Gui %window%:Default
 		
-		Menu ControMenu, Add, %menuItem%, controlMenuIgnore
-		Menu ControMenu, Disable, %menuItem%
-		Menu ControMenu, Add
+		Menu MainMenu, Add, %menuItem%, controlMenuIgnore
+		Menu MainMenu, Disable, %menuItem%
+		Menu MainMenu, Add
 		
 		try {
 			Menu ControlMenu, DeleteAll
@@ -376,6 +376,9 @@ class StreamDeckPreview extends ControllerPreview {
 				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
 				Menu %menu%, Add, %count%, %handler%
 				
+				if (count = ConfigurationItem.splitDescriptor(element[2])[2])
+					Menu %menu%, Check, %count%
+				
 				count += 1
 			}
 		
@@ -387,7 +390,7 @@ class StreamDeckPreview extends ControllerPreview {
 		
 		label := translate("Button")
 		
-		Menu ControMenu, Add, %label%, :ControlMenu
+		Menu MainMenu, Add, %label%, :ControlMenu
 		
 		button := this.getButton(row, column)
 		
@@ -500,10 +503,10 @@ class StreamDeckPreview extends ControllerPreview {
 			
 			label := translate("Display")
 			
-			Menu ControMenu, Add, %label%, :DisplayMenu
+			Menu MainMenu, Add, %label%, :DisplayMenu
 		}
 
-		Menu ControMenu, Show
+		Menu MainMenu, Show
 	}
 }
 

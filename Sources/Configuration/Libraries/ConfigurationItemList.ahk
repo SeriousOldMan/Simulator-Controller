@@ -279,6 +279,8 @@ class ConfigurationItemList extends ConfigurationItem {
 	deleteItem() {
 		this.ItemList.RemoveAt(this.CurrentItem)
 		
+		this.CurrentItem := 0
+		
 		this.loadList(this.ItemList)
 		
 		this.clearEditor()

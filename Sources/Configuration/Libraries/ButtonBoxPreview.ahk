@@ -469,7 +469,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
-			Menu ControMenu, DeleteAll
+			Menu ControlMenu, DeleteAll
 		}
 		catch exception {
 			; ignore
@@ -479,9 +479,9 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		Gui %window%:Default
 		
-		Menu ControMenu, Add, %menuItem%, controlMenuIgnore
-		Menu ControMenu, Disable, %menuItem%
-		Menu ControMenu, Add
+		Menu MainMenu, Add, %menuItem%, controlMenuIgnore
+		Menu MainMenu, Disable, %menuItem%
+		Menu MainMenu, Add
 		
 		try {
 			Menu ControlMenu, DeleteAll
@@ -500,6 +500,9 @@ class ButtonBoxPreview extends ControllerPreview {
 			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, control)
 		
 			Menu ControlMenu, Add, %control%, %handler%
+				
+			if (control = ConfigurationItem.splitDescriptor(element[2])[1])
+				Menu ControlMenu, Check, %control%
 		}
 		
 		if !isEmpty {
@@ -535,6 +538,9 @@ class ButtonBoxPreview extends ControllerPreview {
 				Loop 10 {
 					handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
 					Menu %menu%, Add, %count%, %handler%
+				
+					if (count = ConfigurationItem.splitDescriptor(element[2])[2])
+						Menu %menu%, Check, %count%
 					
 					count += 1
 				}
@@ -548,7 +554,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		
 		label := translate("Control")
 		
-		Menu ControMenu, Add, %label%, :ControlMenu
+		Menu MainMenu, Add, %label%, :ControlMenu
 		
 		if !isEmpty {
 			try {
@@ -572,10 +578,10 @@ class ButtonBoxPreview extends ControllerPreview {
 			
 			label := translate("Label")
 			
-			Menu ControMenu, Add, %label%, :LabelMenu
+			Menu MainMenu, Add, %label%, :LabelMenu
 		}
 
-		Menu ControMenu, Show
+		Menu MainMenu, Show
 	}
 }
 

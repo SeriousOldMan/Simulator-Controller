@@ -45,15 +45,28 @@ namespace SimulatorControllerPlugin
                     await this.ControllerFunction.Connection.SetImageAsync((String)null, null, true);
                 else
                     using (MemoryStream m = new MemoryStream()) {
-                        var image = Image.FromFile(path);
-                        var raw = image.RawFormat;
+                        Image image = Image.FromFile(path);
+                        ImageFormat raw = image.RawFormat;
                         string mimeType = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == raw.Guid).MimeType;
+                        string base64String;
 
-                        image.Save(m, raw);
+                        if (mimeType.CompareTo("image/x-icon") == 0)
+                        {
+                            image.Save(m, ImageFormat.Bmp);
 
-                        byte[] imageBytes = m.ToArray();
+                            byte[] bytes = m.ToArray();
 
-                        string base64String = Convert.ToBase64String(imageBytes);
+                            base64String = Convert.ToBase64String(bytes);
+                            mimeType = "image/x-bmp";
+                        }
+                        else
+                        {
+                            image.Save(m, raw);
+
+                            byte[] imageBytes = m.ToArray();
+
+                            base64String = Convert.ToBase64String(imageBytes);
+                        }
 
                         await this.ControllerFunction.Connection.SetImageAsync("data:" + mimeType + ";base64," + base64String);
                     }

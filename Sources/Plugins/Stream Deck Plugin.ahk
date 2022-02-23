@@ -328,6 +328,9 @@ class StreamDeck extends FunctionController {
 	}
 	
 	setControlLabel(function, text, color := "Black", overlay := false) {
+		if !IsObject(function)
+			function := this.Controller.findFunction(function)
+		
 		if (this.isRunning() && this.hasFunction(function)) {
 			actions := this.Actions[function]
 			icon := false
@@ -359,6 +362,9 @@ class StreamDeck extends FunctionController {
 	}
 	
 	setControlIcon(function, icon) {
+		if !IsObject(function)
+			function := this.Controller.findFunction(function)
+		
 		if (this.isRunning() && this.hasFunction(function)) {
 			if (!icon || (icon = ""))
 				icon := "clear"

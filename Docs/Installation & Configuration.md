@@ -498,7 +498,7 @@ As you have seen before, you can define in the layout editor for every button wh
 
 You can select with the drop down menu in the upper area, whether the exceptions apply to the currently edited Stream Deck layout from the "Layouts" list or whether they might apply to all Stream Deck layouts.
 
-Please note, that the order of rules applied goes from the most specific rules for 1. button and icon specific exceptions for a given layout, over 2. icon, but not button specific exceptions for a given layout to 3. layout unspefific exceptions for a given icon. Sorry for that complexity, probably you will never use this stuff, but it's good that it's there, if you may ever need it.
+Please note, that the order of rules applied goes from the most specific rules for 1. button and icon specific exceptions for a given layout, over 2. icon, but not button specific exceptions for a given layout to 3. layout unspecific exceptions for a given icon. Sorry for that complexity, probably you will never use this stuff, but it's good that it's there, if you may ever need it.
 
 ## Action Labels & Icons
 

@@ -21,6 +21,10 @@ Release 3.9.2 Checklist
 =======================
 
 0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+2. Fix in Stream Deck Plugin
+   a. Mention re-install in Update Notes
 
 Release 3.9.0 Checklist
 =======================

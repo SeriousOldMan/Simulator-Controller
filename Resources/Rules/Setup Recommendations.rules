@@ -1,0 +1,36 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Generic Setup Recommendations   ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[?Curbs.Stability.Correction != 0] =>																											\
+		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),							\
+		(Prove: changeSetting(Damper.Rebound.Fast, [Front.Left, Front.Right], 0.5, ?Curbs.Stability.Correction)),								\
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Curbs.Stability.Correction)),										\
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),										\
+		(Prove: changeSetting(AntiRoolbar, [Front, Rear], -1, ?Curbs.Stability.Correction))
+
+[?Brake.LockUp.Correction != 0] =>																												\
+		(Prove: changeSetting(Electronics.ABS, 2, ?Brake.LockUp.Correction)),																	\
+		(Prove: changeSetting(Brake.Pressure, -1, ?Brake.LockUp.Correction))
+
+[?Brake.Straight.Performance.Correction != 0] =>																								\
+		(Prove: changeSetting(Electronics.ABS, -1, ?Brake.Straight.Performance.Correction)),													\
+		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right, Rear.Left, Rear.Right], 1, ?Brake.Straight.Performance.Correction)),	\
+		(Prove: changeSetting(Brake.Balance, -1, ?Brake.Straight.Performance.Correction))
+
+[?Brake.Straight.Stability.Correction != 0] =>																									\
+		(Prove: changeSetting(Brake.Balance, 1, ?Brake.Straight.Stability.Correction)),															\
+		(Prove: changeSetting(Damper.Slow, [Front.Left, Front.Right], -0.5, ?Brake.Straight.Stability.Correction)),								\
+		(Prove: changeSetting(Rebound.Slow, [Rear.Left, Rear.Right], 0.5, ?Brake.Straight.Stability.Correction))
+
+[?Speed.Straight.Correction != 0] =>																											\
+		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Speed.Straight.Correction)),																	\
+		(Prove: changeSetting(Aero.Height.Rear, -1, ?Speed.Straight.Correction))
+
+[?Speed.Corner.Fast.Correction != 0] =>																											\
+		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Speed.Corner.Fast.Correction)),																\
+		(Prove: changeSetting(Aero.Height.Rear, -1, ?Speed.Corner.Fast.Correction)),															\
+		(Prove: changeSetting(Aero.Height.Front, -1, ?Speed.Corner.Fast.Correction))

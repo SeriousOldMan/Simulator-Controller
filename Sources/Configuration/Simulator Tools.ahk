@@ -749,7 +749,7 @@ createShortcuts(location, installLocation) {
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 		
 		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
-						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration"]
+						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
 	else
@@ -776,7 +776,7 @@ deleteShortcuts(location) {
 	}
 	
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
-					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration"]
+					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
 		try {
 			FileDelete %location%\%name%.lnk
 		}
@@ -807,6 +807,7 @@ writeAppPaths(installLocation) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe, , %installLocation%\Binaries\Strategy Workbench.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe, , %installLocation%\Binaries\SetupAdvisor.exe
 }
 
 deleteAppPaths() {
@@ -821,6 +822,7 @@ deleteAppPaths() {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe
 }
 
 writeUninstallerInfo(installLocation) {
@@ -1392,6 +1394,16 @@ renewConsent() {
 		setConfigurationValue(consent, "General", "ReNew", true)
 		
 		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+	}
+}
+
+updateInstallationForV392() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		FileCreateShortCut %installLocation%\Binaries\Setup Advisor.exe, %A_StartMenu%\Simulator Controller\Setup Advisor.lnk, %installLocation%\Binaries
 	}
 }
 

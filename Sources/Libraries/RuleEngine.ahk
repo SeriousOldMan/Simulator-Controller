@@ -3059,8 +3059,11 @@ class RuleEngine {
 class RuleCompiler {
 	compile(fileName, ByRef productions, ByRef reductions, path := false) {
 		if !path {
-			productions := false
-			reductions := false
+			if !IsObject(productions)
+				productions := false
+			
+			if !IsObject(reductions)
+				reductions := false
 		}
 		
 		FileRead text, %fileName%
@@ -3071,8 +3074,11 @@ class RuleCompiler {
 	
 	compileRules(text, ByRef productions, ByRef reductions, path := false) {
 		if !path {
-			productions := []
-			reductions := []
+			if !IsObject(productions)
+				productions := []
+			
+			if !IsObject(reductions)
+				reductions := []
 		}
 		
 		incompleteLine := false

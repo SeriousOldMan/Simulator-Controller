@@ -1,0 +1,170 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Setup Advisor Rules             ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Global Trigger                              ;;;
+;;;                                                                         ;;;
+;;; Entry points for the surrounding script code. Typically, the rule       ;;;
+;;; will be triggered by setting a target fact and call "produce()" on the  ;;;
+;;; KnowledgeBase instance.                                                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;; This trigger must be called, after all dynamic setup rules have been    ;;;
+;;; added to the rule set.                                                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Initialize] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;; Setting this trigger recalulates all setting values for the current     ;;;
+;;; car characteristics.                                                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Calculate] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                      Characteristics Initialization                     ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 5, [?Initialize] => (Set: Characteristics.Count, 0)
+priority: -5, [?Initialize] => (Clear: Initialize)
+
+addCharacteristics([])
+addCharacteristics([?characteristic | ?characteristics]) <= addCharacteristic(?characteristic), addCharacteristics(?characteristics)
+
+addCharacteristic(?characteristic) <= addCharacteristic(?characteristic, !Characteristics.Count),												\
+									  Set(Characteristic, ?characteristic, Weight, 50),															\
+									  Set(Characteristic, ?characteristic, Quality, 90)
+
+addCharacteristic(?characteristic, ?index) <= Set(Characteristic, ?index, ?characteristic),														\
+											  ?next = ?index + 1, Set(Characteristics.Count, ?next)
+
+allCharacteristics(?characteristics) <= allCharacteristics(?characteristics, !Characteristics.Count)
+
+allCharacteristics([], 0)
+allCharacteristics([?characteristic | ?characteristics], ?index) <= Get(Characteristic, ?index, ?characteristic), ?next = ?index - 1, 			\
+																	allCharacteristics(?characteristics, ?next)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Settings Initialization                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 5, [?Initialize] => (Set: Settings.Count, 0)
+priority: -5, [?Initialize] => (Clear: Initialize)
+
+addSettings([])
+addSettings([?setting | ?settings]) <= addSetting(?setting), addSettings(?settings)
+
+addSetting(?setting) <= addSetting(?setting, !Settings.Count), Set(Setting, ?setting, Value, 0)
+
+addSetting(?setting, ?index) <= Set(Setting, ?index, ?setting), ?next = ?index + 1, Set(Settings.Count, ?next)
+
+allSettings(?characteristics) <= allSettings(?characteristics, !Settings.Count)
+
+allSettings([], 0)
+allSettings([?setting | ?settings], ?index) <= Get(Settings, ?index, ?setting), ?next = ?index - 1, allSettings(?settings, ?next)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Simulator Configuration                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 5, [?Initialize] => (Set: Simulator.Count, 0),																						\
+							  (Set: Environment.Simulator, *), (Set: Environment.Car, *), (Set: Environment.Track, *)
+
+addSimulator(?simulator) <= addSimulator(?simulator, !Simulator.Count)
+
+addSimulator(?simulator, ?count) <= Set(Simulator, ?count, ?simulator),																			\
+									?next = ?count + 1, Set(Simulator.Count, ?next)
+
+addCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),														\
+												   addCharacteristics(?simulator, ?car, ?track, ?characteristics)
+		
+addCharacteristics(?, ?, ?, [])
+addCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=															\
+		addCharacteristic(?simulator, ?car, ?track, ?characteristic), addCharacteristics(?simulator, ?car, ?track, ?characteristics)
+
+addCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?simulator, ?car, ?track, Characteristic, ?characteristic, Active, true)
+
+characteristicActive(?simulator, ?car, ?track, ?characteristic, ?active) <=																		\
+		Append(?simulator, ., ?car, ., ?track, .Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+characteristicActive(?simulator, ?car, ?, ?characteristic, ?active) <=																			\
+		Append(?simulator, ., ?car, .*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+characteristicActive(?simulator, ?, ?, ?characteristic, ?active) <=																				\
+		Append(?simulator, .*.*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+characteristicActive(?, ?, ?, ?characteristic, ?active) <=																						\
+		Append(*.*.*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+characteristicActive(?, ?, ?, ?, false)
+
+addSettings(?simulator, ?car, *) <= allSettings(?settings), addSettings(?simulator, ?car, ?settings)
+		
+addSettings(?, ?, [])
+addSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
+		addSetting(?simulator, ?car, ?setting), addCharacteristics(?simulator, ?car, ?settings)
+
+addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
+
+settingActive(?simulator, ?car, ?setting, ?active) <=																							\
+		Append(?simulator, ., ?car, .Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+settingActive(?simulator, ?car, ?setting, ?active) <=																							\
+		Append(?simulator, ., ?car, .Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+settingActive(?simulator, ?, ?setting, ?active) <=																								\
+		Append(?simulator, .*.Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+settingActive(?, ?, ?setting, ?active) <=																										\
+		Append(*.*.*.Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+settingActive(?, ?, ?, ?, false)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                           Settings Calculation                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+priority: 5, [?Calculate] => (Prove: resetSettings())
+[?Calculate] => (Prove: updateCharacteristics()), (Prove: calculateSettings()), (Prove: balanceSettings())
+priority: -5, [?Calculate] => (Clear: Calculate)
+
+resetSettings() <= resetSettings(!Settings.Count)
+
+resetSettings(0) <= !
+resetSettings(?index) <= Get(Setting, ?index, ?setting), Set(Setting, ?setting, Value, 0), ?nIndex = ?index - 1, resetSettings(?nIndex)
+
+updateCharacteristics() <= updateCharacteristics(!Environemnt.Simulator, !Environment.Car, !Environment.Track, !Characteristics.Count)
+
+updateCharacteristics(?, ?, ?, 0) <= !
+updateCharacteristics(?simulator, ?car, ?track, ?index) <=																						\
+		Get(Characteristic, ?index, ?characteristic), updateCharacteristic(?simulator, ?car, ?track, ?characteristic)							\
+		?nIndex = ?index - 1, updateCharacteristics(?simulator, ?car, ?track, ?nIndex)
+
+updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <=																				\
+		characteristicActive(?simulator, ?car, ?track, ?characteristic), !,																		\
+		Get(?characteristic, Weight, ?weight), Get(?characteristic, Value, ?value),																\
+		?factor = ?weight / 100, ?cValue = 100 - ?value, ?correction = ?cValue * ?factor, ?nCorrection = ?correction / 100,						\
+		Set(?characteristic, Correction, ?nCorrection)
+updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?characteristic, Correction, 0)
+
+changeSetting(?setting, ?increment, ?correction) <= Get(?setting, Value, ?value), ?delta = ?increment * ?correction,							\
+													?nValue = ?value + ?delta, Set(?setting, Value, ?nValue)
+
+changeSetting(?, [], ?, ?)
+changeSetting(?setting, [?suffix | ?suffixes], ?increment, ?correction) <=																		\
+		Append(?setting, ., ?suffix, ?name), changeSetting(?name, ?increment, ?correction),														\
+		changeSetting(?setting, ?suffixes, ?increment, ?correction)
+		
+
+;;;-------------------------------------------------------------------------;;;
+;;;                               Utility Rules                             ;;;
+;;;-------------------------------------------------------------------------;;;
+
+bound?(?x) <= unbound?(?x), !, fail
+bound?(?)
+
+member?(?value, [?value | ?])
+member?(?value, [? | ?tail]) <= member?(?value, ?tail)

@@ -420,7 +420,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
 						
-						SetTimer updatePitstopState, 5000
+						if this.iPSIsOpen
+							SetTimer updatePitstopState, 5000
 					}
 			}
 		}
@@ -445,8 +446,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 				this.iPSIsOpen := false
 				
-				if this.iImageMode
-					SetTimer updatePitstopState, Off
+				SetTimer updatePitstopState, Off
 			}
 		}
 		else if !reported {
@@ -472,6 +472,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
 			this.iImageMode := false
+			
+			SetTimer updatePitstopState, Off
 			
 			this.activateACCWindow()
 			
@@ -841,8 +843,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		else {
 			this.iPSIsOpen := false
 			
-			if this.iImageMode
-				SetTimer updatePitstopState, Off
+			SetTimer updatePitstopState, Off
 		}
 		
 		return lastY
@@ -1238,27 +1239,32 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lastY := 0
 			images := []
 			
-			if (fromTimer || !this.iPSImageSearchArea)
-				lastY := this.searchPitstopLabel(images)
-			
-			if (!fromTimer && this.iPSIsOpen) {
-				reload := this.searchStrategyLabel(lastY, images)
+			try {
+				if (fromTimer || !this.iPSImageSearchArea)
+					lastY := this.searchPitstopLabel(images)
 				
-				; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
-				
-				reload := (this.searchTyreLabel(lastY, images) || reload)
-				
-				reload := (this.searchBrakeLabel(lastY, images) || reload)
-	
-				reload := (this.searchDriverLabel(lastY, images) || reload)
-				
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
-				
-				if isDebug()
-					showMessage("Found images: " . values2String(", ", images*), "Pitstop MFD Image Search", "Information.png", 5000)
-				
-				return reload
+				if (!fromTimer && this.iPSIsOpen) {
+					reload := this.searchStrategyLabel(lastY, images)
+					
+					; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
+					
+					reload := (this.searchTyreLabel(lastY, images) || reload)
+					
+					reload := (this.searchBrakeLabel(lastY, images) || reload)
+		
+					reload := (this.searchDriverLabel(lastY, images) || reload)
+					
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Complete update of pitstop state took ") . A_TickCount - beginTickCount . translate(" ms"))
+					
+					if isDebug()
+						showMessage("Found images: " . values2String(", ", images*), "Pitstop MFD Image Search", "Information.png", 5000)
+					
+					return reload
+				}
+			}
+			catch exception {
+				this.iPSOpen := false
 			}
 		}
 		

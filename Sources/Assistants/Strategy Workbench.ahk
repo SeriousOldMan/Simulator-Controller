@@ -276,7 +276,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 	
-	__New(simulator := false, car := false, track := false, duration := false, weather := false, airTemperature := false, trackTemperature := false
+	__New(simulator := false, car := false, track := false, weather := false, airTemperature := false, trackTemperature := false
 		, compound := false, compoundColor := false) {
 		this.iSelectedSimulator := simulator
 		this.iSelectedCar := car
@@ -2285,7 +2285,6 @@ runStrategyWorkbench() {
 	simulator := "Assetto Corsa Competizione"
 	car := false
 	track := false
-	duration := false
 	weather := "Dry"
 	airTemperature := 23
 	trackTemperature:= 27
@@ -2304,9 +2303,6 @@ runStrategyWorkbench() {
 				index += 2
 			case "-Track":
 				track := A_Args[index + 1]
-				index += 2
-			case "-Duration":
-				duration := A_Args[index + 1]
 				index += 2
 			case "-Weather":
 				weather := A_Args[index + 1]
@@ -2336,7 +2332,7 @@ runStrategyWorkbench() {
 	current := fixIE(11)
 	
 	try {
-		workbench := new StrategyWorkbench(simulator, car, track, duration, weather, airTemperature, trackTemperature
+		workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature
 										 , compound, compoundColor, map, tc, abs)
 		
 		workbench.createGui(workbench.Configuration)

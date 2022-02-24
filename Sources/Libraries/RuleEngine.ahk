@@ -2374,16 +2374,16 @@ class KnowledgeBase {
 			this.deregisterRuleFacts(rule)
 	}
 	
-	setValue(fact, value) {
-		this.Facts.setValue(fact, value)
+	setValue(fact, value, propagate := false) {
+		this.Facts.setValue(fact, value, propagate)
 	}
 
 	getValue(fact, default := "__NotInitialized__") {
 		return this.Facts.getValue(fact, default)
 	}
 	
-	setFact(fact, value) {
-		this.Facts.setFact(fact, value)
+	setFact(fact, value, propagate := false) {
+		this.Facts.setFact(fact, value, propagate)
 	}
 	
 	clearFact(fact) {
@@ -2526,7 +2526,7 @@ class Facts {
 			Throw "Subclassing of Facts is not allowed..."
 	}
 	
-	setValue(fact, value) {
+	setValue(fact, value, propagate := false) {
 		if (value == kNotInitialized)
 			this.clearFact(fact)
 		else
@@ -2534,7 +2534,7 @@ class Facts {
 				if (this.RuleEngine.TraceLevel <= kTraceMedium)
 					this.RuleEngine.trace(kTraceMedium, "Setting fact " . fact . " to " . value)
 				
-				if (this.iFacts[fact] != value) {
+				if ((this.iFacts[fact] != value) || propagate) {
 					this.iGeneration += 1
 					
 					this.iFacts[fact] := value
@@ -2559,9 +2559,9 @@ class Facts {
 		return (facts.HasKey(fact) ? facts[fact] : default)
 	}
 	
-	setFact(fact, value) {
+	setFact(fact, value, propagate := false) {
 		if this.hasFact(fact)
-			this.setValue(fact, value)
+			this.setValue(fact, value, propagate)
 		else
 			this.addFact(fact, value)
 	}

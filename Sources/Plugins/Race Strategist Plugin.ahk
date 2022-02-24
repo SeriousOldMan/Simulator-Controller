@@ -122,9 +122,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 	
-	addLap(lapNumber, dataFile, telemetryData, positionsData) {
-		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
-		
+	checkStrategy() {
 		if (this.TeamSession && this.RaceStrategist) {
 			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
 			
@@ -150,6 +148,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					}
 			}
 		}
+	}
+	
+	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+		
+		this.checkStrategy()
+	}
+	
+	updateLap(lapNumber, dataFile) {
+		base.updateLap(lapNumber, dataFile)
+		
+		this.checkStrategy()
 	}
 	
 	requestInformation(arguments*) {

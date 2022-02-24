@@ -1928,10 +1928,15 @@ runCleanTargets(ByRef buildProgress) {
 				try {
 					Loop Files, *.*, FDR
 					{
-						if InStr(FileExist(A_LoopFilePath), "D")
-							FileRemoveDir %A_LoopFilePath%, 1
-						else
-							FileDelete %A_LoopFilePath%
+						try {
+							if InStr(FileExist(A_LoopFilePath), "D")
+								FileRemoveDir %A_LoopFilePath%, 1
+							else
+								FileDelete %A_LoopFilePath%
+						}
+						catch exception {
+							; ignore
+						}
 					
 						if !kSilentMode
 							showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})

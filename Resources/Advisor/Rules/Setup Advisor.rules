@@ -29,11 +29,14 @@
 ; [?Calculate] => ...
 
 
+priority: -5, [?Initialize] => (Clear: Initialize)
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                      Characteristics Initialization                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -5, [?Initialize] => (Clear: Initialize)
+priority: 5, {All: [?Initialize], {None: [?Characteristics.Count]}} => (Set: Characteristics.Count, 0)
 
 addCharacteristics([])
 addCharacteristics([?characteristic | ?characteristics]) <= addCharacteristic(?characteristic), addCharacteristics(?characteristics)
@@ -53,7 +56,7 @@ allCharacteristics([?characteristic | ?characteristics], ?index) <= Get(Characte
 ;;;                         Settings Initialization                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: -5, [?Initialize] => (Clear: Initialize)
+priority: 5, {All: [?Initialize], {None: [?Settings.Count]}} => (Set: Settings.Count, 0)
 
 addSettings([])
 addSettings([?setting | ?settings]) <= addSetting(?setting), addSettings(?settings)

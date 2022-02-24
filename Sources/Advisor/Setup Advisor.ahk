@@ -74,6 +74,8 @@ global weatherDropDown
 
 global settingsViewer
 
+global characteristicsButton
+
 class SetupAdvisor extends ConfigurationItem {
 	iDebug := kDebugOff
 
@@ -267,7 +269,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 482, W: 482, Height: 439, H: 439}
 		
-		Gui %window%:Add, Button, x418 yp-24 w80 h23 gchooseCharacteristic, % translate("Describe...")
+		Gui %window%:Add, Button, x418 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Describe...")
 		
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -302,7 +304,16 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	getSimulators() {
-		return ["Assetto Corsa Competizione"]
+		simulators := []
+		
+		Loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
+		{
+			SplitPath, A_LoopFileName, , , , simulator
+			
+			simulators.Push(simulator)
+		}
+		
+		return simulators
 	}
 	
 	dumpKnowledge(knowledgeBase) {
@@ -352,6 +363,13 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 	}
 	
+	updateState() {
+		if (this.SelectedCharacteristics.Length() < 6)
+			GuiControl Enable, characteristicsButton
+		else
+			GuiControl Disable, characteristicsButton
+	}
+	
 	loadRules(definition, ByRef productions, ByRef reductions) {
 		local rules
 		
@@ -396,7 +414,8 @@ class SetupAdvisor extends ConfigurationItem {
 					
 						this.Characteristics.Push(characteristic)
 						
-						Sleep 100
+						if !isDebug()
+							Sleep 100
 					}
 				}
 				else {
@@ -408,7 +427,8 @@ class SetupAdvisor extends ConfigurationItem {
 					
 					this.Characteristics.Push(characteristic)
 						
-					Sleep 100
+					if !isDebug()
+						Sleep 100
 				}
 			}
 	}
@@ -436,7 +456,8 @@ class SetupAdvisor extends ConfigurationItem {
 					
 						this.Settings.Push(setting)
 						
-						Sleep 100
+						if !isDebug()
+							Sleep 100
 					}
 				}
 				else {
@@ -448,7 +469,8 @@ class SetupAdvisor extends ConfigurationItem {
 					
 					this.Settings.Push(setting)
 						
-					Sleep 100
+					if !isDebug()
+						Sleep 100
 				}
 			}
 	}
@@ -487,7 +509,9 @@ class SetupAdvisor extends ConfigurationItem {
 			
 				this.loadRules(definition, productions, reductions)
 				
-				this.iKnowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+				knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+				
+				this.iKnowledgeBase := knowledgeBase
 							
 				if this.Debug[kDebugRules]
 					this.dumpRules(this.KnowledgeBase)
@@ -501,18 +525,18 @@ class SetupAdvisor extends ConfigurationItem {
 					Sleep 5
 				}
 				
-				this.KnowledgeBase.addFact("Initialize", true)
+				knowledgeBase.addFact("Initialize", true)
 					
-				this.KnowledgeBase.produce()
+				knowledgeBase.produce()
 				
-				this.KnowledgeBase.setFact("Environment.Simulator", simulator)
+				knowledgeBase.setFact("Environment.Simulator", simulator)
 				
-				this.KnowledgeBase.addFact("Calculate", true)
+				knowledgeBase.addFact("Calculate", true)
 					
-				this.KnowledgeBase.produce()
+				knowledgeBase.produce()
 							
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledge(knowledgeBase)
 				
 				this.updateRecommendations()
 				
@@ -568,7 +592,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 			x := x + 25
 			
-			Gui %window%:Add, Text, x%X% y%Y% w250 h26 HWNDlabel1, % characteristicLabels[characteristic]
+			Gui %window%:Add, Text, x%X% y%Y% w350 h26 HWNDlabel1, % characteristicLabels[characteristic]
 			
 			x := x - 25
 			
@@ -602,6 +626,8 @@ class SetupAdvisor extends ConfigurationItem {
 			callback := Func("initializeSlider").Bind(slider1, 0, slider2, 0)
 			
 			SetTimer %callback%, -50
+			
+			this.updateState()
 		}
 	}
 	
@@ -737,44 +763,57 @@ class SetupAdvisor extends ConfigurationItem {
 		window := this.Window
 		
 		Gui %window%:Default
-		
-		for ignore, characteristic in this.SelectedCharacteristics {
-			widgets := this.SelectedCharacteristicsWidgets[characteristic]
-		
-			GuiControlGet value1, , % widgets[1]
-			GuiControlGet value2, , % widgets[2]
+		Gui %window%:+Disabled
 			
-			knowledgeBase.setFact(characteristic . ".Weight", value1, true)
-			knowledgeBase.setFact(characteristic . ".Value", value2, true)
+		try {
+			for ignore, characteristic in this.SelectedCharacteristics {
+				widgets := this.SelectedCharacteristicsWidgets[characteristic]
+			
+				GuiControlGet value1, , % widgets[1]
+				GuiControlGet value2, , % widgets[2]
+				
+				knowledgeBase.setFact(characteristic . ".Weight", value1, true)
+				knowledgeBase.setFact(characteristic . ".Value", value2, true)
+			}
+			
+			knowledgeBase.addFact("Calculate", true)
+			
+			this.KnowledgeBase.produce()
+						
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledge(this.KnowledgeBase)
+			
+			settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
+			
+			if (settingsLabels.Count() == 0)
+				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels.EN", Object())
+				
+			html := ""
+			first := true
+			
+			for ignore, setting in this.Settings {
+				delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
+				
+				if delta is Number
+					if (delta != 0) {
+						if !first
+							html .= "<br>"
+						
+						first := false
+				
+						html .= ("Delta " . settingsLabels[setting] . " = " . Round(delta, 2))
+					}
+			}
+			
+			settingsViewer.Document.Open()
+			settingsViewer.Document.Write(html)
+			settingsViewer.Document.Close()
 		}
-		
-		knowledgeBase.addFact("Calculate", true)
-		
-		this.KnowledgeBase.produce()
-					
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
-		
-		html := ""
-		first := true
-		
-		for ignore, setting in this.Settings {
-			delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
-			
-			if delta is Number
-				if (delta != 0) {
-					if !first
-						html .= "<br>"
-					
-					first := false
-			
-					html .= ("Delta " . setting . " = " . Round(delta, 2))
-				}
+		finally {
+			Gui %window%:-Disabled
 		}
-		
-		settingsViewer.Document.Open()
-		settingsViewer.Document.Write(html)
-		settingsViewer.Document.Close()
+			
+		this.updateState()
 	}
 }
 

@@ -267,7 +267,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 482, W: 482, Height: 439, H: 439}
 		
-		Gui %window%:Add, Button, x418 yp-24 w80 h23 gchooseCharacteristic, % translate("Report...")
+		Gui %window%:Add, Button, x418 yp-24 w80 h23 gchooseCharacteristic, % translate("Describe...")
 		
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -626,6 +626,11 @@ class SetupAdvisor extends ConfigurationItem {
 				}
 			}
 			
+			widgets := this.SelectedCharacteristicsWidgets[characteristic]
+			
+			this.KnowledgeBase.clearFact(characteristic . ".Weight")
+			this.KnowledgeBase.clearFact(characteristic . ".Value")
+			
 			this.SelectedCharacteristics.RemoveAt(index)
 			this.SelectedCharacteristicsWidgets.Delete(characteristic)
 			
@@ -751,17 +756,20 @@ class SetupAdvisor extends ConfigurationItem {
 			this.dumpKnowledge(this.KnowledgeBase)
 		
 		html := ""
+		first := true
 		
-		for index, setting in this.Settings {
-			if (index > 1)
-				html .= "<br>"
-			
+		for ignore, setting in this.Settings {
 			delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 			
 			if delta is Number
-				delta := ((delta = 0) ? "0.00" : Round(delta, 2))
+				if (delta != 0) {
+					if !first
+						html .= "<br>"
+					
+					first := false
 			
-			html .= ("Delta " . setting . " = " . delta)
+					html .= ("Delta " . setting . " = " . Round(delta, 2))
+				}
 		}
 		
 		settingsViewer.Document.Open()

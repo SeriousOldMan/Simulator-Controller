@@ -10,7 +10,7 @@
 		(Prove: changeSetting(Damper.Rebound.Fast, [Front.Left, Front.Right], 0.5, ?Curbs.Stability.Correction)),								\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Curbs.Stability.Correction)),										\
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),										\
-		(Prove: changeSetting(AntiRoolbar, [Front, Rear], -1, ?Curbs.Stability.Correction))
+		(Prove: changeSetting(AntiRollbar, [Front, Rear], -1, ?Curbs.Stability.Correction))
 
 [?Brake.LockUp.Correction != 0] =>																												\
 		(Prove: changeSetting(Electronics.ABS, 2, ?Brake.LockUp.Correction)),																	\

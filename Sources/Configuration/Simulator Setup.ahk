@@ -2185,6 +2185,10 @@ restartSetup:
 		Sleep 5
 	}
 	
+	showProgress({progress: 100, message: translate("Finished...")})
+	
+	Sleep 1000
+	
 	hideSplashTheme()
 	hideProgress()
 	

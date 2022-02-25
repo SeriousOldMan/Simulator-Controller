@@ -18,4 +18,4 @@
 ;;;                         Setup Recommendations                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include %kResourcesDirectory%Advisor\Rules\Setup Recommendations.rules
+#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules

@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Math.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\SetupDatabase.ahk
 
@@ -103,6 +104,12 @@ class SetupAdvisor extends ConfigurationItem {
 	Window[] {
 		Get {
 			return "Advisor"
+		}
+	}
+	
+	SettingsViewer[] {
+		Get {
+			return settingsViewer
 		}
 	}
 	
@@ -301,7 +308,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 482, W: 482, Height: 439, H: 439}
 		
-		Gui %window%:Add, Button, x418 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Describe...")
+		Gui %window%:Add, Button, x418 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
 		
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -315,6 +322,8 @@ class SetupAdvisor extends ConfigurationItem {
 	
 		settingsViewer.Navigate("about:blank")
 		
+		this.showSettingsChart(false)
+		
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x8 y706 w1200 0x10
@@ -326,6 +335,94 @@ class SetupAdvisor extends ConfigurationItem {
 		window := this.Window
 			
 		Gui %window%:Show
+	}
+	
+	showSettingsChart(drawChartFunction) {
+		if this.SettingsViewer {
+			window := this.Window
+			
+			Gui %window%:Default
+			
+			this.SettingsViewer.Document.open()
+			
+			if (drawChartFunction && (drawChartFunction != "")) {
+				before =
+				(
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+							.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+							.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						</style>
+						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						<script type="text/javascript">
+							google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+				)
+
+				width := this.SettingsViewer.Width
+				height := (this.SettingsViewer.Height - 1)
+				
+				after =
+				(
+						</script>
+					</head>
+					<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+					</body>
+				</html>
+				)
+
+				this.SettingsViewer.Document.write(before . drawChartFunction . after)
+			}
+			else {
+				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			
+				this.SettingsViewer.Document.write(html)
+			}
+			
+			this.SettingsViewer.Document.close()
+		}
+	}
+	
+	showSettingsDeltas(settings) {
+		this.showSettingsChart(false)
+		
+		if (settings && (settings.Length() > 0)) {
+			drawChartFunction := "function drawChart() {"
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+			
+			names := []
+			values := []
+			
+			for ignore, setting in settings {
+				names.Push(setting[1])
+				values.Push(setting[2])
+			}
+			
+			max := Max(Abs(maximum(values)), Abs(minimum(values)))
+			
+			for index, value in values
+				values[index] := (value / max)
+			
+			/*
+			drawChartFunction .= "`n['" . values2String("', '", translate("Category"), names*) . "'],"
+			
+			drawChartFunction .= "`n['" . translate("Setting") . "'," . values2String(",", values*) . "]"
+			*/
+			
+			drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
+			
+			drawChartFunction .= "`n[" . values2String(",", values*) . "]"
+			
+			drawChartFunction .= ("`n]);")
+			
+			drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '30%', bottom: '5%' } };"
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			
+			this.showSettingsChart(drawChartFunction)
+		}
 	}
 	
 	setDebug(option, enabled) {
@@ -607,11 +704,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.loadCharacteristics(this.Definition)
 				this.loadSettings(this.Definition)
 				
-				while (vProgressCount < 100) {
-					showProgress({progress: ++vProgressCount, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI...")})
-				
-					Sleep 5
-				}
+				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI...")})
 				
 				knowledgeBase.addFact("Initialize", true)
 					
@@ -631,7 +724,13 @@ class SetupAdvisor extends ConfigurationItem {
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledge(knowledgeBase)
 				
+				showProgress({message: translate("Initialize Car Setup...")})
+				
 				this.updateRecommendations()
+				
+				showProgress({message: translate("Finished...")})
+				
+				Sleep 1000
 				
 				hideProgress()
 			}
@@ -875,27 +974,18 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			if (settingsLabels.Count() == 0)
 				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels.EN", Object())
-				
-			html := ""
-			first := true
+			
+			settings := []
 			
 			for ignore, setting in this.Settings {
 				delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 				
 				if delta is Number
-					if (delta != 0) {
-						if !first
-							html .= "<br>"
-						
-						first := false
-				
-						html .= ("Delta " . settingsLabels[setting] . " = " . Round(delta, 2))
-					}
+					if (delta != 0)
+						settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
 			}
 			
-			settingsViewer.Document.Open()
-			settingsViewer.Document.Write(html)
-			settingsViewer.Document.Close()
+			this.showSettingsDeltas(settings)
 		}
 		finally {
 			Gui %window%:-Disabled

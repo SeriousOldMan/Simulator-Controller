@@ -6,8 +6,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 [?Curbs.Stability.Correction != 0] =>																											\
-		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),							\
-		(Prove: changeSetting(Damper.Rebound.Fast, [Front.Left, Front.Right], 0.5, ?Curbs.Stability.Correction)),								\
+		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right, Rear.Left, Rear.Right], -1, ?Curbs.Stability.Correction)),		\
+		(Prove: changeSetting(Damper.Rebound.Fast, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Curbs.Stability.Correction)),		\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Curbs.Stability.Correction)),										\
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),										\
 		(Prove: changeSetting(AntiRollbar, [Front, Rear], -1, ?Curbs.Stability.Correction))

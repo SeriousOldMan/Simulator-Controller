@@ -326,7 +326,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		simulator := 0
 		
 		if (simulators.Length() > 0) {
-			if this.iSelectedSimulator
+			if this.SelectedSimulator
 				simulator := inList(simulators, this.SelectedSimulator)
 
 			if (simulator == 0)

@@ -1,0 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Generic Setup Rules             ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator(*)), 																			\
+				 (Prove: addCharacteristics(*, *, *, *)),															\
+				 (Prove: addSettings(*, *, *))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Advisor\Rules\Setup Recommendations.rules

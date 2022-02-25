@@ -46,6 +46,8 @@ ListLines Off					; Disable execution history
 global kOk = "ok"
 global kCancel = "cancel"
 
+global kMaxCharacteristics = 8
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -78,20 +80,23 @@ global characteristicsButton
 
 class SetupAdvisor extends ConfigurationItem {
 	iDebug := kDebugOff
-
-	iDefinition := false
-	iCharacteristics := []
-	iSettings := []
 	
 	iCharacteristicsArea := false
-	
-	iSelectedCharacteristics := []
-	iSelectedCharacteristicsWidgets := {}
+
+	iDefinition := false
+	iSimulatorDefinition := false
+	iSimulatorSettings := false
 	
 	iSelectedSimulator := false
 	iSelectedCar := false
 	iSelectedTrack := false
 	iSelectedWeather := "Dry"
+	
+	iCharacteristics := []
+	iSettings := []
+	
+	iSelectedCharacteristics := []
+	iSelectedCharacteristicsWidgets := {}
 	
 	iKnowledgeBase := false
 	
@@ -104,6 +109,18 @@ class SetupAdvisor extends ConfigurationItem {
 	Definition[] {
 		Get {
 			return this.iDefinition
+		}
+	}
+	
+	SimulatorDefinition[] {
+		Get {
+			return this.iSimulatorDefinition
+		}
+	}
+	
+	SimulatorSettings[] {
+		Get {
+			return this.iSimulatorSettings
 		}
 	}
 	
@@ -147,21 +164,36 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 	
-	SelectedSimulator[] {
+	SelectedSimulator[label := true] {
 		Get {
-			return this.iSelectedSimulator
+			if (label = "*")
+				return ((this.iSelectedSimulator == true) ? "*" : this.iSelectedSimulator)
+			else if this.SimulatorSettings
+				return (label ? this.SimulatorSettings.Name : this.iSelectedSimulator)
+			else
+				return this.iSelectedSimulator
 		}
 	}
 	
-	SelectedCar[] {
+	SelectedCar[label := true] {
 		Get {
-			return this.iSelectedCar
+			if ((label = "*") && (this.iSelectedCar == true))
+				return "*"
+			else if (label && (this.iSelectedCar == true))
+				return translate("All")
+			else
+				return this.iSelectedCar
 		}
 	}
 	
-	SelectedTrack[] {
+	SelectedTrack[label := true] {
 		Get {
-			return this.iSelectedTrack
+			if ((label = "*") && (this.iSelectedTrack == true))
+				return "*"
+			else if (label && (this.iSelectedTrack == true))
+				return translate("All")
+			else
+				return this.iSelectedTrack
 		}
 	}
 	
@@ -225,7 +257,7 @@ class SetupAdvisor extends ConfigurationItem {
 		simulator := 0
 		
 		if (simulators.Length() > 0) {
-			if this.iSelectedSimulator
+			if this.SelectedSimulator
 				simulator := inList(simulators, this.SelectedSimulator)
 
 			if (simulator == 0)
@@ -364,13 +396,13 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	updateState() {
-		if (this.SelectedCharacteristics.Length() < 6)
+		if (this.SelectedCharacteristics.Length() < kMaxCharacteristics)
 			GuiControl Enable, characteristicsButton
 		else
 			GuiControl Disable, characteristicsButton
 	}
 	
-	loadRules(definition, ByRef productions, ByRef reductions) {
+	loadRules(ByRef productions, ByRef reductions) {
 		local rules
 		
 		FileRead rules, % kResourcesDirectory . "Advisor\Rules\Setup Advisor.rules"
@@ -382,7 +414,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		compiler.compileRules(rules, productions, reductions)
 		
-		fileName := substituteVariables(getConfigurationValue(definition, "Simulator", "Rules", ""))
+		fileName := substituteVariables(getConfigurationValue(this.SimulatorDefinition, "Simulator", "Rules", ""))
 		
 		if (fileName && (fileName != "")) {
 			FileRead rules, %fileName%
@@ -391,12 +423,13 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 	
-	loadCharacteristics(definition) {
+	loadCharacteristics(definition, simulator := false, car := false, track := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iCharacteristics := []
 		
-		knowledgeBase.addFact("Characteristics.Count", 0)
+		if !simulator
+			knowledgeBase.addFact("Characteristics.Count", 0)
 		
 		compiler := new RuleCompiler()
 		
@@ -408,37 +441,56 @@ class SetupAdvisor extends ConfigurationItem {
 					for ignore, option in string2Values(",", groupOption[2]) {
 						characteristic := factPath(group, groupOption[1], option)
 					
-						showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+						if !simulator {
+							showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+							
+							knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
 						
-						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
-					
-						this.Characteristics.Push(characteristic)
+							this.Characteristics.Push(characteristic)
+							
+							if !isDebug()
+								Sleep 100
+						}
+						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
+																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+																	   . ")")) {
+							showProgress({progress: ++vProgressCount})
 						
-						if !isDebug()
-							Sleep 100
+							this.Characteristics.Push(characteristic)
+						}
 					}
 				}
 				else {
 					characteristic := factPath(group, groupOption)
 				
-					showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+					if !simulator {
+						showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+							
+						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
 						
-					knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
+						this.Characteristics.Push(characteristic)
+							
+						if !isDebug()
+							Sleep 100
+					}
+					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
+																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
+																   . ")")) {
+						showProgress({progress: ++vProgressCount})
 					
-					this.Characteristics.Push(characteristic)
-						
-					if !isDebug()
-						Sleep 100
+						this.Characteristics.Push(characteristic)
+					}
 				}
 			}
 	}
 	
-	loadSettings(definition) {
+	loadSettings(definition, simulator := false, car := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iSettings := []
 		
-		knowledgeBase.addFact("Settings.Count", 0)
+		if !simulator
+			knowledgeBase.addFact("Settings.Count", 0)
 		
 		compiler := new RuleCompiler()
 		
@@ -450,27 +502,45 @@ class SetupAdvisor extends ConfigurationItem {
 					for ignore, option in string2Values(",", groupOption[2]) {
 						setting := factPath(group, groupOption[1], option)
 					
-						showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+						if !simulator {
+							showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+							
+							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
 						
-						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
-					
-						this.Settings.Push(setting)
+							this.Settings.Push(setting)
+							
+							if !isDebug()
+								Sleep 100
+						}
+						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
+																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+																	   . ")")) {
+							showProgress({progress: ++vProgressCount})
 						
-						if !isDebug()
-							Sleep 100
+							this.Settings.Push(setting)
+						}
 					}
 				}
 				else {
 					setting := factPath(group, groupOption)
 				
-					showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
-					
-					knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
-					
-					this.Settings.Push(setting)
+					if !simulator {
+						showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
 						
-					if !isDebug()
-						Sleep 100
+						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
+						
+						this.Settings.Push(setting)
+							
+						if !isDebug()
+							Sleep 100
+					}
+					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
+																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
+																   . ")")) {
+						showProgress({progress: ++vProgressCount})
+					
+						this.Settings.Push(setting)
+					}
 				}
 			}
 	}
@@ -479,6 +549,22 @@ class SetupAdvisor extends ConfigurationItem {
 		engine := new RuleEngine(productions, reductions, facts)
 		
 		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
+	}
+	
+	initializeSimulator(name) {
+		definition := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . name . ".ini")
+		
+		this.iSimulatorDefinition := definition
+		
+		simulator := getConfigurationValue(definition, "Simulator", "Simulator")
+		cars := string2Values(",", getConfigurationValue(definition, "Simulator", "Cars"))
+		tracks := string2Values(",", getConfigurationValue(definition, "Simulator", "Tracks"))
+		
+		this.iSimulatorSettings := {Name: name, Simulator: simulator, Cars: cars, Tracks: tracks}
+		
+		this.iSelectedSimulator := ((simulator = "*") ? true : simulator)
+		this.iSelectedCar := ((cars[1] = "*") ? true : cars[1])
+		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -500,14 +586,16 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Advisor"), message: translate("Preparing Knowledgebase...")})
 		
+				Sleep 200
+				
 				this.clearCharacteristics()
 				
-				definition := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+				this.initializeSimulator((simulator == true) ? translate("Generic") : simulator)
 				
 				productions := false
 				reductions := false
 			
-				this.loadRules(definition, productions, reductions)
+				this.loadRules(productions, reductions)
 				
 				knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
 				
@@ -528,8 +616,13 @@ class SetupAdvisor extends ConfigurationItem {
 				knowledgeBase.addFact("Initialize", true)
 					
 				knowledgeBase.produce()
+		
+				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
+				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
 				
-				knowledgeBase.setFact("Environment.Simulator", simulator)
+				knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
+				knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
+				knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
 				
 				knowledgeBase.addFact("Calculate", true)
 					
@@ -565,14 +658,14 @@ class SetupAdvisor extends ConfigurationItem {
 	addCharacteristic(characteristic) {
 		numCharacteristics := this.SelectedCharacteristics.Length()
 		
-		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= 6)) {
+		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
 			window := this.Window
 		
 			Gui %window%:Default
 			Gui %window%:Color, D0D0D0, D8D8D8
 			
 			x := (this.CharacteristicsArea.X + 8)
-			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * 75))
+			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * 56))
 			
 			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
 		
@@ -601,27 +694,22 @@ class SetupAdvisor extends ConfigurationItem {
 			x := x + 8
 			y := y + 26
 			
-			Gui %window%:Add, Text, x%X% y%Y% w80 HWNDlabel2, % translate("Importance")
+			Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
 			
-			x := x + 90
+			x := x + 120
 			
-			Gui %window%:Add, Slider, x%x% yp-2 w360 h30 0x10 Range0-100 ToolTip HWNDslider1, 0
+			Gui %window%:Add, Slider, x%x% yp-2 w165 h30 0x10 Range0-100 ToolTip HWNDslider1, 0
 			
-			x := x - 90
-			y := y + 24
+			x := x + 170
 			
-			Gui %window%:Add, Text, x%X% y%Y% w80 HWNDlabel3, % translate("Severity")
-			
-			x := x + 90
-			
-			Gui %window%:Add, Slider, x%x% yp-2 w360 h30 0x10 Range0-100 ToolTip HWNDslider2, 0
+			Gui %window%:Add, Slider, x%x% yp w165 h30 0x10 Range0-100 ToolTip HWNDslider2, 0
 			
 			callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
 			
 			GuiControl +g, %slider1%, %callback%
 			GuiControl +g, %slider2%, %callback%
 			
-			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, label3, deleteButton]
+			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
 			
 			callback := Func("initializeSlider").Bind(slider1, 0, slider2, 0)
 			
@@ -709,8 +797,8 @@ class SetupAdvisor extends ConfigurationItem {
 			
 					for ignore, option in string2Values(",", groupOption[2]) {
 						characteristic := factPath(group, groupOption[1], option)
-					
-						if !inList(this.SelectedCharacteristics, characteristic) {
+				
+						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
 							handler := ObjBindMethod(this, "addCharacteristic", characteristic)
 						
 							label := characteristicLabels[option]
@@ -732,7 +820,7 @@ class SetupAdvisor extends ConfigurationItem {
 				else {
 					characteristic := factPath(group, groupOption)
 					
-					if !inList(this.SelectedCharacteristics, characteristic) {
+					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
 						handler := ObjBindMethod(this, "addCharacteristic", characteristic)
 						label := characteristicLabels[groupOption]
 						
@@ -921,7 +1009,7 @@ chooseSimulator() {
 	
 	GuiControlGet simulatorDropDown
 	
-	advisor.loadSimulator(simulatorDropDown)
+	advisor.loadSimulator((simulatorDropDown = translate("Generic")) ? true : simulatorDropDown)
 }
 
 chooseCar() {

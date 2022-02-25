@@ -65,18 +65,17 @@ addSetting(?setting) <= addSetting(?setting, !Settings.Count), Set(?setting, Del
 
 addSetting(?setting, ?index) <= ?next = ?index + 1, Set(Setting, ?next, ?setting), Set(Settings.Count, ?next)
 
-allSettings(?characteristics) <= allSettings(?characteristics, !Settings.Count)
+allSettings(?settings) <= allSettings(?settings, !Settings.Count)
 
 allSettings([], 0)
-allSettings([?setting | ?settings], ?index) <= Get(Settings, ?index, ?setting), ?next = ?index - 1, allSettings(?settings, ?next)
+allSettings([?setting | ?settings], ?index) <= Get(Setting, ?index, ?setting), ?next = ?index - 1, allSettings(?settings, ?next)
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Simulator Configuration                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, [?Initialize] => (Set: Simulator.Count, 0),																						\
-							  (Set: Environment.Simulator, *), (Set: Environment.Car, *), (Set: Environment.Track, *)
+priority: 5, [?Initialize] => (Set: Simulator.Count, 0), (Set: Advisor.Simulator, *), (Set: Advisor.Car, *), (Set: Advisor.Track, *)
 
 addSimulator(?simulator) <= addSimulator(?simulator, !Simulator.Count)
 
@@ -108,22 +107,22 @@ addSettings(?simulator, ?car, *) <= allSettings(?settings), addSettings(?simulat
 		
 addSettings(?, ?, [])
 addSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
-		addSetting(?simulator, ?car, ?setting), addCharacteristics(?simulator, ?car, ?settings)
+		addSetting(?simulator, ?car, ?setting), addSettings(?simulator, ?car, ?settings)
 
 addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
 
-settingActive(?simulator, ?car, ?setting) <= settingActive(?simulator, ?car, ?setting, true)
-settingActive(?, ?, ?) <= fail
+settingAvailable(?simulator, ?car, ?setting) <= settingAvailable(?simulator, ?car, ?setting, true)
+settingAvailable(?, ?, ?) <= fail
 
-settingActive(?simulator, ?car, ?setting, ?active) <=																							\
-		Append(?simulator, ., ?car, .Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
-settingActive(?simulator, ?car, ?setting, ?active) <=																							\
-		Append(?simulator, ., ?car, .Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
-settingActive(?simulator, ?, ?setting, ?active) <=																								\
-		Append(?simulator, .*.Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
-settingActive(?, ?, ?setting, ?active) <=																										\
-		Append(*.*.*.Setting., ?setting, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
-settingActive(?, ?, ?, ?, false)
+settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
+		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
+		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+settingAvailable(?simulator, ?, ?setting, ?available) <=																						\
+		Append(?simulator, .*.Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+settingAvailable(?, ?, ?setting, ?available) <=																									\
+		Append(*.*.*.Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+settingAvailable(?, ?, ?, ?, false)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -145,7 +144,7 @@ resetCharacteristics(0) <= !
 resetCharacteristics(?index) <= Get(Characteristic, ?index, ?characteristic), Set(?characteristic, Correction, 0),								\
 							   ?nIndex = ?index - 1, resetCharacteristics(?nIndex)
 
-updateCharacteristics() <= updateCharacteristics(!Environment.Simulator, !Environment.Car, !Environment.Track, !Characteristics.Count)
+updateCharacteristics() <= updateCharacteristics(!Advisor.Simulator, !Advisor.Car, !Advisor.Track, !Characteristics.Count)
 
 updateCharacteristics(?, ?, ?, 0) <= !
 updateCharacteristics(?simulator, ?car, ?track, ?index) <=																						\

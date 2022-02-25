@@ -49,11 +49,7 @@ global kUpdateMessages = {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updateActionLabels: "Updating action labels to "
 						, updateActionIcons: "Updating action icons to "
-						, updatePhraseGrammars: "Updating phrase grammars to "
-						, updateACCPluginForV20: "Updating ACC plugin to ", updateACCPluginForV21: "Updating ACC plugin to "
-						, updatePedalCalibrationPluginForV21: "Updating Pedal Calibration plugin to "
-						, updateRF2PluginForV23: "Updating rFactor 2 plugin to "
-						, updateRREPluginForV24: "Updating RaceRoom Racing Experience plugin to "}
+						, updatePhraseGrammars: "Updating phrase grammars to "}
 
 global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
 

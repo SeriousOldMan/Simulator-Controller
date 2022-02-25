@@ -1,3 +1,11 @@
+## 3.9.2-release 02/25/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Pre-Alpha version of "Setup Advisor". No documentation and not feature complete at all.
+  4. Pitstop settings and Strategy updates are synchronized in Race Center every 10 seconds now.
+  5. Fixed a crash when using ICON instead of JPEG or PNG files for icons in Stream Deck. Please update the plugin in the Stream Deck directory.
+
 ## 3.9.1-release 02/18/22
 
   1. Critical fixes in several grammar files

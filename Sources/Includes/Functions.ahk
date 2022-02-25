@@ -730,50 +730,52 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
-	check := !FileExist(kTempDirectory . "VERSION")
-	
-	if !check {
-		FileGetTime lastModified, %kTempDirectory%VERSION, M
+	if !inList(["Simulator Tools", "Simulator Download"], StrSplit(A_ScriptName, ".")[1]) {
+		check := !FileExist(kTempDirectory . "VERSION")
 		
-		EnvAdd lastModified, 1, Days
+		if !check {
+			FileGetTime lastModified, %kTempDirectory%VERSION, M
+			
+			EnvAdd lastModified, 1, Days
+			
+			check := (lastModified < A_Now)
+		}
 		
-		check := (lastModified < A_Now)
-	}
-	
-	if check {
-		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
-		
-		release := readConfiguration(kTempDirectory . "VERSION")
-		version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
-		
-		if version {
-			version := StrSplit(version, "-", , 2)
-			current := StrSplit(kVersion, "-", , 2)
+		if check {
+			URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 			
-			dottedVersion := version[1]
+			release := readConfiguration(kTempDirectory . "VERSION")
+			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
 			
-			versionPostfix := version[2]
-			currentPostfix := current[2]
-			
-			version := values2String("", string2Values(".", version[1])*)
-			current := values2String("", string2Values(".", current[1])*)
-			
-			if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-				title := translate("Update")
-				MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
-				OnMessage(0x44, "")
+			if version {
+				version := StrSplit(version, "-", , 2)
+				current := StrSplit(kVersion, "-", , 2)
+				
+				dottedVersion := version[1]
+				
+				versionPostfix := version[2]
+				currentPostfix := current[2]
+				
+				version := values2String("", string2Values(".", version[1])*)
+				current := values2String("", string2Values(".", current[1])*)
+				
+				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+					title := translate("Update")
+					MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
+					OnMessage(0x44, "")
 
-				IfMsgBox Yes
-				{		
-					automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
-	
-					if automaticUpdates
-						Run *RunAs %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
-					else
-						Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
-					
-					ExitApp 0
+					IfMsgBox Yes
+					{		
+						automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
+		
+						if automaticUpdates
+							Run *RunAs %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
+						else
+							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+						
+						ExitApp 0
+					}
 				}
 			}
 		}
@@ -790,7 +792,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if !inList(A_Args, "-NoUpdate") {
+	if (!inList(A_Args, "-NoUpdate") && !inList(["Simulator Tools", "Simulator Download"], StrSplit(A_ScriptName, ".")[1])) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())

@@ -1,16 +1,16 @@
 [Development]
-Version=3.9.2-dev
+Version=3.9.2-release
 Target=3.9.2-release
-Date=02/23/2022
-Download=
-Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, Fixed a crash when using ICON instead of JPEG or PNG files for icons in Stream Deck
+Date=02/25/2022
+Download=https://cntr.click/4Cv4t1P
+Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, Fixed a crash when using ICON instead of JPEG or PNG files for icons in Stream Deck, Initial version of "Setup Advisor"
 [Release]
-Version=3.9.1-release
-Date=02/18/2022
-Download=https://cntr.click/XvAN9vj
-Changes=Spotter implementation for rFactor 2, Spotter improvements: Race start report, Position development report, Final laps announcement, Fixed wonky Spotter side alerts in RaceRoom Racing Experience, More tyre compound types added (Green, Yellow, Soft, Medium, Hard), Overhaul of chart data selection in "Strategy Workbench", Extended Race Spotter configuration, Bugfix for ACC image search fallback algorithm
+Version=3.9.2-release
+Date=02/25/2022
+Download=https://cntr.click/4Cv4t1P
+Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, Fixed a crash when using ICON instead of JPEG or PNG files for icons in Stream Deck, Initial version of "Setup Advisor"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.9.1-release
-Development=3.9.2-dev
+Release=3.9.2-release
+Development=3.9.2-release

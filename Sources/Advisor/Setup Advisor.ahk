@@ -55,6 +55,7 @@ global kMaxCharacteristics = 8
 ;;;-------------------------------------------------------------------------;;;
 
 global vProgressCount = 0
+global vCharacteristicFinished = true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -331,6 +332,115 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Add, Button, x574 y714 w80 h23 GcloseAdvisor, % translate("Close")
 	}
 	
+	saveState(fileName := false) {
+		if !fileName
+			fileName := (kUserConfigDirectory . "Setup.state")
+		
+		state := this.SimulatorDefinition.Clone()
+		
+		setConfigurationValue(state, "State", "Simulator", this.SelectedSimulator["*"])
+		setConfigurationValue(state, "State", "Car", this.SelectedCar["*"])
+		setConfigurationValue(state, "State", "Track", this.SelectedTrack["*"])
+		setConfigurationValue(state, "State", "Weather", this.SelectedWeather)
+		
+		setConfigurationValue(state, "State", "Characteristics", values2String(",", this.Characteristics*))
+		setConfigurationValue(state, "State", "Settings", values2String(",", this.Settings*))
+		
+		setConfigurationValue(state, "Characteristics", "Characteristics", values2String(",", this.SelectedCharacteristics*))
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		for ignore, characteristic in this.SelectedCharacteristics {
+			widgets := this.SelectedCharacteristicsWidgets[characteristic]
+		
+			GuiControlGet value1, , % widgets[1]
+			GuiControlGet value2, , % widgets[2]
+			
+			setConfigurationValue(state, "Characteristics", characteristic . ".Weight", value1)
+			setConfigurationValue(state, "Characteristics", characteristic . ".Value", value2)
+		}
+		
+		setConfigurationSectionValues(state, "KnowledgeBase", this.KnowledgeBase.Facts.Facts)
+		
+		writeConfiguration(fileName, state)
+	}
+	
+	restoreState(fileName := false) {
+		if !fileName
+			fileName := (kUserConfigDirectory . "Setup.state")
+		
+		if FileExist(fileName) {
+			state := readConfiguration(fileName)
+		
+			simulator := getConfigurationValue(state, "State", "Simulator")
+			car := getConfigurationValue(state, "State", "Car")
+			track := getConfigurationValue(state, "State", "Track")
+			weather := getConfigurationValue(state, "State", "Weather")
+			
+			if (simulator = "*")
+				simulator := true
+			
+			if (car = "*")
+				car := true
+			
+			if (track = "*")
+				track := true
+			
+			this.loadSimulator(simulator, true)
+			this.loadCar(car)
+			this.loadTrack(track)
+			this.loadWeather(weather)
+
+			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
+		
+			if (characteristicLabels.Count() == 0)
+				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+		
+			characteristics := string2Values(",", getConfigurationValue(state, "Characteristics", "Characteristics"))
+			
+			if (characteristics.Length() > 0) {
+				window := this.Window
+			
+				Gui %window%:Default
+				Gui %window%:+Disabled
+				
+				try {
+					x := Round((A_ScreenWidth - 300) / 2)
+					y := A_ScreenHeight - 150
+					
+					vProgressCount := 0
+					
+					showProgress({x: x, y: y, color: "Green", title: translate("Loading Setup"), message: translate("Preparing Characteristics...")})
+			
+					Sleep 200
+					
+					for ignore, characteristic in characteristics {
+						showProgress({progress: (vProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+					
+						this.addCharacteristic(characteristic, getConfigurationValue(state, "Characteristics", characteristic . ".Weight")
+															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value"))
+					
+						while !vCharacteristicFinished
+							Sleep 50
+					}
+					
+					showProgress({progress: 100, message: translate("Finished...")})
+					
+					Sleep 1000
+					
+					hideProgress()
+				}
+				finally {
+					Gui %window%:-Disabled
+				}
+			}
+		}
+		else
+			advisor.loadSimulator(advisor.getSimulators()[1], true)
+	}
+	
 	show() {
 		window := this.Window
 			
@@ -373,7 +483,7 @@ class SetupAdvisor extends ConfigurationItem {
 					</body>
 				</html>
 				)
-
+				
 				this.SettingsViewer.Document.write(before . drawChartFunction . after)
 			}
 			else {
@@ -393,8 +503,8 @@ class SetupAdvisor extends ConfigurationItem {
 			drawChartFunction := "function drawChart() {"
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 			
-			names := []
-			values := []
+			names := [translate("Settings")]
+			values := [translate("All")]
 			
 			for ignore, setting in settings {
 				names.Push(setting[1])
@@ -726,7 +836,9 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				showProgress({message: translate("Initialize Car Setup...")})
 				
-				this.updateRecommendations()
+				this.updateRecommendations(false)
+		
+				this.showSettingsChart(false)
 				
 				showProgress({message: translate("Finished...")})
 				
@@ -751,74 +863,83 @@ class SetupAdvisor extends ConfigurationItem {
 	
 	clearCharacteristics() {
 		while (this.SelectedCharacteristics.Length() > 0)
-			this.deleteCharacteristic(this.SelectedCharacteristics[this.SelectedCharacteristics.Length()])
+			this.deleteCharacteristic(this.SelectedCharacteristics[this.SelectedCharacteristics.Length()], false)
+		
+		this.showSettingsChart(false)
 	}
 	
-	addCharacteristic(characteristic) {
+	addCharacteristic(characteristic, weight := 50, value := 90) {
 		numCharacteristics := this.SelectedCharacteristics.Length()
 		
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
-			window := this.Window
+			vCharacteristicFinished := false
+			
+			try {
+				window := this.Window
+			
+				Gui %window%:Default
+				Gui %window%:Color, D0D0D0, D8D8D8
+				
+				x := (this.CharacteristicsArea.X + 8)
+				y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * 56))
+				
+				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
+			
+				if (characteristicLabels.Count() == 0)
+					characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+				
+				this.SelectedCharacteristics.Push(characteristic)
+
+				Gui %window%:Font, s10 Italic, Arial
+
+				Gui %window%:Add, Button, x%X% y%Y% w20 h20 HWNDdeleteButton
+				setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+				
+				callback := ObjBindMethod(this, "deleteCharacteristic", characteristic)
+				
+				GuiControl +g, %deleteButton%, %callback%
+
+				x := x + 25
+				
+				Gui %window%:Add, Text, x%X% y%Y% w350 h26 HWNDlabel1, % characteristicLabels[characteristic]
+				
+				x := x - 25
+				
+				Gui %window%:Font, s8 Norm, Arial
+				
+				x := x + 8
+				y := y + 26
+				
+				Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
+				
+				x := x + 120
+				
+				Gui %window%:Add, Slider, x%x% yp-2 w165 0x10 Range0-100 ToolTip HWNDslider1, 0
+				
+				x := x + 170
+				
+				Gui %window%:Add, Slider, x%x% yp w165 0x10 Range0-100 ToolTip HWNDslider2, 0
+				
+				callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
+				
+				GuiControl +g, %slider1%, %callback%
+				GuiControl +g, %slider2%, %callback%
+				
+				this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
 		
-			Gui %window%:Default
-			Gui %window%:Color, D0D0D0, D8D8D8
-			
-			x := (this.CharacteristicsArea.X + 8)
-			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * 56))
-			
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
+				initializeSlider(slider1, weight, slider2, value)
 		
-			if (characteristicLabels.Count() == 0)
-				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
-			
-			this.SelectedCharacteristics.Push(characteristic)
-
-			Gui %window%:Font, s10 Italic, Arial
-
-			Gui %window%:Add, Button, x%X% y%Y% w20 h20 HWNDdeleteButton
-			setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-			
-			callback := ObjBindMethod(this, "deleteCharacteristic", characteristic)
-			
-			GuiControl +g, %deleteButton%, %callback%
-
-			x := x + 25
-			
-			Gui %window%:Add, Text, x%X% y%Y% w350 h26 HWNDlabel1, % characteristicLabels[characteristic]
-			
-			x := x - 25
-			
-			Gui %window%:Font, s8 Norm, Arial
-			
-			x := x + 8
-			y := y + 26
-			
-			Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
-			
-			x := x + 120
-			
-			Gui %window%:Add, Slider, x%x% yp-2 w165 h30 0x10 Range0-100 ToolTip HWNDslider1, 0
-			
-			x := x + 170
-			
-			Gui %window%:Add, Slider, x%x% yp w165 h30 0x10 Range0-100 ToolTip HWNDslider2, 0
-			
-			callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
-			
-			GuiControl +g, %slider1%, %callback%
-			GuiControl +g, %slider2%, %callback%
-			
-			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
-			
-			callback := Func("initializeSlider").Bind(slider1, 0, slider2, 0)
-			
-			SetTimer %callback%, -50
-			
-			this.updateState()
+				this.updateRecommendations()
+				
+				this.updateState()
+			}
+			finally {
+				vCharacteristicFinished := true
+			}
 		}
 	}
 	
-	deleteCharacteristic(characteristic) {
+	deleteCharacteristic(characteristic, draw := true) {
 		numCharacteristics := this.SelectedCharacteristics.Length()
 		index := inList(this.SelectedCharacteristics, characteristic)
 		
@@ -847,7 +968,7 @@ class SetupAdvisor extends ConfigurationItem {
 			this.SelectedCharacteristics.RemoveAt(index)
 			this.SelectedCharacteristicsWidgets.Delete(characteristic)
 			
-			this.updateRecommendations()
+			this.updateRecommendations(draw)
 		}
 	}
 	
@@ -898,7 +1019,7 @@ class SetupAdvisor extends ConfigurationItem {
 						characteristic := factPath(group, groupOption[1], option)
 				
 						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-							handler := ObjBindMethod(this, "addCharacteristic", characteristic)
+							handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 90)
 						
 							label := characteristicLabels[option]
 							
@@ -920,7 +1041,7 @@ class SetupAdvisor extends ConfigurationItem {
 					characteristic := factPath(group, groupOption)
 					
 					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-						handler := ObjBindMethod(this, "addCharacteristic", characteristic)
+						handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 90)
 						label := characteristicLabels[groupOption]
 						
 						Menu %groupMenu%, Add, %label%, %handler%
@@ -944,7 +1065,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.updateRecommendations()
 	}
 	
-	updateRecommendations() {
+	updateRecommendations(draw := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		window := this.Window
@@ -970,22 +1091,24 @@ class SetupAdvisor extends ConfigurationItem {
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledge(this.KnowledgeBase)
 			
-			settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
-			
-			if (settingsLabels.Count() == 0)
-				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels.EN", Object())
-			
-			settings := []
-			
-			for ignore, setting in this.Settings {
-				delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
+			if draw {
+				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
 				
-				if delta is Number
-					if (delta != 0)
-						settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+				if (settingsLabels.Count() == 0)
+					settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels.EN", Object())
+				
+				settings := []
+				
+				for ignore, setting in this.Settings {
+					delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
+					
+					if delta is Number
+						if (delta != 0)
+							settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+				}
+				
+				this.showSettingsDeltas(settings)
 			}
-			
-			this.showSettingsDeltas(settings)
 		}
 		finally {
 			Gui %window%:-Disabled
@@ -1040,6 +1163,30 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 
 	return IL_Add(normal_il, file, index)
 }
+
+fixIE(version := 0, exeName := "") {
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
+	
+	if versions.HasKey(version)
+		version := versions[version]
+	
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath A_AhkPath, exeName
+	}
+	
+	RegRead previousValue, HKCU, %key%, %exeName%
+
+	if (version = "")
+		RegDelete, HKCU, %key%, %exeName%
+	else
+		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
+	
+	return previousValue
+}
 	
 initializeSlider(slider1, value1, slider2, value2) {
 	window := SetupAdvisor.Instance.Window
@@ -1047,20 +1194,23 @@ initializeSlider(slider1, value1, slider2, value2) {
 	Gui %window%:Default
 	Gui %window%:Color, D0D0D0, D8D8D8
 	
-	if (value1 == 0) {
-		ControlClick, , ahk_id %slider1%, , , , x0 y0
-		ControlClick, , ahk_id %slider2%, , , , x0 y0
+	ControlClick, , ahk_id %slider1%, , , , x0 y0
+	ControlClick, , ahk_id %slider2%, , , , x0 y0
+
+	Sleep 10
 	
-		callback := Func("initializeSlider").Bind(slider1, 50, slider2, 90)
-			
-		SetTimer %callback%, -50
-	}
-	else {
-		GuiControl, , %slider1%, %value1%
-		GuiControl, , %slider2%, %value2%
-		
-		SetupAdvisor.Instance.updateRecommendations()
-	}
+	GuiControlGet pos, Pos, %slider1%
+	y := (posY - 1)
+	GuiControl MoveDraw, %slider1%, y%Y%
+	GuiControl MoveDraw, %slider1%, y%posY%
+	
+	GuiControlGet pos, Pos, %slider2%
+	y := (posY - 1)
+	GuiControl MoveDraw, %slider2%, y%Y%
+	GuiControl MoveDraw, %slider2%, y%posY%
+	
+	GuiControl, , %slider1%, %value1%
+	GuiControl, , %slider2%, %value2%
 }
 
 updateSlider(characteristic, slider1, slider2) {
@@ -1080,6 +1230,9 @@ factPath(path*) {
 }
 
 closeAdvisor() {
+	if GetKeyState("Ctrl", "P")
+		SetupAdvisor.Instance.saveState()
+	
 	ExitApp 0
 }
 
@@ -1151,13 +1304,26 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 	
-	advisor := new SetupAdvisor()
+	current := fixIE(11)
 	
-	advisor.createGui(advisor.Configuration)
-	
-	advisor.show()
+	try {
+		advisor := new SetupAdvisor()
 		
-	advisor.loadSimulator(advisor.getSimulators()[1], true)
+		advisor.createGui(advisor.Configuration)
+		
+		advisor.show()
+		
+		if !GetKeyState("Ctrl", "P")
+			advisor.loadSimulator(advisor.getSimulators()[1], true)
+		else {
+			callback := ObjBindMethod(advisor, "restoreState")
+		
+			SetTimer %callback%, -50
+		}
+	}
+	finally {
+		fixIE(current)
+	}
 }
 
 

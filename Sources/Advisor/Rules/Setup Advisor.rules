@@ -90,6 +90,15 @@ addCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics
 
 addCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?simulator, ?car, ?track, Characteristic, ?characteristic, Active, true)
 
+removeCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),														\
+													  removeCharacteristics(?simulator, ?car, ?track, ?characteristics)
+		
+removeCharacteristics(?, ?, ?, [])
+removeCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=														\
+		removeCharacteristic(?simulator, ?car, ?track, ?characteristic), removeCharacteristics(?simulator, ?car, ?track, ?characteristics)
+
+removeCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Clear(?simulator, ?car, ?track, Characteristic, ?characteristic, Active)
+
 characteristicActive(?simulator, ?car, ?track, ?characteristic) <= characteristicActive(?simulator, ?car, ?track, ?characteristic, true)
 characteristicActive(?, ?, ?, ?) <= fail
 																   
@@ -110,6 +119,14 @@ addSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
 		addSetting(?simulator, ?car, ?setting), addSettings(?simulator, ?car, ?settings)
 
 addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
+
+removeSettings(?simulator, ?car, *) <= allSettings(?settings), removeSettings(?simulator, ?car, ?settings)
+
+removeSettings(?, ?, [])
+removeSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
+		removeSetting(?simulator, ?car, ?setting), removeSettings(?simulator, ?car, ?settings)
+
+removeSetting(?simulator, ?car, ?setting) <= Clear(?simulator, ?car, Setting, ?setting, Available)
 
 settingAvailable(?simulator, ?car, ?setting) <= settingAvailable(?simulator, ?car, ?setting, true)
 settingAvailable(?, ?, ?) <= fail

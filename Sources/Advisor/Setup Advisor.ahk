@@ -506,10 +506,16 @@ class SetupAdvisor extends ConfigurationItem {
 		if (settings && (settings.Length() > 0)) {
 			drawChartFunction := "function drawChart() {"
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-			
-			names := [translate("Settings")]
-			values := [translate("All")]
-			
+
+			if false {
+				names := []
+				values := []
+			}
+			else {
+				names := [translate("Settings")]
+				values := [translate("All")]
+			}
+				
 			for ignore, setting in settings {
 				names.Push(setting[1])
 				values.Push(setting[2])
@@ -520,19 +526,26 @@ class SetupAdvisor extends ConfigurationItem {
 			for index, value in values
 				values[index] := (value / max)
 			
-			/*
-			drawChartFunction .= "`n['" . values2String("', '", translate("Category"), names*) . "'],"
+			if false {
+				drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
+				
+				Loop % names.Length()
+					drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
+				
+				drawChartFunction .= "`n]);"
+				
+				drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
+			}
+			else {
+				drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
+				
+				drawChartFunction .= "`n[" . values2String(",", values*) . "]"
+				
+				drawChartFunction .= "`n]);"
+				
+				drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
+			}
 			
-			drawChartFunction .= "`n['" . translate("Setting") . "'," . values2String(",", values*) . "]"
-			*/
-			
-			drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
-			
-			drawChartFunction .= "`n[" . values2String(",", values*) . "]"
-			
-			drawChartFunction .= ("`n]);")
-			
-			drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '30%', bottom: '5%' } };"
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			
 			this.showSettingsChart(drawChartFunction)

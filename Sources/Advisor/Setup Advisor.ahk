@@ -673,7 +673,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Characteristics.Push(characteristic)
 							
 							if !isDebug()
-								Sleep 100
+								Sleep 20
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -695,7 +695,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Characteristics.Push(characteristic)
 							
 						if !isDebug()
-							Sleep 100
+							Sleep 20
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -734,7 +734,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Settings.Push(setting)
 							
 							if !isDebug()
-								Sleep 100
+								Sleep 20
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -756,7 +756,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Settings.Push(setting)
 							
 						if !isDebug()
-							Sleep 100
+							Sleep 20
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -842,8 +842,21 @@ class SetupAdvisor extends ConfigurationItem {
 					
 				knowledgeBase.produce()
 		
+				showProgress({progress: vProgressCount++})
+				
+				Sleep 200
+				
 				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
+		
+				showProgress({progress: vProgressCount++})
+				
+				Sleep 200
+				
 				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
+				
+				showProgress({progress: vProgressCount++})
+				
+				Sleep 200
 				
 				knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
 				knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
@@ -856,7 +869,9 @@ class SetupAdvisor extends ConfigurationItem {
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledge(knowledgeBase)
 				
-				showProgress({message: translate("Initialize Car Setup...")})
+				showProgress({progress: vProgressCount++, message: translate("Initialize Car Setup...")})
+				
+				Sleep 200
 				
 				this.updateRecommendations(false)
 		
@@ -1013,7 +1028,15 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		menuIndex := 1
 		
-		for group, definition in getConfigurationSectionValues(this.Definition, "Setup.Characteristics", Object()) {
+		groups := getConfigurationSectionValues(this.Definition, "Setup.Characteristics", Object())
+		translatedGroups := {}
+		
+		for group, definition in groups
+			translatedGroups[characteristicLabels[group]] := group
+			
+		for ignore, group in translatedGroups {
+			definition := groups[group]
+		
 			groupMenu := ("SubMenu" . menuIndex++)
 			groupEmpty := true
 					

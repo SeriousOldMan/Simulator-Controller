@@ -1946,7 +1946,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
 				
-				showMessage(translate("Race Strategist will be instructed in the next lap."))
+				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
 			catch exception {
 				showMessage(translate("Session has not been started yet."))
@@ -1968,7 +1968,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
 				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
 				
-				showMessage(translate("Race Strategist will be instructed in the next lap."))
+				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
 			catch exception {
 				showMessage(translate("Session has not been started yet."))
@@ -2027,7 +2027,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
 				this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 				
-				showMessage(translate("Race Engineer will be instructed in the next lap."))
+				showMessage(translate("Race Engineer will be instructed as fast as possible."))
 			}
 			catch exception {
 				title := translate("Information")
@@ -2255,7 +2255,7 @@ class RaceCenter extends ConfigurationItem {
 						title := translate("Strategy")
 						
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-						MsgBox 262436, %title%, % translate("Do you really want to discard the active strategy? Strategist will be instructed in the next lap...")
+						MsgBox 262436, %title%, % translate("Do you really want to discard the active strategy? Strategist will be instructed immediately...")
 						OnMessage(0x44, "")
 						
 						IfMsgBox Yes

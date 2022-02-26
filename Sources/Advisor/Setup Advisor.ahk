@@ -48,6 +48,7 @@ global kOk = "ok"
 global kCancel = "cancel"
 
 global kMaxCharacteristics = 8
+global kCharacteristicHeight = 56
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -329,12 +330,15 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 y706 w1200 0x10
 		
+		Gui %window%:Add, Button, x16 y714 w77 h23 gloadSetup, % translate("&Load...")
+		Gui %window%:Add, Button, x98 y714 w77 h23 gsaveSetup, % translate("&Save...")
+		
 		Gui %window%:Add, Button, x574 y714 w80 h23 GcloseAdvisor, % translate("Close")
 	}
 	
 	saveState(fileName := false) {
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup.state")
+			fileName := (kUserConfigDirectory . "Advisor.setup")
 		
 		state := this.SimulatorDefinition.Clone()
 		
@@ -369,7 +373,7 @@ class SetupAdvisor extends ConfigurationItem {
 	
 	restoreState(fileName := false) {
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup.state")
+			fileName := (kUserConfigDirectory . "Advisor.setup")
 		
 		if FileExist(fileName) {
 			state := readConfiguration(fileName)
@@ -798,7 +802,12 @@ class SetupAdvisor extends ConfigurationItem {
 				this.clearCharacteristics()
 				
 				this.initializeSimulator((simulator == true) ? translate("Generic") : simulator)
-				
+		
+				simulators := this.getSimulators()
+		
+				if (simulators.Length() > 0)
+					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), (simulator == true) ? translate("Generic") : simulator)
+		
 				productions := false
 				reductions := false
 			
@@ -881,7 +890,7 @@ class SetupAdvisor extends ConfigurationItem {
 				Gui %window%:Color, D0D0D0, D8D8D8
 				
 				x := (this.CharacteristicsArea.X + 8)
-				y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * 56))
+				y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 				
 				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
 			
@@ -954,7 +963,7 @@ class SetupAdvisor extends ConfigurationItem {
 				for ignore, widget in this.SelectedCharacteristicsWidgets[this.SelectedCharacteristics[row]] {
 					GuiControlGet pos, Pos, %widget%
 				
-					y := (posY - 75)
+					y := (posY - kCharacteristicHeight)
 					
 					GuiControl MoveDraw, %widget%, y%Y%
 				}
@@ -1227,6 +1236,32 @@ factPath(path*) {
 		result .= ((StrLen(result) > 0) ? ("." . path[A_Index]) : path[A_Index])
 	
 	return result
+}
+
+loadSetup() {
+	title := translate("Load Setup...")
+	
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+	FileSelectFile fileName, 1, , %title%, Setup (*.setup)
+	OnMessage(0x44, "")
+
+	if (fileName != "")
+		SetupAdvisor.Instance.restoreState(fileName)
+}
+
+saveSetup() {
+	title := translate("Save Setup...")
+	
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+	FileSelectFile fileName, S17, , %title%, Setup (*.setup)
+	OnMessage(0x44, "")
+
+	if (fileName != "") {
+		if !InStr(fileName, ".")
+			fileName := (fileName . ".setup")
+		
+		SetupAdvisor.Instance.saveState(fileName)
+	}
 }
 
 closeAdvisor() {

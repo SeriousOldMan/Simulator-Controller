@@ -19,6 +19,8 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
+global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -730,7 +732,7 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
-	if !inList(["Simulator Tools", "Simulator Download"], StrSplit(A_ScriptName, ".")[1]) {
+	if !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kTempDirectory . "VERSION")
 		
 		if !check {
@@ -792,7 +794,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if (!inList(A_Args, "-NoUpdate") && !inList(["Simulator Tools", "Simulator Download"], StrSplit(A_ScriptName, ".")[1])) {
+	if (!inList(A_Args, "-NoUpdate") && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())

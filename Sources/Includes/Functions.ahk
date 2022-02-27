@@ -520,6 +520,8 @@ stopMessageManager() {
 }
 
 startMessageManager() {
+	FileCreateDir %kTempDirectory%Messages
+	
 	OnMessage(0x4a, "receiveWindowMessage") 
 	
 	registerEventHandler("*", "unknownEventHandler")
@@ -730,10 +732,10 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
-	check := !FileExist(kTempDirectory . "VERSION")
+	check := !FileExist(kUserConfigDirectory . "VERSION")
 	
 	if !check {
-		FileGetTime lastModified, %kTempDirectory%VERSION, M
+		FileGetTime lastModified, %kUserConfigDirectory%VERSION, M
 		
 		EnvAdd lastModified, 1, Days
 		
@@ -741,9 +743,9 @@ checkForUpdates() {
 	}
 	
 	if check {
-		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
+		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
 		
-		release := readConfiguration(kTempDirectory . "VERSION")
+		release := readConfiguration(kUserConfigDirectory . "VERSION")
 		version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
 		
 		if version {
@@ -963,7 +965,6 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Translations
 	FileCreateDir %kUserHomeDirectory%Grammars
 	FileCreateDir %kUserHomeDirectory%Temp
-	FileCreateDir %kTempDirectory%Messages
 	FileCreateDir %kDatabaseDirectory%Global
 	FileCreateDir %kDatabaseDirectory%Local
 	

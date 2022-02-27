@@ -472,7 +472,7 @@ class SetupAdvisor extends ConfigurationItem {
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+							google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 				)
 
 				width := this.SettingsViewer.Width
@@ -513,7 +513,7 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 			else {
 				names := [translate("Settings")]
-				values := [translate("All")]
+				values := [0.0]
 			}
 				
 			for ignore, setting in settings {

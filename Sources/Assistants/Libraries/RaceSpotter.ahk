@@ -283,7 +283,7 @@ class RaceSpotter extends RaceAssistant {
 	updateDriver() {
 		local knowledgeBase = this.KnowledgeBase
 		
-		if (this.Speaker) {
+		if (this.Speaker && (this.Session = kSessionRace)) {
 			if !this.SpotterSpeaking {
 				this.iSpotterSpeaking := true
 				
@@ -394,7 +394,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	pitWindow(state) {
-		if (this.AnnouncementSettings["PitWindow"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.AnnouncementSettings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
 			this.iSpotterSpeaking := true
 			
 			try {

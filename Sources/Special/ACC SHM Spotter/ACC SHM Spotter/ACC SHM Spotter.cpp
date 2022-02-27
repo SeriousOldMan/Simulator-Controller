@@ -335,7 +335,7 @@ bool checkFlagState() {
 
 			return true;
 		}
-		else if (blueCount++ > 100) {
+		else if (blueCount++ > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;

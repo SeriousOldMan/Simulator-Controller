@@ -68,6 +68,13 @@
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-4)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-4)
 
+[Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
+------
+  - [Introduction]()
+  - [Describing Setup Issues]()
+  - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
+
+
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#introduction)

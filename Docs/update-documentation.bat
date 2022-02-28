@@ -16,3 +16,4 @@ copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
 copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md
 copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
+copy "Setup Advisor.md" ..\..\Controller.Wiki\Setup-Advisor.md

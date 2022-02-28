@@ -26,6 +26,8 @@ global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Simulator Co
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vDetachedInstallation = false
+
 global vDebug = false
 global vLogLevel = kLogWarn
 
@@ -931,31 +933,41 @@ initializeEnvironment() {
 	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
 	
 	if A_IsCompiled {
-		RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
-		
-		installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-		installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
-		
-		install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
-		install := (install || !installLocation || (installLocation = ""))
-		
-		if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Download")) {
-			kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
+		if FileExist(kConfigDirectory . "Simulator Controller.install") {
+			installOptions := readConfiguration(kConfigDirectory . "Simulator Controller.install")
+			installLocation := getConfigurationValue(installOptions, "Install", "Location", "..\")
 			
-			if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
-				vTargetLanguageCode := getSystemLanguage()
-			else
-				vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
-	
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Installation")
-			MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
-			OnMessage(0x44, "")
-
-			IfMsgBox Yes
-				Run *RunAs %kBinariesDirectory%Simulator Tools.exe
+			if ((installLocation = "*") || (installLocation = "..\"))
+				vDetachedInstallation := true
+		}
+		
+		if !vDetachedInstallation {
+			RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+		
+			installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+			installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
+			
+			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
+			install := (install || !installLocation || (installLocation = ""))
+			
+			if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Download")) {
+				kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 				
-			ExitApp 0
+				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
+					vTargetLanguageCode := getSystemLanguage()
+				else
+					vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+		
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Installation")
+				MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
+				OnMessage(0x44, "")
+
+				IfMsgBox Yes
+					Run *RunAs %kBinariesDirectory%Simulator Tools.exe
+					
+				ExitApp 0
+			}
 		}
 	}
 	
@@ -2057,9 +2069,13 @@ decreaseLogLevel() {
 
 initializeEnvironment()
 loadSimulatorConfiguration()
-checkForUpdates()
-requestShareSetupDatabaseConsent()
-shareSetupDatabase()
+
+if vDetachedInstallation {
+	checkForUpdates()
+	requestShareSetupDatabaseConsent()
+	shareSetupDatabase()
+}
+
 initializeLoggingSystem()
 startMessageManager()
 startTrayMessageManager()

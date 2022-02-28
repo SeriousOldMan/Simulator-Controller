@@ -303,7 +303,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		Gui %window%:Add, DropDownList, x100 yp w180 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
 			
-		Gui %window%:Add, Text, x8 yp+30 w500 0x10
+		Gui %window%:Add, Text, x8 yp+30 w400 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -312,21 +312,21 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Add, Text, x50 yp+5 w180 h26, % translate("Characteristics")
 		
 		Gui %window%:Font, s8 Norm
-		Gui %window%:Add, GroupBox, x16 yp+30 w482 h469 -Theme
+		Gui %window%:Add, GroupBox, x16 yp+30 w382 h469 -Theme
 		
-		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 482, W: 482, Height: 439, H: 439}
+		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 382, W: 482, Height: 439, H: 439}
 		
-		Gui %window%:Add, Button, x418 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
+		Gui %window%:Add, Button, x318 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
 		
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
 			
-		Gui %window%:Add, Picture, x520 ys+12 w30 h30, %kIconsDirectory%Assistant.ico
-		Gui %window%:Add, Text, x554 yp+5 w150 h26, % translate("Recommendations")
+		Gui %window%:Add, Picture, x420 ys+12 w30 h30, %kIconsDirectory%Assistant.ico
+		Gui %window%:Add, Text, x454 yp+5 w150 h26, % translate("Recommendations")
 			
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, ActiveX, x520 yp+30 w675 h595 Border vsettingsViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x420 yp+30 w775 h595 Border vsettingsViewer, shell.explorer
 	
 		settingsViewer.Navigate("about:blank")
 		
@@ -944,7 +944,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 				x := x + 25
 				
-				Gui %window%:Add, Text, x%X% y%Y% w350 h26 HWNDlabel1, % characteristicLabels[characteristic]
+				Gui %window%:Add, Text, x%X% y%Y% w300 h26 HWNDlabel1, % characteristicLabels[characteristic]
 				
 				x := x - 25
 				
@@ -957,11 +957,11 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				x := x + 120
 				
-				Gui %window%:Add, Slider, x%x% yp-2 w165 0x10 Range0-100 ToolTip HWNDslider1, 0
+				Gui %window%:Add, Slider, x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
 				
-				x := x + 170
+				x := x + 123
 				
-				Gui %window%:Add, Slider, x%x% yp w165 0x10 Range0-100 ToolTip HWNDslider2, 0
+				Gui %window%:Add, Slider, x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
 				
 				callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
 				

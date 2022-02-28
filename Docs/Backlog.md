@@ -10,7 +10,6 @@
 
 #### Setup Development
   1. [Target: VV4.x] Consolidating the shared setup database and build a distribution process
-  2. [Target: V4.x] An AI-based wizard, which supports on creating or modifying car setups using an interview style approach
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game

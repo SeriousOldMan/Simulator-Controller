@@ -163,13 +163,13 @@ class VoiceAssistant {
 			stopped := this.Assistant.stopListening()
 			
 			try {
-				this.iIsSpeaking := true
+				this.Speaking := true
 			
 				try {
 					base.speak(text, true)
 				}
 				finally {
-					this.iIsSpeaking := false
+					this.Speaking := false
 				}
 			}
 			finally {
@@ -233,6 +233,10 @@ class VoiceAssistant {
 	Speaking[] {
 		Get {
 			return this.iIsSpeaking
+		}
+		
+		Set {
+			return (this.iIsSpeaking := value)
 		}
 	}
 	

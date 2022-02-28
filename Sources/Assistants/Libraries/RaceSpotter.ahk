@@ -75,7 +75,11 @@ class RaceSpotter extends RaceAssistant {
 	
 	SpotterSpeaking[] {
 		Get {
-			return this.iSpotterSpeaking
+			return this.getSpeaker(true).Speaking
+		}
+		
+		Set {
+			return (this.getSpeaker(true).Speaking := true)
 		}
 	}
 	
@@ -285,7 +289,7 @@ class RaceSpotter extends RaceAssistant {
 		
 		if (this.Speaker && (this.Session = kSessionRace)) {
 			if !this.SpotterSpeaking {
-				this.iSpotterSpeaking := true
+				this.SpotterSpeaking := true
 				
 				try {
 					lastLap := knowledgeBase.getValue("Lap", 0)
@@ -312,7 +316,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 				finally {
-					this.iSpotterSpeaking := false
+					this.SpotterSpeaking := false
 				}
 			}
 			else {
@@ -338,13 +342,13 @@ class RaceSpotter extends RaceAssistant {
 			}
 			
 			if (this.Speaker && !this.SpotterSpeaking) {
-				this.iSpotterSpeaking := true
+				this.SpotterSpeaking := true
 				
 				try {
 					this.getSpeaker(true).speakPhrase(type, variables)
 				}
 				finally {
-					this.iSpotterSpeaking := false
+					this.SpotterSpeaking := false
 				}
 			}
 		}
@@ -352,7 +356,7 @@ class RaceSpotter extends RaceAssistant {
 	
 	yellowFlag(type, arguments*) {
 		if (this.AnnouncementSettings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
-			this.iSpotterSpeaking := true
+			this.SpotterSpeaking := true
 			
 			try {
 				switch type {
@@ -370,41 +374,41 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			finally {
-				this.iSpotterSpeaking := false
+				this.SpotterSpeaking := false
 			}
 		}
 	}
 	
 	blueFlag() {
 		if (this.AnnouncementSettings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
-			this.iSpotterSpeaking := true
+			this.SpotterSpeaking := true
 			
 			try {
 				delta := this.KnowledgeBase.getValue("Position.Standings.Behind.Delta", false)
 				
 				if (delta && (delta < 2000))
-					this.getSpeaker().speakPhrase("BlueForPosition")
+					this.getSpeaker(true).speakPhrase("BlueForPosition")
 				else
-					this.getSpeaker().speakPhrase("Blue")
+					this.getSpeaker(true).speakPhrase("Blue")
 			}
 			finally {
-				this.iSpotterSpeaking := false
+				this.SpotterSpeaking := false
 			}
 		}
 	}
 	
 	pitWindow(state) {
 		if (this.AnnouncementSettings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
-			this.iSpotterSpeaking := true
+			this.SpotterSpeaking := true
 			
 			try {
 				if (state = "Open")
-					this.getSpeaker().speakPhrase("PitWindowOpen")
+					this.getSpeaker(true).speakPhrase("PitWindowOpen")
 				else if (state = "Closed")
-					this.getSpeaker().speakPhrase("PitWindowClosed")
+					this.getSpeaker(true).speakPhrase("PitWindowClosed")
 			}
 			finally {
-				this.iSpotterSpeaking := false
+				this.SpotterSpeaking := false
 			}
 		}
 	}

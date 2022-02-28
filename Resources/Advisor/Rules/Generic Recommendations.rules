@@ -168,8 +168,8 @@
 
 [?Brake.Stability.Corner.Slow.Correction != 0] =>																								\
 		(Prove: changeSetting(Electronics.ABS, 1, ?Brake.Stability.Corner.Slow.Correction)),													\
-		(Prove: changeSetting(AntiRollbar.Front, 0.5, ?Brake.Stability.Corner.Slow.Correction)),												\
-		(Prove: changeSetting(AntiRollbar.Rear, -0.25, ?Brake.Stability.Corner.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Front, 0.5, ?Brake.Stability.Corner.Slow.Correction)),												\
+		(Prove: changeSetting(AntiRollBar.Rear, -0.25, ?Brake.Stability.Corner.Slow.Correction))
 
 {All: [?Brake.Stability.Corner.Slow.Correction != 0], [?Brake.Stability.Corner.Slow.Value > 50]} =>												\
 		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right], -0.25, ?Brake.Stability.Corner.Slow.Correction)),				\
@@ -188,16 +188,16 @@
 {All: [?Curbs.Stability.Correction != 0], [?Curbs.Stability.Value > 50]} =>																		\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Curbs.Stability.Correction)),										\
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Curbs.Stability.Correction)),										\
-		(Prove: changeSetting(AntiRollbar, [Front, Rear], -1, ?Curbs.Stability.Correction))
+		(Prove: changeSetting(AntiRollBar, [Front, Rear], -1, ?Curbs.Stability.Correction))
 
 [?Speed.Straight.Correction != 0] =>																											\
 		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Speed.Straight.Correction)),																	\
 		(Prove: changeSetting(Aero.Height.Rear, -1, ?Speed.Straight.Correction))
 
 [?Speed.Corner.Slow.Correction != 0] =>																											\
-		(Prove: changeSetting(AntiRollbar.Front, -0.5, ?Speed.Corner.Slow.Correction)),															\
+		(Prove: changeSetting(AntiRollBar.Front, -0.5, ?Speed.Corner.Slow.Correction)),															\
 		(Prove: changeSetting(Geometry.Camber, [Rear.Left, Rear.Right], 0.5, ?Speed.Corner.Slow.Correction)),									\
-		(Prove: changeSetting(Differential.Lock, 1, ?Speed.Corner.Slow.Correction))
+		(Prove: changeSetting(Differential.Preload, 1, ?Speed.Corner.Slow.Correction))
 		
 {All: [?Speed.Corner.Slow.Correction != 0], [?Speed.Corner.Slow.Value > 50]} =>																	\
 		(Prove: changeSetting(Spring.Rate, [Rear.Left, Rear.Right], 1, ?Speed.Corner.Slow.Correction)),											\
@@ -213,14 +213,16 @@
 {All: [?Speed.Corner.Fast.Correction != 0], [?Speed.Corner.Fast.Value > 50]} =>																	\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Speed.Corner.Fast.Correction))
 
-[?Understeer.General.Correction != 0] =>																										\
+[?Understeer.General.Correction != 0] =>																											\
+		(Prove: changeSetting(AntiRollBar.Front, -1, ?Understeer.General.Correction))
+
+{All: [?Understeer.General.Correction != 0], [?Understeer.General.Value > 50]} =>																\
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right], 1, ?Understeer.General.Correction)),									\
 		(Prove: changeSetting(Geometry.Camber, [Rear.Left, Rear.Right], -1, ?Understeer.General.Correction)),									\
 		(Prove: changeSetting(Geometry.Toe, [Rear.Left, Rear.Right], -0.5, ?Understeer.General.Correction))
 
 [?Oversteer.General.Correction != 0] =>																											\
-		(Prove: changeSetting(Brake.Balance, 1, ?Oversteer.General.Correction)),																\
-		(Prove: changeSetting(AntiRollbar.Rear, -1, ?Oversteer.General.Correction))
+		(Prove: changeSetting(AntiRollBar.Rear, -1, ?Oversteer.General.Correction))
 
 {All: [?Oversteer.General.Correction != 0], [?Oversteer.General.Value > 50]} =>																	\
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right], -1, ?Oversteer.General.Correction)),									\
@@ -229,8 +231,8 @@
 
 [?Understeer.Corner.Entry.Slow.Correction != 0] =>																								\
 		(Prove: changeSetting(Brake.Balance, -1, ?Understeer.Corner.Entry.Slow.Correction)),													\
-		(Prove: changeSetting(AntiRollbar.Front, -0.5, ?Understeer.Corner.Entry.Slow.Correction)),												\
-		(Prove: changeSetting(Differential.Lock, -1, ?Understeer.Corner.Entry.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Front, -0.5, ?Understeer.Corner.Entry.Slow.Correction)),												\
+		(Prove: changeSetting(Differential.Preload, -1, ?Understeer.Corner.Entry.Slow.Correction))
 		
 {All: [?Understeer.Corner.Entry.Slow.Correction != 0], [?Understeer.Corner.Entry.Slow.Value > 50]} =>											\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Entry.Slow.Correction)),							\
@@ -239,8 +241,8 @@
 		
 [?Oversteer.Corner.Entry.Slow.Correction != 0] =>																								\
 		(Prove: changeSetting(Brake.Balance, 0.5, ?Oversteer.Corner.Entry.Slow.Correction)),													\
-		(Prove: changeSetting(AntiRollbar.Front, 1, ?Oversteer.Corner.Entry.Slow.Correction)),													\
-		(Prove: changeSetting(AntiRollbar.Rear, -0.5, ?Oversteer.Corner.Entry.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Front, 1, ?Oversteer.Corner.Entry.Slow.Correction)),													\
+		(Prove: changeSetting(AntiRollBar.Rear, -0.5, ?Oversteer.Corner.Entry.Slow.Correction))
 
 {All: [?Oversteer.Corner.Entry.Slow.Correction != 0], [?Oversteer.Corner.Entry.Slow.Value > 50]} =>												\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Entry.Slow.Correction)),								\
@@ -269,8 +271,8 @@
 
 [?Understeer.Corner.Apex.Slow.Correction != 0] =>																								\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Apex.Slow.Correction)),							\
-		(Prove: changeSetting(AntiRollbar.Front, -0.5, ?Understeer.Corner.Apex.Slow.Correction)),												\
-		(Prove: changeSetting(Differential.Lock, -1, ?Understeer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Front, -0.5, ?Understeer.Corner.Apex.Slow.Correction)),												\
+		(Prove: changeSetting(Differential.Preload, -1, ?Understeer.Corner.Apex.Slow.Correction))
 		
 {All: [?Understeer.Corner.Apex.Slow.Correction != 0], [?Understeer.Corner.Apex.Slow.Value > 50]} =>												\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Apex.Slow.Correction)),							\
@@ -278,8 +280,8 @@
 
 [?Oversteer.Corner.Apex.Slow.Correction != 0] =>																								\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Apex.Slow.Correction)),								\
-		(Prove: changeSetting(AntiRollbar.Front, 0.5, ?Oversteer.Corner.Apex.Slow.Correction)),													\
-		(Prove: changeSetting(Differential.Lock, 0.5, ?Oversteer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(AntiRollBar.Front, 0.5, ?Oversteer.Corner.Apex.Slow.Correction)),													\
+		(Prove: changeSetting(Differential.Preload, 0.5, ?Oversteer.Corner.Apex.Slow.Correction))
 		
 {All: [?Oversteer.Corner.Apex.Slow.Correction != 0], [?Oversteer.Corner.Apex.Slow.Value > 50]} =>												\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Oversteer.Corner.Apex.Slow.Correction)),							\
@@ -293,7 +295,7 @@
 {All: [?Understeer.Corner.Apex.Fast.Correction != 0], [?Understeer.Corner.Apex.Fast.Value > 50]} =>												\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Apex.Fast.Correction)),							\
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Apex.Fast.Correction)),							\
-		(Prove: changeSetting(Differential.Lock, -0.5, ?Understeer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(Differential.Preload, -0.5, ?Understeer.Corner.Apex.Slow.Correction))
 
 [?Oversteer.Corner.Apex.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Apex.Fast.Correction)),														\
@@ -303,4 +305,50 @@
 {All: [?Oversteer.Corner.Apex.Fast.Correction != 0], [?Oversteer.Corner.Apex.Fast.Value > 50]} =>												\
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Oversteer.Corner.Apex.Fast.Correction)),							\
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Apex.Fast.Correction)),							\
-		(Prove: changeSetting(Differential.Lock, 0.5, ?Oversteer.Corner.Apex.Slow.Correction))
+		(Prove: changeSetting(Differential.Preload, 0.5, ?Oversteer.Corner.Apex.Slow.Correction))
+
+[?Understeer.Corner.Exit.Slow.Correction != 0] =>																								\
+		(Prove: changeSetting(Electronics.TC, -1, ?Understeer.Corner.Exit.Slow.Correction)),													\
+		(Prove: changeSetting(AntiRollBar.Rear, 0.5, ?Understeer.Corner.Exit.Slow.Correction)),													\
+		(Prove: changeSetting(Differential.Preload, 0.5, ?Understeer.Corner.Exit.Slow.Correction))
+		
+{All: [?Understeer.Corner.Exit.Slow.Correction != 0], [?Understeer.Corner.Exit.Slow.Value > 50]} =>												\
+		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Exit.Slow.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Exit.Slow.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Exit.Slow.Correction))
+		
+[?Oversteer.Corner.Exit.Slow.Correction != 0] =>																								\
+		(Prove: changeSetting(Electronics.TC, 1, ?Oversteer.Corner.Exit.Slow.Correction)),														\
+		(Prove: changeSetting(AntiRollBar.Rear, -0.5, ?Oversteer.Corner.Exit.Slow.Correction)),													\
+		(Prove: changeSetting(Differential.Preload, -0.5, ?Oversteer.Corner.Exit.Slow.Correction))
+
+{All: [?Oversteer.Corner.Exit.Slow.Correction != 0], [?Oversteer.Corner.Exit.Slow.Value > 50]} =>												\
+		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Exit.Slow.Correction)),								\
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Oversteer.Corner.Exit.Slow.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Exit.Slow.Correction))
+
+[?Understeer.Corner.Exit.Fast.Correction != 0] =>																								\
+		(Prove: changeSetting(Electronics.TC, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Height.Rear, 0.5, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Height.Front, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),												\
+		(Prove: changeSetting(Differential.Preload, 0.5, ?Understeer.Corner.Exit.Fast.Correction))
+
+{All: [?Understeer.Corner.Exit.Fast.Correction != 0], [?Understeer.Corner.Exit.Fast.Value > 50]} =>												\
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Range, [Rear.Left, Rear.Right], -0.5, ?Understeer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Rear.Left, Rear.Right], 0.5, ?Understeer.Corner.Exit.Fast.Correction))
+
+[?Oversteer.Corner.Exit.Fast.Correction != 0] =>																								\
+		(Prove: changeSetting(Electronics.TC, 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Exit.Fast.Correction)),														\
+		(Prove: changeSetting(Aero.Height.Rear, -0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Height.Front, 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),												\
+		(Prove: changeSetting(Differential.Preload, -0.5, ?Oversteer.Corner.Exit.Fast.Correction))
+
+{All: [?Oversteer.Corner.Exit.Fast.Correction != 0], [?Oversteer.Corner.Exit.Fast.Value > 50]} =>												\
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], -1, ?Oversteer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Range, [Rear.Left, Rear.Right], 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),							\
+		(Prove: changeSetting(Bumpstop.Rate, [Rear.Left, Rear.Right], -0.5, ?Oversteer.Corner.Exit.Fast.Correction))

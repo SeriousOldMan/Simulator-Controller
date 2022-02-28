@@ -91,8 +91,8 @@ class SetupAdvisor extends ConfigurationItem {
 	iSimulatorSettings := false
 	
 	iSelectedSimulator := false
-	iSelectedCar := false
-	iSelectedTrack := false
+	iSelectedCar := true
+	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 	
 	iCharacteristics := []
@@ -221,10 +221,12 @@ class SetupAdvisor extends ConfigurationItem {
 	__New(simulator := false, car := false, track := false, weather := false) {
 		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		
-		this.iSelectedSimulator := simulator
-		this.iSelectedCar := car
-		this.iSelectedTrack := track
-		this.iSelectedWeather := weather
+		if simulator {
+			this.iSelectedSimulator := simulator
+			this.iSelectedCar := car
+			this.iSelectedTrack := track
+			this.iSelectedWeather := weather
+		}
 		
 		this.iDefinition := readConfiguration(kResourcesDirectory . "Advisor\Setup Advisor.ini")
 		
@@ -270,8 +272,12 @@ class SetupAdvisor extends ConfigurationItem {
 				simulator := inList(simulators, this.SelectedSimulator)
 
 			if (simulator == 0)
-				simulator := 1
+				simulator := simulator := inList(simulators, true)
 		}
+		
+		for index, name in simulators
+			if (name == true)
+				simulators[index] := translate("Generic")
 	
 		Gui %window%:Add, DropDownList, x100 yp w180 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
@@ -442,7 +448,7 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 		}
 		else
-			advisor.loadSimulator(advisor.getSimulators()[1], true)
+			advisor.loadSimulator(true, true)
 	}
 	
 	show() {
@@ -566,7 +572,7 @@ class SetupAdvisor extends ConfigurationItem {
 		{
 			SplitPath, A_LoopFileName, , , , simulator
 			
-			simulators.Push(simulator)
+			simulators.Push((simulator = "Generic") ? true : simulator)
 		}
 		
 		return simulators
@@ -814,12 +820,12 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				this.clearCharacteristics()
 				
-				this.initializeSimulator((simulator == true) ? translate("Generic") : simulator)
+				this.initializeSimulator((simulator == true) ? "Generic" : simulator)
 		
 				simulators := this.getSimulators()
 		
 				if (simulators.Length() > 0)
-					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), (simulator == true) ? translate("Generic") : simulator)
+					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 		
 				productions := false
 				reductions := false
@@ -836,7 +842,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.loadCharacteristics(this.Definition)
 				this.loadSettings(this.Definition)
 				
-				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI...")})
+				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI kernel...")})
 				
 				knowledgeBase.addFact("Initialize", true)
 					
@@ -1385,7 +1391,7 @@ runSetupAdvisor() {
 		advisor.show()
 		
 		if !GetKeyState("Ctrl", "P")
-			advisor.loadSimulator(advisor.getSimulators()[1], true)
+			advisor.loadSimulator(true, true)
 		else {
 			callback := ObjBindMethod(advisor, "restoreState")
 		

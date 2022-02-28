@@ -875,7 +875,7 @@ class SetupAdvisor extends ConfigurationItem {
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledge(knowledgeBase)
 				
-				showProgress({progress: vProgressCount++, message: translate("Initialize Car Setup...")})
+				showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
 				
 				Sleep 200
 				

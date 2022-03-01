@@ -344,8 +344,11 @@ Selects the driver to take the car during the next pitstop. *selection* must be 
 #### *openRaceSettings(import :: Boolean := false)*
 Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.
 
+#### *openSetupAdvisor()*
+Opens the tool which helps you creating a suspension setup for a car. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
+
 #### *openSetupDatabase()*
-Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
+Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. This action function is provided by the "Race Engineer" and "Race Strategis" plugins and is available depending on the concrete configuration.
 
 #### *openStrategyWorkbench()*
 Opens the "Strategy Workbench" tool, with which you can explore the telemetrie data for past session, as long as they have been saved by the Race Strategist, and with which you can create a strategy for an upcoming race. If a simulation is currently running, several selections (car, track, and so on) will already be prefilled.

@@ -195,6 +195,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceCenter(this.Plugin)
 			else if (this.Action = "SetupDatabaseOpen")
 				openSetupDatabase(this.Plugin)
+			else if (this.Action = "SetupAdvisorOpen")
+				openSetupAdvisor(this.Plugin)
 			else if (this.Action = "StrategyWorkbenchOpen")
 				openStrategyWorkbench(this.Plugin)
 		}
@@ -416,6 +418,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if openSetupDatabase
 			this.createRaceAssistantAction(controller, "SetupDatabaseOpen", openSetupDatabase)
 		
+		openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
+		
+		if openSetupAdvisor
+			this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
+		
 		openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
 		
 		if openStrategyWorkbench
@@ -493,7 +500,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.registerAction(new this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
-				  || (action = "SetupDatabaseOpen") || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
+				  || (action = "SetupDatabaseOpen") || (action = "SetupAdvisorOpen")
+				  || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 				
 				this.registerAction(new this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
@@ -542,6 +550,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SetupDatabaseOpen")
+				 || (theAction.Action = "SetupAdvisorOpen")
 				 || (theAction.Action = "StrategyWorkbenchOpen")|| (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
@@ -1416,6 +1425,30 @@ openSetupDatabase(plugin := false) {
 		logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
 		showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+openSetupAdvisor(plugin := false) {
+	exePath := kBinariesDirectory . "Setup Advisor.exe"	
+	controller := SimulatorController.Instance
+	
+	if !plugin {
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
+		
+		if !plugin
+			plugin := controller.findPlugin(kRaceStrategistPlugin)
+	}
+	
+	try {
+		; options := getSimulatorOptions(plugin)
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Setup Advisor tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Setup Advisor tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

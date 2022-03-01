@@ -95,7 +95,15 @@ You can even use all these functionalities during multiplayer team races using t
 
 #### Virtual Race Spotter
 
-Simulator Controller also comes with a Virtual Spotter, which will keep an eye on the traffic around you and will warn you about critical situations.
+Simulator Controller also comes with a Virtual Spotter, which will keep an eye on the traffic around you and will warn you about critical situations. You can fully customize the information provided by the Spotter to your specific needs and taste.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2011.JPG)
+
+#### Setup Advisor
+
+Another very useful tool of the Simulator Controller suite is the Setup Advisor. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on problem descriptions provided by the driver.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Advisor.JPG)
 
 ### Additional features
 

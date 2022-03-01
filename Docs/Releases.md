@@ -1,3 +1,13 @@
+## 3.9.4-release 03/04/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New tool ["Setup Advisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor), which generates recommendations for changing the setup options of a car based on problem descriptions provided by the driver.
+  4. New [plugin parameter "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for "Race Engineer" plugin.
+  5. New [action function "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions).
+  6. Frequency of blue flag warnings has been drastically reduced.
+  7. Fixed sporadic cacophony of Race Assistants voice output.
+
 ## 3.9.2-release 02/25/22
 
   1. Bugfixes, as always

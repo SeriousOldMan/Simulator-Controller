@@ -207,6 +207,8 @@
 		
 [?Speed.Corner.Fast.Correction != 0] =>																											\
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Speed.Corner.Fast.Correction)),																\
+		(Prove: changeSetting(Aero.Splitter.Front, 1, ?Speed.Corner.Fast.Correction)),															\
+		(Prove: changeSetting(Aero.Wing.Front, 1, ?Speed.Corner.Fast.Correction)),																\
 		(Prove: changeSetting(Aero.Height.Rear, -1, ?Speed.Corner.Fast.Correction)),															\
 		(Prove: changeSetting(Aero.Height.Front, -1, ?Speed.Corner.Fast.Correction))
 
@@ -251,7 +253,9 @@
 
 [?Understeer.Corner.Entry.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Brake.Balance, -0.5, ?Understeer.Corner.Entry.Fast.Correction)),													\
-		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Understeer.Corner.Entry.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Rear, -0.5, ?Understeer.Corner.Entry.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Front, 1, ?Understeer.Corner.Entry.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Splitter.Front, 1, ?Understeer.Corner.Entry.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Rear, 0.5, ?Understeer.Corner.Entry.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Front, -0.5, ?Understeer.Corner.Entry.Fast.Correction))
 
@@ -262,6 +266,8 @@
 [?Oversteer.Corner.Entry.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Brake.Balance, 1, ?Oversteer.Corner.Entry.Fast.Correction)),														\
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Entry.Fast.Correction)),														\
+		(Prove: changeSetting(Aero.Wing.Front, -0.5, ?Oversteer.Corner.Entry.Fast.Correction)),														\
+		(Prove: changeSetting(Aero.Splitter.Front, -0.5, ?Oversteer.Corner.Entry.Fast.Correction)),														\
 		(Prove: changeSetting(Aero.Height.Rear, -0.5, ?Oversteer.Corner.Entry.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Front, 0.5, ?Oversteer.Corner.Entry.Fast.Correction))
 
@@ -288,7 +294,9 @@
 		(Prove: changeSetting(Bumpstop.Rate, [Front.Left, Front.Right], 1, ?Oversteer.Corner.Apex.Slow.Correction))
 
 [?Understeer.Corner.Apex.Fast.Correction != 0] =>																								\
-		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Understeer.Corner.Apex.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Rear, -0.5, ?Understeer.Corner.Apex.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Front, 1, ?Understeer.Corner.Apex.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Splitter.Front, 1, ?Understeer.Corner.Apex.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Rear, 0.5, ?Understeer.Corner.Apex.Fast.Correction)),													\
 		(Prove: changeSetting(Aero.Height.Front, -0.5, ?Understeer.Corner.Apex.Fast.Correction))
 
@@ -299,6 +307,8 @@
 
 [?Oversteer.Corner.Apex.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Apex.Fast.Correction)),														\
+		(Prove: changeSetting(Aero.Wing.Front, -0.5, ?Oversteer.Corner.Apex.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Splitter.Front, -0.5, ?Oversteer.Corner.Apex.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Rear, -0.5, ?Oversteer.Corner.Apex.Fast.Correction)),													\
 		(Prove: changeSetting(Aero.Height.Front, 0.5, ?Oversteer.Corner.Apex.Fast.Correction))
 
@@ -329,7 +339,9 @@
 
 [?Understeer.Corner.Exit.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Electronics.TC, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),													\
-		(Prove: changeSetting(Aero.Wing.Rear, -1, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Rear, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Wing.Front, 1, ?Understeer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Splitter.Front, 1, ?Understeer.Corner.Exit.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Rear, 0.5, ?Understeer.Corner.Exit.Fast.Correction)),													\
 		(Prove: changeSetting(Aero.Height.Front, -0.5, ?Understeer.Corner.Exit.Fast.Correction)),												\
 		(Prove: changeSetting(Differential.Preload, 0.5, ?Understeer.Corner.Exit.Fast.Correction))
@@ -343,8 +355,10 @@
 [?Oversteer.Corner.Exit.Fast.Correction != 0] =>																								\
 		(Prove: changeSetting(Electronics.TC, 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
 		(Prove: changeSetting(Aero.Wing.Rear, 1, ?Oversteer.Corner.Exit.Fast.Correction)),														\
+		(Prove: changeSetting(Aero.Wing.Front, -0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
+		(Prove: changeSetting(Aero.Splitter.Front, -0.5, ?Oversteer.Corner.Exit.Fast.Correction)),												\
 		(Prove: changeSetting(Aero.Height.Rear, -0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
-		(Prove: changeSetting(Aero.Height.Front, 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),												\
+		(Prove: changeSetting(Aero.Height.Front, 0.5, ?Oversteer.Corner.Exit.Fast.Correction)),													\
 		(Prove: changeSetting(Differential.Preload, -0.5, ?Oversteer.Corner.Exit.Fast.Correction))
 
 {All: [?Oversteer.Corner.Exit.Fast.Correction != 0], [?Oversteer.Corner.Exit.Fast.Value > 50]} =>												\

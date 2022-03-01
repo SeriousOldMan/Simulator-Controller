@@ -175,21 +175,30 @@ updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <=														
 		Set(?characteristic, Correction, ?nCorrection)
 updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?characteristic, Correction, 0)
 
-changeSetting(?setting, ?increment, ?correction) <= Get(?setting, Delta, ?value), ?delta = ?increment * ?correction,							\
-													?nValue = ?value + ?delta, Set(?setting, Delta, ?nValue)
-
 changeSetting(?, [], ?, ?)
 changeSetting(?setting, [?suffix | ?suffixes], ?increment, ?correction) <=																		\
 		Append(?setting, ., ?suffix, ?name), changeSetting(?name, ?increment, ?correction),														\
 		changeSetting(?setting, ?suffixes, ?increment, ?correction)
 		
+changeSetting(?setting, ?increment, ?correction) <= Get(?setting, Delta, ?delta), ?value = ?increment * ?correction,							\
+													combineDelta(?value, ?delta, ?nDelta), Set(?setting, Delta, ?nDelta)
+
+combineDelta(0, ?delta, ?delta)
+combineDelta(?delta, 0, ?delta)
+combineDelta(?delta1, ?delta2, ?delta) <= ?delta1 < 0, ?delta2 < 0, !, min(?delta1, ?delta2, ?delta)
+combineDelta(?delta1, ?delta2, ?delta) <= ?delta1 > 0, ?delta2 > 0, !, max(?delta1, ?delta2, ?delta)
+combineDelta(?delta1, ?delta2, ?delta) <= ?delta = ?delta1 + ?delta2
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                               Utility Rules                             ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+max(?x, ?y, ?x) <= ?x > ?y, !
+max(?x, ?y, ?y)
+
+min(?x, ?y, ?x) <= ?x < ?y, !
+min(?x, ?y, ?y)
+
 bound?(?x) <= unbound?(?x), !, fail
 bound?(?)
-
-member?(?value, [?value | ?])
-member?(?value, [? | ?tail]) <= member?(?value, ?tail)

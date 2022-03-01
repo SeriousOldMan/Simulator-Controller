@@ -1136,9 +1136,9 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 			
 			knowledgeBase.addFact("Calculate", true)
-			
+		
 			this.KnowledgeBase.produce()
-						
+			
 			if this.Debug[kDebugKnowledgeBase]
 				this.dumpKnowledge(this.KnowledgeBase)
 			

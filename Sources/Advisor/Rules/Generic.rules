@@ -11,7 +11,8 @@
 
 [?Initialize] => (Prove: addSimulator(*)), 																			\
 				 (Prove: addCharacteristics(*, *, *, *)),															\
-				 (Prove: addSettings(*, *, *))
+				 (Prove: addSettings(*, *, *)),																		\
+				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
 
 
 ;;;-------------------------------------------------------------------------;;;

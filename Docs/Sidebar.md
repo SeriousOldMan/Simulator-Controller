@@ -73,6 +73,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#introduction)
   - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#describing-setup-issues)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#understanding-the-recommendations)
+  - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#how-it-works)
 
 
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
@@ -87,7 +88,7 @@
 	- [Team Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team)
 	- [Execute a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop)
 	- [Setup Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
-	- [Models & Algorithms](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
+	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information)
     - [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-rule-engine)
 	- [States & History](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interaction-states)
@@ -101,7 +102,7 @@
   - [Interacting with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#interacting-with-cato)
   - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
-	- [Models & Algorithms](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
+	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
   - [Race Reports](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports)
   - [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling)

@@ -7,6 +7,7 @@
   5. New [action function "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions).
   6. Frequency of blue flag warnings has been drastically reduced.
   7. Fixed sporadic cacophony of Race Assistants voice output.
+  8. Support for mutiple tyre compound colors in Strategy simulation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
 
 ## 3.9.2-release 02/25/22
 

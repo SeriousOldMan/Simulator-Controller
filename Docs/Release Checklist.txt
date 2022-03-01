@@ -24,6 +24,9 @@ Release 3.9.4 Checklist
 1. Update Procedure
    a. Translations
    b. Action Labels & Icons
+2. New tyre compound color variations
+   a. Doc Images
+   b. Documentation
 
 Release 3.9.2 Checklist
 =======================

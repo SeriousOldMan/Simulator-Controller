@@ -17,7 +17,7 @@
 ;;;                        Private Variables Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vChartID := 1
+global vChartID = 1
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -69,7 +69,7 @@ class StrategyViewer {
 	createSetupInfo(strategy) {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(strategy.TyreCompound[true]) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translateQualifiedCompound(strategy.TyreCompound, strategy.TyreCompoundColor) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")

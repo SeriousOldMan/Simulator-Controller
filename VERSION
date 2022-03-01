@@ -3,7 +3,7 @@ Version=3.9.4-dev
 Target=3.9.4-release
 Date=03/01/2022
 Download=https://www.dropbox.com/s/eef6f9xrq1zid9n/Simulator%20Controller%203.9.4-dev.zip?dl=1
-Changes=New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compouund variation in Strategy simulations
+Changes=New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compound variation in Strategy simulations
 [Release]
 Version=3.9.2-release
 Date=02/25/2022

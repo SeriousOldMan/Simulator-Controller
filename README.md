@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.9.4-release](https://www.dropbox.com/s/eef6f9xrq1zid9n/Simulator%20Controller%203.9.4-dev.zip?dl=1) (Early build for Release 3.9.4. New features: New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compouund variation in Strategy simulations. Stable, incl. documentation and update procedure.)
+[3.9.4-release](https://www.dropbox.com/s/eef6f9xrq1zid9n/Simulator%20Controller%203.9.4-dev.zip?dl=1) (Early build for Release 3.9.4. New features: New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compound variation in Strategy simulations. Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-394) of this version and all the versions you might have skipped, before installing and using this version.
 

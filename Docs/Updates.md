@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 3.9.4
 
-Adjustments to the configuration are carried out automatically. Please check whether the new plugin parameter "openSetupAdvisor" should be included in the configuration of the "Race Engineer" plugin. Also, a new action label and action icon slot has been introduced for the "SetupAdvisorOpen" action. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
+Adjustments to the configuration are carried out automatically. Please check whether the new plugin parameter ["openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) should be included in the configuration of the "Race Engineer" plugin. Also, a new action label and action icon slot has been introduced for the "SetupAdvisorOpen" action. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
 
 ***
 

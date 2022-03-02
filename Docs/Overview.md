@@ -17,7 +17,10 @@ Welcome to the Simulator Controller documentation. Here you will find everything
     General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the race assistants using.
 	
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
-    Reference information for all the builtin plugins and modes.  
+    Reference information for all the builtin plugins and modes.
+
+  - [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
+    This smart tool gives valuable recommendations on how to change a car setup for a given problem. The tool follows an interview-like approach and can even handle contradictory requirements.
 	
   - [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
     You don't want to miss out Jona, the world first full voice dialog capable Virtual Race Engineer based on artificial intelligence algorithms. Jona keeps an eye on all the technical stuff regarding your car and will help you to determine the correct amount of fuel and the correct tyre pressures for an upcoming pitstop.

@@ -1,8 +1,8 @@
 [Development]
-Version=3.9.4-dev
+Version=3.9.4-alpha
 Target=3.9.4-release
 Date=03/02/2022
-Download=https://www.dropbox.com/s/eef6f9xrq1zid9n/Simulator%20Controller%203.9.4-dev.zip?dl=1
+Download=https://www.dropbox.com/s/m18ck98scs92mja/Simulator%20Controller%203.9.4-alpha.zip?dl=1
 Changes=New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compound variation in Strategy simulations
 [Release]
 Version=3.9.2-release
@@ -13,4 +13,4 @@ Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, F
 Type=Development
 [Version]
 Release=3.9.2-release
-Development=3.9.4-dev
+Development=3.9.4-alpha

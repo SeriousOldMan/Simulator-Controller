@@ -911,7 +911,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.showSettingsChart(false)
 	}
 	
-	addCharacteristic(characteristic, weight := 50, value := 50) {
+	addCharacteristic(characteristic, weight := 50, value := 33) {
 		numCharacteristics := this.SelectedCharacteristics.Length()
 		
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
@@ -1070,7 +1070,7 @@ class SetupAdvisor extends ConfigurationItem {
 						characteristic := factPath(group, groupOption[1], option)
 				
 						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-							handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 50)
+							handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33)
 						
 							label := characteristicLabels[option]
 							
@@ -1092,7 +1092,7 @@ class SetupAdvisor extends ConfigurationItem {
 					characteristic := factPath(group, groupOption)
 					
 					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-						handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 50)
+						handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33)
 						label := characteristicLabels[groupOption]
 						
 						Menu %groupMenu%, Add, %label%, %handler%

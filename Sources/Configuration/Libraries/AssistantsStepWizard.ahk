@@ -142,6 +142,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 									arguments .= ("; openStrategyWorkbench: " . values2String(A_Space, function*))
 								case "RaceCenterOpen":
 									arguments .= ("; openRaceCenter: " . values2String(A_Space, function*))
+								case "SetupAdvisorOpen":
+									arguments .= ("; openSetupAdvisor: " . values2String(A_Space, function*))
 								case "SetupImport":
 									arguments .= ("; importSetup: " . values2String(A_Space, function*))
 								default:

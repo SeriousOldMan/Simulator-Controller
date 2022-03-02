@@ -2563,7 +2563,7 @@ class RaceCenter extends ConfigurationItem {
 			initialFuelConsumption := lastLap.FuelConsumption
 			initialAvgLapTime := this.CurrentStint.AvgLapTime
 			
-			Loop % lastLap.nr
+			Loop % lastLap.Nr
 				initialStintTime += lastLap.Laptime
 			
 			tyresTable := telemetryDB.Database.Tables["Tyres"]
@@ -2577,13 +2577,14 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
-	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight, ByRef tyreCompoundVariationWeight) {
 		useStartConditions := false
 		useTelemetryData := true
 		
 		consumptionWeight := 0
 		initialFuelWeight := 0
 		tyreUsageWeight := 0
+		tyreCompoundVariationWeight := 0
 
 		if !this.UseTraffic {
 			window := this.Window
@@ -2593,6 +2594,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControlGet randomFactorEdit
 			
 			tyreUsageWeight := randomFactorEdit
+			tyreCompoundVariationWeight := randomFactorEdit
 		}
 		
 		return true
@@ -6275,8 +6277,8 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 		}
 	}
 	
-	createPitstop(id, lap, configuration := false, adjustments := false) {
-		pitstop := new this.TrafficPitstop(this, id, lap, configuration, adjustments)
+	createPitstop(id, lap, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		pitstop := new this.TrafficPitstop(this, id, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
 		
 		if ((id == 1) && !this.TrafficScenario)
 			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
@@ -6479,12 +6481,14 @@ class TrafficSimulation extends StrategySimulation {
 		useTelemetryData := false
 		consumption := 0
 		tyreUsage := 0
+		tyreCompoundVariation := 0
 		initialFuel := 0
 		
-		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage)
+		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 		
 		consumptionStep := (consumption / 4)
 		tyreUsageStep := (tyreUsage / 4)
+		tyreCompoundVariationStep := (tyreCompoundVariation / 4)
 		initialFuelStep := (initialFuel / 4)
 		
 		scenarios := {}
@@ -6504,97 +6508,121 @@ class TrafficSimulation extends StrategySimulation {
 			
 			if (variation > numScenarios)
 				break
+		
+			if (tyreCompoundVariation > 0) {
+				if (useStartConditions && useTelemetryData) 
+					tyreCompoundColors := Array(tyreCompoundColor, this.getTyreCompoundColors(weather, tyreCompound)*)
+				else if useTelemetryData
+					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
+				else
+					tyreCompoundColors := [tyreCompoundColor]
+			}
+			else
+				tyreCompoundColors := [tyreCompoundColor]
+		
+			this.TyreCompoundColors := tyreCompoundColors
 			
+			this.TyreCompound := tyreCompound
+			this.TyreCompoundColor := tyreCompoundColor
+			this.TyreCompoundVariation := tyreCompoundVariation
+
 			Loop { ; consumption
 				Loop { ; initialFuel
 					Loop { ; tyreUsage
-						if useStartConditions {
-							if map is number
-							{
-								message := (translate("Creating Initial Scenario with Map ") . simMapEdit  . translate(":") . variation++ . translate("..."))
-									
-								showProgress({progress: progress, message: message})
-								
-								stintLaps := Floor((stintLength * 60) / avgLapTime)
-								
-								name := (translate("Initial Conditions - Map ") . map)
-								
-								this.setFixedLapTime(avgLapTime)
-								
-								try {
-									strategy := this.createStrategy(name)
-									
-									currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
-									
-									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
-									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
-																, tyreCompound, tyreCompoundColor, 0, avgLapTime)
-								
-									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-													, currentConsumption, lapTime)
-								}
-								finally {
-									this.setFixedLapTime(false)
-								}
-								
-								scenarios[name . translate(":") . variation] := strategy
-									
-								Sleep 100
-									
-								progress += 1
-							}
-						}
-						
-						if useTelemetryData
-							for ignore, mapData in electronicsData {
-								scenarioMap := mapData["Map"]
-								scenarioFuelConsumption := mapData["Fuel.Consumption"]
-								scenarioAvgLapTime := mapData["Lap.Time"]
-
-								if scenarioMap is number
+						Loop { ; tyreCompoundVariation
+							if useStartConditions {
+								if map is number
 								{
-									message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
-									
+									message := (translate("Creating Initial Scenario with Map ") . simMapEdit  . translate(":") . variation++ . translate("..."))
+										
 									showProgress({progress: progress, message: message})
-								
-									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 									
-									name := (translate("Telemetry - Map ") . scenarioMap)
+									stintLaps := Floor((stintLength * 60) / avgLapTime)
 									
-									strategy := this.createStrategy(name)
+									name := (translate("Initial Conditions - Map ") . map)
 									
-									currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+									this.setFixedLapTime(avgLapTime)
 									
-									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
-									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
-																, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
-								
-									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-													, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
-													, currentConsumption, lapTime)
+									try {
+										strategy := this.createStrategy(name)
+										
+										currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
+										
+										startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
+																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
+									
+										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+														, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
+														, currentConsumption, lapTime)
+									}
+									finally {
+										this.setFixedLapTime(false)
+									}
 									
 									scenarios[name . translate(":") . variation] := strategy
-									
+										
 									Sleep 100
-									
+										
 									progress += 1
 								}
 							}
+							
+							if useTelemetryData
+								for ignore, mapData in electronicsData {
+									scenarioMap := mapData["Map"]
+									scenarioFuelConsumption := mapData["Fuel.Consumption"]
+									scenarioAvgLapTime := mapData["Lap.Time"]
+
+									if scenarioMap is number
+									{
+										message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
+										
+										showProgress({progress: progress, message: message})
+									
+										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
+										
+										name := (translate("Telemetry - Map ") . scenarioMap)
+										
+										strategy := this.createStrategy(name)
+										
+										currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+										
+										startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
+																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
+									
+										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+														, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
+														, currentConsumption, lapTime)
+										
+										scenarios[name . translate(":") . variation] := strategy
+										
+										Sleep 100
+										
+										progress += 1
+									}
+								}
+						
+							if (tyreCompoundVariation <= 0)
+								break
+							else
+								tyreCompoundVariation := Max(0, tyreCompoundVariation - tyreCompoundVariationStep)
+						}
 				
-						if (tyreUsage = 0)
+						if (tyreUsage <= 0)
 							break
 						else
 							tyreUsage := Max(0, tyreUsage - tyreUsageStep)
 					}
 							
-					if (initialFuel = 0)
+					if (initialFuel <= 0)
 						break
 					else
 						initialFuel := Max(0, initialFuel - initialFuelStep)
 				}
 				
-				if (consumption = 0)
+				if (consumption <= 0)
 					break
 				else
 					consumption := Max(0, consumption - consumptionStep)

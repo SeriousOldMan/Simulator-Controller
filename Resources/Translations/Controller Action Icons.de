@@ -311,6 +311,7 @@ TeamServer.Toggle=
 RaceCenterOpen.Activate=
 StrategyWorkbenchOpen.Activate=
 SetupDatabaseOpen.Activate=
+SetupAdvisorOpen.Activate=
 RaceSettingsOpen.Activate=
 SetupImport.Activate=
 LapsRemaining.Activate=

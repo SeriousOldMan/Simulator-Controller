@@ -113,6 +113,7 @@ global simFuelConsumptionEdit = 3.8
 
 global simConsumptionWeight = 0
 global simTyreUsageWeight = 0
+global simtyreCompoundVariationWeight = 0
 global simInitialFuelWeight = 0
 
 global simInputDropDown
@@ -620,7 +621,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h99, % translate("Optimizer")
+		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h120, % translate("Optimizer")
 		
 		Gui %window%:Font, Norm, Arial
 
@@ -633,13 +634,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Usage")
 		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
 		
-		Gui %window%:Add, Text, x214 yp+48 w40 h23 +0x200, % translate("Use")
+		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Compound")
+		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimtyreCompoundVariationWeight, %simtyreCompoundVariationWeight%
+		
+		Gui %window%:Add, Text, x214 yp+32 w40 h23 +0x200, % translate("Use")
 		
 		choices := map(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], "translate")
 
 		Gui %window%:Add, DropDownList, x250 yp w138 AltSubmit Choose3 VsimInputDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Button, x214 yp+34 w174 h20 grunSimulation, % translate("Simulate!")
+		Gui %window%:Add, Button, x214 yp+26 w174 h20 grunSimulation, % translate("Simulate!")
 		
 		x := 407
 		x0 := x - 4
@@ -1533,7 +1537,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControl Text, strategyStartTCEdit, % strategy.TC
 		GuiControl Text, strategyStartABSEdit, % strategy.ABS
 		
-		compound := strategy.TyreCompound[true]
+		compound := qualifiedCompound(strategy.TyreCompound, strategy.TyreCompoundColor)
 		GuiControl Choose, strategyCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
 		
 		GuiControl, , strategyPressureFLEdit, % strategy.TyrePressureFL
@@ -1863,7 +1867,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		initialAvgLapTime := simAvgLapTimeEdit
 	}
 	
-	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight) {
+	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight, ByRef tyreUsageWeight, ByRef tyreCompoundVariationWeight) {
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1873,6 +1877,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simConsumptionWeight
 		GuiControlGet simInitialFuelWeight
 		GuiControlGet simTyreUsageWeight
+		GuiControlGet simtyreCompoundVariationWeight
 		
 		useStartConditions := ((simInputDropDown == 1) || (simInputDropDown == 3))
 		useTelemetryData := (simInputDropDown > 1)
@@ -1880,6 +1885,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		consumptionWeight := simConsumptionWeight
 		initialFuelWeight := simInitialFuelWeight
 		tyreUsageWeight := simTyreUsageWeight
+		tyreCompoundVariationWeight := simtyreCompoundVariationWeight
 	}
 
 	runSimulation() {

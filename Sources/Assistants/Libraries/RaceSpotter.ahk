@@ -79,7 +79,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 		
 		Set {
-			return (this.getSpeaker(true).Speaking := true)
+			return (this.getSpeaker(true).Speaking := value)
 		}
 	}
 	

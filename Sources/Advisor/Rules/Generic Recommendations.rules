@@ -215,7 +215,7 @@
 {All: [?Speed.Corner.Fast.Correction != 0], [?Speed.Corner.Fast.Value > 50]} =>																	\
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Speed.Corner.Fast.Correction))
 
-[?Understeer.General.Correction != 0] =>																											\
+[?Understeer.General.Correction != 0] =>																										\
 		(Prove: changeSetting(AntiRollBar.Front, -1, ?Understeer.General.Correction))
 
 {All: [?Understeer.General.Correction != 0], [?Understeer.General.Value > 50]} =>																\

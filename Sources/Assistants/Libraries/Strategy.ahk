@@ -118,8 +118,8 @@ class StrategySimulation {
 														, tyreUsageWeight, tyreCompoundVariationWeight)
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
-		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
+		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired, tyreSets)
 	}
 	
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -633,6 +633,7 @@ class Strategy extends ConfigurationItem {
 	iTyreLaps := 0
 	
 	iPitstops := []
+	iTyreSets := []
 	
 	class Pitstop extends ConfigurationItem {
 		iStrategy := false
@@ -1213,6 +1214,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	TyreSets[index := false] {
+		Get {
+			return (index ? this.iTyreSets[index] : this.iTyreSets)
+		}
+	}
+	
 	__New(strategyManager, configuration := false) {
 		this.iStrategyManager := strategyManager
 		
@@ -1281,8 +1288,9 @@ class Strategy extends ConfigurationItem {
 			pitstopRequired := false
 			refuelRequired := false
 			tyreChangeRequired := false
+			tyreSets := false
 			
-			this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired)
+			this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired, tyreSets)
 
 			if !pitstopRequired {
 				refuelRequired := false
@@ -1292,6 +1300,7 @@ class Strategy extends ConfigurationItem {
 			this.iPitstopRequired := pitstopRequired
 			this.iRefuelRequired := refuelRequired
 			this.iTyreChangeRequired := tyreChangeRequired
+			this.iTyreSets := tyreSets
 		}
 	}
 	
@@ -1339,6 +1348,11 @@ class Strategy extends ConfigurationItem {
 		
 		this.iRefuelRequired := getConfigurationValue(configuration, "Settings", "PitstopRefuel", false)
 		this.iTyreChangeRequired := getConfigurationValue(configuration, "Settings", "PitstopTyreChange", false)
+		
+		tyreSets := string2Values(";", getConfigurationValue(configuration, "Settings", "TyreSets", []))
+		
+		Loop % tyreSets.Length()
+			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 		
 		this.iMap := getConfigurationValue(configuration, "Setup", "Map", "n/a")
 		this.iTC := getConfigurationValue(configuration, "Setup", "TC", "n/a")
@@ -1391,6 +1405,13 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Settings", "PitstopRequired", pitstopRequired)
 		setConfigurationValue(configuration, "Settings", "PitstopRefuel", this.RefuelRequired)
 		setConfigurationValue(configuration, "Settings", "PitstopTyreChange", this.TyreChangeRequired)
+		
+		tyreSets := []
+		
+		for ignore, descriptor in this.TyreSets
+			tyreSets.Push(values2String(":", descriptor*))
+		
+		setConfigurationValue(configuration, "Settings", "TyreSets", values2String(";", tyreSets*))
 		
 		setConfigurationValue(configuration, "Weather", "Weather", this.Weather)
 		setConfigurationValue(configuration, "Weather", "AirTemperature", this.AirTemperature)

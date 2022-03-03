@@ -97,6 +97,11 @@ global tyreChangeRequirementsLabel
 global refuelRequirementsDropDown
 global refuelRequirementsLabel
 
+global tyreSetDropDown
+global tyreSetCountEdit
+global tyreSetAddButton
+global tyreSetDeleteButton
+
 global pitstopDeltaEdit = 60
 global pitstopTyreServiceEdit = 30
 global pitstopFuelServiceEdit = 1.2
@@ -155,6 +160,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iTelemetryChartHTML := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 	iStrategyChartHTML := this.iTelemetryChartHTML
+	
+	iTyreSetListView := false
 	
 	iSelectedScenario := false
 	iSelectedStrategy := false
@@ -238,6 +245,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedSessionType[] {
 		Get {
 			return this.iSelectedSessionType
+		}
+	}
+	
+	TyreSetListView[] {
+		Get {
+			return this.iTyreSetListView
 		}
 	}
 	
@@ -519,6 +532,31 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
 		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
 		
+		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Tyre Sets")
+		
+		w12 := (x11 + 50 - x7)
+		
+		Gui %window%:Add, ListView, x%x7% yp w%w12% h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtyreSetListView gchooseTyreSet, % values2String("|", map(["Compound", "#"], "translate")*)
+	
+		this.iTyreSetListView := tyreSetListView
+		
+		x13 := (x7 + w12 + 5)
+		
+		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map(kQualifiedTyreCompounds, "translate")*)
+		
+		Gui %window%:Add, Edit, x%x13% yp+24 w40 h20 Limit2 Number vtyreSetCountEdit gupdateTyreSet
+		Gui %window%:Add, UpDown, x%x13% yp w18 h20 0x80
+		
+		x13 := (x7 + w12 + 5 + 116 - 48)
+	
+		Gui %window%:Add, Button, x%x13% yp+18 w23 h23 Center +0x200 HWNDaddButtonHandle vtyreSetAddButton gaddTyreSet
+		setButtonIcon(addButtonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		
+		x13 += 25
+		
+		Gui %window%:Add, Button, x%x13% yp w23 h23 Center +0x200 HWNDdeleteButtonHandle vtyreSetDeleteButton gdeleteTyreSet
+		setButtonIcon(deleteButtonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		
 		Gui %window%:Tab, 2
 		
 		x := 32
@@ -786,6 +824,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		if track
 			this.loadTrack(track)
+		
+		this.updateState()
 	}
 	
 	show() {
@@ -858,6 +898,25 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		GuiControl Choose, chartSourceDropDown, 2
 		GuiControl Hide, chartTypeDropDown
+	}
+	
+	updateState() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.TyreSetListView
+
+		if (LV_GetNext(0) > 0) {
+			GuiControl Enable, tyreSetDropDown
+			GuiControl Enable, tyreSetCountEdit
+			GuiControl Enable, tyreSetDeleteButton
+		}
+		else {
+			GuiControl Disable, tyreSetDropDown
+			GuiControl Disable, tyreSetCountEdit
+			GuiControl Disable, tyreSetDeleteButton
+		}
 	}
 	
 	createStrategyInfo(strategy) {
@@ -1777,7 +1836,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
 		result := true
 		
 		window := this.Window
@@ -1814,6 +1873,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		refuelRequired := (refuelRequirementsDropDown = 2)
 		tyreChangeRequired := (tyreChangeRequirementsDropDown = 2)
+		
+		Gui ListView, % this.TyreSetListView
+		
+		translatedCompounds := map(kQualifiedTyreCompounds, "translate")
+		tyreSets := []
+		
+		Loop % LV_GetCount()
+		{
+			LV_GetText(compound, A_Index, 1)
+			LV_GetText(count, A_Index, 2)
+		
+			splitQualifiedCompound(kQualifiedTyreCompounds[inList(translatedCompounds, compound)], compound, compoundColor)
+		
+			tyreSets.Push(Array(compound, compoundColor, count))
+		}
 			
 		return result
 	}
@@ -2097,6 +2171,13 @@ chooseDataType() {
 }
 
 chooseData() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % workbench.DataListView
+	
 	LV_Modify(A_EventInfo, "-Select")
 }
 
@@ -2180,6 +2261,89 @@ choosePitstopRequirements() {
 		GuiControl Show, refuelRequirementsLabel
 		GuiControl Show, refuelRequirementsDropDown
 	}
+}
+
+chooseTyreSet() {
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		workbench := StrategyWorkbench.Instance
+	
+		window := workbench.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % workbench.TyreSetListView
+
+		LV_GetText(compound, A_EventInfo, 1)
+		LV_GetText(count, A_EventInfo, 2)
+		
+		GuiControl Choose, tyreSetDropDown, % inList(map(kQualifiedTyreCompounds, "translate"), compound)
+		GuiControl, , tyreSetCountEdit, %count%
+	
+		workbench.updateState()
+	}
+}
+
+updateTyreSet() {
+	workbench := StrategyWorkbench.Instance
+	
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % workbench.TyreSetListView
+	
+	row := LV_GetNext(0)
+	
+	if (row > 0) {
+		GuiControlGet tyreSetDropDown
+		GuiControlGet tyreSetCountEdit
+		
+		LV_Modify(row, "", map(kQualifiedTyreCompounds, "translate")[tyreSetDropDown], tyreSetCountEdit)
+	}
+}
+
+addTyreSet() {
+	workbench := StrategyWorkbench.Instance
+	
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % workbench.TyreSetListView
+	
+	index := inList(kQualifiedTyreCompounds, "Dry")
+	
+	if !index
+		index := 1
+	
+	LV_Add("", map(kQualifiedTyreCompounds, "translate")[index], 99)
+	LV_Modify(LV_GetCount(), "Select Vis")
+	
+	GuiControl Choose, tyreSetDropDown, %index%
+	GuiControl, , tyreSetCountEdit, 99
+	
+	LV_ModifyCol()
+	LV_ModifyCol(1, "AutoHdr")
+	LV_ModifyCol(2, "AutoHdr")
+	
+	workbench.updateState()
+}
+
+deleteTyreSet() {
+	workbench := StrategyWorkbench.Instance
+	
+	window := workbench.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % workbench.TyreSetListView
+	
+	LV_Delete(LV_GetNext(0))
+	
+	GuiControl Choose, tyreSetDropDown, 0
+	GuiControl, , tyreSetCountEdit, % ""
+	
+	workbench.updateState()
 }
 
 settingsMenu() {

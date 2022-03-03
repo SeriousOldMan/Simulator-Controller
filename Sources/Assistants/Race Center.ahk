@@ -1730,9 +1730,9 @@ class RaceCenter extends ConfigurationItem {
 		initial := ((stintNr = 1) ? "-" : "")
 			
 		if position
-			LV_Insert(position, "Select", stintNr, "", "", "", initial, initial, initial, initial)
+			LV_Insert(position, "Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
 		else
-			LV_Add("Select", stintNr, "", "", "", initial, initial, initial, initial)
+			LV_Add("Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
 		
 		GuiControl Choose, driverDropDownMenu, 1
 		GuiControl, , planTimeEdit, 20200101000000
@@ -2600,13 +2600,14 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired) {
+	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
 		local strategy := this.Strategy
 		
 		if strategy {
 			pitstopRequired := strategy.PitstopRequired
 			refuelRequired := strategy.RefuelRequired
 			tyreChangeRequired := strategy.TyreChangeRequired
+			tyreSets := strategy.TyreSets
 			
 			if pitstopRequired is Integer
 				if (pitstopRequired > 1) {
@@ -6510,8 +6511,12 @@ class TrafficSimulation extends StrategySimulation {
 				break
 		
 			if (tyreCompoundVariation > 0) {
-				if (useStartConditions && useTelemetryData) 
-					tyreCompoundColors := Array(tyreCompoundColor, this.getTyreCompoundColors(weather, tyreCompound)*)
+				if (useStartConditions && useTelemetryData) {
+					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
+					
+					if !inList(tyreCompoundColors, tyreCompoundColor)
+						tyreCompoundColors.Push(tyreCompoundColor)
+				}
 				else if useTelemetryData
 					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
 				else
@@ -6997,6 +7002,10 @@ updatePlan() {
 
 updatePlanAsync() {
 	rCenter := RaceCenter.Instance
+
+	window := rCenter.Window
+	
+	Gui %window%:Default
 	
 	Gui ListView, % rCenter.PlanListView
 	

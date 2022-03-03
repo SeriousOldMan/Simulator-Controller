@@ -222,7 +222,11 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
 
-Notes: If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races. 
+Notes:
+
+  1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
+  2. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used.
+  3. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tire compounds for which data is available are used.
 
 ### Pitstop & Service
 

@@ -6511,8 +6511,12 @@ class TrafficSimulation extends StrategySimulation {
 				break
 		
 			if (tyreCompoundVariation > 0) {
-				if (useStartConditions && useTelemetryData) 
-					tyreCompoundColors := Array(tyreCompoundColor, this.getTyreCompoundColors(weather, tyreCompound)*)
+				if (useStartConditions && useTelemetryData) {
+					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
+					
+					if !inList(tyreCompoundColors, tyreCompoundColor)
+						tyreCompoundColors.Push(tyreCompoundColor)
+				}
 				else if useTelemetryData
 					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
 				else

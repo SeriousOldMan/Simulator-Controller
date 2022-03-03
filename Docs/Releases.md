@@ -8,6 +8,7 @@
   6. Frequency of blue flag warnings has been drastically reduced.
   7. Fixed sporadic cacophony of Race Assistants voice output.
   8. Support for tyre compound color variation in Strategy simulations. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) for more information.
+  9. Support to restrict the number of tyre sets available for the different tyre compound in Strategy simulations. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings) for more information.
 
 ## 3.9.2-release 02/25/22
 

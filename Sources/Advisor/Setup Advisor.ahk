@@ -842,7 +842,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.loadCharacteristics(this.Definition)
 				this.loadSettings(this.Definition)
 				
-				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI kernel...")})
+				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI Kernel...")})
 				
 				knowledgeBase.addFact("Initialize", true)
 					

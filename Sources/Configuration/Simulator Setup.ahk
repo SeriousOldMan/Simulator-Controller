@@ -276,7 +276,7 @@ class SetupWizard extends ConfigurationItem {
 		else
 			initialize  := false
 
-		showProgress({progress: ++vProgressCount, message: translate("Initializing AI kernel...")})
+		showProgress({progress: ++vProgressCount, message: translate("Initializing AI Kernel...")})
 		
 		if initialize {
 			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
@@ -295,7 +295,7 @@ class SetupWizard extends ConfigurationItem {
 		if isDebug()
 			Sleep 1000
 
-		showProgress({progress: ++vProgressCount, message: translate("Starting AI kernel...")})
+		showProgress({progress: ++vProgressCount, message: translate("Starting AI Kernel...")})
 			
 		this.KnowledgeBase.produce()
 					

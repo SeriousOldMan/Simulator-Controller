@@ -1,4 +1,4 @@
-## 3.9.4-release 03/04/22 (planned)
+## 3.9.4-release 03/04/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

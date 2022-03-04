@@ -121,9 +121,11 @@ class StrategyViewer {
 			lastTyreLaps := strategy.RemainingTyreLaps
 		
 			for ignore, pitstop in strategy.Pitstops {
+				pitstopLap := (pitstop.Lap - lastLap)
+			
 				stints.Push("<th class=""th-std"">" . A_Index . "</th>")
 				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
-				laps.Push("<td class=""td-std"">" . (pitstop.Lap - lastLap) . "</td>")
+				laps.Push("<td class=""td-std"">" . Max(pitstopLap, 0) . "</td>")
 				lapTimes.Push("<td class=""td-std"">" . Round(lastLapTime, 1) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")

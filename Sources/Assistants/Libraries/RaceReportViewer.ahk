@@ -27,8 +27,6 @@ global kRaceReports = ["Overview", "Car", "Driver", "Position", "Pace"]
 global kOk = "Ok"
 global kCancel = "Cancel"
 
-global kNull = "null"
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -314,7 +312,7 @@ class RaceReportViewer {
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			for ignore, lap in this.getReportLaps(raceData) {
 				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-				time := ((time = kNull) ? 0 : Round(times[lap][car] / 1000, 1))
+				time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 				
 				if (time > 0) {
 					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
@@ -334,7 +332,7 @@ class RaceReportViewer {
 		
 		for ignore, lap in this.getReportLaps(raceData) {
 			time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-			time := ((time = kNull) ? 0 : Round(time, 1))
+			time := (isNull(time) ? 0 : Round(time, 1))
 				
 			if (time > 0)
 				validTimes.Push(time)
@@ -433,7 +431,7 @@ class RaceReportViewer {
 			
 			for ignore, lap in this.getReportLaps(raceData) {
 				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-				time := ((time = kNull) ? 0 : Round(times[lap][car] / 1000, 1))
+				time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 				
 				if (time > 0)
 					if (time > threshold)
@@ -610,14 +608,14 @@ class RaceReportViewer {
 			{
 				car := A_Index
 				
-				result := (positions[lapsCount][car] = kNull ? "DNF" : positions[lapsCount][car])
+				result := (isNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
 				
 				Loop % lapsCount
 				{
 					lapTime := times[A_Index][car]
 				
-					if ((lapTime != kNull) && (lapTime > 0))
+					if (!isNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
 					else
 						result := "DNF"

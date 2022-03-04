@@ -521,18 +521,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, Text, x%x5% yp+23 w90 h20, % translate("Pitstop")
+		Gui %window%:Add, Text, x%x5% yp+23 w75 h20, % translate("Pitstop")
 		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
-		Gui %window%:Add, Text, x%x5% yp+22 w85 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
+		Gui %window%:Add, Text, x%x5% yp+22 w75 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
 		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
 
-		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
+		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
 		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
 		
-		Gui %window%:Add, Text, x%x5% yp+26 w85 h23 +0x200, % translate("Tyre Sets")
+		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200, % translate("Tyre Sets")
 		
 		w12 := (x11 + 50 - x7)
 		
@@ -965,7 +965,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			value := values[xAxis]
 			
-			if ((value = "n/a") || (value == kNull))
+			if ((value = "n/a") || (isNull(value)))
 				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
@@ -976,7 +976,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
 			
-				if ((value = "n/a") || (value == kNull))
+				if ((value = "n/a") || (isNull(value)))
 					value := kNull
 				
 				drawChartFunction .= (", " . value)

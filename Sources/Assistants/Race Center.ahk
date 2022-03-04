@@ -439,7 +439,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		updatePressure(weather, airTemperature, trackTemperature, compound, compoundColor
 					 , type, tyre, pressure, count := 1, flush := true) {
-			if (null(pressure) == kNull)
+			if (isNull(null(pressure)))
 				return
 			
 			if (!compoundColor || (compoundColor = ""))
@@ -485,6 +485,41 @@ class RaceCenter extends ConfigurationItem {
 			base.saveToConfiguration(configuration)
 			
 			setConfigurationValue(configuration, "General", "Version", this.iVersion)
+		}
+		
+		initializeAvailableTyreSets() {
+			base.initializeAvailableTyreSets()
+			
+			rCenter := RaceCenter.Instance
+			
+			window := rCenter.Window
+					
+			Gui %window%:Default
+			
+			Gui ListView, % rCenter.PitstopsListView
+
+			availableTyreSets := this.AvailableTyreSets
+			translatedCompounds := map(kQualifiedTyreCompounds, "translate")
+			
+			Loop % LV_GetCount()
+			{
+				LV_GetText(compound, A_Index, 4)
+				
+				index := inList(translatedCompounds, compound)
+				
+				if index {
+					compound := kQualifiedTyreCompounds[index]
+					
+					if availableTyreSets.HasKey(compound) {
+						count := (availableTyreSets[compound] - 1)
+					
+						if (count > 0)
+							availableTyreSets[compound] := count
+						else
+							availableTyreSets.Delete(compound)
+					}
+				}
+			}
 		}
 	}
 	
@@ -3157,7 +3192,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -3463,13 +3498,13 @@ class RaceCenter extends ConfigurationItem {
 				if (tyresTable.Length() >= lastLap) {
 					tyres := tyresTable[A_Index]
 				
-					if (pressureFL = kNull)
+					if (isNull(pressureFL))
 						pressureFL := tyres["Tyre.Pressure.Front.Left"]
-					if (pressureFR = kNull)
+					if (isNull(pressureFR))
 						pressureFR := tyres["Tyre.Pressure.Front.Right"]
-					if (pressureRL = kNull)
+					if (isNull(pressureRL))
 						pressureRL := tyres["Tyre.Pressure.Rear.Left"]
-					if (pressureRR = kNull)
+					if (isNull(pressureRR))
 						pressureRR := tyres["Tyre.Pressure.Rear.Right"]
 				}
 				
@@ -4109,31 +4144,31 @@ class RaceCenter extends ConfigurationItem {
 						  , Damage: lap.Damage, Accident: lap.Accident
 						  , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
 			
-			if (newLap.Map == kNull)
+			if (isNull(newLap.Map))
 				newLap.Map := "n/a"
 			
-			if (newLap.TC == kNull)
+			if (isNull(newLap.TC))
 				newLap.TC := "n/a"
 			
-			if (newLap.ABS == kNull)
+			if (isNull(newLap.ABS))
 				newLap.ABS := "n/a"
 			
-			if (newLap.Position == kNull)
+			if (isNull(newLap.Position))
 				newLap.Position := "-"
 			
-			if (newLap.Laptime == kNull)
+			if (isNull(newLap.Laptime))
 				newLap.Laptime := "-"
 			
-			if (newLap.FuelConsumption == kNull)
+			if (isNull(newLap.FuelConsumption))
 				newLap.FuelConsumption := "-"
 			
-			if (newLap.FuelRemaining == kNull)
+			if (isNull(newLap.FuelRemaining))
 				newLap.FuelRemaining := "-"
 			
-			if (newLap.AirTemperature == kNull)
+			if (isNull(newLap.AirTemperature))
 				newLap.AirTemperature := "-"
 			
-			if (newLap.TrackTemperature == kNull)
+			if (isNull(newLap.TrackTemperature))
 				newLap.TrackTemperature := "-"
 			
 			this.Laps[newLap.Nr] := newLap
@@ -4153,7 +4188,7 @@ class RaceCenter extends ConfigurationItem {
 					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
 					   , Time: stint["Time.Start"]}
 					   
-			if (newStint.Time == kNull)
+			if (isNull(newStint.Time))
 				newStint.Time := false
 			
 			driver.Stints.Push(newStint)
@@ -4191,19 +4226,19 @@ class RaceCenter extends ConfigurationItem {
 			newStint.Consistency := "-"
 			newStint.CarControl := "-"
 
-			if (newStint.AvgLaptime == kNull)
+			if (isNull(newStint.AvgLaptime))
 				newStint.AvgLaptime := "-"
 			
-			if (newStint.BestLaptime == kNull)
+			if (isNull(newStint.BestLaptime))
 				newStint.BestLaptime := "-"
 			
-			if (newStint.FuelConsumption == kNull)
+			if (isNull(newStint.FuelConsumption))
 				newStint.FuelConsumption := "-"
 			
-			if (newStint.StartPosition == kNull)
+			if (isNull(newStint.StartPosition))
 				newStint.StartPosition := "-"
 			
-			if (newStint.EndPosition == kNull)
+			if (isNull(newStint.EndPosition))
 				newStint.EndPosition := "-"
 			
 			this.Stints[newStint.Nr] := newStint
@@ -4248,7 +4283,7 @@ class RaceCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (LV_GetCount() + 1)
 					
-					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, lap.FuelConsumption, lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 				}
 				
 		LV_ModifyCol()
@@ -4568,7 +4603,7 @@ class RaceCenter extends ConfigurationItem {
 			first := false
 			value := values[xAxis]
 			
-			if ((value = "n/a") || (value == kNull))
+			if ((value = "n/a") || (isNull(value)))
 				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
@@ -4579,7 +4614,7 @@ class RaceCenter extends ConfigurationItem {
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
 			
-				if ((value = "n/a") || (value == kNull))
+				if ((value = "n/a") || (isNull(value)))
 					value := kNull
 				
 				drawChartFunction .= (", " . value)
@@ -5039,13 +5074,13 @@ class RaceCenter extends ConfigurationItem {
 				pressureRL := pressures["Tyre.Pressure.Hot.Rear.Left"]
 				pressureRR := pressures["Tyre.Pressure.Hot.Rear.Right"]
 				
-				if (pressureFL = kNull)
+				if (isNull(pressureFL))
 					pressureFL := tyres["Tyre.Pressure.Front.Left"]
-				if (pressureFR = kNull)
+				if (isNull(pressureFR))
 					pressureFR := tyres["Tyre.Pressure.Front.Right"]
-				if (pressureRL = kNull)
+				if (isNull(pressureRL))
 					pressureRL := tyres["Tyre.Pressure.Rear.Left"]
-				if (pressureRR = kNull)
+				if (isNull(pressureRR))
 					pressureRR := tyres["Tyre.Pressure.Rear.Right"]
 				
 				lapData["Tyre.Pressure.Hot.Front.Left"] := null(pressureFL)
@@ -5679,7 +5714,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				value := chartValue(null(lap.Laptime))
 				
-				if (value != kNull)
+				if (!isNull(value))
 					driverTimes.Push(value)
 			}
 			
@@ -6714,11 +6749,11 @@ fixIE(version := 0, exeName := "") {
 }
 
 displayValue(value) {
-	return ((value == kNull) ? "-" : value)
+	return (isNull(value) ? "-" : value)
 }
 
 chartValue(value) {
-	return ((value == kNull) ? kNull : value)
+	return (isNull(value) ? kNull : value)
 }
 
 null(value) {

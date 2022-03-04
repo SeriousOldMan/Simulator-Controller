@@ -73,6 +73,8 @@ global kCustomType = "Custom"
 global kTrue = "true"
 global kFalse = "false"
 
+global kNull = "__Null__"
+
 global kActivate = "activate"
 global kDeactivate = "deactivate"
 

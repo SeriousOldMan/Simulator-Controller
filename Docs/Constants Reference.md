@@ -53,6 +53,9 @@ Additional constants used by Simulator Controller.
 #### *kUndefined*
 May be used by functions to denote a default value for optional parameters that might be boolean values.
 
+#### *kNull*
+Similar to *kUndefined*, denotes an undefined value. *kNull* typically is used for data contexts.
+
 #### *kVersion*
 The current version of Simulator Controller according to the VERSION document in the root folder.
 

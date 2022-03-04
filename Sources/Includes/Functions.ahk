@@ -1328,6 +1328,10 @@ moveByMouse(window) {
 	}
 }
 
+isNull(value) {
+	return ((value == kNull) || (value = "null"))
+}
+
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 	if isDebug()
 		showMessage("The literal value " . reference . " was used as an object...")

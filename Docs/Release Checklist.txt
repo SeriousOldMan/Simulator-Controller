@@ -27,6 +27,10 @@ Release 3.9.4 Checklist
 2. New tyre compound color variations
    a. Doc Images
    b. Documentation
+3. New tool "Setup Advisor", incl. plugin parameter and action support
+   a. Documentation
+   b. Action Labels & Icons update
+   c. Translations update
 
 Release 3.9.2 Checklist
 =======================

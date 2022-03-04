@@ -1434,6 +1434,21 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV394() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		subtitle := getConfigurationValue(userConfiguration, "Splash Window", "Subtitle", "")
+		
+		if InStr(subtitle, "2021") {
+			setConfigurationValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2022"))
+			
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
 updateConfigurationForV384() {
 	setupDB := new SetupDatabase()
 	

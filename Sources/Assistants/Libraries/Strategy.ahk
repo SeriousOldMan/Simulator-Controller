@@ -826,6 +826,8 @@ class Strategy extends ConfigurationItem {
 					else
 						this.iRemainingTyreLaps := remainingTyreLaps
 				}
+				else if (!tyreCompound && !tyreCompoundColor)
+					this.iRemainingTyreLaps := remainingTyreLaps
 				else if ((remainingTyreLaps - stintLaps) >= 0) {
 					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps >= this.iRemainingLaps)) {
 						this.iTyreChange := true
@@ -1501,8 +1503,15 @@ class Strategy extends ConfigurationItem {
 				availableTyreSets[qualifiedCompound(tyreCompound, compoundColor)] := 99
 		}
 		else
-			for ignore, descriptor in tyreSets
-				availableTyreSets[qualifiedCompound(descriptor[1], descriptor[2])] := descriptor[3]
+			for ignore, descriptor in tyreSets {
+				count := descriptor[3]
+			
+				if ((descriptor[1] = this.TyreCompound) && (descriptor[2] = this.TyreCompoundColor))
+					count -= 1
+				
+				if (count > 0)
+					availableTyreSets[qualifiedCompound(descriptor[1], descriptor[2])] := count
+			}
 	
 		this.AvailableTyreSets := availableTyreSets
 	}
@@ -1612,6 +1621,9 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
+		if (this.LastPitstop && !this.LastPitstop.TyreChange)
+			remainingTyreLaps := this.MaxTyreLaps
+		
 		fuelConsumption := this.FuelConsumption[true]
 		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
 		
@@ -1639,38 +1651,60 @@ class Strategy extends ConfigurationItem {
 				return pitstops[pitstopNr].TyreCompoundColor
 		}
 		else {
-			tries := 100
+			Random rnd, 0.01, 0.99
 		
-			while (tries > 0) {
-				Random rnd, 0, 1
+			chooseNext := Round(rnd * this.StrategyManager.TyreCompoundVariation / 100)
 			
-				if Round(rnd * this.StrategyManager.TyreCompoundVariation / 100) {
-					tyreCompoundColors := this.StrategyManager.TyreCompoundColors
+			if !chooseNext {
+				tyreCompoundColor := this.StrategyManager.TyreCompoundColor
+				qualifiedCompound := qualifiedCompound(tyreCompound, tyreCompoundColor)
 				
-					Random rnd, 1, % tyreCompoundColors.Length()
+				if !this.AvailableTyreSets.HasKey(qualifiedCompound)
+					chooseNext := true
+				else {
+					count := (this.AvailableTyreSets[qualifiedCompound] - 1)
+					
+					if (count > 0)
+						this.AvailableTyreSets[qualifiedCompound] := count
+					else
+						this.AvailableTyreSets.Delete(qualifiedCompound)
+					
+					return tyreCompoundColor
+				}
+			}				
+					
+			if chooseNext {
+				availableTyreSets := this.AvailableTyreSets
+				tyreCompoundColors := this.StrategyManager.TyreCompoundColors.Clone()
+				numColors := tyreCompoundColors.Length()
+				
+				tries := (100 * numColors)
+	
+				while (tries > 0) {
+					Random rnd, 1, %numColors%
 		
 					tyreCompoundColor := tyreCompoundColors[Round(rnd)]
 					qualifiedCompound := qualifiedCompound(tyreCompound, tyreCompoundColor)
 					
-					if this.AvailableTyreSets.HasKey(qualifiedCompound) {
+					if availableTyreSets.HasKey(qualifiedCompound) {
 						this.StrategyManager.TyreCompoundColor := tyreCompoundColor
 						
-						count := (this.AvailableTyreSets[qualifiedCompound] - 1)
+						count := (availableTyreSets[qualifiedCompound] - 1)
 						
 						if (count > 0)
-							this.AvailableTyreSets[qualifiedCompound] := count
+							availableTyreSets[qualifiedCompound] := count
 						else
-							this.AvailableTyreSets.Delete(qualifiedCompound)
+							availableTyreSets.Delete(qualifiedCompound)
 						
-						break
+						return tyreCompoundColor
 					}
-				}
 				
-				tries -= 1
+					tries -= 1
+				}
 			}
 		}
 		
-		return this.StrategyManager.TyreCompoundColor
+		return false
 	}
 	
 	createStints(currentLap, currentSessionTime, currentTyreLaps, currentFuel, stintLaps, maxTyreLaps, map, fuelConsumption, avgLapTime, adjustments := false) {
@@ -1726,8 +1760,12 @@ class Strategy extends ConfigurationItem {
 			pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
 			tyreCompound := this.StrategyManager.TyreCompound
+			tyreCompoundColor := this.chooseTyreCompoundColor(currentPitstops, A_Index, tyreCompound)
 			
-			pitstop := this.createPitstop(A_Index, pitstopLap, tyreCompound, this.chooseTyreCompoundColor(currentPitstops, A_Index, tyreCompound), false, adjustments)
+			if !tyreCompoundColor
+				tyreCompound := false
+			
+			pitstop := this.createPitstop(A_Index, pitstopLap, tyreCompound, tyreCompoundColor, false, adjustments)
 			
 			if (this.SessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)

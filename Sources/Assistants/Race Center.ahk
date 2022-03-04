@@ -3578,8 +3578,8 @@ class RaceCenter extends ConfigurationItem {
 				coldPressures := string2Values(",", lapPressures[9])
 				hotPressures := string2Values(",", lapPressures[10])
 				
-				coldPressures := map(coldPressures, kNull)
-				hotPressures := map(hotPressures, kNull)
+				coldPressures := map(coldPressures, "null")
+				hotPressures := map(hotPressures, "null")
 				
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
@@ -4615,7 +4615,7 @@ class RaceCenter extends ConfigurationItem {
 				value := values[yAxis]
 			
 				if ((value = "n/a") || (isNull(value)))
-					value := kNull
+					value := "null"
 				
 				drawChartFunction .= (", " . value)
 			}

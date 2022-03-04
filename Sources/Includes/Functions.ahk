@@ -1329,7 +1329,7 @@ moveByMouse(window) {
 }
 
 isNull(value) {
-	return ((value == kNull) || (value = "null"))
+	return ((value == "__Null__") || (value = "null"))
 }
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {

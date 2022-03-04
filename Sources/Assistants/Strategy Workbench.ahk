@@ -443,7 +443,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, DropDownList, x250 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
 		
 		Gui %window%:Add, DropDownList, x435 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
@@ -916,6 +916,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl Disable, tyreSetDropDown
 			GuiControl Disable, tyreSetCountEdit
 			GuiControl Disable, tyreSetDeleteButton
+			
+			GuiControl Choose, tyreSetDropDown, 0
+			GuiControl, , tyreSetCountEdit, % ""
 		}
 	}
 	
@@ -1290,12 +1293,105 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSettingsMenu(line) {
+		local strategy
+		
 		window := this.Window
 						
 		Gui %window%:Default
 		
 		switch line {
-			case 3: ; "Load from Setup Database..."
+			case 3: ; "Load from Strategy"
+				simulator := this.SelectedSimulator
+				car := this.SelectedCar
+				track := this.SelectedTrack
+				
+				if (simulator && car && track) {
+					strategy := this.SelectedStrategy
+					
+					if strategy {
+						GuiControl, , pitstopDeltaEdit, % strategy.PitstopDelta
+						GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
+						GuiControl, , pitstopFuelServiceEdit, % strategy.PitstopFuelService
+						GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simulataneous") ? 1 : 2
+						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
+						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
+						
+						pitstopRequired := strategy.PitstopRequired
+						
+						if !pitstopRequired
+							GuiControl Choose, pitstopRequirementsDropDown, 1
+						else if IsObject(pitstopRequired) {
+							GuiControl Choose, pitstopRequirementsDropDown, 3
+						
+							pitstopWindowEdit := values2String("-", pitstopRequired*)
+						}
+						else {
+							GuiControl Choose, pitstopRequirementsDropDown, 3
+						
+							pitstopWindowEdit := pitstopRequired
+						}
+						
+						choosePitstopRequirements()
+		
+						GuiControl Choose, refuelRequirementsDropDown, % (strategy.RefuelRequired ? 2 : 1)
+						GuiControl Choose, tyreChangeRequirementsDropDown, % (strategy.TyreChangeRequired ? 2 : 1)
+						
+						Gui ListView, % this.TyreSetListView
+						
+						LV_Delete()
+						
+						for ignore, descriptor in strategy.TyreSets
+							LV_Add("", qualifiedCompound(descriptor[1], descriptor[2]), descriptor[3])
+						
+						LV_ModifyCol()
+						LV_ModifyCol(1, "AutoHdr")
+						LV_ModifyCol(2, "AutoHdr")
+					
+						if (strategy.SessionType = "Duration") {
+							GuiControl, , sessionTypeDropDown, 1
+							GuiControl, , sessionLengthlabel, % translate("Minutes")
+						}
+						else {
+							GuiControl, , sessionTypeDropDown, 2
+							GuiControl, , sessionLengthlabel, % translate("Laps")
+						}
+					
+						GuiControl, , sessionLengthEdit, % Round(strategy.SessionLength)
+						
+						GuiControl, , stintLengthEdit, % strategy.StintLength
+						GuiControl, , formationLapCheck, % strategy.FormationLap
+						GuiControl, , postRaceLapCheck, % strategy.PostRaceLap
+							
+						compound := strategy.TyreCompound
+						compoundColor := strategy.TyreCompoundColor
+						
+						GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
+						
+						GuiControl, , simAvgLapTimeEdit, % Round(strategy.AvgLapTime, 1)
+						GuiControl, , simFuelConsumptionEdit, % Round(strategy.FuelConsumption, 2)
+						GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
+						
+						GuiControl, , simInitialFuelAmountEdit, % Round(strategy.RemainingFuel)
+						GuiControl, , simMapEdit, % strategy.Map
+
+						this.updateState()
+					}
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("There is no current Strategy.")
+						OnMessage(0x44, "")
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
+			case 4: ; "Load from Setup Database..."
 				simulator := this.SelectedSimulator
 				car := this.SelectedCar
 				track := this.SelectedTrack
@@ -1346,7 +1442,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 					OnMessage(0x44, "")
 				}
-			case 4: ; "Update from Telemetry..."
+			case 5: ; "Update from Telemetry..."
 				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
 					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 					
@@ -1371,7 +1467,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 					OnMessage(0x44, "")
 				}
-			case 5: ; "Import from Simulation..."
+			case 6: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
 				
 				if simulator {
@@ -1425,8 +1521,6 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a simulation.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; "Load Defaults..."
-			case 8: ; "Save Defaults"
 		}
 	}
 	
@@ -2339,9 +2433,6 @@ deleteTyreSet() {
 	Gui ListView, % workbench.TyreSetListView
 	
 	LV_Delete(LV_GetNext(0))
-	
-	GuiControl Choose, tyreSetDropDown, 0
-	GuiControl, , tyreSetCountEdit, % ""
 	
 	workbench.updateState()
 }

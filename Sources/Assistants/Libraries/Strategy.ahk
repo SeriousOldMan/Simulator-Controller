@@ -1374,6 +1374,8 @@ class Strategy extends ConfigurationItem {
 		Loop % tyreSets.Length()
 			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 		
+		this.iTyreSets := tyreSets
+		
 		this.iMap := getConfigurationValue(configuration, "Setup", "Map", "n/a")
 		this.iTC := getConfigurationValue(configuration, "Setup", "TC", "n/a")
 		this.iABS := getConfigurationValue(configuration, "Setup", "ABS", "n/a")

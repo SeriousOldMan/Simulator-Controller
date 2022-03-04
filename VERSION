@@ -1,9 +1,9 @@
 [Development]
-Version=3.9.4-dev
-Target=3.9.4-release
-Date=03/01/2022
+Version=3.9.6-dev
+Target=3.9.6-release
+Date=03/04/2022
 Download=
-Changes=New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compouund variation in Strategy simulations
+Changes="Import from Strategy" command in "Strategy Workbench"
 [Release]
 Version=3.9.2-release
 Date=02/25/2022
@@ -13,4 +13,4 @@ Changes=Pitstop settings are synchronized in Race Center every 10 seconds now, F
 Type=Development
 [Version]
 Release=3.9.2-release
-Development=3.9.4-dev
+Development=3.9.6-dev

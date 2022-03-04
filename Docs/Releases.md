@@ -1,3 +1,10 @@
+## 3.9.6-release 03/11/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full handling of restricted tyre sets in "Race Center".
+  4. New "Import from Strategy" command in "Strategy Workbench" to initialize all rules & settings from a currently loaded strategy.
+
 ## 3.9.4-release 03/04/22
 
   1. Bugfixes, as always

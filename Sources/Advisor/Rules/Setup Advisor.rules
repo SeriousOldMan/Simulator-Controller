@@ -97,19 +97,20 @@ removeCharacteristics(?, ?, ?, [])
 removeCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=														\
 		removeCharacteristic(?simulator, ?car, ?track, ?characteristic), removeCharacteristics(?simulator, ?car, ?track, ?characteristics)
 
-removeCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Clear(?simulator, ?car, ?track, Characteristic, ?characteristic, Active)
+removeCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?simulator, ?car, ?track, Characteristic, ?characteristic, Active, false)
 
 characteristicActive(?simulator, ?car, ?track, ?characteristic) <= characteristicActive(?simulator, ?car, ?track, ?characteristic, true)
+characteristicActive(?, ?, ?, false) <= !
 characteristicActive(?, ?, ?, ?) <= fail
 																   
 characteristicActive(?simulator, ?car, ?track, ?characteristic, ?active) <=																		\
-		Append(?simulator, ., ?car, ., ?track, .Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+		Append(?simulator, ., ?car, ., ?track, .Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
 characteristicActive(?simulator, ?car, ?, ?characteristic, ?active) <=																			\
-		Append(?simulator, ., ?car, .*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+		Append(?simulator, ., ?car, .*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
 characteristicActive(?simulator, ?, ?, ?characteristic, ?active) <=																				\
-		Append(?simulator, .*.*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+		Append(?simulator, .*.*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
 characteristicActive(?, ?, ?, ?characteristic, ?active) <=																						\
-		Append(*.*.*.Characteristic., ?characteristic, .Active, ?fact), bound?(?fact), !, Get(?fact, ?active)
+		Append(*.*.*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
 characteristicActive(?, ?, ?, ?, false)
 
 addSettings(?simulator, ?car, *) <= allSettings(?settings), addSettings(?simulator, ?car, ?settings)
@@ -126,19 +127,20 @@ removeSettings(?, ?, [])
 removeSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
 		removeSetting(?simulator, ?car, ?setting), removeSettings(?simulator, ?car, ?settings)
 
-removeSetting(?simulator, ?car, ?setting) <= Clear(?simulator, ?car, Setting, ?setting, Available)
+removeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, false)
 
 settingAvailable(?simulator, ?car, ?setting) <= settingAvailable(?simulator, ?car, ?setting, true)
+settingAvailable(?, ?, false) <= !
 settingAvailable(?, ?, ?) <= fail
 
 settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
-		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
 settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
-		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
 settingAvailable(?simulator, ?, ?setting, ?available) <=																						\
-		Append(?simulator, .*.Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+		Append(?simulator, .*.Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
 settingAvailable(?, ?, ?setting, ?available) <=																									\
-		Append(*.*.*.Setting., ?setting, .Available, ?fact), bound?(?fact), !, Get(?fact, ?available)
+		Append(*.*.*.Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
 settingAvailable(?, ?, ?, ?, false)
 
 
@@ -199,6 +201,8 @@ max(?x, ?y, ?y)
 
 min(?x, ?y, ?x) <= ?x < ?y, !
 min(?x, ?y, ?y)
+
+fact?(?f) <= Get(?f, ?)
 
 bound?(?x) <= unbound?(?x), !, fail
 bound?(?)

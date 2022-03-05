@@ -91,6 +91,7 @@ class SetupAdvisor extends ConfigurationItem {
 	iSimulatorSettings := false
 	
 	iSelectedSimulator := false
+	iAvailableCars := []
 	iSelectedCar := true
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
@@ -181,6 +182,22 @@ class SetupAdvisor extends ConfigurationItem {
 				return (label ? this.SimulatorSettings.Name : this.iSelectedSimulator)
 			else
 				return this.iSelectedSimulator
+		}
+	}
+	
+	AvailableCars[label := true] {
+		Get {
+			if ((label == true) && inList(this.iAvailableCars, "*")) {
+				cars := this.iAvailableCars.Clone()
+				
+				for index, car in cars
+					if (car = "*")
+						cars[index] := translate("All")
+			
+				return cars
+			}
+			else
+				return this.iAvailableCars
 		}
 	}
 	
@@ -279,7 +296,7 @@ class SetupAdvisor extends ConfigurationItem {
 			if (name == true)
 				simulators[index] := translate("Generic")
 	
-		Gui %window%:Add, DropDownList, x100 yp w180 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		Gui %window%:Add, DropDownList, x100 yp w220 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -287,8 +304,8 @@ class SetupAdvisor extends ConfigurationItem {
 			simulator := false
 		
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car / Track")
-		Gui %window%:Add, DropDownList, AltSubmit x100 yp w88 Disabled Choose1 vcarDropDown gchooseCar, % translate("All")
-		Gui %window%:Add, DropDownList, x192 yp w88 Disabled Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		Gui %window%:Add, DropDownList, x100 yp w108 Choose1 vcarDropDown gchooseCar, % translate("All")
+		Gui %window%:Add, DropDownList, x212 yp w108 Disabled Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
 		
@@ -301,7 +318,7 @@ class SetupAdvisor extends ConfigurationItem {
 			chosen := 1
 		}
 		
-		Gui %window%:Add, DropDownList, x100 yp w180 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x100 yp w220 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
 			
 		Gui %window%:Add, Text, x8 yp+30 w400 0x10
 
@@ -568,12 +585,20 @@ class SetupAdvisor extends ConfigurationItem {
 	getSimulators() {
 		simulators := []
 		
+		hasGeneric := false
+		
 		Loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
 		{
 			SplitPath, A_LoopFileName, , , , simulator
 			
-			simulators.Push((simulator = "Generic") ? true : simulator)
+			if (simulator = "Generic")
+				hasGeneric := true
+			else
+				simulators.Push(simulator)
 		}
+		
+		if hasGeneric
+			simulators.InsertAt(1, true)
 		
 		return simulators
 	}
@@ -793,6 +818,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSimulatorSettings := {Name: name, Simulator: simulator, Cars: cars, Tracks: tracks}
 		
 		this.iSelectedSimulator := ((simulator = "*") ? true : simulator)
+		this.iAvailableCars := cars
 		this.iSelectedCar := ((cars[1] = "*") ? true : cars[1])
 		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
@@ -827,6 +853,8 @@ class SetupAdvisor extends ConfigurationItem {
 				if (simulators.Length() > 0)
 					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 		
+				this.loadCars(this.AvailableCars[true], false)
+				
 				productions := false
 				reductions := false
 			
@@ -848,19 +876,15 @@ class SetupAdvisor extends ConfigurationItem {
 					
 				knowledgeBase.produce()
 		
-				showProgress({progress: vProgressCount++})
-				
 				Sleep 200
+				
+				showProgress({progress: vProgressCount++, color: "Green", title: translate("Loading Car"), message: translate("Loading Car Settings...")})
 				
 				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
 		
-				showProgress({progress: vProgressCount++})
-				
 				Sleep 200
 				
 				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
-				
-				showProgress({progress: vProgressCount++})
 				
 				Sleep 200
 				
@@ -895,7 +919,78 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 	
+	loadCars(cars) {
+		GuiControl, , carDropDown, % "|" . values2String("|", cars*)
+		
+		GuiControl Choose, carDropDown, 1
+		
+		this.iSelectedCar := ((cars[1] = translate("All")) ? true : cars[1])
+	}
+	
 	loadCar(car, force := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (force || (car != this.SelectedCar[false])) {
+			this.iSelectedCar := car
+			
+			window := this.Window
+		
+			Gui %window%:Default
+			Gui %window%:+Disabled
+			
+			try {
+				x := Round((A_ScreenWidth - 300) / 2)
+				y := A_ScreenHeight - 150
+				
+				vProgressCount := 0
+				
+				showProgress({x: x, y: y, color: "Green", title: translate("Loading Car"), message: translate("Clearing Problems...")})
+		
+				Sleep 200
+				
+				this.clearCharacteristics()
+				
+				showProgress({progress: (vProgressCount += 10), color: "Green", message: translate("Loading Car Settings...")})
+		
+				Sleep 200
+				
+				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
+		
+				Sleep 200
+				
+				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
+				
+				Sleep 200
+				
+				knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
+				knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
+				knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
+				
+				knowledgeBase.addFact("Calculate", true)
+					
+				knowledgeBase.produce()
+							
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(knowledgeBase)
+				
+				showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
+				
+				Sleep 200
+				
+				this.updateRecommendations(false)
+		
+				this.showSettingsChart(false)
+				
+				showProgress({message: translate("Finished...")})
+				
+				Sleep 1000
+				
+				hideProgress()
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
 	}
 	
 	loadTrack(track, force := false) {
@@ -1104,7 +1199,7 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			if !groupEmpty {
 				label := characteristicLabels[group]
-						
+					 
 				Menu CharacteristicsMenu, Add, %label%, :%groupMenu%
 			}
 		}
@@ -1333,7 +1428,6 @@ chooseSimulator() {
 }
 
 chooseCar() {
-	/*
 	advisor := SetupAdvisor.Instance
 	window := advisor.Window
 	
@@ -1341,8 +1435,7 @@ chooseCar() {
 	
 	GuiControlGet carDropDown
 	
-	advisor.loadCar(advisor.getCars(advisor.SelectedSimulator)[carDropDown])
-	*/
+	advisor.loadCar((carDropDown = translate("All")) ? true : carDropDown)
 }
 
 chooseTrack() {
@@ -1354,7 +1447,7 @@ chooseTrack() {
 	
 	GuiControlGet trackDropDown
 	
-	advisor.loadTrack(trackDropDown)
+	advisor.loadTrack(trackDropDown = translate("All")) ? true : trackDropDown)
 	*/
 }
 

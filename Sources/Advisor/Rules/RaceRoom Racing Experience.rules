@@ -1,0 +1,22 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - RaceRoom Racing Experience      ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator(RaceRoom\ Racing\ Experience)),																			\
+				 (Prove: addCharacteristics(RaceRoom\ Racing\ Experience, *, *, *)),															\
+				 (Prove: addSettings(RaceRoom\ Racing\ Experience, *, *))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules

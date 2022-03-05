@@ -1808,7 +1808,7 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	releasePlan() {
+	releasePlan(verbose := true) {
 		if this.SessionActive
 			try {
 				session := this.SelectedSession[true]
@@ -1836,12 +1836,13 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.setSessionValue(session, "Stint Plan", plan)
 				this.Connector.setSessionValue(session, "Stint Plan Version", version)
 				
-				showMessage(translate("Plan will be updated for this Session."))
+				if verbose
+					showMessage(translate("Plan will be updated for this Session."))
 			}
 			catch exception {
 				; ignore
 			}
-		else {
+		else if verbose {
 			title := translate("Information")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -4389,6 +4390,9 @@ class RaceCenter extends ConfigurationItem {
 			catch exception {
 				; ignore
 			}
+			
+			this.deletePlan()
+			this.releasePlan(false)
 			
 			this.initializeSession()
 		}

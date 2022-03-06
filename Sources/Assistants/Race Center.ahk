@@ -3421,25 +3421,40 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 				catch exception {
-					state := false
-					
 					try {
 						state := this.Connector.GetSessionValue(session, "Race Engineer State")
 					}
 					catch exception {
-						; ignore
+						state := false
+					}
+					
+					try {
+						pitstop := this.Connector.GetSessionLapValue(session, lap, "Race Center Pitstop")
+						
+						if (pitstop = "")
+							pitstop := false
+					}
+					catch exception {
+						pitstop := false
 					}
 				
-					if (state && (state != "")) {
+					if (!pitstop && (state && (state != ""))) {
 						state := parseConfiguration(state)
 						
 						pitstop := getConfigurationValue(state, "Session State", "Pitstop.Last", false)
 				
-						if pitstop
-							pitstop := (lap == (getConfigurationValue(state, "Session State", "Pitstop." . pitstop . ".Lap") + 1))
+						if pitstop {
+							pitstop := (Abs(lap - (getConfigurationValue(state, "Session State", "Pitstop." . pitstop . ".Lap") + 1)) <= 2)
+						
+							if pitstop
+								try {
+									this.Connector.SetSessionLapValue(session, lap, "Race Center Pitstop", pitstop)
+								}
+								catch exception {
+									; ignore
+								}
+						}
 					}
-					else
-						pitstop := false
 				
 					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
 				}

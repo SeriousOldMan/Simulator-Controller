@@ -205,8 +205,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
-								 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-								 , compound, compoundColor, pressures, temperatures))
+													, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
+													, compound, compoundColor, pressures, temperatures))
 		else
 			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

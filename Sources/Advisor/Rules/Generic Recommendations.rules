@@ -117,25 +117,41 @@
 		(Prove: changeSetting(Geometry.Camber.Front.Left, -1, ?Tyre.Wear.Front.Inner.Correction)),												\
 		(Prove: changeSetting(Geometry.Camber.Front.Right, -1, ?Tyre.Wear.Front.Inner.Correction))
 
+{All: [?Tyre.Wear.Front.Inner.Correction != 0], [?Tyre.Wear.Front.Inner.Value > 50]} =>															\
+		(Prove: changeSetting(Geometry.Toe.Front.Left, -1, ?Tyre.Wear.Front.Inner.Correction)),													\
+		(Prove: changeSetting(Geometry.Toe.Front.Right, -1, ?Tyre.Wear.Front.Inner.Correction))
+
 [?Tyre.Wear.Front.Middle.Correction != 0] =>																									\
 		(Prove: changeSetting(Tyre.Pressure.Front.Left, -1, ?Tyre.Wear.Front.Middle.Correction)),												\
-		(Prove: changeSetting(Tyre.Pressure.Front.Left, -1, ?Tyre.Wear.Front.Middle.Correction))
+		(Prove: changeSetting(Tyre.Pressure.Front.Right, -1, ?Tyre.Wear.Front.Middle.Correction))
 
 [?Tyre.Wear.Front.Outer.Correction != 0] =>																										\
 		(Prove: changeSetting(Geometry.Camber.Front.Left, 1, ?Tyre.Wear.Front.Outer.Correction)),												\
 		(Prove: changeSetting(Geometry.Camber.Front.Right, 1, ?Tyre.Wear.Front.Outer.Correction))
 
+{All: [?Tyre.Wear.Front.Outer.Correction != 0], [?Tyre.Wear.Front.Outer.Value > 50]} =>															\
+		(Prove: changeSetting(Geometry.Toe.Front.Left, -1, ?Tyre.Wear.Front.Outer.Correction)),													\
+		(Prove: changeSetting(Geometry.Toe.Front.Right, -1, ?Tyre.Wear.Front.Outer.Correction))
+
 [?Tyre.Wear.Rear.Inner.Correction != 0] =>																										\
 		(Prove: changeSetting(Geometry.Camber.Rear.Left, -1, ?Tyre.Wear.Rear.Inner.Correction)),												\
 		(Prove: changeSetting(Geometry.Camber.Rear.Right, -1, ?Tyre.Wear.Rear.Inner.Correction))
 
+{All: [?Tyre.Wear.Rear.Inner.Correction != 0], [?Tyre.Wear.Rear.Inner.Value > 50]} =>															\
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Wear.Rear.Inner.Correction)),													\
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Wear.Rear.Inner.Correction))
+
 [?Tyre.Wear.Rear.Middle.Correction != 0] =>																										\
 		(Prove: changeSetting(Tyre.Pressure.Rear.Left, -1, ?Tyre.Wear.Rear.Middle.Correction)),													\
-		(Prove: changeSetting(Tyre.Pressure.Rear.Left, -1, ?Tyre.Wear.Rear.Middle.Correction))
+		(Prove: changeSetting(Tyre.Pressure.Rear.Right, -1, ?Tyre.Wear.Rear.Middle.Correction))
 
 [?Tyre.Wear.Rear.Outer.Correction != 0] =>																										\
 		(Prove: changeSetting(Geometry.Camber.Rear.Left, 1, ?Tyre.Wear.Rear.Outer.Correction)),													\
 		(Prove: changeSetting(Geometry.Camber.Rear.Right, 1, ?Tyre.Wear.Rear.Outer.Correction))
+
+{All: [?Tyre.Wear.Rear.Outer.Correction != 0], [?Tyre.Wear.Rear.Outer.Value > 50]} =>															\
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Wear.Rear.Outer.Correction)),													\
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Wear.Rear.Outer.Correction))
 
 [?Brake.Performance.Straight.Correction != 0] =>																								\
 		(Prove: changeSetting(Electronics.ABS, -1, ?Brake.Performance.Straight.Correction)),													\

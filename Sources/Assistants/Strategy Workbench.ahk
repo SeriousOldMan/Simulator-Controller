@@ -1423,7 +1423,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Session Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
+							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -1489,7 +1490,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					
 					data := readSimulatorData(prefix)
 					
-					if false && ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
+					if ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
 					 || (getConfigurationValue(data, "Session Data", "Track") != this.SelectedTrack))
 						return
 					else {

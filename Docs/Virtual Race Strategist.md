@@ -183,7 +183,33 @@ In the first tab you enter the rules and settings for the upcoming event. Using 
 
 Loading of settings is supported for:
 
-  1. *Race.settings* file (from the setup database)
+  1. The currently loaded Strategy:
+  
+     This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the *Strategy* menu and than choose this command. The following fields are loaded from the strategy:
+	 
+	 - Rules & Settings
+	   - Race Duration
+	   - Stint Limit
+	   - Formation Lap
+	   - Post Race Lap
+	   - All Pitstop Rules incl. Tyre Sets
+	 - Pitstop & Service
+	   - Pitstop Delta
+	   - Tyre Service Time
+	   - Refuel Service Time
+	   - Service Rules
+	   - Fuel Capacity
+	   - Safety Fuel
+	 - Simulation
+	   - Tyre Compound
+	   - Tyre Compound Color
+	   - Tyre Usage
+	   - Fuel Amount
+	   - Map
+	   - Average Lap Time
+	   - Average Fuel Consumption
+  
+  2. *Race.settings* file (from the setup database)
   
      The file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
 	 
@@ -191,17 +217,19 @@ Loading of settings is supported for:
 	   - Race Duration
 	   - Formation Lap
 	   - Post Race Lap
-	   - Pitstop Delta
 	 - Pitstop & Service
+	   - Pitstop Delta
 	   - Tyre Service Time
 	   - Refuel Service Time
+	   - Service Rules
+	   - Safety Fuel
 	 - Simulation
 	   - Tyre Compound
 	   - Tyre Compound Color
 	   - Average Lap Time
 	   - Average Fuel Consumption
 
-  2. Telemetry Data
+  3. Telemetry Data
   
      The best lap time and the best hot tyre pressures are extracted for for the current simulator / car / track combination and the following fields are initialized from this data:
 	 
@@ -210,7 +238,7 @@ Loading of settings is supported for:
 	   - Average Lap Time
 	   - Average Fuel Consumption
 
-  3. Simulation
+  4. Simulation
   
      If a simulator session exists and is identical to the currently selected simulator / car / track combination, the following fields are initialized from data acquired from the simulator:
 	 
@@ -252,7 +280,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	Hint: If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
   - Tyre Usage
   
-	Here you have a range from 0 to 100% to enable some kind of *overuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race.
+	Here you have a range from 0 to 100% to enable some kind of *overuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
   - Tyre Compound
   
     When you are preparing the Strategy for a car, for which different tyre compound mixtures (for example White - Blue - Red) are available, you can define with this slider the propabilty, with which a different mixture will be used for the next stint. Up to 100 variations may be evaluated for best possible lap times and thereby overall race performance. Tyre usage based lap time degredation will be included in the stochiastic modeling, as long as enough data is available for each tyre compound mixture.

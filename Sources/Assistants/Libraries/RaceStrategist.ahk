@@ -746,7 +746,7 @@ class RaceStrategist extends RaceAssistant {
 			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 			
 			if pitstop
-				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
+				pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
 			
 			prefix := "Lap." . lapNumber
 			

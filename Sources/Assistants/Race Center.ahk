@@ -3445,7 +3445,7 @@ class RaceCenter extends ConfigurationItem {
 						pitstop := getConfigurationValue(state, "Session State", "Pitstop.Last", false)
 				
 						if pitstop {
-							pitstop := (Abs(lap - (getConfigurationValue(state, "Session State", "Pitstop." . pitstop . ".Lap") + 1)) <= 2)
+							pitstop := (Abs(lap - (getConfigurationValue(state, "Session State", "Pitstop." . pitstop . ".Lap"))) <= 2)
 						
 							if pitstop
 								try {

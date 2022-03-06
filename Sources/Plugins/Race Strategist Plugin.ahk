@@ -236,7 +236,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 					
-					if telemetryData[10]
+					if ((runningLap > 2) && telemetryData[10])
 						runningLap := 0
 					
 					runningLap += 1

@@ -3462,7 +3462,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				telemetryData := string2Values(";", telemetryData)
 			
-				if telemetryData[10]
+				if ((runningLap > 2) && telemetryData[10])
 					runningLap := 0
 				
 				runningLap += 1

@@ -6542,7 +6542,7 @@ class TrafficSimulation extends StrategySimulation {
 		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 		
 		consumptionStep := (consumption / 4)
-		tyreUsageStep := (tyreUsage / 4)
+		tyreUsageStep := (tyreUsage / 10)
 		tyreCompoundVariationStep := (tyreCompoundVariation / 4)
 		initialFuelStep := (initialFuel / 4)
 		
@@ -6588,6 +6588,8 @@ class TrafficSimulation extends StrategySimulation {
 			Loop { ; consumption
 				Loop { ; initialFuel
 					Loop { ; tyreUsage
+						tyreLapsVariation := tyreUsage
+					
 						Loop { ; tyreCompoundVariation
 							if useStartConditions {
 								if map is number
@@ -6612,8 +6614,7 @@ class TrafficSimulation extends StrategySimulation {
 																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 									
 										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-														, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), map
-														, currentConsumption, lapTime)
+														, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
 									}
 									finally {
 										this.setFixedLapTime(false)
@@ -6652,8 +6653,7 @@ class TrafficSimulation extends StrategySimulation {
 																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 									
 										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-														, stintLaps, maxTyreLaps + (maxTyreLaps / 100 * tyreUsage), scenarioMap
-														, currentConsumption, lapTime)
+														, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 										
 										scenarios[name . translate(":") . variation] := strategy
 										

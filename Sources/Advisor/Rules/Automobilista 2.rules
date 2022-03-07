@@ -11,7 +11,9 @@
 
 [?Initialize] => (Prove: addSimulator(Automobilista\ 2)),																						\
 				 (Prove: addCharacteristics(Automobilista\ 2, *, *, *)),																		\
-				 (Prove: addSettings(Automobilista\ 2, *, *))
+				 (Prove: addSettings(Automobilista\ 2, *, *)),																					\
+				 (Prove: removeSetting(Automobilista\ 2, *, [Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,								\
+															 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;

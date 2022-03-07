@@ -6541,10 +6541,10 @@ class TrafficSimulation extends StrategySimulation {
 		
 		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 		
-		consumptionStep := (consumption / 4)
-		tyreUsageStep := (tyreUsage / 10)
-		tyreCompoundVariationStep := (tyreCompoundVariation / 4)
-		initialFuelStep := (initialFuel / 4)
+		consumptionSteps := consumption / 10
+		tyreUsageSteps := tyreUsage
+		tyreCompoundVariationSteps := tyreCompoundVariation / 4
+		initialFuelSteps := initialFuel / 10
 		
 		scenarios := {}
 		variation := 1
@@ -6584,6 +6584,11 @@ class TrafficSimulation extends StrategySimulation {
 			this.TyreCompound := tyreCompound
 			this.TyreCompoundColor := tyreCompoundColor
 			this.TyreCompoundVariation := tyreCompoundVariation
+		
+			consumptionRound := 0
+			initialFuelRound := 0
+			tyreUsageRound := 0
+			tyreCompoundVariationRound := 0
 
 			Loop { ; consumption
 				Loop { ; initialFuel
@@ -6663,28 +6668,20 @@ class TrafficSimulation extends StrategySimulation {
 									}
 								}
 						
-							if (tyreCompoundVariation <= 0)
+							if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
 								break
-							else
-								tyreCompoundVariation := Max(0, tyreCompoundVariation - tyreCompoundVariationStep)
 						}
-				
-						if (tyreUsage <= 0)
+						
+						if (++tyreUsageRound >= tyreUsageSteps)
 							break
-						else
-							tyreUsage := Max(0, tyreUsage - tyreUsageStep)
 					}
-							
-					if (initialFuel <= 0)
+					
+					if (++initialFuelRound >= initialFuelSteps)
 						break
-					else
-						initialFuel := Max(0, initialFuel - initialFuelStep)
 				}
 				
-				if (consumption <= 0)
+				if (++consumptionRound >= consumptionSteps)
 					break
-				else
-					consumption := Max(0, consumption - consumptionStep)
 			}
 			
 			if (scenarios.Count() == 0)

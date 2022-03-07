@@ -193,7 +193,7 @@ class StrategyViewer {
 		if durationSession
 			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		else
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Minutes") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
 		
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
@@ -209,7 +209,7 @@ class StrategyViewer {
 			drawChartFunction .= ("[" . xAxis . ", " . fuelSeries[A_Index] . ", " . tyreSeries[A_Index] . "]")
 		}
 		
-		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 				
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . vChartID . "')); chart.draw(data, options); }")
 		

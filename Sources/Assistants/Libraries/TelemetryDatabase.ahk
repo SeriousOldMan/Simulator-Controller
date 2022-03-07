@@ -337,9 +337,19 @@ removeInvalidLaps(rows) {
 	
 	computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
 	
-	if (rows < 20) {
+	count := rows.Length()
+	
+	if (count < 5) {
 		ltStdDev *= 2
 		cStdDev *= 2
+	}
+	else if (count < 10) {
+		ltStdDev *= 1.5
+		cStdDev *= 1.5
+	}
+	else if (count < 20) {
+		ltStdDev *= 1.2
+		cStdDev *= 1.2
 	}
 	
 	result := []

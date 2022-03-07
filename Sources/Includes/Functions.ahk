@@ -736,6 +736,9 @@ shareSetupDatabase() {
 }
 
 checkForUpdates() {
+	if vDetachedInstallation
+		return
+	
 	if !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kUserConfigDirectory . "VERSION")
 		

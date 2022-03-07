@@ -204,7 +204,7 @@ class StrategySimulation {
 		if (this.SessionType = "Duration")
 			for name, strategy in scenarios {
 				if verbose {
-					message := (translate("Optimizing Stint length for Scenario ") . name . translate("..."))
+					message := (translate("Optimizing Scenario ") . name . translate("..."))
 				
 					showProgress({progress: progress, message: message})
 				}
@@ -447,10 +447,10 @@ class VariationSimulation extends StrategySimulation {
 		
 		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 		
-		consumptionStep := (consumption / 4)
-		tyreUsageStep := (tyreUsage / 10)
-		tyreCompoundVariationStep := (tyreCompoundVariation / 4)
-		initialFuelStep := (initialFuel / 4)
+		consumptionSteps := consumption / 10
+		tyreUsageSteps := tyreUsage
+		tyreCompoundVariationSteps := tyreCompoundVariation / 4
+		initialFuelSteps := initialFuel / 10
 		
 		scenarios := {}
 		variation := 1
@@ -476,11 +476,16 @@ class VariationSimulation extends StrategySimulation {
 		this.TyreCompoundColor := tyreCompoundColor
 		this.TyreCompoundVariation := tyreCompoundVariation
 		
+		consumptionRound := 0
+		initialFuelRound := 0
+		tyreUsageRound := 0
+		tyreCompoundVariationRound := 0
+		
 		Loop { ; consumption
 			Loop { ; initialFuel
-				Loop { ; tyreUsage
-					tyreLapsVariation := tyreUsage
+				tyreLapsVariation := tyreUsage
 				
+				Loop { ; tyreUsage
 					Loop { ; tyreCompoundVariation
 						if useStartConditions {
 							if map is number
@@ -554,28 +559,20 @@ class VariationSimulation extends StrategySimulation {
 								}
 							}
 						
-						if (tyreCompoundVariation <= 0)
+						if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
 							break
-						else
-							tyreCompoundVariation := Max(0, tyreCompoundVariation - tyreCompoundVariationStep)
 					}
-				
-					if (tyreUsage <= 0)
+					
+					if (++tyreUsageRound >= tyreUsageSteps)
 						break
-					else
-						tyreUsage := Max(0, tyreUsage - tyreUsageStep)
 				}
-						
-				if (initialFuel <= 0)
+				
+				if (++initialFuelRound >= initialFuelSteps)
 					break
-				else
-					initialFuel := Max(0, initialFuel - initialFuelStep)
 			}
 			
-			if (consumption <= 0)
+			if (++consumptionRound >= consumptionSteps)
 				break
-			else
-				consumption := Max(0, consumption - consumptionStep)
 		}
 		
 		progress := Floor(progress + 10)
@@ -1660,8 +1657,21 @@ class Strategy extends ConfigurationItem {
 	
 	chooseTyreCompoundColor(pitstops, pitstopNr, tyreCompound) {
 		if (pitstopNr <= pitstops.Length()) {
-			if pitstops[pitstopNr].TyreChange
-				return pitstops[pitstopNr].TyreCompoundColor
+			if pitstops[pitstopNr].TyreChange {
+				tyreCompoundColor := pitstops[pitstopNr].TyreCompoundColor
+				qualifiedCompound := qualifiedCompound(pitstops[pitstopNr].TyreCompound, tyreCompoundColor)
+				
+				if this.AvailableTyreSets.HasKey(qualifiedCompound) {
+					count := (this.AvailableTyreSets[qualifiedCompound] - 1)
+					
+					if (count > 0)
+						this.AvailableTyreSets[qualifiedCompound] := count
+					else
+						this.AvailableTyreSets.Delete(qualifiedCompound)
+				}
+				
+				return tyreCompoundColor
+			}
 		}
 		else {
 			Random rnd, 0.01, 0.99

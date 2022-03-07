@@ -120,8 +120,8 @@ class StrategySimulation {
 														, tyreUsageWeight, tyreCompoundVariationWeight)
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
-		return this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired, tyreSets)
+	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
+		return this.StrategyManager.getPitstopRules(pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 	}
 	
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -221,7 +221,7 @@ class StrategySimulation {
 					sessionTime -= avgLapTime
 				}
 				
-				reqPitstops := strategy.PitstopRequired
+				reqPitstops := strategy.PitstopRule
 				
 				if IsObject(reqPitstops)
 					reqPitstops := 1
@@ -242,6 +242,10 @@ class StrategySimulation {
 			progress := Floor(progress + 10)
 		
 		return scenarios
+	}
+	
+	validScenario(strategy) {
+		return ((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0)
 	}
 	
 	compareScenarios(scenario1, scenario2) {
@@ -277,21 +281,23 @@ class StrategySimulation {
 		candidate := false
 		
 		for name, strategy in scenarios {
-			if verbose {
-				message := (translate("Evaluating Scenario ") . name . translate("..."))
+			if this.validScenario(strategy) {
+				if verbose {
+					message := (translate("Evaluating Scenario ") . name . translate("..."))
+					
+					showProgress({progress: progress, message: message})
+				}
 				
-				showProgress({progress: progress, message: message})
-			}
-			
-			if !candidate
-				candidate := strategy
-			else
-				candidate := this.compareScenarios(strategy, candidate)
-			
-			if verbose {
-				progress += 1
-			
-				Sleep 500
+				if !candidate
+					candidate := strategy
+				else
+					candidate := this.compareScenarios(strategy, candidate)
+				
+				if verbose {
+					progress += 1
+				
+					Sleep 500
+				}
 			}
 		}
 		
@@ -627,9 +633,9 @@ class Strategy extends ConfigurationItem {
 	iPitstopTyreService := 0.0
 	iPitstopSeviceOrder := "Simultaneous"
 	
-	iPitstopRequired := false
-	iRefuelRequired := false
-	iTyreChangeRequired := false
+	iPitstopRule := false
+	iRefuelRule := false
+	iTyreChangeRule := false
 	iTyreSets := []
 		
 	iStintLaps := 0
@@ -774,9 +780,9 @@ class Strategy extends ConfigurationItem {
 			base.__New(configuration)
 			
 			if !configuration {
-				pitstopRequired := strategy.PitstopRequired
-				refuelRequired := strategy.RefuelRequired
-				tyreChangeRequired := strategy.TyreChangeRequired
+				pitstopRule := strategy.PitstopRule
+				refuelRule := strategy.RefuelRule
+				tyreChangeRule := strategy.TyreChangeRule
 			
 				remainingFuel := strategy.RemainingFuel[true]
 				remainingLaps := strategy.RemainingLaps[true]
@@ -795,7 +801,11 @@ class Strategy extends ConfigurationItem {
 				this.iMap := strategy.Map[true]
 				this.iFuelConsumption := fuelConsumption
 				
-				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
+				if (refuelRule = "Disallowed")
+					refuelAmount := 0
+				else
+					refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingLaps, lastStintLaps)
+				
 				tyreChange := kUndefined
 				
 				if (adjustments && adjustments.HasKey(id)) {
@@ -805,8 +815,8 @@ class Strategy extends ConfigurationItem {
 					if adjustments[id].HasKey("TyreChange")
 						tyreChange := adjustments[id].TyreChange
 				}
-						
-				if ((id == 1) && refuelRequired && (refuelAmount <= 0))
+				
+				if ((id == 1) && (refuelRule = "Required") && (refuelAmount <= 0))
 					refuelAmount := 1
 				else if (refuelAmount <= 0)
 					refuelAmount := 0
@@ -821,8 +831,12 @@ class Strategy extends ConfigurationItem {
 				variation := (strategy.TyreLapsVariation / 100 * rnd)
 				
 				freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
-						
-				if (tyreChange != kUndefined) {
+				
+				if (tyreChangeRule = "Disallowed") {
+					this.iTyreChange := false
+					this.iRemainingTyreLaps := remainingTyreLaps
+				}
+				else if (tyreChange != kUndefined) {
 					this.iTyreChange := tyreChange
 					
 					if tyreChange
@@ -833,7 +847,7 @@ class Strategy extends ConfigurationItem {
 				else if (!tyreCompound && !tyreCompoundColor)
 					this.iRemainingTyreLaps := remainingTyreLaps
 				else if ((remainingTyreLaps - stintLaps) >= 0) {
-					if ((id == 1) && tyreChangeRequired && (remainingTyreLaps >= this.iRemainingLaps)) {
+					if ((id == 1) && (tyreChangeRule = "Required") && (remainingTyreLaps >= this.iRemainingLaps)) {
 						this.iTyreChange := true
 						this.iRemainingTyreLaps := freshTyreLaps
 					}
@@ -1126,21 +1140,21 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
-	PitstopRequired[] {
+	PitstopRule[] {
 		Get {
-			return this.iPitstopRequired
+			return this.iPitstopRule
 		}
 	}
 	
-	RefuelRequired[] {
+	RefuelRule[] {
 		Get {
-			return this.iRefuelRequired
+			return this.iRefuelRule
 		}
 	}
 	
-	TyreChangeRequired[] {
+	TyreChangeRule[] {
 		Get {
-			return this.iTyreChangeRequired
+			return this.iTyreChangeRule
 		}
 	}
 	
@@ -1317,21 +1331,23 @@ class Strategy extends ConfigurationItem {
 			this.iPitstopTyreService := pitstopTyreService
 			this.iPitstopServiceOrder := pitstopServiceOrder
 			
-			pitstopRequired := false
-			refuelRequired := false
-			tyreChangeRequired := false
+			pitstopRule := false
+			refuelRule := false
+			tyreChangeRule := false
 			tyreSets := false
 			
-			this.StrategyManager.getPitstopRules(pitstopRequired, refuelRequired, tyreChangeRequired, tyreSets)
+			this.StrategyManager.getPitstopRules(pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 
-			if !pitstopRequired {
-				refuelRequired := false
-				tyreChangeRequired := false
+			/*
+			if !pitstopRule {
+				refuelRule := false
+				tyreChangeRule := false
 			}
+			*/
 			
-			this.iPitstopRequired := pitstopRequired
-			this.iRefuelRequired := refuelRequired
-			this.iTyreChangeRequired := tyreChangeRequired
+			this.iPitstopRule := pitstopRule
+			this.iRefuelRule := refuelRule
+			this.iTyreChangeRule := tyreChangeRule
 			this.iTyreSets := tyreSets
 		}
 	}
@@ -1372,14 +1388,28 @@ class Strategy extends ConfigurationItem {
 		this.iPitstopTyreService := getConfigurationValue(configuration, "Settings", "PitstopTyreService", 0.0)
 		this.iPitstopServiceOrder := getConfigurationValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
 		
-		this.iPitstopRequired := getConfigurationValue(configuration, "Settings", "PitstopRequired", false)
+		this.iPitstopRule := getConfigurationValue(configuration, "Settings", "PitstopRule", kUndefined)
 		
-		if this.iPitstopRequired
-			if InStr(this.iPitstopRequired, "-")
-				this.iPitstopRequired := string2Values("-", this.iPitstopRequired)
+		if (this.iPitstopRule == kUndefined)
+			this.iPitstopRule := getConfigurationValue(configuration, "Settings", "PitstopRequired", false)
 		
-		this.iRefuelRequired := getConfigurationValue(configuration, "Settings", "PitstopRefuel", false)
-		this.iTyreChangeRequired := getConfigurationValue(configuration, "Settings", "PitstopTyreChange", false)
+		if this.iPitstopRule
+			if InStr(this.iPitstopRule, "-")
+				this.iPitstopRule := string2Values("-", this.iPitstopRule)
+		
+		this.iRefuelRule := getConfigurationValue(configuration, "Settings", "PitstopRefuel", "Optional")
+		
+		if (this.iRefuelRule == false)
+			this.iRefuelRule := "Optional"
+		else if (this.iRefuelRule == true)
+			this.iRefuelRule := "Required"
+		
+		this.iTyreChangeRule := getConfigurationValue(configuration, "Settings", "PitstopTyreChange", false)
+		
+		if (this.iTyreChangeRule == false)
+			this.iTyreChangeRule := "Optional"
+		else if (this.iTyreChangeRule == true)
+			this.iTyreChangeRule := "Required"
 		
 		tyreSets := string2Values(";", getConfigurationValue(configuration, "Settings", "TyreSets", []))
 		
@@ -1431,14 +1461,14 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
 		setConfigurationValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
 		
-		pitstopRequired := this.PitstopRequired
+		pitstopRule := this.PitstopRule
 		
-		if IsObject(pitstopRequired)
-			pitstopRequired := values2String("-", pitstopRequired*)
+		if IsObject(pitstopRule)
+			pitstopRule := values2String("-", pitstopRule*)
 		
-		setConfigurationValue(configuration, "Settings", "PitstopRequired", pitstopRequired)
-		setConfigurationValue(configuration, "Settings", "PitstopRefuel", this.RefuelRequired)
-		setConfigurationValue(configuration, "Settings", "PitstopTyreChange", this.TyreChangeRequired)
+		setConfigurationValue(configuration, "Settings", "PitstopRule", pitstopRule)
+		setConfigurationValue(configuration, "Settings", "PitstopRefuel", this.RefuelRule)
+		setConfigurationValue(configuration, "Settings", "PitstopTyreChange", this.TyreChangeRule)
 		
 		tyreSets := []
 		
@@ -1638,16 +1668,16 @@ class Strategy extends ConfigurationItem {
 		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
 		
 		if (pitstopNr = 1) {
-			pitstopRequired := this.PitstopRequired
+			pitstopRule := this.PitstopRule
 			
-			if (((targetLap >= remainingLaps) && pitstopRequired) || IsObject(pitstopRequired)) {
-				if (pitstopRequired == true)
+			if (((targetLap >= remainingLaps) && pitstopRule) || IsObject(pitstopRule)) {
+				if (pitstopRule == true)
 					targetLap := remainingLaps - 2
-				else if IsObject(pitstopRequired) {
-					closingLap := (pitstopRequired[2] * 60 / this.AvgLapTime)
+				else if IsObject(pitstopRule) {
+					closingLap := (pitstopRule[2] * 60 / this.AvgLapTime)
 				
 					if (currentLap < closingLap)
-						targetLap := Min(targetLap, Floor((pitstopRequired[1] + ((pitstopRequired[2] - pitstopRequired[1]) / 2)) * 60 / this.AvgLapTime))
+						targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / this.AvgLapTime))
 				}
 			}
 		}
@@ -1751,7 +1781,7 @@ class Strategy extends ConfigurationItem {
 		
 		sessionLaps := this.RemainingLaps
 		
-		numPitstops := this.PitstopRequired
+		numPitstops := this.PitstopRule
 		
 		if numPitstops is Integer
 		{

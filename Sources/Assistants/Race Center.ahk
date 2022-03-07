@@ -2636,17 +2636,17 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
+	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		local strategy := this.Strategy
 		
 		if strategy {
-			pitstopRequired := strategy.PitstopRequired
-			refuelRequired := strategy.RefuelRequired
-			tyreChangeRequired := strategy.TyreChangeRequired
+			pitstopRule := strategy.PitstopRule
+			refuelRule := strategy.RefuelRule
+			tyreChangeRule := strategy.TyreChangeRule
 			tyreSets := strategy.TyreSets
 			
-			if pitstopRequired is Integer
-				if (pitstopRequired > 1) {
+			if pitstopRule is Integer
+				if (pitstopRule > 1) {
 					window := this.Window
 					
 					Gui %window%:Default
@@ -2655,7 +2655,7 @@ class RaceCenter extends ConfigurationItem {
 					
 					pitstops := LV_GetCount()
 					
-					pitstopRequired := Max(0, pitstopRequired - pitstops)
+					pitstopRule := Max(0, pitstopRule - pitstops)
 				}
 				
 			return true
@@ -2716,7 +2716,7 @@ class RaceCenter extends ConfigurationItem {
 	chooseScenario(strategy) {
 		if strategy {
 			if this.Strategy
-				strategy.iPitstopRequired := this.Strategy.PitstopRequired
+				strategy.iPitstopRule := this.Strategy.PitstopRule
 				
 			this.selectStrategy(strategy, true)
 		}
@@ -6344,7 +6344,7 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
 		targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
 		
-		if ((pitstopNr = 1) && IsObject(this.PitstopRequired))
+		if ((pitstopNr = 1) && IsObject(this.PitstopRule))
 			return targetLap
 		else {
 			variationWindow := this.StrategyManager.VariationWindow

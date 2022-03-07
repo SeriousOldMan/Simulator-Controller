@@ -527,10 +527,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w75 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
 
 		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
 		
 		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200, % translate("Tyre Sets")
 		
@@ -919,6 +919,70 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			GuiControl Choose, tyreSetDropDown, 0
 			GuiControl, , tyreSetCountEdit, % ""
+		}
+
+		GuiControlGet pitstopRequirementsDropDown
+		GuiControlGet pitstopWindowEdit
+		
+		if (pitstopRequirementsDropDown = 3) {
+			GuiControl Show, pitstopWindowEdit
+			GuiControl Show, pitstopWindowLabel
+			
+			GuiControl, , pitstopWindowLabel, % translate("Minute (From - To)")
+			
+			if !InStr(pitstopWindowEdit, "-")
+				GuiControl, , pitstopWindowEdit, 25-35
+		}
+		else if (pitstopRequirementsDropDown = 2) {
+			GuiControl Show, pitstopWindowEdit
+			GuiControl Show, pitstopWindowLabel
+			
+			GuiControl, , pitstopWindowLabel, % ""
+			
+			if InStr(pitstopWindowEdit, "-")
+				GuiControl, , pitstopWindowEdit, 1
+		}
+		else {
+			GuiControl Hide, pitstopWindowEdit
+			GuiControl Hide, pitstopWindowLabel
+		}
+		
+		GuiControlGet tyreChangeRequirementsDropDown
+		GuiControlGet refuelRequirementsDropDown
+			
+		if (pitstopRequirementsDropDown = 1) {
+			/*
+			GuiControl Hide, tyreChangeRequirementsLabel
+			GuiControl Hide, tyreChangeRequirementsDropDown
+			GuiControl Hide, refuelRequirementsLabel
+			GuiControl Hide, refuelRequirementsDropDown
+			*/
+			
+			oldTChoice := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
+			oldFChoice := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
+			
+			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
+			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
+			
+			GuiControl Choose, tyreChangeRequirementsDropDown, % (oldTChoice <= 2) ? oldTChoice : 1
+			GuiControl Choose, refuelRequirementsDropDown, % (oldFChoice <= 2) ? oldFChoice : 1
+			
+		}
+		else {
+			/*
+			GuiControl Show, tyreChangeRequirementsLabel
+			GuiControl Show, tyreChangeRequirementsDropDown
+			GuiControl Show, refuelRequirementsLabel
+			GuiControl Show, refuelRequirementsDropDown
+			*/
+			oldTChoice := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
+			oldFChoice := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
+			
+			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
+			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
+			
+			GuiControl Choose, tyreChangeRequirementsDropDown, %oldTChoice%
+			GuiControl Choose, refuelRequirementsDropDown, %oldFChoice%
 		}
 	}
 	
@@ -1316,25 +1380,25 @@ class StrategyWorkbench extends ConfigurationItem {
 						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
 						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
 						
-						pitstopRequired := strategy.PitstopRequired
+						pitstopRule := strategy.PitstopRule
 						
-						if !pitstopRequired
+						if !pitstopRule
 							GuiControl Choose, pitstopRequirementsDropDown, 1
-						else if IsObject(pitstopRequired) {
+						else if IsObject(pitstopRule) {
 							GuiControl Choose, pitstopRequirementsDropDown, 3
 						
-							pitstopWindowEdit := values2String("-", pitstopRequired*)
+							pitstopWindowEdit := values2String("-", pitstopRule*)
 						}
 						else {
 							GuiControl Choose, pitstopRequirementsDropDown, 3
 						
-							pitstopWindowEdit := pitstopRequired
+							pitstopWindowEdit := pitstopRule
 						}
 						
 						choosePitstopRequirements()
 		
-						GuiControl Choose, refuelRequirementsDropDown, % (strategy.RefuelRequired ? 2 : 1)
-						GuiControl Choose, tyreChangeRequirementsDropDown, % (strategy.TyreChangeRequired ? 2 : 1)
+						GuiControl Choose, refuelRequirementsDropDown, % (strategy.RefuelRule ? 2 : 1)
+						GuiControl Choose, tyreChangeRequirementsDropDown, % (strategy.TyreChangeRule ? 2 : 1)
 						
 						Gui ListView, % this.TyreSetListView
 						
@@ -1931,7 +1995,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
-	getPitstopRules(ByRef pitstopRequired, ByRef refuelRequired, ByRef tyreChangeRequired, ByRef tyreSets) {
+	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		result := true
 		
 		window := this.Window
@@ -1945,12 +2009,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		switch pitstopRequirementsDropDown {
 			case 1:
-				pitstopRequired := false
+				pitstopRule := false
 			case 2:
 				if pitstopWindowEdit is Integer
-					pitstopRequired := pitstopWindowEdit
+					pitstopRule := pitstopWindowEdit
 				else {
-					pitstopRequired := true
+					pitstopRule := true
 				
 					result := false
 				}
@@ -1958,16 +2022,22 @@ class StrategyWorkbench extends ConfigurationItem {
 				window := string2Values("-", pitstopWindowEdit)
 				
 				if (window.Length() = 2)
-					pitstopRequired := window
+					pitstopRule := window
 				else {
-					pitstopRequired := true
+					pitstopRule := true
 				
 					result := false
 				}
 		}
 		
-		refuelRequired := (refuelRequirementsDropDown = 2)
-		tyreChangeRequired := (tyreChangeRequirementsDropDown = 2)
+		if (pitstopRequirementsDropDown > 1) {
+			refuelRule := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
+			tyreChangeRule := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
+		}
+		else {
+			refuelRule := ["Optional", "Disallowed"][refuelRequirementsDropDown]
+			tyreChangeRule := ["Optional", "Disallowed"][tyreChangeRequirementsDropDown]
+		}
 		
 		Gui ListView, % this.TyreSetListView
 		
@@ -2315,47 +2385,7 @@ chooseSessionType() {
 }
 
 choosePitstopRequirements() {
-	GuiControlGet pitstopRequirementsDropDown
-	GuiControlGet pitstopWindowEdit
-	
-	if (pitstopRequirementsDropDown = 3) {
-		GuiControl Show, pitstopWindowEdit
-		GuiControl Show, pitstopWindowLabel
-		
-		GuiControl, , pitstopWindowLabel, % translate("Minute (From - To)")
-		
-		if !InStr(pitstopWindowEdit, "-")
-			GuiControl, , pitstopWindowEdit, 25-35
-	}
-	else if (pitstopRequirementsDropDown = 2) {
-		GuiControl Show, pitstopWindowEdit
-		GuiControl Show, pitstopWindowLabel
-		
-		GuiControl, , pitstopWindowLabel, % ""
-		
-		if InStr(pitstopWindowEdit, "-")
-			GuiControl, , pitstopWindowEdit, 1
-	}
-	else {
-		GuiControl Hide, pitstopWindowEdit
-		GuiControl Hide, pitstopWindowLabel
-	}
-	
-	if (pitstopRequirementsDropDown = 1) {
-		GuiControl Choose, tyreChangeRequirementsDropDown, 1
-		GuiControl Choose, refuelRequirementsDropDown, 1
-		
-		GuiControl Hide, tyreChangeRequirementsLabel
-		GuiControl Hide, tyreChangeRequirementsDropDown
-		GuiControl Hide, refuelRequirementsLabel
-		GuiControl Hide, refuelRequirementsDropDown
-	}
-	else {
-		GuiControl Show, tyreChangeRequirementsLabel
-		GuiControl Show, tyreChangeRequirementsDropDown
-		GuiControl Show, refuelRequirementsLabel
-		GuiControl Show, refuelRequirementsDropDown
-	}
+	StrategyWorkbench.Instance.updateState()
 }
 
 chooseTyreSet() {

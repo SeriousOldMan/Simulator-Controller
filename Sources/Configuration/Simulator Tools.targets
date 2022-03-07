@@ -92,6 +92,7 @@ Translations.10=%kResourcesDirectory%Templates\Controller Action Icons.de <- %kS
 Translations.11=%kResourcesDirectory%Translations\Controller Action Icons.en <- %kSourcesDirectory%Plugins\Controller Action Icons.en
 Translations.12=%kResourcesDirectory%Translations\Controller Action Icons.de <- %kSourcesDirectory%Plugins\Controller Action Icons.de
 Consent=%kTranslationsDirectory%Consent.ini <- %kSourcesDirectory%Assistants\Consent.ini
+Strategy Engine.1=%kResourcesDirectory%Strategy\Rules\Strategy Validation.rules <- %kSourcesDirectory%Assistants\Rules\Strategy Validation.rules
 Race Assistant Configuration.1=%kResourcesDirectory%Rules\Utilities.rules <- %kSourcesDirectory%Assistants\Rules\Utilities.rules
 Race Assistant Configuration.2=%kResourcesDirectory%Rules\Statistical Computations.rules <- %kSourcesDirectory%Assistants\Rules\Statistical Computations.rulesrules
 Race Assistant Configuration.3=%kResourcesDirectory%Rules\Session Information Retrieval.rules <- %kSourcesDirectory%Assistants\Rules\Session Information Retrieval.rules

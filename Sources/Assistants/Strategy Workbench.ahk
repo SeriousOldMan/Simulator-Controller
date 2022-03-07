@@ -308,6 +308,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	createGui(configuration) {
+		local compound
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1181,6 +1183,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	loadDataType(dataType, force := false) {
+		local compound
+		
 		if (force || (this.SelectedDataType != dataType)) {
 			this.showTelemetryChart(false)
 			
@@ -1304,6 +1308,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	loadChart(chartType) {
+		local compound
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1357,6 +1363,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	chooseSettingsMenu(line) {
+		local compound
 		local strategy
 		
 		window := this.Window
@@ -1729,6 +1736,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	selectStrategy(strategy) {
+		local compound
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1884,6 +1893,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
+		local compound
+		
 		window := this.Window
 			
 		Gui %window%:Default
@@ -1996,6 +2007,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 	
 	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
+		local compound
+		
 		result := true
 		
 		window := this.Window
@@ -2389,6 +2402,8 @@ choosePitstopRequirements() {
 }
 
 chooseTyreSet() {
+	local compound
+	
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		workbench := StrategyWorkbench.Instance
 	
@@ -2569,6 +2584,8 @@ fixIE(version := 0, exeName := "") {
 }
 
 runStrategyWorkbench() {
+	local compound
+	
 	icon := kIconsDirectory . "Dashboard.ico"
 	
 	Menu Tray, Icon, %icon%, , 1

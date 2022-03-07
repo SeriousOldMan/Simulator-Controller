@@ -488,6 +488,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		initializeAvailableTyreSets() {
+			local compound
+			
 			base.initializeAvailableTyreSets()
 			
 			rCenter := RaceCenter.Instance
@@ -1908,6 +1910,8 @@ class RaceCenter extends ConfigurationItem {
 	}			
 	
 	initializePitstopFromSession() {
+		local compound
+		
 		pressuresDB := this.PressuresDatabase
 		
 		if pressuresDB {
@@ -2910,6 +2914,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	loadNewLaps(stint) {
+		local compound
+		
 		newLaps := []
 		
 		stintLaps := string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
@@ -3616,6 +3622,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	syncPitstops(state := false) {
+		local compound
+		
 		sessionDB := this.SessionDatabase
 		window := this.Window
 		

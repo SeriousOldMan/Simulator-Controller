@@ -1,0 +1,67 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Strategy Validation Rules       ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+tyreSets([[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <= setupTyreSet(?tyreCompound, ?tyreCompoundColor), pitstopTyreSets(1, ?tyreSets)
+
+fuelAmount(?fuelAmount, ?numRefuels) <= startFuel(?startFuel), pitstopRefuels(?refuels, ?numRefuels), ?fuelAmount = ?startFuel + ?refuels
+
+refuelAmount(?refuelAmount, ?numRefuels) <= pitstopRefuels(?refuelAmount, ?numRefuels)
+
+tyreCompounds([], ?, [])
+tyreCompounds([[?compound | ?compoundColor] | ?tyreSets], ?compound, [?compoundColor | ?result]) <=												\
+		tyreCompounds(?tyreSets, ?compound, ?result)
+
+startFuel(?startFuel) <= setup(?startFuel, ?, ?)
+
+pitstopRefuels(?refuelAmount, ?numRefuels) <= pitstopRefuels(1, ?refuelAmount, ?numRefuels)
+
+pitstopRefuels(?pitstop, ?refuelAmount, ?numRefuels) <=																							\
+		pitstop(?pitstop, ?pitstopRefuelAmount, ?, ?), ?pitstopRefuelAmount > 0, !,																\
+		?nextPitstop = ?pitstop + 1, pitstopRefuels(?nextPitstop, ?nextRefuelAmount, ?nextNumRefuels),											\
+		?refuelAmount = ?pitstopRefuelAmount + ?nextRefuelAmount, ?numRefuels = ?nextNumRefuels + 1
+pitstopRefuels(?, 0, 0)
+
+setupTyreSet(?tyreCompound, ?tyreCompoundColor) <= setup(?, ?tyreCompound, ?tyreCompoundColor)
+
+pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, false, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <=																\
+		pitstop(?pitstop, ?, ?tyreCompound, ?tyreCompoundColor), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?, [])
+
+unique([], [])
+unique([?value | ?values], [?value | ?result]) <= none?(?value, ?values), !, unique(?values, ?result)
+unique([?value | ?values], ?result) <= unique(?values, ?result)
+
+any?(?value, [?value | ?])
+any?(?value, [? | ?tail]) <= any?(?value, ?tail)
+
+all?(?value, [?value])
+all?(?value, [?value | ?tail]) <= all?(?value, ?tail)
+
+none?(?value, [])
+none?(?value, [?value | ?]) <= !, fail
+none?(?value, [? | ?tail]) <= none?(?value, ?tail)
+
+one?(?value, []) <= fail
+one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
+one?(?value, [? | ?tail]) <= one?(?value, ?tail)
+
+sequence(?x, ?x, [?x]) <= !
+sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
+				
+length([], 0)
+length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+reverse([], [])
+reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)
+
+concat([], ?l, ?l)
+concat([?h | ?t], ?l, [?h | ?r]) <= concat(?t, ?l, ?r)
+
+remove([], ?, [])
+remove([?h | ?t], ?h, ?result) <= !, remove(?t, ?h, ?result)
+remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)

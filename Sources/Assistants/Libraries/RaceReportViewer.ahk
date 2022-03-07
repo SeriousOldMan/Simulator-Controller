@@ -676,6 +676,8 @@ class RaceReportViewer {
 	}
 	
 	showCarReport() {
+		local compound
+		
 		report := this.Report
 		
 		if report {

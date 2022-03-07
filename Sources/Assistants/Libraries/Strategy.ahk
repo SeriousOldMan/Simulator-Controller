@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\RuleEngine.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -83,6 +90,123 @@ class StrategySimulation {
 		this.iStrategyManager := strategyManager
 		this.iSessionType := sessionType
 		this.iTelemetryDatabase := telemetryDatabase
+	}
+	
+	createKnowledgeBase(facts, productions, reductions) {
+		engine := new RuleEngine(productions, reductions, facts)
+		
+		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
+	}
+	
+	loadRules(compiler, validationRules, ByRef productions, ByRef reductions) {
+		local rules
+		
+		FileRead rules, % kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules"
+		
+		productions := false
+		reductions := false
+
+		compiler.compileRules(rules, productions, reductions)
+		compiler.compileRules(validationRules, productions, reductions)
+	}
+	
+	dumpKnowledge(knowledgeBase) {
+		try {
+			FileDelete %kTempDirectory%Strategy Validation.knowledge
+		}
+		catch exception {
+			; ignore
+		}
+
+		for key, value in knowledgeBase.Facts.Facts {
+			text := (key . " = " . value . "`n")
+		
+			FileAppend %text%, %kTempDirectory%Setup Advisor.knowledge
+		}
+	}
+	
+	dumpRules(knowledgeBase) {
+		local rules
+		local rule
+		
+		try {
+			FileDelete %kTempDirectory%Strategy Validation.rules
+		}
+		catch exception {
+			; ignore
+		}
+
+		production := knowledgeBase.Rules.Productions[false]
+		
+		Loop {
+			if !production
+				break
+			
+			text := (production.Rule.toString() . "`n")
+		
+			FileAppend %text%, %kTempDirectory%Strategy Validation.rules
+			
+			production := production.Next[false]
+		}
+
+		for ignore, rules in knowledgeBase.Rules.Reductions
+			for ignore, rule in rules {
+				text := (rule.toString() . "`n")
+			
+				FileAppend %text%, %kTempDirectory%Strategy Validation.rules
+			}
+	}
+	
+	scenarioValid(strategy, validationRules) {
+		local knowledgeBase
+		local resultSet
+		
+		if validationRules {
+			static compiler := false
+			static goal := false
+			
+			if !compiler {
+				compiler := new RuleCompiler()
+				goal := compiler.compileGoal("validScenario()")
+			}
+			
+			productions := false
+			reductions := false
+		
+			this.loadRules(compiler, validationRules, productions, reductions)
+					
+			knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+			
+			knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
+																. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
+																. StrReplace(strategy.TyreCompoundColor, A_Space, "\ ") . ")"))
+			
+			for number, pitstop in strategy.Pitstops {
+				if pitstop.TyreChange {
+					tyreCompound := pitstop.TyreCompound
+					tyreCompoundColor := pitstop.TyreCompoundColor
+				}
+				else {
+					tyreCompound := false
+					tyreCompoundColor := false
+				}
+				
+				knowledgeBase.addRule(compiler.compileRule("pitstop(" . number . "," . Round(pitstop.RefuelAmount) . ","
+																	  . tyreCompound . "," . tyreCompoundColor . ")"))
+			}
+		
+			if isDebug()
+				this.dumpRules(knowledgeBase)
+			
+			resultSet := knowledgeBase.prove(goal)
+			
+			if resultSet
+				resultSet.dispose()
+			
+			return (resultSet != false)
+		}
+		else
+			return true
 	}
 	
 	createStrategy(nameOrConfiguration := false) {
@@ -245,7 +369,11 @@ class StrategySimulation {
 	}
 	
 	validScenario(strategy) {
-		return ((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0)
+		local rules
+		
+		FileRead rules, % "C:\Users\olive\Desktop\F1.rules"
+		
+		return (((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0) && this.scenarioValid(strategy, rules))
 	}
 	
 	compareScenarios(scenario1, scenario2) {
@@ -277,6 +405,7 @@ class StrategySimulation {
 	
 	evaluateScenarios(scenarios, verbose, ByRef progress) {
 		local strategy
+		local candidate
 		
 		candidate := false
 		

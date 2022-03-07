@@ -699,7 +699,7 @@ class SetupAdvisor extends ConfigurationItem {
 						if !simulator {
 							showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
 							
-							knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
+							knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 						
 							this.Characteristics.Push(characteristic)
 							
@@ -721,7 +721,7 @@ class SetupAdvisor extends ConfigurationItem {
 					if !simulator {
 						showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
 							
-						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")"))
+						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 						
 						this.Characteristics.Push(characteristic)
 							
@@ -760,7 +760,7 @@ class SetupAdvisor extends ConfigurationItem {
 						if !simulator {
 							showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
 							
-							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
+							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 						
 							this.Settings.Push(setting)
 							
@@ -782,7 +782,7 @@ class SetupAdvisor extends ConfigurationItem {
 					if !simulator {
 						showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
 						
-						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")"))
+						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 						
 						this.Settings.Push(setting)
 							

@@ -3113,7 +3113,9 @@ class RuleCompiler {
 					incompleteLine := false
 				}
 				
-				if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
+				if ((line != "") && (SubStr(Trim(line), StrLen(line), 1) == ","))
+					incompleteLine := line
+				else if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
 					incompleteLine := SubStr(line, 1, StrLen(line) - 1)
 					
 				if (!incompleteLine && (line != "")) {

@@ -5,17 +5,31 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-tyreSets([[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <= setupTyreSet(?tyreCompound, ?tyreCompoundColor), pitstopTyreSets(1, ?tyreSets)
+tyreSets([[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <= startTyreSet(?tyreCompound, ?tyreCompoundColor), pitstopTyreSets(1, ?tyreSets)
 
-fuelAmount(?fuelAmount, ?numRefuels) <= startFuel(?startFuel), pitstopRefuels(?refuels, ?numRefuels), ?fuelAmount = ?startFuel + ?refuels
+refuels(?refuels) <= totalFuel(?, ?refuels)
 
-refuelAmount(?refuelAmount, ?numRefuels) <= pitstopRefuels(?refuelAmount, ?numRefuels)
+totalFuel(?fuelAmount, ?numRefuels) <= startFuel(?startFuel), pitstopFuel(?refuels, ?numRefuels), ?fuelAmount = ?startFuel + ?refuels
+
+startFuel(?startFuel) <= setup(?startFuel, ?, ?)
+
+pitstopFuel(?refuelAmount, ?numRefuels) <= pitstopRefuels(?refuelAmount, ?numRefuels)
 
 tyreCompounds([], ?, [])
 tyreCompounds([[?compound | ?compoundColor] | ?tyreSets], ?compound, [?compoundColor | ?result]) <=												\
 		tyreCompounds(?tyreSets, ?compound, ?result)
+		
+startTyreSet(?tyreCompound, ?tyreCompoundColor) <= setup(?, ?tyreCompound, ?tyreCompoundColor)
 
-startFuel(?startFuel) <= setup(?startFuel, ?, ?)
+pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, false, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <=																\
+		pitstop(?pitstop, ?, ?tyreCompound, ?tyreCompoundColor), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?, [])
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                             Internal Rules                              ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 pitstopRefuels(?refuelAmount, ?numRefuels) <= pitstopRefuels(1, ?refuelAmount, ?numRefuels)
 
@@ -25,12 +39,10 @@ pitstopRefuels(?pitstop, ?refuelAmount, ?numRefuels) <=																							\
 		?refuelAmount = ?pitstopRefuelAmount + ?nextRefuelAmount, ?numRefuels = ?nextNumRefuels + 1
 pitstopRefuels(?, 0, 0)
 
-setupTyreSet(?tyreCompound, ?tyreCompoundColor) <= setup(?, ?tyreCompound, ?tyreCompoundColor)
 
-pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, false, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
-pitstopTyreSets(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <=																\
-		pitstop(?pitstop, ?, ?tyreCompound, ?tyreCompoundColor), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
-pitstopTyreSets(?, [])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                            Collection Rules                             ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 unique([], [])
 unique([?value | ?values], [?value | ?result]) <= none?(?value, ?values), !, unique(?values, ?result)

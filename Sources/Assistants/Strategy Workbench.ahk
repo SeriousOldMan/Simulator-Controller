@@ -1012,7 +1012,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		if (fileNames.Length() > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
-			settingsMenu.Push(translate("Validators:"))
+			settingsMenu.Push(translate("Rules:"))
 			
 			for ignore, fileName in fileNames {
 				SplitPath fileName, , , , validator

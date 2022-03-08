@@ -994,13 +994,9 @@ class Strategy extends ConfigurationItem {
 				}
 				else if (tyreChange != kUndefined) {
 					this.iTyreChange := tyreChange
-					
-					if tyreChange
-						this.iRemainingTyreLaps := freshTyreLaps
-					else
-						this.iRemainingTyreLaps := remainingTyreLaps
+					this.iRemainingTyreLaps := (tyreChange ? freshTyreLaps : remainingTyreLaps)
 				}
-				else if (!tyreCompound && !tyreCompoundColor)
+				else if (!adjustments && !tyreCompound && !tyreCompoundColor)
 					this.iRemainingTyreLaps := remainingTyreLaps
 				else if ((remainingTyreLaps - stintLaps) >= 0) {
 					if ((id == 1) && (tyreChangeRule = "Required") && (remainingTyreLaps >= this.iRemainingLaps)) {
@@ -1015,15 +1011,14 @@ class Strategy extends ConfigurationItem {
 					this.iRemainingTyreLaps := freshTyreLaps
 				}
 				
-				if this.iTyreChange {
-					this.iTyreCompound := tyreCompound
-					this.iTyreCompoundColor := tyreCompoundColor
-				}
-				else {
+				if !this.iTyreChange {
 					tyreCompound := strategy.TyreCompound[true]
 					tyreCompoundColor := strategy.TyreCompoundColor[true]
 				}
 				
+				this.iTyreCompound := tyreCompound
+				this.iTyreCompoundColor := tyreCompoundColor
+					
 				this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel, fuelConsumption
 														 , tyreCompound, tyreCompoundColor
 														 , Max(strategy.MaxTyreLaps - this.RemainingTyreLaps, 0))
@@ -1937,7 +1932,7 @@ class Strategy extends ConfigurationItem {
 		variation := (tyreLapsVariation / 100 * rnd)
 			
 		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps / 100 * variation)) - currentTyreLaps, 0)
-		
+	
 		this.iMap := map
 		this.iFuelConsumption := fuelConsumption
 		this.iAvgLapTime := avgLapTime

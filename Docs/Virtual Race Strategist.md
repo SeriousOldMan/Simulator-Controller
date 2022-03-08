@@ -304,7 +304,7 @@ Although the logical predicates in *Prolog* look like function calls, the semant
 
   5. *pitstopTyreSets(?tyreSets)*
   
-     *?tyreSets* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[[Dry | White], [Wet | Black]]"
+     *?tyreSets* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[ [Dry | White], [Wet | Black] ]"
   
   6. *refuels(?refuels)*
   

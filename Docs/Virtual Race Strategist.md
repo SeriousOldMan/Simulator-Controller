@@ -252,9 +252,113 @@ Loading of settings is supported for:
 
 Notes:
 
-  1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with a required tyre change and/or a required refueling has been defined, but actually there is no need for refueling or tyre change, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
-  2. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used.
-  3. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tire compounds for which data is available are used.
+  1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with required refueling has been defined, but actually there is no need for a tyre change or even for refueling, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
+  2. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based scenario validations, which are described in the next section.
+  3. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used.
+  4. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tire compounds for which data is available are used.
+  
+#### Scenario validation
+
+Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of scenarios created during the simulation. These rules use the same technology used by the different Virtual Race Assistants, a hybrid rule engine, which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+
+	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
+
+Every validation script has to define a "validScenario()" rule, which is invoked by the simulation engine. When this rule returns logical *true*, the current scenario is considered to be a valid strategy. In this simple example, this is the case, when at least one pitstop with refueling has been planned. Let's take a look at another example:
+
+	validScenario() <= pitstopTyreSets(?tyreSets), length(?tyreSets, ?length), ?length > 0
+
+In this case, the current scenario is considered valid, when the tyres will be changed at least once. As yu can see, you have different so called logical predicates like *pitstopFuel* or *pitstopTyreSets* at hand, which you can use to implement your "validScenario()" rule. The available predicates are described below.
+
+The previous examples are of course very simple. Therefore, before presenting the available predicates, let's take a look at a more complex example.
+
+	validScenario() <= refuels(0), tyreSets(?tyreSets), validTyreSets(?tyreSets)
+
+	validTyreSets(?tyreSets) <= any?([Wet | ?], ?tyreSets)
+	validTyreSets(?tyreSets) <= any?([Intermediate | ?], ?tyreSets)
+	validTyreSets(?tyreSets) <= tyreCompounds(?tyreSets, Dry, ?temp),
+								unique(?temp, ?compounds),
+								length(?compounds, ?length),
+								?length > 1
+
+This validation script implements the current pitstop rules in Formula 1 races. In such a race, you are not allowed to refuel the car and you have to use at least two different dry tyre compounds, unless you have a used a wet or an intermediate tyre set during the race.
+
+##### Builtin Predicates
+
+Although the logical predicates in *Prolog* look like function calls, the semantics are very different. First, as you can see in the "Formula 1" example above, an unlimited set of alternatives can be defined for a give predicate. These alternatives are called rules. And variables, which are identified by a leading question mark, can be used bi-directional. This is called unification, where a variable is bound to the value, which must be used to satisfy the logical constraints imposed by a given rule. That said, let's take a look at the builtin predicates:
+
+  1. *totalFuel(?fuelAmount, ?numRefuels)*
+  
+     *?fuelAmount* is unified with total amount of fuel which will be used for the session and *?numRefuels* will be unified with the number of refuels at the pitstops during the session.
+  
+  2. *startFuel(?startFuel)*
+  
+     *?startFuel* is unified with the amount of fuel in the car at the start of the session.
+
+  3. *pitstopFuel(?refuelAmount, ?numRefuels)*
+  
+     *?refuelAmount* is unified with amount of fuel which will be refilled at the pitstops and *?numRefuels* will be unified with the number of refuels at the pitstops.
+  
+  4. *startTyreSet(?tyreCompound, ?tyreCompoundColor)*
+  
+     *?tyreCompound* and *?tyreCompoundColor* are unified with the info for the tyre set which has been mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
+
+  5. *pitstopTyreSets(?tyreSets)*
+  
+     *?tyreSets* is unified with a list of tyre compounds mounted in the various pitstops of the session. A list has the syntactical structure "[element1, element2, ...]". A tyre compound is represented as a pair of compound and color, like "[Dry | White]". Example for two different tyre sets used in a session: "[[Dry | White], [Wet | Black]]"
+  
+  6. *refuels(?refuels)*
+  
+     Convinience predicate for: "refuels(?refuels) <= totalFuel(?, ?refuels)"
+
+  7. *tyreSets(?tyreSets)*
+  
+     Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
+  
+  8. *tyreCompounds(?tyreSets, ?tyreCompound, ?tyreCompoundColors)*
+  
+     Use this predicate to query the different mixtures (colors) for a given tyre compound. *?tyreSets* is a list of tyre sets as *returned* for example by the *tyreSets* predicate. *?tyreCompound* is identified with the base compound, for example "Dry", "Wet" and so on. For each base compound the list of unique tyre compound colors is unified with *?tyreCompoundColors*. Take a look at the "Formula 1" example, to see how this predicate can be used.
+  
+Beside these predicates, which access the data of the current scenario, you have a set of additional predicates, which you can use to implement your validation rules.
+
+  - *unique(?list, ?uniqueList)*
+  
+    *?uniqueList* is unified with a list which contains only the unique elements in list *?list*.
+  
+  - *any?(?value, ?list)*
+  
+    *any?* is considered logically *true*, when *?value* occurs in *?list* at least once.
+	
+  - *all?(?value, ?list)*
+  
+    *all?* is considered logically *true*, when *?list* contains only elements equal to *?value*.
+
+  - *none?(?value, ?list)*
+  
+    *none?* is considered logically *true*, when *?list* does not contain *?value*.
+	
+  - *one?(?value, ?list)*
+  
+    *one?* is considered logically *true*, when *?list* contain exactly one element equal to *?value*.
+
+  - *length(?list, ?length)*
+  
+    *?length* is unified with the number of elements in *?list*.
+
+  - *reverse(?list, ?reversedList)*
+  
+    *?reversedList* is unified with a list, which contains the elements of *?list* in reversed order.
+
+  - *concat(?list1, ?list2, ?concatenatedList)*
+  
+    *?concatenatedList* is unified with a list which contains the elements of both *?list1* and *?list2* in that order.
+	
+  - *remove(?list, ?value ?resultList)*
+  
+    *?resultList* is unified with a list which contains all elements of *?list* except all occurences of *?value*.
+
+##### Integrating into Strategy Workbench
+
+Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench".
 
 ### Pitstop & Service
 
@@ -273,14 +377,17 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
   - Fuel Consumption
   
 	The slider defines a range between 0 and 10%, in which the simulation will decrease the fuel consumption, which has been derived from past telemetry data or from the values entered into the *Initial Conditions* group. This can be beneficial in endirance races for example, if you think, that you are able to save additional fuel by applying some lift n cost techniques or if you want to use a fuel saving engine map, for which no telemetry data is available yet.
+	
   - Initial fuel
   
 	Perhaps the most tricky one and it needs a lot of historical telemetry data to create sensible results. Using the slider, you can optimize the amount of fuel to be used for the first stint, thereby influencing the car weight and in the end the resulting lap times in the critical first phase of a race. For some cars, for example, lap times degrade heavily, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemtry data. If you set the slider completely to the left, the initial fuel amount entered in the *Initial Conditions* field group will be used only, whereas, if you set the slider to the right, you specify, how much of the fuel capacity of the car might be used as additional fuel for the simulation variations.
 	
 	Hint: If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
+	
   - Tyre Usage
   
-	Here you have a range from 0 to 100% to enable some kind of *overuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
+	Here you have a range from 0 to 100% to enable some kind of *over-* or *underuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
+	
   - Tyre Compound
   
     When you are preparing the Strategy for a car, for which different tyre compound mixtures (for example White - Blue - Red) are available, you can define with this slider the propabilty, with which a different mixture will be used for the next stint. Up to 100 variations may be evaluated for best possible lap times and thereby overall race performance. Tyre usage based lap time degredation will be included in the stochiastic modeling, as long as enough data is available for each tyre compound mixture.

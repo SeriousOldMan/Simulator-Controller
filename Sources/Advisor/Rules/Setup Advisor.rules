@@ -48,7 +48,7 @@ addCharacteristic(?characteristic, ?index) <= ?next = ?index + 1, Set(Characteri
 allCharacteristics(?characteristics) <= allCharacteristics(?characteristics, !Characteristics.Count)
 
 allCharacteristics([], 0)
-allCharacteristics([?characteristic | ?characteristics], ?index) <= Get(Characteristic, ?index, ?characteristic), ?next = ?index - 1, 			\
+allCharacteristics([?characteristic | ?characteristics], ?index) <= Get(Characteristic, ?index, ?characteristic), ?next = ?index - 1,
 																	allCharacteristics(?characteristics, ?next)
 
 
@@ -81,20 +81,20 @@ addSimulator(?simulator) <= addSimulator(?simulator, !Simulator.Count)
 
 addSimulator(?simulator, ?count) <= ?next = ?count + 1, Set(Simulator, ?next, ?simulator), Set(Simulator.Count, ?next)
 
-addCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),														\
+addCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),
 												   addCharacteristics(?simulator, ?car, ?track, ?characteristics)
 		
 addCharacteristics(?, ?, ?, [])
-addCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=															\
+addCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=
 		addCharacteristic(?simulator, ?car, ?track, ?characteristic), addCharacteristics(?simulator, ?car, ?track, ?characteristics)
 
 addCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?simulator, ?car, ?track, Characteristic, ?characteristic, Active, true)
 
-removeCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),														\
+removeCharacteristics(?simulator, ?car, ?track, *) <= allCharacteristics(?characteristics),
 													  removeCharacteristics(?simulator, ?car, ?track, ?characteristics)
 		
 removeCharacteristics(?, ?, ?, [])
-removeCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=														\
+removeCharacteristics(?simulator, ?car, ?track, [?characteristic | ?characteristics]) <=
 		removeCharacteristic(?simulator, ?car, ?track, ?characteristic), removeCharacteristics(?simulator, ?car, ?track, ?characteristics)
 
 removeCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?simulator, ?car, ?track, Characteristic, ?characteristic, Active, false)
@@ -103,20 +103,20 @@ characteristicActive(?simulator, ?car, ?track, ?characteristic) <= characteristi
 characteristicActive(?, ?, ?, false) <= !
 characteristicActive(?, ?, ?, ?) <= fail
 																   
-characteristicActive(?simulator, ?car, ?track, ?characteristic, ?active) <=																		\
+characteristicActive(?simulator, ?car, ?track, ?characteristic, ?active) <=
 		Append(?simulator, ., ?car, ., ?track, .Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
-characteristicActive(?simulator, ?car, ?, ?characteristic, ?active) <=																			\
+characteristicActive(?simulator, ?car, ?, ?characteristic, ?active) <=
 		Append(?simulator, ., ?car, .*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
-characteristicActive(?simulator, ?, ?, ?characteristic, ?active) <=																				\
+characteristicActive(?simulator, ?, ?, ?characteristic, ?active) <=
 		Append(?simulator, .*.*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
-characteristicActive(?, ?, ?, ?characteristic, ?active) <=																						\
+characteristicActive(?, ?, ?, ?characteristic, ?active) <=
 		Append(*.*.*.Characteristic., ?characteristic, .Active, ?fact), fact?(?fact), !, Get(?fact, ?active)
 characteristicActive(?, ?, ?, ?, false)
 
 addSettings(?simulator, ?car, *) <= allSettings(?settings), addSettings(?simulator, ?car, ?settings)
 		
 addSettings(?, ?, [])
-addSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
+addSettings(?simulator, ?car, [?setting | ?settings]) <=
 		addSetting(?simulator, ?car, ?setting), addSettings(?simulator, ?car, ?settings)
 
 addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
@@ -124,7 +124,7 @@ addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?settin
 removeSettings(?simulator, ?car, *) <= allSettings(?settings), removeSettings(?simulator, ?car, ?settings)
 
 removeSettings(?, ?, [])
-removeSettings(?simulator, ?car, [?setting | ?settings]) <=																						\
+removeSettings(?simulator, ?car, [?setting | ?settings]) <=
 		removeSetting(?simulator, ?car, ?setting), removeSettings(?simulator, ?car, ?settings)
 
 removeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, false)
@@ -133,13 +133,13 @@ settingAvailable(?simulator, ?car, ?setting) <= settingAvailable(?simulator, ?ca
 settingAvailable(?, ?, false) <= !
 settingAvailable(?, ?, ?) <= fail
 
-settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
+settingAvailable(?simulator, ?car, ?setting, ?available) <=
 		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
-settingAvailable(?simulator, ?car, ?setting, ?available) <=																						\
+settingAvailable(?simulator, ?car, ?setting, ?available) <=
 		Append(?simulator, ., ?car, .Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
-settingAvailable(?simulator, ?, ?setting, ?available) <=																						\
+settingAvailable(?simulator, ?, ?setting, ?available) <=
 		Append(?simulator, .*.Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
-settingAvailable(?, ?, ?setting, ?available) <=																									\
+settingAvailable(?, ?, ?setting, ?available) <=
 		Append(*.*.*.Setting., ?setting, .Available, ?fact), fact?(?fact), !, Get(?fact, ?available)
 settingAvailable(?, ?, ?, ?, false)
 
@@ -160,29 +160,29 @@ resetSettings(?index) <= Get(Setting, ?index, ?setting), Set(?setting, Delta, 0)
 resetCharacteristics() <= resetCharacteristics(!Characteristics.Count)
 
 resetCharacteristics(0) <= !
-resetCharacteristics(?index) <= Get(Characteristic, ?index, ?characteristic), Set(?characteristic, Correction, 0),								\
+resetCharacteristics(?index) <= Get(Characteristic, ?index, ?characteristic), Set(?characteristic, Correction, 0),
 							   ?nIndex = ?index - 1, resetCharacteristics(?nIndex)
 
 updateCharacteristics() <= updateCharacteristics(!Advisor.Simulator, !Advisor.Car, !Advisor.Track, !Characteristics.Count)
 
 updateCharacteristics(?, ?, ?, 0) <= !
-updateCharacteristics(?simulator, ?car, ?track, ?index) <=																						\
-		Get(Characteristic, ?index, ?characteristic), updateCharacteristic(?simulator, ?car, ?track, ?characteristic),							\
+updateCharacteristics(?simulator, ?car, ?track, ?index) <=
+		Get(Characteristic, ?index, ?characteristic), updateCharacteristic(?simulator, ?car, ?track, ?characteristic),
 		?nIndex = ?index - 1, updateCharacteristics(?simulator, ?car, ?track, ?nIndex)
 
-updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <=																				\
-		characteristicActive(?simulator, ?car, ?track, ?characteristic),																		\
-		Get(?characteristic, Weight, ?weight), Get(?characteristic, Value, ?value), !,															\
-		?factor = ?weight / 100, ?correction = ?value * ?factor, ?nCorrection = ?correction / 100,												\
+updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <=
+		characteristicActive(?simulator, ?car, ?track, ?characteristic),
+		Get(?characteristic, Weight, ?weight), Get(?characteristic, Value, ?value), !,
+		?factor = ?weight / 100, ?correction = ?value * ?factor, ?nCorrection = ?correction / 100,
 		Set(?characteristic, Correction, ?nCorrection)
 updateCharacteristic(?simulator, ?car, ?track, ?characteristic) <= Set(?characteristic, Correction, 0)
 
 changeSetting(?, [], ?, ?)
-changeSetting(?setting, [?suffix | ?suffixes], ?increment, ?correction) <=																		\
-		Append(?setting, ., ?suffix, ?name), changeSetting(?name, ?increment, ?correction),														\
+changeSetting(?setting, [?suffix | ?suffixes], ?increment, ?correction) <=
+		Append(?setting, ., ?suffix, ?name), changeSetting(?name, ?increment, ?correction),
 		changeSetting(?setting, ?suffixes, ?increment, ?correction)
 		
-changeSetting(?setting, ?increment, ?correction) <= Get(?setting, Delta, ?delta), ?value = ?increment * ?correction,							\
+changeSetting(?setting, ?increment, ?correction) <= Get(?setting, Delta, ?delta), ?value = ?increment * ?correction,
 													combineDelta(?value, ?delta, ?nDelta), Set(?setting, Delta, ?nDelta)
 
 combineDelta(0, ?delta, ?delta)

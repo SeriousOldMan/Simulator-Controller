@@ -403,7 +403,9 @@ callSimHub(command) {
 		RunWait "%kSimHub%" -triggerinput %command%, , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . exception.Message . translate(" - please check the configuration"))
+		message := (IsObject(exception) ? exception.Message : exception)
+		
+		logMessage(kLogCritical, translate("Error while connecting to SimHub (") . kSimHub . translate("): ") . message . translate(" - please check the configuration"))
 		
 		showMessage(substituteVariables(translate("Cannot connect to SimHub (%kSimHub%) - please check the configuration..."))
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)

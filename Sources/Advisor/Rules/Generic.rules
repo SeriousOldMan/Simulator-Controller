@@ -9,9 +9,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(*)), 																			\
-				 (Prove: addCharacteristics(*, *, *, *)),															\
-				 (Prove: addSettings(*, *, *)),																		\
+[?Initialize] => (Prove: addSimulator(*)),
+				 (Prove: addCharacteristics(*, *, *, *)),
+				 (Prove: addSettings(*, *, *)),
 				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
 
 

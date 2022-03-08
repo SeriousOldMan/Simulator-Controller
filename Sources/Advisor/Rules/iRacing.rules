@@ -9,8 +9,8 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(iRacing)),																								\
-				 (Prove: addCharacteristics(iRacing, *, *, *)),																					\
+[?Initialize] => (Prove: addSimulator(iRacing)),
+				 (Prove: addCharacteristics(iRacing, *, *, *)),
 				 (Prove: addSettings(iRacing, *, *))
 
 

@@ -3105,6 +3105,8 @@ class RuleCompiler {
 				}
 			}
 			else {
+				line := Trim(line)
+				
 				if ((line != "") && this.skipDelimiter(";", line, 1, false))
 					line := ""
 			
@@ -3113,8 +3115,10 @@ class RuleCompiler {
 					incompleteLine := false
 				}
 				
-				if ((line != "") && (SubStr(Trim(line), StrLen(line), 1) == ","))
+				if ((line != "") && (SubStr(line, StrLen(line), 1) == ","))
 					incompleteLine := line
+				else if ((line != "") && (StrLen(line) > 1) && ((SubStr(line, StrLen(line) - 1, 2) = "<=") || (SubStr(line, StrLen(line) - 1, 2) = "=>")))
+					incompleteLine := (line . A_Space)
 				else if ((line != "") && (SubStr(line, StrLen(line), 1) == "\"))
 					incompleteLine := SubStr(line, 1, StrLen(line) - 1)
 					

@@ -977,6 +977,7 @@ initializeEnvironment() {
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Rules
+	FileCreateDir %kUserHomeDirectory%Validators
 	FileCreateDir %kUserHomeDirectory%Logs
 	FileCreateDir %kUserHomeDirectory%Splash Media
 	FileCreateDir %kUserHomeDirectory%Screen Images

@@ -1,0 +1,1 @@
+validScenario() <= pitstopTyreSets(?tyreSets), length(?tyreSets, ?length), ?length > 0

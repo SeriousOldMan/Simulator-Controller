@@ -5,39 +5,39 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-tyreSets([[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <= startTyreSet(?tyreCompound, ?tyreCompoundColor), pitstopTyreSets(1, ?tyreSets)
-
-refuels(?refuels) <= totalFuel(?, ?refuels)
-
 totalFuel(?fuelAmount, ?numRefuels) <= startFuel(?startFuel), pitstopFuel(?refuels, ?numRefuels), ?fuelAmount = ?startFuel + ?refuels
 
 startFuel(?startFuel) <= setup(?startFuel, ?, ?)
 
-pitstopFuel(?refuelAmount, ?numRefuels) <= pitstopRefuels(?refuelAmount, ?numRefuels)
-
-tyreCompounds([], ?, [])
-tyreCompounds([[?compound | ?compoundColor] | ?tyreSets], ?compound, [?compoundColor | ?result]) <=												\
-		tyreCompounds(?tyreSets, ?compound, ?result)
+pitstopFuel(?refuelAmount, ?numRefuels) <= pitstopRefuels(1, ?refuelAmount, ?numRefuels)
 		
 startTyreSet(?tyreCompound, ?tyreCompoundColor) <= setup(?, ?tyreCompound, ?tyreCompoundColor)
 
-pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, false, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
-pitstopTyreSets(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <=																\
-		pitstop(?pitstop, ?, ?tyreCompound, ?tyreCompoundColor), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
-pitstopTyreSets(?, [])
+pitstopTyreSets(?tyreSets) <= pitstopTyreSets(1, ?tyreSets)
+
+refuels(?refuels) <= totalFuel(?, ?refuels)
+
+tyreSets([[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <= startTyreSet(?tyreCompound, ?tyreCompoundColor), pitstopTyreSets(?tyreSets)
+
+tyreCompounds([], ?, [])
+tyreCompounds([[?compound | ?compoundColor] | ?tyreSets], ?compound, [?compoundColor | ?result]) <=
+		tyreCompounds(?tyreSets, ?compound, ?result)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;                             Internal Rules                              ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-pitstopRefuels(?refuelAmount, ?numRefuels) <= pitstopRefuels(1, ?refuelAmount, ?numRefuels)
-
-pitstopRefuels(?pitstop, ?refuelAmount, ?numRefuels) <=																							\
-		pitstop(?pitstop, ?pitstopRefuelAmount, ?, ?), ?pitstopRefuelAmount > 0, !,																\
-		?nextPitstop = ?pitstop + 1, pitstopRefuels(?nextPitstop, ?nextRefuelAmount, ?nextNumRefuels),											\
+pitstopRefuels(?pitstop, ?refuelAmount, ?numRefuels) <=
+		pitstop(?pitstop, ?pitstopRefuelAmount, ?, ?), ?pitstopRefuelAmount > 0, !,
+		?nextPitstop = ?pitstop + 1, pitstopRefuels(?nextPitstop, ?nextRefuelAmount, ?nextNumRefuels),
 		?refuelAmount = ?pitstopRefuelAmount + ?nextRefuelAmount, ?numRefuels = ?nextNumRefuels + 1
 pitstopRefuels(?, 0, 0)
+
+pitstopTyreSets(?pitstop, ?tyreSets) <= pitstop(?pitstop, ?, false, ?), !, ?nextPitstop = ?pitstop + 1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?pitstop, [[?tyreCompound | ?tyreCompoundColor] | ?tyreSets]) <=
+		pitstop(?pitstop, ?, ?tyreCompound, ?tyreCompoundColor), !, ?nextPitstop = ?pitstop +1, pitstopTyreSets(?nextPitstop, ?tyreSets)
+pitstopTyreSets(?, [])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -61,9 +61,6 @@ none?(?value, [? | ?tail]) <= none?(?value, ?tail)
 one?(?value, []) <= fail
 one?(?value, [?value | ?tail]) <= !, none?(?value, ?tail)
 one?(?value, [? | ?tail]) <= one?(?value, ?tail)
-
-sequence(?x, ?x, [?x]) <= !
-sequence(?from, ?to, [?from | ?more]) <= ?temp = ?from + 1, sequence(?temp, ?to, ?more)
 				
 length([], 0)
 length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1

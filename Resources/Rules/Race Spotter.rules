@@ -49,11 +49,11 @@ updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.R
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
-priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],																				\
+priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
 					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],																			\
+priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
 					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],																				\
+priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
 					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
 
 
@@ -66,7 +66,7 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],													
 {Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
 
 updateLapTimes(?, ?car) <= =<(?car, 0), !
-updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),									\
+updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),
 							  ?nextCar = ?car - 1, updateLapTimes(?lap, ?nextCar)
 
 
@@ -103,21 +103,21 @@ clearStandings(0) <= !
 clearStandings(?lap) <= ?lap < 0, !
 clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
 
-clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),					\
-					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),														\
-					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),											\
-					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),												\
+clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),
+					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),
+					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),
+					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),
 					   clearStanding(?lap, ?carCount), clearExtrapolatedLap(?lap, ?carCount)
 clearStanding(?)
 
 clearStanding(?, 0) <= !
 clearStanding(?, ?car) <= ?car < 0, !
-clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,														\
-														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),							\
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,
+														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 
 clearStanding(?, ?, []) <= !
-clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),						\
+clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),
 											   clearStanding(?lap, ?car, ?names)
 
 

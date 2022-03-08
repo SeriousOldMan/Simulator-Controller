@@ -2,9 +2,15 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Full handling of restricted tyre sets in "Race Center".
-  4. New "Import from Strategy" command in "Strategy Workbench" to initialize all rules & settings from a currently loaded strategy.
-
+  3. Support for *Intermediate* tyres in all parts of Simulator Controller.
+  4. New ["Import from Strategy" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings) in "Strategy Workbench" to initialize all Rules & Settings from a currently loaded strategy.
+  5. Support for [Stint time variation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) based on tyre usage dependent lap time degradation in Strategy simulation.
+  6. New settings for [disallowed refueling and disallowed tyre change](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings) in Strategy simulation.
+  7. Support for [scenario validation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario--validation) in Strategy simulation. These rules, which can be created or changed by the user, are based on the logic programming language *Prolog*.
+  8. Full handling of restricted tyre sets in "Race Center" and special validation rules, when a strategy gets adopted to the current race situation.
+  9. Improved data quality for missing laps in "Race Center".
+  10. Initial preparation for simulation and car specific rules in "Setup Advisor".
+  
 ## 3.9.4-release 03/04/22
 
   1. Bugfixes, as always
@@ -36,7 +42,7 @@
   3. Support for rFactor 2 has been added for the new Spotter Assistant.
   4. The capabilities of the Spotter has been extended again. It now informs about your performance after the first few laps and also periodically during the race. It also announces you the final laps. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   5. Fix for wonky Spotter side alerts in RaceRoom Racing Experience.
-  6. Improved the Strategy Simulation by introducing an alorithm which includes tyre wear, fuel level induced laptime variations and the effects of ECU maps at the same time.
+  6. Improved the Strategy Simulation by introducing an alorithm which includes tyre wear, fuel level induced lap time variations and the effects of ECU maps at the same time.
   7. Introduced new tyre compound types (colors) in all applications. Yellow, Green, Soft, Medium and Hard compounds are now supported, when the corresponding simulation supports them.
   8. The Race Spotter can now be fully configured with regards to the issued warnings and announcements. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information.
   9. Import of cold tyre pressures is now supported for iRacing in "Race Settings" and the Race Assistants.
@@ -70,13 +76,13 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Last version introduced a critical bug in "Race Reports" when switching cars. This has been fixed.
-  4. Introduced data filtering in "Race Reports" for spurios average laptimes, which origin from formation and post race laps.
+  4. Introduced data filtering in "Race Reports" for spurios average lap times, which origin from formation and post race laps.
   5. Strategy Simulation now includes a tyre degradation model based on telemetry data.
   6. Improved control for pitstop service time calculation.
   7. Improved calculation of overtake deltas.
   8. A fixed number of required pitstops can be defined for a strategy simulation, when a required pitstop is chosen in the "Rules & Settings" tab.
   9. Introduction of a traffic model using Monte Carlo alogrithms for taffic density prediction as well as over- and undercut optimization in "Race Center". See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#monte-carlo-traffic-model) for more information.
-  10. Reduced frequency of damage reporting by Jona. One a damage had been reported, any subsequent damage will be included in the currently running laptime analysis.
+  10. Reduced frequency of damage reporting by Jona. One a damage had been reported, any subsequent damage will be included in the currently running lap time analysis.
 
 ## 3.8.2-release 01/07/22
 

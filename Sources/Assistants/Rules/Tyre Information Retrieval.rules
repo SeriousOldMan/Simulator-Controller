@@ -20,7 +20,7 @@ setupTyreCompound(?compound, ?color) <= Get(Session.Setup.Tyre.Compound, ?compou
 setupTyrePressure(?compound, ?tyreType, ?pressure) <= Get(Session.Setup.Tyre, ?compound, Pressure, ?tyreType, ?pressure)
 
 setupTyrePressures(?compound, [], [])
-setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=															\
+setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=
 		setupTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressures(?compound, ?tyreTypes, ?pressures)
 
 tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Session.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?pressure)

@@ -1,0 +1,8 @@
+validScenario() <= refuels(0), tyreSets(?tyreSets), validTyreSets(?tyreSets)
+
+validTyreSets(?tyreSets) <= any?([Wet | ?], ?tyreSets)
+validTyreSets(?tyreSets) <= any?([Intermediate | ?], ?tyreSets)
+validTyreSets(?tyreSets) <= tyreCompounds(?tyreSets, Dry, ?temp),
+							unique(?temp, ?compounds),
+							length(?compounds, ?length),
+							?length > 1

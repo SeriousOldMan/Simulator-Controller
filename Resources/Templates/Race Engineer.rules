@@ -67,10 +67,10 @@
 
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap))
 
-updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingSessionLaps(?lap, ?remainingLaps),		\
-						  ?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),											\
-						  ?neededFuel = ?sessionFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel, \
-						  min(?refillAmount, !Session.Settings.Fuel.Max, ?temp), max(0, ?temp, ?adjustedRefillAmount),							\
+updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingSessionLaps(?lap, ?remainingLaps),
+						  ?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),
+						  ?neededFuel = ?sessionFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
+						  min(?refillAmount, !Session.Settings.Fuel.Max, ?temp), max(0, ?temp, ?adjustedRefillAmount),
 						  Set(Fuel.Amount.Target, ?adjustedRefillAmount), !
 updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 
@@ -88,56 +88,56 @@ currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compou
 
 priority: 5, {All: [?Lap], [?Session.Settings.Tyre.Compound.Change = Temperature]} => (Prove: updateTyreTemperatureWindow(?Lap, !Tyre.Compound))
 
-updateTyreTemperatureWindow(?lap, Dry) <= lapTyreTemperature(?lap, ?lapTemperature),															\
-										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),										\
-										  ?temperature = ?lapTemperature + ?threshold, ?temperature > 70,										\
+updateTyreTemperatureWindow(?lap, Dry) <= lapTyreTemperature(?lap, ?lapTemperature),
+										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),
+										  ?temperature = ?lapTemperature + ?threshold, ?temperature > 70,
 										  Set(Tyre.Temperature.Window, true)
-updateTyreTemperatureWindow(?lap, Wet) <= lapTyreTemperature(?lap, ?lapTemperature),															\
-										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),										\
-										  ?temperature = ?lapTemperature - ?threshold, ?temperature < 55,										\
+updateTyreTemperatureWindow(?lap, Wet) <= lapTyreTemperature(?lap, ?lapTemperature),
+										  Get(Session.Settings.Tyre.Compound.Change.Threshold, ?threshold),
+										  ?temperature = ?lapTemperature - ?threshold, ?temperature < 55,
 										  Set(Tyre.Temperature.Window, true)
 updateTyreTemperatureWindow(?, ?) <= Set(Tyre.Temperature.Window, false)
 		  
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],							\
-		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} =>																	\
-		(Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Set: Tyre.Compound.Color.Target, !Weather.Tyre.Compound.Color.Target),		\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Weather], [?Weather.Tyre.Compound.Target],
+		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} =>
+		(Set: Tyre.Compound.Target, ?Weather.Tyre.Compound.Target), (Set: Tyre.Compound.Color.Target, !Weather.Tyre.Compound.Color.Target),
 		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
-		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>																		\
-		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor(Wet)),																\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},
+		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Dry]} =>
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor(Wet)),
 		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
-		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>																			\
-		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor(Dry)),																\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},
+		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Dry]} =>
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor(Dry)),
 		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
-		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>																		\
-		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor(Dry)),																\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},
+		  [?Tyre.Temperature.Window = false], [?Tyre.Compound = Wet]} =>
+		(Set: Tyre.Compound.Target, Dry), (Prove: updateTargetCompoundColor(Dry)),
 		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},						\
-		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>																			\
-		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor(Wet)),																\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Temperature], {Any: [?Lap], [?Pitstop.Lap]},
+		  [?Tyre.Temperature.Window = true], [?Tyre.Compound = Wet]} =>
+		(Set: Tyre.Compound.Target, Wet), (Prove: updateTargetCompoundColor(Wet)),
 		(Set: Tyre.Weather.Target, !Weather.Weather.10Min), (Clear: Tyre.Set.Target)
 
-priority: 5,																																	\
-	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Never],															\
+priority: 5,
+	{All: {None: [?Pitstop.Plan]}, [?Session.Settings.Tyre.Compound.Change = Never],
 		  {Any: [?Lap], [?Pitstop.Lap], {None: [?Tyre.Compound.Target]}}} => (Prove: keepTyreCompound(!Lap)), (Clear: Tyre.Set.Target)
 
 {All: {Any: [?Lap], [?Pitstop.Lap]}, {None: [?Tyre.Compound.Target]}} => (Prove: keepTyreCompound(!Lap)), (Clear: Tyre.Set.Target)
 
-keepTyreCompound(?lap) <= lastPitstopTyreCompound(?compound, ?color),																			\
-						  lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),						\
+keepTyreCompound(?lap) <= lastPitstopTyreCompound(?compound, ?color),
+						  lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),
 						  Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color), !
-keepTyreCompound(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),						\
+keepTyreCompound(?lap) <= lapWeather(?lap, ?index), weatherSymbol(?index, ?weather), Set(Tyre.Weather.Target, ?weather),
 						  setupTyreCompound(?compound, ?color), Set(Tyre.Compound.Target, ?compound), Set(Tyre.Compound.Color.Target, ?color)
 
 updateTargetCompoundColor(?compound) <= tyreCompoundColor(?compound, ?color), Set(Tyre.Compound.Color.Target, ?color)
@@ -175,57 +175,57 @@ nextDryTyreSet() <= Set(Tyre.Set.Target, !Session.Setup.Tyre.Set.Fresh)
 {All: [?Tyre.Update.Pressure = true], [?Tyre.Compound = ?Tyre.Compound.Target]} => (Prove: updateTyrePressureDeviation(!Lap))
 priority: -5, [?Tyre.Update.Pressure = true] => (Clear: Tyre.Update.Pressure)
 
-updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations), 												\
+updateTyrePressureDeviation(?lap) <= tyrePressureDeviation(?lap, [FL, FR, RL, RR], ?deviations),
 									 updateTargetPressures([FL, FR, RL, RR], ?deviations)
 
 tyrePressureDeviation(?lap, [], [])
-tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]) <= 															\
+tyrePressureDeviation(?lap, [?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=
 		weightedDeviation(?lap, ?tyreType, ?deviation), tyrePressureDeviation(?lap, ?tyreTypes, ?deviations)
 		
-weightedDeviation(?lap, ?tyreType, ?deviation) <= weightedDeviations(?lap, 0, !Tyre.Compound, ?tyreType, ?deviations, ?weights),				\
-												  sum(?deviations, ?sumDeviations), sum(?weights, ?sumWeights),									\
+weightedDeviation(?lap, ?tyreType, ?deviation) <= weightedDeviations(?lap, 0, !Tyre.Compound, ?tyreType, ?deviations, ?weights),
+												  sum(?deviations, ?sumDeviations), sum(?weights, ?sumWeights),
 												  ?deviation = ?sumDeviations / ?sumWeights
 
 weightedDeviations(?, !Session.Settings.Lap.History.Considered, ?, ?, [], []) <= !
 weightedDeviations(?lap, ?lap, ?, ?, [], []) <= !
-weightedDeviations(?lap, ?offset, ?compound, ?tyreType, [?deviation | ?deviations], [?weight | ?weights]) <=									\
-		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?tyreType, ?lPressure), tyrePressureTarget(?compound, ?tyreType, ?tPressure),			\
-		?lDeviation = ?lPressure - ?tPressure, lapWeight(?tLap, ?weight), ?deviation = ?lDeviation * ?weight,									\
+weightedDeviations(?lap, ?offset, ?compound, ?tyreType, [?deviation | ?deviations], [?weight | ?weights]) <=
+		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?tyreType, ?lPressure), tyrePressureTarget(?compound, ?tyreType, ?tPressure),
+		?lDeviation = ?lPressure - ?tPressure, lapWeight(?tLap, ?weight), ?deviation = ?lDeviation * ?weight,
 		?nOffset = ?offset + 1, weightedDeviations(?lap, ?nOffset, ?compound, ?tyreType, ?deviations, ?weights)
 
 updateTargetPressures([], [])
-updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=																	\
+updateTargetPressures([?tyreType | ?tyreTypes], [?deviation | ?deviations]) <=
 		Set(Tyre.Pressure.Deviation, ?tyreType, ?deviation), updateTargetPressures(?tyreTypes, ?deviations)
 
-{All: [?Tyre.Pressure.Deviation.FL], [?Tyre.Pressure.Target.Correction]}  =>																	\
+{All: [?Tyre.Pressure.Deviation.FL], [?Tyre.Pressure.Target.Correction]}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, FL, ?Tyre.Pressure.Deviation.FL, ?Tyre.Pressure.Target.Correction))
-{All: [?Tyre.Pressure.Deviation.FR], [?Tyre.Pressure.Target.Correction]}  =>																	\
+{All: [?Tyre.Pressure.Deviation.FR], [?Tyre.Pressure.Target.Correction]}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, FR, ?Tyre.Pressure.Deviation.FR, ?Tyre.Pressure.Target.Correction))
-{All: [?Tyre.Pressure.Deviation.RL], [?Tyre.Pressure.Target.Correction]}  =>																	\
+{All: [?Tyre.Pressure.Deviation.RL], [?Tyre.Pressure.Target.Correction]}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, RL, ?Tyre.Pressure.Deviation.RL, ?Tyre.Pressure.Target.Correction))
-{All: [?Tyre.Pressure.Deviation.RR], [?Tyre.Pressure.Target.Correction]}  =>																	\
+{All: [?Tyre.Pressure.Deviation.RR], [?Tyre.Pressure.Target.Correction]}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, RR, ?Tyre.Pressure.Deviation.RR, ?Tyre.Pressure.Target.Correction))
 		
-{All: [?Tyre.Pressure.Deviation.FL], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+{All: [?Tyre.Pressure.Deviation.FL], {None: [?Tyre.Pressure.Target.Correction]}}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, FL, ?Tyre.Pressure.Deviation.FL, 0))
-{All: [?Tyre.Pressure.Deviation.FR], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+{All: [?Tyre.Pressure.Deviation.FR], {None: [?Tyre.Pressure.Target.Correction]}}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, FR, ?Tyre.Pressure.Deviation.FR, 0))
-{All: [?Tyre.Pressure.Deviation.RL], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+{All: [?Tyre.Pressure.Deviation.RL], {None: [?Tyre.Pressure.Target.Correction]}}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, RL, ?Tyre.Pressure.Deviation.RL, 0))
-{All: [?Tyre.Pressure.Deviation.RR], {None: [?Tyre.Pressure.Target.Correction]}}  =>															\
+{All: [?Tyre.Pressure.Deviation.RR], {None: [?Tyre.Pressure.Target.Correction]}}  =>
 		(Prove: updatePressureDelta(!Tyre.Compound.Target, RR, ?Tyre.Pressure.Deviation.RR, 0))
 
-updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=																			\
-		?delta = ?correction - ?deviation, abs(?delta, ?absDelta),																				\
+updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=
+		?delta = ?correction - ?deviation, abs(?delta, ?absDelta),
 		Set(Tyre.Pressure.Delta, ?tyreType, ?delta), Set(Tyre.Pressure.Delta, ?tyreType, Abs, ?absDelta)
 		
-[?Tyre.Pressure.Delta.FL.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>																	\
+[?Tyre.Pressure.Delta.FL.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>
 		(Prove: updateTargetPressure(!Tyre.Compound.Target, FL, !Tyre.Pressure.Delta.FL))
-[?Tyre.Pressure.Delta.FR.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>																	\
+[?Tyre.Pressure.Delta.FR.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>
 		(Prove: updateTargetPressure(!Tyre.Compound.Target, FR, !Tyre.Pressure.Delta.FR))
-[?Tyre.Pressure.Delta.RL.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>																	\
+[?Tyre.Pressure.Delta.RL.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>
 		(Prove: updateTargetPressure(!Tyre.Compound.Target, RL, !Tyre.Pressure.Delta.RL))
-[?Tyre.Pressure.Delta.RR.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>																	\
+[?Tyre.Pressure.Delta.RR.Abs > ?Session.Settings.Tyre.Pressure.Deviation] =>
 		(Prove: updateTargetPressure(!Tyre.Compound.Target, RR, !Tyre.Pressure.Delta.RR))
 		
 [?Tyre.Pressure.Delta.FL.Abs <= ?Session.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure(!Tyre.Compound.Target, FL, 0))
@@ -233,7 +233,7 @@ updatePressureDelta(?compound, ?tyreType, ?deviation, ?correction) <=											
 [?Tyre.Pressure.Delta.RL.Abs <= ?Session.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure(!Tyre.Compound.Target, RL, 0))
 [?Tyre.Pressure.Delta.RR.Abs <= ?Session.Settings.Tyre.Pressure.Deviation] => (Prove: updateTargetPressure(!Tyre.Compound.Target, RR, 0))
 
-updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?tyreType, ?pressure),											\
+updateTargetPressure(?compound, ?tyreType, ?delta) <= lastPressure(?compound, ?tyreType, ?pressure),
 													  ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure)
 
 lastPressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), !
@@ -243,31 +243,31 @@ lastPressure(?compound, ?tyreType, ?pressure) <= setupTyrePressure(?compound, ?t
 ;;;              Target pressure calculation with compound change           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
-	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, {None: [?Tyre.Pressure.Target.Correction]}} =>											\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],
+	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, {None: [?Tyre.Pressure.Target.Correction]}} =>
 		(Prove: updateTyrePressureDeviation(?Lap, ?Tyre.Compound.Target, 0))
 		
-{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																						\
-	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, [?Tyre.Pressure.Target.Correction]} =>													\
+{All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],
+	  {None: [?Tyre.Compound = ?Tyre.Compound.Target]}, [?Tyre.Pressure.Target.Correction]} =>
 		(Prove: updateTyrePressureDeviation(?Lap, ?Tyre.Compound.Target, ?Tyre.Pressure.Target.Correction))
 
-priority: -5, {All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],																			\
-					{None: [?Tyre.Compound = ?Tyre.Compound.Target]}} =>																		\
-		(Clear: Tyre.Pressure.Deviation.FL), (Clear: Tyre.Pressure.Deviation.FR),																\
-		(Clear: Tyre.Pressure.Deviation.RL), (Clear: Tyre.Pressure.Deviation.RR),																\
-		(Clear: Tyre.Pressure.Delta.FL), (Clear: Tyre.Pressure.Delta.FR),																		\
-		(Clear: Tyre.Pressure.Delta.RL), (Clear: Tyre.Pressure.Delta.RR),																		\
-		(Clear: Tyre.Pressure.Delta.FL.Abs), (Clear: Tyre.Pressure.Delta.FR.Abs),																\
+priority: -5, {All: [?Lap], [?Tyre.Compound], [?Tyre.Compound.Target],
+					{None: [?Tyre.Compound = ?Tyre.Compound.Target]}} =>
+		(Clear: Tyre.Pressure.Deviation.FL), (Clear: Tyre.Pressure.Deviation.FR),
+		(Clear: Tyre.Pressure.Deviation.RL), (Clear: Tyre.Pressure.Deviation.RR),
+		(Clear: Tyre.Pressure.Delta.FL), (Clear: Tyre.Pressure.Delta.FR),
+		(Clear: Tyre.Pressure.Delta.RL), (Clear: Tyre.Pressure.Delta.RR),
+		(Clear: Tyre.Pressure.Delta.FL.Abs), (Clear: Tyre.Pressure.Delta.FR.Abs),
 		(Clear: Tyre.Pressure.Delta.RL.Abs), (Clear: Tyre.Pressure.Delta.RR.Abs)
 
-updateTyrePressureDeviation(?lap, ?compound, ?correction) <=																					\
-		?deviations = [0, 0, 0, 0], setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),												\
+updateTyrePressureDeviation(?lap, ?compound, ?correction) <=
+		?deviations = [0, 0, 0, 0], setupTyrePressures(?compound, [FL, FR, RL, RR], ?pressures),
 		updateTargetPressures([FL, FR, RL, RR], ?pressures, ?deviations, ?correction, ?targetPressures)
 													
 updateTargetPressures([], [], [], ?, [])
-updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],																		\
-					  [?deviation | ?deviations], ?correction, [?targetPressure | ?targetPressures]) <=											\
-		?delta = ?correction - ?deviation, ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure),			\
+updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],
+					  [?deviation | ?deviations], ?correction, [?targetPressure | ?targetPressures]) <=
+		?delta = ?correction - ?deviation, ?targetPressure = ?pressure + ?delta, Set(Tyre.Pressure.Target, ?tyreType, ?targetPressure),
 		updateTargetPressures(?tyreTypes, ?pressures, ?deviations, ?correction, ?targetPressures)
 
 ;;;-------------------------------------------------------------------------;;;
@@ -279,8 +279,8 @@ updateTargetPressures([?tyreType | ?tyreTypes], [?pressure | ?pressures],							
 [?Tyre.Pressure.Target.RL] => (Prove: updateTargetPressureIncrement(!Tyre.Compound.Target, RL))
 [?Tyre.Pressure.Target.RR] => (Prove: updateTargetPressureIncrement(!Tyre.Compound.Target, RR))
 
-updateTargetPressureIncrement(?compound, ?tyreType) <=																							\
-		setupTyrePressure(?compound, ?tyreType, ?basePressure), Get(Tyre.Pressure.Target, ?tyreType, ?targetPressure),							\
+updateTargetPressureIncrement(?compound, ?tyreType) <=
+		setupTyrePressure(?compound, ?tyreType, ?basePressure), Get(Tyre.Pressure.Target, ?tyreType, ?targetPressure),
 		?increment = ?targetPressure - ?basePressure, Set(Tyre.Pressure.Target, ?tyreType, Increment, ?increment)
 
 
@@ -301,28 +301,28 @@ priority: 5, [?Damage.Update.Bodywork] => (Clear: Lap, !Lap, Damage.Bodywork)
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), Set(Damage.Suspension, ?damage)
 updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bodywork, ?damage)
 
-{Any: {All: [?Session.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},													\
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],																			\
-			[?Damage.Suspension >= ?Session.Settings.Damage.Suspension.Repair.Threshold]},														\
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],																				\
+{Any: {All: [?Session.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],
+			[?Damage.Suspension >= ?Session.Settings.Damage.Suspension.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],
 			[?Damage.Suspension.Lap.Delta >= ?Session.Settings.Damage.Suspension.Repair.Threshold]}} => (Set: Damage.Repair.Suspension.Target)
 			
-{Any: [?Session.Settings.Damage.Suspension.Repair = Never], [?Damage.Suspension = 0],															\
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],																			\
-			[?Damage.Suspension < ?Session.Settings.Damage.Suspension.Repair.Threshold]},														\
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],																				\
+{Any: [?Session.Settings.Damage.Suspension.Repair = Never], [?Damage.Suspension = 0],
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],
+			[?Damage.Suspension < ?Session.Settings.Damage.Suspension.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],
 			[?Damage.Suspension.Lap.Delta < ?Session.Settings.Damage.Suspension.Repair.Threshold]}} => (Clear: Damage.Repair.Suspension.Target)
 
-{Any: {All: [?Session.Settings.Damage.Bodywork.Repair = Always], [?Damage.Bodywork > 0]},														\
-	  {All: [?Session.Settings.Damage.Bodywork.Repair = Threshold],																				\
-			[?Damage.Bodywork >= ?Session.Settings.Damage.Bodywork.Repair.Threshold]},															\
-	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],																				\
+{Any: {All: [?Session.Settings.Damage.Bodywork.Repair = Always], [?Damage.Bodywork > 0]},
+	  {All: [?Session.Settings.Damage.Bodywork.Repair = Threshold],
+			[?Damage.Bodywork >= ?Session.Settings.Damage.Bodywork.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],
 			[?Damage.Bodywork.Lap.Delta >= ?Session.Settings.Damage.Bodywork.Repair.Threshold]}} => (Set: Damage.Repair.Bodywork.Target)
 
-{Any: [?Session.Settings.Damage.Bodywork.Repair = Never], [?Damage.Bodywork = 0],																\
-	  {All: [?Session.Settings.Damage.Bodywork.Repair = Threshold],																				\
-			[?Damage.Bodywork < ?Session.Settings.Damage.Bodywork.Repair.Threshold]},															\
-	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],																				\
+{Any: [?Session.Settings.Damage.Bodywork.Repair = Never], [?Damage.Bodywork = 0],
+	  {All: [?Session.Settings.Damage.Bodywork.Repair = Threshold],
+			[?Damage.Bodywork < ?Session.Settings.Damage.Bodywork.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],
 			[?Damage.Bodywork.Lap.Delta < ?Session.Settings.Damage.Bodywork.Repair.Threshold]}} => (Clear: Damage.Repair.Bodywork.Target)
 
 {All: [?Lap], [?Damage.Suspension]} => (Set: Lap, ?Lap, Damage.Suspension, ?Damage.Suspension)
@@ -343,19 +343,19 @@ priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear
 {All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact(?Lap, Bodywork, !Damage.Bodywork))
 
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <= recentPitstopLap(?lap), !, fail
-lapTimeDamageImpact(?lap, ?damageType, ?damage) <=																								\
-		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),										\
-		?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),														\
-		abs(?delta, ?absDelta), ?damageDelta = ?absDelta - ?stdDeviation, ?damageDelta > 0,														\
+lapTimeDamageImpact(?lap, ?damageType, ?damage) <=
+		lapAvgTime(?lap, ?lTime), preDamageLap(?damageType, ?damage, ?pdLap), lapAvgTime(?pdLap, ?pdTime),
+		?delta = ?pdTime - ?lTime, ?delta < 0, lapTimeStdDeviation(?pdLap, ?stdDeviation),
+		abs(?delta, ?absDelta), ?damageDelta = ?absDelta - ?stdDeviation, ?damageDelta > 0,
 		?deltaSecs = ?absDelta / 1000, Set(Damage, ?damageType, Lap.Delta, ?deltaSecs)
 
 preDamageLap(?damageType, ?, ?lap) <= Get(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
-preDamageLap(?damageType, ?, ?lap) <= !Lap > 1, ?tLap = !Lap - 1, Get(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap),					\
+preDamageLap(?damageType, ?, ?lap) <= !Lap > 1, ?tLap = !Lap - 1, Get(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap),
 									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
-preDamageLap(?damageType, ?, ?lap) <= unbound?(?lap), preDamageLap(?damageType, 0, !Lap, ?lap),													\
+preDamageLap(?damageType, ?, ?lap) <= unbound?(?lap), preDamageLap(?damageType, 0, !Lap, ?lap),
 									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
-preDamageLap(?damageType, ?currentDamage, ?lap) <= unbound?(?lap), !, !Lap > 1, ?tLap = !Lap - 1,												\
-												   preDamageLap(?damageType, ?currentDamage, ?tLap, ?lap),										\
+preDamageLap(?damageType, ?currentDamage, ?lap) <= unbound?(?lap), !, !Lap > 1, ?tLap = !Lap - 1,
+												   preDamageLap(?damageType, ?currentDamage, ?tLap, ?lap),
 												   Set(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap)
 preDamageLap(?, ?, 0) <= !, fail
 preDamageLap(?, ?, 1) <= !, fail
@@ -364,7 +364,7 @@ preDamageLap(?damageType, ?currentDamage, ?lap) <= Get(Lap, ?lap, Damage, ?damag
 
 preDamageLap(?, ?, 0, ?) <= !, fail
 preDamageLap(?damageType, ?currentDamage, ?lap, ?lap) <= preDamageLap(?damageType, ?currentDamage, ?lap)
-preDamageLap(?damageType, ?currentDamage, ?candidateLap, ?lap) <= ?nCandidateLap = ?candidateLap - 1,											\
+preDamageLap(?damageType, ?currentDamage, ?candidateLap, ?lap) <= ?nCandidateLap = ?candidateLap - 1,
 																  preDamageLap(?damageType, ?currentDamage, ?nCandidateLap, ?lap)
 
 lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdDeviation(?lapTimes, ?deviation)
@@ -377,37 +377,37 @@ lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdD
 ;;; worthwile. The driver is informed and may setup an unplanned pitstop.   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},											\
-						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},																\
-				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},												\
+priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},
+						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},
+				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},
 						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
 				   
-priority: -5, {All: [?Lap], [?Damage.Reported],																									\
-					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\
-					{Any: {None: [?Damage.Analysis.Reported]},																					\
-						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},							\
-					{Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>												\
+priority: -5, {All: [?Lap], [?Damage.Reported],
+					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},
+					{Any: {None: [?Damage.Analysis.Reported]},
+						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},
+					{Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>
 		(Prove: reportAnalysis(!Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta))
 				   
-priority: -5, {All: [?Lap], [?Damage.Reported],																									\
-					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},																		\
-					{Any: {None: [?Damage.Analysis.Reported]},																					\
-						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},							\
-					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>													\
+priority: -5, {All: [?Lap], [?Damage.Reported],
+					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},
+					{Any: {None: [?Damage.Analysis.Reported]},
+						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},
+					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>
 		(Prove: reportAnalysis(0, 0))
 
 reportAnalysis(?, ?) <= recentPitstopLap(!Lap), !, fail
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
 reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
-reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,							\
-									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),										\
+reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
+									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),
 									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta), 												\
-												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),											\
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
+												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),
 												 Set(Damage.Analysis.Reported, !Lap)
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta, 													\
-												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),											\
+reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta,
+												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),
 												 Set(Damage.Analysis.Reported, !Lap)
 
 
@@ -418,36 +418,36 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.P
 ;;;-------------------------------------------------------------------------;;;
 
 [?Lap] => (Prove: reportNewDamage(?Lap))
-{Any: {Any: {All: [?Damage.Update.Suspension], {None: [?Damage.Suspension.Reported]}},															\
-			[?Damage.Update.Suspension > ?Damage.Suspension.Reported]},																			\
-	  {Any: {All: [?Damage.Update.Bodywork], {None: [?Damage.Bodywork.Reported]}},																\
+{Any: {Any: {All: [?Damage.Update.Suspension], {None: [?Damage.Suspension.Reported]}},
+			[?Damage.Update.Suspension > ?Damage.Suspension.Reported]},
+	  {Any: {All: [?Damage.Update.Bodywork], {None: [?Damage.Bodywork.Reported]}},
 			[?Damage.Update.Bodywork > ?Damage.Bodywork.Reported]}} => (Prove: reportNewDamage(!Lap))
-priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>																	\
+priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>
 		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
 
 reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
-reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
-						 lastPitstopDamageRepair(Suspension, ?suspensionRepaired), lastPitstopDamageRepair(Bodywork, ?bodyworkRepaired),		\
-						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),														\
-						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),														\
-						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),									\
+reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
+						 lastPitstopDamageRepair(Suspension, ?suspensionRepaired), lastPitstopDamageRepair(Bodywork, ?bodyworkRepaired),
+						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
+						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),
+						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),
+						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),
 						 setDamageReported(Suspension, ?newSDamage), setDamageReported(Bodywork, ?newBDamage)
-reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,																		\
-						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
+reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
+						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
+						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),
 						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
-reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),											\
-						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),						\
+reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
+						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),
 						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
 						 
-reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
-						 bound?(!Damage.Reported), !Damage.Reported > !Damage.Analysis.Reported, !,												\
-						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
+reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=
+						 bound?(!Damage.Reported), !Damage.Reported > !Damage.Analysis.Reported, !,
+						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater),
 						 any?(true, [?sGreater, ?bGreater]), setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
-reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=																			\
-						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), 										\
-						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),											\
+reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=
+						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater),
+						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),
 						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
 
 newDamageAfterRepair(0, ?, false)
@@ -474,18 +474,18 @@ updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.R
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
-priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},						\
-					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning], [?Lap.Remaining.Session > 0]} =>								\
+priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},
+					[?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning], [?Lap.Remaining.Session > 0]} =>
 		(Prove: lowFuelWarning(!Lap, !Lap.Remaining.Fuel))
 
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
 lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
-priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],																				\
+priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
 					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],																			\
+priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
 					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],																				\
+priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
 					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
 
 
@@ -498,34 +498,34 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],													
 
 [?Lap > 5] => (Prove: updateWeatherTrend(?Lap))
 
-updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,															\
-							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),				\
-							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),		\
-							lapWeather(?startlap, ?startWeather), projectedWeather(?lap, ?curWeather),											\
-							lapTyreTemperature(?startlap, ?startTyreTemperature), projectedTyreTemperature(?lap, ?curTyreTemperature),			\
-							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,	\
-							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,						\
-							?tempWeather = ?curWeather - ?startWeather, ?deltaWeather = ?tempWeather / ?deltaLaps,								\
-							?tempTyreTemperature = ?curTyreTemperature - ?startTyreTemperature,													\
-							?deltaTyreTemperature = ?tempTyreTemperature / ?deltaLaps,															\
-							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),															\
-							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather),			\
+updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,
+							lapAirTemperature(?startlap, ?startAirTemperature), projectedAirTemperature(?lap, ?curAirTemperature),
+							lapTrackTemperature(?startlap, ?startTrackTemperature), projectedTrackTemperature(?lap, ?curTrackTemperature),
+							lapWeather(?startlap, ?startWeather), projectedWeather(?lap, ?curWeather),
+							lapTyreTemperature(?startlap, ?startTyreTemperature), projectedTyreTemperature(?lap, ?curTyreTemperature),
+							?tempAir = ?curAirTemperature - ?startAirTemperature, ?tempTrack = ?curTrackTemperature - ?startTrackTemperature,
+							?deltaAirTemperature = ?tempAir / ?deltaLaps, ?deltaTrackTemperature = ?tempTrack / ?deltaLaps,
+							?tempWeather = ?curWeather - ?startWeather, ?deltaWeather = ?tempWeather / ?deltaLaps,
+							?tempTyreTemperature = ?curTyreTemperature - ?startTyreTemperature,
+							?deltaTyreTemperature = ?tempTyreTemperature / ?deltaLaps,
+							Set(Weather.Temperature.Air.Delta, ?deltaAirTemperature),
+							Set(Weather.Temperature.Track.Delta, ?deltaTrackTemperature), Set(Weather.Weather.Delta, ?deltaWeather),
 							Set(Weather.Temperature.Tyre.Delta, ?deltaTyreTemperature)
 
-projectedWeather(?lap, ?weather) <=																												\
-		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),									\
+projectedWeather(?lap, ?weather) <=
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapWeathers(?firstlap, !Lap, ?weathers),
 		linRegression(?indices, ?weathers, ?a, ?b), ?temp = ?b * ?lap, ?weather = ?a + ?temp
 
-projectedAirTemperature(?lap, ?temperature) <=																									\
-		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapAirTemperatures(?firstlap, !Lap, ?temperatures),						\
+projectedAirTemperature(?lap, ?temperature) <=
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapAirTemperatures(?firstlap, !Lap, ?temperatures),
 		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
-projectedTrackTemperature(?lap, ?temperature) <=																								\
-		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTrackTemperatures(?firstlap, !Lap, ?temperatures),					\
+projectedTrackTemperature(?lap, ?temperature) <=
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTrackTemperatures(?firstlap, !Lap, ?temperatures),
 		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
-projectedTyreTemperature(?lap, ?temperature) <=																									\
-		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),						\
+projectedTyreTemperature(?lap, ?temperature) <=
+		firstStintLap(?firstlap), sequence(?firstlap, !Lap, ?indices), lapTyreTemperatures(?firstlap, !Lap, ?temperatures),
 		linRegression(?indices, ?temperatures, ?a, ?b), ?temp = ?b * ?lap, ?temperature = ?a + ?temp
 
 
@@ -539,12 +539,12 @@ projectedTyreTemperature(?lap, ?temperature) <=																									\
 
 priority: 5, {All: [?Lap > 5], [?Session.Settings.Tyre.Pressure.Correction.Temperature = true]} => (Prove: updateTyrePressureCorrection(?Lap))
 
-updateTyrePressureCorrection(?lap) <=																											\
-		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,											\
-		sequence(?firstlap, ?lap, ?indices), lapAirTemperatures(?firstLap, ?lap, ?temperatures), linRegression(?indices, ?temperatures, ?a, ?b),\
-		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,																		\
-		average(?temperatures, ?averagetemperature), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,						\
-		?projectedtemperature = ?a + ?temp, ?temperatureFactor = ?averagetemperature - ?projectedtemperature,									\
+updateTyrePressureCorrection(?lap) <=
+		firstStintLap(?startlap), ?firstLap = ?startLap + 1, ?numLaps = ?lap - ?firstLap, ?numLaps > 5,
+		sequence(?firstlap, ?lap, ?indices), lapAirTemperatures(?firstLap, ?lap, ?temperatures), linRegression(?indices, ?temperatures, ?a, ?b),
+		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,
+		average(?temperatures, ?averagetemperature), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,
+		?projectedtemperature = ?a + ?temp, ?temperatureFactor = ?averagetemperature - ?projectedtemperature,
 		?pressureCorrection = ?temperatureFactor * 0.1,	Set(Tyre.Pressure.Target.Correction, ?pressureCorrection)
 
 
@@ -569,121 +569,121 @@ updateTyrePressureCorrection(?lap) <=																											\
 ;;; crash.                                                                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target],																			\
+priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target],
 					[?Session.Settings.Tyre.Pressure.Correction.Setup = true]} => (Prove: updateTyrePressureTarget(!Lap))
 
-updateTyrePressureTarget(?lap) <= Get(Tyre.Weather.Target, ?weather), lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),	\
-								  Call(setupTyrePressures, ?weather, ?airTemp, ?trackTemp, !Tyre.Compound.Target, !Tyre.Compound.Color.Target),	\
-								  Set(Tyre.Compound.Target, !Tyre.Setup.Compound), Set(Tyre.Compound.Color.Target, !Tyre.Setup.Compound.Color),	\
+updateTyrePressureTarget(?lap) <= Get(Tyre.Weather.Target, ?weather), lapAirTemperature(?lap, ?airTemp), lapTrackTemperature(?lap, ?trackTemp),
+								  Call(setupTyrePressures, ?weather, ?airTemp, ?trackTemp, !Tyre.Compound.Target, !Tyre.Compound.Color.Target),
+								  Set(Tyre.Compound.Target, !Tyre.Setup.Compound), Set(Tyre.Compound.Color.Target, !Tyre.Setup.Compound.Color),
 								  tyrePressureCorrections([FL, FR, RL, RR], ?corrections), adjustTargetPressures([FL, FR, RL, RR], ?corrections)
 
 tyrePressureCorrections(?tyreTypes, ?corrections) <= tyrePressureCorrections(?tyreTypes, !Tyre.Setup.Certainty, ?corrections)
 
 tyrePressureCorrections([], ?, [])
-tyrePressureCorrections([?tyreType | ?tyreTypes], ?factor, [?correction | ?corrections]) <=														\
-		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), Get(Tyre.Setup.Pressure, ?tyreType, ?setupPressure),									\
-		?temp = ?setupPressure - ?pressure, ?correction = ?temp * ?factor,																		\
+tyrePressureCorrections([?tyreType | ?tyreTypes], ?factor, [?correction | ?corrections]) <=
+		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), Get(Tyre.Setup.Pressure, ?tyreType, ?setupPressure),
+		?temp = ?setupPressure - ?pressure, ?correction = ?temp * ?factor,
 		tyrePressureCorrections(?tyreTypes, ?factor, ?corrections)
 
 adjustTargetPressures([], [])
-adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=																\
-		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), ?newPressure = ?pressure + ?correction,												\
-		Set(Tyre.Pressure.Target, ?tyreType, ?newPressure), Get(Tyre.Pressure.Target, ?tyreType, Increment, ?increment),						\
-		?newIncrement = ?increment + ?correction, Set(Tyre.Pressure.Target, ?tyreType, Increment, ?newIncrement),								\
+adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=
+		Get(Tyre.Pressure.Target, ?tyreType, ?pressure), ?newPressure = ?pressure + ?correction,
+		Set(Tyre.Pressure.Target, ?tyreType, ?newPressure), Get(Tyre.Pressure.Target, ?tyreType, Increment, ?increment),
+		?newIncrement = ?increment + ?correction, Set(Tyre.Pressure.Target, ?tyreType, Increment, ?newIncrement),
 		adjustTargetPressures(?tyreTypes, ?corrections)
 
-priority: 20, [?Pitstop.Plan = true] =>																											\
-		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),																				\
-		(Clear: Pitstop.Planned.Fuel),																											\
-		(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color), (Clear: Pitstop.Planned.Tyre.Set), 				\
-		(Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 													\
-		(Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 													\
-		(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment), 								\
-		(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 								\
-		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),																						\
+priority: 20, [?Pitstop.Plan = true] =>
+		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),
+		(Clear: Pitstop.Planned.Fuel),
+		(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color), (Clear: Pitstop.Planned.Tyre.Set),
+		(Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR),
+		(Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR),
+		(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
+		(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
+		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
-{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},																						\
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},
 	  [?Fuel.Amount.Target], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Fuel.Amount], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Pitstop.Plan.Fuel.Amount)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),										\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),
 															   (Set: Pitstop.Planned.Tyre.Compound.Color, false)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Set],																								\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Set],
 	  {None: [?Pitstop.Planned.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, ?Pitstop.Plan.Tyre.Set)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Compound],																							\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Compound],
 	  {None: [?Pitstop.Planned.Tyre.Compound]}} => (Set: Pitstop.Planned.Tyre.Compound, ?Pitstop.Plan.Tyre.Compound)	  
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Compound.Color],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Compound.Color],
 	  {None: [?Pitstop.Planned.Tyre.Compound.Color]}} => (Set: Pitstop.Planned.Tyre.Compound.Color, ?Pitstop.Plan.Tyre.Compound.Color)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.FL],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.FL],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.FL, ?Pitstop.Plan.Tyre.Pressure.FL)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.FR],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.FR],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.FR]}} => (Set: Pitstop.Planned.Tyre.Pressure.FR, ?Pitstop.Plan.Tyre.Pressure.FR)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.RL],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.RL],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.RL, ?Pitstop.Plan.Tyre.Pressure.RL)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.RR],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Pressure.RR],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Pitstop.Plan.Tyre.Pressure.RR)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Suspension],																						\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Suspension],
 	  {None: [?Pitstop.Planned.Repair.Suspension]}} => (Set: Pitstop.Planned.Repair.Suspension, ?Pitstop.Plan.Repair.Suspension)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Bodywork],																							\
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Bodywork],
 	  {None: [?Pitstop.Planned.Repair.Bodywork]}} => (Set: Pitstop.Planned.Repair.Bodywork, ?Pitstop.Plan.Repair.Bodywork)
-{All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>			\
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target), (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
-{All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>					\
+{All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL], {None: [?Pitstop.Planned.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = false]}} =>	\
-		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),																		\
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL], {None: [?Pitstop.Planned.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
 		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR], {None: [?Pitstop.Planned.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = false]}} =>	\
-		(Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR),																		\
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FR], {None: [?Pitstop.Planned.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Pressure.FR, ?Tyre.Pressure.Target.FR),
 		(Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, !Tyre.Pressure.Target.FR.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RL], {None: [?Pitstop.Planned.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = false]}} =>	\
-		(Set: Pitstop.Planned.Tyre.Pressure.RL, ?Tyre.Pressure.Target.RL),																		\
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RL], {None: [?Pitstop.Planned.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Pressure.RL, ?Tyre.Pressure.Target.RL),
 		(Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, !Tyre.Pressure.Target.RL.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR], {None: [?Pitstop.Planned.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = false]}} =>	\
-		(Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR),																		\
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.RR], {None: [?Pitstop.Planned.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = false]}} =>
+		(Set: Pitstop.Planned.Tyre.Pressure.RR, ?Tyre.Pressure.Target.RR),
 		(Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, !Tyre.Pressure.Target.RR.Increment)
-{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.Correction],																						\
-	  {None: [?Pitstop.Planned.Tyre.Pressure.Correction], [?Pitstop.Planned.Tyre.Compound = false]}} =>											\
+{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.Correction],
+	  {None: [?Pitstop.Planned.Tyre.Pressure.Correction], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.Correction, ?Tyre.Pressure.Target.Correction)
-{All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target], {None: [?Pitstop.Planned.Repair.Suspension]}} =>										\
+{All: [?Pitstop.Plan], [?Damage.Repair.Suspension.Target], {None: [?Pitstop.Planned.Repair.Suspension]}} =>
 		(Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
-{All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target], {None: [?Pitstop.Planned.Repair.Bodywork]}} =>											\
+{All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target], {None: [?Pitstop.Planned.Repair.Bodywork]}} =>
 		(Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
 {All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}, {None: [?Pitstop.Plan.Fuel.Amount]}} => (Set: Pitstop.Planned.Fuel, 0)
-{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Change = false], [?Tyre.Compound.Target], [?Pitstop.Plan.Tyre.Compound]}} =>					\
-		(Set: Pitstop.Planned.Tyre.Compound, !Session.Setup.Tyre.Compound),																		\
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Change = false], [?Tyre.Compound.Target], [?Pitstop.Plan.Tyre.Compound]}} =>
+		(Set: Pitstop.Planned.Tyre.Compound, !Session.Setup.Tyre.Compound),
 		(Set: Pitstop.Planned.Tyre.Compound.Color, !Session.Setup.Tyre.Compound.Color)		
 {All: [?Pitstop.Plan], {None: [?Tyre.Set.Target], [?Pitstop.Plan.Tyre.Set]}} => (Set: Pitstop.Planned.Tyre.Set, !Session.Setup.Tyre.Set.Fresh)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FL]}, [?Pitstop.Plan.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = Dry]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FL]}, [?Pitstop.Plan.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = Dry]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FL, !Session.Setup.Tyre.Dry.Pressure.FL), (Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FR]}, [?Pitstop.Plan.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = Dry]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FR]}, [?Pitstop.Plan.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = Dry]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FR, !Session.Setup.Tyre.Dry.Pressure.FR), (Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RL]}, [?Pitstop.Plan.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = Dry]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RL]}, [?Pitstop.Plan.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = Dry]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.RL, !Session.Setup.Tyre.Dry.Pressure.RL), (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RR]}, [?Pitstop.Plan.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = Dry]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RR]}, [?Pitstop.Plan.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = Dry]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.RR, !Session.Setup.Tyre.Dry.Pressure.RR), (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FL]}, [?Pitstop.Plan.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = Wet]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FL]}, [?Pitstop.Plan.Tyre.Pressure.FL], [?Pitstop.Planned.Tyre.Compound = Wet]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FL, !Session.Setup.Tyre.Wet.Pressure.FL), (Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FR]}, [?Pitstop.Plan.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = Wet]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.FR]}, [?Pitstop.Plan.Tyre.Pressure.FR], [?Pitstop.Planned.Tyre.Compound = Wet]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.FR, !Session.Setup.Tyre.Wet.Pressure.FR), (Set: Pitstop.Planned.Tyre.Pressure.FR.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RL]}, [?Pitstop.Plan.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = Wet]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RL]}, [?Pitstop.Plan.Tyre.Pressure.RL], [?Pitstop.Planned.Tyre.Compound = Wet]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.RL, !Session.Setup.Tyre.Wet.Pressure.RL), (Set: Pitstop.Planned.Tyre.Pressure.RL.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RR]}, [?Pitstop.Plan.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = Wet]} =>			\
+{All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Target.RR]}, [?Pitstop.Plan.Tyre.Pressure.RR], [?Pitstop.Planned.Tyre.Compound = Wet]} =>
 		(Set: Pitstop.Planned.Tyre.Pressure.RR, !Session.Setup.Tyre.Wet.Pressure.RR), (Set: Pitstop.Planned.Tyre.Pressure.RR.Increment, 0)
-{All: [?Pitstop.Plan], {None: [?Damage.Repair.Suspension.Target], [?Pitstop.Plan.Repair.Suspension]}} =>										\
+{All: [?Pitstop.Plan], {None: [?Damage.Repair.Suspension.Target], [?Pitstop.Plan.Repair.Suspension]}} =>
 		(Set: Pitstop.Planned.Repair.Suspension, false)
-{All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target], [?Pitstop.Plan.Repair.Bodywork]}} =>											\
+{All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target], [?Pitstop.Plan.Repair.Bodywork]}} =>
 		(Set: Pitstop.Planned.Repair.Bodywork, false)
 
-priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [Pitstop.Plan.Tyre.Change = true]}} =>								\
+priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
-priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),																\
-								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),			\
-								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),								\
-								  (Clear: Pitstop.Plan.Tyre.Pressure.FL), (Clear: Pitstop.Plan.Tyre.Pressure.FR),								\
-								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),								\
+priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
+								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),
+								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),
+								  (Clear: Pitstop.Plan.Tyre.Pressure.FL), (Clear: Pitstop.Plan.Tyre.Pressure.FR),
+								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
@@ -702,23 +702,23 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.Planned), (Clear: Pitstop.Prepare), (Set: Pitstop.Prepared)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
-preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),																				\
-								  setTyreSet(?pitstopNumber), setTyrePressures(?pitstopNumber),													\
+preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
+								  setTyreSet(?pitstopNumber), setTyrePressures(?pitstopNumber),
 								  requestRepairs(?pitstopNumber)
 preparePitstop(?pitstopNumber) <= Call(finishPitstopSetup, ?pitstopNumber)
 
 setRefuelAmount(?pitstopNumber) <= Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
 
-setTyreSet(?pitstopNumber) <= Call(setPitstopTyreSet, ?pitstopNumber,																			\
+setTyreSet(?pitstopNumber) <= Call(setPitstopTyreSet, ?pitstopNumber,
 								   !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Compound.Color, !Pitstop.Planned.Tyre.Set)
 								   
 setTyrePressures(?pitstopNumber) <= !Pitstop.Planned.Tyre.Compound = false, !
-setTyrePressures(?pitstopNumber) <=																												\
-		Call(setPitstopTyrePressures, ?pitstopNumber,																							\
-									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,										\
+setTyrePressures(?pitstopNumber) <=
+		Call(setPitstopTyrePressures, ?pitstopNumber,
+									  !Pitstop.Planned.Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FR,
 									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
 
-requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,																	\
+requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
 															  !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
 
 
@@ -731,15 +731,15 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,			
 
 [?Pitstop.Lap] => (ProveAll: pitstopPerformed(?Pitstop.Lap)), (Set: Cleanup, Laps)
 
-priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),																					\
-								 (Clear: Pitstop.Planned.Fuel),																					\
-								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),							\
-								 (Clear: Pitstop.Planned.Tyre.Set), 																			\
-								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR), 							\
-								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR), 							\
-								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment), 		\
-								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment), 		\
-								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),																\
+priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),
+								 (Clear: Pitstop.Planned.Fuel),
+								 (Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
+								 (Clear: Pitstop.Planned.Tyre.Set),
+								 (Clear: Pitstop.Planned.Tyre.Pressure.FL), (Clear: Pitstop.Planned.Tyre.Pressure.FR),
+								 (Clear: Pitstop.Planned.Tyre.Pressure.RL), (Clear: Pitstop.Planned.Tyre.Pressure.RR),
+								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
+								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
+								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),
 								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
 priority: -20, {All: [?Pitstop.Lap], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr)
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
@@ -750,8 +750,8 @@ pitstopPerformed(?lap) <= Get(Lap, ?lap, Time.End, ?time), Set(Pitstop, !Pitstop
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Air, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Air, ?temp)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Track, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Track, ?temp)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Fuel, !Pitstop.Planned.Fuel)
-pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound, !Pitstop.Planned.Tyre.Compound),										\
-						  Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound.Color, !Pitstop.Planned.Tyre.Compound.Color),							\
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound, !Pitstop.Planned.Tyre.Compound),
+						  Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Compound.Color, !Pitstop.Planned.Tyre.Compound.Color),
 						  Set(Tyre.Compound, !Pitstop.Planned.Tyre.Compound), Set(Tyre.Compound.Color, !Pitstop.Planned.Tyre.Compound.Color)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Set, !Pitstop.Planned.Tyre.Set)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FL, !Pitstop.Planned.Tyre.Pressure.FL)

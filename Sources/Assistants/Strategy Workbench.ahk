@@ -155,6 +155,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	
 	iSelectedDataType := "Electronics"
 	iSelectedChartType := "Scatter"
+
+	iSelectedValidator := false
 	
 	iSelectedSessionType := "Duration"
 	
@@ -239,6 +241,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+	
+	SelectedValidator[] {
+		Get {
+			return this.iSelectedValidator
 		}
 	}
 	
@@ -445,7 +453,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, DropDownList, x250 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu, % values2String("|", map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")*)
+		Gui %window%:Add, DropDownList, x250 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown gsettingsMenu
+		
+		this.updateSettingsMenu()
 		
 		Gui %window%:Add, DropDownList, x435 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown gsimulationMenu, % values2String("|", map(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], "translate")*)
 		
@@ -968,7 +978,6 @@ class StrategyWorkbench extends ConfigurationItem {
 			
 			GuiControl Choose, tyreChangeRequirementsDropDown, % (oldTChoice <= 2) ? oldTChoice : 1
 			GuiControl Choose, refuelRequirementsDropDown, % (oldFChoice <= 2) ? oldFChoice : 1
-			
 		}
 		else {
 			/*
@@ -977,6 +986,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl Show, refuelRequirementsLabel
 			GuiControl Show, refuelRequirementsDropDown
 			*/
+			
 			oldTChoice := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
 			oldFChoice := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
 			
@@ -986,6 +996,34 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl Choose, tyreChangeRequirementsDropDown, %oldTChoice%
 			GuiControl Choose, refuelRequirementsDropDown, %oldFChoice%
 		}
+	}
+	
+	updateSettingsMenu() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		settingsMenu := map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")
+		
+		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+		
+		if (fileNames.Length() > 0) {
+			settingsMenu.Push(translate("---------------------------------------------"))
+			settingsMenu.Push(translate("Validators:"))
+			
+			for ignore, fileName in fileNames {
+				SplitPath fileName, , , , validator
+			
+				if (validator = this.SelectedValidator)
+					settingsMenu.Push("(x) " . validator)
+				else
+					settingsMenu.Push("      " . validator)
+			}
+		}
+		
+		GuiControl, , settingsMenuDropDown, % "|" . values2String("|", settingsMenu*)
+		
+		GuiControl Choose, settingsMenuDropDown, 1
 	}
 	
 	createStrategyInfo(strategy) {
@@ -1387,6 +1425,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
 						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
 						
+						this.iSelectedValidator := strategy.Validator
+						
 						pitstopRule := strategy.PitstopRule
 						
 						if !pitstopRule
@@ -1446,6 +1486,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						GuiControl, , simMapEdit, % strategy.Map
 
 						this.updateState()
+						this.updateSettingsMenu()
 					}
 					else {
 						title := translate("Information")
@@ -1592,6 +1633,19 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 					MsgBox 262192, %title%, % translate("You must first select a simulation.")
 					OnMessage(0x44, "")
+				}
+			default:
+				if (line > 8) {
+					fileName := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")[line - 8]
+					
+					SplitPath fileName, , , , validator
+			
+					if (this.iSelectedValidator = validator)
+						this.iSelectedValidator := false
+					else
+						this.iSelectedValidator := validator
+					
+					this.updateSettingsMenu()
 				}
 		}
 	}
@@ -2006,7 +2060,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 	
-	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
+	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		local compound
 		
 		result := true
@@ -2019,6 +2073,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet pitstopWindowEdit
 		GuiControlGet tyreChangeRequirementsDropDown
 		GuiControlGet refuelRequirementsDropDown
+		
+		validator := this.SelectedValidator
 		
 		switch pitstopRequirementsDropDown {
 			case 1:

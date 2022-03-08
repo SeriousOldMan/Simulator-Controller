@@ -18,14 +18,14 @@ lastPitstopTyreSet(?tyreSet) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Set, ?t
 
 lastPitstopTyreCompound(?tyreCompound) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound)
 
-lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),				\
+lastPitstopTyreCompound(?tyreCompound, ?tyreCompoundColor) <= lastPitstop(?nr), Get(Pitstop, ?nr, Tyre.Compound, ?tyreCompound),
 															  Get(Pitstop, ?nr, Tyre.Compound.Color, ?tyreCompoundColor)
 
-lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastPitstop(?nr),								\
+lastPitstopTyrePressure(?compound, ?tyreType, ?pressure) <= lastPitstopTyreCompound(?compound), lastPitstop(?nr),
 															Get(Pitstop, ?nr, Tyre.Pressure, ?tyreType, ?pressure)
 
 lastPitstopTyrePressures(?compound, [], [])
-lastPitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=														\
+lastPitstopTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=
 		lastPitstopTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressure(?compound, ?tyreTypes, ?pressures)
 
 lastPitstopDamageRepair(Suspension, ?repair) <= lastPitstop(?nr), Get(Pitstop, ?nr, Repair.Suspension, ?repair)

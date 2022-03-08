@@ -2640,10 +2640,11 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 	
-	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
+	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		local strategy := this.Strategy
 		
 		if strategy {
+			validator := strategy.Validator
 			pitstopRule := strategy.PitstopRule
 			refuelRule := strategy.RefuelRule
 			tyreChangeRule := strategy.TyreChangeRule

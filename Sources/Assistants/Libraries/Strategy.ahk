@@ -98,7 +98,7 @@ class StrategySimulation {
 		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
 	
-	loadRules(compiler, validationRules, ByRef productions, ByRef reductions) {
+	loadRules(compiler, validator, ByRef productions, ByRef reductions) {
 		local rules
 		
 		FileRead rules, % kResourcesDirectory . "Strategy\Rules\Strategy Validation.rules"
@@ -107,7 +107,21 @@ class StrategySimulation {
 		reductions := false
 
 		compiler.compileRules(rules, productions, reductions)
-		compiler.compileRules(validationRules, productions, reductions)
+		
+		try {
+			FileRead rules, % getFileName(validator . ".rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+			
+			if (rules != "")
+				compiler.compileRules(rules, productions, reductions)
+		}
+		catch exception {
+			message := (IsObject(exception) ? exception.Message : exception)
+			title := translate("Error")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("Cannot load the custom validation rules.") . "`n`n" . message
+			OnMessage(0x44, "")
+		}
 	}
 	
 	dumpKnowledge(knowledgeBase) {
@@ -157,25 +171,38 @@ class StrategySimulation {
 			}
 	}
 	
-	scenarioValid(strategy, validationRules) {
-		local knowledgeBase
+	scenarioValid(strategy, validator) {
+		local static knowledgeBase
+		local rules
+		local rule
 		local resultSet
 		
-		if validationRules {
+		if validator {
 			static compiler := false
 			static goal := false
+			static lastvalidator := false
 			
 			if !compiler {
 				compiler := new RuleCompiler()
 				goal := compiler.compileGoal("validScenario()")
 			}
 			
-			productions := false
-			reductions := false
-		
-			this.loadRules(compiler, validationRules, productions, reductions)
-					
-			knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+			if (validator != lastvalidator) {
+				productions := false
+				reductions := false
+			
+				this.loadRules(compiler, validator, productions, reductions)
+						
+				knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+			}
+			
+			rules := knowledgeBase.Rules
+			
+			for ignore, rule in rules.Reductions["setup", 3].clone()
+				rules.removeRule(rule)
+			
+			for ignore, rule in rules.Reductions["pitstop", 4].clone()
+				rules.removeRule(rule)
 			
 			knowledgeBase.addRule(compiler.compileRule("setup(" . strategy.RemainingFuel . ","
 																. StrReplace(strategy.TyreCompound, A_Space, "\ ") . ","
@@ -244,8 +271,8 @@ class StrategySimulation {
 														, tyreUsageWeight, tyreCompoundVariationWeight)
 	}
 	
-	getPitstopRules(ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
-		return this.StrategyManager.getPitstopRules(pitstopRule, refuelRule, tyreChangeRule, tyreSets)
+	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
+		return this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 	}
 	
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -369,11 +396,8 @@ class StrategySimulation {
 	}
 	
 	validScenario(strategy) {
-		local rules
-		
-		FileRead rules, % "C:\Users\olive\Desktop\F1.rules"
-		
-		return (((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0) && this.scenarioValid(strategy, rules))
+		return (((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0)
+			 && this.scenarioValid(strategy, strategy.Validator))
 	}
 	
 	compareScenarios(scenario1, scenario2) {
@@ -761,6 +785,8 @@ class Strategy extends ConfigurationItem {
 	iPitstopFuelService := 0.0
 	iPitstopTyreService := 0.0
 	iPitstopSeviceOrder := "Simultaneous"
+	
+	iValidator := false
 	
 	iPitstopRule := false
 	iRefuelRule := false
@@ -1269,6 +1295,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 	
+	Validator[] {
+		Get {
+			return this.iValidator
+		}
+	}
+	
 	PitstopRule[] {
 		Get {
 			return this.iPitstopRule
@@ -1460,20 +1492,15 @@ class Strategy extends ConfigurationItem {
 			this.iPitstopTyreService := pitstopTyreService
 			this.iPitstopServiceOrder := pitstopServiceOrder
 			
+			validator := false
 			pitstopRule := false
 			refuelRule := false
 			tyreChangeRule := false
 			tyreSets := false
 			
-			this.StrategyManager.getPitstopRules(pitstopRule, refuelRule, tyreChangeRule, tyreSets)
+			this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 
-			/*
-			if !pitstopRule {
-				refuelRule := false
-				tyreChangeRule := false
-			}
-			*/
-			
+			this.iValidator := validator
 			this.iPitstopRule := pitstopRule
 			this.iRefuelRule := refuelRule
 			this.iTyreChangeRule := tyreChangeRule
@@ -1516,6 +1543,8 @@ class Strategy extends ConfigurationItem {
 		this.iPitstopFuelService := getConfigurationValue(configuration, "Settings", "PitstopFuelService", 0.0)
 		this.iPitstopTyreService := getConfigurationValue(configuration, "Settings", "PitstopTyreService", 0.0)
 		this.iPitstopServiceOrder := getConfigurationValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
+		
+		this.iValidator := getConfigurationValue(configuration, "Settings", "Validator", false)
 		
 		this.iPitstopRule := getConfigurationValue(configuration, "Settings", "PitstopRule", kUndefined)
 		
@@ -1589,6 +1618,8 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
 		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
 		setConfigurationValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
+		
+		setConfigurationValue(configuration, "Settings", "Validator", this.Validator)
 		
 		pitstopRule := this.PitstopRule
 		

@@ -44,10 +44,6 @@ pitstopTyreSets(?, [])
 ;;;                            Collection Rules                             ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-unique([], [])
-unique([?value | ?values], [?value | ?result]) <= none?(?value, ?values), !, unique(?values, ?result)
-unique([?value | ?values], ?result) <= unique(?values, ?result)
-
 any?(?value, [?value | ?])
 any?(?value, [? | ?tail]) <= any?(?value, ?tail)
 
@@ -64,6 +60,10 @@ one?(?value, [? | ?tail]) <= one?(?value, ?tail)
 				
 length([], 0)
 length([?h | ?t], ?length) <= length(?t, ?tLength), ?length = ?tLength + 1
+
+unique([], [])
+unique([?value | ?values], [?value | ?result]) <= none?(?value, ?values), !, unique(?values, ?result)
+unique([?value | ?values], ?result) <= unique(?values, ?result)
 
 reverse([], [])
 reverse([?h | ?t], ?rev) <= reverse(?t, ?rt), concat(?rt, [?h], ?rev)

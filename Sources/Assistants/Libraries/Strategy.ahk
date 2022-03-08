@@ -660,8 +660,15 @@ class VariationSimulation extends StrategySimulation {
 									strategy := this.createStrategy(name)
 							
 									currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
+					
+									Random rnd, 0, 1
 									
-									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+									if (Round(rnd) = 1)
+										startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
+									else
+										startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
+									
+									startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 								
@@ -700,7 +707,14 @@ class VariationSimulation extends StrategySimulation {
 								
 									currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
 									
-									startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+									Random rnd, 0, 1
+									
+									if (Round(rnd) = 1)
+										startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
+									else
+										startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
+									
+									startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 								
@@ -996,7 +1010,7 @@ class Strategy extends ConfigurationItem {
 					this.iTyreChange := tyreChange
 					this.iRemainingTyreLaps := (tyreChange ? freshTyreLaps : remainingTyreLaps)
 				}
-				else if (!adjustments && !tyreCompound && !tyreCompoundColor)
+				else if (!tyreCompound && !tyreCompoundColor)
 					this.iRemainingTyreLaps := remainingTyreLaps
 				else if ((remainingTyreLaps - stintLaps) >= 0) {
 					if ((id == 1) && (tyreChangeRule = "Required") && (remainingTyreLaps >= this.iRemainingLaps)) {

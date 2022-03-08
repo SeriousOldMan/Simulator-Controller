@@ -6622,8 +6622,15 @@ class TrafficSimulation extends StrategySimulation {
 										strategy := this.createStrategy(name)
 										
 										currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
+					
+										Random rnd, 0, 1
 										
-										startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+										if (Round(rnd) = 1)
+											startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
+										else
+											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
+										
+										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 									
@@ -6661,8 +6668,15 @@ class TrafficSimulation extends StrategySimulation {
 										strategy := this.createStrategy(name)
 										
 										currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+					
+										Random rnd, 0, 1
 										
-										startFuelAmount := Min(fuelCapacity, initialFuelAmount + (initialFuel / 100 * fuelCapacity))
+										if (Round(rnd) = 1)
+											startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
+										else
+											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
+										
+										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 									

@@ -253,13 +253,13 @@ Loading of settings is supported for:
 Notes:
 
   1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with required refueling has been defined, but actually there is no need for a tyre change or even for refueling, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
-  2. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based scenario validations, which are described in the next section.
+  2. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
   3. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used. Please be aware, that only those tyre compounds can be handled by the simulation engine, for which corresponding is available. If there is no data available for a given compound, either by the "Initial Conditions" or by the telemetry data, the simulation will fail and no valid scenario will be created. 
   4. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tyre compounds for which data is available are used.
   
 #### Scenario validation
 
-Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of scenarios created during the simulation. These rules use the same technology used by the different Virtual Race Assistants, a hybrid rule engine, which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of strategy scenarios created during the simulation. These rules use the same technology used by the different Virtual Race Assistants, a hybrid rule engine, which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
 
 	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
 

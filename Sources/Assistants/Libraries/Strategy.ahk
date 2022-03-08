@@ -982,7 +982,7 @@ class Strategy extends ConfigurationItem {
 				
 				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
 			
-				Random rnd, 1, 100
+				Random rnd, -10, 100
 				
 				variation := (strategy.TyreLapsVariation / 100 * rnd)
 				
@@ -1932,7 +1932,7 @@ class Strategy extends ConfigurationItem {
 		this.iMaxTyreLaps := maxTyreLaps
 		this.iTyreLapsVariation := tyreLapsVariation
 		
-		Random rnd, 1, 100
+		Random rnd, -10, 100
 				
 		variation := (tyreLapsVariation / 100 * rnd)
 			

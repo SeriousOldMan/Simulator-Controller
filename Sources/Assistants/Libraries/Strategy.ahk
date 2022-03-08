@@ -665,7 +665,7 @@ class VariationSimulation extends StrategySimulation {
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 								
-									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, startFuelAmount
 													, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
 								}
 								finally {
@@ -704,7 +704,7 @@ class VariationSimulation extends StrategySimulation {
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 								
-									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+									this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, startFuelAmount
 													, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 									
 									scenarios[name . translate(":") . variation] := strategy

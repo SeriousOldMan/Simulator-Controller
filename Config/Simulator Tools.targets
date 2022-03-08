@@ -33,7 +33,7 @@ Release 3.8.8=Release 3.8.6 -> updateTranslations, updatePhraseGrammars, updateA
 Release 3.9.0=Release 3.8.8 -> updateTranslations, updatePhraseGrammars
 Release 3.9.2=Release 3.9.0 -> updateTranslations, updateInstallationForV392
 Release 3.9.4=Release 3.9.2 -> updateTranslations, updateActionLabels, updateActionIcons, updateConfigurationForV394
-; Release 3.9.6=Release 3.9.4 -> updateTranslations
+Release 3.9.6=Release 3.9.4 -> updateTranslations
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

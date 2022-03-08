@@ -6636,7 +6636,7 @@ class TrafficSimulation extends StrategySimulation {
 									
 									scenarios[name . translate(":") . variation] := strategy
 										
-									Sleep 100
+									Sleep 20
 										
 									progress += 1
 								}
@@ -6671,7 +6671,7 @@ class TrafficSimulation extends StrategySimulation {
 										
 										scenarios[name . translate(":") . variation] := strategy
 										
-										Sleep 100
+										Sleep 20
 										
 										progress += 1
 									}

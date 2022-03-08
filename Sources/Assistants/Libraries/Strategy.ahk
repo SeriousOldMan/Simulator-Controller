@@ -383,7 +383,7 @@ class StrategySimulation {
 				strategy.adjustLastPitstopRefuelAmount()
 				
 				if verbose {
-					Sleep 500
+					Sleep 20
 					
 					progress += 1
 				}
@@ -446,11 +446,8 @@ class StrategySimulation {
 				else
 					candidate := this.compareScenarios(strategy, candidate)
 				
-				if verbose {
+				if verbose
 					progress += 1
-				
-					Sleep 500
-				}
 			}
 		}
 		
@@ -640,10 +637,10 @@ class VariationSimulation extends StrategySimulation {
 		tyreUsageRound := 0
 		tyreCompoundVariationRound := 0
 		
+		tyreLapsVariation := tyreUsage
+		
 		Loop { ; consumption
 			Loop { ; initialFuel
-				tyreLapsVariation := tyreUsage
-				
 				Loop { ; tyreUsage
 					Loop { ; tyreCompoundVariation
 						if useStartConditions {
@@ -677,7 +674,7 @@ class VariationSimulation extends StrategySimulation {
 								
 								scenarios[name . translate(":") . variation] := strategy
 									
-								Sleep 100
+								Sleep 20
 									
 								progress += 1
 							}
@@ -712,7 +709,7 @@ class VariationSimulation extends StrategySimulation {
 									
 									scenarios[name . translate(":") . variation] := strategy
 									
-									Sleep 100
+									Sleep 20
 									
 									progress += 1
 								}
@@ -726,9 +723,13 @@ class VariationSimulation extends StrategySimulation {
 						break
 				}
 				
+				initialFuel -= initialFuelSteps
+				
 				if (++initialFuelRound >= initialFuelSteps)
 					break
 			}
+			
+			consumption -= consumptionSteps
 			
 			if (++consumptionRound >= consumptionSteps)
 				break
@@ -1460,7 +1461,7 @@ class Strategy extends ConfigurationItem {
 			this.iSessionLength := sessionLength
 			
 			this.iMaxTyreLaps := maxTyreLaps
-			
+		
 			this.iTyreCompound := tyreCompound
 			this.iTyreCompoundColor := tyreCompoundColor
 			this.iTyrePressureFL := tyrePressures[1]
@@ -1930,6 +1931,12 @@ class Strategy extends ConfigurationItem {
 		this.iStintLaps := stintLaps
 		this.iMaxTyreLaps := maxTyreLaps
 		this.iTyreLapsVariation := tyreLapsVariation
+		
+		Random rnd, 1, 100
+				
+		variation := (tyreLapsVariation / 100 * rnd)
+			
+		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps / 100 * variation)) - currentTyreLaps, 0)
 		
 		this.iMap := map
 		this.iFuelConsumption := fuelConsumption

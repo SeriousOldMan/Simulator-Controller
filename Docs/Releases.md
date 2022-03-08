@@ -7,9 +7,10 @@
   5. Support for [Stint time variation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation) based on tyre usage dependent lap time degradation in Strategy simulation.
   6. New settings for [disallowed refueling and disallowed tyre change](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings) in Strategy simulation.
   7. Support for [scenario validation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#scenario-validation) in Strategy simulation. These rules, which can be created or changed by the user, are based on the logic programming language *Prolog*.
-  8. Full handling of restricted tyre sets in "Race Center" and special validation rules, when a strategy gets adopted to the current race situation.
-  9. Improved data quality for missing laps in "Race Center".
-  10. Initial preparation for simulation and car specific rules in "Setup Advisor".
+  8. Significant performance improvements by a factor of 10 in Strategy simulations.
+  9. Full handling of restricted tyre sets in "Race Center" and special validation rules, when a strategy gets adopted to the current race situation.
+  10. Improved data quality for missing laps in "Race Center".
+  11. Initial preparation for simulation and car specific rules in "Setup Advisor".
   
 ## 3.9.4-release 03/04/22
 

@@ -41,6 +41,14 @@ class TestRaceStrategist extends RaceStrategist {
 		
 		this.updateConfigurationValues({Settings: settings})
 	}
+	
+	createKnowledgeBase(facts) {
+		local knowledgeBase := base.createKnowledgeBase(facts)
+		
+		knowledgeBase.addRule(new RuleCompiler().compileRule("carNumber(?car, ?car)"))
+		
+		return knowledgeBase
+	}
 }
 
 class BasicReporting extends Assert {

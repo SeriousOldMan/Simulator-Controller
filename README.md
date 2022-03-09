@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.9.6-release](https://www.dropbox.com/s/orn59mgmxv6efrn/Simulator%20Controller%203.9.6-dev.zip?dl=1) (Early build for 3.9.6. New features: Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor". Stable, incl. update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-396) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

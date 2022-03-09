@@ -253,7 +253,7 @@ Loading of settings is supported for:
 Notes:
 
   1. If you specify a required pitstop window, this will be applied for the first pitstop only, of course. When a mandatory pitstop with required refueling has been defined, but actually there is no need for a tyre change or even for refueling, the pitstop is planned as late as possible and only 1 liter will be refueled. All these are common scenarios for a GT3 solo or team sprint races.
-  2. If you have to perform a number of required pitstops, the minimum allowed value here is **2**. If there is only one required pitstop, either use the window rule or set the pitstop setting to "Optional", but choose "Refuel" and/or "Tyre Change" as required.
+  2. If you have to perform a number of required pitstops, enter the number of pitstops and choose "Refuel" and/or "Tyre Change" as required. If you don't choose either "Refuel" or "Tyre Change", the simulation engige might be confused, because there is no reason to go to the pits, right?
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
   4. If you **have entered** tyre sets in the "Pitstop" group, only these tyre compounds will be used by the simulation, except for the first stint, for which the tyre compound, which has been chosen in the "Initial Conditions" (see below), is used. Please be aware, that only those tyre compounds can be handled by the simulation engine, for which corresponding is available. If there is no data available for a given compound, either by the "Initial Conditions" or by the telemetry data, the simulation will fail and no valid scenario will be created. 
   5. If you **don't have entered** any tyre sets in the "Pitstop" group, the simulation will be restricted to the tyre compound chosen in the "Initial Conditions" (see below), if you are not running a tyre compound variation simulation. However, when you run a tyre compound variation simulation using telemetry data, all tyre compounds for which data is available are used.
@@ -415,7 +415,7 @@ When a race session starts, Cato looks for a currently defined strategy and chec
 
 The currently active strategy might be dropped, if you do not adhere to the pitstop plan defined in the strategy. To conform to the strategy, you must execute the pitstops in the laps as defined in the strategy +/- a few laps (10% deviation is allowed). If you think, that the predefined strategy is not of any use any more, because of a crash or changing weather conditions, you can cancel it actively with a voice command or by using ["StrategyCancel" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist).
 
-Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event.
+Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event. If there is a need to alter or adopt the selected strategy later on, for example due to accidents or severe wether changes, this can be done using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling).
 
 ## Technical information
 

@@ -952,7 +952,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl, , pitstopWindowLabel, % ""
 			
 			if InStr(pitstopWindowEdit, "-")
-				GuiControl, , pitstopWindowEdit, 2
+				GuiControl, , pitstopWindowEdit, 1
 		}
 		else {
 			GuiControl Hide, pitstopWindowEdit
@@ -2074,9 +2074,9 @@ class StrategyWorkbench extends ConfigurationItem {
 				pitstopRule := false
 			case 2:
 				if pitstopWindowEdit is Integer
-					pitstopRule := Max(pitstopWindowEdit, 2)
+					pitstopRule := Max(pitstopWindowEdit, 1)
 				else {
-					pitstopRule := 2
+					pitstopRule := 1
 				
 					result := false
 				}
@@ -2284,8 +2284,8 @@ validatePitstopWindow() {
 	GuiControlGet pitstopWindowEdit
 	
 	if (pitstopRequirementsDropDown == 2) {
-		if (pitstopWindowEdit < 2)
-			GuiControl, , pitstopWindowEdit, 2
+		if (pitstopWindowEdit < 1)
+			GuiControl, , pitstopWindowEdit, 1
 		else
 			GuiControl, , pitstopWindowEdit, % Round(pitstopWindowEdit)
 	}

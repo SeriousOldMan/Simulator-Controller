@@ -1002,9 +1002,6 @@ class Strategy extends ConfigurationItem {
 				
 				freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
 				
-				; if (!tyreCompound && !tyreCompoundColor && (remainingTyreLaps < 10))
-				;	Msgbox Oops
-				
 				if (tyreChangeRule = "Disallowed") {
 					this.iTyreChange := false
 					this.iRemainingTyreLaps := remainingTyreLaps

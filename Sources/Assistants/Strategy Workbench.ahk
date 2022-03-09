@@ -548,7 +548,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		w12 := (x11 + 50 - x7)
 		
-		Gui %window%:Add, ListView, x%x7% yp w%w12% h65 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtyreSetListView gchooseTyreSet, % values2String("|", map(["Compound", "#"], "translate")*)
+		Gui %window%:Add, ListView, x%x7% yp w%w12% h65 -Multi -Hdr -LV0x10 AltSubmit NoSort NoSortHdr HWNDtyreSetListView gchooseTyreSet, % values2String("|", map(["Compound", "#"], "translate")*)
 	
 		this.iTyreSetListView := tyreSetListView
 		
@@ -1450,8 +1450,6 @@ class StrategyWorkbench extends ConfigurationItem {
 							LV_Add("", translateQualifiedCompound(descriptor[1], descriptor[2]), descriptor[3])
 						
 						LV_ModifyCol()
-						LV_ModifyCol(1, "AutoHdr")
-						LV_ModifyCol(2, "AutoHdr")
 					
 						if (strategy.SessionType = "Duration") {
 							GuiControl, , sessionTypeDropDown, 1
@@ -2511,6 +2509,8 @@ updateTyreSet() {
 		GuiControlGet tyreSetCountEdit
 		
 		LV_Modify(row, "", map(kQualifiedTyreCompounds, "translate")[tyreSetDropDown], tyreSetCountEdit)
+						
+		LV_ModifyCol()
 	}
 }
 
@@ -2529,14 +2529,13 @@ addTyreSet() {
 		index := 1
 	
 	LV_Add("", map(kQualifiedTyreCompounds, "translate")[index], 99)
+	
 	LV_Modify(LV_GetCount(), "Select Vis")
+	
+	LV_ModifyCol()
 	
 	GuiControl Choose, tyreSetDropDown, %index%
 	GuiControl, , tyreSetCountEdit, 99
-	
-	LV_ModifyCol()
-	LV_ModifyCol(1, "AutoHdr")
-	LV_ModifyCol(2, "AutoHdr")
 	
 	workbench.updateState()
 }

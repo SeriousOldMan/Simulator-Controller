@@ -382,11 +382,8 @@ class StrategySimulation {
 				
 				strategy.adjustLastPitstopRefuelAmount()
 				
-				if verbose {
-					Sleep 20
-					
+				if verbose
 					progress += 1
-				}
 			}
 		
 		if verbose
@@ -539,7 +536,7 @@ class StrategySimulation {
 			
 			showProgress({progress: 100, message: message})
 			
-			Sleep 1000
+			Sleep 200
 			
 			hideProgress()
 		
@@ -681,8 +678,6 @@ class VariationSimulation extends StrategySimulation {
 								
 								scenarios[name . translate(":") . variation] := strategy
 									
-								Sleep 20
-									
 								progress += 1
 							}
 						}
@@ -722,8 +717,6 @@ class VariationSimulation extends StrategySimulation {
 													, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 									
 									scenarios[name . translate(":") . variation] := strategy
-									
-									Sleep 20
 									
 									progress += 1
 								}

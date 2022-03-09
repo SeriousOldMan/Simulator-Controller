@@ -6643,8 +6643,6 @@ class TrafficSimulation extends StrategySimulation {
 									
 									scenarios[name . translate(":") . variation] := strategy
 										
-									Sleep 20
-										
 									progress += 1
 								}
 							}
@@ -6684,8 +6682,6 @@ class TrafficSimulation extends StrategySimulation {
 														, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 										
 										scenarios[name . translate(":") . variation] := strategy
-										
-										Sleep 20
 										
 										progress += 1
 									}

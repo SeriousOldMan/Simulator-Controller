@@ -1002,6 +1002,9 @@ class Strategy extends ConfigurationItem {
 				
 				freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
 				
+				; if (!tyreCompound && !tyreCompoundColor && (remainingTyreLaps < 10))
+				;	Msgbox Oops
+				
 				if (tyreChangeRule = "Disallowed") {
 					this.iTyreChange := false
 					this.iRemainingTyreLaps := remainingTyreLaps
@@ -1988,13 +1991,24 @@ class Strategy extends ConfigurationItem {
 					break
 			}
 			
-			pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
+			if (adjustments && adjustments.HasKey(A_Index) && adjustments[A_Index].HasKey("Lap"))
+				pitstopLap := adjustments[A_Index]["Lap"]
+			else
+				pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
-			tyreCompound := this.StrategyManager.TyreCompound
-			tyreCompoundColor := this.chooseTyreCompoundColor(currentPitstops, A_Index, tyreCompound)
-			
-			if !tyreCompoundColor
-				tyreCompound := false
+			if (adjustments && adjustments.HasKey(A_Index) && adjustments[A_Index].HasKey("TyreChange")) {
+				tyreChange := adjustments[A_Index]["TyreChange"]
+				
+				tyreCompound := tyreChange[1]
+				tyreCompoundColor := tyreChange[2]
+			}
+			else {
+				tyreCompound := this.StrategyManager.TyreCompound
+				tyreCompoundColor := this.chooseTyreCompoundColor(currentPitstops, A_Index, tyreCompound)
+				
+				if !tyreCompoundColor
+					tyreCompound := false
+			}
 			
 			pitstop := this.createPitstop(A_Index, pitstopLap, tyreCompound, tyreCompoundColor, false, adjustments)
 			
@@ -2056,6 +2070,14 @@ class Strategy extends ConfigurationItem {
 			stintLaps := Ceil(remainingLaps / 2)
 			
 			adjustments := {}
+			
+			for index, pitstop in pitstops {
+				adjustments[index] := {Lap: pitstop.Lap}
+			
+				if pitstop.TyreChange
+					adjustments[index]["TyreChange"] := Array(pitstop.TyreCompound, pitstop.TyreCompoundColor)
+			}
+			
 			adjustments[numPitstops - 1] := {RefuelAmount: refuelAmount, RemainingLaps: remainingLaps, StintLaps: stintLaps}
 			adjustments[numPitstops] := {StintLaps: stintLaps}
 			

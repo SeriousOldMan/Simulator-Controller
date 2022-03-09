@@ -952,7 +952,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl, , pitstopWindowLabel, % ""
 			
 			if InStr(pitstopWindowEdit, "-")
-				GuiControl, , pitstopWindowEdit, 1
+				GuiControl, , pitstopWindowEdit, 2
 		}
 		else {
 			GuiControl Hide, pitstopWindowEdit
@@ -966,13 +966,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		oldFChoice := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
 		
 		if (pitstopRequirementsDropDown = 1) {
-			/*
-			GuiControl Hide, tyreChangeRequirementsLabel
-			GuiControl Hide, tyreChangeRequirementsDropDown
-			GuiControl Hide, refuelRequirementsLabel
-			GuiControl Hide, refuelRequirementsDropDown
-			*/
-			
 			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
 			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
 			
@@ -983,13 +976,6 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl Choose, refuelRequirementsDropDown, % oldFChoice ? oldFChoice : 1
 		}
 		else {
-			/*
-			GuiControl Show, tyreChangeRequirementsLabel
-			GuiControl Show, tyreChangeRequirementsDropDown
-			GuiControl Show, refuelRequirementsLabel
-			GuiControl Show, refuelRequirementsDropDown
-			*/
-			
 			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
 			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
 			
@@ -1461,7 +1447,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						LV_Delete()
 						
 						for ignore, descriptor in strategy.TyreSets
-							LV_Add("", qualifiedCompound(descriptor[1], descriptor[2]), descriptor[3])
+							LV_Add("", translateQualifiedCompound(descriptor[1], descriptor[2]), descriptor[3])
 						
 						LV_ModifyCol()
 						LV_ModifyCol(1, "AutoHdr")
@@ -2090,22 +2076,26 @@ class StrategyWorkbench extends ConfigurationItem {
 				pitstopRule := false
 			case 2:
 				if pitstopWindowEdit is Integer
-					pitstopRule := pitstopWindowEdit
+					pitstopRule := Max(pitstopWindowEdit, 2)
 				else {
-					pitstopRule := true
+					pitstopRule := 2
 				
 					result := false
 				}
+				
+				GuiControl, , pitstopWindowEdit, %pitstopRule%
 			case 3:
 				window := string2Values("-", pitstopWindowEdit)
 				
 				if (window.Length() = 2)
-					pitstopRule := window
+					pitstopRule := [Round(window[1]), Round(window[2])]
 				else {
-					pitstopRule := true
+					pitstopRule := [25, 35]
 				
 					result := false
 				}
+				
+				GuiControl, , pitstopWindowEdit, % values2String("-", pitstopRule*)
 		}
 		
 		if (pitstopRequirementsDropDown > 1) {
@@ -2288,6 +2278,23 @@ readSimulatorData(simulator) {
 			
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+validatePitstopWindow() {
+	GuiControlGet pitstopRequirementsDropDown
+	GuiControlGet pitstopWindowEdit
+	
+	if (pitstopRequirementsDropDown == 2) {
+		if (pitstopWindowEdit < 2)
+			GuiControl, , pitstopWindowEdit, 2
+		else
+			GuiControl, , pitstopWindowEdit, % Round(pitstopWindowEdit)
+	}
+	else if ((pitstopRequirementsDropDown == 3) && InStr(pitstopWindowEdit, "-")) {
+		pitstopWindowEdit := string2Values("-", pitstopWindowEdit)
+	
+		GuiControl, , pitstopWindowEdit, % Round(pitstopWindowEdit[1]) . " - " . Round(pitstopWindowEdit[2])
 	}
 }
 

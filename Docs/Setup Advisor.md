@@ -31,14 +31,16 @@ Most of the recommended setup values will be self-explanatory. The table below w
 | Brake Balance           | More pressure to the front brakes | More pressure to the rear brakes  |
 | Brake Ducts             | More open duct                    | Less open duct                    |
 | Splitter / Wing         | More drag / downforce             | Less drag / downforce             |
-| Ride Height             | Higher Ride Height                | Lower Ride Height                 |
+| Ride Height             | Higher ride height                | Lower ride height                 |
 | Damper                  | More damping / resistance         | Less damping / resistance         |
 | Spring / Bumpstop Rate  | Stiffer                           | Softer                            |
 | Bumpstop Range          | Longer                            | Shorter                           |
 | Differential Preload    | More opening resistance           | Less opening resistance           |
 | Anti Roll Bar           | Stiffer                           | Softer                            |
-| Toe                     | More Toe Out                      | Less Toe Out                      |
+| Toe (1)                 | More toe out / Less toe in        | Less toe out | More toe in        |
 | Camber                  | More negative camber              | Less negative camber              |
+
+(1) Most race cars run a little bit of toe in at the rear. The recommendations are based on that assumption. If that is not the case with your car, please reverse the recommendations.
 
 Please be aware, that a long list of change recommendations does not mean that you have to change each and every setting. It rather means, that all these settings have an influence on the given issue. I recommend starting with the setting with the biggest impact and then work through the list step by step while monitoring the resulting change in car handling by driving a few laps after each change.
 

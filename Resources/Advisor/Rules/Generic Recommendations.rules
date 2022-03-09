@@ -38,48 +38,48 @@
 		(Prove: changeSetting(Geometry.Toe.Front.Right, -1, ?Tyre.Temperatures.Hot.Front.Around.Correction))
 		
 {All: [?Tyre.Temperatures.Hot.Rear.Around.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Around.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Hot.Rear.Around.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Hot.Rear.Around.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Hot.Rear.Around.Correction))
 
 {All: [?Tyre.Temperatures.Cold.Front.Around.Correction != 0], [?Tyre.Temperatures.Cold.Front.Around.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Toe.Front.Left, 1, ?Tyre.Temperatures.Cold.Front.Around.Correction)),
 		(Prove: changeSetting(Geometry.Toe.Front.Right, 1, ?Tyre.Temperatures.Cold.Front.Around.Correction))
 		
 {All: [?Tyre.Temperatures.Cold.Rear.Around.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Around.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Cold.Rear.Around.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Cold.Rear.Around.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Cold.Rear.Around.Correction))
 
 {All: [?Tyre.Temperatures.Hot.Front.Inner.Correction != 0], [?Tyre.Temperatures.Hot.Front.Inner.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Toe.Front.Left, -1, ?Tyre.Temperatures.Hot.Front.Inner.Correction)),
 		(Prove: changeSetting(Geometry.Toe.Front.Right, -1, ?Tyre.Temperatures.Hot.Front.Inner.Correction))
 
 {All: [?Tyre.Temperatures.Hot.Rear.Inner.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Inner.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Hot.Rear.Inner.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Hot.Rear.Inner.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Hot.Rear.Inner.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Hot.Rear.Inner.Correction))
 		
 {All: [?Tyre.Temperatures.Cold.Front.Inner.Correction != 0], [?Tyre.Temperatures.Cold.Front.Inner.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Toe.Front.Left, 1, ?Tyre.Temperatures.Cold.Front.Inner.Correction)),
 		(Prove: changeSetting(Geometry.Toe.Front.Right, 1, ?Tyre.Temperatures.Cold.Front.Inner.Correction))
 
 {All: [?Tyre.Temperatures.Cold.Rear.Inner.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Inner.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Cold.Rear.Inner.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Cold.Rear.Inner.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Cold.Rear.Inner.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Cold.Rear.Inner.Correction))
 
 {All: [?Tyre.Temperatures.Hot.Front.Outer.Correction != 0], [?Tyre.Temperatures.Hot.Front.Outer.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Toe.Front.Left, -1, ?Tyre.Temperatures.Hot.Front.Outer.Correction)),
 		(Prove: changeSetting(Geometry.Toe.Front.Right, -1, ?Tyre.Temperatures.Hot.Front.Outer.Correction))
 
 {All: [?Tyre.Temperatures.Hot.Rear.Outer.Correction != 0], [?Tyre.Temperatures.Hot.Rear.Outer.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Hot.Rear.Outer.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Hot.Rear.Outer.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Hot.Rear.Outer.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Hot.Rear.Outer.Correction))
 		
 {All: [?Tyre.Temperatures.Cold.Front.Outer.Correction != 0], [?Tyre.Temperatures.Cold.Front.Outer.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Toe.Front.Left, 1, ?Tyre.Temperatures.Cold.Front.Outer.Correction)),
 		(Prove: changeSetting(Geometry.Toe.Front.Right, 1, ?Tyre.Temperatures.Cold.Front.Outer.Correction))
 
 {All: [?Tyre.Temperatures.Cold.Rear.Outer.Correction != 0], [?Tyre.Temperatures.Cold.Rear.Outer.Value > 50]} =>
-		(Prove: changeSetting(Geometry.Toe.Rear.Left, 1, ?Tyre.Temperatures.Cold.Rear.Outer.Correction)),
-		(Prove: changeSetting(Geometry.Toe.Rear.Right, 1, ?Tyre.Temperatures.Cold.Rear.Outer.Correction))
+		(Prove: changeSetting(Geometry.Toe.Rear.Left, -1, ?Tyre.Temperatures.Cold.Rear.Outer.Correction)),
+		(Prove: changeSetting(Geometry.Toe.Rear.Right, -1, ?Tyre.Temperatures.Cold.Rear.Outer.Correction))
 
 [?Tyre.Temperatures.Hot.Front.Inner.Correction != 0] =>
 		(Prove: changeSetting(Geometry.Camber.Front.Left, -0.5, ?Tyre.Temperatures.Hot.Front.Inner.Correction)),
@@ -221,7 +221,7 @@
 {All: [?Understeer.General.Correction != 0], [?Understeer.General.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right], 1, ?Understeer.General.Correction)),
 		(Prove: changeSetting(Geometry.Camber, [Rear.Left, Rear.Right], -1, ?Understeer.General.Correction)),
-		(Prove: changeSetting(Geometry.Toe, [Rear.Left, Rear.Right], -0.5, ?Understeer.General.Correction))
+		(Prove: changeSetting(Geometry.Toe, [Rear.Left, Rear.Right], 0.5, ?Understeer.General.Correction))
 
 [?Oversteer.General.Correction != 0] =>
 		(Prove: changeSetting(AntiRollBar.Rear, -1, ?Oversteer.General.Correction))
@@ -229,7 +229,7 @@
 {All: [?Oversteer.General.Correction != 0], [?Oversteer.General.Value > 50]} =>
 		(Prove: changeSetting(Geometry.Camber, [Front.Left, Front.Right], -1, ?Oversteer.General.Correction)),
 		(Prove: changeSetting(Geometry.Camber, [Rear.Left, Rear.Right], 1, ?Oversteer.General.Correction)),
-		(Prove: changeSetting(Geometry.Toe, [Rear.Left, Rear.Right], 0.5, ?Oversteer.General.Correction))
+		(Prove: changeSetting(Geometry.Toe, [Rear.Left, Rear.Right], -0.5, ?Oversteer.General.Correction))
 
 [?Understeer.Corner.Entry.Slow.Correction != 0] =>
 		(Prove: changeSetting(Brake.Balance, -1, ?Understeer.Corner.Entry.Slow.Correction)),

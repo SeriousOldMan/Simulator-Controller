@@ -11,6 +11,7 @@
   9. Full handling of restricted tyre sets in "Race Center" and special validation rules, when a strategy gets adopted to the current race situation.
   10. Improved data quality for missing laps in "Race Center".
   11. Initial preparation for simulation and car specific rules in "Setup Advisor".
+  12. Fixed some rules in "Setup Advisor".
   
 ## 3.9.4-release 03/04/22
 

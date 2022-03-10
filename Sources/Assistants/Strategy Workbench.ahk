@@ -1416,7 +1416,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						GuiControl, , pitstopDeltaEdit, % strategy.PitstopDelta
 						GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
 						GuiControl, , pitstopFuelServiceEdit, % strategy.PitstopFuelService
-						GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simulataneous") ? 1 : 2
+						GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
 						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
 						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
 						

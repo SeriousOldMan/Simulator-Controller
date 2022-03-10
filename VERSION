@@ -1,8 +1,8 @@
 [Development]
-Version=3.9.6-rc1
+Version=3.9.6-rc2
 Target=3.9.6-release
 Date=03/10/2022
-Download=https://www.dropbox.com/s/s50xo1ccefxoi7e/Simulator%20Controller%203.9.6-rc1.zip?dl=1
+Download=https://www.dropbox.com/s/ltxtgydpjpbgbxj/Simulator%20Controller%203.9.6-rc2.zip?dl=1
 Changes=Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor", Fixed some rules in "Setup Advisor"
 [Release]
 Version=3.9.4-release
@@ -13,4 +13,4 @@ Changes=New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvis
 Type=Development
 [Version]
 Release=3.9.4-release
-Development=3.9.6-rc1
+Development=3.9.6-rc2

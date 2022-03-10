@@ -90,7 +90,7 @@ global simulationMenuDropDown
 global strategyMenuDropDown
 
 global pitstopRequirementsDropDown
-global pitstopWindowEdit = "25-35"
+global pitstopWindowEdit = "25 - 35"
 global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
 global tyreChangeRequirementsLabel
@@ -535,7 +535,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x5% yp+23 w75 h20, % translate("Pitstop")
 		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
-		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit, %pitstopWindowEdit%
+		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit gvalidatePitstopRule, %pitstopWindowEdit%
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w75 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
@@ -943,7 +943,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl, , pitstopWindowLabel, % translate("Minute (From - To)")
 			
 			if !InStr(pitstopWindowEdit, "-")
-				GuiControl, , pitstopWindowEdit, 25-35
+				GuiControl, , pitstopWindowEdit, 25 - 35
 		}
 		else if (pitstopRequirementsDropDown = 2) {
 			GuiControl Show, pitstopWindowEdit
@@ -2061,6 +2061,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		window := this.Window
 						
 		Gui %window%:Default
+
+		validatePitstopRule("Full")
 		
 		GuiControlGet pitstopRequirementsDropDown
 		GuiControlGet pitstopWindowEdit
@@ -2081,7 +2083,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					result := false
 				}
 				
-				GuiControl, , pitstopWindowEdit, %pitstopRule%
+				; GuiControl, , pitstopWindowEdit, %pitstopRule%
 			case 3:
 				window := string2Values("-", pitstopWindowEdit)
 				
@@ -2093,7 +2095,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					result := false
 				}
 				
-				GuiControl, , pitstopWindowEdit, % values2String("-", pitstopRule*)
+				; GuiControl, , pitstopWindowEdit, % values2String("-", pitstopRule*)
 		}
 		
 		if (pitstopRequirementsDropDown > 1) {
@@ -2279,20 +2281,81 @@ readSimulatorData(simulator) {
 	}
 }
 
-validatePitstopWindow() {
-	GuiControlGet pitstopRequirementsDropDown
+validatePitstopRule(full := false) {
 	GuiControlGet pitstopWindowEdit
 	
-	if (pitstopRequirementsDropDown == 2) {
-		if (pitstopWindowEdit < 1)
-			GuiControl, , pitstopWindowEdit, 1
-		else
-			GuiControl, , pitstopWindowEdit, % Round(pitstopWindowEdit)
-	}
-	else if ((pitstopRequirementsDropDown == 3) && InStr(pitstopWindowEdit, "-")) {
-		pitstopWindowEdit := string2Values("-", pitstopWindowEdit)
+	if (StrLen(Trim(pitstopWindowEdit)) > 0) {
+		GuiControlGet pitstopRequirementsDropDown
 	
-		GuiControl, , pitstopWindowEdit, % Round(pitstopWindowEdit[1]) . " - " . Round(pitstopWindowEdit[2])
+		if (pitstopRequirementsDropDown == 2) {
+			if pitstopWindowEdit is Integer
+			{
+				if (pitstopWindowEdit < 1)
+					GuiControl, , pitstopWindowEdit, 1
+			}
+			else
+				GuiControl, , pitstopWindowEdit, 1
+		}
+		else if (pitstopRequirementsDropDown == 3) {
+			reset := false
+			
+			StrReplace(pitstopWindowEdit, "-", "-", count)
+			
+			if (count > 1) {
+				pitstopWindowEdit := StrReplace(pitstopWindowEdit, "-", "", , count - 1)
+				
+				reset := true
+			}
+			
+			if (reset || InStr(pitstopWindowEdit, "-")) {
+				pitstopWindowEdit := string2Values("-", pitstopWindowEdit)
+				pitOpen := pitstopWindowEdit[1]
+				pitClose := pitstopWindowEdit[2]
+				
+				if (StrLen(Trim(pitOpen)) > 0)
+					if pitOpen is Integer
+					{
+						if (pitOpen < 0) {
+							pitOpen := 0
+							
+							reset := true
+						}
+					}
+					else {
+						pitOpen := 0
+				
+						reset := true
+					}
+				else if (full = "Full") {
+					pitOpen := 0
+			
+					reset := true
+				}
+			
+				if (StrLen(Trim(pitClose)) > 0)
+					if pitClose is Integer
+					{
+						if ((full = "Full") && (pitClose <= pitOpen)) {
+							pitClose := pitOpen + 10
+							
+							reset := true
+						}
+					}
+					else {
+						pitClose := (pitOpen + 10)
+				
+						reset := true
+					}
+				else if (full = "Full") {
+					pitClose := (pitOpen + 10)
+			
+					reset := true
+				}
+					
+				if reset
+					GuiControl, , pitstopWindowEdit, % Round(pitOpen) . " - " . Round(pitClose)
+			}
+		}
 	}
 }
 

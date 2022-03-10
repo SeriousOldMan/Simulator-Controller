@@ -109,7 +109,7 @@ class StrategySimulation {
 		compiler.compileRules(rules, productions, reductions)
 		
 		try {
-			FileRead rules, % getFileName(validator . ".rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
+			FileRead rules, % getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\")
 			
 			if (rules != "")
 				compiler.compileRules(rules, productions, reductions)
@@ -1986,11 +1986,17 @@ class Strategy extends ConfigurationItem {
 			else
 				pitstopLap := this.calcNextPitstopLap(A_Index, currentLap, this.RemainingLaps[true], this.RemainingTyreLaps[true], remainingFuel)
 			
-			if (adjustments && adjustments.HasKey(A_Index) && adjustments[A_Index].HasKey("TyreChange")) {
-				tyreChange := adjustments[A_Index]["TyreChange"]
-				
-				tyreCompound := tyreChange[1]
-				tyreCompoundColor := tyreChange[2]
+			if adjustments {
+				if (adjustments.HasKey(A_Index) && adjustments[A_Index].HasKey("TyreChange")) {
+					tyreChange := adjustments[A_Index]["TyreChange"]
+					
+					tyreCompound := tyreChange[1]
+					tyreCompoundColor := tyreChange[2]
+				}
+				else {
+					tyreCompound := false
+					tyreCompoundColor := false
+				}
 			}
 			else {
 				tyreCompound := this.StrategyManager.TyreCompound
@@ -2068,8 +2074,10 @@ class Strategy extends ConfigurationItem {
 					adjustments[index]["TyreChange"] := Array(pitstop.TyreCompound, pitstop.TyreCompoundColor)
 			}
 			
-			adjustments[numPitstops - 1] := {RefuelAmount: refuelAmount, RemainingLaps: remainingLaps, StintLaps: stintLaps}
-			adjustments[numPitstops] := {StintLaps: stintLaps}
+			for key, value in {RefuelAmount: refuelAmount, RemainingLaps: remainingLaps, StintLaps: stintLaps}
+				adjustments[numPitstops - 1][key] := value
+			
+			adjustments[numPitstops]["StintLaps"] := stintLaps
 			
 			this.initializeAvailableTyreSets()
 			

@@ -37,7 +37,7 @@ Most of the recommended setup values will be self-explanatory. The table below w
 | Bumpstop Range          | Longer                            | Shorter                           |
 | Differential Preload    | More opening resistance           | Less opening resistance           |
 | Anti Roll Bar           | Stiffer                           | Softer                            |
-| Toe (1)                 | More toe out / Less toe in        | Less toe out | More toe in        |
+| Toe (1)                 | More toe out / Less toe in        | Less toe out / More toe in        |
 | Camber                  | More negative camber              | Less negative camber              |
 
 (1) Most race cars run a little bit of toe in at the rear. The recommendations are based on that assumption. If that is not the case with your car, please reverse the recommendations.

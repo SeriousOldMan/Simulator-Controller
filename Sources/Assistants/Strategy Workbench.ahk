@@ -999,14 +999,20 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (fileNames.Length() > 0) {
 			settingsMenu.Push(translate("---------------------------------------------"))
 			settingsMenu.Push(translate("Rules:"))
+	
+			validators := []
 			
 			for ignore, fileName in fileNames {
 				SplitPath fileName, , , , validator
 			
-				if (validator = this.SelectedValidator)
-					settingsMenu.Push("(x) " . validator)
-				else
-					settingsMenu.Push("      " . validator)
+				if !inList(validators, validator) {
+					validators.Push(validator)
+					
+					if (validator = this.SelectedValidator)
+						settingsMenu.Push("(x) " . validator)
+					else
+						settingsMenu.Push("      " . validator)
+				}
 			}
 		}
 		
@@ -1629,10 +1635,17 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			default:
 				if (line > 8) {
-					fileName := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")[line - 8]
+					validators := []
 					
-					SplitPath fileName, , , , validator
+					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+						SplitPath fileName, , , , validator
 			
+						if !inList(validators, validator)
+							validators.Push(validator)
+					}
+					
+					validator := validators[line - 8]
+					
 					if (this.iSelectedValidator = validator)
 						this.iSelectedValidator := false
 					else

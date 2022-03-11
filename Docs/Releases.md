@@ -1,4 +1,4 @@
-## 3.9.6-release 03/11/22 (planned)
+## 3.9.6-release 03/11/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

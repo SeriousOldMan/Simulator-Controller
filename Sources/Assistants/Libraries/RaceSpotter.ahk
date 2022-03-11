@@ -414,7 +414,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	startupSpotter() {
-		code := this.SessionDatabase.getSimulatorCode(this.Simulator)
+		code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 		
 		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 		
@@ -435,7 +435,7 @@ class RaceSpotter extends RaceAssistant {
 			Process Close, %spotterPID%
 		}
 		
-		processName := (this.SessionDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+		processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 		
 		Process Exist, %processName%
 			
@@ -446,7 +446,7 @@ class RaceSpotter extends RaceAssistant {
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 		
-		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
+		simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		configuration := this.Configuration
 		settings := this.Settings
 		
@@ -478,7 +478,7 @@ class RaceSpotter extends RaceAssistant {
 		base.prepareSession(settings, data)
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
 		if !this.AnnouncementSettings {
 			configuration := this.Configuration

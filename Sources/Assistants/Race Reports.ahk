@@ -36,7 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\RaceReportViewer.ahk
-#Include Libraries\SetupDatabase.ahk
+#Include Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

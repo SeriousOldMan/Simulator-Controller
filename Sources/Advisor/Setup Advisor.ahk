@@ -37,7 +37,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

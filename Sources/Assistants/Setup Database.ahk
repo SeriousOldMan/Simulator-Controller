@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
@@ -51,6 +52,7 @@ global kClose = "Close"
 
 global vRequestorPID = false
 
+global vSettingsDatabase = false
 global vSetupDatabase = false
 
 global vLocalSettings = {}
@@ -183,10 +185,10 @@ chooseSimulator() {
 				
 		GuiControlGet simulatorDropDown
 		
-		choices := vSetupDatabase.getCars(simulatorDropDown).Clone()
+		choices := vSettingsDatabase.getCars(simulatorDropDown).Clone()
 		
 		for index, car in choices
-			choices[index] := vSetupDatabase.getCarName(simulatorDropDown, car)
+			choices[index] := vSettingsDatabase.getCarName(simulatorDropDown, car)
 		
 		chosen := ((choices.Length() > 0) ? 1 : 0)
 		
@@ -212,7 +214,7 @@ chooseCar() {
 		GuiControlGet simulatorDropDown
 		GuiControlGet carDropDown
 		
-		choices := vSetupDatabase.getTracks(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown])
+		choices := vSettingsDatabase.getTracks(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown])
 		chosen := ((choices.Length() > 0) ? 1 : 0)
 		
 		GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
@@ -238,7 +240,7 @@ chooseTrack() {
 		GuiControlGet carDropDown
 		GuiControlGet trackDropDown
 		
-		conditions := vSetupDatabase.getConditions(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
+		conditions := vSetupDatabase.getConditions(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
 		
 		if (conditions.Length() > 0) {
 			conditions := conditions[1]
@@ -296,7 +298,7 @@ loadSetups(asynchronous := true) {
 		localSetups := false
 		globalSetups := false
 		
-		vSetupDatabase.getSetupNames(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, localSetups, globalSetups)
+		vSetupDatabase.getSetupNames(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, localSetups, globalSetups)
 		
 		newDryQualificationDropDown := concatenate(localSetups[kDryQualificationSetup], globalSetups[kDryQualificationSetup])
 		newDryRaceDropDown := concatenate(localSetups[kDryRaceSetup], globalSetups[kDryRaceSetup])
@@ -447,7 +449,7 @@ loadSettings(settings := false) {
 		if !settings
 			settings := getSettings()
 	
-		vSetupDatabase.getSettingsNames(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, vLocalSettings, vGlobalSettings)
+		vSettingsDatabase.getSettingsNames(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, vLocalSettings, vGlobalSettings)
 		
 		LV_Delete()
 		
@@ -497,7 +499,7 @@ loadNotes() {
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
 	
-	notesEdit := vSetupDatabase.readNotes(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
+	notesEdit := vSetupDatabase.readNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
 	
 	GuiControl Text, notesEdit, %notesEdit%
 	
@@ -530,7 +532,8 @@ loadPressures() {
 		else
 			compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 		
-		pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, kWeatherOptions[weatherDropDown]
+		pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+												   , trackDropDown, kWeatherOptions[weatherDropDown]
 												   , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
 
 		if (pressureInfos.Count() == 0) {
@@ -610,7 +613,8 @@ uploadSetup(setupType) {
 		FileRead setup, %fileName%
 		SplitPath fileName, fileName
 		
-		vSetupDatabase.writeSetup(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, setupType, fileName, setup)
+		vSetupDatabase.writeSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+								, trackDropDown, setupType, fileName, setup)
 	
 		loadSetups()
 	}
@@ -628,7 +632,8 @@ downloadSetup(setupType, setupName) {
 	OnMessage(0x44, "")
 	
 	if (fileName != "") {
-		setupData := vSetupDatabase.readSetup(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, setupType, setupName)
+		setupData := vSetupDatabase.readSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+											, trackDropDown, setupType, setupName)
 		
 		try {
 			FileDelete %fileName%
@@ -655,7 +660,8 @@ deleteSetup(setupType, setupName) {
 		GuiControlGet carDropDown
 		GuiControlGet trackDropDown
 		
-		vSetupDatabase.deleteSetup(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, setupType, setupName)
+		vSetupDatabase.deleteSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+								 , trackDropDown, setupType, setupName)
 		
 		loadSetups()
 	}
@@ -786,7 +792,8 @@ settingsListViewEvent() {
 		
 		LV_GetText(newName, A_EventInfo)
 		
-		vSetupDatabase.renameSettings(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, oldName, newName)
+		vSettingsDatabase.renameSettings(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+									   , trackDropDown, oldName, newName)
 	}
 	else {
 		index := LV_GetNext()
@@ -824,7 +831,8 @@ addSettings() {
 	if settings {
 		settingsName := translate("New")
 		
-		vSetupDatabase.writeSettings(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, settingsName, settings)
+		vSettingsDatabase.writeSettings(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+									  , trackDropDown, settingsName, settings)
 	
 		loadSettings(settingsName)
 		
@@ -839,10 +847,11 @@ editSettings() {
 	
 	settingsName := getSettings()
 	
-	settings := openSettings("Edit", vSetupDatabase.readSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName))
+	settings := openSettings("Edit", vSettingsDatabase.readSettings(simulatorDropDown, carDropDown, trackDropDown, settingsName))
 	
 	if settings
-		vSetupDatabase.writeSettings(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, settingsName, settings)
+		vSettingsDatabase.writeSettings(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+									  , trackDropDown, settingsName, settings)
 }
 
 duplicateSettings() {
@@ -852,14 +861,14 @@ duplicateSettings() {
 	
 	settingsName := getSettings()
 	
-	selectedCar := vSetupDatabase.getCars(simulatorDropDown)[carDropDown]
+	selectedCar := vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 	
-	settings := openSettings("Edit", vSetupDatabase.readSettings(simulatorDropDown, selectedCar, trackDropDown, settingsName))
+	settings := openSettings("Edit", vSettingsDatabase.readSettings(simulatorDropDown, selectedCar, trackDropDown, settingsName))
 	
 	if settings {
 		settingsName := (settingsName . translate(" Copy"))
 		
-		vSetupDatabase.writeSettings(simulatorDropDown, selectedCar, trackDropDown, settingsName, settings)
+		vSettingsDatabase.writeSettings(simulatorDropDown, selectedCar, trackDropDown, settingsName, settings)
 	
 		loadSettings(settingsName)
 		
@@ -881,7 +890,8 @@ deleteSettings() {
 		
 		settingsName := getSettings()
 		
-		vSetupDatabase.deleteSettings(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, settingsName)
+		vSettingsDatabase.deleteSettings(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+									   , trackDropDown, settingsName)
 		
 		loadSettings()
 	}
@@ -892,6 +902,7 @@ updateQueryScope() {
 			
 	GuiControlGet queryScopeDropDown
 	
+	vSettingsDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
 	vSetupDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
 		
 	chooseSimulator()
@@ -905,7 +916,7 @@ writeNotes() {
 	GuiControlGet trackDropDown
 	GuiControlGet notesEdit
 	
-	vSetupDatabase.writeNotes(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, notesEdit)
+	vSetupDatabase.writeNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, notesEdit)
 }
 
 transferPressures() {
@@ -929,7 +940,7 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	for ignore, pressureInfo in vSetupDatabase.getPressures(simulatorDropDown, vSetupDatabase.getCars(simulatorDropDown)[carDropDown]
+	for ignore, pressureInfo in vSetupDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 														  , trackDropDown, kWeatherOptions[weatherDropDown]
 														  , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
@@ -974,7 +985,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		
 		Gui RES:Add, Text, x16 y60 w105 h23 +0x200, % translate("Simulator")
 		
-		choices := vSetupDatabase.getSimulators()
+		choices := vSettingsDatabase.getSimulators()
 		chosen := inList(choices, simulator)
 		if (!chosen && (choices.Length() > 0)) {
 			simulator := choices[1]
@@ -986,7 +997,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, Text, x16 y83 w105 h23 +0x200, % translate("Car / Track")
 		
 		if (simulator && car) {
-			choices := vSetupDatabase.getCars(simulator)
+			choices := vSettingsDatabase.getCars(simulator)
 			chosen := inList(choices, car)
 			if (!chosen && (choices.Length() > 0)) {
 				car := choices[1]
@@ -1001,7 +1012,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		Gui RES:Add, DropDownList, x106 y83 w144 Choose%chosen% AltSubmit gchooseCar vcarDropDown, % values2String("|", choices*)
 		
 		if (simulator && car && track) {
-			choices := vSetupDatabase.getTracks(simulator, car)
+			choices := vSettingsDatabase.getTracks(simulator, car)
 			chosen := inList(choices, track)
 			if (!chosen && (choices.Length() > 0)) {
 				track := choices[1]
@@ -1221,6 +1232,7 @@ showSetupDatabase() {
 		trackTemperature := false
 	}	
 	
+	vSettingsDatabase := new SettingsDatabase()
 	vSetupDatabase := new SetupDatabase()
 	
 	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)

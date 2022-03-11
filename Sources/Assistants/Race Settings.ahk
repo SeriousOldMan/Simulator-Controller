@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
-#Include Libraries\SetupDatabase.ahk
+#Include Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

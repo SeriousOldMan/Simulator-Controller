@@ -38,7 +38,7 @@ ListLines Off					; Disable execution history
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
 #Include Libraries\TelemetryDatabase.ahk
-#Include Libraries\SetupDatabase.ahk
+#Include Libraries\SessionDatabase.ahk
 #Include Libraries\RaceReportViewer.ahk
 #Include Libraries\Strategy.ahk
 #Include Libraries\StrategyViewer.ahk

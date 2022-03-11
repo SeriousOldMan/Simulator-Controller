@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -674,13 +674,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	prepareSettings(data) {
-		setupDB := new SetupDatabase()
+		settingsDB := new SettingsDatabase()
 							
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")
 		track := getConfigurationValue(data, "Session Data", "Track")
 		
-		simulatorName := setupDB.getSimulatorName(simulator)
+		simulatorName := settingsDB.getSimulatorName(simulator)
 		
 		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
 		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
@@ -690,7 +690,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default"))
 		
 		if (loadSettings = "SetupDatabase")
-			settings := setupDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: (Round((duration / 60) / 5) * 300), Compound: compound, CompoundColor: compoundColor})
+			settings := settingsDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: (Round((duration / 60) / 5) * 300)
+																		 , Compound: compound, CompoundColor: compoundColor})
 		else
 			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		

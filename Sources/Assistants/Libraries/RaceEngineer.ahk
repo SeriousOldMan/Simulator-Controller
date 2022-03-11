@@ -679,7 +679,7 @@ class RaceEngineer extends RaceAssistant {
 		
 		configuration := this.Configuration
 		
-		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
+		simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		
 		facts["Session.Settings.Pitstop.Delta"] := getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)

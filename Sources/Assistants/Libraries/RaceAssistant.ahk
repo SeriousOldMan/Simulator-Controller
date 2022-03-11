@@ -18,6 +18,7 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceAssistant.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\SetupDatabase.ahk
 
 
@@ -75,6 +76,8 @@ class RaceAssistant extends ConfigurationItem {
 	iEnoughData := false
 	
 	iSetupDatabase := false
+	
+	iSettingsDatabase := false
 	iSaveSettings := kNever
 	
 	class RaceAssistantRemoteHandler {
@@ -306,18 +309,21 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
+	SettingsDatabase[] {
+		Get {
+			if !this.iSettingsDatabase
+				this.iSettingsDatabase := new SettingsDatabase()
+			
+			return this.iSettingsDatabase
+		}
+	}
+	
 	SetupDatabase[] {
 		Get {
 			if !this.iSetupDatabase
 				this.iSetupDatabase := new SetupDatabase()
 			
 			return this.iSetupDatabase
-		}
-	}
-	
-	SessionDatabase[] {
-		Get {
-			return this.SetupDatabase
 		}
 	}
 	
@@ -540,7 +546,7 @@ class RaceAssistant extends ConfigurationItem {
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
 		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":
@@ -577,7 +583,7 @@ class RaceAssistant extends ConfigurationItem {
 		settings := this.Settings
 		
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SessionDatabase.getSimulatorName(simulator)
+		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
 		switch getConfigurationValue(data, "Session Data", "Session", "Practice") {
 			case "Practice":
@@ -913,9 +919,9 @@ class RaceAssistant extends ConfigurationItem {
 		local compound
 		
 		if knowledgeBase {
-			setupDB := this.SetupDatabase
+			settingsDB := this.SettingsDatabase
 			
-			simulatorName := setupDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			simulatorName := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
@@ -936,14 +942,14 @@ class RaceAssistant extends ConfigurationItem {
 				values["AvgLapTime"] := lapTime
 			
 			if (loadSettings = "SetupDatabase")
-				setupDB.updateSettings(simulatorName, car, track
+				settingsDB.updateSettings(simulatorName, car, track
 									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
 			else {
 				fileName := getFileName("Race.settings", kUserConfigDirectory)
 				
 				settings := readConfiguration(fileName)
 				
-				setupDB.updateSettingsValues(settings, values)
+				settingsDB.updateSettingsValues(settings, values)
 				
 				writeConfiguration(fileName, settings)
 			}

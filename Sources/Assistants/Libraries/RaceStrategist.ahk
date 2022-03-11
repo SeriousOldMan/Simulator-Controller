@@ -568,7 +568,7 @@ class RaceStrategist extends RaceAssistant {
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 		
-		simulatorName := this.SessionDatabase.getSimulatorName(facts["Session.Simulator"])
+		simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
 			strategy := readConfiguration(kUserConfigDirectory . "Race.strategy")

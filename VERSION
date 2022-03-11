@@ -1,16 +1,16 @@
 [Development]
-Version=3.9.6-release
-Target=3.9.6-release
+Version=3.9.8-dev
+Target=3.9.8-release
 Date=03/11/2022
-Download=https://cntr.click/cY5vVT1
-Changes=Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor", Fixed some rules in "Setup Advisor"
+Download=
+Changes=
 [Release]
 Version=3.9.6-release
 Date=03/11/2022
 Download=https://cntr.click/cY5vVT1
 Changes=Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor", Fixed some rules in "Setup Advisor"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=3.9.6-release
-Development=3.9.6-release
+Development=3.9.8-dev

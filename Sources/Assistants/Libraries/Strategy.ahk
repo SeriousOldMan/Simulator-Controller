@@ -360,8 +360,8 @@ class StrategySimulation {
 					showProgress({progress: progress, message: message})
 				}
 				
-				avgLapTime := strategy.AvgLapTime[true]
-
+				avgLapTime := strategy.AvgLapTime["Session"]
+				
 				targetTime := strategy.calcSessionTime(avgLapTime, false)
 				sessionTime := strategy.getSessionDuration()
 				
@@ -1042,7 +1042,7 @@ class Strategy extends ConfigurationItem {
 					this.iRemainingTime := (lastPitstop.RemainingTime - delta)
 				}
 				else {
-					this.iTime := (lastStintLaps * strategy.AvgLapTime[true])
+					this.iTime := (lastStintLaps * strategy.AvgLapTime)
 					this.iRemainingTime := (strategy.RemainingTime - this.iTime)
 				}
 			}
@@ -1399,8 +1399,21 @@ class Strategy extends ConfigurationItem {
 
 	AvgLapTime[lastStint := false] {
 		Get {
-			if (lastStint && this.LastPitstop)
-				return this.LastPitstop.AvgLapTime
+			lastPitstop := this.LastPitstop
+			
+			if (lastStint && lastPitstop)
+				return lastPitstop.AvgLapTime
+			else if (lastStint = "Session") {
+				avgLapTime := 0
+			
+				for ignore, pitstop in this.Pitstops
+					avgLapTime += pitstop.AvgLapTime
+				
+				if (avgLapTime == 0)
+					return this.iAvgLapTime
+				else
+					return (avgLapTime / this.Pitstops.Length())
+			}
 			else
 				return this.iAvgLapTime
 		}
@@ -1733,7 +1746,7 @@ class Strategy extends ConfigurationItem {
 		index := false
 		curTime := 0
 		maxTime := 0
-		avgLapTime := this.AvgLapTime
+		avgLapTime := this.AvgLapTime["Session"]
 		
 		if !this.LastPitstop
 			numLaps := this.getSessionLaps()
@@ -1775,7 +1788,7 @@ class Strategy extends ConfigurationItem {
 	
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps) {
 		return this.StrategyManager.getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption
-												, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime)
+												, tyreCompound, tyreCompoundColor, tyreLaps, this.AvgLapTime["Session"])
 	}
 	
 	getMaxFuelLaps(remainingFuel, fuelConsumption, withSafety := true) {
@@ -1788,7 +1801,7 @@ class Strategy extends ConfigurationItem {
 		hasPostRaceLap := this.PostRaceLap
 		
 		if !avgLapTime
-			avgLapTime := this.AvgLapTime
+			avgLapTime := this.AvgLapTime["Session"]
 		
 		if (this.SessionType = "Duration")
 			return Ceil(((sessionLength * 60) / avgLapTime) + ((formationLap && hasFormationLap) ? 1 : 0) + ((postRaceLap && hasPostRaceLap) ? 1 : 0))
@@ -1802,7 +1815,7 @@ class Strategy extends ConfigurationItem {
 		hasPostRaceLap := this.PostRaceLap
 		
 		if !avgLapTime
-			avgLapTime := this.AvgLapTime
+			avgLapTime := this.AvgLapTime["Session"]
 		
 		if (this.SessionType = "Duration")
 			return ((sessionLength * 60) + (((formationLap && hasFormationLap) ? 1 : 0) * avgLapTime) + (((postRaceLap && hasPostRaceLap) ? 1 : 0) * avgLapTime))
@@ -1837,10 +1850,11 @@ class Strategy extends ConfigurationItem {
 				if (pitstopRule == true)
 					targetLap := remainingLaps - 2
 				else if IsObject(pitstopRule) {
-					closingLap := (pitstopRule[2] * 60 / this.AvgLapTime)
+					avgLapTime := this.AvgLapTime[true]
+					closingLap := (pitstopRule[2] * 60 / avgLapTime)
 				
 					if (currentLap < closingLap)
-						targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / this.AvgLapTime))
+						targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / avgLapTime))
 				}
 			}
 		}
@@ -2082,7 +2096,8 @@ class Strategy extends ConfigurationItem {
 			this.initializeAvailableTyreSets()
 			
 			this.createStints(this.StartLap, this.StartTime, Max(this.MaxTyreLaps - this.RemainingTyreLaps, 0), this.RemainingFuel
-							, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption, this.AvgLapTime, adjustments)
+							, this.StintLaps, this.MaxTyreLaps, this.TyreLapsVariation, this.Map, this.FuelConsumption
+							, this.AvgLapTime, adjustments)
 		}
 	}
 	

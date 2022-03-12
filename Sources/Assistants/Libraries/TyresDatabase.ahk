@@ -52,7 +52,7 @@ class TyresDatabase extends SessionDatabase {
 	
 	iDatabase := false
 	
-	getTyresDatabase(simulator, car, track, type) {
+	getTyresDatabase(simulator, car, track, type := "User") {
 		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
 		
 		return new Database(kDatabaseDirectory . type . "\" . path, kTyresDataSchemas)

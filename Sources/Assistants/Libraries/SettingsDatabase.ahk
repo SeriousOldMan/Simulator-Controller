@@ -33,7 +33,8 @@ global kSettingsDataSchemas := {"Settings": ["ID", "Name", "Owner", "Car", "Trac
 
 class SettingsDatabase extends SessionDatabase {
 	iLastSimulator := false
-	iDatabase := false
+	iUserDatabase := false
+	iCommunityDatabase := false
 	
 	iID := false
 	
@@ -51,19 +52,22 @@ class SettingsDatabase extends SessionDatabase {
 		this.iID := identifier
 	}
 	
-	getSettingsDatabase(simulator) {
+	getSettingsDatabase(simulator, type := "User") {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator
-			this.iDatabase := new Database(kDatabaseDirectory . "\" . this.getSimulatorCode(simulator), kSettingsDataSchemas)
+			
+			this.iUserDatabase := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator), kSettingsDataSchemas)
+			this.iCommunityDatabase := new Database(kDatabaseDirectory . "Community\" . this.getSimulatorCode(simulator), kSettingsDataSchemas)
 		}
 		
-		return this.iDatabase
+		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
 	}
 	
 	querySettings(simulator, car, track, weather, ByRef userSettings, ByRef communitySettings) {
-		local database := this.getSettingsDatabase(simulator)
+		local database
 		
 		if userSettings {
+			database := this.getSettingsDatabase(simulator, "User")
 			userSettings := []
 			
 			if ((car != true) && (track != true) && (weather != true))
@@ -87,6 +91,8 @@ class SettingsDatabase extends SessionDatabase {
 		}
 		
 		if communitySettings {
+			database := this.getSettingsDatabase(simulator, "Community")
+
 			communitySettings := []
 			
 			if ((car != true) && (track != true) && (weather != true))
@@ -129,8 +135,6 @@ class SettingsDatabase extends SessionDatabase {
 	}
 	
 	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
-		local database := this.getSettingsDatabase(simulator)
-		
 		if (community = kUndefined)
 			community := this.UseCommunity
 		
@@ -138,20 +142,20 @@ class SettingsDatabase extends SessionDatabase {
 		
 		id := this.ID
 		
-		readSettings(database, settings, id, community, "*", "*", "*")
-		readSettings(database, settings, id, community, car, "*", "*")
-		readSettings(database, settings, id, community, "*", track, "*")
-		readSettings(database, settings, id, community, "*", "*", weather)
-		readSettings(database, settings, id, community, car, track, "*")
-		readSettings(database, settings, id, community, car, "*", weather)
-		readSettings(database, settings, id, community, "*", track, weather)
-		readSettings(database, settings, id, community, car, track, weather)
+		readSettings(this, simulator, settings, id, community, "*", "*", "*")
+		readSettings(this, simulator, settings, id, community, car, "*", "*")
+		readSettings(this, simulator, settings, id, community, "*", track, "*")
+		readSettings(this, simulator, settings, id, community, "*", "*", weather)
+		readSettings(this, simulator, settings, id, community, car, track, "*")
+		readSettings(this, simulator, settings, id, community, car, "*", weather)
+		readSettings(this, simulator, settings, id, community, "*", track, weather)
+		readSettings(this, simulator, settings, id, community, car, track, weather)
 		
 		return settings
 	}
 	
 	readSettings(simulator, id) {
-		local database := this.getSettingsDatabase(simulator)
+		local database := this.getSettingsDatabase(simulator, "User")
 		
 		settings := newConfiguration()
 		
@@ -162,7 +166,7 @@ class SettingsDatabase extends SessionDatabase {
 	}
 	
 	writeSettings(simulator, id, settings) {
-		local database := this.getSettingsDatabase(simulator)
+		local database := this.getSettingsDatabase(simulator, "User")
 		
 		data := database.query("Settings", {Select: ["Owner", "Name", "Weather"], Where: {ID: id}})
 		
@@ -186,7 +190,7 @@ class SettingsDatabase extends SessionDatabase {
 	}
 	
 	renameSettings(simulator, id, newName) {
-		local database := this.getSettingsDatabase(simulator)
+		local database := this.getSettingsDatabase(simulator, "User")
 		
 		rows := database.query("Settings", {Where: {ID: id}})
 		
@@ -203,7 +207,7 @@ class SettingsDatabase extends SessionDatabase {
 	}
 	
 	removeSettings(simulator, id) {
-		local database := this.getSettingsDatabase(simulator)
+		local database := this.getSettingsDatabase(simulator, "User")
 		
 		database.remove("Settings", Func("constraintSettings").Bind({ID: id}), false, true)
 		
@@ -228,12 +232,14 @@ constraintSettings(constraints, row) {
 	return true
 }
 
-readSettings(database, settings, owner, community, car, track, weather) {
+readSettings(database, simulator, settings, owner, community, car, track, weather) {
 	if community
-		for ignore, row in database.query("Settings", {Where: {Car: car, Track: track, Weather: weather, Owner: owner}})
+		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings", {Where: {Car: car, Track: track
+																										 , Weather: weather, Owner: owner}})
 			if (row.Owner != owner)
 				setConfigurationValue(settings, row.Section, row.Key, row.Value)
 	
-	for ignore, row in database.query("Settings", {Where: {Car: car, Track: track, Weather: weather, Owner: owner}})
+	for ignore, row in database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
+																								, Weather: weather, Owner: owner}})
 		setConfigurationValue(settings, row.Section, row.Key, row.Value)
 }

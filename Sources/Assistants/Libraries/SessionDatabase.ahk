@@ -179,7 +179,12 @@ class SessionDatabase {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
-			FileRead notes, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
+			if (track && (track != true))
+				FileRead notes, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
+			else if (car && (car != true))
+				FileRead notes, %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
+			else
+				FileRead notes, %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
 			
 			return notes
 		}
@@ -191,16 +196,33 @@ class SessionDatabase {
 	writeNotes(simulator, car, track, notes) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
-		
 		try {
-			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
+			if (track && (track != true))
+				FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
+			else if (car && (car != true))
+				FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
+			else
+				FileDelete %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
 		}
 		catch exception {
 			; ignore
 		}
 		
-		FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+		if (track && (track != true)) {
+			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		
+			FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+		}
+		else if (car && (car != true)) {
+			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%
+		
+			FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt, UTF-16
+		}
+		else {
+			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%
+		
+			FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\Notes.txt, UTF-16
+		}
 	}
 	
 	getSetupNames(simulator, car, track, ByRef userSetups, ByRef communitySetups) {

@@ -30,6 +30,7 @@ Release 3.9.8 Checklist
    a. Configuration: "SetupDatabase" => "TyresDatabase"
    b. Adopt Configuration and Simulator Setup
    c. "Race Assistant Shutdown", simulatorName . ".SaveSettings" => "Never"
+   d. Fix Unit Tests
    
 
 Release 3.9.6 Checklist

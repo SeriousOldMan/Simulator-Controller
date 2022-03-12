@@ -47,9 +47,292 @@ global kClose = "Close"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
+;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global simulatorDropDown
+global carDropDown
+global trackDropDown
+global weatherDropDown
+
+global notesEdit
+
+class SessionDatabaseEditor extends ConfigurationItem {
+	iSessionDatabase := new SessionDatabase()
+	
+	iSelectedSimulator := false
+	iSelectedCar := true
+	iSelectedTrack := true
+	iSelectedWeather := "Dry"
+	
+	Window[] {
+		Get {
+			return "SDE"
+		}
+	}
+	
+	SessionDatabase[] {
+		Get {
+			return this.iSessionDatabase
+		}
+	}
+	
+	SelectedSimulator[label := false] {
+		Get {
+			if (label = "*")
+				return ((this.iSelectedSimulator == true) ? "*" : this.iSelectedSimulator)
+			else if label
+				return this.iSelectedSimulator
+			else
+				return this.iSelectedSimulator
+		}
+	}
+	
+	SelectedCar[label := false] {
+		Get {
+			if ((label = "*") && (this.iSelectedCar == true))
+				return "*"
+			else if (label && (this.iSelectedCar == true))
+				return translate("All")
+			else
+				return this.iSelectedCar
+		}
+	}
+	
+	SelectedTrack[label := false] {
+		Get {
+			if ((label = "*") && (this.iSelectedTrack == true))
+				return "*"
+			else if (label && (this.iSelectedTrack == true))
+				return translate("All")
+			else
+				return this.iSelectedTrack
+		}
+	}
+	
+	SelectedWeather[] {
+		Get {
+			return this.iSelectedWeather
+		}
+	}
+	
+	__New(simulator := false, car := false, track := false, weather := false) {
+		if simulator {
+			this.iSelectedSimulator := simulator
+			this.iSelectedCar := car
+			this.iSelectedTrack := track
+			this.iSelectedWeather := weather
+		}
+		
+		base.__New(kSimulatorConfiguration)
+		
+		SessionDatabaseEditor.Instance := this
+	}
+	
+	createGui(configuration) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w724 Center gmoveSessionDatabaseEditor, % translate("Modular Simulator Controller System") 
+		
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, YP+20 w724 cBlue Center gopenSessionDatabaseEditorDocumentation, % translate("Session Database")
+		
+		Gui %window%:Add, Text, x8 yp+30 w730 0x10 Section
+		
+		
+		Gui %window%:Font, Norm
+		Gui %window%:Font, s10 Bold, Arial
+			
+		Gui %window%:Add, Picture, x16 yp+12 w30 h30, %kIconsDirectory%Report Settings.ico
+		Gui %window%:Add, Text, x50 yp+5 w120 h26, % translate("Settings")
+			
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x16 yp+32 w80 h23 +0x200 Section, % translate("Simulator")
+		
+		car := this.SelectedCar
+		track := this.SelectedTrack
+		weather := this.SelectedWeather
+		
+		simulators := this.getSimulators()
+		simulator := 0
+		
+		if (simulators.Length() > 0) {
+			if this.SelectedSimulator
+				simulator := inList(simulators, this.SelectedSimulator)
+
+			if (simulator == 0)
+				simulator := 1
+		}
+	
+		Gui %window%:Add, DropDownList, x100 yp w160 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		
+		if (simulator > 0)
+			simulator := simulators[simulator]
+		else
+			simulator := false
+		
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car")
+		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vcarDropDown gchooseCar, % translate("All")
+		
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
+		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
+		
+		choices := map(kWeatherOptions, "translate")
+		choices.InsertAt(1, translate("All"))
+		chosen := inList(kWeatherOptions, weather)
+		
+		if (!chosen && (choices.Length() > 0)) {
+			weather := choices[1]
+			chosen := 1
+		}
+		
+		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		
+		Gui %window%:Font, Norm, Arial
+		
+		Gui %window%:Add, Text, x300 ys w65 h23 +0x200, % translate("Notes")
+		Gui %window%:Add, Edit, x370 ys w364 h94 -Background gupdateNotes vnotesEdit
+
+		Gui %window%:Add, Text, x8 y706 w730 0x10
+		
+		Gui %window%:Add, Button, x334 y714 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
+		
+		this.loadSimulator(simulator, true)
+		this.loadCar(car, true)
+		this.loadTrack(track, true)
+		this.loadWeather(weather, true)
+	}
+	
+	show() {
+		window := this.Window
+			
+		Gui %window%:Show
+	}
+	
+	
+	getSimulators() {
+		return this.SessionDatabase.getSimulators()
+	}
+	
+	getCars(simulator) {
+		return this.SessionDatabase.getCars(simulator)
+	}
+	
+	getTracks(simulator, car) {
+		return this.SessionDatabase.getTracks(simulator, car)
+	}
+	
+	loadSimulator(simulator, force := false) {
+		if (force || (simulator != this.SelectedSimulator)) {
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			this.iSelectedSimulator := simulator
+			
+			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
+			
+			choices := this.getCars(simulator)
+			
+			for index, car in choices
+				choices[index] := this.SessionDatabase.getCarName(simulator, car)
+			
+			choices.InsertAt(1, translate("All"))
+			
+			GuiControl, , carDropDown, % "|" . values2String("|", choices*)
+			
+			this.loadCar(true, true)
+		}
+	}
+	
+	loadCar(car, force := false) {
+		if (force || (car != this.SelectedCar)) {
+			this.iSelectedCar := car
+			
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			if (car == true)
+				GuiControl Choose, carDropDown, 1
+			else
+				GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car) + 1
+			
+			if (car && (car != true)) {
+				choices := this.getTracks(this.SelectedSimulator, car)
+				choices.InsertAt(1, translate("All"))
+			}
+			else
+				choices := [translate("All")]
+			
+			GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
+			
+			this.loadTrack(true, true)
+		}
+	}
+	
+	loadTrack(track, force := false) {
+		if (force || (track != this.SelectedTrack)) {
+			this.iSelectedTrack := track
+			
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			if (track == true)
+				GuiControl Choose, trackDropDown, 1
+			else
+				GuiControl Choose, trackDropDown, % inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1
+		}
+		
+		this.updateModules()
+	}
+	
+	loadWeather(weather, force := false) {
+		if (force || (weather != this.SelectedWeather)) {
+			this.iSelectedWeather := weather
+			
+			window := this.Window
+		
+			Gui %window%:Default
+			
+			if (weather == true)
+				GuiControl Choose, weatherDropDown, 1
+			else
+				GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather) + 1
+		}
+	}
+	
+	updateModules() {
+		window := this.Window
+		
+		Gui %window%:Default
+			
+		GuiControl, , notesEdit, % this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+	}
+	
+	updateNotes(notes) {
+		this.SessionDatabase.writeNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, notes)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Variable Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+/*
 global vRequestorPID = false
 
 global vSettingsDatabase = false
@@ -118,65 +401,14 @@ global rrPressure2
 global rrPressure3
 global rrPressure4
 global rrPressure5
+*/
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
-}
-
-moveSetupsEditor() {
-	moveByMouse("RES")
-}
-
-closeSetups() {
-	showSetups(kClose)
-}
-
-openSetupsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database
-}
-
+/*
 chooseSimulator() {
 	protectionOn()
 
@@ -1179,8 +1411,130 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 		}
 	}
 }
+*/
 
-showTyresDatabase() {
+
+
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin	
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
+
+moveSessionDatabaseEditor() {
+	moveByMouse("SDE")
+}
+
+closeSessionDatabaseEditor() {
+	ExitApp 0
+}
+
+openSessionDatabaseEditorDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#session-database
+}
+
+chooseSimulator() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet simulatorDropDown
+	
+	editor.loadSimulator(simulatorDropDown)
+}
+
+chooseCar() {
+	editor := SessionDatabaseEditor.Instance
+	simulator := editor.SelectedSimulator
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet carDropDown
+	
+	if (carDropDown = translate("All"))
+		editor.loadCar(true)
+	else
+		for index, car in editor.getCars(simulator)
+			if (carDropDown = editor.SessionDatabase.getCarName(simulator, car)) {
+				editor.loadCar(car)
+				
+				break
+			}
+}
+
+chooseTrack() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet trackDropDown
+	
+	editor.loadTrack((trackDropDown = translate("All")) ? true : trackDropDown)
+}
+
+chooseWeather() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet weatherDropDown
+	
+	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherOptions[weatherDropDown - 1])
+}
+
+
+
+updateNotes() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet notesEdit
+	
+	editor.updateNotes(notesEdit)
+}
+
+showSessionDatabaseEditor() {
 	icon := kIconsDirectory . "Wrench.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -1230,14 +1584,13 @@ showTyresDatabase() {
 	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
 		airTemperature := false
 		trackTemperature := false
-	}	
+	}
 	
-	vSettingsDatabase := new SettingsDatabase()
-	vTyresDatabase := new TyresDatabase()
+	editor := new SessionDatabaseEditor(simulator, car, track, weather)
+		
+	editor.createGui(editor.Configuration)
 	
-	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
-	
-	ExitApp 0
+	editor.show()
 }
 
 
@@ -1245,4 +1598,4 @@ showTyresDatabase() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showTyresDatabase()
+showSessionDatabaseEditor()

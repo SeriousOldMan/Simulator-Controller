@@ -36,7 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,7 +53,7 @@ global kClose = "Close"
 global vRequestorPID = false
 
 global vSettingsDatabase = false
-global vSetupDatabase = false
+global vTyresDatabase = false
 
 global vLocalSettings = {}
 global vGlobalSettings = {}
@@ -240,7 +240,7 @@ chooseTrack() {
 		GuiControlGet carDropDown
 		GuiControlGet trackDropDown
 		
-		conditions := vSetupDatabase.getConditions(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
+		conditions := vTyresDatabase.getConditions(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
 		
 		if (conditions.Length() > 0) {
 			conditions := conditions[1]
@@ -298,7 +298,7 @@ loadSetups(asynchronous := true) {
 		localSetups := false
 		globalSetups := false
 		
-		vSetupDatabase.getSetupNames(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, localSetups, globalSetups)
+		vTyresDatabase.getSetupNames(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, localSetups, globalSetups)
 		
 		newDryQualificationDropDown := concatenate(localSetups[kDryQualificationSetup], globalSetups[kDryQualificationSetup])
 		newDryRaceDropDown := concatenate(localSetups[kDryRaceSetup], globalSetups[kDryRaceSetup])
@@ -499,7 +499,7 @@ loadNotes() {
 	GuiControlGet carDropDown
 	GuiControlGet trackDropDown
 	
-	notesEdit := vSetupDatabase.readNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
+	notesEdit := vTyresDatabase.readNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown)
 	
 	GuiControl Text, notesEdit, %notesEdit%
 	
@@ -532,7 +532,7 @@ loadPressures() {
 		else
 			compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 		
-		pressureInfos := vSetupDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+		pressureInfos := vTyresDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 												   , trackDropDown, kWeatherOptions[weatherDropDown]
 												   , airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
 
@@ -613,7 +613,7 @@ uploadSetup(setupType) {
 		FileRead setup, %fileName%
 		SplitPath fileName, fileName
 		
-		vSetupDatabase.writeSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+		vTyresDatabase.writeSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 								, trackDropDown, setupType, fileName, setup)
 	
 		loadSetups()
@@ -632,7 +632,7 @@ downloadSetup(setupType, setupName) {
 	OnMessage(0x44, "")
 	
 	if (fileName != "") {
-		setupData := vSetupDatabase.readSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+		setupData := vTyresDatabase.readSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 											, trackDropDown, setupType, setupName)
 		
 		try {
@@ -660,7 +660,7 @@ deleteSetup(setupType, setupName) {
 		GuiControlGet carDropDown
 		GuiControlGet trackDropDown
 		
-		vSetupDatabase.deleteSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+		vTyresDatabase.deleteSetup(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 								 , trackDropDown, setupType, setupName)
 		
 		loadSetups()
@@ -902,9 +902,9 @@ updateQueryScope() {
 			
 	GuiControlGet queryScopeDropDown
 	
-	vSettingsDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
-	vSetupDatabase.setUseGlobalDatabase(queryScopeDropDown - 1)
-		
+	vSettingsDatabase.UseCommunity := (queryScopeDropDown == 2)
+	vTyresDatabase.UseCommunity := (queryScopeDropDown == 2)
+	
 	chooseSimulator()
 }
 
@@ -916,7 +916,7 @@ writeNotes() {
 	GuiControlGet trackDropDown
 	GuiControlGet notesEdit
 	
-	vSetupDatabase.writeNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, notesEdit)
+	vTyresDatabase.writeNotes(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown], trackDropDown, notesEdit)
 }
 
 transferPressures() {
@@ -940,7 +940,7 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	for ignore, pressureInfo in vSetupDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
+	for ignore, pressureInfo in vTyresDatabase.getPressures(simulatorDropDown, vSettingsDatabase.getCars(simulatorDropDown)[carDropDown]
 														  , trackDropDown, kWeatherOptions[weatherDropDown]
 														  , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
@@ -1180,7 +1180,7 @@ showSetups(command := false, simulator := false, car := false, track := false, w
 	}
 }
 
-showSetupDatabase() {
+showTyresDatabase() {
 	icon := kIconsDirectory . "Wrench.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
@@ -1233,7 +1233,7 @@ showSetupDatabase() {
 	}	
 	
 	vSettingsDatabase := new SettingsDatabase()
-	vSetupDatabase := new SetupDatabase()
+	vTyresDatabase := new TyresDatabase()
 	
 	showSetups(false, simulator, car, track, weather, airTemperature, trackTemperature, compound)
 	
@@ -1245,4 +1245,4 @@ showSetupDatabase() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showSetupDatabase()
+showTyresDatabase()

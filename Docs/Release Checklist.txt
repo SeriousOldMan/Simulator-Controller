@@ -21,6 +21,13 @@ Release 3.9.8 Checklist
 =======================
 
 0. Search for new links (*)
+1. Update Procedure
+   a. Full update of the Database directory
+   b. Update Configuration: "SetupDatabase" => "TyresDatabase"
+2. Rework of the Setup Database
+   a. Configuration: "SetupDatabase" => "TyresDatabase"
+   b. Adopt Configuration and Simulator Setup
+   
 
 Release 3.9.6 Checklist
 =======================

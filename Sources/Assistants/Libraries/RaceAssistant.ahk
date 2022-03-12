@@ -19,7 +19,7 @@
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceAssistant.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -75,7 +75,7 @@ class RaceAssistant extends ConfigurationItem {
 	
 	iEnoughData := false
 	
-	iSetupDatabase := false
+	iTyresDatabase := false
 	
 	iSettingsDatabase := false
 	iSaveSettings := kNever
@@ -318,12 +318,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 	
-	SetupDatabase[] {
+	TyresDatabase[] {
 		Get {
-			if !this.iSetupDatabase
-				this.iSetupDatabase := new SetupDatabase()
+			if !this.iTyresDatabase
+				this.iTyresDatabase := new TyresDatabase()
 			
-			return this.iSetupDatabase
+			return this.iTyresDatabase
 		}
 	}
 	

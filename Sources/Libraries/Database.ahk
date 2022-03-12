@@ -161,7 +161,7 @@ class Database {
 			this.iTableChanged[name] := true
 	}
 	
-	remove(name, where, predicate, flush := false) {
+	remove(name, where, predicate := false, flush := false) {
 		rows := []
 		
 		if (where && !where.MinParams)
@@ -169,7 +169,7 @@ class Database {
 		
 		for ignore, row in this.Tables[name]
 			if (!where || %where%(row)) {
-				if !%predicate%(row)
+				if (!predicate || !%predicate%(row))
 					rows.Push(row)
 			}
 			else

@@ -488,7 +488,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				
-				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 			
 				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 			
@@ -555,7 +555,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 				
-				simulatorCode := new SetupDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 			
 				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 			

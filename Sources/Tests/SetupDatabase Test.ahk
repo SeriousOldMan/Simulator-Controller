@@ -25,7 +25,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 
@@ -47,7 +47,7 @@ class DatabaseTest extends Assert {
 	
 	updatePressures(database, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures) {
 		if !database
-			database := new SetupDatabase()
+			database := new TyresDatabase()
 		
 		for ignore, pressures in coldPressures
 			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
@@ -188,65 +188,65 @@ class InitializeDatabase extends DatabaseTest {
 
 class SimplePressures extends PressuresAssert {
 	SimpleReadPressure_Test() {
-		pressures := new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
+		pressures := new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
 		
 		this.AssertExactResult(pressures, 26.1, 26.2, 26.3, 26.4)
 	}
 		
 	ExtendedReadPressure_Test() {
-		this.AssertExactResult(new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
+		this.AssertExactResult(new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
 	}
 }
 
 class ExtrapolatedPressures extends PressuresAssert {
 	ReadPressure_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, 0)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, -1)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4, 0, 0)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, 0)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, -1)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4, 0, 0)
 	}
 		
 	ReadSetup_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
 		compound := false
 		compoundColor := false
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.1, 26.2, 26.3, 26.4], pressures, 1.0, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.5, 26.4, 26.4], pressures, 1.0, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 25, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 25, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.8, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 24, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 24, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.6, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 23, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 23, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.4, 26.5, 26.6], pressures, 0.4, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 26, 27, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 26, 27, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.4, 26.3, 26.3], pressures, 0.6, certainty)
 	}
 }
 
 class DifferentCompoundPressures extends PressuresAssert {	
 	CompoundSetup_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
 		compound := false
 		compoundColor := false
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 16, 17, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 16, 17, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Red", compoundColor, [26.6, 26.5, 26.8, 26.6], pressures, 0.6, certainty)
 		
 		compound := false
@@ -254,7 +254,7 @@ class DifferentCompoundPressures extends PressuresAssert {
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "LightRain", 17, 17, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "LightRain", 17, 17, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Wet", compound, "Black", compoundColor, [26.5, 26.4, 26.7, 26.5], pressures, 0.8, certainty)
 	}
 }

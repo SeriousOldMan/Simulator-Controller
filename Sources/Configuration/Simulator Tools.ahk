@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1450,7 +1450,7 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	setupDB := new SetupDatabase()
+	setupDB := new TyresDatabase()
 	
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
@@ -1498,7 +1498,7 @@ updateConfigurationForV378() {
 }
 
 updateConfigurationForV372() {
-	setupDB := new SetupDatabase()
+	setupDB := new TyresDatabase()
 	
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{

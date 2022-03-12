@@ -86,7 +86,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
-		choices := map(["Use values from previous Session", "Load from Setup Database"], "translate")
+		choices := map(["Load from previous Session", "Load from Database"], "translate")
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit vreLoadSettingsDropDown HWNDwidget5 Hidden, % values2String("|", choices*)
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
@@ -101,7 +101,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
-		choices := map(["Use Values from Settings", "Load from Setup Database", "Import from Simulator"], "translate")
+		choices := map(["Load from Settings", "Load from Database", "Import from Simulator"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 		

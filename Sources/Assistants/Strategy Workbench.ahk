@@ -992,7 +992,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		settingsMenu := map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")
+		settingsMenu := map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")
 		
 		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
 		

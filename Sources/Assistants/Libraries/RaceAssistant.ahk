@@ -915,6 +915,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	saveSessionSettings() {
+		/*
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
@@ -941,7 +942,7 @@ class RaceAssistant extends ConfigurationItem {
 			if (lapTime > 10)
 				values["AvgLapTime"] := lapTime
 			
-			if (loadSettings = "SetupDatabase")
+			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase"))
 				settingsDB.updateSettings(simulatorName, car, track
 									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
 			else {
@@ -954,6 +955,7 @@ class RaceAssistant extends ConfigurationItem {
 				writeConfiguration(fileName, settings)
 			}
 		}
+		*/
 	}
 	
 	dumpKnowledge(knowledgeBase) {

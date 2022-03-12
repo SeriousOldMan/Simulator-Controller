@@ -24,9 +24,11 @@ Release 3.9.8 Checklist
 1. Update Procedure
    a. Full update of the Database directory
    b. Update Configuration: "SetupDatabase" => "TyresDatabase"
+   c. Update Configuration: "Race Assistant Shutdown", simulatorName . ".SaveSettings" => "Never"
 2. Rework of the Setup Database
    a. Configuration: "SetupDatabase" => "TyresDatabase"
    b. Adopt Configuration and Simulator Setup
+   c. "Race Assistant Shutdown", simulatorName . ".SaveSettings" => "Never"
    
 
 Release 3.9.6 Checklist

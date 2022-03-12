@@ -667,10 +667,16 @@ class RaceStrategist extends RaceAssistant {
 		
 		raceEngineer := (ErrorLevel > 0)
 		
+		/*
 		if raceEngineer
 			saveSettings := kNever
-		else
-			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
+		else {
+			deprecated := getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
+			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
+		}
+		*/
+		
+		saveSettings := kNever
 		
 		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 		

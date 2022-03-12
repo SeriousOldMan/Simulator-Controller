@@ -409,14 +409,14 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		__New(rCenter) {
-			this.iDatabase := new Database(rCenter.SessionDirectory, kSetupDataSchemas)
+			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresDataSchemas)
 		}
 		
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
 			if (!compoundColor || (compoundColor = ""))
 				compoundColor := "Black"
 			
-			this.Database.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+			this.Database.add("Tyres.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 												, Compound: compound, "Compound.Color": compoundColor
 												, "Tyre.Pressure.Cold.Front.Left": null(coldPressures[1])
 												, "Tyre.Pressure.Cold.Front.Right": null(coldPressures[2])
@@ -445,14 +445,14 @@ class RaceCenter extends ConfigurationItem {
 			if (!compoundColor || (compoundColor = ""))
 				compoundColor := "Black"
 			
-			rows := this.Database.query("Setup.Pressures.Distribution"
+			rows := this.Database.query("Tyres.Pressures.Distribution"
 									  , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											   , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 			
 			if (rows.Length() > 0)
 				rows[1].Count := rows[1].Count + count
 			else
-				this.Database.add("Setup.Pressures.Distribution"
+				this.Database.add("Tyres.Pressures.Distribution"
 								, {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 								 , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 		}
@@ -1915,7 +1915,7 @@ class RaceCenter extends ConfigurationItem {
 		pressuresDB := this.PressuresDatabase
 		
 		if pressuresDB {
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		
 			last := pressuresTable.Length()
 			
@@ -3509,7 +3509,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 			
-			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Setup.Pressures"] {
+			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Tyres.Pressures"] {
 				if !this.Laps.HasKey(A_Index)
 					continue
 				
@@ -3553,7 +3553,7 @@ class RaceCenter extends ConfigurationItem {
 			else
 				return
 			
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 			lap := pressuresTable.Length()
 			
 			newData := false
@@ -5057,7 +5057,7 @@ class RaceCenter extends ConfigurationItem {
 			lastLap := lastLap.Nr
 		
 		if lastLap {
-			pressuresTable := this.PressuresDatabase.Database.Tables["Setup.Pressures"]
+			pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
 			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 					
 			newLap := (sessionDB.Tables["Lap.Data"].Length() + 1)
@@ -5490,7 +5490,7 @@ class RaceCenter extends ConfigurationItem {
 		pressuresDB := this.PressuresDatabase
 		
 		if pressuresDB {
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		
 			if (pressuresTable.Length() >= lap.Nr) {
 				pressures := pressuresTable[lap.Nr]

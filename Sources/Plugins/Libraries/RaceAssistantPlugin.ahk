@@ -682,20 +682,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		simulatorName := settingsDB.getSimulatorName(simulator)
 		
-		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
-		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-		compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-		compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
-	
-		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", getConfigurationValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default"))
+		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		
-		if (loadSettings = "SetupDatabase")
-			settings := settingsDB.getSettings(simulatorName, car, track, {Weather: weather, Duration: (Round((duration / 60) / 5) * 300)
-																		 , Compound: compound, CompoundColor: compoundColor})
-		else
-			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		loadSettings := getConfigurationValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
+		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", loadSettings)
 		
-		; writeConfiguration(kTempDirectory . this.Plugin . ".settings", settings)
+		if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase"))
+			for section, values in settingsDB.loadSettings(simulatorName, car, track
+														 , getConfigurationValue(data, "Weather Data", "Weather", "Dry"))
+				for key, value in values
+					setConfigurationValue(settings, section, key, value)
+		
+		if isDebug()
+			writeConfiguration(kTempDirectory . this.Plugin . ".settings", settings)
 		
 		return settings
 	}

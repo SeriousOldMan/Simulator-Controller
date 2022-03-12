@@ -685,7 +685,7 @@ shareSetupDatabase() {
 								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
 									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 								
-								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.Distribution.CSV")
+								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
 								
 								if FileExist(distFile)
 									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%

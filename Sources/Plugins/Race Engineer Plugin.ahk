@@ -136,7 +136,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		
 		tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		
-		if (tpSetting = "SetupDatabase") {
+		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
 			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
 			

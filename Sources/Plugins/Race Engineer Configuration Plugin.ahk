@@ -91,7 +91,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit Disabled vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -156,7 +156,8 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default"))
 			simulatorConfiguration["LoadTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Default")
 		
-			simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))
+			; simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))
+			simulatorConfiguration["SaveSettings"] := "Never"
 			simulatorConfiguration["SaveTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
 		
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
@@ -175,11 +176,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		this.saveSimulatorConfiguration()
 		
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			setConfigurationValue(configuration, "Race Assistant Startup", simulator . "." . "LoadSettings", simulatorConfiguration["LoadSettings"])
-			setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . "." . "SaveSettings", simulatorConfiguration["SaveSettings"])
+			setConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", simulatorConfiguration["LoadSettings"])
+			setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", simulatorConfiguration["SaveSettings"])
 		
-			setConfigurationValue(configuration, "Race Engineer Startup", simulator . "." . "LoadTyrePressures", simulatorConfiguration["LoadTyrePressures"])
-			setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . "." . "SaveTyrePressures", simulatorConfiguration["SaveTyrePressures"])
+			setConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", simulatorConfiguration["LoadTyrePressures"])
+			setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", simulatorConfiguration["SaveTyrePressures"])
 			
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
 				setConfigurationValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])
@@ -210,8 +211,17 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		if this.iSimulatorConfigurations.HasKey(reSimulatorDropDown) {
 			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
 			
-			GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SetupDatabase"], configuration["LoadSettings"])
-			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "SetupDatabase", "Import"], configuration["LoadTyrePressures"])
+			value := configuration["LoadSettings"]
+			if (value = "SetupDatabase")
+				value := "SettingsDatabase"
+				
+			GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SettingsDatabase"], configuration["LoadSettings"])
+			
+			value := configuration["LoadTyrePressures"]
+			if (value = "SetupDatabase")
+				value := "TyresDatabase"
+				
+			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "TyresDatabase", "Import"], configuration["LoadTyrePressures"])
 			
 			GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
 			GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
@@ -246,8 +256,8 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 			
-			configuration["LoadSettings"] := ["Default", "SetupDatabase"][reLoadSettingsDropDown]
-			configuration["LoadTyrePressures"] := ["Default", "SetupDatabase", "Import"][reLoadTyrePressuresDropDown]
+			configuration["LoadSettings"] := ["Default", "SettingsDatabase"][reLoadSettingsDropDown]
+			configuration["LoadTyrePressures"] := ["Default", "TyresDatabase", "Import"][reLoadTyrePressuresDropDown]
 			
 			configuration["SaveSettings"] := ["Ask", "Always", "Never"][reSaveSettingsDropDown]
 			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][reSaveTyrePressuresDropDown]

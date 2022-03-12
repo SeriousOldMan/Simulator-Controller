@@ -140,7 +140,11 @@ class SettingsDatabase extends SessionDatabase {
 		
 		readSettings(database, settings, id, community, "*", "*", "*")
 		readSettings(database, settings, id, community, car, "*", "*")
+		readSettings(database, settings, id, community, "*", track, "*")
+		readSettings(database, settings, id, community, "*", "*", weather)
 		readSettings(database, settings, id, community, car, track, "*")
+		readSettings(database, settings, id, community, car, "*", weather)
+		readSettings(database, settings, id, community, "*", track, weather)
 		readSettings(database, settings, id, community, car, track, weather)
 		
 		return settings
@@ -222,10 +226,6 @@ constraintSettings(constraints, row) {
 			return false
 		
 	return true
-}
-
-always(value, ignore*) {
-	return value
 }
 
 readSettings(database, settings, owner, community, car, track, weather) {

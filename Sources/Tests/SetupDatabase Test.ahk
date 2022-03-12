@@ -144,9 +144,9 @@ class InitializeDatabase extends DatabaseTest {
 			msgbox here
 		}
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -157,9 +157,9 @@ class InitializeDatabase extends DatabaseTest {
 		
 		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -167,9 +167,9 @@ class InitializeDatabase extends DatabaseTest {
 	ConditionWritePressure_Test() {
 		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", [[26.5, 26.4, 26.7, 26.5]])
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 		this.AssertEqual(true, InStr(line, "Drizzle") && InStr(line, "Red"), "Database file has not been created...")
@@ -180,7 +180,7 @@ class InitializeDatabase extends DatabaseTest {
 		
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertFalse(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 	}

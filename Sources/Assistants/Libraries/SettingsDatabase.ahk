@@ -52,6 +52,22 @@ class SettingsDatabase extends SessionDatabase {
 		this.iID := identifier
 	}
 	
+	newID() {
+		ticks := A_TickCount
+		
+		Random wait, 0, 100
+		
+		Random, , % Min(4294967295, A_TickCount)
+		Random major, 0, 10000
+		
+		Sleep %wait%
+		
+		Random, , % Min(4294967295, A_TickCount)
+		Random minor, 0, 10000
+		
+		id := values2String(".", A_TickCount, major, minor)
+	}
+	
 	getSettingsDatabase(simulator, type := "User") {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator

@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Finetuning for average lap times in Strategy simulation.
   4. Backend overhaul of the Session / Setup Database.
+  5. All new user interface for "Setup Database".
 
 ## 3.9.6-release 03/11/22
 

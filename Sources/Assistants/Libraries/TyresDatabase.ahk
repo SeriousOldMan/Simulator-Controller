@@ -59,9 +59,13 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor, ByRef distributions) {
-		for ignore, pressureData in database.query("Tyres.Pressures.Distribution"
-												 , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-														  , Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}}) {
+		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+				, Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
+		
+		if (weather != true)
+			where["Weather"] := weather
+		
+		for ignore, pressureData in database.query("Tyres.Pressures.Distribution", {Where: where}) {
 			tyre := pressureData.Tyre
 			pressure := pressureData.Pressure
 			
@@ -120,9 +124,14 @@ class TyresDatabase extends SessionDatabase {
 				
 				conditionIndex := inList(kWeatherOptions, condition[1])
 			
-				if (((Abs(weatherIndex - conditionIndex) <= 1) || ((weatherIndex >= 2) && (conditionIndex >= 2))) && !inList(visited, theCompound)) {  
-					visited.Push(theCompound)
+				valid := (weather == true)
 				
+				if !valid
+					valid := (!inList(visited, theCompound) && ((Abs(weatherIndex - conditionIndex) <= 1) || ((weatherIndex >= 2) && (conditionIndex >= 2))))
+				
+				if valid {  
+					visited.Push(theCompound)
+					
 					compounds.Push(Array(condition[4], condition[5]))
 				}
 			}
@@ -159,15 +168,44 @@ class TyresDatabase extends SessionDatabase {
 		return false
 	}
 	
-	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
-		weatherBaseIndex := inList(kWeatherOptions, weather)
+	getPressureInfo(simulator, car, track, weather) {
+		local database
 		
-		if (weatherBaseIndex == 1)
-			weatherCandidateOffsets := [0, 1]
-		if (weatherBaseIndex == 2)
-			weatherCandidateOffsets := [0, -1]
-		else
-			weatherCandidateOffsets := [0, 1, 2, 3]
+		info := []
+		
+		database := this.getTyresDatabase(simulator, car, track, "User")
+		
+		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+		
+		database := this.getTyresDatabase(simulator, car, track, "Community")
+		
+		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: this.qualifiedCompound(row.Compound, row.CompoundColor), Count: row.Count})
+		
+		return info
+	}
+	
+	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
+		if (weather != true) {
+			weatherBaseIndex := inList(kWeatherOptions, weather)
+			
+			if (weatherBaseIndex == 1)
+				weatherCandidateOffsets := [0, 1]
+			if (weatherBaseIndex == 2)
+				weatherCandidateOffsets := [0, -1]
+			else
+				weatherCandidateOffsets := [0, 1, 2, 3]
+		}
+		else {
+			weatherBaseIndex := 1
+		
+			weatherCandidateOffsets := [0, 1, 2, 3, 4, 5]
+		}
 		
 		localTyresDatabase := this.getTyresDatabase(simulator, car, track, "User")
 		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Global") : false)
@@ -276,5 +314,44 @@ class TyresDatabase extends SessionDatabase {
 			
 			this.iDatabase := false
 		}
+	}
+	
+	qualifiedCompound(compound, compoundColor) {
+		if (compound= "Dry") {
+			if (compoundColor = "Black")
+				return "Dry"
+			else
+				return ("Dry (" . compoundColor . ")")
+		}
+		else if (compoundColor = "Black")
+			return "Wet"
+		else
+			return ("Wet (" . compoundColor . ")")
+	}
+
+	translateQualifiedCompound(compound, compoundColor) {
+		if (compound= "Dry") {
+			if (compoundColor = "Black")
+				return translate("Dry")
+			else
+				return (translate("Dry") . translate(" (") . translate(compoundColor) . translate(")"))
+		}
+		else if (compoundColor = "Black")
+			return translate("Wet")
+		else
+			return (translate("Wet") . translate(" (") . translate(compoundColor) . translate(")"))
+	}
+
+	splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
+		compoundColor := "Black"
+		
+		index := inList(kQualifiedTyreCompounds, qualifiedCompound)
+		
+		if (index == 1)
+			compound := "Wet"
+		else
+			compound := "Dry"
+		
+		compoundColor := kQualifiedTyreCompoundColors[index]
 	}
 }

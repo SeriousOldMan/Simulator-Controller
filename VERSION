@@ -1,9 +1,9 @@
 [Development]
 Version=3.9.8-dev
 Target=3.9.8-release
-Date=03/11/2022
+Date=03/13/2022
 Download=
-Changes=
+Changes=Finetuning for average lap times in Strategy simulation, Backend overhaul of the Session / Setup Database, All new user interface for "Setup Database"
 [Release]
 Version=3.9.6-release
 Date=03/11/2022

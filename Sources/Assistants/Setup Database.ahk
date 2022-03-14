@@ -68,16 +68,14 @@ global notesEdit
 
 global settingsTab
 
+global settingsImg1
+global settingsImg2
+global settingsImg3
 global settingsTab1
 global settingsTab2
 global settingsTab3
 
 global settingsListView
-
-global settingGroupDropDown
-
-global addSettingGroupButton
-global deleteSettingGroupButton
 
 global addSettingButton
 global deleteSettingButton
@@ -152,8 +150,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iSelectedSetupType := false
 	
-	iSelectedSettingGroup := false
-	
 	iDataListView := false
 	iSettingsListView := false
 	iSetupListView := false
@@ -212,12 +208,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SelectedModule[] {
 		Get {
 			return this.iSelectedModule
-		}
-	}
-	
-	SelectedSettingGroup[] {
-		Get {
-			return this.iSelectedSettingGroup
 		}
 	}
 	
@@ -348,7 +338,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
 			
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section gchooseTab1, %kIconsDirectory%Report Settings.ico
+		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section vsettingsImg1 gchooseTab1, %kIconsDirectory%Report Settings.ico
 		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab1 gchooseTab1, % translate("Race Settings")
 		
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
@@ -356,7 +346,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 			
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 gchooseTab2, %kIconsDirectory%Tools BW.ico
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg2 gchooseTab2, %kIconsDirectory%Tools BW.ico
 		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Setup Repository")
 		
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
@@ -364,7 +354,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 			
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 gchooseTab3, %kIconsDirectory%Pressure.ico
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg3 gchooseTab3, %kIconsDirectory%Pressure.ico
 		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Tyre Pressure Advisor")
 		
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
@@ -379,19 +369,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 1
 		
-		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Group")
-		Gui %window%:Add, DropDownList, xp+90 yp w218 vsettingGroupDropDown gchooseSettingGroup
-		
-		Gui %window%:Add, Button, xp+220 yp w23 h23 HWNDaddSettingButtonHandle gaddSettingGroup vaddSettingGroupButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSettingButtonHandle gdeleteSettingGroup vdeleteSettingGroupButton
-		setButtonIcon(addSettingButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteSettingButtonHandle, kIconsDirectory . "Minus.ico", 1)
-		
-		Gui %window%:Add, ListView, x296 yp+24 w360 h198 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Label", "Value"], "translate")*)
+		Gui %window%:Add, ListView, x296 ys w360 h222 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Section", "Key", "Value"], "translate")*)
 		
 		this.iSettingsListView := settingsListViewHandle
 		
-		Gui %window%:Add, Button, xp+310 yp+200 w23 h23 HWNDaddSettingButtonHandle gaddSetting vaddSettingButton
+		Gui %window%:Add, Button, xp+310 yp+224 w23 h23 HWNDaddSettingButtonHandle gaddSetting vaddSettingButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSettingButtonHandle gdeleteSetting vdeleteSettingButton
 		setButtonIcon(addSettingButtonHandle, kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(deleteSettingButtonHandle, kIconsDirectory . "Minus.ico", 1)
@@ -665,14 +647,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		LV_Delete()
 		
-		userSettings := true
-		communitySettings := false
-		
-		new SettingsDatabase().querySettings(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
-										   , userSettings, communitySettings)
-		
-		for type, setting in userSettings
-			LV_Add("", translate("Local"), name)
+		for ignore, setting in new SettingsDatabase().getSettings(this.SelectedSimulator, this.SelectedCar
+																, this.SelectedTrack, this.SelectedWeather)
+			LV_Add("", setting.Section, setting.Key, setting.Value)
 		
 		LV_ModifyCol()
 		
@@ -689,6 +666,54 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		while LV_DeleteCol(1)
 			ignore := 1
+		
+		for ignore, column in map(["Reference", "#"], "translate")
+			LV_InsertCol(A_Index, "", column)
+		
+		references := {Car: 0, Track: 0, Weather: 0, AllCar: 0, AllTrack: 0, AllWeather: 0}
+							  
+		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar
+																 , this.SelectedTrack, this.SelectedWeather) {
+			if (setting.Car != "*")
+				references.Car := 1
+			else
+				references.AllCar := 1
+			
+			if (setting.Track != "*")
+				references.Track := 1
+			else
+				references.AllTrack := 1
+			
+			if (setting.Weather != "*")
+				references.Weather := 1
+			else
+				references.AllWeather := 1
+		}
+		
+		for reference, count in references
+			if (count > 0) {
+				switch reference {
+					case "AllCar":
+						reference := (translate("Car: ") . translate("All"))
+					case "AllTrack":
+						reference := (translate("Track: ") . translate("All"))
+					case "AllWeather":
+						reference := (translate("Weather: ") . translate("All"))
+					case "Car":
+						reference := (translate("Car: ") . this.SelectedCar)
+					case "Track":
+						reference := (translate("Track: ") . this.SelectedTrack)
+					case "Weather":
+						reference := (translate("Weather: ") . this.SelectedWeather)
+				}
+				
+				LV_Add("", reference, count)
+			}
+		
+		LV_ModifyCol()
+		
+		Loop 2
+			LV_ModifyCol(A_Index, "AutoHdr")
 		
 		this.loadSettings()
 	}
@@ -816,24 +841,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Choose, settingsTab, 0
 		}
 		
-		if this.moduleAvailable("Settings")
+		if this.moduleAvailable("Settings") {
+			GuiControl Enable, settingsImg1
 			Gui Font, s10 Bold cGray, Arial
-		else
+		}
+		else {
+			GuiControl Disable, settingsImg1
 			Gui Font, s10 Bold cSilver, Arial
+		}
 		
 		GuiControl Font, settingsTab1
 		
-		if this.moduleAvailable("Setups")
+		if this.moduleAvailable("Setups") {
+			GuiControl Enable, settingsImg2
 			Gui Font, s10 Bold cGray, Arial
-		else
+		}
+		else {
+			GuiControl Disable, settingsImg2
 			Gui Font, s10 Bold cSilver, Arial
+		}
 		
 		GuiControl Font, settingsTab2
 		
-		if this.moduleAvailable("Pressures")
+		if this.moduleAvailable("Pressures") {
+			GuiControl Enable, settingsImg3
 			Gui Font, s10 Bold cGray, Arial
-		else
+		}
+		else {
+			GuiControl Disable, settingsImg3
 			Gui Font, s10 Bold cSilver, Arial
+		}
 		
 		GuiControl Font, settingsTab3
 		
@@ -864,16 +901,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Disable, deleteSetupButton
 		}
 		
-		if this.SelectedSettingGroup {
-			GuiControl Enable, deleteSettingGroupButton
-			GuiControl Enable, addSettingButton
-		}
-		else {
-			GuiControl Disable, deleteSettingGroupButton
-			GuiControl Disable, addSettingButton
-		}
-		
-		Gui ListView, % this.SettingGroupListView
+		Gui ListView, % this.SettingsListView
 		
 		selected := LV_GetNext(0)
 		
@@ -1482,30 +1510,6 @@ updateNotes() {
 	GuiControlGet notesEdit
 	
 	editor.updateNotes(notesEdit)
-}
-
-chooseSettingGroup() {
-}
-
-addSettingGroup() {
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter the name of the setting group:")
-	
-	editor := SessionDatabaseEditor.Instance
-	
-	window := editor.Window
-
-	Gui %window%:Default
-	
-	locale := ((getLanguage() = "en") ? "" : "Locale")
-	
-	InputBox name, %title%, %prompt%, , 300, 150, , , %locale%
-	
-	if !ErrorLevel
-		editor.addSetting(name)
-}
-
-deleteSettingGroup() {
 }
 
 chooseSetting() {

@@ -985,8 +985,8 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Translations
 	FileCreateDir %kUserHomeDirectory%Grammars
 	FileCreateDir %kUserHomeDirectory%Temp
-	FileCreateDir %kDatabaseDirectory%Global
-	FileCreateDir %kDatabaseDirectory%Local
+	FileCreateDir %kDatabaseDirectory%Community
+	FileCreateDir %kDatabaseDirectory%User
 	
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")

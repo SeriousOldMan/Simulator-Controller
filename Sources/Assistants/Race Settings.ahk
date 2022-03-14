@@ -866,7 +866,7 @@ restart:
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
 		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
-		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on setup database values")
+		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on database values")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial

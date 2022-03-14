@@ -82,6 +82,7 @@ global settingsListView
 global settingDropDown
 global settingValueDropDown
 global settingValueEdit
+global settingValueCheck
 
 global addSettingButton
 global deleteSettingButton
@@ -392,11 +393,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
 		Gui %window%:Add, DropDownList, xp+90 yp w180 vsettingValueDropDown gchangeSetting
 		Gui %window%:Add, Edit, xp yp w50 vsettingValueEdit gchangeSetting
+		Gui %window%:Add, CheckBox, xp yp+4 vsettingValueCheck gchangeSetting
 		
 		Gui %window%:Add, Button, x606 yp+30 w23 h23 HWNDaddSettingButtonHandle gaddSetting vaddSettingButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSettingButtonHandle gdeleteSetting vdeleteSettingButton
 		setButtonIcon(addSettingButtonHandle, kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(deleteSettingButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		
+		Gui %window%:Add, Button, x440 yp+30 w80 h23 gtestSettings, % translate("Test...")
 		
 		Gui Tab, 2
 
@@ -627,12 +631,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Enable, settingDropDown
 			GuiControl Enable, settingValueDropDown
 			GuiControl Enable, settingValueEdit
+			GuiControl Enable, settingValueCheck
 		}
 		else {
 			GuiControl Disable, deleteSettingButton
 			GuiControl Disable, settingDropDown
 			GuiControl Hide, settingValueDropDown
 			GuiControl Disable, settingValueDropDown
+			GuiControl Hide, settingValueCheck
+			GuiControl Disable, settingValueCheck
 			GuiControl Show, settingValueEdit
 			GuiControl Disable, settingValueEdit
 			
@@ -781,8 +788,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
 																 , this.SelectedTrack["*"], this.SelectedWeather["*"], false) {
-			if IsObject(this.getSettingType(setting.Section, setting.Key))
+			type := this.getSettingType(setting.Section, setting.Key)
+			
+			if IsObject(type)
 				value := translate(setting.Value)
+			else if (type = "Boolean")
+				value := (setting.Value ? "x" : "")
 			else
 				value := setting.Value
 			
@@ -950,11 +961,37 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.SessionDatabase.writeNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, notes)
 	}
 	
-	getSettingLabel(section, key) {
+	getSettingLabel(section := false, key := false) {
+		if !section {
+			window := this.Window
+			
+			Gui %window%:Default
+			
+			Gui ListView, % this.SettingListView
+			
+			selected := LV_GetNext(0)
+			
+			section := this.iSettings[selected][1]
+			key := this.iSettings[selected][2]
+		}
+		
 		return getConfigurationValue(vSettingDescriptors, section . ".Labels", key, "")
 	}
 	
-	getSettingType(section, key) {
+	getSettingType(section := false, key := false) {
+		if !section {
+			window := this.Window
+			
+			Gui %window%:Default
+			
+			Gui ListView, % this.SettingListView
+			
+			selected := LV_GetNext(0)
+			
+			section := this.iSettings[selected][1]
+			key := this.iSettings[selected][2]
+		}
+		
 		type := getConfigurationValue(vSettingDescriptors, section . ".Types", key, "Text")
 		
 		if InStr(type, "Choices:")
@@ -1057,7 +1094,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
-		LV_Modify(selected, "", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key)) ? translate(value) : value)
+		type := this.getSettingType(section, key)
+	
+		if IsObject(type)
+			display := translate(value)
+		else if (type = "Boolean")
+			display := (value ? "x" : "")
+		else
+			display := value
+		
+		LV_Modify(selected, "", this.getSettingLabel(section, key), display)
 		
 		LV_ModifyCol()
 		
@@ -1268,46 +1314,7 @@ global queryScopeDropDown
 /*
 
 
-openSettings(mode := "New", arguments*) {
-	exePath := kBinariesDirectory . "Race Settings.exe"
-	fileName := kTempDirectory . "Temp.settings"
-				
-	Gui %window%:Hide
-				
-	try {
-		switch mode {
-			case "New":
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
-			case "Edit":
-				writeConfiguration(fileName, arguments[1])
-		}
-				
-		options := "-NoTeam -File """ . fileName . """"
-		
-		RunWait "%exePath%" %options%, %kBinariesDirectory%, , pid
-			
-		if ErrorLevel
-			return readConfiguration(fileName)
-		else
-			return false
-	}
-	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-			
-		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		
-		return false
-	}
-	finally {
-		Gui %window%:Show
-	}
-}
+
 
 
 updateQueryScope() {
@@ -1482,6 +1489,7 @@ chooseSetting() {
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueDropDown
 		GuiControl Enable, settingValueDropDown
 		
@@ -1490,8 +1498,20 @@ chooseSetting() {
 		GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
 		GuiControl Choose, settingValueDropDown, % inList(labels, value)
 	}
+	else if (type = "Boolean") {
+		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueEdit
+		GuiControl Show, settingValueCheck
+		GuiControl Enable, settingValueCheck
+		
+		GuiControlGet settingValueCheck
+		
+		if (settingValueCheck != value)
+			GuiControl, , settingValueCheck, % (value = "x") ? true : false
+	}
 	else {
 		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueEdit
 		GuiControl Enable, settingValueEdit
 		
@@ -1527,6 +1547,7 @@ addSetting() {
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueDropDown
 		GuiControl Enable, settingValueDropDown
 		
@@ -1537,8 +1558,17 @@ addSetting() {
 		
 		value := type[1]
 	}
+	else if (type = "Boolean") {
+		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueEdit
+		GuiControl Show, settingValueCheck
+		GuiControl Enable, settingValueCheck
+		
+		GuiControl, , settingValueCheck, 1
+	}
 	else {
 		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueEdit
 		GuiControl Enable, settingValueEdit
 		
@@ -1618,6 +1648,7 @@ selectSetting() {
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueDropDown
 		GuiControl Enable, settingValueDropDown
 		
@@ -1628,8 +1659,19 @@ selectSetting() {
 		
 		value := type[1]
 	}
+	else if (type = "Boolean") {
+		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueEdit
+		GuiControl Show, settingValueCheck
+		GuiControl Enable, settingValueCheck
+		
+		GuiControl, , settingValueCheck, % true
+		
+		value := true
+	}
 	else {
 		GuiControl Hide, settingValueDropDown
+		GuiControl Hide, settingValueCheck
 		GuiControl Show, settingValueEdit
 		GuiControl Enable, settingValueEdit
 		
@@ -1681,9 +1723,31 @@ changeSetting() {
 		
 		value := type[inList(map(type, "translate"), settingValueDropDown)]
 	}
+	else if (type = "Boolean") {
+		GuiControlGet settingValueCheck
+	
+		value := settingValueCheck
+	}
 	else {
 		GuiControlGet settingValueEdit
 	
+		if (type = "Integer") {
+			if settingValueEdit is not Integer
+			{
+				settingValueEdit := Round(settingValueEdit)
+				
+				GuiControl, , settingValueEdit, %settingValueEdit%
+			}
+		}
+		else if (type = "Float") {
+			if settingValueEdit is not Number
+			{
+				settingValueEdit := 0.0
+				
+				GuiControl, , settingValueEdit, %settingValueEdit%
+			}
+		}
+		
 		value := settingValueEdit
 	}
 	
@@ -1807,6 +1871,33 @@ transferPressures() {
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)
+}
+
+testSettings() {
+	editor := SessionDatabaseEditor.Instance
+	exePath := kBinariesDirectory . "Race Settings.exe"
+	fileName := kTempDirectory . "Temp.settings"
+				
+	try {
+		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
+		
+		for section, values in new SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
+																 , editor.SelectedTrack["*"], editor.SelectedWeather["*"])
+			for key, value in values
+				setConfigurationValue(settings, section, key, value)
+																 
+		writeConfiguration(fileName, settings)
+				
+		options := "-NoTeam -File """ . fileName . """"
+		
+		Run "%exePath%" %options%, %kBinariesDirectory%
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
 }
 
 showSessionDatabaseEditor() {

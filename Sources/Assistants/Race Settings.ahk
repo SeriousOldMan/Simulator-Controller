@@ -30,6 +30,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Includes\Includes.ahk
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -60,6 +61,15 @@ global vSilentMode := kSilentMode
 global vTeamMode := true
 global vEditMode := false
 
+global vSimulator := false
+global vCar := false
+global vTrack := false
+global vWeather := "Dry"
+global vAirTemperature := 23
+global vTrackTemperature:= 27
+global vCompound := "Dry"
+global vCompoundColor := "Black"
+	
 global repairSuspensionDropDown
 global repairSuspensionThresholdEdit
 global repairSuspensionGreaterLabel
@@ -282,9 +292,15 @@ updateChangeTyreState() {
 }
 
 readTyreSetup(settings) {
-	spSetupTyreCompoundDropDown := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+	if (vCompound && vCompoundColor) {
+		spSetupTyreCompoundDropDown := vCompound
+		color := vCompoundColor
+	}
+	else {
+		spSetupTyreCompoundDropDown := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+		color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
+	}
 	
-	color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
 	if (color != "Black")
 		spSetupTyreCompoundDropDown := spSetupTyreCompoundDropDown . " (" . color . ")"
 	
@@ -1133,8 +1149,18 @@ restart:
 				
 				title := translate("Load Race Settings...")
 				
+				if (vSimulator && vCar && vTrack) {
+					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					
+					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					
+					FileCreateDir %dirName%
+				}
+				else
+					dirName := kRaceSettingsFile
+				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
 			
 				if (file != "") {
@@ -1148,10 +1174,22 @@ restart:
 			else if (result == kSave) {
 				result := false
 			
+				if (vSimulator && vCar && vTrack) {
+					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					
+					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					
+					FileCreateDir %dirName%
+					
+					fileName := (dirName . "\Race.settings")
+				}
+				else
+					fileName := kRaceSettingsFile
+				
 				title := translate("Save Race Settings...")
 				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-				FileSelectFile file, S17, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
 			
 				if (file != "") {
@@ -1340,6 +1378,56 @@ showRaceSettingsEditor() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
+	
+	vSimulator := false
+	vCar := false
+	vTrack := false
+	vWeather := "Dry"
+	vAirTemperature := 23
+	vTrackTemperature:= 27
+	vCompound := "Dry"
+	vCompoundColor := "Black"
+	
+	index := 1
+	
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Simulator":
+				vSimulator := A_Args[index + 1]
+				index += 2
+			case "-Car":
+				vCar := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				vTrack := A_Args[index + 1]
+				index += 2
+			case "-Weather":
+				vWeather := A_Args[index + 1]
+				index += 2
+			case "-AirTemperature":
+				vAirTemperature := A_Args[index + 1]
+				index += 2
+			case "-TrackTemperature":
+				vTrackTemperature := A_Args[index + 1]
+				index += 2
+			case "-Compound":
+				vCompound := A_Args[index + 1]
+				index += 2
+			case "-CompoundColor":
+				vCompoundColor := A_Args[index + 1]
+				index += 2
+			case "-Setup":
+				vRequestorPID := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
+	
+	if ((vAirTemperature <= 0) || (vTrackTemperature <= 0)) {
+		vAirTemperature := false
+		vTrackTemperature := false
+	}
 	
 	fileName := kRaceSettingsFile
 	

@@ -1513,7 +1513,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						telemetryDB := new TelemetryDatabase(simulator, car, track)
 						simulatorCode := telemetryDB.getSimulatorCode(simulator)
 						
-						dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
+						dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Settings
 						
 						FileCreateDir %dirName%
 						
@@ -1757,7 +1757,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			telemetryDB := new TelemetryDatabase(simulator, car, track)
 			simulatorCode := telemetryDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
+			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
 		}

@@ -642,7 +642,7 @@ shareSetupDatabase() {
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
 		if (shareTyrePressures || shareCarSetups) {
-			uploadTimeStamp := kDatabaseDirectory . "Local\UPLOAD"
+			uploadTimeStamp := kDatabaseDirectory . "User\UPLOAD"
 			
 			if FileExist(uploadTimeStamp) {
 				FileReadLine upload, %uploadTimeStamp%, 1
@@ -663,29 +663,29 @@ shareSetupDatabase() {
 					; ignore
 				}
 				
-				Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
+				Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 				{
 					simulator := A_LoopFileName
 					
 					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
 					
-					Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
+					Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					{
 						car := A_LoopFileName
 					
 						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
 						
-						Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
 						{
 							track := A_LoopFileName
 					
 							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 							
 							if shareTyrePressures {
-								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
 									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
 								
-								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
+								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
 								
 								if FileExist(distFile)
 									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
@@ -693,7 +693,7 @@ shareSetupDatabase() {
 							
 							if shareCarSetups {
 								try {
-									FileCopyDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
+									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
 								}
 								catch exception {
 									; ignore
@@ -715,13 +715,13 @@ shareSetupDatabase() {
 				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
 				
 				try {
-					FileDelete %kDatabaseDirectory%Local\UPLOAD
+					FileDelete %kDatabaseDirectory%User\UPLOAD
 				}
 				catch exception {
 					; ignore
 				}
 				
-				FileAppend %A_Now%, %kDatabaseDirectory%Local\UPLOAD
+				FileAppend %A_Now%, %kDatabaseDirectory%User\UPLOAD
 				
 				logMessage(kLogInfo, translate("Database successfully uploaded"))
 			}

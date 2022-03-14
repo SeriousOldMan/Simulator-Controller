@@ -154,6 +154,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			simulatorConfiguration := {}
 		
 			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default"))
+			
+			if (simulatorConfiguration["LoadSettings"] = "Ask")
+				simulatorConfiguration["LoadSettings"] := "Always"
+				
 			simulatorConfiguration["LoadTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Default")
 		
 			; simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))

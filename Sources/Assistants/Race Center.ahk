@@ -2169,7 +2169,7 @@ class RaceCenter extends ConfigurationItem {
 			sessionDB := new SessionDatabase()
 			simulatorCode := sessionDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
+			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
 		}

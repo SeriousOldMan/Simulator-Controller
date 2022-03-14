@@ -45,7 +45,7 @@ ListLines Off					; Disable execution history
 
 adjustPressureDistributions(code, car, track, compound, weather, airTemperature, trackTemperature, correction, ByRef progress) {
 	fileName := (code . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
-	fileName := (kDatabaseDirectory . "local\" . fileName)
+	fileName := (kDatabaseDirectory . "User\" . fileName)
 	
 	if FileExist(fileName) {
 		showProgress({progress: progress++, message: "Adjusting " . compound . " (" . airTemperature . ", " . trackTemperature . ") for " . car . " on " . track . " in " weather . "..."})

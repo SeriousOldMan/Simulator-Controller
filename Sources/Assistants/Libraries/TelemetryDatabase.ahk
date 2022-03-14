@@ -57,7 +57,7 @@ class TelemetryDatabase extends SessionDatabase {
 			else
 				simulatorCode := simulator
 			
-			this.iDatabase := new Database(kDatabaseDirectory . "Local\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
+			this.iDatabase := new Database(kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
 		}
 	}
 	

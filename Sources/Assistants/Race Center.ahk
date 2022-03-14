@@ -2372,7 +2372,7 @@ class RaceCenter extends ConfigurationItem {
 			case 3:
 				this.initializePitstopFromSession()
 			case 4:
-				exePath := kBinariesDirectory . "Setup Database.exe"
+				exePath := kBinariesDirectory . "Session Database.exe"
 				
 				try {
 					Process Exist
@@ -2384,9 +2384,9 @@ class RaceCenter extends ConfigurationItem {
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 				}
 				catch exception {
-					logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+					logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 						
-					showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:

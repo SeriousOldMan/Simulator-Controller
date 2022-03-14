@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Database Tool             ;;;
+;;;   Modular Simulator Controller System - Session Database Tool           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -20,8 +20,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Setup Database.ico
-;@Ahk2Exe-ExeName Setup Database.exe
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Session Database.ico
+;@Ahk2Exe-ExeName Session Database.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1904,10 +1904,10 @@ testSettings() {
 }
 
 showSessionDatabaseEditor() {
-	icon := kIconsDirectory . "Setup Database.ico"
+	icon := kIconsDirectory . "Session Database.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Setup Database
+	Menu Tray, Tip, Session Database
 	
 	simulator := false
 	car := false

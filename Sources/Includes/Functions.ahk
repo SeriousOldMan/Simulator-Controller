@@ -560,7 +560,7 @@ startTrayMessageManager() {
 	SetTimer trayMessageQueue, -500
 }
 
-requestShareSetupDatabaseConsent() {
+requestShareSessionDatabaseConsent() {
 	if !inList(A_Args, "-Install") {
 		program := StrSplit(A_ScriptName, ".")[1]
 		
@@ -628,7 +628,7 @@ requestShareSetupDatabaseConsent() {
 	}
 }
 
-shareSetupDatabase() {
+shareSessionDatabase() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
 	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
@@ -2080,8 +2080,8 @@ loadSimulatorConfiguration()
 
 if vDetachedInstallation {
 	checkForUpdates()
-	requestShareSetupDatabaseConsent()
-	shareSetupDatabase()
+	requestShareSessionDatabaseConsent()
+	shareSessionDatabase()
 }
 
 initializeLoggingSystem()

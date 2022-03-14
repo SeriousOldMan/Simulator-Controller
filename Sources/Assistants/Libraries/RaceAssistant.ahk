@@ -944,7 +944,7 @@ class RaceAssistant extends ConfigurationItem {
 			
 			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase"))
 				settingsDB.updateSettings(simulatorName, car, track
-									 , {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+										, {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
 			else {
 				fileName := getFileName("Race.settings", kUserConfigDirectory)
 				

@@ -996,7 +996,7 @@ restart:
 		
 		option := (import ? "yp-25" : "yp")
 
-		Gui RES:Add, Button, x292 %option% w90 h23 gopenSetupDatabase, % translate("Setups...")
+		Gui RES:Add, Button, x292 %option% w90 h23 gopenSessionDatabase, % translate("Setups...")
 		
 		if import
 			Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
@@ -1229,8 +1229,8 @@ readSimulatorData(simulator) {
 	return readConfiguration(dataFile)
 }
 
-openSetupDatabase() {
-	exePath := kBinariesDirectory . "Setup Database.exe"
+openSessionDatabase() {
+	exePath := kBinariesDirectory . "Session Database.exe"
 	
 	try {
 		options := []
@@ -1249,9 +1249,9 @@ openSetupDatabase() {
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

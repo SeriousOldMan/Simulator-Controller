@@ -348,8 +348,8 @@ Opens the settings tool, with which you can edit all the race specific settings,
 #### *openSetupAdvisor()*
 Opens the tool which helps you creating a suspension setup for a car. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
 
-#### *openSetupDatabase()*
-Opens the query tool for the setup database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. This action function is provided by the "Race Engineer" and "Race Strategis" plugins and is available depending on the concrete configuration.
+#### *openSessionDatabase()*
+Opens the tool for the session database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. This action function is provided by the "Race Engineer" and "Race Strategis" plugins and is available depending on the concrete configuration.
 
 #### *openStrategyWorkbench()*
 Opens the "Strategy Workbench" tool, with which you can explore the telemetrie data for past session, as long as they have been saved by the Race Strategist, and with which you can create a strategy for an upcoming race. If a simulation is currently running, several selections (car, track, and so on) will already be prefilled.

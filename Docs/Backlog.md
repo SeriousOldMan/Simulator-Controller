@@ -9,7 +9,7 @@
      - Adjust pitstop strategy depending on upcoming weather conditions
 
 #### Setup Development
-  1. [Target: VV4.x] Consolidating the shared setup database and build a distribution process
+  1. [Target: VV4.x] Consolidating the shared database and build a distribution process
   
 #### General
   1. [Target: V3.x] Choosing a specific theme depending on the selected simulation game

@@ -505,7 +505,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		this.updateState()
 		
-		this.selectModule("Settings")
+		if (vRequestorPID && this.moduleAvailable("Pressures"))
+			this.selectModule("Pressures")
+		else
+			this.selectModule("Settings")
 	}
 	
 	show() {

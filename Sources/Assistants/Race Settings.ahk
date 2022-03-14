@@ -59,7 +59,6 @@ global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 global vSilentMode := kSilentMode
 global vTeamMode := true
-global vEditMode := false
 
 global vSimulator := false
 global vCar := false
@@ -961,16 +960,11 @@ restart:
 		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Post Race")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
-				
-		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui RES:Add, Edit, x292 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
-		Gui RES:Add, UpDown, x324 yp-2 w18 h20, %safetyFuelEdit%
-		Gui RES:Add, Text, x350 yp+2 w90 h20, % translate("Ltr.")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 yp+28 w270 0x10
+		Gui RES:Add, Text, x66 yp+52 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial
@@ -1002,7 +996,6 @@ restart:
 		
 		option := (import ? "yp-25" : "yp")
 
-		if !vEditMode
 		Gui RES:Add, Button, x292 %option% w90 h23 gopenSetupDatabase, % translate("Setups...")
 		
 		if import
@@ -1103,6 +1096,11 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
 		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
+				
+		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui RES:Add, Edit, x126 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %safetyFuelEdit%
+		Gui RES:Add, Text, x184 yp+2 w90 h20, % translate("Ltr.")
 
 		if vTeamMode {
 			Gui RES:Tab, 4
@@ -1433,11 +1431,8 @@ showRaceSettingsEditor() {
 	
 	index := inList(A_Args, "-File")
 	
-	if index {
+	if index
 		fileName := A_Args[index + 1]
-		
-		vEditMode := true
-	}
 	
 	settings := readConfiguration(fileName)
 	
@@ -1460,7 +1455,7 @@ showRaceSettingsEditor() {
 		if (editSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
 	
-			ExitApp %vEditMode%
+			ExitApp 0
 		}
 	}
 	

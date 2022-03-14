@@ -56,8 +56,8 @@ class SettingsDatabase extends SessionDatabase {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator
 			
-			this.iUserDatabase := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator), kSettingsDataSchemas)
-			this.iCommunityDatabase := new Database(kDatabaseDirectory . "Community\" . this.getSimulatorCode(simulator), kSettingsDataSchemas)
+			this.iUserDatabase := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iCommunityDatabase := new Database(kDatabaseDirectory . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
 		}
 		
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
@@ -69,29 +69,39 @@ class SettingsDatabase extends SessionDatabase {
 		id := this.ID
 		
 		if userSettings {
+			result := {}
+			
+			readSettings(this, simulator, result, id, true, false, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", "*")
+			readSettings(this, simulator, result, id, true, false, "*", track, "*")
+			readSettings(this, simulator, result, id, true, false, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, false, car, track, "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", weather)
+			readSettings(this, simulator, result, id, true, false, "*", track, weather)
+			readSettings(this, simulator, result, id, true, false, car, track, weather)
+			
 			userSettings := []
 			
-			readSettings(this, simulator, userSettings, id, true, false, "*", "*", "*")
-			readSettings(this, simulator, userSettings, id, true, false, car, "*", "*")
-			readSettings(this, simulator, userSettings, id, true, false, "*", track, "*")
-			readSettings(this, simulator, userSettings, id, true, false, "*", "*", weather)
-			readSettings(this, simulator, userSettings, id, true, false, car, track, "*")
-			readSettings(this, simulator, userSettings, id, true, false, car, "*", weather)
-			readSettings(this, simulator, userSettings, id, true, false, "*", track, weather)
-			readSettings(this, simulator, userSettings, id, true, false, car, track, weather)
+			for ignore, setting in result
+				userSettings.Push(setting)
 		}
 		
 		if communitySettings {
+			result := {}
+			
+			readSettings(this, simulator, result, id, false, true, "*", "*", "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", "*")
+			readSettings(this, simulator, result, id, false, true, "*", track, "*")
+			readSettings(this, simulator, result, id, false, true, "*", "*", weather)
+			readSettings(this, simulator, result, id, false, true, car, track, "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", weather)
+			readSettings(this, simulator, result, id, false, true, "*", track, weather)
+			readSettings(this, simulator, result, id, false, true, car, track, weather)
+			
 			communitySettings := []
 			
-			readSettings(this, simulator, communitySettings, id, false, true, "*", "*", "*")
-			readSettings(this, simulator, communitySettings, id, false, true, car, "*", "*")
-			readSettings(this, simulator, communitySettings, id, false, true, "*", track, "*")
-			readSettings(this, simulator, communitySettings, id, false, true, "*", "*", weather)
-			readSettings(this, simulator, communitySettings, id, false, true, car, track, "*")
-			readSettings(this, simulator, communitySettings, id, false, true, car, "*", weather)
-			readSettings(this, simulator, communitySettings, id, false, true, "*", track, weather)
-			readSettings(this, simulator, communitySettings, id, false, true, car, track, weather)
+			for ignore, setting in result
+				communitySettings.Push(setting)
 		}
 	}
 	
@@ -127,23 +137,31 @@ class SettingsDatabase extends SessionDatabase {
 		return settings
 	}
 	
-	readSettings(simulator, car, track, weather, community := "__Undefined__") {
+	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
 		if (community = kUndefined)
 			community := this.UseCommunity
 		
-		settings := []
+		result := {}
 		
 		id := this.ID
 		
-		readSettings(this, simulator, settings, id, true, community, "*", "*", "*")
-		readSettings(this, simulator, settings, id, true, community, car, "*", "*")
-		readSettings(this, simulator, settings, id, true, community, "*", track, "*")
-		readSettings(this, simulator, settings, id, true, community, "*", "*", weather)
-		readSettings(this, simulator, settings, id, true, community, car, track, "*")
-		readSettings(this, simulator, settings, id, true, community, car, "*", weather)
-		readSettings(this, simulator, settings, id, true, community, "*", track, weather)
-		readSettings(this, simulator, settings, id, true, community, car, track, weather)
+		if inherited {
+			readSettings(this, simulator, result, id, true, community, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", "*")
+			readSettings(this, simulator, result, id, true, community, "*", track, "*")
+			readSettings(this, simulator, result, id, true, community, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, community, car, track, "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", weather)
+			readSettings(this, simulator, result, id, true, community, "*", track, weather)
+		}
 		
+		readSettings(this, simulator, result, id, true, community, car, track, weather)
+
+		settings := []
+		
+		for ignore, setting in result
+			settings.Push(setting)
+			
 		return settings
 	}
 	
@@ -158,21 +176,19 @@ class SettingsDatabase extends SessionDatabase {
 	setSettingValue(simulator, car, track, weather, section, key, value) {
 		local database := this.getSettingsDatabase(simulator, "User")
 		
-		database.remove("Settings", {Where: {Owner: this.ID
-										   , Car: car, Track: track, Weather: weather
-										   , Section: section, Key: key}}
+		database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
 								  , Func("always").Bind(true))
 		
-		database.add({Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+		database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
 		
 		database.flush()
 	}
 	
 	removeSettingValue(simulator, car, track, weather, section, key) {
-		this.getSettingsDatabase(simulator, "User").remove("Settings", {Where: {Owner: this.ID
-																			  , Car: car, Track: track, Weather: weather
-																			  , Section: section, Key: key}}
-																	  , Func("always").Bind(true), true)
+		this.getSettingsDatabase(simulator, "User").remove("Settings", {Owner: this.ID
+																	  , Car: car, Track: track, Weather: weather
+																	  , Section: section, Key: key}
+																	 , Func("always").Bind(true), true)
 	}
 }
 
@@ -218,11 +234,11 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 		}
 	
 	for ignore, row in reverse(filtered)
-		settings.Push(row)
+		settings[row.Section . "." . row.Key] := row
 }
 
 loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
-	values := []
+	values := {}
 	
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 	

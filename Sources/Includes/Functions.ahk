@@ -1673,7 +1673,7 @@ reverse(list) {
 	newList := []
 	length := list.Length()
 	
-	Loop length
+	Loop %length%
 		newList.Push(list[length - (A_Index - 1)])
 	
 	return newList

@@ -197,10 +197,12 @@ class SessionDatabase {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
-			if (track && (track != true))
-				FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
-			else if (car && (car != true))
-				FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
+			if (car && (car != true)) {
+				if (track && (track != true))
+					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
+				else 
+					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
+			}
 			else
 				FileDelete %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
 		}
@@ -208,15 +210,17 @@ class SessionDatabase {
 			; ignore
 		}
 		
-		if (track && (track != true)) {
-			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		if (car && (car != true)) {
+			if (track && (track != true)) {
+				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 		
-			FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
-		}
-		else if (car && (car != true)) {
-			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%
+				FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+			}
+			else {
+				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%
 		
-			FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt, UTF-16
+				FileAppend %notes%, %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt, UTF-16
+			}
 		}
 		else {
 			FileCreateDir %kDatabaseDirectory%User\%simulatorCode%

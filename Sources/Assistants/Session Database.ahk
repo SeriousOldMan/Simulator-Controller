@@ -61,6 +61,8 @@ global vSettingDescriptors = newConfiguration()
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global databaseScopeDropDown
+
 global simulatorDropDown
 global carDropDown
 global trackDropDown
@@ -142,6 +144,8 @@ global transferPressuresButton
 class SessionDatabaseEditor extends ConfigurationItem {
 	iSessionDatabase := new SessionDatabase()
 	
+	iUseCommunity := false
+	
 	iSelectedSimulator := false
 	iSelectedCar := true
 	iSelectedTrack := true
@@ -168,6 +172,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	Window[] {
 		Get {
 			return "SDE"
+		}
+	}
+	
+	UseCommunity[] {
+		Get {
+			return this.iUseCommunity
+		}
+		
+		Set {
+			this.SessionDatabase.UseCommunity := value
+			
+			return (this.iUseCommunity := value)
 		}
 	}
 	
@@ -326,7 +342,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Wetter")
 		
 		choices := map(kWeatherOptions, "translate")
 		choices.InsertAt(1, translate("All"))
@@ -379,7 +395,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Add, GroupBox, x280 ys-8 w390 h372 
 		
-		tabs := map(["Tyres", "Setup", "Settings"], "translate")
+		tabs := map(["Settings", "Setups", "Pressures"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
@@ -496,7 +512,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 y596 w670 0x10
 		
-		Gui %window%:Add, Button, x304 y604 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
+		choices := ["Local", "Local & Community"]
+		chosen := inList(choices, "Local")
+		
+		Gui %window%:Add, Text, x16 y604 w55 h23 +0x200, % translate("Scope")
+		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
+		
+		Gui %window%:Add, Button, x304 yp w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
 		
 		this.loadSimulator(simulator, true)
 		this.loadCar(car, true)
@@ -933,8 +955,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 			LV_InsertCol(A_Index, "", column)
-			
-		for ignore, info in new TyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
+		
+		tyresDB := new TyresDatabase()
+		tyresDB.UseCommunity := this.UseCommunity
+		
+		for ignore, info in tyresDB.getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
 			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
 					 , translate(info.Compound), info.Count)
 	
@@ -1152,84 +1177,89 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadPressures() {
 		tyresDB := new TyresDatabase()
+		tyresDB.UseCommunity := this.UseCommunity
 		
-		window := this.Window
-		
-		Gui %window%:Default
+		if (this.SelectedSimulator && (this.SelectedSimulator != true)
+		 && this.SelectedCar && (this.SelectedCar != true)
+		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
+			window := this.Window
 			
-		static lastColor := "D0D0D0"
+			Gui %window%:Default
+				
+			static lastColor := "D0D0D0"
 
-		try {
-			GuiControlGet airTemperatureEdit
-			GuiControlGet trackTemperatureEdit
-			GuiControlGet tyreCompoundDropDown
+			try {
+				GuiControlGet airTemperatureEdit
+				GuiControlGet trackTemperatureEdit
+				GuiControlGet tyreCompoundDropDown
 
-			compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
-			
-			if (compound.Length() == 1)
-				compoundColor := "Black"
-			else
-				compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
-			
-			pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
-												, airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+				compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
+				
+				if (compound.Length() == 1)
+					compoundColor := "Black"
+				else
+					compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+				
+				pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
+													, airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
 
-			if (pressureInfos.Count() == 0) {
-				for ignore, tyre in ["fl", "fr", "rl", "rr"]
-					for ignore, postfix in ["1", "2", "3", "4", "5"] {
-						GuiControl Text, %tyre%Pressure%postfix%, 0.0
-						GuiControl +Background, %tyre%Pressure%postfix%
-						GuiControl Disable, %tyre%Pressure%postfix%
-					}
-
-				if vRequestorPID
-					GuiControl Disable, transferPressuresButton
-			}
-			else {
-				for tyre, pressureInfo in pressureInfos {
-					pressure := pressureInfo["Pressure"]
-					trackDelta := pressureInfo["Delta Track"]
-					airDelta := pressureInfo["Delta Air"] + Round(trackDelta * 0.49)
-					
-					pressure -= 0.2
-					
-					if ((airDelta == 0) && (trackDelta == 0))
-						color := "Green"
-					else if (airDelta == 0)
-						color := "Lime"
-					else
-						color := "Yellow"
-					
-					if (true || (color != lastColor)) {
-						lastColor := color
-						
-						Gui %window%:Color, D0D0D0, %color%
-					}
-					
-					for index, postfix in ["1", "2", "3", "4", "5"] {
-						pressure := Format("{:.1f}", pressure)
-					
-						GuiControl Text, %tyre%Pressure%postfix%, %pressure%
-						
-						if (index = (3 + airDelta)) {
+				if (pressureInfos.Count() == 0) {
+					for ignore, tyre in ["fl", "fr", "rl", "rr"]
+						for ignore, postfix in ["1", "2", "3", "4", "5"] {
+							GuiControl Text, %tyre%Pressure%postfix%, 0.0
 							GuiControl +Background, %tyre%Pressure%postfix%
-							GuiControl Enable, %tyre%Pressure%postfix%
-						}
-						else {
-							GuiControl -Background, %tyre%Pressure%postfix%
 							GuiControl Disable, %tyre%Pressure%postfix%
 						}
-					
-						pressure += 0.1
-					}
-				
+
 					if vRequestorPID
-						GuiControl Enable, transferPressuresButton
+						GuiControl Disable, transferPressuresButton
+				}
+				else {
+					for tyre, pressureInfo in pressureInfos {
+						pressure := pressureInfo["Pressure"]
+						trackDelta := pressureInfo["Delta Track"]
+						airDelta := pressureInfo["Delta Air"] + Round(trackDelta * 0.49)
+						
+						pressure -= 0.2
+						
+						if ((airDelta == 0) && (trackDelta == 0))
+							color := "Green"
+						else if (airDelta == 0)
+							color := "Lime"
+						else
+							color := "Yellow"
+						
+						if (true || (color != lastColor)) {
+							lastColor := color
+							
+							Gui %window%:Color, D0D0D0, %color%
+						}
+						
+						for index, postfix in ["1", "2", "3", "4", "5"] {
+							pressure := Format("{:.1f}", pressure)
+						
+							GuiControl Text, %tyre%Pressure%postfix%, %pressure%
+							
+							if (index = (3 + airDelta)) {
+								GuiControl +Background, %tyre%Pressure%postfix%
+								GuiControl Enable, %tyre%Pressure%postfix%
+							}
+							else {
+								GuiControl -Background, %tyre%Pressure%postfix%
+								GuiControl Disable, %tyre%Pressure%postfix%
+							}
+						
+							pressure += 0.1
+						}
+					
+						if vRequestorPID
+							GuiControl Enable, transferPressuresButton
+					}
 				}
 			}
-		}
-		catch exception {
-			; ignore
+			catch exception {
+				; ignore
+			}
 		}
 	}
 
@@ -1255,13 +1285,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			file.RawRead(setup, size)
 		
 			file.Close()
-				
-							  
-	
 			
-							  
-	
-   
 			SplitPath fileName, fileName
 			
 			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size)
@@ -1877,6 +1901,19 @@ chooseTab3() {
 		editor.selectModule("Pressures")
 }
 
+chooseDatabaseScope() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+			
+	GuiControlGet databaseScopeDropDown
+	
+	editor.UseCommunity := (databaseScopeDropDown == 2)
+	
+	editor.loadSimulator(editor.SelectedSimulator, true)
+}
+
 transferPressures() {
 	editor := SessionDatabaseEditor.Instance
 	window := editor.Window
@@ -1897,8 +1934,11 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	for ignore, pressureInfo in new TyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
-															   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
+	tyresDB := new TyresDatabase()
+	tyresDB.UseCommunity := editor.UseCommunity
+		
+	for ignore, pressureInfo in tyresDB.getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
+												   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)

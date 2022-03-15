@@ -62,6 +62,9 @@ class TyresDatabase extends SessionDatabase {
 		simulatorCode := this.getSimulatorCode(simulator)
 		simulator := this.getSimulatorName(simulatorCode)
 		
+		if (car == true)
+			MsgBox Here
+		
 		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 		
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track))) {

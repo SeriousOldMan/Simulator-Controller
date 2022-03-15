@@ -37,7 +37,6 @@ An automated update mechanism for local configuration databases exists since Rel
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-396) of this version and all the versions you might have skipped, before installing and using this version.
 
-
 ##### Earlier release builds
 
 [3.9.4-release](https://cntr.click/wDvdX7Z) (New features: New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compound variation in Strategy simulations.)
@@ -46,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[3.9.8-dev](https://www.dropbox.com/s/wr6drgydu96sgrs/Simulator%20Controller%203.9.8-dev.zip?dl=1) (Early build for 3.9.8. New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase". Stable, incl. documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-398) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

@@ -1,8 +1,8 @@
 [Development]
 Version=3.9.8-dev
 Target=3.9.8-release
-Date=03/13/2022
-Download=
+Date=03/15/2022
+Download=https://www.dropbox.com/s/wr6drgydu96sgrs/Simulator%20Controller%203.9.8-dev.zip?dl=1
 Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase"
 [Release]
 Version=3.9.6-release

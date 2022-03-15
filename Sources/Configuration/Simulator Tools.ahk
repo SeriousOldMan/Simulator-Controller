@@ -1393,6 +1393,37 @@ renewConsent() {
 	}
 }
 
+updateInstallationForV398() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		try {
+			FileDelete %installLocation%\Binaries\Setup Database.exe
+			
+			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
+		}
+		catch exception {
+			; ignore
+		}
+	}
+		
+	if (getConfigurationValue(installOptions, "Install", "Type", false) = "Registry") {
+		try {
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe, , %installLocation%\Binaries\Session Database.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe, , %installLocation%\Binaries\Setup Advisor.exe
+			
+			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+		}
+		catch exception {
+			; ignore
+		}
+	}
+}
+
 updateInstallationForV392() {
 	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
 	
@@ -1431,6 +1462,62 @@ updateInstallationForV354() {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 		
 		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+	}
+}
+
+updateConfigurationForV398() {
+	try {
+		if FileExist(kDatabaseDirectory . "User")
+			FileRemoveDir %kDatabaseDirectory%User, 1
+		
+		FileMoveDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
+	}
+	catch exception {
+		; ignore
+	}
+	
+	try {
+		if FileExist(kDatabaseDirectory . "Community")
+			FileRemoveDir %kDatabaseDirectory%Community, 1
+	
+		FileMoveDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
+	}
+	catch exception {
+		; ignore
+	}
+	
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+		
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+			
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+				
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Setup.Pressures.CSV
+				
+				if FileExist(fileName)
+					FileMove %fileName%, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.CSV
+				
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Setup.Pressures.Distribution.CSV
+				
+				if FileExist(fileName)
+					FileMove %fileName%, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.Distribution.CSV
+			}
+		}
+	}
+	
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+	
+		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
+		
+		FileDelete %kUserHomeDirectory%Setup\Setup.data
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
 
@@ -1645,6 +1732,31 @@ updateConfigurationForV310() {
 		catch exception {
 			; ignore
 		}
+}
+
+updatePluginsForV398() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
+		
+		if engineerDescriptor {
+			engineerDescriptor := StrReplace(engineerDescriptor, "openSetupDatabase", "openSessionDatabase")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
+		}
+		
+		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
+		
+		if strategistDescriptor {
+			strategistDescriptor := StrReplace(strategistDescriptor, "openSetupDatabase", "openSessionDatabase")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
+		}
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
 }
 
 updatePluginsForV386() {

@@ -263,15 +263,23 @@ class SessionDatabase {
 		}
 	}
 	
-	readSetup(simulator, car, track, type, name) {
+	readSetup(simulator, car, track, type, name, ByRef size) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
-		FileRead data, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
+		data := false
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
+		
+		file := FileOpen(fileName, "r")
+		size := file.Length
+		
+		file.RawRead(data, size)
+	
+		file.Close()
 		
 		return data
 	}
 	
-	writeSetup(simulator, car, track, type, name, setup) {
+	writeSetup(simulator, car, track, type, name, setup, size) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		
 		try {
@@ -280,9 +288,18 @@ class SessionDatabase {
 		catch exception {
 			; ignore
 		}
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%
 		
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%
-		FileAppend %setup%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
+		FileCreateDir %fileName%
+		
+		fileName := (fileName . "\" . name)
+		
+		file := FileOpen(fileName, "w", "")
+		
+		file.RawWrite(setup, size)
+	
+		file.Close()
 	}
 	
 	removeSetup(simulator, car, track, type, name) {

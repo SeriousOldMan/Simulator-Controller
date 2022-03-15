@@ -282,7 +282,7 @@ This tab gives you all you need to become a driver in a team session. Whenever y
 
 The details about the installation, configuration and usage of the *Team Server*, and also about the team administration task in general can be found in the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) for the *Team Server*.
 
-### The pitstop
+### The Pitstop
 
 The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing* and *Automobilista 2*.
 
@@ -343,17 +343,17 @@ Note: The database is stored in the *Simulator Controller\Database* folder, whic
 
 *Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines from [above sections](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), so that Jona has a correct understanding of your car and tyre setup. This has been important in the past to get a correct setup for an upcoming pitstop, but it is even more important when building the setup databse, so that we do not end up with compromised data. Jona will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since Jona will store the corrected values in the database, as long as your initial setup values are known.
 
-#### Querying the Session Database
+#### Managing the Session Database
 
 Whenever you have to setup your car for a given track and specific environmental conditions you can query the session database to get a recommendation on how to setup your car. When you start the application *Session Database.exe* from the *Binaries* folder, the following dialog will open up.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.jpg)
 
 This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the Virtual Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) using track and car specific default values.
 
 You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%204.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%204.jpg)
 
 You will get a summary of all available data in the list below the tabs. Please note, that the "Setup Repository" and the "Tyre Pressure Advisor" will only be available, when you have selected a specific car and a specific track before.
 
@@ -363,7 +363,7 @@ Last, but not least, you can write some notes in the field in the upper right co
 
 The Virtual Race Assistants provide many settings, as you have seen above in the section about the [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings). Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, of you can store default values for all theses settings in the session database.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.jpg)
 
 When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide settings for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and overwrite them for a more specific configuration. For example, you can provide an average "Pitstop Delta" for *all* tracks, but also supply a very precise value for those tracks you race most often.
 
@@ -373,7 +373,7 @@ You can use the "Test..." button to open the "Race Settings" tool to check the r
 
 This tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the session database.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
 Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download or delete a setup file from your simulator.
 
@@ -381,7 +381,7 @@ Use the drop down menu at the top to select the type of setup, you want to store
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the session database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
 Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
 

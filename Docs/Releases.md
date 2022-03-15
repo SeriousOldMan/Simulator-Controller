@@ -3,9 +3,10 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Finetuning for average lap times in Strategy simulation.
-  4. Renamed "Setup Database" to "Session Database".
-  5. Backend overhaul of the Session Database.
-  6. All new user interface for "Session Database".
+  4. Renamed the application "Setup Database" to "Session Database".
+  5. Renamed action function "openSetupDatabase" to "openSessionDatabase". Also renamed the similar named plugin parameters of the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugins.
+  6. Comprehensive revision of the session database backend to support the new race settings model.
+  7. All new user interface for "Session Database". See the fully [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for more information.
 
 ## 3.9.6-release 03/11/22
 

@@ -147,6 +147,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 	
+	iLastTracks := []
+	
 	iAirTemperature := 27
 	iTrackTemperature := 31
 	iTyreCompound := "Dry"
@@ -664,6 +666,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %window%:Default
 			
 			this.iSelectedSimulator := simulator
+			this.iLastTracks := []
 			
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 			
@@ -695,14 +698,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			if (car && (car != true)) {
 				choices := this.getTracks(this.SelectedSimulator, car)
+				
+				this.iLastTracks := choices.Clone()
+				
 				choices.InsertAt(1, translate("All"))
 			
 				GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
 				
 				this.loadTrack(true, true)
 			}
-			else
+			else if (this.iLastTracks.Length() > 0)
 				this.updateModules()
+			else
+				this.loadTrack(true, true)
 		}
 	}
 	
@@ -714,8 +722,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 			Gui %window%:Default
 			
-			if (track == true)
-				GuiControl Choose, trackDropDown, 1
+			if (track == true) {
+				if (this.iLastTracks.Length() > 0) {
+					index := (inList(this.iLastTracks, track) + 1)
+					
+					if (index == 1)
+						this.iSelectedTrack := true
+					
+					GuiControl Choose, trackDropDown, % index
+				}
+				else
+					GuiControl Choose, trackDropDown, 1
+			}
+			else if (this.iLastTracks.Length() > 0)
+				GuiControl Choose, trackDropDown, % inList(this.iLastTracks, track) + 1
 			else
 				GuiControl Choose, trackDropDown, % inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1
 		
@@ -1229,20 +1249,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 
 		if (fileName != "") {
-			oldEncoding := A_FileEncoding
+			file := FileOpen(fileName, "r")
+			size := file.Length
 			
-			try {
-				FileEncoding
+			file.RawRead(setup, size)
+		
+			file.Close()
 				
-				FileRead setup, %fileName%
-			}
-			finally {
-				FileEncoding %oldEncoding%
-			}
+							  
+	
 			
+							  
+	
+   
 			SplitPath fileName, fileName
 			
-			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup)
+			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size)
 		
 			this.loadSetups(this.SelectedSetupType, true)
 		}
@@ -1264,7 +1286,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 		
 		if (fileName != "") {
-			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName)
+			
+			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 			
 			try {
 				FileDelete %fileName%
@@ -1273,7 +1296,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				; ignore
 			}
 			
-			FileAppend %setupData%, %fileName%
+			file := FileOpen(fileName, "w", "")
+				
+			file.Length := size
+			file.RawWrite(setupData, size)
+		
+			file.Close()
 		}
 	}
 
@@ -1384,7 +1412,7 @@ closeSessionDatabaseEditor() {
 }
 
 openSessionDatabaseEditorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#session-database
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
 }
 
 chooseSimulator() {

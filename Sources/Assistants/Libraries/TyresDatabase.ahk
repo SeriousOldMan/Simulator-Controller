@@ -57,6 +57,29 @@ class TyresDatabase extends SessionDatabase {
 		
 		return new Database(kDatabaseDirectory . type . "\" . path, kTyresDataSchemas)
 	}
+	
+	requireDatabase(simulator, car, track) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		simulator := this.getSimulatorName(simulatorCode)
+		
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		
+		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track))) {
+			this.flush()
+			
+			this.iDatabase := false
+		}
+		
+		if !this.iDatabase {
+			this.iLastSimulator := simulator
+			this.iLastCar := car
+			this.iLastTrack := track
+			
+			this.iDatabase := this.getTyresDatabase(simulator, car, track, "User")
+		}
+		
+		return this.iDatabase
+	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor, ByRef distributions) {
 		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
@@ -85,7 +108,7 @@ class TyresDatabase extends SessionDatabase {
 		
 		conditions := {}
 
-		database := this.getTyresDatabase(simulator, car, track, "User")
+		database := this.requireDatabase(simulator, car, track)
 		
 		for ignore, condition in database.query("Tyres.Pressures.Distribution"
 											  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
@@ -173,7 +196,7 @@ class TyresDatabase extends SessionDatabase {
 		
 		info := []
 		
-		database := this.getTyresDatabase(simulator, car, track, "User")
+		database := this.requireDatabase(simulator, car, track)
 		
 		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
@@ -207,9 +230,9 @@ class TyresDatabase extends SessionDatabase {
 			weatherCandidateOffsets := [0, 1, 2, 3, 4, 5]
 		}
 		
-		localTyresDatabase := this.getTyresDatabase(simulator, car, track, "User")
-		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Global") : false)
-			
+		localTyresDatabase := this.requireDatabase(simulator, car, track)
+		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Community") : false)
+	
 		for ignore, weatherOffset in weatherCandidateOffsets {
 			weather := kWeatherOptions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherOptions.Length()))]
 			
@@ -253,19 +276,6 @@ class TyresDatabase extends SessionDatabase {
 		return {}
 	}
 	
-	requireDatabase(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		simulator := this.getSimulatorName(simulatorCode)
-		
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
-		
-		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track)))
-			this.flush()
-		
-		if !this.iDatabase
-			this.iDatabase := this.getTyresDatabase(simulator, car, track, "User")
-	}
-	
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
@@ -285,7 +295,10 @@ class TyresDatabase extends SessionDatabase {
 		for typeIndex, tPressures in [coldPressures, hotPressures]
 			for tyreIndex, pressure in tPressures
 				this.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-								  , types[typeIndex], tyres[tyreIndex], pressure, 1, flush, false)
+								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false)
+		
+		if flush
+			this.flush()
 	}
 	
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
@@ -300,8 +313,14 @@ class TyresDatabase extends SessionDatabase {
 								   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											, Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 		
-		if (rows.Length() > 0)
+		if (rows.Length() > 0) {
 			rows[1].Count := rows[1].Count + count
+			
+			if flush
+				this.flush()
+			else
+				this.iDatabase.changed("Tyres.Pressures.Distribution")
+		}
 		else
 			this.iDatabase.add("Tyres.Pressures.Distribution"
 							 , {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

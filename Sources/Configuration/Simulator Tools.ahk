@@ -1466,25 +1466,42 @@ updateInstallationForV354() {
 }
 
 updateConfigurationForV398() {
-	try {
-		if FileExist(kDatabaseDirectory . "User")
-			FileRemoveDir %kDatabaseDirectory%User, 1
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		for ignore, simulator in ["Assetto Corsa Competizione", "rFactor 2", "iRacing", "Automobilista 2", "RaceRoom Racing Experience"] {
+			if (getConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", false) = "SetupDatabase")
+				setConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", "SettingsDatabase")
+			
+			if (getConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false) = "SetupDatabase")
+				setConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "TyresDatabase")
+			
+			setConfigurationValue(userConfiguration, "Race Assistant Shutdown", simulator . ".SaveSettings", "Never")
+		}
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+	
+	if FileExist(kDatabaseDirectory . "Local")
+		try {
+			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
 		
-		FileMoveDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
-	}
-	catch exception {
-		; ignore
-	}
+			FileRemoveDir %kDatabaseDirectory%Local, 1
+		}
+		catch exception {
+			; ignore
+		}
 	
-	try {
-		if FileExist(kDatabaseDirectory . "Community")
-			FileRemoveDir %kDatabaseDirectory%Community, 1
-	
-		FileMoveDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
-	}
-	catch exception {
-		; ignore
-	}
+	if FileExist(kDatabaseDirectory . "Global")
+		try {
+			FileCopyDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
+		
+			FileRemoveDir %kDatabaseDirectory%Global, 1
+		}
+		catch exception {
+			; ignore
+		}
 	
 	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{

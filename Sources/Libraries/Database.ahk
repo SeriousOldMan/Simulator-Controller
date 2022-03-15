@@ -192,6 +192,10 @@ class Database {
 		}
 	}
 	
+	changed(name) {
+		this.iTableChanged[name] := true
+	}
+	
 	flush(name := false) {
 		if name {
 			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {

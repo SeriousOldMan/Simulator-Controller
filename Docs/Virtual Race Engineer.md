@@ -395,6 +395,8 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
+Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available, when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+
 #### Race Settings
 
 The Virtual Race Assistants provide many settings, as you have seen above in the section about the [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings). Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, of you can store default values for all theses settings in the session database.

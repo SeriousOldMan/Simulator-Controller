@@ -67,6 +67,14 @@ class SessionDatabase {
 		
 		this.iControllerConfiguration := controllerConfiguration
 	}
+	
+	ensure(simulator, car, track) {
+		if (simulator && car && track) {
+			simulatorCode := this.getSimulatorCode(simulator)
+
+			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		}
+	}
 		
 	getEntries(filter := "*.*", option := "D") {
 		result := []

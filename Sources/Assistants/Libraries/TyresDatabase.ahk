@@ -49,25 +49,27 @@ class TyresDatabase extends SessionDatabase {
 	iLastSimulator := false
 	iLastCar := false
 	iLastTrack := false
+	iLastScope := false
 	
 	iDatabase := false
 	
-	getTyresDatabase(simulator, car, track, type := "User") {
+	getTyresDatabase(simulator, car, track, scope := "User") {
 		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
 		
-		return new Database(kDatabaseDirectory . type . "\" . path, kTyresDataSchemas)
+		return new Database(kDatabaseDirectory . scope . "\" . path, kTyresDataSchemas)
 	}
 	
-	requireDatabase(simulator, car, track) {
+	requireDatabase(simulator, car, track, scope := "User") {
 		simulatorCode := this.getSimulatorCode(simulator)
 		simulator := this.getSimulatorName(simulatorCode)
 		
 		if (car == true)
 			MsgBox Here
 		
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		FileCreateDir %kDatabaseDirectory%%scope%\%simulatorCode%\%car%\%track%
 		
-		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track))) {
+		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
+							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
 			this.flush()
 			
 			this.iDatabase := false
@@ -77,8 +79,9 @@ class TyresDatabase extends SessionDatabase {
 			this.iLastSimulator := simulator
 			this.iLastCar := car
 			this.iLastTrack := track
+			this.iLastScope := scope
 			
-			this.iDatabase := this.getTyresDatabase(simulator, car, track, "User")
+			this.iDatabase := this.getTyresDatabase(simulator, car, track, scope)
 		}
 		
 		return this.iDatabase
@@ -305,12 +308,12 @@ class TyresDatabase extends SessionDatabase {
 	}
 	
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true) {
+				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User") {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 		
 		if require
-			this.requireDatabase(simulator, car, track)
+			this.requireDatabase(simulator, car, track, scope)
 		
 		rows := this.iDatabase.query("Tyres.Pressures.Distribution"
 								   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

@@ -657,7 +657,7 @@ shareSessionDatabase() {
 			
 			try {
 				try {
-					FileRemoveDir %kTempDirectory%SetupDabase, 1
+					FileRemoveDir %kTempDirectory%DBase, 1
 				}
 				catch exception {
 					; ignore
@@ -667,33 +667,33 @@ shareSessionDatabase() {
 				{
 					simulator := A_LoopFileName
 					
-					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
+					FileCreateDir %kTempDirectory%DBase\%simulator%
 					
 					Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					{
 						car := A_LoopFileName
 					
-						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
+						FileCreateDir %kTempDirectory%DBase\%simulator%\%car%
 						
 						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
 						{
 							track := A_LoopFileName
 					
-							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+							FileCreateDir %kTempDirectory%DBase\%simulator%\%car%\%track%
 							
 							if shareTyrePressures {
 								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
-									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+									FileCopy %A_LoopFilePath%, %kTempDirectory%DBase\%simulator%\%car%\%track%
 								
 								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
 								
 								if FileExist(distFile)
-									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
+									FileCopy %distFile%, %kTempDirectory%DBase\%simulator%\%car%\%track%
 							}
 							
 							if shareCarSetups {
 								try {
-									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
+									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%DBase\%simulator%\%car%\%track%\Car Setups
 								}
 								catch exception {
 									; ignore
@@ -710,7 +710,7 @@ shareSessionDatabase() {
 					; ignore
 				}
 				
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%DBase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
 				
 				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
 				

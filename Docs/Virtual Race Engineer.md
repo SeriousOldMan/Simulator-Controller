@@ -419,6 +419,8 @@ The race assistants use several values from the race settings to calculate, how 
 
 Important note: The value for the setting "Race Duration" is stored in seconds, although it will display in minutes in many locations. So you will have to enter 3600 for 60 minute race here. Comparable transformations may apply to other values. Therefore use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings.
 
+The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings).
+
 #### Setup Repository
 
 This tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the session database.

@@ -231,7 +231,7 @@ Loading of settings is supported for:
   
   3. Session Database
      
-     All preconfigured setting values for the selected simulator / car / track / weather combination are loaded from the Session Database. Available values are used to initialize the same fields as with the contents of the *Race.settings* file.
+     All preconfigured setting values for the selected simulator / car / track / weather combination are [loaded from the Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1). Available values are used to initialize the same fields as with the contents of the *Race.settings* file.
 
   4. Telemetry Data
   

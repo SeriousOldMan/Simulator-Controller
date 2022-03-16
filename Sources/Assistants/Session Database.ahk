@@ -92,6 +92,7 @@ global deleteSettingButton
 global setupTypeDropDown
 global uploadSetupButton
 global downloadSetupButton
+global renameSetupButton
 global deleteSetupButton
 
 global dryQualificationDropDown
@@ -426,11 +427,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
 		
-		Gui %window%:Add, Button, xp+285 yp+200 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
+		Gui %window%:Add, Button, xp+260 yp+200 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadSetupButtonHandle gdownloadSetup vdownloadSetupButton
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameSetupButtonHandle grenameSetup vrenameSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSetupButtonHandle gdeleteSetup vdeleteSetupButton
 		setButtonIcon(uploadSetupButtonHandle, kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(downloadSetupButtonHandle, kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(renameSetupButtonHandle, kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui Tab, 3
@@ -637,12 +640,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		selected := LV_GetNext(0)
 		
 		if selected {
+			LV_GetText(type, selected, 1)
+			
 			GuiControl Enable, downloadSetupButton
-			GuiControl Enable, deleteSetupButton
+			
+			if (type = translate("Local")) {
+				GuiControl Enable, deleteSetupButton
+				GuiControl Enable, renameSetupButton
+			}
+			else {
+				GuiControl Disable, deleteSetupButton
+				GuiControl Disable, renameSetupButton
+			}
 		}
 		else {
 			GuiControl Disable, downloadSetupButton
 			GuiControl Disable, deleteSetupButton
+			GuiControl Disable, renameSetupButton
 		}
 		
 		Gui ListView, % this.SettingsListView
@@ -1346,6 +1360,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadSetups(this.SelectedSetupType, true)
 		}
 	}
+
+	renameSetup(setupType, setupName) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		SplitPath setupName, , , curExtension, curName
+			
+		title := translate("Delete")
+		prompt := translate("Please enter the new name for the selected setup:")
+		
+		locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
+		
+		if !ErrorLevel {
+			GuiControlGet simulatorDropDown
+			GuiControlGet carDropDown
+			GuiControlGet trackDropDown
+			
+			if (StrLen(curExtension) > 0)
+				newName .= ("." . curExtension)
+			
+			this.SessionDatabase.renameSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, newName)
+			
+			this.loadSetups(this.SelectedSetupType, true)
+		}
+	}
 }
 
 
@@ -1815,6 +1857,21 @@ downloadSetup() {
 	LV_GetText(name, LV_GetNext(0), 2)
 	
 	SessionDatabaseEditor.Instance.downloadSetup(kSetupTypes[setupTypeDropDown], name)
+}
+
+renameSetup() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet setupTypeDropDown
+	
+	Gui ListView, % editor.SetupListView
+	
+	LV_GetText(name, LV_GetNext(0), 2)
+	
+	SessionDatabaseEditor.Instance.renameSetup(kSetupTypes[setupTypeDropDown], name)
 }
 
 deleteSetup() {

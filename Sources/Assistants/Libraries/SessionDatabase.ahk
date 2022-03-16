@@ -325,6 +325,17 @@ class SessionDatabase extends ConfigurationItem {
 		file.Close()
 	}
 	
+	renameSetup(simulator, car, track, type, oldName, newName) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		try {
+			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
 	removeSetup(simulator, car, track, type, name) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		

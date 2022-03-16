@@ -395,7 +395,13 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available, when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
+
+Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
+
+Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+
+Following you will find an overview about the different database topics:
 
 #### Race Settings
 
@@ -428,10 +434,6 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
 Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
-
-With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
-
-Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
 
 ## Technical information
 

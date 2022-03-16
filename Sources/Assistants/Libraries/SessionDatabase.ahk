@@ -36,7 +36,7 @@ global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSe
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SessionDatabase {
+class SessionDatabase extends ConfigurationItem {
 	iControllerConfiguration := false
 	
 	iUseCommunity := false
@@ -53,11 +53,19 @@ class SessionDatabase {
 		}
 		
 		Set {
+			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			
+			setConfigurationValue(configuration, "Scope", "Community", value)
+			
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			
 			return (this.iUseCommunity := value)
 		}
 	}
 	
 	__New(controllerConfiguration := false) {
+		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
+		
 		if !controllerConfiguration {
 			controllerConfiguration := getControllerConfiguration()
 		
@@ -68,11 +76,16 @@ class SessionDatabase {
 		this.iControllerConfiguration := controllerConfiguration
 	}
 	
-	ensure(simulator, car, track) {
+	loadFromConfiguration(configuration) {
+		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+	}
+	
+	prepareDatabase(simulator, car, track) {
 		if (simulator && car && track) {
 			simulatorCode := this.getSimulatorCode(simulator)
 
-			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+			if (simulatorCode && (car != true) && (track != true))
+				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 		}
 	}
 		
@@ -151,9 +164,8 @@ class SessionDatabase {
 	getCars(simulator) {
 		code := this.getSimulatorCode(simulator)
 		
-		if code {
+		if code
 			return this.getEntries(code . "\*.*")
-		}
 		else
 			return []
 	}
@@ -161,9 +173,8 @@ class SessionDatabase {
 	getTracks(simulator, car) {
 		code := this.getSimulatorCode(simulator)
 		
-		if code {
+		if code
 			return this.getEntries(code . "\" . car . "\*.*")
-		}
 		else
 			return []
 	}

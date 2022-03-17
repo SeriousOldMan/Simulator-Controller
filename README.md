@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[3.9.8-alpha](https://www.dropbox.com/s/2ghar8omf74lykc/Simulator%20Controller%203.9.8-alpha.zip?dl=1) (Test build for version 3.9.8. New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase". Stable, incl. documentation and update procedure.)
+[3.9.8-rc1](https://www.dropbox.com/s/z4ir9r81bd9kl4i/Simulator%20Controller%203.9.8-rc1.zip?dl=1) (Release candidate for version 3.9.8. New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase". Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-398) of this version and all the versions you might have skipped, before installing and using this version.
 

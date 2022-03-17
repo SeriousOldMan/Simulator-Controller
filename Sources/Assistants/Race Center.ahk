@@ -5704,7 +5704,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
 			avgLapTimesData.Push("<td class=""td-std"">" . Round(average(lapTimes), 1) . "</td>")
-			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 1) . "</td>")
+			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
 			

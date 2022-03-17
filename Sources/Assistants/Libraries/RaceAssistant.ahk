@@ -915,14 +915,13 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	saveSessionSettings() {
-		/*
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
 		if knowledgeBase {
 			settingsDB := this.SettingsDatabase
 			
-			simulatorName := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
@@ -930,32 +929,30 @@ class RaceAssistant extends ConfigurationItem {
 			compound := knowledgeBase.getValue("Tyre.Compound")
 			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 			
-			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
-			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulator . ".LoadSettings", oldValue)
 		
-			duration := (Round((duration / 60) / 5) * 300)
-			
-			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
-			
 			lapTime := Round(this.BestLapTime / 1000)
 			
-			if (lapTime > 10)
-				values["AvgLapTime"] := lapTime
-			
-			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase"))
-				settingsDB.updateSettings(simulatorName, car, track
-										, {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
+				settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				
+				if (lapTime > 10)
+					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
+			}
 			else {
 				fileName := getFileName("Race.settings", kUserConfigDirectory)
 				
 				settings := readConfiguration(fileName)
 				
-				settingsDB.updateSettingsValues(settings, values)
+				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				
+				if (lapTime > 10)
+					setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
 				
 				writeConfiguration(fileName, settings)
 			}
 		}
-		*/
 	}
 	
 	dumpKnowledge(knowledgeBase) {

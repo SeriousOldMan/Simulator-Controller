@@ -797,18 +797,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
 
 			userSetups := true
-			communitySetups := true
+			communitySetups := this.UseCommunity
 			
 			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
 			
-			for type, setups in userSetups
-				if (type = setupType)
-					for ignore, name in setups
-						LV_Add("", translate("Local"), name)
+			userSetups := userSetups[type]
 			
-			for type, setups in communitySetups
-				if (type = setupType)
-					for ignore, name in setups
+			for ignore, name in userSetups
+				LV_Add("", translate("Local"), name)
+			
+			if communitySetups
+				for ignore, name in communitySetups[type]
+					if !inList(userSetups, name)
 						LV_Add("", translate("Community"), name)
 			
 			LV_ModifyCol()

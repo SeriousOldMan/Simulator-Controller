@@ -242,7 +242,8 @@ class SessionDatabase {
 				{
 					SplitPath A_LoopFileName, name
 				
-					setups.Push(name)
+					if !inList(setups, name)
+						setups.Push(name)
 				}
 				
 				userSetups[type] := setups
@@ -259,7 +260,8 @@ class SessionDatabase {
 				{
 					SplitPath A_LoopFileName, name
 				
-					setups.Push(name)
+					if !inList(setups, name)
+						setups.Push(name)
 				}
 				
 				communitySetups[type] := setups
@@ -273,14 +275,24 @@ class SessionDatabase {
 		data := false
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 		
-		file := FileOpen(fileName, "r")
-		size := file.Length
+		if !FileExist(fileName)
+			fileName = %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 		
-		file.RawRead(data, size)
-	
-		file.Close()
+		if FileExist(fileName) {
+			file := FileOpen(fileName, "r")
+			size := file.Length
+			
+			file.RawRead(data, size)
 		
-		return data
+			file.Close()
+			
+			return data
+		}
+		else {
+			size := 0
+		
+			return ""
+		}
 	}
 	
 	writeSetup(simulator, car, track, type, name, setup, size) {

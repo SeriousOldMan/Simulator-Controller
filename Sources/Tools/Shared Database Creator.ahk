@@ -275,7 +275,7 @@ createDatabases(inputDirectory, outputDirectory) {
 	
 	new DatabaseCreator(inputDirectory, database . "\", false, true).createDatabase()
 	
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 	
 	if FileExist(database ".zip")
 		archives.Push(database ".zip")
@@ -297,7 +297,7 @@ createDatabases(inputDirectory, outputDirectory) {
 	
 	new DatabaseCreator(inputDirectory, database . "\", true, true).createDatabase()
 	
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 	
 	if FileExist(database ".zip")
 		archives.Push(database ".zip")
@@ -339,7 +339,11 @@ createSharedDatabases() {
 	
 	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
 	
-	for ignore, filePath in createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\") {
+	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
+	
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "..."})
+	
+	for ignore, filePath in archives {
 		SplitPath filePath, fileName
 	
 		updateProgress("Uploading " . fileName . "...")

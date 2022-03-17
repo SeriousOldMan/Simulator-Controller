@@ -405,17 +405,30 @@ Following you will find an overview about the different database topics:
 
 #### Race Settings
 
-The Virtual Race Assistants provide many settings, as you have seen above in the section about the [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings). Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, of you can store default values for all theses settings in the session database.
+The Virtual Race Assistants provide many settings, as you have seen above in the section about the [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings). Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, or you can store default values for all theses settings in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.jpg)
 
-When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide settings for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and overwrite them for a more specific configuration. Let's take a look at a specific example:
+When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide settings for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and *overwrite* them for a more specific configuration. Let's take a look at a specific example:
 
-The race assistants use several values from the race settings to calculate, how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be the same for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
+The race assistants use several values from the race settings to calculate how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be identical for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
 
 | Settings for *all* cars and *all* tracks | Specific setting for *Hungaroring* |
 |------------------------------------------|------------------------------------|
 | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%208.jpg) | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%209.jpg) |
+
+Below you find the order, in which the different combinations will be loaded. As you can see, setting values from a more concrete combination of car / track / weather will be *overwriten* those from a less specific combination.
+
+| Car      | Track    | Weather  |
+|----------|----------|----------|
+| All      | All      | All      |
+| Specific | All      | All      |
+| All      | Specific | All      |
+| All      | All      | Specific |
+| Specific | Specific | All      |
+| Specific | All      | Specific |
+| All      | Specific | Specific |
+| Specific | Specific | Specific |
 
 Important note: The value for the setting "Race Duration" is stored in seconds, although it will display in minutes in many locations. So you will have to enter 3600 for 60 minute race here. Comparable transformations may apply to other values. Therefore use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings.
 

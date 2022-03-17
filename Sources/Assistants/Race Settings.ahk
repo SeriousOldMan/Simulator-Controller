@@ -990,7 +990,7 @@ restart:
 		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
 			if new Application(simulator, kSimulatorConfiguration).isRunning() {
 				import := true
-				
+			
 				break
 			}
 		
@@ -1269,18 +1269,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				break
 			}
 		
-		switch simulator {
-			case "Assetto Corsa Competizione":
-				prefix := "ACC"
-			case "RaceRoom Racing Experience":
-				prefix := "R3E"
-			case "rFactor 2":
-				prefix := "RF2"
-			case "iRacing":
-				prefix := "IRC"
-			default:
-				return
-		}
+		prefix := new SessionDatabase().getSimulatorCode(simulator)
 	}
 	
 	data := readSimulatorData(prefix)
@@ -1318,11 +1307,11 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 				
 				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
-					message := ((color = "Black") ? "Tyre setup imported: Dry" : "Tyre setup imported: Dry (" . color . ")")
+					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? "Dry" : " (" . color . ")")))
 					
-					showMessage(message . ", Set " . spSetupTyreSetEdit . "; "
-							  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
-							  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
+							  . Round(spDryFrontLeftEdit, 1) . translate(", ") . Round(spDryFrontRightEdit, 1) . translate(", ")
+							  . Round(spDryRearLeftEdit, 1) . translate(", ") . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
 				}
 			}
 			else {
@@ -1355,9 +1344,11 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 				
 				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2"))
-					showMessage("Tyre setup imported: Wet; "
-							  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
-							  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? "Dry" : " (" . color . ")")))
+					
+					showMessage(message . translate("; ")
+							  . Round(spWetFrontLeftEdit, 1) . translate(", ") . Round(spWetFrontRightEdit, 1) . translate(", ")
+							  . Round(spWetRearLeftEdit, 1) . translate(", ") . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
 			}
 			else {
 				GuiControl Choose, spSetupTyreCompoundDropDown, 1

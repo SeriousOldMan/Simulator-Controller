@@ -6,7 +6,8 @@
   4. Renamed the application "Setup Database" to "Session Database".
   5. Renamed action function "openSetupDatabase" to "openSessionDatabase". Also renamed the similar named plugin parameters of the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugins.
   6. Comprehensive revision of the session database backend to support the new race settings model.
-  7. All new user interface for "Session Database". See the fully [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for more information.
+  7. Completely new [handling of race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) at the start of a session. For the moment, the saving of race settings at the end of a session is disabled. This will be enabled again with the next release.
+  8. All new user interface for "Session Database". See the fully [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for more information.
 
 ## 3.9.6-release 03/11/22
 

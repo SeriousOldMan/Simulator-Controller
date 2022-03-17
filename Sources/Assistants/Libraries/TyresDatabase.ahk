@@ -46,6 +46,8 @@ global kMaxTemperatureDelta = 4
 ;;;-------------------------------------------------------------------------;;;
 
 class TyresDatabase extends SessionDatabase {
+	iDatabaseDirectory := kDatabaseDirectory
+	
 	iLastSimulator := false
 	iLastCar := false
 	iLastTrack := false
@@ -53,21 +55,30 @@ class TyresDatabase extends SessionDatabase {
 	
 	iDatabase := false
 	
-	getTyresDatabase(simulator, car, track, scope := "User") {
-		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
+	DatabaseDirectory[] {
+		Get {
+			return this.iDatabaseDirectory
+		}
 		
-		return new Database(kDatabaseDirectory . scope . "\" . path, kTyresDataSchemas)
+		Set {
+			return (this.iDatabaseDirectory := value)
+		}
+	}
+	
+	getTyresDatabase(simulator, car, track, scope := "User") {
+		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
+		
+		FileCreateDir %directory%
+		
+		return new Database(directory . "\", kTyresDataSchemas)
 	}
 	
 	requireDatabase(simulator, car, track, scope := "User") {
-		simulatorCode := this.getSimulatorCode(simulator)
-		simulator := this.getSimulatorName(simulatorCode)
+		simulator := this.getSimulatorName(simulator)
 		
 		if (car == true)
 			MsgBox Here
-		
-		FileCreateDir %kDatabaseDirectory%%scope%\%simulatorCode%\%car%\%track%
-		
+
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
 							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
 			this.flush()

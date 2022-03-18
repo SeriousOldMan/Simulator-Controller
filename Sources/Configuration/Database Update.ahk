@@ -43,7 +43,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups) {
-	uploadTimeStamp := kDatabaseDirectory . "User\UPLOAD"
+	uploadTimeStamp := kDatabaseDirectory . "UPLOAD"
 	
 	if FileExist(uploadTimeStamp) {
 		FileReadLine upload, %uploadTimeStamp%, 1
@@ -134,13 +134,13 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		}
 		
 		try {
-			FileDelete %kDatabaseDirectory%User\UPLOAD
+			FileDelete %kDatabaseDirectory%UPLOAD
 		}
 		catch exception {
 			; ignore
 		}
 		
-		FileAppend %A_Now%, %kDatabaseDirectory%User\UPLOAD
+		FileAppend %A_Now%, %kDatabaseDirectory%UPLOAD
 		
 		logMessage(kLogInfo, translate("Database successfully uploaded"))
 	}
@@ -153,6 +153,19 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups) {
+	downloadTimeStamp := kDatabaseDirectory . "DOWNLOAD"
+	
+	if FileExist(downloadTimeStamp) {
+		FileReadLine download, %downloadTimeStamp%, 1
+		
+		now := A_Now
+		
+		EnvSub now, %download%, days
+		
+		if (now <= 2)
+			return
+	}
+	
 	try {
 		try {
 			FileRemoveDir %kTempDirectory%Shared Database, 1
@@ -198,6 +211,15 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 		catch exception {
 			; ignore
 		}
+		
+		try {
+			FileDelete %kDatabaseDirectory%DOWNLOAD
+		}
+		catch exception {
+			; ignore
+		}
+		
+		FileAppend %A_Now%, %kDatabaseDirectory%DOWNLOAD
 		
 		logMessage(kLogInfo, translate("Database successfully downloaded"))
 	}

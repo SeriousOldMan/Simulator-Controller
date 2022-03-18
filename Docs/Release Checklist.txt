@@ -22,6 +22,14 @@ Release 3.9.8 Checklist
 
 0. Search for new links (*)
 1. Update Procedure
+   a. Translations
+   b. Renew database consent
+
+Release 3.9.8 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
    a. Full update of the Database directory
    b. Update Configuration: "SetupDatabase" => "TyresDatabase"
    c. Update Configuration: "Race Assistant Shutdown", simulatorName . ".SaveSettings" => "Never"

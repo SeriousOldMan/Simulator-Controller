@@ -537,6 +537,8 @@ checkInstallation() {
 						Run %installLocation%\Binaries\Simulator Setup.exe
 				}
 				else {
+					Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes
+				
 					index := inList(A_Args, "-Start")
 				
 					if index
@@ -1462,6 +1464,16 @@ updateInstallationForV354() {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 		
 		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+	}
+}
+
+
+updateConfigurationForV400() {
+	try {
+		FileDelete %kDatabaseDirectory%User\UPLOAD
+	}
+	catch exception {
+		; ignore
 	}
 }
 

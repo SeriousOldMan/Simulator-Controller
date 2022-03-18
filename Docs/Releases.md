@@ -5,6 +5,7 @@
   3. Full implementation of the database consolidation and distribution process. Depending on your own consent, you will receive new tyre pressure information or even shared car setups from the community every 2 days. Because of this, you will be asked to renew your consent for sharing your own data, because you will only receive anything, if you are also willing to share.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) and check whether any manual updates to your local configuration might be necessary.
+  4. [Developer] Added a class library for handling complex FTP operations.
 
 ## 3.9.8-release 03/18/22
 

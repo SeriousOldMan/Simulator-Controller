@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -744,7 +744,7 @@ createShortcuts(location, installLocation) {
 		
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 		
-		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
+		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
 						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
@@ -771,7 +771,7 @@ deleteShortcuts(location) {
 		}
 	}
 	
-	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Setup Database"
+	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
 					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
 		try {
 			FileDelete %location%\%name%.lnk
@@ -798,7 +798,7 @@ writeAppPaths(installLocation) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe, , %installLocation%\Binaries\Simulator Setup.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe, , %installLocation%\Binaries\Simulator Configuration.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe, , %installLocation%\Binaries\Race Settings.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe, , %installLocation%\Binaries\Setup Database.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe, , %installLocation%\Binaries\Session Database.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe, , %installLocation%\Binaries\Race Reports.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe, , %installLocation%\Binaries\Strategy Workbench.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
@@ -813,7 +813,7 @@ deleteAppPaths() {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe
-	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe
@@ -1393,6 +1393,37 @@ renewConsent() {
 	}
 }
 
+updateInstallationForV398() {
+	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	
+	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+		
+		try {
+			FileDelete %installLocation%\Binaries\Setup Database.exe
+			
+			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
+		}
+		catch exception {
+			; ignore
+		}
+	}
+		
+	if (getConfigurationValue(installOptions, "Install", "Type", false) = "Registry") {
+		try {
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe, , %installLocation%\Binaries\Session Database.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe, , %installLocation%\Binaries\Setup Advisor.exe
+			
+			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
+		}
+		catch exception {
+			; ignore
+		}
+	}
+}
+
 updateInstallationForV392() {
 	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
 	
@@ -1434,6 +1465,79 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV398() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		for ignore, simulator in ["Assetto Corsa Competizione", "rFactor 2", "iRacing", "Automobilista 2", "RaceRoom Racing Experience"] {
+			if (getConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", false) = "SetupDatabase")
+				setConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", "SettingsDatabase")
+			
+			if (getConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false) = "SetupDatabase")
+				setConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "TyresDatabase")
+			
+			setConfigurationValue(userConfiguration, "Race Assistant Shutdown", simulator . ".SaveSettings", "Never")
+		}
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+	
+	if FileExist(kDatabaseDirectory . "Local")
+		try {
+			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
+		
+			FileRemoveDir %kDatabaseDirectory%Local, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	if FileExist(kDatabaseDirectory . "Global")
+		try {
+			FileCopyDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
+		
+			FileRemoveDir %kDatabaseDirectory%Global, 1
+		}
+		catch exception {
+			; ignore
+		}
+	
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+		
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+			
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+				
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Setup.Pressures.CSV
+				
+				if FileExist(fileName)
+					FileMove %fileName%, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.CSV
+				
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Setup.Pressures.Distribution.CSV
+				
+				if FileExist(fileName)
+					FileMove %fileName%, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.Distribution.CSV
+			}
+		}
+	}
+	
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+	
+		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
+		
+		FileDelete %kUserHomeDirectory%Setup\Setup.data
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
+	}
+}
+
 updateConfigurationForV394() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1450,7 +1554,7 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	setupDB := new SetupDatabase()
+	setupDB := new TyresDatabase()
 	
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
@@ -1498,7 +1602,7 @@ updateConfigurationForV378() {
 }
 
 updateConfigurationForV372() {
-	setupDB := new SetupDatabase()
+	setupDB := new TyresDatabase()
 	
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
@@ -1645,6 +1749,31 @@ updateConfigurationForV310() {
 		catch exception {
 			; ignore
 		}
+}
+
+updatePluginsForV398() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
+		
+		if engineerDescriptor {
+			engineerDescriptor := StrReplace(engineerDescriptor, "openSetupDatabase", "openSessionDatabase")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
+		}
+		
+		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
+		
+		if strategistDescriptor {
+			strategistDescriptor := StrReplace(strategistDescriptor, "openSetupDatabase", "openSessionDatabase")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
+		}
+			
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
 }
 
 updatePluginsForV386() {

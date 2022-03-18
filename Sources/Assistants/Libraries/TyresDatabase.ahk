@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Database                  ;;;
+;;;   Modular Simulator Controller System - Tyres Database                  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -24,19 +24,12 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDryQualificationSetup = "DQ"
-global kDryRaceSetup = "DR"
-global kWetQualificationSetup = "WQ"
-global kWetRaceSetup = "WR"
-
-global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
-
-global kSetupDataSchemas := {"Setup.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+global kTyresDataSchemas := {"Tyres.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 											   , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											   , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 											   , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
 											   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
-						   , "Setup.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+						   , "Tyres.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 															, "Type", "Tyre", "Pressure", "Count"]}
 
 
@@ -52,23 +45,67 @@ global kMaxTemperatureDelta = 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SetupDatabase extends SessionDatabase {
+class TyresDatabase extends SessionDatabase {
+	iDatabaseDirectory := kDatabaseDirectory
+	
 	iLastSimulator := false
 	iLastCar := false
 	iLastTrack := false
+	iLastScope := false
 	
 	iDatabase := false
 	
-	getSetupDatabase(simulator, car, track, type) {
-		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
+	DatabaseDirectory[] {
+		Get {
+			return this.iDatabaseDirectory
+		}
 		
-		return new Database(kDatabaseDirectory . type . "\" . path, kSetupDataSchemas)
+		Set {
+			return (this.iDatabaseDirectory := value)
+		}
+	}
+	
+	getTyresDatabase(simulator, car, track, scope := "User") {
+		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
+		
+		FileCreateDir %directory%
+		
+		return new Database(directory . "\", kTyresDataSchemas)
+	}
+	
+	requireDatabase(simulator, car, track, scope := "User") {
+		simulator := this.getSimulatorName(simulator)
+		
+		if (car == true)
+			MsgBox Here
+
+		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
+							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
+			this.flush()
+			
+			this.iDatabase := false
+		}
+		
+		if !this.iDatabase {
+			this.iLastSimulator := simulator
+			this.iLastCar := car
+			this.iLastTrack := track
+			this.iLastScope := scope
+			
+			this.iDatabase := this.getTyresDatabase(simulator, car, track, scope)
+		}
+		
+		return this.iDatabase
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor, ByRef distributions) {
-		for ignore, pressureData in database.query("Setup.Pressures.Distribution"
-												 , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-														  , Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}}) {
+		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+				, Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
+		
+		if (weather != true)
+			where["Weather"] := weather
+		
+		for ignore, pressureData in database.query("Tyres.Pressures.Distribution", {Where: where}) {
 			tyre := pressureData.Tyre
 			pressure := pressureData.Pressure
 			
@@ -88,18 +125,18 @@ class SetupDatabase extends SessionDatabase {
 		
 		conditions := {}
 
-		database := this.getSetupDatabase(simulator, car, track, "Local")
+		database := this.requireDatabase(simulator, car, track)
 		
-		for ignore, condition in database.query("Setup.Pressures.Distribution"
+		for ignore, condition in database.query("Tyres.Pressures.Distribution"
 											  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 											   , Where: {Type: "Cold"}})
 			conditions[values2String("|", condition.Weather, condition["Temperature.Air"], condition["Temperature.Track"]
 										, condition.Compound, condition["Compound.Color"])] := true
 		
-		if this.UseGlobalDatabase {
-			database := this.getSetupDatabase(simulator, car, track, "Global")
+		if this.UseCommunity {
+			database := this.getTyresDatabase(simulator, car, track, "Community")
 			
-			for ignore, condition in database.query("Setup.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				conditions[values2String("|", condition*)] := true
 		}
@@ -127,9 +164,14 @@ class SetupDatabase extends SessionDatabase {
 				
 				conditionIndex := inList(kWeatherOptions, condition[1])
 			
-				if (((Abs(weatherIndex - conditionIndex) <= 1) || ((weatherIndex >= 2) && (conditionIndex >= 2))) && !inList(visited, theCompound)) {  
-					visited.Push(theCompound)
+				valid := (weather == true)
 				
+				if !valid
+					valid := (!inList(visited, theCompound) && ((Abs(weatherIndex - conditionIndex) <= 1) || ((weatherIndex >= 2) && (conditionIndex >= 2))))
+				
+				if valid {  
+					visited.Push(theCompound)
+					
 					compounds.Push(Array(condition[4], condition[5]))
 				}
 			}
@@ -166,19 +208,48 @@ class SetupDatabase extends SessionDatabase {
 		return false
 	}
 	
+	getPressureInfo(simulator, car, track, weather) {
+		local database
+		
+		info := []
+		
+		database := this.requireDatabase(simulator, car, track)
+		
+		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+		
+		database := this.getTyresDatabase(simulator, car, track, "Community")
+		
+		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: this.qualifiedCompound(row.Compound, row.CompoundColor), Count: row.Count})
+		
+		return info
+	}
+	
 	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor) {
-		weatherBaseIndex := inList(kWeatherOptions, weather)
-		
-		if (weatherBaseIndex == 1)
-			weatherCandidateOffsets := [0, 1]
-		if (weatherBaseIndex == 2)
-			weatherCandidateOffsets := [0, -1]
-		else
-			weatherCandidateOffsets := [0, 1, 2, 3]
-		
-		localSetupDatabase := this.getSetupDatabase(simulator, car, track, "Local")
-		globalSetupDatabase := (this.UseGlobalDatabase ? this.getSetupDatabase(simulator, car, track, "Global") : false)
+		if (weather != true) {
+			weatherBaseIndex := inList(kWeatherOptions, weather)
 			
+			if (weatherBaseIndex == 1)
+				weatherCandidateOffsets := [0, 1]
+			if (weatherBaseIndex == 2)
+				weatherCandidateOffsets := [0, -1]
+			else
+				weatherCandidateOffsets := [0, 1, 2, 3]
+		}
+		else {
+			weatherBaseIndex := 1
+		
+			weatherCandidateOffsets := [0, 1, 2, 3, 4, 5]
+		}
+		
+		localTyresDatabase := this.requireDatabase(simulator, car, track)
+		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Community") : false)
+	
 		for ignore, weatherOffset in weatherCandidateOffsets {
 			weather := kWeatherOptions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherOptions.Length()))]
 			
@@ -186,10 +257,10 @@ class SetupDatabase extends SessionDatabase {
 				for ignore, trackDelta in kTemperatureDeltas {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 					
-					this.getPressureDistributions(localSetupDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
+					this.getPressureDistributions(localTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
 					
-					if this.UseGlobalDatabase
-						this.getPressureDistributions(globalSetupDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
+					if this.UseCommunity
+						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta, compound, compoundColor, distributions)
 					
 					if (distributions["FL"].Count() != 0) {
 						thePressures := {}
@@ -222,26 +293,13 @@ class SetupDatabase extends SessionDatabase {
 		return {}
 	}
 	
-	requireDatabase(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		simulator := this.getSimulatorName(simulatorCode)
-		
-		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
-		
-		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track)))
-			this.flush()
-		
-		if !this.iDatabase
-			this.iDatabase := this.getSetupDatabase(simulator, car, track, "Local")
-	}
-	
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 	
 		this.requireDatabase(simulator, car, track)
 		
-		this.iDatabase.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.iDatabase.add("Tyres.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , Compound: compound, "Compound.Color": compoundColor
 											 , "Tyre.Pressure.Cold.Front.Left": coldPressures[1], "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
 											 , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3], "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
@@ -254,25 +312,34 @@ class SetupDatabase extends SessionDatabase {
 		for typeIndex, tPressures in [coldPressures, hotPressures]
 			for tyreIndex, pressure in tPressures
 				this.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-								  , types[typeIndex], tyres[tyreIndex], pressure, 1, flush, false)
+								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false)
+		
+		if flush
+			this.flush()
 	}
 	
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true) {
+				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User") {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 		
 		if require
-			this.requireDatabase(simulator, car, track)
+			this.requireDatabase(simulator, car, track, scope)
 		
-		rows := this.iDatabase.query("Setup.Pressures.Distribution"
+		rows := this.iDatabase.query("Tyres.Pressures.Distribution"
 								   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											, Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 		
-		if (rows.Length() > 0)
+		if (rows.Length() > 0) {
 			rows[1].Count := rows[1].Count + count
+			
+			if flush
+				this.flush()
+			else
+				this.iDatabase.changed("Tyres.Pressures.Distribution")
+		}
 		else
-			this.iDatabase.add("Setup.Pressures.Distribution"
+			this.iDatabase.add("Tyres.Pressures.Distribution"
 							 , {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 							  , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 	}
@@ -285,98 +352,42 @@ class SetupDatabase extends SessionDatabase {
 		}
 	}
 	
-	readNotes(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		try {
-			FileRead notes, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
-			
-			return notes
+	qualifiedCompound(compound, compoundColor) {
+		if (compound= "Dry") {
+			if (compoundColor = "Black")
+				return "Dry"
+			else
+				return ("Dry (" . compoundColor . ")")
 		}
-		catch exception {
-			return ""
-		}
+		else if (compoundColor = "Black")
+			return "Wet"
+		else
+			return ("Wet (" . compoundColor . ")")
 	}
-	
-	writeNotes(simulator, car, track, notes) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%
-		
-		try {
-			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt
+
+	translateQualifiedCompound(compound, compoundColor) {
+		if (compound= "Dry") {
+			if (compoundColor = "Black")
+				return translate("Dry")
+			else
+				return (translate("Dry") . translate(" (") . translate(compoundColor) . translate(")"))
 		}
-		catch exception {
-			; ignore
-		}
-		
-		FileAppend %notes%, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Notes.txt, UTF-16
+		else if (compoundColor = "Black")
+			return translate("Wet")
+		else
+			return (translate("Wet") . translate(" (") . translate(compoundColor) . translate(")"))
 	}
-	
-	getSetupNames(simulator, car, track, ByRef localSetups, ByRef globalSetups) {
-		simulatorCode := this.getSimulatorCode(simulator)
+
+	splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
+		compoundColor := "Black"
 		
-		localSetups := {}
-		globalSetups := {}
+		index := inList(kQualifiedTyreCompounds, qualifiedCompound)
 		
-		for ignore, setupType in kSetupTypes {
-			setups := []
-			
-			Loop Files, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
-			{
-				SplitPath A_LoopFileName, setupName
-			
-				setups.Push(setupName)
-			}
-			
-			localSetups[setupType] := setups
-		}
+		if (index == 1)
+			compound := "Wet"
+		else
+			compound := "Dry"
 		
-		if this.UseGlobalDatabase
-			for ignore, setupType in kSetupTypes {
-				setups := []
-				
-				Loop Files, %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\*.*
-				{
-					SplitPath A_LoopFileName, setupName
-				
-					setups.Push(setupName)
-				}
-				
-				globalSetups[setupType] := setups
-			}
-	}
-	
-	readSetup(simulator, car, track, setupType, setup) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		FileRead setupData, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
-		
-		return setupData
-	}
-	
-	writeSetup(simulator, car, track, setupType, fileName, setup) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		try {
-			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
-		}
-		catch exception {
-			; ignore
-		}
-		
-		FileCreateDir %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%
-		FileAppend %setup%, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%fileName%
-	}
-	
-	deleteSetup(simulator, car, track, setupType, setup) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		try {
-			FileDelete %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Car Setups\%setupType%\%setup%
-		}
-		catch exception {
-			; ignore
-		}
+		compoundColor := kQualifiedTyreCompoundColors[index]
 	}
 }

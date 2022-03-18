@@ -289,7 +289,7 @@ class SetupAdvisor extends ConfigurationItem {
 				simulator := inList(simulators, this.SelectedSimulator)
 
 			if (simulator == 0)
-				simulator := simulator := inList(simulators, true)
+				simulator := inList(simulators, true)
 		}
 		
 		for index, name in simulators

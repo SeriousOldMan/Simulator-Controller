@@ -242,7 +242,7 @@ The first tab of the settings tool contains information about the actual session
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%201.JPG)
 
-You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [setup database query tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and *import+ the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
+You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and *import* the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
 
 Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome. But to be honest, there is even less functionality available at the moment for other simulators.
 
@@ -258,9 +258,9 @@ The upper area with the three dropdown menus give you you control over several d
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
-In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future influences by falling or rising ambient temperatures and upcoming weather changes, and Jona also might access the setup database for a second opinion on target pressures, both depending on the selection of the *Correction* check boxes.
+In the lower area you can define the optimal or target tyre pressures. When there is a deviation larger than *Deviation Threshold* from these *Target Pressures* is detected by Jona, corresponding pressure adjustments will be applied for the next pitstop. Beside this very simple approach, there are rules in the AI kernel, which try to predict future influences by falling or rising ambient temperatures and upcoming weather changes, and Jona also might access the session database for a second opinion on target pressures, both depending on the selection of the *Correction* check boxes.
 
-If you open the settings tool, it will load the *Race.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. As an alternative to handle the locations of the settings files yourself, you can use the setup database to organize them. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for the setup database for further information.
+If you open the settings tool, it will load the *Race.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. As an alternative to handle the locations of the settings files yourself, you can use the session database to organize them. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for the session database for further information.
 
 Good to know: When the *Race.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
 
@@ -268,7 +268,7 @@ Beside the session respectively race specific settings described in the previous
 
 #### Tab *Strategy*
 
-You will find settings for the race strategy analysis and simulation in the third tab. These settings are mainly used by the Virtual Race Strategist, but some of them, for example the *Pitstop Delta* time will also be used by Jona.
+You will find settings for the race strategy analysis and simulation in the third tab. These settings are mainly used by the Virtual Race Strategist, but some of them, for example the *Pitstop Delta* time or the *Safety Fuel* will also be used by Jona.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%203.JPG)
 
@@ -325,7 +325,7 @@ No special setup required for *iRacing*, since this simulation has an integrated
 
 Furthermore, it is very important, that you do not use the *Automobilista 2* ICM yourself, while you want Jona to control the pitstop settings or want to use the "Pitstop" mode of the "AMS2" plugin. Additionally, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
 
-### Race & Setup database
+### Race & Session database
 
 With the introduction of Release 2.6, Jona, the Virtual Race Engineer, collects several data points from your practice and race sessions (qualification sessions are not supported, since they often use special setups which will only be in the perfect window during the first few laps) and saves them together with the associated tyre choice and start pressures, air and asphalt temperature and other environmental conditions in a local database. Beside that, you can upload your car setups for a given track and different conditions to the setup databse. This informations may then be used as a starting point for a setup in an upcoming race under the same or similar conditions. In order to build up a comprehensive collection of data on vehicles, tracks and environmental conditions as quickly as possible, Jona can integrate your data with the data of all other drivers, and in return will make the consolidated database available to all contributors.
 
@@ -333,43 +333,59 @@ When your data is transferred, no direct or indirect personal data is involved. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Consent.JPG)
 
-Note: You can give separate consents for sharing your tyre pressure setups and your mechanical and aerodynamic car setups, since the later might be considered to be some sort of private secret, for example. Furthermore, you must explicitly upload car setup data to include it to the setup database, so you can decide which data you want to share. On the other hand, tyre pressures will be collected automatically by Jona, but you will be asked whether to include them in the setup database (see below).
+Note: You can give separate consents for sharing your tyre pressure setups and your mechanical and aerodynamic car setups, since the later might be considered to be some sort of private secret, for example. Furthermore, you must explicitly upload car setup data to include it to the session database, so you can decide which data you want to share. On the other hand, tyre pressures will be collected automatically by Jona, but you will be asked whether to include them in the session database (see below).
 
 If you have given your consents, all data of your local races will be transferred to a cloud database once a week. For the moment, nothing more will happen. The functionality will come to live with a later Release of the Version 3 cycle. You will get a payback in terms of a consilidated database of all contributors and Jona will use the data to help you in your setup task in the pit, but also during a race, when radical weather changes are upcoming. This database will then be updated for you once a week too, so you will always get the latest and greatest setup data.
 
 For the moment, the data collection consist of tyre and car setup information for the different track and weather conditions, as long, as they are available in the different simulation telemetry interfaces. But there will be more in the future. For example, there are ideas in the backlog to use race position data and pitstop events from the races to optimize the pitstop strategy with regards to the most positive effect on race position. Neural networks and reenforcment learning algorithms will be used for that, but to be able to do this, our joint database needs to have enough data points, so this will take some time.
 
-Note: The database is stored in the *Simulator Controller\Setup Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *Local* subfolder, whereas the consolidated data will end up in the *Global* subfolder.
+Note: The database is stored in the *Simulator Controller\Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *Local* subfolder, whereas the consolidated data will end up in the *Global* subfolder.
 
 *Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines from [above sections](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), so that Jona has a correct understanding of your car and tyre setup. This has been important in the past to get a correct setup for an upcoming pitstop, but it is even more important when building the setup databse, so that we do not end up with compromised data. Jona will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since Jona will store the corrected values in the database, as long as your initial setup values are known.
 
-#### Querying the setup database
+#### Querying the Session Database
 
-Whenever you have to setup your car for a given track and specific environmental conditions you can query the setup database to get a recommendation on how to setup your car. When you start the application *Setup Database.exe* from the *Binaries* folder, the following dialog will open up.
+Whenever you have to setup your car for a given track and specific environmental conditions you can query the session database to get a recommendation on how to setup your car. When you start the application *Session Database.exe* from the *Binaries* folder, the following dialog will open up.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%201.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.JPG)
 
-You have to enter all the fields in the upper area to specify the simulation, car, track, current weather and so on. Then you will get a recommendation for initial cold tyre pressures in the first tab in the lower area, if a matching setup is available in the setup database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
+This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the Virtual Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) using track and car specific default values.
 
-Note: If the *Setup Database* query tool has been [started by the *Race Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
-The second tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the setup database.
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%204.JPG)
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%202.JPG)
+You will get a summary of all available data in the list below the tabs. Please note, that the "Setup Repository" and the "Tyre Pressure Advisor" will only be available, when you have selected a specific car and a specific track before.
 
-The dropdown menus let you access all setup files, which had been associated with the given car and track, either by you or by another person from the community. The buttons on the right side of the dropdown menu let you 1. upload a setup to the database, 2. download a setup and store it in the specific folder for a simulation and 3. delete one of your setups from the database.
+Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-Session settings created by the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) tool can be stored in the setup database as well. You can configure Jona with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) to load the best matching settings according to the session duration at the beginning of a new session.
+##### Race Settings
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%204.JPG)
+The Virtual Race Assistants provide many settings, as you have seen above in the section about the [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings). Many values are specific for a given car or track, for example the pitstop delta or the time required to change tyres. You can change all these settings manually before each session, of you can store default values for all theses settings in the session database.
 
-The buttons below the list of settings will allow you to create new settings, edit the selected settings, clone the selected settings or delete the selected settings. Settings may alos be renamed by double clicking on the corresponding line or pressing *F2* while a line is selected.
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%205.JPG)
 
-In the last tab you can take some notes on the track, or open issues with your setups and so on.
+When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide settings for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and overwrite them for a more specific configuration. For example, you can provide an average "Pitstop Delta" for *all* tracks, but also supply a very precise value for those tracks you race most often.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Database%203.JPG)
+You can use the "Test..." button to open the "Race Settings" tool to check the resulting settings for the current selected car / track / weather combination.
 
-With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of othe users of Simulator Controller might be considered (=> "Local & Global"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
+##### Setup Repository
+
+This tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the session database.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.JPG)
+
+Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download or delete a setup file from your simulator.
+
+##### Tyre Pressure Advisor
+
+Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the session database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.JPG)
+
+Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+
+With the dropdown menu in the lower left corner you can choose, whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
 
 Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
 
@@ -383,7 +399,7 @@ The following statistical models are currently implemented:
   
      The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
 	 
-	 When planning and preparing a pitstop, Jona will consult the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database query tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
+	 When planning and preparing a pitstop, Jona will consult the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
 
   2. Refuel amount
   

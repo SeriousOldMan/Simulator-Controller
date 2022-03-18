@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
@@ -45,7 +45,7 @@ ListLines Off					; Disable execution history
 
 adjustPressureDistributions(code, car, track, compound, weather, airTemperature, trackTemperature, correction, ByRef progress) {
 	fileName := (code . "\" . car . "\" . track . "\Tyre Setup " . compound . A_Space . weather . ".data")
-	fileName := (kDatabaseDirectory . "local\" . fileName)
+	fileName := (kDatabaseDirectory . "User\" . fileName)
 	
 	if FileExist(fileName) {
 		showProgress({progress: progress++, message: "Adjusting " . compound . " (" . airTemperature . ", " . trackTemperature . ") for " . car . " on " . track . " in " weather . "..."})
@@ -88,7 +88,7 @@ adjustPressureDistributions(code, car, track, compound, weather, airTemperature,
 }
 
 cleanupTyrePressures() {
-	setupDB := new SetupDatabase()
+	tyresDB := new TyresDatabase()
 
 	dryCorrection := ""
 	prompt := "Please input the adjustment factor for cold DRY pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
@@ -127,9 +127,9 @@ cleanupTyrePressures() {
 
 	showProgress({x: x, y: y, width: 450, color: "Silver", message: "", title: translate("Adjust Tyre Pressures")})
 	
-	for ignore, car in setupDB.getCars("Assetto Corsa Competizione")
-		for ignore, track in setupDB.getTracks("Assetto Corsa Competizione", car)
-			for ignore, condition in setupDB.getConditions("Assetto Corsa Competizione", car, track) {
+	for ignore, car in tyresDB.getCars("Assetto Corsa Competizione")
+		for ignore, track in tyresDB.getTracks("Assetto Corsa Competizione", car)
+			for ignore, condition in tyresDB.getConditions("Assetto Corsa Competizione", car, track) {
 				weather := condition[1]
 				airTemperature := condition[2]
 				trackTemperature := condition[3]
@@ -137,7 +137,7 @@ cleanupTyrePressures() {
 				
 				if (((compound = "Dry") && (dryCorrection != 0)) || ((compound = "Wet") && (wetCorrection != 0)))
 					for ignore, qualifiedCompound in kQualifiedTyreCompounds
-						adjustPressureDistributions(setupDB.getSimulatorCode("Assetto Corsa Competizione"), car, track, qualifiedCompound, weather
+						adjustPressureDistributions(tyresDB.getSimulatorCode("Assetto Corsa Competizione"), car, track, qualifiedCompound, weather
 												  , airTemperature, trackTemperature, (compound = "Dry") ? dryCorrection : wetCorrection, progress)
 			}
 	
@@ -145,7 +145,7 @@ cleanupTyrePressures() {
 }
 
 cleanupTelemetryData() {
-	setupDB := new SetupDatabase()
+	tyresDB := new TyresDatabase()
 
 	laptimeCorrection := ""
 	prompt := "Please input the adjustment factor for laptimes in DRY conditions (use ""."" as decimal point).`n`nExample: 0.5 will increase all lap times in telemetry data by half a second."
@@ -170,8 +170,8 @@ cleanupTelemetryData() {
 
 		showProgress({x: x, y: y, width: 450, color: "Silver", message: "", title: translate("Adjust Laptimes")})
 	
-		for ignore, car in setupDB.getCars("Assetto Corsa Competizione")
-			for ignore, track in setupDB.getTracks("Assetto Corsa Competizione", car) {
+		for ignore, car in tyresDB.getCars("Assetto Corsa Competizione")
+			for ignore, track in tyresDB.getTracks("Assetto Corsa Competizione", car) {
 				showProgress({progress: progress++, message: "Adjusting laptime for " . car . " on " . track . " in Dry..."})
 			
 				if (progress > 100)

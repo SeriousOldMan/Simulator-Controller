@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Race Center                     ;;;
+;;;   Modular Simulator Controller System - Race Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -37,8 +37,9 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
-#Include Libraries\TelemetryDatabase.ahk
 #Include Libraries\SessionDatabase.ahk
+#Include Libraries\TyresDatabase.ahk
+#Include Libraries\TelemetryDatabase.ahk
 #Include Libraries\RaceReportViewer.ahk
 #Include Libraries\Strategy.ahk
 #Include Libraries\StrategyViewer.ahk
@@ -409,14 +410,14 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		__New(rCenter) {
-			this.iDatabase := new Database(rCenter.SessionDirectory, kSetupDataSchemas)
+			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresDataSchemas)
 		}
 		
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
 			if (!compoundColor || (compoundColor = ""))
 				compoundColor := "Black"
 			
-			this.Database.add("Setup.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+			this.Database.add("Tyres.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 												, Compound: compound, "Compound.Color": compoundColor
 												, "Tyre.Pressure.Cold.Front.Left": null(coldPressures[1])
 												, "Tyre.Pressure.Cold.Front.Right": null(coldPressures[2])
@@ -445,14 +446,14 @@ class RaceCenter extends ConfigurationItem {
 			if (!compoundColor || (compoundColor = ""))
 				compoundColor := "Black"
 			
-			rows := this.Database.query("Setup.Pressures.Distribution"
+			rows := this.Database.query("Tyres.Pressures.Distribution"
 									  , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											   , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 			
 			if (rows.Length() > 0)
 				rows[1].Count := rows[1].Count + count
 			else
-				this.Database.add("Setup.Pressures.Distribution"
+				this.Database.add("Tyres.Pressures.Distribution"
 								, {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 								 , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 		}
@@ -1012,7 +1013,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 		
-		Gui %window%:Add, DropDownList, x750 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Setup Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		Gui %window%:Add, DropDownList, x750 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown gpitstopMenu, % values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
@@ -1915,7 +1916,7 @@ class RaceCenter extends ConfigurationItem {
 		pressuresDB := this.PressuresDatabase
 		
 		if pressuresDB {
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		
 			last := pressuresTable.Length()
 			
@@ -2168,7 +2169,7 @@ class RaceCenter extends ConfigurationItem {
 			sessionDB := new SessionDatabase()
 			simulatorCode := sessionDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
+			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
 		}
@@ -2371,7 +2372,7 @@ class RaceCenter extends ConfigurationItem {
 			case 3:
 				this.initializePitstopFromSession()
 			case 4:
-				exePath := kBinariesDirectory . "Setup Database.exe"
+				exePath := kBinariesDirectory . "Session Database.exe"
 				
 				try {
 					Process Exist
@@ -2383,9 +2384,9 @@ class RaceCenter extends ConfigurationItem {
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 				}
 				catch exception {
-					logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+					logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 						
-					showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:
@@ -3509,7 +3510,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 			
-			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Setup.Pressures"] {
+			for ignore, pressureData in this.PressuresDatabase.Database.Tables["Tyres.Pressures"] {
 				if !this.Laps.HasKey(A_Index)
 					continue
 				
@@ -3553,7 +3554,7 @@ class RaceCenter extends ConfigurationItem {
 			else
 				return
 			
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 			lap := pressuresTable.Length()
 			
 			newData := false
@@ -5057,7 +5058,7 @@ class RaceCenter extends ConfigurationItem {
 			lastLap := lastLap.Nr
 		
 		if lastLap {
-			pressuresTable := this.PressuresDatabase.Database.Tables["Setup.Pressures"]
+			pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
 			tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
 					
 			newLap := (sessionDB.Tables["Lap.Data"].Length() + 1)
@@ -5490,7 +5491,7 @@ class RaceCenter extends ConfigurationItem {
 		pressuresDB := this.PressuresDatabase
 		
 		if pressuresDB {
-			pressuresTable := pressuresDB.Database.Tables["Setup.Pressures"]
+			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 		
 			if (pressuresTable.Length() >= lap.Nr) {
 				pressures := pressuresTable[lap.Nr]
@@ -5703,7 +5704,7 @@ class RaceCenter extends ConfigurationItem {
 			
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
 			avgLapTimesData.Push("<td class=""td-std"">" . Round(average(lapTimes), 1) . "</td>")
-			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 1) . "</td>")
+			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
 			

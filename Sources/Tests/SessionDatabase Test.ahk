@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Database Test             ;;;
+;;;   Modular Simulator Controller System - Session Database Test           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -25,7 +25,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 #Include AHKUnit\AHKUnit.ahk
 
 
@@ -36,18 +36,18 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 class DatabaseTest extends Assert {
 	clearDatabase() {
 		try {
-			FileRemoveDir %kDatabaseDirectory%Local\Unknown\TestCar, 1
+			FileRemoveDir %kDatabaseDirectory%User\Unknown\TestCar, 1
 		}
 		catch exception {
 			; ignore
 		}
 		
-		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "Local\Unknown\TestCar"), "Database has not been deleted...")
+		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "User\Unknown\TestCar"), "Database has not been deleted...")
 	}
 	
 	updatePressures(database, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures) {
 		if !database
-			database := new SetupDatabase()
+			database := new TyresDatabase()
 		
 		for ignore, pressures in coldPressures
 			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
@@ -144,9 +144,14 @@ class InitializeDatabase extends DatabaseTest {
 			msgbox here
 		}
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		try {
+			FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
+		}
+		catch exception {
+			msgbox here
+		}
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -157,9 +162,9 @@ class InitializeDatabase extends DatabaseTest {
 		
 		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black", pressures)
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -167,9 +172,9 @@ class InitializeDatabase extends DatabaseTest {
 	ConditionWritePressure_Test() {
 		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Drizzle", 17, 18, "Dry", "Red", [[26.5, 26.4, 26.7, 26.5]])
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 		this.AssertEqual(true, InStr(line, "Drizzle") && InStr(line, "Red"), "Database file has not been created...")
@@ -178,9 +183,9 @@ class InitializeDatabase extends DatabaseTest {
 		
 		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "MediumRain", 17, 18, "Wet", "Black", [[26.5, 26.4, 26.7, 26.5]])
 		
-		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
+		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
 		
-		FileRead line, % (kDatabaseDirectory . "Local\Unknown\TestCar\TestTrack\Setup.Pressures.Distribution.CSV")
+		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertFalse(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 	}
@@ -188,65 +193,65 @@ class InitializeDatabase extends DatabaseTest {
 
 class SimplePressures extends PressuresAssert {
 	SimpleReadPressure_Test() {
-		pressures := new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
+		pressures := new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
 		
 		this.AssertExactResult(pressures, 26.1, 26.2, 26.3, 26.4)
 	}
 		
 	ExtendedReadPressure_Test() {
-		this.AssertExactResult(new SetupDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
+		this.AssertExactResult(new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
 	}
 }
 
 class ExtrapolatedPressures extends PressuresAssert {
 	ReadPressure_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, 0)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, -1)
-		this.AssertExtrapolatedResult(setupDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4, 0, 0)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, 0)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 24, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 1, -1)
+		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black"), 26.1, 26.2, 26.3, 26.4, 0, 0)
 	}
 		
 	ReadSetup_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
 		compound := false
 		compoundColor := false
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.1, 26.2, 26.3, 26.4], pressures, 1.0, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.5, 26.4, 26.4], pressures, 1.0, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 25, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 25, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.8, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 24, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 24, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.3, 26.4, 26.5], pressures, 0.6, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 23, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 24, 23, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.3, 26.4, 26.5, 26.6], pressures, 0.4, certainty)
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 26, 27, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 26, 27, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Black", compoundColor, [26.2, 26.4, 26.3, 26.3], pressures, 0.6, certainty)
 	}
 }
 
 class DifferentCompoundPressures extends PressuresAssert {	
 	CompoundSetup_Test() {
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 		
 		compound := false
 		compoundColor := false
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 16, 17, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "Dry", 16, 17, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Dry", compound, "Red", compoundColor, [26.6, 26.5, 26.8, 26.6], pressures, 0.6, certainty)
 		
 		compound := false
@@ -254,7 +259,7 @@ class DifferentCompoundPressures extends PressuresAssert {
 		pressures := false
 		certainty := false
 		
-		setupDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "LightRain", 17, 17, compound, compoundColor, pressures, certainty)
+		tyresDB.getTyreSetup("Unknown", "TestCar", "TestTrack", "LightRain", 17, 17, compound, compoundColor, pressures, certainty)
 		this.AssertExtrapolatedValues("Wet", compound, "Black", compoundColor, [26.5, 26.4, 26.7, 26.5], pressures, 0.8, certainty)
 	}
 }

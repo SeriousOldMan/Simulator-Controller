@@ -33,7 +33,7 @@ global buttonBoxSimulationDurationInput
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                    Private Function Declaration Section                  ;;;
+;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 saveModes() {
@@ -314,6 +314,11 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		return result
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Public Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
 
 editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "Center", y := "Center") {
 	static modeSettings

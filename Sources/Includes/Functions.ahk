@@ -560,7 +560,7 @@ startTrayMessageManager() {
 	SetTimer trayMessageQueue, -500
 }
 
-requestShareSetupDatabaseConsent() {
+requestShareSessionDatabaseConsent() {
 	if !inList(A_Args, "-Install") {
 		program := StrSplit(A_ScriptName, ".")[1]
 		
@@ -628,10 +628,10 @@ requestShareSetupDatabaseConsent() {
 	}
 }
 
-shareSetupDatabase() {
+shareSessionDatabase() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Session Database")) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -642,88 +642,16 @@ shareSetupDatabase() {
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
 		if (shareTyrePressures || shareCarSetups) {
-			uploadTimeStamp := kDatabaseDirectory . "Local\UPLOAD"
+			options := ("-ID '" . id . "'")
 			
-			if FileExist(uploadTimeStamp) {
-				FileReadLine upload, %uploadTimeStamp%, 1
-				
-				now := A_Now
-				
-				EnvSub now, %upload%, days
-				
-				if (now <= 7)
-					return
-			}
+			if shareTyrePressures
+				options := " -Presssures"
+			
+			if shareCarSetups
+				options := " -Setups"
 			
 			try {
-				try {
-					FileRemoveDir %kTempDirectory%SetupDabase, 1
-				}
-				catch exception {
-					; ignore
-				}
-				
-				Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
-				{
-					simulator := A_LoopFileName
-					
-					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
-					
-					Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
-					{
-						car := A_LoopFileName
-					
-						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
-						
-						Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
-						{
-							track := A_LoopFileName
-					
-							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-							
-							if shareTyrePressures {
-								Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
-									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-								
-								distFile := (kDatabaseDirectory . "Local\" . simulator . "\" . car . "\" . track . "\Setup.Pressures.Distribution.CSV")
-								
-								if FileExist(distFile)
-									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-							}
-							
-							if shareCarSetups {
-								try {
-									FileCopyDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
-								}
-								catch exception {
-									; ignore
-								}
-							}
-						}
-					}
-				}
-				
-				try {
-					FileDelete %kTempDirectory%Database.%id%.zip
-				}
-				catch exception {
-					; ignore
-				}
-				
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
-				
-				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
-				
-				try {
-					FileDelete %kDatabaseDirectory%Local\UPLOAD
-				}
-				catch exception {
-					; ignore
-				}
-				
-				FileAppend %A_Now%, %kDatabaseDirectory%Local\UPLOAD
-				
-				logMessage(kLogInfo, translate("Database successfully uploaded"))
+				Run %kBinariesDirectory%Database Updater.exe %options%
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
@@ -985,8 +913,8 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Translations
 	FileCreateDir %kUserHomeDirectory%Grammars
 	FileCreateDir %kUserHomeDirectory%Temp
-	FileCreateDir %kDatabaseDirectory%Global
-	FileCreateDir %kDatabaseDirectory%Local
+	FileCreateDir %kDatabaseDirectory%Community
+	FileCreateDir %kDatabaseDirectory%User
 	
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
@@ -1673,7 +1601,7 @@ reverse(list) {
 	newList := []
 	length := list.Length()
 	
-	Loop length
+	Loop %length%
 		newList.Push(list[length - (A_Index - 1)])
 	
 	return newList
@@ -2080,8 +2008,8 @@ loadSimulatorConfiguration()
 
 if vDetachedInstallation {
 	checkForUpdates()
-	requestShareSetupDatabaseConsent()
-	shareSetupDatabase()
+	requestShareSessionDatabaseConsent()
+	shareSessionDatabase()
 }
 
 initializeLoggingSystem()

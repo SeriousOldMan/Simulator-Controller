@@ -87,7 +87,7 @@
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-strategy)
 	- [Team Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-team)
 	- [Execute a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-pitstop)
-	- [Setup Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database)
+	- [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database)
 	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information)
     - [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-rule-engine)

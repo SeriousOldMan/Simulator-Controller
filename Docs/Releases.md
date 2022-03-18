@@ -3,7 +3,9 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Finetuning for average lap times in Strategy simulation.
-  4. Backend overhaul of the Session / Setup Database.
+  4. Renamed "Setup Database" to "Session Database".
+  5. Backend overhaul of the Session Database.
+  6. All new user interface for "Session Database".
 
 ## 3.9.6-release 03/11/22
 
@@ -382,7 +384,7 @@
   2. Documentation updates, as always
   3. A [new page in the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) allows you to customize many aspects of the Race Engineer behaviour and the integration of Jona with the setup database.
   4. The *Race Engineer Settings* tool has been overhauled, since some of the options has been moved to the configuration page of the configuration tool, as mentioned above. The [*Race Engineer Settings* tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) now only contains session or race specific options.
-  5. Race Engineer Settings can now be stored also in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for future use.
+  5. Race Engineer Settings can now be stored also in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for future use.
   6. Before beginning a session, the best matching of the Race Engineer Settings can be selected from the setup database depending on the session duration. This settings will be activated for the next session, optionally together with the tyre pressures for the current environmaental conditions.
 
 ## 3.0.4-release 05/23/21
@@ -390,7 +392,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full rework of fuel consumption projection after a pitstop.
-  4. Simulator car setup files can be stored together with additional notes in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for future use.
+  4. Simulator car setup files can be stored together with additional notes in the [setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for future use.
   5. The setup database consent has been extended to give [separate consents](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--setup-database) for tyre pressures and car setup information.
   
 ## 3.0.3-release 05/16/21
@@ -401,7 +403,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Tyre pressures can be [transfered from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) to the *Race Engineer Settings* tool.
+  3. Tyre pressures can be [transfered from the setup database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) to the *Race Engineer Settings* tool.
   4. Jona can consult the setup database for a second opinion for tyre pressures.
   5. [New switches](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop) in *Race Engineer Settings* to control the different strategies that Jona uses to come up with target tyre pressures.
   6. Refactoring of the setup database code and some file relocations.
@@ -411,7 +413,7 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Graphical interface for querying the setup database (see the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-setup-database) for more information)
+  3. Graphical interface for querying the setup database (see the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#querying-the-session-database) for more information)
   4. [New plugin parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool. If a simulation is currently running, most of the query arguments will already be prefilled.
 
 ## 2.8.6-release 04/30/21

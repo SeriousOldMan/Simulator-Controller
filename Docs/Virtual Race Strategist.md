@@ -177,7 +177,7 @@ The lower area allows you to create a race strategy. You have to enter the race 
 
 ### Rules & Settings
 
-In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the setup Database or the from the currently active simulation.
+In the first tab you enter the rules and settings for the upcoming event. Using the *Settings* drop down menu directly above the tabbed area, you can load settings values from different sources, for example from the Session Database or the from the currently active simulation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%201.JPG)
 
@@ -209,9 +209,9 @@ Loading of settings is supported for:
 	   - Average Lap Time
 	   - Average Fuel Consumption
   
-  2. *Race.settings* file (from the setup database)
+  2. *Race.settings* file
   
-     The file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
+     The content of the current *Race.settings* file is used to initialize some fields. If the Control key is pressed, when this command is selected, the file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
 	 
 	 - Rules & Settings
 	   - Race Duration
@@ -228,8 +228,12 @@ Loading of settings is supported for:
 	   - Tyre Compound Color
 	   - Average Lap Time
 	   - Average Fuel Consumption
+  
+  3. Session Database
+     
+     All preconfigured setting values for the selected simulator / car / track / weather combination are loaded from the Session Database. Available values are used to initialize the same fields as with the contents of the *Race.settings* file.
 
-  3. Telemetry Data
+  4. Telemetry Data
   
      The best lap time and the best hot tyre pressures are extracted for for the current simulator / car / track combination and the following fields are initialized from this data:
 	 
@@ -238,7 +242,7 @@ Loading of settings is supported for:
 	   - Average Lap Time
 	   - Average Fuel Consumption
 
-  4. Simulation
+  5. Simulation
   
      If a simulator session exists and is identical to the currently selected simulator / car / track combination, the following fields are initialized from data acquired from the simulator:
 	 

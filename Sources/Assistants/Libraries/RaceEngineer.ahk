@@ -76,8 +76,8 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("savePressureData", arguments*)
 		}
 		
-		updateSetupDatabase(arguments*) {
-			this.callRemote("updateSetupDatabase", arguments*)
+		updateTyresDatabase(arguments*) {
+			this.callRemote("updateTyresDatabase", arguments*)
 		}
 	}
 	
@@ -781,9 +781,12 @@ class RaceEngineer extends RaceAssistant {
 		simulatorName := this.Simulator
 		configuration := this.Configuration
 		
+		deprecated := getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
+		saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
+		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".LearningLaps", 1)
 									  , AdjustLapTime: getConfigurationValue(configuration, "Race Engineer Analysis", simulatorName . ".AdjustLapTime", true)
-									  , SaveSettings: getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever))
+									  , SaveSettings: saveSettings
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 		
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
@@ -1062,7 +1065,7 @@ class RaceEngineer extends RaceAssistant {
 				this.saveSessionSettings()
 			
 			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData)
-				this.updateSetupDatabase()
+				this.updateTyresDatabase()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1078,9 +1081,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	updateSetupDatabase() {
+	updateTyresDatabase() {
 		if this.RemoteHandler
-			this.RemoteHandler.updateSetupDatabase()
+			this.RemoteHandler.updateTyresDatabase()
 		
 		this.updateDynamicValues({HasPressureData: false})
 	}
@@ -1585,7 +1588,8 @@ class RaceEngineer extends RaceAssistant {
 	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		return this.SetupDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+		return this.TyresDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator")
+											 , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty)
 	}
 }

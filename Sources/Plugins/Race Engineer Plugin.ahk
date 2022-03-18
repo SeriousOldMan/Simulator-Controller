@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Assistants\Libraries\SetupDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -121,13 +121,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	prepareSettings(data) {
 		settings := base.prepareSettings(data)
 		
-		setupDB := new SetupDatabase()
+		tyresDB := new TyresDatabase()
 							
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")
 		track := getConfigurationValue(data, "Session Data", "Track")
 		
-		simulatorName := setupDB.getSimulatorName(simulator)
+		simulatorName := tyresDB.getSimulatorName(simulator)
 		
 		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
 		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
@@ -136,7 +136,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		
 		tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		
-		if (tpSetting = "SetupDatabase") {
+		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
 			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
 			
@@ -145,7 +145,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pressures := {}
 			certainty := 1.0
 			
-			if setupDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 				
@@ -287,7 +287,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 	
-	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures) {
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+				   , compound, compoundColor, coldPressures, hotPressures) {
 		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.SessionActive)
@@ -300,8 +301,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
 	}
 	
-	updateSetupDatabase() {
-		setupDB := new SetupDatabase()
+	updateTyresDatabase() {
+		tyresDB := new TyresDatabase()
 		teamServer := this.TeamServer
 		session := this.TeamSession
 		
@@ -316,25 +317,27 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					
 					lapPressures := string2Values(";", lapPressures)
 					
-					setupDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9]), string2Values(",", lapPressures[10]), false)
+					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
+										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
+										  , string2Values(",", lapPressures[10]), false)
 				}
 				catch exception {
 					break
 				}
 				finally {
-					setupDB.flush()
+					tyresDB.flush()
 				}
 			}
 		else
 			try {
 				for ignore, lapData in this.LapDatabase.Tables["Pressures"]
-					setupDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather, lapData["Temperature.Air"], lapData["Temperature.Track"]
+					tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
+										  , lapData["Temperature.Air"], lapData["Temperature.Track"]
 										  , lapData.Compound, lapData["Compound.Color"]
 										  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
 			}
 			finally {
-				setupDB.flush()
+				tyresDB.flush()
 			}
 	}
 }

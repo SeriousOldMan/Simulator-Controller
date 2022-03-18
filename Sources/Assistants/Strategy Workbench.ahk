@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include Libraries\SettingsDatabase.ahk
 #Include Libraries\TelemetryDatabase.ahk
 #Include Libraries\Strategy.ahk
 #Include Libraries\StrategyViewer.ahk
@@ -992,7 +993,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		settingsMenu := map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Setup Database...", "Initialize from Telemetry...", "Initialize from Simulation..."], "translate")
+		settingsMenu := map(["Settings", "---------------------------------------------", "Initialize from Strategy", "Initialize from Settings...", "Initialize from Database", "Initialize from Telemetry", "Initialize from Simulation"], "translate")
 		
 		fileNames := getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\")
 		
@@ -1502,25 +1503,29 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 					OnMessage(0x44, "")
 				}
-			case 4: ; "Load from Setup Database..."
+			case 4: ; "Load from Settings..."
 				simulator := this.SelectedSimulator
 				car := this.SelectedCar
 				track := this.SelectedTrack
 				
 				if (simulator && car && track) {
-					telemetryDB := new TelemetryDatabase(simulator, car, track)
-					simulatorCode := telemetryDB.getSimulatorCode(simulator)
+					if GetKeyState("Ctrl", "P") {
+						telemetryDB := new TelemetryDatabase(simulator, car, track)
+						simulatorCode := telemetryDB.getSimulatorCode(simulator)
+						
+						dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Settings
+						
+						FileCreateDir %dirName%
+						
+						title := translate("Load Race Settings...")
+								
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+						FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+						OnMessage(0x44, "")
+					}
+					else
+						file := getFileName("Race.settings", kUserConfigDirectory)
 					
-					dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
-					
-					FileCreateDir %dirName%
-					
-					title := translate("Load Race Settings...")
-							
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-					FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
-					OnMessage(0x44, "")
-				
 					if (file != "") {
 						settings := readConfiguration(file)
 						
@@ -1534,7 +1539,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Session Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
@@ -1554,7 +1559,67 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 					OnMessage(0x44, "")
 				}
-			case 5: ; "Update from Telemetry..."
+			case 5:
+				simulator := this.SelectedSimulator
+				car := this.SelectedCar
+				track := this.SelectedTrack
+				
+				if (simulator && car && track) {
+					settingsDB := new SettingsDatabase()
+										
+					settings := new SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
+					
+					if (settings.Count() > 0) {
+						if (getConfigurationValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
+							GuiControl, , sessionTypeDropDown, 1
+							GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration") / 60)
+							GuiControl, , sessionLengthlabel, % translate("Minutes")
+						}
+						
+						if (getConfigurationValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
+							GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation")
+						
+						if (getConfigurationValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
+							GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace")
+						
+						if (getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
+							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta")
+						
+						if (getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
+							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres")
+						
+						if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined)
+							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
+						
+						if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simulataneous") ? 1 : 2
+						
+						if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
+							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")
+						
+						if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
+						 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
+							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound")
+							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color")
+						
+							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
+						}
+						
+						if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
+							GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+						
+						if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
+							GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+					OnMessage(0x44, "")
+				}
+			case 6: ; "Update from Telemetry..."
 				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
 					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 					
@@ -1579,7 +1644,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; "Import from Simulation..."
+			case 7: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
 				
 				if simulator {
@@ -1634,7 +1699,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, "")
 				}
 			default:
-				if (line > 8) {
+				if (line > 9) {
 					validators := []
 					
 					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
@@ -1644,7 +1709,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							validators.Push(validator)
 					}
 					
-					validator := validators[line - 8]
+					validator := validators[line - 9]
 					
 					if (this.iSelectedValidator = validator)
 						this.iSelectedValidator := false
@@ -1692,7 +1757,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			telemetryDB := new TelemetryDatabase(simulator, car, track)
 			simulatorCode := telemetryDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Strategies
+			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
 			
 			FileCreateDir %dirName%
 		}

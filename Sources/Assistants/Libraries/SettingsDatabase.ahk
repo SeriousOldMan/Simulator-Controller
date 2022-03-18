@@ -16,223 +16,232 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Database.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kSettingsDataSchemas := {"Settings": ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SettingsDatabase extends SessionDatabase {	
-	getSettingsNames(simulator, car, track, ByRef localSettings, ByRef globalSettings) {
-		simulatorCode := this.getSimulatorCode(simulator)
+class SettingsDatabase extends SessionDatabase {
+	iLastSimulator := false
+	iUserDatabase := false
+	iCommunityDatabase := false
+	
+	iID := false
+	
+	ID[] {
+		Get {
+			return this.iID
+		}
+	}
+	
+	__New(controllerConfiguration := false) {
+		base.__New(controllerConfiguration)
 		
-		localSettings := []
-		globalSettings := []
+		FileRead identifier, % kUserConfigDirectory . "ID"
+		
+		this.iID := identifier
+	}
+	
+	getSettingsDatabase(simulator, type := "User") {
+		if (this.iLastSimulator != simulator) {
+			this.iLastSimulator := simulator
 			
-		Loop Files, %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\*.*
-		{
-			SplitPath A_LoopFileName, settingsName
-		
-			localSettings.Push(StrReplace(settingsName, ".settings", ""))
+			this.iUserDatabase := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iCommunityDatabase := new Database(kDatabaseDirectory . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
 		}
 		
-		if this.UseGlobalDatabase {
-			Loop Files, %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\*.*
-			{
-				SplitPath A_LoopFileName, settingsName
+		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
+	}
+	
+	querySettings(simulator, car, track, weather, ByRef userSettings, ByRef communitySettings) {
+		local database
+		
+		id := this.ID
+		
+		if userSettings {
+			result := {}
 			
-				globalSettings.Push(StrReplace(settingsName, ".settings", ""))
-			}
-		}
-	}
-	
-	doSettings(simulator, car, track, function) {
-		localSettings := false
-		globalSettings := false
-		
-		this.getSettingsNames(simulator, car, track, localSettings, globalSettings)
-		
-		for ignore, name in localSettings
-			%function%(simulator, car, track, name)
-		
-		for ignore, name in globalSettings
-			%function%(simulator, car, track, name)
-	}
-	
-	matchProperties(query, precise, result, simulator, car, track, name) {
-		local compound
-		
-		if precise {
-			match := true
+			readSettings(this, simulator, result, id, true, false, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", "*")
+			readSettings(this, simulator, result, id, true, false, "*", track, "*")
+			readSettings(this, simulator, result, id, true, false, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, false, car, track, "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", weather)
+			readSettings(this, simulator, result, id, true, false, "*", track, weather)
+			readSettings(this, simulator, result, id, true, false, car, track, weather)
 			
-			newSettings := this.readSettings(simulator, car, track, name)
+			userSettings := []
 			
-			if (query.HasKey("Duration") && (getConfigurationValue(newSettings, "Session Settings", "Duration") != query["Duration"]))
-				match := false
+			for ignore, setting in result
+				userSettings.Push(setting)
+		}
+		
+		if communitySettings {
+			result := {}
 			
-			if (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") != (query.HasKey("Compound") ? query["Compound"] : "Dry"))
-				match := false
+			readSettings(this, simulator, result, id, false, true, "*", "*", "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", "*")
+			readSettings(this, simulator, result, id, false, true, "*", track, "*")
+			readSettings(this, simulator, result, id, false, true, "*", "*", weather)
+			readSettings(this, simulator, result, id, false, true, car, track, "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", weather)
+			readSettings(this, simulator, result, id, false, true, "*", track, weather)
+			readSettings(this, simulator, result, id, false, true, car, track, weather)
 			
-			if match {
-				result["Name"] := name
-				result["Settings"] := newSettings
-			}
-		}
-		else {
-			if !result.HasKey("Name") {
-				result["Name"] := name
-				result["Settings"] := this.readSettings(simulator, car, track, name)
-			}
-			else {
-				newSettings := this.readSettings(simulator, car, track, name)
+			communitySettings := []
 			
-				if query.HasKey("Duration") {
-					duration := query["Duration"]
-					
-					betterMatchingDuration := (Abs(getConfigurationValue(newSettings, "Session Settings", "Duration") - duration) < Abs(getConfigurationValue(result["Settings"], "Session Settings", "Duration") - duration))
-				}
-				else
-					betterMatchingDuration := false
-				
-				if query.HasKey("Compound") {
-					compound := query["Compound"]
-				
-					matchingTyres := (compound = getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry"))
-					
-					betterMatchingTyres := (matchingTyres && (compound != getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry")))
-				}
-				else {
-					matchingTyres := (getConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry") = "Dry")
-				
-					if (getConfigurationValue(result["Settings"], "Session Setup", "Tyre.Compound", "Dry") = "Dry")
-						betterMatchingTyres := false
-					else
-						betterMatchingTyres := matchingTyres
-				}
-				
-				if (betterMatchingDuration && !matchingTyres)
-					betterMatchingDuration := false
-				
-				if (betterMatchingTyres || betterMatchingDuration) {
-					result["Name"] := name
-					result["Settings"] := newSettings
-				}
-			}
+			for ignore, setting in result
+				communitySettings.Push(setting)
 		}
 	}
 	
-	getSettings(simulator, car, track, query) {
-		simulatorName := this.getSimulatorName(simulator)
+	doSettings(simulator, car, track, weather, function, userSettings := true, communitySettings := true) {
+		this.querySettings(simulator, car, track, weather, userSettings, communitySettings)
 		
-		result := {}
-			
-		this.doSettings(simulatorName, car, track, ObjBindMethod(this, "matchProperties", query, false, result))
-	
-		settingsName := (result.HasKey("Name") ? result["Name"] : false)
+		if userSettings
+			for ignore, setting in userSettings
+				%function%(simulator, car, track, weather, setting)
 		
-		if settingsName
-			return this.readSettings(simulatorName, car, track, settingsName)
-		else
-			return readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		if communitySettings
+			for ignore, setting in communitySettings
+				%function%(simulator, car, track, weather, setting)
 	}
 	
-	readSettings(simulator, car, track, settingsName) {
-		simulatorCode := this.getSimulatorCode(simulator)
+	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
+		if (community = kUndefined)
+			community := this.UseCommunity
 		
-		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
+		settings := newConfiguration()
 		
-		settings := readConfiguration(fileName)
+		id := this.ID
 		
-		if (settings.Count() = 0) {
-			fileName = %kDatabaseDirectory%Global\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*")
+		loadSettings(this, simulator, settings, id, true, community, car, "*", "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", track, "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", weather)
+		loadSettings(this, simulator, settings, id, true, community, car, track, "*")
+		loadSettings(this, simulator, settings, id, true, community, car, "*", weather)
+		loadSettings(this, simulator, settings, id, true, community, "*", track, weather)
+		loadSettings(this, simulator, settings, id, true, community, car, track, weather)
 		
-			return readConfiguration(fileName)
-		}
-		else
-			return settings
+		return settings
 	}
 	
-	writeSettings(simulator, car, track, settingsName, settings) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings
-		
-		FileCreateDir %fileName%
-		
-		fileName := (fileName . "\" . settingsName . ".settings")
-		
-		writeConfiguration(fileName, settings)
-	}
-	
-	deleteSettings(simulator, car, track, settingsName) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		fileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%settingsName%.settings
-		
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
-	}
-	
-	renameSettings(simulator, car, track, oldSettingsName, newSettingsName) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		
-		oldFileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%oldSettingsName%.settings
-		newFileName = %kDatabaseDirectory%Local\%simulatorCode%\%car%\%track%\Race Settings\%newSettingsName%.settings
-		
-		try {
-			FileMove %oldFileName%, %newFileName%, 1
-		}
-		catch exception {
-			; ignore
-		}
-	}
-	
-	updateSettingsValues(settings, values) {
-		if values.HasKey("Compound")
-			setConfigurationValue(settings, "Session Setup", "Tyre.Compound", values["Compound"])
-		
-		if values.HasKey("CompoundColor")
-			setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", values["CompoundColor"])
-		
-		if values.HasKey("AvgLapTime")
-			setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", values["AvgLapTime"])
-		
-		if values.HasKey("AvgFuelConsumption")
-			setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", values["AvgFuelConsumption"])
-		
-		if values.HasKey("Duration")
-			setConfigurationValue(settings, "Session Settings", "Duration", values["Duration"])
-	}
-	
-	updateSettings(simulator, car, track, query, values) {
-		simulatorName := this.getSimulatorName(simulator)
+	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
+		if (community = kUndefined)
+			community := this.UseCommunity
 		
 		result := {}
 		
-		this.doSettings(simulatorName, car, track, ObjBindMethod(this, "matchProperties", query, true, result))
-	
-		settingsName := (result.HasKey("Name") ? result["Name"] : false)
+		id := this.ID
 		
-		if settingsName {
-			settings := this.readSettings(simulatorName, car, track, settingsName)
+		if inherited {
+			readSettings(this, simulator, result, id, true, community, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", "*")
+			readSettings(this, simulator, result, id, true, community, "*", track, "*")
+			readSettings(this, simulator, result, id, true, community, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, community, car, track, "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", weather)
+			readSettings(this, simulator, result, id, true, community, "*", track, weather)
+		}
 		
-			this.updateSettingsValues(settings, values)
+		readSettings(this, simulator, result, id, true, community, car, track, weather)
+
+		settings := []
+		
+		for ignore, setting in result
+			settings.Push(setting)
 			
-			this.writeSettings(simulatorName, car, track, settingsName, settings)
-		}
-		else {
-			fileName := getFileName("Race.settings", kUserConfigDirectory)
-			
-			settings := readConfiguration(fileName)
-			
-			this.updateSettingsValues(settings, values)
-			
-			this.writeSettings(simulatorName, car, track, translate("New") . " - " . A_Now, settings)
-		}
+		return settings
 	}
+	
+	getSettingValue(simulator, car, track, weather, section, key, default := false) {
+		rows := this.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Owner: this.ID
+																					 , Car: car, Track: track, Weather: weather
+																					 , Section: section, Key: key}})
+		
+		return ((rows.Length() > 0) ? rows[1].Value : default)
+	}
+	
+	setSettingValue(simulator, car, track, weather, section, key, value) {
+		local database := this.getSettingsDatabase(simulator, "User")
+		
+		database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
+								  , Func("always").Bind(true))
+		
+		database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+		
+		database.flush()
+	}
+	
+	removeSettingValue(simulator, car, track, weather, section, key) {
+		this.getSettingsDatabase(simulator, "User").remove("Settings", {Owner: this.ID
+																	  , Car: car, Track: track, Weather: weather
+																	  , Section: section, Key: key}
+																	 , Func("always").Bind(true), true)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+constraintSettings(constraints, row) {
+	for column, value in constraints
+		if (row[column] != value)
+			return false
+		
+	return true
+}
+
+always(value, ignore*) {
+	return value
+}
+
+readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
+	result := []
+	
+	if community
+		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
+																					, {Where: {Car: car, Track: track, Weather: weather}})
+			if (row.Owner != owner)
+				result.Push(row)
+
+	if user
+		for ignore, row in database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
+																									, Weather: weather, Owner: owner}})
+			result.Push(row)
+	
+	filtered := []
+	visited := {}
+	
+	for ignore, row in reverse(result)
+		if !visited.HasKey(row.Section . "." . row.Key) {
+			visited[row.Section . "." . row.Key] := true
+			
+			filtered.Push(row)
+		}
+	
+	for ignore, row in reverse(filtered)
+		settings[row.Section . "." . row.Key] := row
+}
+
+loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
+	values := {}
+	
+	readSettings(database, simulator, values, owner, user, community, car, track, weather)
+	
+	for ignore, setting in values
+		setConfigurationValue(settings, setting.Section, setting.Key, setting.Value)
 }

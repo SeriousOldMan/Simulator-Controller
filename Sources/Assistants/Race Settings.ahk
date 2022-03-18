@@ -30,6 +30,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Includes\Includes.ahk
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -58,8 +59,16 @@ global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 global vSilentMode := kSilentMode
 global vTeamMode := true
-global vEditMode := false
 
+global vSimulator := false
+global vCar := false
+global vTrack := false
+global vWeather := "Dry"
+global vAirTemperature := 23
+global vTrackTemperature:= 27
+global vCompound := "Dry"
+global vCompoundColor := "Black"
+	
 global repairSuspensionDropDown
 global repairSuspensionThresholdEdit
 global repairSuspensionGreaterLabel
@@ -282,9 +291,15 @@ updateChangeTyreState() {
 }
 
 readTyreSetup(settings) {
-	spSetupTyreCompoundDropDown := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+	if (vCompound && vCompoundColor) {
+		spSetupTyreCompoundDropDown := vCompound
+		color := vCompoundColor
+	}
+	else {
+		spSetupTyreCompoundDropDown := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+		color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
+	}
 	
-	color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
 	if (color != "Black")
 		spSetupTyreCompoundDropDown := spSetupTyreCompoundDropDown . " (" . color . ")"
 	
@@ -641,7 +656,7 @@ restart:
 		
 		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 2))
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
@@ -866,7 +881,7 @@ restart:
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
 		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
-		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on setup database values")
+		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on database values")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -945,16 +960,11 @@ restart:
 		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Post Race")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
-				
-		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui RES:Add, Edit, x292 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
-		Gui RES:Add, UpDown, x324 yp-2 w18 h20, %safetyFuelEdit%
-		Gui RES:Add, Text, x350 yp+2 w90 h20, % translate("Ltr.")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 yp+28 w270 0x10
+		Gui RES:Add, Text, x66 yp+52 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial
@@ -986,8 +996,7 @@ restart:
 		
 		option := (import ? "yp-25" : "yp")
 
-		if !vEditMode
-		Gui RES:Add, Button, x292 %option% w90 h23 gopenSetupDatabase, % translate("Setups...")
+		Gui RES:Add, Button, x292 %option% w90 h23 gopenSessionDatabase, % translate("Setups...")
 		
 		if import
 			Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
@@ -1087,6 +1096,11 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
 		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
+				
+		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
+		Gui RES:Add, Edit, x126 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %safetyFuelEdit%
+		Gui RES:Add, Text, x184 yp+2 w90 h20, % translate("Ltr.")
 
 		if vTeamMode {
 			Gui RES:Tab, 4
@@ -1133,8 +1147,18 @@ restart:
 				
 				title := translate("Load Race Settings...")
 				
+				if (vSimulator && vCar && vTrack) {
+					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					
+					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					
+					FileCreateDir %dirName%
+				}
+				else
+					dirName := kRaceSettingsFile
+				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
 			
 				if (file != "") {
@@ -1148,10 +1172,22 @@ restart:
 			else if (result == kSave) {
 				result := false
 			
+				if (vSimulator && vCar && vTrack) {
+					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					
+					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					
+					FileCreateDir %dirName%
+					
+					fileName := (dirName . "\Race.settings")
+				}
+				else
+					fileName := kRaceSettingsFile
+				
 				title := translate("Save Race Settings...")
 				
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-				FileSelectFile file, S17, %kRaceSettingsFile%, %title%, Settings (*.settings)
+				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
 			
 				if (file != "") {
@@ -1193,8 +1229,8 @@ readSimulatorData(simulator) {
 	return readConfiguration(dataFile)
 }
 
-openSetupDatabase() {
-	exePath := kBinariesDirectory . "Setup Database.exe"
+openSessionDatabase() {
+	exePath := kBinariesDirectory . "Session Database.exe"
 	
 	try {
 		options := []
@@ -1213,9 +1249,9 @@ openSetupDatabase() {
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
 	catch exception {
-		logMessage(kLogCritical, translate("Cannot start the Setup Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 			
-		showMessage(substituteVariables(translate("Cannot start the Setup Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }
@@ -1341,15 +1377,62 @@ showRaceSettingsEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
 	
+	vSimulator := false
+	vCar := false
+	vTrack := false
+	vWeather := "Dry"
+	vAirTemperature := 23
+	vTrackTemperature:= 27
+	vCompound := "Dry"
+	vCompoundColor := "Black"
+	
+	index := 1
+	
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Simulator":
+				vSimulator := A_Args[index + 1]
+				index += 2
+			case "-Car":
+				vCar := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				vTrack := A_Args[index + 1]
+				index += 2
+			case "-Weather":
+				vWeather := A_Args[index + 1]
+				index += 2
+			case "-AirTemperature":
+				vAirTemperature := A_Args[index + 1]
+				index += 2
+			case "-TrackTemperature":
+				vTrackTemperature := A_Args[index + 1]
+				index += 2
+			case "-Compound":
+				vCompound := A_Args[index + 1]
+				index += 2
+			case "-CompoundColor":
+				vCompoundColor := A_Args[index + 1]
+				index += 2
+			case "-Setup":
+				vRequestorPID := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
+	
+	if ((vAirTemperature <= 0) || (vTrackTemperature <= 0)) {
+		vAirTemperature := false
+		vTrackTemperature := false
+	}
+	
 	fileName := kRaceSettingsFile
 	
 	index := inList(A_Args, "-File")
 	
-	if index {
+	if index
 		fileName := A_Args[index + 1]
-		
-		vEditMode := true
-	}
 	
 	settings := readConfiguration(fileName)
 	
@@ -1372,7 +1455,7 @@ showRaceSettingsEditor() {
 		if (editSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
 	
-			ExitApp %vEditMode%
+			ExitApp 0
 		}
 	}
 	

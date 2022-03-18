@@ -522,6 +522,7 @@ class RaceSpotter extends RaceAssistant {
 		simulatorName := this.Simulator
 		configuration := this.Configuration
 		
+		/*
 		Process Exist, Race Engineer.exe
 		
 		if (ErrorLevel > 0)
@@ -534,6 +535,9 @@ class RaceSpotter extends RaceAssistant {
 			else
 				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
+		*/
+		
+		saveSettings := kNever
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 									  , SaveSettings: saveSettings})

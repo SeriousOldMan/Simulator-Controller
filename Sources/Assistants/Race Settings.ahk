@@ -990,7 +990,7 @@ restart:
 		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
 			if new Application(simulator, kSimulatorConfiguration).isRunning() {
 				import := true
-				
+			
 				break
 			}
 		
@@ -1269,18 +1269,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				break
 			}
 		
-		switch simulator {
-			case "Assetto Corsa Competizione":
-				prefix := "ACC"
-			case "RaceRoom Racing Experience":
-				prefix := "R3E"
-			case "rFactor 2":
-				prefix := "RF2"
-			case "iRacing":
-				prefix := "IRC"
-			default:
-				return
-		}
+		prefix := new SessionDatabase().getSimulatorCode(simulator)
 	}
 	
 	data := readSimulatorData(prefix)
@@ -1300,7 +1289,9 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		}
 		
-		if (getConfigurationValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown) != "Wet") {
+		compound := getConfigurationValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown)
+		
+		if (compound = "Dry") {
 			spDryFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)
 			spDryFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)
 			spDryRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)
@@ -1309,7 +1300,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			if settings {
 				color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 				
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", color)
 				
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
@@ -1318,20 +1309,20 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 				
 				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
-					message := ((color = "Black") ? "Tyre setup imported: Dry" : "Tyre setup imported: Dry (" . color . ")")
+					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
 					
-					showMessage(message . ", Set " . spSetupTyreSetEdit . "; "
-							  . Round(spDryFrontLeftEdit, 1) . ", " . Round(spDryFrontRightEdit, 1) . ", "
-							  . Round(spDryRearLeftEdit, 1) . ", " . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
+							  . Round(spDryFrontLeftEdit, 1) . translate(", ") . Round(spDryFrontRightEdit, 1) . translate(", ")
+							  . Round(spDryRearLeftEdit, 1) . translate(", ") . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
 				}
 			}
 			else {
-				compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
+				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 				
 				if (compoundColor = "Black")
-					GuiControl Choose, spSetupTyreCompoundDropDown, 2
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
 				else
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompoundColors, compoundColor)
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
 				
 				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
@@ -1339,28 +1330,38 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
 			}
 		}
-		else {
+		else if ((compound = "Wet") || (compound = "Intermediate")) {
 			spWetFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)
 			spWetFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)
 			spWetRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)
 			spWetRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)
 			
 			if settings {
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Wet")
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
+				color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compound)
 				
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 				
-				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2"))
-					showMessage("Tyre setup imported: Wet; "
-							  . Round(spWetFrontLeftEdit, 1) . ", " . Round(spWetFrontRightEdit, 1) . ", "
-							  . Round(spWetRearLeftEdit, 1) . ", " . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
+					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
+					
+					showMessage(message . translate("; ")
+							  . Round(spWetFrontLeftEdit, 1) . translate(", ") . Round(spWetFrontRightEdit, 1) . translate(", ")
+							  . Round(spWetRearLeftEdit, 1) . translate(", ") . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+				}
 			}
 			else {
-				GuiControl Choose, spSetupTyreCompoundDropDown, 1
+				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				
+				if (compoundColor = "Black")
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
+				else
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
 				
 				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
 				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%

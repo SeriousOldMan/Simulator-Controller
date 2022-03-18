@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
@@ -1021,6 +1022,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 			
+			if (dataLastLap == 0)
+				prepareSessionDatabase(data)
+			
 			if isDebug() {
 				testData := getConfigurationSectionValues(data, "Test Data", Object())
 				
@@ -1320,6 +1324,22 @@ getDataSessionState(data) {
 	}
 	else
 		return kSessionFinished
+}
+
+prepareSessionDatabase(data) {
+	local plugin
+	
+	controller := SimulatorController.Instance
+	
+	plugin := controller.findPlugin(kRaceEngineerPlugin)
+	
+	if !plugin
+		plugin := controller.findPlugin(kRaceStrategistPlugin)
+	
+	if plugin.Simulator
+		new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator()
+											, getConfigurationValue(data, "Session Data", "Car", "Unknown")
+											, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
 }
 
 getSimulatorOptions(plugin := false) {

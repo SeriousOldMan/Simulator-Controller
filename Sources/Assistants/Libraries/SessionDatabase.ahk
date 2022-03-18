@@ -36,7 +36,7 @@ global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSe
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SessionDatabase {
+class SessionDatabase extends ConfigurationItem {
 	iControllerConfiguration := false
 	
 	iUseCommunity := false
@@ -53,11 +53,19 @@ class SessionDatabase {
 		}
 		
 		Set {
+			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			
+			setConfigurationValue(configuration, "Scope", "Community", value)
+			
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			
 			return (this.iUseCommunity := value)
 		}
 	}
 	
 	__New(controllerConfiguration := false) {
+		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
+		
 		if !controllerConfiguration {
 			controllerConfiguration := getControllerConfiguration()
 		
@@ -66,6 +74,19 @@ class SessionDatabase {
 		}
 		
 		this.iControllerConfiguration := controllerConfiguration
+	}
+	
+	loadFromConfiguration(configuration) {
+		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+	}
+	
+	prepareDatabase(simulator, car, track) {
+		if (simulator && car && track) {
+			simulatorCode := this.getSimulatorCode(simulator)
+
+			if (simulatorCode && (car != true) && (track != true))
+				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		}
 	}
 		
 	getEntries(filter := "*.*", option := "D") {
@@ -312,6 +333,17 @@ class SessionDatabase {
 		file.RawWrite(setup, size)
 	
 		file.Close()
+	}
+	
+	renameSetup(simulator, car, track, type, oldName, newName) {
+		simulatorCode := this.getSimulatorCode(simulator)
+		
+		try {
+			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
+		}
+		catch exception {
+			; ignore
+		}
 	}
 	
 	removeSetup(simulator, car, track, type, name) {

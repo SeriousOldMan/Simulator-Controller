@@ -92,6 +92,7 @@ global deleteSettingButton
 global setupTypeDropDown
 global uploadSetupButton
 global downloadSetupButton
+global renameSetupButton
 global deleteSetupButton
 
 global dryQualificationDropDown
@@ -144,8 +145,6 @@ global transferPressuresButton
 class SessionDatabaseEditor extends ConfigurationItem {
 	iSessionDatabase := new SessionDatabase()
 	
-	iUseCommunity := false
-	
 	iSelectedSimulator := false
 	iSelectedCar := true
 	iSelectedTrack := true
@@ -177,13 +176,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	UseCommunity[] {
 		Get {
-			return this.iUseCommunity
+			return this.SessionDatabase.UseCommunity
 		}
 		
 		Set {
-			this.SessionDatabase.UseCommunity := value
-			
-			return (this.iUseCommunity := value)
+			return (this.SessionDatabase.UseCommunity := value)
 		}
 	}
 	
@@ -430,11 +427,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
 		
-		Gui %window%:Add, Button, xp+285 yp+200 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
+		Gui %window%:Add, Button, xp+260 yp+200 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadSetupButtonHandle gdownloadSetup vdownloadSetupButton
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameSetupButtonHandle grenameSetup vrenameSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSetupButtonHandle gdeleteSetup vdeleteSetupButton
 		setButtonIcon(uploadSetupButtonHandle, kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(downloadSetupButtonHandle, kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(renameSetupButtonHandle, kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		
 		Gui Tab, 3
@@ -513,7 +512,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x8 y596 w670 0x10
 		
 		choices := ["Local", "Local & Community"]
-		chosen := inList(choices, "Local")
+		chosen := (this.UseCommunity ? 2 : 1)
 		
 		Gui %window%:Add, Text, x16 y604 w55 h23 +0x200, % translate("Scope")
 		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
@@ -641,12 +640,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		selected := LV_GetNext(0)
 		
 		if selected {
+			LV_GetText(type, selected, 1)
+			
 			GuiControl Enable, downloadSetupButton
-			GuiControl Enable, deleteSetupButton
+			
+			if (type = translate("Local")) {
+				GuiControl Enable, deleteSetupButton
+				GuiControl Enable, renameSetupButton
+			}
+			else {
+				GuiControl Disable, deleteSetupButton
+				GuiControl Disable, renameSetupButton
+			}
 		}
 		else {
 			GuiControl Disable, downloadSetupButton
 			GuiControl Disable, deleteSetupButton
+			GuiControl Disable, renameSetupButton
 		}
 		
 		Gui ListView, % this.SettingsListView
@@ -832,7 +842,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iSettings := []
 		
 		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																 , this.SelectedTrack["*"], this.SelectedWeather["*"], false) {
+																 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+																 , false, false) {
 			type := this.getSettingType(setting.Section, setting.Key)
 			
 			if IsObject(type)
@@ -869,7 +880,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
 							  
 		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																 , this.SelectedTrack["*"], this.SelectedWeather["*"]) {
+																 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+																 , true, false) {
 			if (setting.Car != "*")
 				references.Car += 1
 			else
@@ -957,7 +969,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			LV_InsertCol(A_Index, "", column)
 		
 		tyresDB := new TyresDatabase()
-		tyresDB.UseCommunity := this.UseCommunity
 		
 		for ignore, info in tyresDB.getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
 			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
@@ -1177,7 +1188,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadPressures() {
 		tyresDB := new TyresDatabase()
-		tyresDB.UseCommunity := this.UseCommunity
 		
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
@@ -1350,41 +1360,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.loadSetups(this.SelectedSetupType, true)
 		}
 	}
+
+	renameSetup(setupType, setupName) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		SplitPath setupName, , , curExtension, curName
+			
+		title := translate("Delete")
+		prompt := translate("Please enter the new name for the selected setup:")
+		
+		locale := ((getLanguage() = "en") ? "" : "Locale")
+	
+		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
+		
+		if !ErrorLevel {
+			GuiControlGet simulatorDropDown
+			GuiControlGet carDropDown
+			GuiControlGet trackDropDown
+			
+			if (StrLen(curExtension) > 0)
+				newName .= ("." . curExtension)
+			
+			this.SessionDatabase.renameSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, newName)
+			
+			this.loadSetups(this.SelectedSetupType, true)
+		}
+	}
 }
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-/*
-global queryScopeDropDown
-
-*/
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-/*
-
-
-
-
-
-updateQueryScope() {
-	Gui %window%:Default
-			
-	GuiControlGet queryScopeDropDown
-	
-	vSettingsDatabase.UseCommunity := (queryScopeDropDown == 2)
-	vTyresDatabase.UseCommunity := (queryScopeDropDown == 2)
-	
-	chooseSimulator()
-}
-
-*/
-
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;   Parameters:
@@ -1850,6 +1859,21 @@ downloadSetup() {
 	SessionDatabaseEditor.Instance.downloadSetup(kSetupTypes[setupTypeDropDown], name)
 }
 
+renameSetup() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	GuiControlGet setupTypeDropDown
+	
+	Gui ListView, % editor.SetupListView
+	
+	LV_GetText(name, LV_GetNext(0), 2)
+	
+	SessionDatabaseEditor.Instance.renameSetup(kSetupTypes[setupTypeDropDown], name)
+}
+
 deleteSetup() {
 	editor := SessionDatabaseEditor.Instance
 	window := editor.Window
@@ -1935,7 +1959,6 @@ transferPressures() {
 	compound := compound[1]
 	
 	tyresDB := new TyresDatabase()
-	tyresDB.UseCommunity := editor.UseCommunity
 		
 	for ignore, pressureInfo in tyresDB.getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
 												   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
@@ -1953,7 +1976,7 @@ testSettings() {
 		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
 		
 		for section, values in new SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
-																 , editor.SelectedTrack["*"], editor.SelectedWeather["*"])
+																 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
 			for key, value in values
 				setConfigurationValue(settings, section, key, value)
 																 

@@ -75,9 +75,6 @@ class TyresDatabase extends SessionDatabase {
 	
 	requireDatabase(simulator, car, track, scope := "User") {
 		simulator := this.getSimulatorName(simulator)
-		
-		if (car == true)
-			MsgBox Here
 
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
 							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
@@ -85,6 +82,9 @@ class TyresDatabase extends SessionDatabase {
 			
 			this.iDatabase := false
 		}
+		
+		if ((simulator == true) || (car == true) || (track == true))
+			Throw "Unsupported database specification detected in TyresDatabase.requireDatabase..."
 		
 		if !this.iDatabase {
 			this.iLastSimulator := simulator

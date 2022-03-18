@@ -93,11 +93,12 @@ class SessionDatabase extends ConfigurationItem {
 		result := []
 		
 		Loop Files, %kDatabaseDirectory%User\%filter%, %option%
-			result.Push(A_LoopFileName)
+			if (A_LoopFileName != "1")
+				result.Push(A_LoopFileName)
 		
 		if this.UseCommunity
 			Loop Files, %kDatabaseDirectory%Community\%filter%, %option%
-				if !inList(result, A_LoopFileName)
+				if ((A_LoopFileName != "1") && !inList(result, A_LoopFileName))
 					result.Push(A_LoopFileName)
 		
 		return result

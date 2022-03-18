@@ -566,27 +566,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		track := this.SelectedTrack
 		
 		if simulator {
-			this.iAvailableModules["Settings"] := true
-			
-			if ((car && (car != true)) && (track && (track != true))) {
-				this.iAvailableModules["Setups"] := true
-				this.iAvailableModules["Pressures"] := true
-			}
-			else {
-				this.iAvailableModules["Setups"] := false
-				this.iAvailableModules["Pressures"] := false
-				
+			if !((car && (car != true)) && (track && (track != true)))
 				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
-			}
 		}
-		else {
-			this.iAvailableModules["Settings"] := false
-			this.iAvailableModules["Setups"] := false
-			this.iAvailableModules["Pressures"] := false
-			
+		else
 			GuiControl Choose, settingsTab, 0
-		}
 		
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
@@ -983,6 +968,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	moduleAvailable(module) {
+		simulator := this.SelectedSimulator
+		car := this.SelectedCar
+		track := this.SelectedTrack
+		
+		if simulator {
+			this.iAvailableModules["Settings"] := true
+			
+			if ((car && (car != true)) && (track && (track != true))) {
+				this.iAvailableModules["Setups"] := true
+				this.iAvailableModules["Pressures"] := true
+			}
+			else {
+				this.iAvailableModules["Setups"] := false
+				this.iAvailableModules["Pressures"] := false
+			}
+		}
+		else {
+			this.iAvailableModules["Settings"] := false
+			this.iAvailableModules["Setups"] := false
+			this.iAvailableModules["Pressures"] := false
+		}
+		
 		return this.iAvailableModules[module]
 	}
 	
@@ -1013,7 +1020,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		GuiControl, , notesEdit, % this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		
-		this.selectModule(this.SelectedModule, true)
+		if this.moduleAvailable(this.SelectedModule)
+			this.selectModule(this.SelectedModule, true)
+		else
+			this.selectModule("Settings", true)
 	}
 	
 	updateNotes(notes) {
@@ -1933,9 +1943,11 @@ chooseDatabaseScope() {
 			
 	GuiControlGet databaseScopeDropDown
 	
-	editor.UseCommunity := (databaseScopeDropDown == 2)
-	
-	editor.loadSimulator(editor.SelectedSimulator, true)
+	if (true || (databaseScopeDropDown == 2) != editor.UseCommunity) {
+		editor.UseCommunity := (databaseScopeDropDown == 2)
+		
+		editor.loadSimulator(editor.SelectedSimulator, true)
+	}
 }
 
 transferPressures() {

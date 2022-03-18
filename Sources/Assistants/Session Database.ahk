@@ -726,8 +726,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else if (this.iLastTracks.Length() > 0)
 				this.updateModules()
-			else
+			else {
+				GuiControl, , trackDropDown, % "|" . translate("All")
+			
 				this.loadTrack(true, true)
+			}
 		}
 	}
 	

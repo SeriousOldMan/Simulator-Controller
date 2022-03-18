@@ -73,31 +73,49 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
-			
-				FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 				
-				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
-				{
-					track := A_LoopFileName
-			
-					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
-					
-					if uploadPressures {
-						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
-							FileCopy %A_LoopFilePath%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
-						
-						distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
-						
-						if FileExist(distFile)
-							FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+				if car is number
+					try {
+						FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%, 1
 					}
+					catch exception {
+						; ignore
+					}
+				else {
+					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 					
-					if uploadSetups {
-						try {
-							FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
-						}
-						catch exception {
-							; ignore
+					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
+					{
+						track := A_LoopFileName
+				
+						if car is number
+							try {
+								FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%, 1
+							}
+							catch exception {
+								; ignore
+							}
+						else {
+							FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+							
+							if uploadPressures {
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
+									FileCopy %A_LoopFilePath%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+								
+								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
+								
+								if FileExist(distFile)
+									FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+							}
+							
+							if uploadSetups {
+								try {
+									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
+								}
+								catch exception {
+									; ignore
+								}
+							}
 						}
 					}
 				}
@@ -154,13 +172,23 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 				RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 				
 				try {
+					FileDelete %kTempDirectory%%fileName%
+				}
+				catch exception {
+					; ignore
+				}
+		
+				try {
 					FileRemoveDir %kDatabaseDirectory%Community, 1
 				}
 				catch exception {
 					; ignore
 				}
 				
-				FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
+				if FileExist(kTempDirectory . "Shared Database\" . directory . "\Community")
+					FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
+				else if FileExist(kTempDirectory . "Shared Database\Community")
+					FileMoveDir %kTempDirectory%Shared Database\Community, %kDatabaseDirectory%Community, R
 			}
 		}
 		

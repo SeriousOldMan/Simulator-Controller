@@ -120,26 +120,43 @@ class DatabaseCreator {
 			{
 				car := A_LoopFileName
 				
-				Loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
-				{
-					track := A_LoopFileName
-					
-					directory = %databaseDirectory%%simulator%\%car%\%track%\
-					
-					if FileExist(directory . "Setup.Pressures.Distribution.CSV")
-						FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
-					
-					if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
-						this.loadPressures(simulator, car, track, new Database(directory, kTyresDataSchemas))
-					
-					Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
-					{
-						type := A_LoopFileName
-						
-						Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
-							this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+				if car is number
+					try {
+						FileRemoveDir %databaseDirectory%%simulator%\%car%, 1
 					}
-				}
+					catch exception {
+						; ignore
+					}
+				else
+					Loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
+					{
+						track := A_LoopFileName
+						
+						if car is number
+							try {
+								FileRemoveDir %databaseDirectory%%simulator%\%car%\%track%, 1
+							}
+							catch exception {
+								; ignore
+							}
+						else {
+							directory = %databaseDirectory%%simulator%\%car%\%track%\
+							
+							if FileExist(directory . "Setup.Pressures.Distribution.CSV")
+								FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
+							
+							if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
+								this.loadPressures(simulator, car, track, new Database(directory, kTyresDataSchemas))
+							
+							Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+							{
+								type := A_LoopFileName
+								
+								Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
+									this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+							}
+						}
+					}
 			}
 		}
 	}
@@ -148,11 +165,17 @@ class DatabaseCreator {
 		if this.IncludePressures {
 			updateProgress("Pressures: " simulator . A_Space . car . A_Space . track . "...")
 			
-			for ignore, row in database.Tables["Tyres.Pressures.Distribution"]
+			for ignore, row in database.Tables["Tyres.Pressures.Distribution"] {
+				color := row["Compound.Color"]
+			
+				if ((color = kNull) || !color || (StrLen(color) = 0))
+					color := "Black"
+				
 				this.TyresDatabase.updatePressure(simulator, car, track, row.Weather
 												, row["Temperature.Air"], row["Temperature.Track"]
-												, row.Compound, row["Compound.Color"], row.Type, row.Tyre
+												, row.Compound, color, row.Type, row.Tyre
 												, row.Pressure, row.Count, false, true, "Community")
+			}
 			
 			this.TyresDatabase.flush()
 		}
@@ -160,7 +183,7 @@ class DatabaseCreator {
 	
 	loadCarSetup(simulator, car, track, type, setupFile) {
 		if this.IncludeSetups {
-			updateProgress("Setups: " simulator . A_Space . car . A_Space . track . "...")
+			updateProgress("Setups: " simulator . " / " . car . " / " . track . "...")
 			
 			FileCreateDir %kDatabaseDirectory%Community\%simulator%\%car%\Car Setups
 			

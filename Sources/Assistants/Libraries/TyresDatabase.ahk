@@ -220,12 +220,14 @@ class TyresDatabase extends SessionDatabase {
 			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
 		
-		database := this.getTyresDatabase(simulator, car, track, "Community")
-		
-		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
-																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
-			info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-					 , Compound: this.qualifiedCompound(row.Compound, row.CompoundColor), Count: row.Count})
+		if this.UseCommunity {
+			database := this.getTyresDatabase(simulator, car, track, "Community")
+			
+			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+				info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+						 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+		}
 		
 		return info
 	}

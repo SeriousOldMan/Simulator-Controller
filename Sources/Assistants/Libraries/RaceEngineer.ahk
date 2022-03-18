@@ -1521,7 +1521,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 		
 		if !ErrorLevel
-			if this.Speaker {
+			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1534,7 +1534,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 		
 		if (!ErrorLevel && (knowledgeBase.getValue("Lap.Remaining") > 3))
-			if this.Speaker {
+			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 				

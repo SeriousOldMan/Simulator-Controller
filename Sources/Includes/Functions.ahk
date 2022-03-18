@@ -539,9 +539,7 @@ startTrayMessageManager() {
 
 requestShareSessionDatabaseConsent() {
 	if !inList(A_Args, "-Install") {
-		program := StrSplit(A_ScriptName, ".")[1]
-		
-		if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Simulator Setup")) {
+		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {
 			idFileName := kUserConfigDirectory . "ID"
 			
 			FileReadLine id, %idFileName%, 1
@@ -606,9 +604,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 shareSessionDatabase() {
-	program := StrSplit(A_ScriptName, ".")[1]
-	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Session Database")) {
+	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -622,10 +618,10 @@ shareSessionDatabase() {
 			options := ("-ID '" . id . "'")
 			
 			if shareTyrePressures
-				options := " -Presssures"
+				options .= " -Pressures"
 			
 			if shareCarSetups
-				options := " -Setups"
+				options .= " -Setups"
 			
 			try {
 				Run %kBinariesDirectory%Database Update.exe %options%
@@ -1983,7 +1979,7 @@ decreaseLogLevel() {
 initializeEnvironment()
 loadSimulatorConfiguration()
 
-if vDetachedInstallation {
+if !vDetachedInstallation {
 	checkForUpdates()
 	requestShareSessionDatabaseConsent()
 	shareSessionDatabase()

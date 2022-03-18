@@ -631,7 +631,7 @@ requestShareSessionDatabaseConsent() {
 shareSessionDatabase() {
 	program := StrSplit(A_ScriptName, ".")[1]
 	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
+	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Session Database")) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -642,88 +642,16 @@ shareSessionDatabase() {
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
 		if (shareTyrePressures || shareCarSetups) {
-			uploadTimeStamp := kDatabaseDirectory . "User\UPLOAD"
+			options := ("-ID '" . id . "'")
 			
-			if FileExist(uploadTimeStamp) {
-				FileReadLine upload, %uploadTimeStamp%, 1
-				
-				now := A_Now
-				
-				EnvSub now, %upload%, days
-				
-				if (now <= 7)
-					return
-			}
+			if shareTyrePressures
+				options := " -Presssures"
+			
+			if shareCarSetups
+				options := " -Setups"
 			
 			try {
-				try {
-					FileRemoveDir %kTempDirectory%DBase, 1
-				}
-				catch exception {
-					; ignore
-				}
-				
-				Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
-				{
-					simulator := A_LoopFileName
-					
-					FileCreateDir %kTempDirectory%DBase\%simulator%
-					
-					Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
-					{
-						car := A_LoopFileName
-					
-						FileCreateDir %kTempDirectory%DBase\%simulator%\%car%
-						
-						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
-						{
-							track := A_LoopFileName
-					
-							FileCreateDir %kTempDirectory%DBase\%simulator%\%car%\%track%
-							
-							if shareTyrePressures {
-								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
-									FileCopy %A_LoopFilePath%, %kTempDirectory%DBase\%simulator%\%car%\%track%
-								
-								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
-								
-								if FileExist(distFile)
-									FileCopy %distFile%, %kTempDirectory%DBase\%simulator%\%car%\%track%
-							}
-							
-							if shareCarSetups {
-								try {
-									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%DBase\%simulator%\%car%\%track%\Car Setups
-								}
-								catch exception {
-									; ignore
-								}
-							}
-						}
-					}
-				}
-				
-				try {
-					FileDelete %kTempDirectory%Database.%id%.zip
-				}
-				catch exception {
-					; ignore
-				}
-				
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%DBase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
-				
-				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
-				
-				try {
-					FileDelete %kDatabaseDirectory%User\UPLOAD
-				}
-				catch exception {
-					; ignore
-				}
-				
-				FileAppend %A_Now%, %kDatabaseDirectory%User\UPLOAD
-				
-				logMessage(kLogInfo, translate("Database successfully uploaded"))
+				Run %kBinariesDirectory%Database Updater.exe %options%
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))

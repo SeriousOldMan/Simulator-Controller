@@ -216,7 +216,7 @@ ftpClearDirectory(server, user, password, directory) {
 	FTP.disconnect(hSession)
 	
 	FTP.close(hFTP)
-}	
+}
 
 ftpDownload(server, user, password, remoteFile, localFile) {
 	hFTP := FTP.open("AHK-FTP")
@@ -252,7 +252,9 @@ downloadUserDatabases(directory) {
 			; ignore
 		}
 		
-		if FileExist(directory . "DBase")
+		if FileExist(directory . "Shared Database")
+			FileMoveDir %directory%DBase, %directory%%idName%, R
+		else if FileExist(directory . "DBase")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
 		else if FileExist(directory . "Dabase")
 			FileMoveDir %directory%Dabase, %directory%%idName%, R

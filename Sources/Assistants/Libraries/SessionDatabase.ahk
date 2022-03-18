@@ -143,9 +143,8 @@ class SessionDatabase {
 	getCars(simulator) {
 		code := this.getSimulatorCode(simulator)
 		
-		if code {
+		if code
 			return this.getEntries(code . "\*.*")
-		}
 		else
 			return []
 	}
@@ -153,9 +152,8 @@ class SessionDatabase {
 	getTracks(simulator, car) {
 		code := this.getSimulatorCode(simulator)
 		
-		if code {
+		if code
 			return this.getEntries(code . "\" . car . "\*.*")
-		}
 		else
 			return []
 	}
@@ -242,8 +240,7 @@ class SessionDatabase {
 				{
 					SplitPath A_LoopFileName, name
 				
-					if !inList(setups, name)
-						setups.Push(name)
+					setups.Push(name)
 				}
 				
 				userSetups[type] := setups
@@ -260,8 +257,7 @@ class SessionDatabase {
 				{
 					SplitPath A_LoopFileName, name
 				
-					if !inList(setups, name)
-						setups.Push(name)
+					setups.Push(name)
 				}
 				
 				communitySetups[type] := setups

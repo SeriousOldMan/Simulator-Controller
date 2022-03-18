@@ -2078,7 +2078,7 @@ decreaseLogLevel() {
 initializeEnvironment()
 loadSimulatorConfiguration()
 
-if vDetachedInstallation {
+if !vDetachedInstallation {
 	checkForUpdates()
 	requestShareSessionDatabaseConsent()
 	shareSessionDatabase()

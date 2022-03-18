@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Session Database Tool           ;;;
+;;;   Modular Simulator Controller System - Database Update Tool            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -20,8 +20,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Session Database.ico
-;@Ahk2Exe-ExeName Session Database.exe
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Database Update.ico
+;@Ahk2Exe-ExeName Database Update.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -134,21 +134,69 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	}
 }
 
+downloadSessionDatabase(id, downloadPressures, downloadSetups) {
+	try {
+		try {
+			FileRemoveDir %kTempDirectory%Shared Database, 1
+		}
+		catch exception {
+			; ignore
+		}
+		
+		for ignore, fileName in ftpListFiles("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads") {
+			SplitPath fileName, , , , directory
+		
+			type := StrSplit(Trim(fileName), ".", "", 2)[1]
+		
+			if (type = (downloadPressures . downloadSetups)) {
+				ftpDownload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads\" . fileName, kTempDirectory . fileName)
+			
+				RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
+				
+				try {
+					FileRemoveDir %kDatabaseDirectory%Community, 1
+				}
+				catch exception {
+					; ignore
+				}
+				
+				FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
+			}
+		}
+		
+		try {
+			FileRemoveDir %kTempDirectory%Shared Database, 1
+		}
+		catch exception {
+			; ignore
+		}
+		
+		logMessage(kLogInfo, translate("Database successfully downloaded"))
+	}
+	catch exception {
+		logMessage(kLogCritical, translate("Error while downloading database - please check your internet connection..."))
+	
+		showMessage(translate("Error while downloading database - please check your internet connection...")
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
 updateSessionDatabase() {
 	icon := kIconsDirectory . "Database Update.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Database Updater
+	Menu Tray, Tip, Database Update
 	
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)
 	
 	id := inList(A_Args, "-ID")
 	
-	if !id {
+	if id {
 		id := A_Args[id + 1]
 
-		uploadSessionDatabase(id, uploadPressures, uploadSetups)
+		uploadSessionDatabase(id, usePressures, useSetups)
+		downloadSessionDatabase(id, usePressures, useSetups)
 	}
 	
 	ExitApp 0

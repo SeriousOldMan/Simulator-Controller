@@ -19,7 +19,7 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
+global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Update", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -54,29 +54,6 @@ global vTrayMessageDuration = 1500
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-ftpUpload(server, user, password, localFile, remoteFile) {
-    static a := "AHK-FTP-UL"
-	
-	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
-	h := DllCall("wininet\InternetOpen", "ptr", &a, "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
-	
-    if (!m || !h)
-        return false
-	
-	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", &server, "ushort", 21, "ptr", &user, "ptr", &password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
-	
-    if f {
-        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0)
-            return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
-		
-        DllCall("wininet\InternetCloseHandle", "ptr", f)
-    }
-    
-	DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m)
-    
-	return true
-}
 
 createMessageReceiver() {
 	; Gui MR:-Border -Caption
@@ -651,7 +628,7 @@ shareSessionDatabase() {
 				options := " -Setups"
 			
 			try {
-				Run %kBinariesDirectory%Database Updater.exe %options%
+				Run %kBinariesDirectory%Database Update.exe %options%
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
@@ -881,7 +858,7 @@ initializeEnvironment() {
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
 			
-			if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Download")) {
+			if (install && !inList(["Simulator Tools", "Simulator Download", "Database Update"], StrSplit(A_ScriptName, ".")[1])) {
 				kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 				
 				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))

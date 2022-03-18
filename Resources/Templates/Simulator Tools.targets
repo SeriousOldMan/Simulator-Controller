@@ -35,6 +35,7 @@ Release 3.9.2=Release 3.9.0 -> updateTranslations, updateInstallationForV392
 Release 3.9.4=Release 3.9.2 -> updateTranslations, updateActionLabels, updateActionIcons, updateConfigurationForV394
 Release 3.9.6=Release 3.9.4 -> updateTranslations
 Release 3.9.8=Release 3.9.6 -> updateTranslations, updateInstallationForV398, updateConfigurationForV398, updatePluginsForV398
+; Release 4.0.0=Release 3.9.8 -> updateTranslations
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -149,5 +150,6 @@ Setup Advisor=%kBinariesDirectory%Setup Advisor.exe <- %kSourcesDirectory%Adviso
 Simulator Configuration=%kBinariesDirectory%Simulator Configuration.exe <- %kSourcesDirectory%Configuration\Simulator Configuration.ahk; %kIncludesDirectory%, %kLibrariesDirectory%SpeechSynthesizer.ahk, %kLibrariesDirectory%SpeechRecognizer.ahk, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Tools=%kBinariesDirectory%Simulator Tools.exe <- %kSourcesDirectory%Configuration\Simulator Tools.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kHomeDirectory%VERSION
 Simulator Download=%kBinariesDirectory%Simulator Download.exe <- %kSourcesDirectory%Configuration\Simulator Download.ahk; %kIncludesDirectory%, %kHomeDirectory%VERSION
+Database Update=%kBinariesDirectory%Database Update.exe <- %kSourcesDirectory%Configuration\Database Update.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kHomeDirectory%VERSION
 Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Configuration\Simulator Setup.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kLibrariesDirectory%, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Configuration\Simulator Settings.ahk; %kIncludesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION

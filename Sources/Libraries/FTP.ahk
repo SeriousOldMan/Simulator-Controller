@@ -324,8 +324,7 @@ class FTP {
 			return false
 	}
 	
-	openFile(hConnect, fileName, access)
-	{
+	openFile(hConnect, fileName, access) {
 		static FTP_TRANSFER_TYPE_BINARY := 2
 
 		if (hFTPSession := DllCall("wininet\FtpOpenFile", "ptr", hConnect, "ptr", &fileName, "uint", access, "uint", FTP_TRANSFER_TYPE_BINARY, "uptr", 0))
@@ -333,4 +332,71 @@ class FTP {
 		else
 			return false
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                     Public Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+ftpListFiles(server, user, password, path) {
+	files := []
+	
+	hFTP := FTP.open("AHK-FTP")
+	hSession := FTP.connect(hFTP, server, user, password)
+	
+	for ignore, file in FTP.findFiles(hSession, path)
+		files.Push(file.FileName)
+	
+	FTP.disconnect(hSession)
+	
+	FTP.close(hFTP)
+	
+	return files
+}
+
+ftpClearDirectory(server, user, password, directory) {
+	hFTP := FTP.open("AHK-FTP")
+	hSession := FTP.connect(hFTP, server, user, password)
+	
+	for ignore, file in FTP.findFiles(hSession, directory)
+		FTP.deleteFile(hSession, directory . "\" . file.FileName)
+	
+	FTP.disconnect(hSession)
+	
+	FTP.close(hFTP)
+}
+
+ftpUpload(server, user, password, localFile, remoteFile) {
+    static a := "AHK-FTP"
+	
+	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
+	h := DllCall("wininet\InternetOpen", "ptr", &a, "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
+	
+    if (!m || !h)
+        return false
+	
+	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", &server, "ushort", 21, "ptr", &user, "ptr", &password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
+	
+    if f {
+        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0)
+            return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
+		
+        DllCall("wininet\InternetCloseHandle", "ptr", f)
+    }
+    
+	DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m)
+    
+	return true
+}
+
+ftpDownload(server, user, password, remoteFile, localFile) {
+	hFTP := FTP.open("AHK-FTP")
+	hSession := FTP.connect(hFTP, server, user, password)
+	
+	FTP.getFile(hSession, remoteFile, localFile)
+	
+	FTP.disconnect(hSession)
+	
+	FTP.close(hFTP)
 }

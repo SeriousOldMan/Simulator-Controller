@@ -190,45 +190,6 @@ windowsPath(path) {
 		return path
 }
 
-ftpListFiles(server, user, password, path) {
-	files := []
-	
-	hFTP := FTP.open("AHK-FTP")
-	hSession := FTP.connect(hFTP, server, user, password)
-	
-	for ignore, file in FTP.findFiles(hSession, path)
-		files.Push(file.FileName)
-	
-	FTP.disconnect(hSession)
-	
-	FTP.close(hFTP)
-	
-	return files
-}
-
-ftpClearDirectory(server, user, password, directory) {
-	hFTP := FTP.open("AHK-FTP")
-	hSession := FTP.connect(hFTP, server, user, password)
-	
-	for ignore, file in FTP.findFiles(hSession, directory)
-		FTP.deleteFile(hSession, directory . "\" . file.FileName)
-	
-	FTP.disconnect(hSession)
-	
-	FTP.close(hFTP)
-}
-
-ftpDownload(server, user, password, remoteFile, localFile) {
-	hFTP := FTP.open("AHK-FTP")
-	hSession := FTP.connect(hFTP, server, user, password)
-	
-	FTP.getFile(hSession, remoteFile, localFile)
-	
-	FTP.disconnect(hSession)
-	
-	FTP.close(hFTP)
-}
-
 downloadUserDatabases(directory) {
 	wDirectory := windowsPath(directory)
 	

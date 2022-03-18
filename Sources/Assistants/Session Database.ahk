@@ -811,13 +811,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
 			
-			userSetups := userSetups[type]
+			userSetups := userSetups[setupType]
 			
 			for ignore, name in userSetups
 				LV_Add("", translate("Local"), name)
 			
 			if communitySetups
-				for ignore, name in communitySetups[type]
+				for ignore, name in communitySetups[setupType]
 					if !inList(userSetups, name)
 						LV_Add("", translate("Community"), name)
 			

@@ -120,7 +120,7 @@ class DatabaseCreator {
 			{
 				car := A_LoopFileName
 				
-				if car is number
+				if (car = "1")
 					try {
 						FileRemoveDir %databaseDirectory%%simulator%\%car%, 1
 					}
@@ -132,7 +132,7 @@ class DatabaseCreator {
 					{
 						track := A_LoopFileName
 						
-						if car is number
+						if (track = "1")
 							try {
 								FileRemoveDir %databaseDirectory%%simulator%\%car%\%track%, 1
 							}
@@ -166,14 +166,18 @@ class DatabaseCreator {
 			updateProgress("Pressures: " simulator . A_Space . car . A_Space . track . "...")
 			
 			for ignore, row in database.Tables["Tyres.Pressures.Distribution"] {
+				compound := row.Compound
 				color := row["Compound.Color"]
 			
+				if ((compound = kNull) || !compound || (StrLen(compound) = 0))
+					compound := "Dry"
+				
 				if ((color = kNull) || !color || (StrLen(color) = 0))
 					color := "Black"
 				
 				this.TyresDatabase.updatePressure(simulator, car, track, row.Weather
 												, row["Temperature.Air"], row["Temperature.Track"]
-												, row.Compound, color, row.Type, row.Tyre
+												, compound, color, row.Type, row.Tyre
 												, row.Pressure, row.Count, false, true, "Community")
 			}
 			

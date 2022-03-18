@@ -395,9 +395,9 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
+With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community").
 
-Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
+Note: You can use the local database, even if you have not given your consent to share your tyre pressure setups with the community.
 
 Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
 
@@ -441,6 +441,18 @@ This tab allows you to store your preferred car setup files for different condit
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
 Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator.
+
+##### Naming conventions
+
+Although technically not strictly necessary, it would be benificial that everybody who contributes to the setup collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
+
+	[Nickname] [T Air] [T Track] [Weather] [Track Surface] [Compound]
+
+Example: "TBO 21 27 Drizzle Damp Dry(Soft)" - (TBO is my nickname (for TheBigO), Dry(Soft) is the tyre compound, the rest is self-explanatory)
+
+Why so complex? There is a strong dependency between the track surface state, air and track temperatures and the needed tyre pressures. Following this convention will give any user of the setup enough information how to alter the pressures for different conditions.
+
+Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
 #### Tyre Pressure Advisor
 

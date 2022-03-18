@@ -74,7 +74,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			{
 				car := A_LoopFileName
 				
-				if car is number
+				if (car = "1")
 					try {
 						FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%, 1
 					}
@@ -88,7 +88,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 					{
 						track := A_LoopFileName
 				
-						if car is number
+						if (track = "1")
 							try {
 								FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%, 1
 							}
@@ -99,9 +99,6 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 							FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 							
 							if uploadPressures {
-								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
-									FileCopy %A_LoopFilePath%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
-								
 								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
 								
 								if FileExist(distFile)
@@ -180,28 +177,36 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 		
 			if (type = (downloadPressures . downloadSetups)) {
-				ftpDownload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads\" . fileName, kTempDirectory . fileName)
+				state := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				
+				if (getConfigurationValue(state, "Database", "Version", false) != directory) {
+					ftpDownload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads\" . fileName, kTempDirectory . fileName)
+				
+					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
+					
+					try {
+						FileDelete %kTempDirectory%%fileName%
+					}
+					catch exception {
+						; ignore
+					}
 			
-				RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
-				
-				try {
-					FileDelete %kTempDirectory%%fileName%
+					try {
+						FileRemoveDir %kDatabaseDirectory%Community, 1
+					}
+					catch exception {
+						; ignore
+					}
+					
+					if FileExist(kTempDirectory . "Shared Database\" . directory . "\Community")
+						FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
+					else if FileExist(kTempDirectory . "Shared Database\Community")
+						FileMoveDir %kTempDirectory%Shared Database\Community, %kDatabaseDirectory%Community, R
+					
+					setConfigurationValue(state, "Database", "Version", directory)
+					
+					writeConfiguration(kUserConfigDirectory . "Session Database.ini", state)
 				}
-				catch exception {
-					; ignore
-				}
-		
-				try {
-					FileRemoveDir %kDatabaseDirectory%Community, 1
-				}
-				catch exception {
-					; ignore
-				}
-				
-				if FileExist(kTempDirectory . "Shared Database\" . directory . "\Community")
-					FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
-				else if FileExist(kTempDirectory . "Shared Database\Community")
-					FileMoveDir %kTempDirectory%Shared Database\Community, %kDatabaseDirectory%Community, R
 			}
 		}
 		

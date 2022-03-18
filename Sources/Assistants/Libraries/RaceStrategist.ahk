@@ -991,7 +991,7 @@ class RaceStrategist extends RaceAssistant {
 		local facts
 		local fact
 		
-		if strategy {
+		if (strategy && (this.Session == kSessionRace)) {
 			if !IsObject(strategy)
 				strategy := readConfiguration(strategy)
 		
@@ -1120,7 +1120,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.Speaker {
+		if (this.Speaker && (this.Session == kSessionRace)) {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1131,7 +1131,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if this.Speaker {
+			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 				

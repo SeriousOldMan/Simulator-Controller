@@ -32,7 +32,7 @@ The Spotter will give you critical and in most cases real time information about
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-6. Periodic Opponent Informations
+6. Distance Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you.
 
@@ -50,18 +50,18 @@ Please note, that not every simulation will support all these capabilities and t
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                     | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| ------------------------------ | -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                     | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert                   | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
-| Yellow Flag                    | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Full Course Yellow             | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow                  | Yes                        | No              | No      | Yes                        | Yes       |
-| Yellow Distance                | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                      | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Pit Window                     | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
-| Start Performance Summary      | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Periodic Opponent Informations | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Final Laps Announcement        | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Capability                | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
+| --------------------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| Side Alert                | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert              | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Yellow Flag               | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Full Course Yellow        | Yes                        | No              | No      | Yes                        | Yes       |
+| Sector Yellow             | Yes                        | No              | No      | Yes                        | Yes       |
+| Yellow Distance           | No                         | No              | No      | Yes                        | No        |
+| Blue Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Pit Window                | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
+| Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Distance Information      | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.

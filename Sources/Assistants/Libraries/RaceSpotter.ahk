@@ -32,7 +32,7 @@ class RaceSpotter extends RaceAssistant {
 	
 	iGridPosition := false
 	
-	iLastPerformanceUpdateLap := false
+	iLastDistanceInformationLap := false
 	iPositionInfo := {}
 	
 	iRaceStartSummarized := true
@@ -108,7 +108,7 @@ class RaceSpotter extends RaceAssistant {
 		base.updateSessionValues(values)
 		
 		if (this.Session == kSessionFinished) {
-			this.iLastPerformanceUpdateLap := false
+			this.iLastDistanceInformationLap := false
 			this.iPositionInfo := {}
 			
 			this.iRaceStartSummarized := false
@@ -141,7 +141,7 @@ class RaceSpotter extends RaceAssistant {
 		
 		announcement := false
 		
-		for ignore, fragment in ["PerformanceUpdates", "SideProximity", "RearProximity", "BlueFlags", "YellowFlags"]
+		for ignore, fragment in ["DistanceInformation", "SideProximity", "RearProximity", "BlueFlags", "YellowFlags"]
 			if matchFragment(words, fragments[fragment]) {
 				announcement := fragment
 				
@@ -158,8 +158,9 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	updateAnnouncement(announcement, value) {
-		if (value && (announcement = "PerformanceUpdates")) {
+		if (value && (announcement = "DistanceInformation")) {
 			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", value)
 			
 			if !value
 				value := 2
@@ -332,10 +333,10 @@ class RaceSpotter extends RaceAssistant {
 							this.summarizeRaceStart(lastLap)
 					}
 					else if (lastLap > 2) {
-						performanceUpdates := this.AnnouncementSettings["PerformanceUpdates"]
+						distanceInformation := this.AnnouncementSettings["DistanceInformation"]
 						
-						if (performanceUpdates && (lastLap >= (this.iLastPerformanceUpdateLap + performanceUpdates))) {
-							this.iLastPerformanceUpdateLap := lastLap
+						if (distanceInformation && (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))) {
+							this.iLastDistanceInformationLap := lastLap
 							
 							this.updatePerformance(lastLap)
 						}
@@ -515,7 +516,9 @@ class RaceSpotter extends RaceAssistant {
 							  , "StartSummary", "FinalLaps", "PitWindow"] 
 				announcementSettings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 				
-			announcementSettings["PerformanceUpdates"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			
+			announcementSettings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 			
 			this.updateConfigurationValues({AnnouncementSettings: announcementSettings})
 			
@@ -573,7 +576,7 @@ class RaceSpotter extends RaceAssistant {
 								, EnoughData: false})
 		
 		this.iFinalLapsAnnounced := false
-		this.iLastPerformanceUpdateLap := false
+		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
 		this.startupSpotter()

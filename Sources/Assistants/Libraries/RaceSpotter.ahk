@@ -87,6 +87,10 @@ class RaceSpotter extends RaceAssistant {
 		Get {
 			return (key ? this.iAnnouncementSettings[key] : this.iAnnouncementSettings)
 		}
+		
+		Set {
+			return (key ? (this.iAnnouncementSettings[key] := value) : (this.iAnnouncementSettings := value))
+		}
 	}
 	
 	GridPosition[] {
@@ -137,9 +141,50 @@ class RaceSpotter extends RaceAssistant {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "AnnouncementsOn":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, true)
+			case "AnnouncementsOn":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, false)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
+	}
+	
+	activateAnnouncement(words, active) {
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		announcement := false
+		
+		for ignore, fragment in ["PerformanceUpdates", "SideProximity", "RearProximity", "BlueFlags", "YellowFlags"]
+			if inList(words, fragments[fragment]) {
+				announcement := fragment
+				
+				break
+			}
+		
+		if announcement {
+			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
+				
+			this.setContinuation(ObjBindMethod(this, "updateAnnouncement", announcement, active))
+		}
+		else
+			speaker.speakPhrase("Repeat")
+	}
+	
+	updateAnnouncement(announcemment, value) {
+		if (value && (announcement = "PerformanceUpdates")) {
+			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			
+			if !value
+				value := 2
+		}
+		
+		this.AnnouncementSettings[announcemment] := value
 	}
 	
 	getSpeaker(fast := false) {

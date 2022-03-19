@@ -45,6 +45,14 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 4.0.0
+
+The shared database consolidation and distribution process is enabled with this release. Since you only will receive any data, when you also contribute to the content of the database, you will get a new chance to review your consent regarding the shared data.
+
+Beside that, this version introduces new voice commands for the Virtual Race Spotter to enable or disable the different spotter announcements while you are out on the track. If you want to use these commands, you have to enable the voice listener for this assistant in the configuration. Simply add "raceAssistantListener: On" to the list of plugin arguments for the "Race Spotter" plugin in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
+***
+
 ## Release 3.9.8
 
 The local database has been revised heavily but all configuration updates will be handled automatically:

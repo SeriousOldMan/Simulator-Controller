@@ -463,9 +463,48 @@ class RaceAssistant extends ConfigurationItem {
 				this.nameRecognized(words)
 			case "Catch":
 				this.getSpeaker().speakPhrase("Repeat")
+			case "AnnouncementsOn":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, true)
+			case "AnnouncementsOff":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, false)
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+	
+	activateAnnouncement(words, active) {
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		announcements := []
+		
+		for key, value in this.AnnouncementSettings
+			announcements.Push(key)
+		
+		announcement := false
+		
+		for ignore, fragment in announcements
+			if matchFragment(words, fragments[fragment]) {
+				announcement := fragment
+				
+				break
+			}
+		
+		if announcement {
+			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
+				
+			this.setContinuation(ObjBindMethod(this, "updateAnnouncement", announcement, active))
+		}
+		else
+			speaker.speakPhrase("Repeat")
+	}
+	
+	updateAnnouncement(announcement, value) {
+		this.AnnouncementSettings[announcement] := value
 	}
 	
 	call() {
@@ -1015,4 +1054,17 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 		return value
 	else
 		return getConfigurationValue(data, oldSection, key, default)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+matchFragment(words, fragment) {
+	for ignore, word in string2Values(A_Space, fragment)
+		if !inList(words, word)
+			return false
+	
+	return true
 }

@@ -122,39 +122,9 @@ class RaceSpotter extends RaceAssistant {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
-			case "AnnouncementsOn":
-				this.clearContinuation()
-				
-				this.activateAnnouncement(words, true)
-			case "AnnouncementsOff":
-				this.clearContinuation()
-				
-				this.activateAnnouncement(words, false)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
-	}
-	
-	activateAnnouncement(words, active) {
-		speaker := this.getSpeaker()
-		fragments := speaker.Fragments
-		
-		announcement := false
-		
-		for ignore, fragment in ["DistanceInformation", "SideProximity", "RearProximity", "BlueFlags", "YellowFlags"]
-			if matchFragment(words, fragments[fragment]) {
-				announcement := fragment
-				
-				break
-			}
-		
-		if announcement {
-			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
-				
-			this.setContinuation(ObjBindMethod(this, "updateAnnouncement", announcement, active))
-		}
-		else
-			speaker.speakPhrase("Repeat")
 	}
 	
 	updateAnnouncement(announcement, value) {
@@ -166,7 +136,7 @@ class RaceSpotter extends RaceAssistant {
 				value := 2
 		}
 		
-		this.AnnouncementSettings[announcement] := value
+		base.updateAnnouncement(announcement, value)
 	}
 	
 	getSpeaker(fast := false) {
@@ -507,7 +477,7 @@ class RaceSpotter extends RaceAssistant {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
-		if !this.AnnouncementSettings {
+		if (!this.AnnouncementSettings || (this.AnnouncementSettings.Count() = 0)) {
 			configuration := this.Configuration
 			
 			announcementSettings := {}
@@ -521,7 +491,6 @@ class RaceSpotter extends RaceAssistant {
 			announcementSettings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 			
 			this.updateConfigurationValues({AnnouncementSettings: announcementSettings})
-			
 		}
 		
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
@@ -686,17 +655,4 @@ class RaceSpotter extends RaceAssistant {
 			this.finishSession()
 		}
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-matchFragment(words, fragment) {
-	for ignore, word in string2Values(A_Space, fragment)
-		if !inList(words, word)
-			return false
-	
-	return true
 }

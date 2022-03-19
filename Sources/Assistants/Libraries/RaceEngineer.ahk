@@ -108,6 +108,8 @@ class RaceEngineer extends RaceAssistant {
 	__New(configuration, remoteHandler := false, name := false, language := "__Undefined__"
 		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Engineer", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		
+		this.updateConfigurationValues({AnnouncementSettings: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, WeatherUpdate: true}})
 	}
 	
 	updateConfigurationValues(values) {
@@ -1446,7 +1448,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	lowFuelWarning(remainingLaps) {
-		if this.Speaker {
+		if (this.Speaker && this.AnnouncementSettings["FuelWarning"]) {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
@@ -1471,7 +1473,7 @@ class RaceEngineer extends RaceAssistant {
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.Speaker {
+		if (this.Speaker && this.AnnouncementSettings["DamageReporting"]) {
 			speaker := this.getSpeaker()
 			phrase := false
 			
@@ -1495,7 +1497,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if this.Speaker {
+			if (this.Speaker && this.AnnouncementSettings["DamageAnalysis"]) {
 				speaker := this.getSpeaker()
 				
 				stintLaps := Round(stintLaps)
@@ -1521,7 +1523,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 		
 		if !ErrorLevel
-			if (this.Speaker && (this.Session == kSessionRace)) {
+			if (this.Speaker && (this.Session == kSessionRace) && this.AnnouncementSettings["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 				
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})

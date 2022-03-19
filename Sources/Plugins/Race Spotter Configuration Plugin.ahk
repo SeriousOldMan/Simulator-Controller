@@ -128,7 +128,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Performance Updates all")
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose3 vperformanceUpdatesDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), 1, 2, 3, 4)
 		Gui %window%:Add, Text, x%x3% yp+4 w80 h20 HWNDwidget32 Hidden, % translate("Laps")
 		

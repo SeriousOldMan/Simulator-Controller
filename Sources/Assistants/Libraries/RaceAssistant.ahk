@@ -52,6 +52,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceAssistant := false
 	
+	iAnnouncementSettings := false
+	
 	iRemoteHandler := false
 	
 	iSessionTime := false
@@ -210,6 +212,16 @@ class RaceAssistant extends ConfigurationItem {
 	Listener[] {
 		Get {
 			return this.VoiceAssistant.Listener
+		}
+	}
+	
+	AnnouncementSettings[key := false] {
+		Get {
+			return (key ? this.iAnnouncementSettings[key] : this.iAnnouncementSettings)
+		}
+		
+		Set {
+			return (key ? (this.iAnnouncementSettings[key] := value) : (this.iAnnouncementSettings := value))
 		}
 	}
 	
@@ -379,6 +391,9 @@ class RaceAssistant extends ConfigurationItem {
 		
 		if values.HasKey("LearningLaps")
 			this.iLearningLaps := values["LearningLaps"]
+		
+		if values.HasKey("AnnouncementSettings")
+			this.iAnnouncementSettings := values["AnnouncementSettings"]
 	}
 	
 	updateSessionValues(values) {

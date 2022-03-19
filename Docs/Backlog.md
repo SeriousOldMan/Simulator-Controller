@@ -5,8 +5,9 @@
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
 
 #### Strategy Development
-  1. [Target: V3.x - V4.0] Using the technology of Jona, implement a Race Strategy Expert
-     - Adjust pitstop strategy depending on upcoming weather conditions
+  1. [Target: V4.x] Enhancements for Race Strategist
+     - Automatically adjust pitstop strategy depending on upcoming weather conditions
+	 - Support in Race Center to simulate alternative strategies for possible weather development
   
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game

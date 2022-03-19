@@ -31,8 +31,6 @@ class RaceSpotter extends RaceAssistant {
 	iSpotterSpeaking := false
 	
 	iGridPosition := false
-
-	iAnnouncementSettings := false
 	
 	iLastPerformanceUpdateLap := false
 	iPositionInfo := {}
@@ -83,16 +81,6 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	AnnouncementSettings[key := false] {
-		Get {
-			return (key ? this.iAnnouncementSettings[key] : this.iAnnouncementSettings)
-		}
-		
-		Set {
-			return (key ? (this.iAnnouncementSettings[key] := value) : (this.iAnnouncementSettings := value))
-		}
-	}
-	
 	GridPosition[] {
 		Get {
 			return this.iGridPosition
@@ -114,13 +102,6 @@ class RaceSpotter extends RaceAssistant {
 	
 	createVoiceAssistant(name, options) {
 		return new this.SpotterVoiceAssistant(this, name, options)
-	}
-	
-	updateConfigurationValues(values) {
-		base.updateConfigurationValues(values)
-		
-		if values.HasKey("AnnouncementSettings")
-			this.iAnnouncementSettings := values["AnnouncementSettings"]
 	}
 	
 	updateSessionValues(values) {
@@ -145,7 +126,7 @@ class RaceSpotter extends RaceAssistant {
 				this.clearContinuation()
 				
 				this.activateAnnouncement(words, true)
-			case "AnnouncementsOn":
+			case "AnnouncementsOff":
 				this.clearContinuation()
 				
 				this.activateAnnouncement(words, false)
@@ -161,7 +142,7 @@ class RaceSpotter extends RaceAssistant {
 		announcement := false
 		
 		for ignore, fragment in ["PerformanceUpdates", "SideProximity", "RearProximity", "BlueFlags", "YellowFlags"]
-			if inList(words, fragments[fragment]) {
+			if matchFragment(words, fragments[fragment]) {
 				announcement := fragment
 				
 				break
@@ -176,7 +157,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.speakPhrase("Repeat")
 	}
 	
-	updateAnnouncement(announcemment, value) {
+	updateAnnouncement(announcement, value) {
 		if (value && (announcement = "PerformanceUpdates")) {
 			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 			
@@ -184,7 +165,7 @@ class RaceSpotter extends RaceAssistant {
 				value := 2
 		}
 		
-		this.AnnouncementSettings[announcemment] := value
+		this.AnnouncementSettings[announcement] := value
 	}
 	
 	getSpeaker(fast := false) {
@@ -702,4 +683,17 @@ class RaceSpotter extends RaceAssistant {
 			this.finishSession()
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+matchFragment(words, fragment) {
+	for ignore, word in string2Values(A_Space, fragment)
+		if !inList(words, word)
+			return false
+	
+	return true
 }

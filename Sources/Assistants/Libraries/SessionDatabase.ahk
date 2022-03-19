@@ -47,18 +47,20 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 	
-	UseCommunity[] {
+	UseCommunity[persistent := true] {
 		Get {
 			return this.iUseCommunity
 		}
 		
 		Set {
-			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			
-			setConfigurationValue(configuration, "Scope", "Community", value)
-			
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-			
+			if persistent {
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				
+				setConfigurationValue(configuration, "Scope", "Community", value)
+				
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+
 			return (this.iUseCommunity := value)
 		}
 	}

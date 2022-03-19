@@ -296,7 +296,10 @@ createDatabases(inputDirectory, outputDirectory) {
 }
 
 createSharedDatabases() {
-	showSplashTheme("McLaren 720s GT3 Pictures")
+	config := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+	
+	if getConfigurationValue(config, "General", "Theme", false)
+		showSplashTheme("McLaren 720s GT3 Pictures")
 	
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150
@@ -344,7 +347,9 @@ createSharedDatabases() {
 	showProgress({progress: 100, message: "Finished..."})
 	
 	hideProgress()
-	hideSplashTheme()
+	
+	if getConfigurationValue(config, "General", "Theme", false)
+		hideSplashTheme()
 	
 	Sleep 500
 	

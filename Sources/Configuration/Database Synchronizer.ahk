@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Database Update Tool            ;;;
+;;;   Modular Simulator Controller System - Database Synchronizer           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -21,7 +21,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Database Update.ico
-;@Ahk2Exe-ExeName Database Update.exe
+;@Ahk2Exe-ExeName Database Synchronizer.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -240,7 +240,7 @@ updateSessionDatabase() {
 	icon := kIconsDirectory . "Database Update.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Database Update
+	Menu Tray, Tip, Database Synchronizer
 	
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)

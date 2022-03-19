@@ -397,9 +397,10 @@ Last, but not least, you can write some notes in the field in the upper right co
 
 With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community").
 
-Note: You can use the local database, even if you have not given your consent to share your tyre pressure setups with the community.
+Important:
 
-Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+  1. If you change the scope using the dropdown menu mentioned above, this will affect only the behaviour and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values ​​by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
+  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
 
 Following you will find an overview about the different database topics:
 

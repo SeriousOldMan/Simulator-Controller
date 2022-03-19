@@ -624,12 +624,12 @@ shareSessionDatabase() {
 				options .= " -Setups"
 			
 			try {
-				Run %kBinariesDirectory%Database Update.exe %options%
+				Run %kBinariesDirectory%Database Synchronizer.exe %options%
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
+				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 			
-				showMessage(translate("Error while uploading database - please check your internet connection...")
+				showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}

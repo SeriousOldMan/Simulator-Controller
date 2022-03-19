@@ -168,19 +168,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	iSettings := []
 	
+	class EditorTyresDatabase extends TyresDatabase {
+		__New(controllerConfiguration := false) {
+			base.__New()
+			
+			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity
+		}
+	}
+	
 	Window[] {
 		Get {
 			return "SDE"
 		}
 	}
 	
-	UseCommunity[] {
+	UseCommunity[persistent := false] {
 		Get {
 			return this.SessionDatabase.UseCommunity
 		}
 		
 		Set {
-			return (this.SessionDatabase.UseCommunity := value)
+			return (this.SessionDatabase.UseCommunity[persistent] := value)
 		}
 	}
 	
@@ -575,10 +583,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -586,10 +596,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -597,10 +609,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Pressures") {
 			GuiControl Enable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -956,9 +970,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 			LV_InsertCol(A_Index, "", column)
 		
-		tyresDB := new TyresDatabase()
-		
-		for ignore, info in tyresDB.getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
+		for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
+																		 , this.SelectedTrack, this.SelectedWeather)
 			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
 					 , translate(info.Compound), info.Count)
 	
@@ -1200,8 +1213,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
-		tyresDB := new TyresDatabase()
-		
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
 		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
@@ -1223,8 +1234,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				else
 					compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 				
-				pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
-													, airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+				pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+																		   , this.SelectedTrack, this.SelectedWeather
+																		   , airTemperatureEdit, trackTemperatureEdit
+																		   , compound[1], compoundColor)
 
 				if (pressureInfos.Count() == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
@@ -1946,8 +1959,20 @@ chooseDatabaseScope() {
 			
 	GuiControlGet databaseScopeDropDown
 	
-	if (true || (databaseScopeDropDown == 2) != editor.UseCommunity) {
-		editor.UseCommunity := (databaseScopeDropDown == 2)
+	persistent := false
+		
+	if GetKeyState("Ctrl", "P") {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Modular Simulator Controller System")
+		MsgBox 262436, %title%, % translate("Do you really want to change the scope for all applications?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+			persistent := true
+	}
+		
+	if (persistent || ((databaseScopeDropDown == 2) != editor.UseCommunity)) {
+		editor.UseCommunity[persistent] := (databaseScopeDropDown == 2)
 		
 		editor.loadSimulator(editor.SelectedSimulator, true)
 	}
@@ -1973,10 +1998,10 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	tyresDB := new TyresDatabase()
-		
-	for ignore, pressureInfo in tyresDB.getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
-												   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
+	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
+																			, editor.SelectedTrack, editor.SelectedWeather
+																			, airTemperatureEdit, trackTemperatureEdit
+																			, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)

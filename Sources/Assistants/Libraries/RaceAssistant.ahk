@@ -490,14 +490,15 @@ class RaceAssistant extends ConfigurationItem {
 		announcement := false
 		
 		for ignore, fragment in announcements
-			if matchFragment(words, fragments[fragment]) {
-				announcement := fragment
-				
-				break
-			}
+			if fragments.HasKey(fragment)
+				if matchFragment(words, fragments[fragment]) {
+					announcement := fragment
+					
+					break
+				}
 		
 		if announcement {
-			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, false, true)
+			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 				
 			this.setContinuation(new VoiceAssistant.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
 		}

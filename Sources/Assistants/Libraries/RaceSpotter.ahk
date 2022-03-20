@@ -480,17 +480,17 @@ class RaceSpotter extends RaceAssistant {
 		if (!this.Warnings || (this.Warnings.Count() = 0)) {
 			configuration := this.Configuration
 			
-			Warnings := {}
+			warnings := {}
 			
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"] 
-				Warnings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+				warnings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 				
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 			
-			Warnings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+			warnings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 			
-			this.updateConfigurationValues({Warnings: Warnings})
+			this.updateConfigurationValues({Warnings: warnings})
 		}
 		
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)

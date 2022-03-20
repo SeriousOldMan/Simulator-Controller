@@ -194,6 +194,48 @@ class VoiceAssistant {
 		}
 	}
 	
+	class ReplyContinuation {
+		iAssistant := false
+		iContinuation := false
+		iReply := false
+	
+		Assistant[] {
+			Get {
+				return this.iAssistant
+			}
+		}
+	
+		Continuation[] {
+			Get {
+				return this.iContinuation
+			}
+		}
+		
+		Reply[] {
+			Get {
+				return this.iReply
+			}
+		}
+		
+		__New(assistant, continuation, reply) {
+			this.iAssistant := assistant
+			this.iContinuation := continuation
+			this.iReply := reply
+		}
+		
+		continue() {
+			if this.Assistant.Speaker
+				this.Assistant.getSpeaker().speakPhrase(this.Reply)
+			
+			continuation := this.Continuation
+			
+			if isInstance(continuation, this.ReplyContinuation)
+				continuation.continue()
+			else if continuation
+				%continuation%()
+		}
+	}
+	
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)

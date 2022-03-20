@@ -497,7 +497,7 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		
 		if announcement {
-			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
+			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, false, true)
 				
 			this.setContinuation(new VoiceAssistant.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
 		}
@@ -543,7 +543,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 			
 	setContinuation(continuation) {
-		this.VoiceAssistant.setContinuation(new VoiceAssistant.VoiceContinuation(this, continuation, "Confirm"))
+		if isInstance(continuation, VoiceAssistant.VoiceContinuation)
+			this.VoiceAssistant.setContinuation(continuation)
+		else
+			this.VoiceAssistant.setContinuation(new VoiceAssistant.VoiceContinuation(this, continuation, "Confirm"))
 	}
 			
 	clearContinuation() {

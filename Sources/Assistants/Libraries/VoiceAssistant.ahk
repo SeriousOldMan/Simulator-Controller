@@ -194,7 +194,7 @@ class VoiceAssistant {
 		}
 	}
 	
-	class ReplyContinuation {
+	class VoiceContinuation {
 		iAssistant := false
 		iContinuation := false
 		iReply := false
@@ -217,19 +217,19 @@ class VoiceAssistant {
 			}
 		}
 		
-		__New(assistant, continuation, reply) {
+		__New(assistant, continuation, reply := false) {
 			this.iAssistant := assistant
 			this.iContinuation := continuation
 			this.iReply := reply
 		}
 		
 		continue() {
-			if this.Assistant.Speaker
+			if (this.Assistant.Speaker && this.Reply)
 				this.Assistant.getSpeaker().speakPhrase(this.Reply)
 			
 			continuation := this.Continuation
 			
-			if isInstance(continuation, this.ReplyContinuation)
+			if isInstance(continuation, this.VoiceContinuation)
 				continuation.continue()
 			else if continuation
 				%continuation%()

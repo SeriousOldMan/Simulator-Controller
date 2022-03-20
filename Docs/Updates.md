@@ -49,7 +49,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 The shared database consolidation and distribution process is enabled with this release. Since you only will receive any data, when you also contribute to the content of the database, you will get a new chance to review your consent regarding the shared data.
 
-Beside that, this version introduces new voice commands for the Virtual Race Spotter to enable or disable the different spotter announcements while you are out on the track. If you want to use these commands, you have to enable the voice listener for this assistant in the configuration. Simply add "raceAssistantListener: On" to the list of plugin arguments for the "Race Spotter" plugin in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+Beside that, this version introduces new voice commands for the Race Assistants and also for the Virtual Race Spotter to enable or disable the different announcements and warnings while you are out on the track. Since this is the first time that you can talk to the Spotter, you have to enable the voice listener for the Race Spotter in the configuration, which might be not enabled currently. Simply add "raceAssistantListener: On" to the list of plugin arguments for the "Race Spotter" plugin in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 ***
 

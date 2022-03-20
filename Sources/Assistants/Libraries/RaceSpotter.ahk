@@ -291,19 +291,19 @@ class RaceSpotter extends RaceAssistant {
 				try {
 					lastLap := knowledgeBase.getValue("Lap", 0)
 						
-					if ((lastLap > 5) && this.AnnouncementSettings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
+					if ((lastLap > 5) && this.Warnings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 						
 						this.announceFinalLaps(lastLap)
 					}
-					else if (this.AnnouncementSettings["StartSummary"] && !this.iRaceStartSummarized && (lastLap = 2)) {
+					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap = 2)) {
 						this.iRaceStartSummarized := true
 
-						if this.AnnouncementSettings["StartSummary"]
+						if this.Warnings["StartSummary"]
 							this.summarizeRaceStart(lastLap)
 					}
 					else if (lastLap > 2) {
-						distanceInformation := this.AnnouncementSettings["DistanceInformation"]
+						distanceInformation := this.Warnings["DistanceInformation"]
 						
 						if (distanceInformation && (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))) {
 							this.iLastDistanceInformationLap := lastLap
@@ -325,7 +325,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	proximityAlert(type, variables := false) {
-		if ((type != "Behind") || this.AnnouncementSettings["RearProximity"]) {
+		if ((type != "Behind") || this.Warnings["RearProximity"]) {
 			if (variables && !IsObject(variables)) {
 				values := {}
 				
@@ -352,7 +352,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	yellowFlag(type, arguments*) {
-		if (this.AnnouncementSettings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -377,7 +377,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	blueFlag() {
-		if (this.AnnouncementSettings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -395,7 +395,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	pitWindow(state) {
-		if (this.AnnouncementSettings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
+		if (this.Warnings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -477,20 +477,20 @@ class RaceSpotter extends RaceAssistant {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
-		if (!this.AnnouncementSettings || (this.AnnouncementSettings.Count() = 0)) {
+		if (!this.Warnings || (this.Warnings.Count() = 0)) {
 			configuration := this.Configuration
 			
-			announcementSettings := {}
+			Warnings := {}
 			
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"] 
-				announcementSettings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+				Warnings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 				
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 			
-			announcementSettings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+			Warnings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 			
-			this.updateConfigurationValues({AnnouncementSettings: announcementSettings})
+			this.updateConfigurationValues({Warnings: Warnings})
 		}
 		
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)

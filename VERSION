@@ -1,9 +1,9 @@
 [Development]
 Version=4.0.0-dev
 Target=4.0.0-release
-Date=03/18/2022
+Date=03/20/2022
 Download=
-Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the verbosity
+Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity
 [Release]
 Version=3.9.8-release
 Date=03/18/2022

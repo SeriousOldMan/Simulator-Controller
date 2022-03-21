@@ -4,7 +4,6 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 // 
 // https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_synthesis_samples.cs
@@ -12,6 +11,8 @@ using System.Windows.Forms;
 
 namespace Speech {
     public class SpeechSynthesizer {
+        private string synthesizerType = "Windows";
+
         private string tokenIssuerEndpoint;
         private string subscriptionKey;
         private string region = "";
@@ -19,12 +20,18 @@ namespace Speech {
         private SpeechConfig config = null;
         private string token = null;
 
+        private int rate;
+        private int volume;
+
+
         private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
 
         public SpeechSynthesizer() {
         }
         
         public bool Connect(string tokenIssuerEndpoint, string subscriptionKey) {
+            this.synthesizerType = "Azure";
+
             this.tokenIssuerEndpoint = tokenIssuerEndpoint;
             this.subscriptionKey = subscriptionKey;
 
@@ -69,30 +76,63 @@ namespace Speech {
                 throw new HttpRequestException($"Cannot get token from {tokenIssuerEndpoint}. Error: {result.StatusCode}");
         }
 
+        public void SetProsody(int rate, int volume)
+        {
+            this.rate = rate;
+            this.volume = volume;
+        }
+
         private bool finished = false;
         private bool failed = false;
 
         private bool SynthesizeAudio(string outputFile, bool isSsml, string text) {
-            RenewToken();
+            if (this.synthesizerType == "Windows")
+            {
+                using var synth = new System.Speech.Synthesis.SpeechSynthesizer();
 
-            using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
-            using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
+                synth.Rate = rate;
+                synth.Volume = volume;
 
-            finished = false;
-			failed = false;
+                synth.SetOutputToWaveFile(outputFile);
 
-            synthesizer.SynthesisCanceled += OnSynthesisCanceled;
-            synthesizer.SynthesisCompleted += OnSynthesisCompleted;
+                finished = false;
+                failed = false;
 
-            if (isSsml)
-                synthesizer.SpeakSsmlAsync(text);
+                synth.SpeakCompleted += OnSpeakCompleted;
+
+                if (isSsml)
+                    synth.SpeakSsmlAsync(text);
+                else
+                    synth.SpeakAsync(text);
+
+                while (!finished)
+                    Thread.Sleep(100);
+
+                return true;
+            }
             else
-                synthesizer.SpeakTextAsync(text);
+            {
+                RenewToken();
 
-            while (!finished)
-                Thread.Sleep(100);
+                using var audioConfig = AudioConfig.FromWavFileOutput(outputFile);
+                using var synthesizer = new Microsoft.CognitiveServices.Speech.SpeechSynthesizer(config, audioConfig);
 
-            return !failed;
+                finished = false;
+                failed = false;
+
+                synthesizer.SynthesisCanceled += OnSynthesisCanceled;
+                synthesizer.SynthesisCompleted += OnSynthesisCompleted;
+
+                if (isSsml)
+                    synthesizer.SpeakSsmlAsync(text);
+                else
+                    synthesizer.SpeakTextAsync(text);
+
+                while (!finished)
+                    Thread.Sleep(100);
+
+                return !failed;
+            }
         }
 
         public bool SpeakSsmlToFile(string outputFile, string text) {
@@ -112,10 +152,33 @@ namespace Speech {
             finished = true;
         }
 
-        public string GetVoices() {
-            RenewToken();
+        private void OnSpeakCompleted(object sender, System.Speech.Synthesis.SpeakCompletedEventArgs e) {
+            finished = true;
 
-            return SynthesisGetAvailableVoicesAsync().Result;
+        }
+
+        public string GetVoices() {
+            if (this.synthesizerType == "Azure")
+            {
+                RenewToken();
+
+                return SynthesisGetAvailableVoicesAsync().Result;
+            }
+            else
+            {
+                var synth = new System.Speech.Synthesis.SpeechSynthesizer();
+                string voices = "";
+
+                foreach (var voice in synth.GetInstalledVoices())
+                {
+                    if (voices.Length > 0)
+                        voices += "|";
+
+                    voices += voice.VoiceInfo.Name + " (" + voice.VoiceInfo.Culture.Name + ")";
+                }
+
+                return voices;
+            }
         }
 
         private async Task<string> SynthesisGetAvailableVoicesAsync() {

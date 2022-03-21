@@ -11,3 +11,4 @@
   
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game
+  2. [Target: V4.x] Further simplification of the setup & configuration process

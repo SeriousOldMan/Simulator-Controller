@@ -20,13 +20,13 @@ namespace Speech {
 
         private const string ONE_CORE_VOICES_REGISTRY = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech_OneCore\Voices";
 
-        private static readonly Type ObjectTokenCategoryType = typeof(SpeechSynthesizer).Assembly
+        private static readonly Type ObjectTokenCategoryType = typeof(System.Speech.Synthesis.SpeechSynthesizer).Assembly
             .GetType("System.Speech.Internal.ObjectTokens.ObjectTokenCategory")!;
 
-        private static readonly Type VoiceInfoType = typeof(SpeechSynthesizer).Assembly
+        private static readonly Type VoiceInfoType = typeof(System.Speech.Synthesis.SpeechSynthesizer).Assembly
             .GetType("System.Speech.Synthesis.VoiceInfo")!;
 
-        private static readonly Type InstalledVoiceType = typeof(SpeechSynthesizer).Assembly
+        private static readonly Type InstalledVoiceType = typeof(System.Speech.Synthesis.SpeechSynthesizer).Assembly
             .GetType("System.Speech.Synthesis.InstalledVoice")!;
 
 
@@ -56,7 +56,7 @@ namespace Speech {
                     if (token == null || GetProperty(token, "Attributes") == null) continue;
 
                     var voiceInfo =
-                        typeof(SpeechSynthesizer).Assembly
+                        typeof(System.Speech.Synthesis.SpeechSynthesizer).Assembly
                             .CreateInstance(VoiceInfoType.FullName!, true,
                                 BindingFlags.Instance | BindingFlags.NonPublic, null,
                                 new object[] { token }, null, null);
@@ -65,7 +65,7 @@ namespace Speech {
                         throw new NotSupportedException($"Failed to instantiate {VoiceInfoType}");
 
                     var installedVoice =
-                        typeof(SpeechSynthesizer).Assembly
+                        typeof(System.Speech.Synthesis.SpeechSynthesizer).Assembly
                             .CreateInstance(InstalledVoiceType.FullName!, true,
                                 BindingFlags.Instance | BindingFlags.NonPublic, null,
                                 new object[] { voiceSynthesizer, voiceInfo }, null, null);

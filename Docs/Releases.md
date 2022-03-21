@@ -4,7 +4,7 @@
   2. Documentation updates, as always
   3. Full implementation of the database consolidation and distribution process. Depending on your own consent, you will receive new tyre pressure information or even shared car setups from the community every 2 days. Because of this, you will be asked to renew your consent for sharing your own data, because you will only receive anything, if you are also willing to share.
   4. New voice commands for the Virtual Race Spotter to enable or disable announcments while out on the track. You can say, for example: "No more performance updates please" or "Please give me blue flag warnings". See the corresponding [documentation](*) for more information.
-  5. Support for .NET compatible TTS voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
+  5. Support for .NET compatible TTS 5.1 voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
   6. [Developer] Added a class library for handling complex FTP operations.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) and check whether any manual updates to your local configuration might be necessary.

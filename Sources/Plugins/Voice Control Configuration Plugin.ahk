@@ -231,7 +231,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (voiceSynthesizerDropDown == 1)
 			this.showWindowsVoiceEditor()
 		else if (voiceSynthesizerDropDown == 2)
-			this.showDOTNETVoiceEditor()
+			this.showDotNETVoiceEditor()
 		else
 			this.showAzureVoiceEditor()
 	}
@@ -247,7 +247,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else
 			voiceLanguageDropDown := languageCode
 		
-		voiceSynthesizerDropDown := inList(["Windows", "DOTNET", "Azure"], getConfigurationValue(configuration, "Voice Control", "Synthesizer", "DOTNET"))
+		voiceSynthesizerDropDown := inList(["Windows", "dotNET", "Azure"], getConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET"))
 		
 		azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
 		windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(configuration, "Voice Control", "Speaker", true))
@@ -294,7 +294,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			
 		GuiControlGet voiceSynthesizerDropDown
 		
-		setConfigurationValue(configuration, "Voice Control", "Synthesizer", ["Windows", "DOTNET", "Azure"][voiceSynthesizerDropDown])
+		setConfigurationValue(configuration, "Voice Control", "Synthesizer", ["Windows", "dotNET", "Azure"][voiceSynthesizerDropDown])
 		
 		GuiControlGet windowsSpeakerDropDown
 		GuiControlGet azureSpeakerDropDown
@@ -308,11 +308,11 @@ class VoiceControlConfigurator extends ConfigurationItem {
 
 		if (voiceSynthesizerDropDown = 1) {
 			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.DOTNET", true)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 		else if (voiceSynthesizerDropDown = 2) {
 			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.DOTNET", windowsSpeakerDropDown)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeakerDropDown)
 		}
 		
 		if (azureSpeakerDropDown = translate("Automatic"))
@@ -327,7 +327,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
 		}
 		else if (voiceSynthesizerDropDown == 2) {
-			setConfigurationValue(configuration, "Voice Control", "Service", "DOTNET")
+			setConfigurationValue(configuration, "Voice Control", "Service", "dotNET")
 			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
 		}
 		else {
@@ -409,7 +409,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (voiceSynthesizerDropDown = 1)
 			this.updateWindowsVoices(configuration)
 		else if (voiceSynthesizerDropDown = 2)
-			this.updateDOTNETVoices(configuration)
+			this.updateDotNETVoices(configuration)
 		
 		this.updateAzureVoices(configuration)
 		
@@ -444,7 +444,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (voiceSynthesizerDropDown == 1)
 			this.showWindowsVoiceEditor()
 		else if (voiceSynthesizerDropDown == 2)
-			this.showDOTNETVoiceEditor()
+			this.showDotNETVoiceEditor()
 		else
 			this.showAzureVoiceEditor()
 	}
@@ -452,8 +452,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	hideWidgets() {
 		if (this.iMode = "Windows")
 			this.hideWindowsVoiceEditor()
-		else if (this.iMode = "DOTNET")
-			this.hideDOTNETVoiceEditor()
+		else if (this.iMode = "dotNET")
+			this.hideDotNETVoiceEditor()
 		else if (this.iMode = "Azure")
 			this.hideAzureVoiceEditor()
 		else {
@@ -478,10 +478,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		this.iMode := "Windows"
 	}
 	
-	showDOTNETVoiceEditor() {
+	showDotNETVoiceEditor() {
 		this.showWindowsVoiceEditor()
 		
-		this.iMode := "DOTNET"
+		this.iMode := "dotNET"
 	}
 	
 	hideWindowsVoiceEditor() {
@@ -489,7 +489,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		hideWidgets(this.iWindowsVoiceWidgets)
 		hideWidgets(this.iOtherWidgets)
 		
-		if ((this.iMode == "Windows") || (this.iMode == "DOTNET"))
+		if ((this.iMode == "Windows") || (this.iMode == "dotNET"))
 			transposeWidgets(this.iOtherWidgets, -24 * this.iWindowsVoiceWidgets.Length(), this.iCorrection)
 		else
 			Throw "Internal error detected in VoiceControlConfigurator.hideWindowsVoiceEditor..."
@@ -497,7 +497,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		this.iMode := false
 	}
 	
-	hideDOTNETVoiceEditor() {
+	hideDotNETVoiceEditor() {
 		this.hideWindowsVoiceEditor()
 	}
 	
@@ -572,7 +572,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (voiceSynthesizerDropDown = 1)
 			this.updateWindowsVoices()
 		else if (voiceSynthesizerDropDown = 2)
-			this.updateDOTNETVoices()
+			this.updateDotNETVoices()
 		
 		this.updateAzureVoices()
 	}
@@ -602,16 +602,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		return this.loadVoices("Windows", configuration)
 	}
 	
-	loadDOTNETVoices(configuration)	{
+	loadDotNETVoices(configuration)	{
 		if configuration
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.DOTNET", true)
+			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		else {
 			GuiControlGet windowsSpeakerDropDown
 			
 			configuration := this.Configuration
 		}
 	
-		return this.loadVoices("DOTNET", configuration)
+		return this.loadVoices("dotNET", configuration)
 	}
 	
 	updateWindowsVoices(configuration := false) {
@@ -626,8 +626,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControl Choose, windowsSpeakerDropDown, % chosen
 	}
 	
-	updateDOTNETVoices(configuration := false) {
-		voices := this.loadDOTNETVoices(configuration)
+	updateDotNETVoices(configuration := false) {
+		voices := this.loadDotNETVoices(configuration)
 		
 		chosen := inList(voices, windowsSpeakerDropDown)
 		
@@ -723,14 +723,14 @@ chooseVoiceSynthesizer() {
 	if (oldChoice == 1)
 		VoiceControlConfigurator.Instance.hideWindowsVoiceEditor()
 	else if (oldChoice == 2)
-		VoiceControlConfigurator.Instance.hideDOTNETVoiceEditor()
+		VoiceControlConfigurator.Instance.hideDotNETVoiceEditor()
 	else
 		VoiceControlConfigurator.Instance.hideAzureVoiceEditor()
 	
 	if (voiceSynthesizerDropDown == 1)
 		VoiceControlConfigurator.Instance.showWindowsVoiceEditor()
 	else if (voiceSynthesizerDropDown == 2)
-		VoiceControlConfigurator.Instance.showDOTNETVoiceEditor()
+		VoiceControlConfigurator.Instance.showDotNETVoiceEditor()
 	else
 		VoiceControlConfigurator.Instance.showAzureVoiceEditor()
 	

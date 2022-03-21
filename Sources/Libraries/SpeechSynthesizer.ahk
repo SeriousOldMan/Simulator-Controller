@@ -79,7 +79,7 @@ class SpeechSynthesizer {
 							voices.Push(voice.GetAttribute("Name"))
 					}
 				}
-				else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+				else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 					for ignore, candidate in this.iVoices {
 						name := string2Values("(", candidate)
 					
@@ -121,8 +121,8 @@ class SpeechSynthesizer {
 			
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
-		else if (service = "DOTNET") {
-			this.iService := "DOTNET"
+		else if (service = "dotNET") {
+			this.iService := "dotNET"
 			
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
@@ -241,7 +241,7 @@ class SpeechSynthesizer {
 		else {
 			if (this.Service = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-			else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+			else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 				Random postfix, 1, 1000000
 				
 				postfix := Round(postfix)
@@ -285,7 +285,7 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.AudioOutputStream := oldStream
 			}
 		}
-		else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
 		    ssml .= " <voice name=""%voice%"">"
 			
@@ -333,7 +333,7 @@ class SpeechSynthesizer {
 			
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
-		else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
 			}
@@ -348,7 +348,7 @@ class SpeechSynthesizer {
 		
 		if (this.Service = "Windows")
 			this.iSpeechSynthesizer.Rate := rate
-		else if (this.Service = "DOTNET")
+		else if (this.Service = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(rate, this.iVolume)
 	}
 	
@@ -357,7 +357,7 @@ class SpeechSynthesizer {
 		
 		if (this.Service = "Windows")
 			this.iSpeechSynthesizer.Volume := volume
-		else if (this.Service = "DOTNET")
+		else if (this.Service = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(this.iRate, volume)
 	}
 	
@@ -390,7 +390,7 @@ class SpeechSynthesizer {
 			else
 				voices := this.Voices
 		}
-		else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 			if ((voice == true) && language) {
 				availableVoices := []
 				
@@ -437,7 +437,7 @@ class SpeechSynthesizer {
 			this.iLanguage := language
 			this.iVoice := name
 		}
-		else if ((this.Service = "DOTNET") || (this.Service = "Azure")) {
+		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
 			name := string2Values("(", name)
 		
 			this.iLanguage := language

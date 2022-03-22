@@ -45,7 +45,7 @@ global kAzureVoices = {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-Jo
 ;;;-------------------------------------------------------------------------;;;
 
 class SpeechSynthesizer {
-	iService := "Windows"
+	iSynthesizer := "Windows"
 	iVoices := []
 	
 	iLanguage := ""
@@ -56,9 +56,9 @@ class SpeechSynthesizer {
 	iPitch := 0
 	iVolume := 100
 	
-	Service[] {
+	Synthesizer[] {
 		Get {
-			return this.iService
+			return this.iSynthesizer
 		}
 	}
 	
@@ -69,7 +69,7 @@ class SpeechSynthesizer {
 			else {
 				voices := []
 			
-				if (this.Service = "Windows") {
+				if (this.Synthesizer = "Windows") {
 					Loop % this.iSpeechSynthesizer.GetVoices.Count
 					{
 						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
@@ -79,7 +79,7 @@ class SpeechSynthesizer {
 							voices.Push(voice.GetAttribute("Name"))
 					}
 				}
-				else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 					for ignore, candidate in this.iVoices {
 						name := string2Values("(", candidate)
 					
@@ -111,9 +111,9 @@ class SpeechSynthesizer {
 		}
 	}
 	
-	__New(service, voice := false, language := false) {
-		if (service = "Windows") {
-			this.iService := "Windows"
+	__New(synthesizer, voice := false, language := false) {
+		if (synthesizer = "Windows") {
+			this.iSynthesizer := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
 			
 			Loop % this.iSpeechSynthesizer.GetVoices.Count
@@ -121,8 +121,8 @@ class SpeechSynthesizer {
 			
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
-		else if (service = "dotNET") {
-			this.iService := "dotNET"
+		else if (synthesizer = "dotNET") {
+			this.iSynthesizer := "dotNET"
 			
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
@@ -148,8 +148,8 @@ class SpeechSynthesizer {
 			
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
-		else if (InStr(service, "Azure|") == 1) {
-			this.iService := "Azure"
+		else if (InStr(synthesizer, "Azure|") == 1) {
+			this.iSynthesizer := "Azure"
 			
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
@@ -163,9 +163,9 @@ class SpeechSynthesizer {
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
 				
-				service := string2Values("|", service)
+				synthesizer := string2Values("|", synthesizer)
 				
-				if !this.iSpeechSynthesizer.Connect(service[2], service[3]) {
+				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 				
@@ -210,7 +210,7 @@ class SpeechSynthesizer {
 			this.speakToFile(temp1Name, text)
 			
 			if !FileExist(temp1Name) {
-				if (this.Service = "Windows")
+				if (this.Synthesizer = "Windows")
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 				
 				return
@@ -227,7 +227,7 @@ class SpeechSynthesizer {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				
-				if (this.Service = "Windows")
+				if (this.Synthesizer = "Windows")
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
@@ -239,9 +239,9 @@ class SpeechSynthesizer {
 			}
 		}
 		else {
-			if (this.Service = "Windows")
+			if (this.Synthesizer = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-			else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 				Random postfix, 1, 1000000
 				
 				postfix := Round(postfix)
@@ -267,7 +267,7 @@ class SpeechSynthesizer {
 	speakToFile(fileName, text) {
 		this.stop()
 		
-		if (this.Service = "Windows") {
+		if (this.Synthesizer = "Windows") {
 			oldStream := this.iSpeechSynthesizer.AudioOutputStream
 			
 			stream := ComObjCreate("Sapi.SpFileStream")
@@ -285,11 +285,11 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.AudioOutputStream := oldStream
 			}
 		}
-		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
 		    ssml .= " <voice name=""%voice%"">"
 			
-			if (this.Service = "Azure")
+			if (this.Synthesizer = "Azure")
 				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
 			else
 				ssml .= "  <prosody pitch=""%pitch%"">"
@@ -307,14 +307,14 @@ class SpeechSynthesizer {
 					Throw "Error while speech synthesizing..."
 			}
 			catch exception {
-				if (this.Service = "Azure")
+				if (this.Synthesizer = "Azure")
 					new SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
 	}
 	
 	pause() {
-		if (this.Service = "Windows") {
+		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
 			
 			if (status = 0)
@@ -325,7 +325,7 @@ class SpeechSynthesizer {
 	}
 	
 	stop() {
-		if (this.Service = "Windows") {
+		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
 			
 			if (status = 0)
@@ -333,7 +333,7 @@ class SpeechSynthesizer {
 			
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
-		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
 			}
@@ -346,32 +346,32 @@ class SpeechSynthesizer {
 	setRate(rate) {
 		this.iRate := rate
 		
-		if (this.Service = "Windows")
+		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Rate := rate
-		else if (this.Service = "dotNET")
+		else if (this.Synthesizer = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(rate, this.iVolume)
 	}
 	
 	setVolume(volume) {
 		this.iVolume := volume
 		
-		if (this.Service = "Windows")
+		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Volume := volume
-		else if (this.Service = "dotNET")
+		else if (this.Synthesizer = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(this.iRate, volume)
 	}
 	
 	setPitch(pitch) {
 		this.iPitch := pitch
 		
-		if (this.Service = "Windows")
+		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak("<pitch absmiddle = '" pitch "'/>", 0x20)
 	}
 
 	computeVoice(voice, language, randomize := true) {
 		voices := this.Voices
 	
-		if (this.Service = "Windows") {
+		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {
 				availableVoices := this.Voices[language]
 				
@@ -390,7 +390,7 @@ class SpeechSynthesizer {
 			else
 				voices := this.Voices
 		}
-		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			if ((voice == true) && language) {
 				availableVoices := []
 				
@@ -426,7 +426,7 @@ class SpeechSynthesizer {
 	}
 	
 	setVoice(language, name) {
-		if (this.Service = "Windows") {
+		if (this.Synthesizer = "Windows") {
 			if !inList(this.Voices, name)
 				return false
 			
@@ -437,7 +437,7 @@ class SpeechSynthesizer {
 			this.iLanguage := language
 			this.iVoice := name
 		}
-		else if ((this.Service = "dotNET") || (this.Service = "Azure")) {
+		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			name := string2Values("(", name)
 		
 			this.iLanguage := language

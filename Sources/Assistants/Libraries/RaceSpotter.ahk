@@ -44,7 +44,7 @@ class RaceSpotter extends RaceAssistant {
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 				
 					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
@@ -94,8 +94,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
-		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 		
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}

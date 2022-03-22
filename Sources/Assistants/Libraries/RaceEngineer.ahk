@@ -106,8 +106,8 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	__New(configuration, remoteHandler := false, name := false, language := "__Undefined__"
-		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Engineer", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 		
 		this.updateConfigurationValues({Warnings: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, WeatherUpdate: true}})
 	}

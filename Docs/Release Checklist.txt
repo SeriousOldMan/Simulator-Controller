@@ -26,9 +26,14 @@ Release 4.0.0 Checklist
    b. Renew database consent
    c. Phrase Grammars
    d. Delete old UPLOAD
+   e. Renamed "raceAssistantService" to "raceAssistantSynthesizer"
 2. Update Grammars on Discord
    a. Announcements
    b. Race Spotter
+3. Support for Speech Recognizer engine choice
+   a. New plugin parameter "raceAssistantRecognizer"
+   b. Documentation: Installation, Plugins
+   c. Simulator Setup: Speech Runtime is optional
 
 Release 3.9.8 Checklist
 =======================

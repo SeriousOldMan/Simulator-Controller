@@ -3,7 +3,7 @@ Version=4.0.0-dev
 Target=4.0.0-release
 Date=03/20/2022
 Download=
-Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output
+Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer"
 [Release]
 Version=3.9.8-release
 Date=03/18/2022

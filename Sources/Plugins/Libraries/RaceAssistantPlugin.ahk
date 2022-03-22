@@ -23,9 +23,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantName := false
 	iRaceAssistantLogo := false
 	iRaceAssistantLanguage := false
-	iRaceAssistantService := false
+	iRaceAssistantSynthesizer := false
 	iRaceAssistantSpeaker := false
 	iRaceAssistantSpeakerVocalics := false
+	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
 	
 	iRaceAssistant := false
@@ -328,9 +329,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
-	RaceAssistantService[] {
+	RaceAssistantSynthesizer[] {
 		Get {
-			return this.iRaceAssistantService
+			return this.iRaceAssistantSynthesizer
 		}
 	}
 	
@@ -343,6 +344,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	RaceAssistantSpeakerVocalics[] {
 		Get {
 			return this.iRaceAssistantSpeakerVocalics
+		}
+	}
+	
+	RaceAssistantRecognizer[] {
+		Get {
+			return this.iRaceAssistantRecognizer
 		}
 	}
 	
@@ -437,7 +444,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
-		this.iRaceAssistantService := this.getArgumentValue("raceAssistantService", false)
+		this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 		
@@ -445,6 +452,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 		
 			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+		
+			this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
 		
 			assistantListener := this.getArgumentValue("raceAssistantListener", false)
 			
@@ -628,14 +637,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if this.RaceAssistantLanguage
 					options .= " -Language """ . this.RaceAssistantLanguage . """"
 				
-				if this.RaceAssistantService
-					options .= " -Service """ . this.RaceAssistantService . """"
+				if this.RaceAssistantSynthesizer
+					options .= " -Synthesizer """ . this.RaceAssistantSynthesizer . """"
 				
 				if this.RaceAssistantSpeaker
 					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
 				
 				if this.RaceAssistantSpeakerVocalics
 					options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
+				
+				if this.RaceAssistantRecognizer
+					options .= " -Recognizer """ . this.RaceAssistantRecognizer . """"
 				
 				if this.RaceAssistantListener
 					options .= " -Listener """ . this.RaceAssistantListener . """"

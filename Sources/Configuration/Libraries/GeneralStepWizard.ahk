@@ -90,7 +90,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			}
 		}
 		else {
-			setConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 			setConfigurationValue(configuration, "Voice Control", "Speaker", false)
 			setConfigurationValue(configuration, "Voice Control", "Listener", false)
 		}

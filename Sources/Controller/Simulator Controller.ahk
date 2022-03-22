@@ -801,7 +801,7 @@ class SimulatorController extends ConfigurationItem {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 					
 					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false
-																								, false, false, false, true), this.VoiceServer)
+																								, false, false, false, true, true), this.VoiceServer)
 				
 					registered := true
 				}

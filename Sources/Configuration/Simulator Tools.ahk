@@ -1777,7 +1777,15 @@ updatePluginsForV400() {
 				setConfigurationValue(userConfiguration, "Plugins", name, descriptor)
 			}
 		}
+		
+		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		
+		if descriptor {
+			descriptor := StrReplace(descriptor, "raceAssistantListener: false", "raceAssistantListener: true")
 			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+		}
+		
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
 }

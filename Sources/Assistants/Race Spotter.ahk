@@ -105,9 +105,10 @@ startRaceSpotter() {
 	spotterName := "Elisa"
 	spotterLogo := false
 	spotterLanguage := false
-	spotterService := true
+	spotterSynthesizer := true
 	spotterSpeaker := false
 	spotterSpeakerVocalics := false
+	spotterRecognizer := true
 	spotterListener := false
 	debug := false
 	
@@ -131,14 +132,17 @@ startRaceSpotter() {
 			case "-Language":
 				spotterLanguage := A_Args[index + 1]
 				index += 2
-			case "-Service":
-				spotterService := A_Args[index + 1]
+			case "-Synthesizer":
+				spotterSynthesizer := A_Args[index + 1]
 				index += 2
 			case "-Speaker":
 				spotterSpeaker := A_Args[index + 1]
 				index += 2
 			case "-SpeakerVocalics":
 				spotterSpeakerVocalics := A_Args[index + 1]
+				index += 2
+			case "-Recognizer":
+				spotterRecognizer := A_Args[index + 1]
 				index += 2
 			case "-Listener":
 				spotterListener := A_Args[index + 1]
@@ -170,7 +174,8 @@ startRaceSpotter() {
 	RaceSpotter.Instance := new RaceSpotter(kSimulatorConfiguration
 										  , remotePID ? new RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 										  , spotterName, spotterLanguage
-										  , spotterService, spotterSpeaker, spotterSpeakerVocalics, spotterListener, voiceServer)
+										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
+										  , spotterRecognizer, spotterListener, voiceServer)
 	
 	registerEventHandler("Race Spotter", "handleSpotterRemoteCalls")
 	

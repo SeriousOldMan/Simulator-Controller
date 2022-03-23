@@ -656,7 +656,7 @@ restart:
 		
 		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 2))
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)

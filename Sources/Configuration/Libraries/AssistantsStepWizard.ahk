@@ -110,14 +110,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if (actions != "")
 					arguments .= ("; assistantCommands: " . actions)
 				
-				if wizard.isModuleSelected("Voice Control") {
-					arguments .= "; raceAssistantSpeaker: On"
-					
-					if ((assistant != "Race Spotter") && wizard.isSoftwareInstalled("MSSpeechRuntime"))
-						arguments .= "; raceAssistantListener: On"
-					else
-						arguments .= "; raceAssistantListener: Off"
-				}
+				if wizard.isModuleSelected("Voice Control")
+					arguments .= "; raceAssistantSpeaker: On; raceAssistantListener: On"
 				else
 					arguments .= "; raceAssistantSpeaker: Off"
 				

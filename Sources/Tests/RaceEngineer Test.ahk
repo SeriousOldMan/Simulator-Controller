@@ -62,8 +62,8 @@ global vDamageStintLaps
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceEngineer extends RaceEngineer {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, listener, voiceServer)
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 		
 		this.updateConfigurationValues({Settings: settings})
 	}
@@ -913,7 +913,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "en", "Windows", true, true)
+								   , new TestPitStopHandler(), "Jona", "en", "Windows", true, true, true)
 
 	engineer.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

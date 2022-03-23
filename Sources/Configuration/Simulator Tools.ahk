@@ -537,6 +537,8 @@ checkInstallation() {
 						Run %installLocation%\Binaries\Simulator Setup.exe
 				}
 				else {
+					Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes
+				
 					index := inList(A_Args, "-Start")
 				
 					if index
@@ -1465,6 +1467,16 @@ updateInstallationForV354() {
 	}
 }
 
+
+updateConfigurationForV400() {
+	try {
+		FileDelete %kDatabaseDirectory%User\UPLOAD
+	}
+	catch exception {
+		; ignore
+	}
+}
+
 updateConfigurationForV398() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1749,6 +1761,33 @@ updateConfigurationForV310() {
 		catch exception {
 			; ignore
 		}
+}
+
+updatePluginsForV400() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		for ignore, name in ["Race Engineer", "Race Strategist", "Race Spotter"] {
+			descriptor := getConfigurationValue(userConfiguration, "Plugins", name, false)
+			
+			if descriptor {
+				descriptor := StrReplace(descriptor, "raceAssistantService", "raceAssistantSynthesizer")
+				
+				setConfigurationValue(userConfiguration, "Plugins", name, descriptor)
+			}
+		}
+		
+		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		
+		if descriptor {
+			descriptor := StrReplace(descriptor, "raceAssistantListener: false", "raceAssistantListener: true")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
 }
 
 updatePluginsForV398() {

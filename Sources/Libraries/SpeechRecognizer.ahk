@@ -31,13 +31,15 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SpeechRecognizer {
+	iEngine := false
 	iChoices := {}
 	_grammarCallbacks := {}
 	
-	__New(recognizer := false, language := false, silent := false) {
+	__New(engine, recognizer := false, language := false, silent := false) {
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 		
+		this.iEngine := engine
 		this.Instance := false
 		this.RecognizerList := []
 		
@@ -48,8 +50,12 @@ class SpeechRecognizer {
 				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
-			this.Instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
-
+			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+			
+			instance.SetEngine(engine)
+			
+			this.Instance := instance
+			
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
@@ -67,10 +73,14 @@ class SpeechRecognizer {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 			
+			found := false
+			
 			if ((recognizer == true) && language) {
 				for ignore, recognizerDescriptor in this.getRecognizerList()
 					if (recognizerDescriptor["TwoLetterISOLanguageName"] = language) {
 						recognizer := recognizerDescriptor["ID"]
+						
+						found := true
 						
 						break
 					}
@@ -80,13 +90,15 @@ class SpeechRecognizer {
 					if (recognizerDescriptor["Name"] = recognizer) {
 						recognizer := recognizerDescriptor["ID"]
 						
+						found := true
+						
 						break
 					}
 			
-			if (recognizer == true)
-				recognizer := false
+			if !found
+				recognizer := 0
 
-			this.initialize(recognizer ? recognizer : 0)
+			this.initialize(recognizer)
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
@@ -100,12 +112,20 @@ class SpeechRecognizer {
 	createRecognizerList() {
 		recognizerList := []
 		
-		Loop % this.Instance.GetRecognizerCount() {
+		Loop % this.Instance.GetRecognizerCount()
+		{
 			index := A_Index - 1
 			
-			recognizerList.Push({ID: index, Name: this.Instance.GetRecognizerName(index)
-							   , TwoLetterISOLanguageName: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)
-							   , LanguageDisplayName: this.Instance.GetRecognizerLanguageDisplayName(index)})
+			recognizer := {ID: index, CultureName: this.Instance.GetRecognizerCultureName(index)
+									, TwoLetterISOLanguageName: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)
+									, LanguageDisplayName: this.Instance.GetRecognizerLanguageDisplayName(index)}
+			
+			if (this.iEngine = "Server")
+				recognizer["Name"] := this.Instance.GetRecognizerName(index)
+			else
+				recognizer["Name"] := (this.Instance.GetRecognizerName(index) . " (" . recognizer["CultureName"] . ")")
+			
+			recognizerList.Push(recognizer)
 		}
 		
 		return recognizerList
@@ -113,7 +133,7 @@ class SpeechRecognizer {
 	
 	initialize(id) {
 		if (id > this.Instance.getRecognizerCount() - 1)
-			Throw "Invalid recognizer ID (" . id . ")detected in SpeechRecognizer.initialize..."
+			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 		else
 			return this.Instance.Initialize(id)
 	}
@@ -143,7 +163,7 @@ class SpeechRecognizer {
 		if this.iChoices.HasKey(name)
 			return this.iChoices[name]
 		else
-			return (this.Instance ? this.Instance.GetChoices(name) : [])
+			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 	}
 	
 	setChoices(name, choiceList) {
@@ -151,11 +171,11 @@ class SpeechRecognizer {
 	}
 	
 	newGrammar() {
-		return this.Instance.NewGrammar()
+		return ((this.iEngine = "Server") ? this.Instance.NewServerGrammar() : this.Instance.NewDesktopGrammar())
 	}
 	
 	newChoices(choiceList) {
-		return this.Instance.NewChoices(choiceList)
+		return ((this.iEngine = "Server") ? this.Instance.NewServerChoices(choiceList) : this.Instance.NewDesktopChoices(choiceList))
 	}
 	
 	loadGrammar(name, grammar, callback) {

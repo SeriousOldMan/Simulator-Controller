@@ -41,12 +41,13 @@ class VoiceAssistant {
 	
 	iName := false
 	
-	iService := "Windows"
+	iSynthesizer := "dotNET"
 	iSpeaker := false
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
 	
+	iRecognizer := "Desktop"
 	iListener := false
 	
 	iVoiceServer := false
@@ -93,7 +94,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		__New(assistant, service, speaker, language, fragments, phrases) {
+		__New(assistant, synthesizer, speaker, language, fragments, phrases) {
 			this.iAssistant := assistant
 			this.iFragments := fragments
 			this.iPhrases := phrases
@@ -151,12 +152,12 @@ class VoiceAssistant {
 			}
 		}
 		
-		__New(assistant, service, speaker, language, fragments, phrases) {
+		__New(assistant, synthesizer, speaker, language, fragments, phrases) {
 			this.iAssistant := assistant
 			this.iFragments := fragments
 			this.iPhrases := phrases
 			
-			base.__New(service, speaker, language)
+			base.__New(synthesizer, speaker, language)
 		}
 		
 		speak(text, focus := false) {
@@ -194,6 +195,48 @@ class VoiceAssistant {
 		}
 	}
 	
+	class VoiceContinuation {
+		iAssistant := false
+		iContinuation := false
+		iReply := false
+	
+		Assistant[] {
+			Get {
+				return this.iAssistant
+			}
+		}
+	
+		Continuation[] {
+			Get {
+				return this.iContinuation
+			}
+		}
+		
+		Reply[] {
+			Get {
+				return this.iReply
+			}
+		}
+		
+		__New(assistant, continuation, reply := false) {
+			this.iAssistant := assistant
+			this.iContinuation := continuation
+			this.iReply := reply
+		}
+		
+		continue() {
+			if (this.Assistant.Speaker && this.Reply)
+				this.Assistant.getSpeaker().speakPhrase(this.Reply)
+			
+			continuation := this.Continuation
+			
+			if isInstance(continuation, this.VoiceContinuation)
+				continuation.continue()
+			else if continuation
+				%continuation%()
+		}
+	}
+	
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
@@ -218,9 +261,9 @@ class VoiceAssistant {
 		}
 	}
 	
-	Service[] {
+	Synthesizer[] {
 		Get {
-			return this.iService
+			return this.iSynthesizer
 		}
 	}
 	
@@ -237,6 +280,12 @@ class VoiceAssistant {
 		
 		Set {
 			return (this.iIsSpeaking := value)
+		}
+	}
+	
+	Recognizer[] {
+		Get {
+			return this.iRecognizer
 		}
 	}
 	
@@ -345,8 +394,8 @@ class VoiceAssistant {
 		if options.HasKey("Language")
 			this.iLanguage := options["Language"]
 		
-		if options.HasKey("Service")
-			this.iService := options["Service"]
+		if options.HasKey("Synthesizer")
+			this.iSynthesizer := options["Synthesizer"]
 		
 		if options.HasKey("Speaker")
 			this.iSpeaker := options["Speaker"]
@@ -359,6 +408,9 @@ class VoiceAssistant {
 		
 		if options.HasKey("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
+		
+		if options.HasKey("Recognizer")
+			this.iRecognizer := options["Recognizer"]
 		
 		if options.HasKey("Listener")
 			this.iListener := options["Listener"]
@@ -412,14 +464,15 @@ class VoiceAssistant {
 				raiseEvent(kFileMessage, "Voice"
 						 , "registerVoiceClient:" . values2String(";", this.Name, processID
 																, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized"
-																, this.Language, this.Service, this.Speaker, this.Listener
+																, this.Language, this.Synthesizer, this.Speaker
+																, this.Recognizer, this.Listener
 																, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed), this.VoiceServer)
 																						
-				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Service, this.Speaker, this.Language
+				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 																, this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			}
 			else {
-				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 															   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 			
 				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
@@ -442,7 +495,7 @@ class VoiceAssistant {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := new SpeechRecognizer(this.Listener, this.Language)
+				recognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				
 				this.buildGrammars(recognizer, this.Language)
 				

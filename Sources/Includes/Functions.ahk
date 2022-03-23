@@ -19,7 +19,7 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
+global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Update", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -54,29 +54,6 @@ global vTrayMessageDuration = 1500
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-ftpUpload(server, user, password, localFile, remoteFile) {
-    static a := "AHK-FTP-UL"
-	
-	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
-	h := DllCall("wininet\InternetOpen", "ptr", &a, "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
-	
-    if (!m || !h)
-        return false
-	
-	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", &server, "ushort", 21, "ptr", &user, "ptr", &password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
-	
-    if f {
-        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", &localFile, "ptr", &remoteFile, "uint", 0, "uptr", 0)
-            return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
-		
-        DllCall("wininet\InternetCloseHandle", "ptr", f)
-    }
-    
-	DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m)
-    
-	return true
-}
 
 createMessageReceiver() {
 	; Gui MR:-Border -Caption
@@ -562,9 +539,7 @@ startTrayMessageManager() {
 
 requestShareSessionDatabaseConsent() {
 	if !inList(A_Args, "-Install") {
-		program := StrSplit(A_ScriptName, ".")[1]
-		
-		if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings") || (program = "Simulator Setup")) {
+		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {
 			idFileName := kUserConfigDirectory . "ID"
 			
 			FileReadLine id, %idFileName%, 1
@@ -629,9 +604,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 shareSessionDatabase() {
-	program := StrSplit(A_ScriptName, ".")[1]
-	
-	if ((program = "Simulator Startup") || (program = "Simulator Configuration") || (program = "Simulator Settings")) {
+	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
 		
 		FileReadLine id, %idFileName%, 1
@@ -642,93 +615,21 @@ shareSessionDatabase() {
 		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 		
 		if (shareTyrePressures || shareCarSetups) {
-			uploadTimeStamp := kDatabaseDirectory . "User\UPLOAD"
+			options := ("-ID '" . id . "'")
 			
-			if FileExist(uploadTimeStamp) {
-				FileReadLine upload, %uploadTimeStamp%, 1
-				
-				now := A_Now
-				
-				EnvSub now, %upload%, days
-				
-				if (now <= 7)
-					return
-			}
+			if shareTyrePressures
+				options .= " -Pressures"
+			
+			if shareCarSetups
+				options .= " -Setups"
 			
 			try {
-				try {
-					FileRemoveDir %kTempDirectory%SetupDabase, 1
-				}
-				catch exception {
-					; ignore
-				}
-				
-				Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
-				{
-					simulator := A_LoopFileName
-					
-					FileCreateDir %kTempDirectory%SetupDabase\%simulator%
-					
-					Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
-					{
-						car := A_LoopFileName
-					
-						FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%
-						
-						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
-						{
-							track := A_LoopFileName
-					
-							FileCreateDir %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-							
-							if shareTyrePressures {
-								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyre Setup*.*
-									FileCopy %A_LoopFilePath%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-								
-								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
-								
-								if FileExist(distFile)
-									FileCopy %distFile%, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%
-							}
-							
-							if shareCarSetups {
-								try {
-									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%SetupDabase\%simulator%\%car%\%track%\Car Setups
-								}
-								catch exception {
-									; ignore
-								}
-							}
-						}
-					}
-				}
-				
-				try {
-					FileDelete %kTempDirectory%Database.%id%.zip
-				}
-				catch exception {
-					; ignore
-				}
-				
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%SetupDabase' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Database.%id%.zip', , Hide
-				
-				ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
-				
-				try {
-					FileDelete %kDatabaseDirectory%User\UPLOAD
-				}
-				catch exception {
-					; ignore
-				}
-				
-				FileAppend %A_Now%, %kDatabaseDirectory%User\UPLOAD
-				
-				logMessage(kLogInfo, translate("Database successfully uploaded"))
+				Run %kBinariesDirectory%Database Synchronizer.exe %options%
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
+				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 			
-				showMessage(translate("Error while uploading database - please check your internet connection...")
+				showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
@@ -953,7 +854,7 @@ initializeEnvironment() {
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
 			
-			if (install && (StrSplit(A_ScriptName, ".")[1] != "Simulator Tools") && (StrSplit(A_ScriptName, ".")[1] != "Simulator Download")) {
+			if (install && !inList(["Simulator Tools", "Simulator Download", "Database Update"], StrSplit(A_ScriptName, ".")[1])) {
 				kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 				
 				if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))

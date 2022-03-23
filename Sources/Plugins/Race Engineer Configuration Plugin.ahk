@@ -91,7 +91,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit Disabled vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -155,13 +155,9 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		
 			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default"))
 			
-			if (simulatorConfiguration["LoadSettings"] = "Ask")
-				simulatorConfiguration["LoadSettings"] := "Always"
-				
 			simulatorConfiguration["LoadTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Default")
 		
-			; simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))
-			simulatorConfiguration["SaveSettings"] := "Never"
+			simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Never"))
 			simulatorConfiguration["SaveTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
 		
 			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)

@@ -36,8 +36,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceStrategist extends RaceStrategist {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, listener, voiceServer)
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 		
 		this.updateConfigurationValues({Settings: settings})
 	}
@@ -304,7 +304,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := 17
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "de", "Windows", true, true)
+									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

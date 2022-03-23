@@ -20,7 +20,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Wand.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration Wand.ico
 ;@Ahk2Exe-ExeName Simulator Setup.exe
 
 
@@ -2124,7 +2124,7 @@ findInstallProperty(name, property) {
 }
 
 initializeSimulatorSetup() {
-	icon := kIconsDirectory . "Wand.ico"
+	icon := kIconsDirectory . "Configuration Wand.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup

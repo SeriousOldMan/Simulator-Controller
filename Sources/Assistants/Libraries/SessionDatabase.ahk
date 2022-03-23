@@ -47,18 +47,20 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 	
-	UseCommunity[] {
+	UseCommunity[persistent := true] {
 		Get {
 			return this.iUseCommunity
 		}
 		
 		Set {
-			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			
-			setConfigurationValue(configuration, "Scope", "Community", value)
-			
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-			
+			if persistent {
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				
+				setConfigurationValue(configuration, "Scope", "Community", value)
+				
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+
 			return (this.iUseCommunity := value)
 		}
 	}
@@ -93,11 +95,12 @@ class SessionDatabase extends ConfigurationItem {
 		result := []
 		
 		Loop Files, %kDatabaseDirectory%User\%filter%, %option%
-			result.Push(A_LoopFileName)
+			if (A_LoopFileName != "1")
+				result.Push(A_LoopFileName)
 		
 		if this.UseCommunity
 			Loop Files, %kDatabaseDirectory%Community\%filter%, %option%
-				if !inList(result, A_LoopFileName)
+				if ((A_LoopFileName != "1") && !inList(result, A_LoopFileName))
 					result.Push(A_LoopFileName)
 		
 		return result
@@ -292,14 +295,24 @@ class SessionDatabase extends ConfigurationItem {
 		data := false
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 		
-		file := FileOpen(fileName, "r")
-		size := file.Length
+		if !FileExist(fileName)
+			fileName = %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 		
-		file.RawRead(data, size)
-	
-		file.Close()
+		if FileExist(fileName) {
+			file := FileOpen(fileName, "r")
+			size := file.Length
+			
+			file.RawRead(data, size)
 		
-		return data
+			file.Close()
+			
+			return data
+		}
+		else {
+			size := 0
+		
+			return ""
+		}
 	}
 	
 	writeSetup(simulator, car, track, type, name, setup, size) {

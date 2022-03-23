@@ -168,19 +168,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	iSettings := []
 	
+	class EditorTyresDatabase extends TyresDatabase {
+		__New(controllerConfiguration := false) {
+			base.__New()
+			
+			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity
+		}
+	}
+	
 	Window[] {
 		Get {
 			return "SDE"
 		}
 	}
 	
-	UseCommunity[] {
+	UseCommunity[persistent := false] {
 		Get {
 			return this.SessionDatabase.UseCommunity
 		}
 		
 		Set {
-			return (this.SessionDatabase.UseCommunity := value)
+			return (this.SessionDatabase.UseCommunity[persistent] := value)
 		}
 	}
 	
@@ -566,34 +574,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		track := this.SelectedTrack
 		
 		if simulator {
-			this.iAvailableModules["Settings"] := true
-			
-			if ((car && (car != true)) && (track && (track != true))) {
-				this.iAvailableModules["Setups"] := true
-				this.iAvailableModules["Pressures"] := true
-			}
-			else {
-				this.iAvailableModules["Setups"] := false
-				this.iAvailableModules["Pressures"] := false
-				
+			if !((car && (car != true)) && (track && (track != true)))
 				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
-			}
 		}
-		else {
-			this.iAvailableModules["Settings"] := false
-			this.iAvailableModules["Setups"] := false
-			this.iAvailableModules["Pressures"] := false
-			
+		else
 			GuiControl Choose, settingsTab, 0
-		}
 		
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -601,10 +596,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -612,10 +609,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Pressures") {
 			GuiControl Enable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -741,8 +740,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else if (this.iLastTracks.Length() > 0)
 				this.updateModules()
-			else
+			else {
+				GuiControl, , trackDropDown, % "|" . translate("All")
+			
 				this.loadTrack(true, true)
+			}
 		}
 	}
 	
@@ -807,18 +809,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
 
 			userSetups := true
-			communitySetups := true
+			communitySetups := this.UseCommunity
 			
 			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
 			
-			for type, setups in userSetups
-				if (type = setupType)
-					for ignore, name in setups
-						LV_Add("", translate("Local"), name)
+			userSetups := userSetups[setupType]
 			
-			for type, setups in communitySetups
-				if (type = setupType)
-					for ignore, name in setups
+			for ignore, name in userSetups
+				LV_Add("", translate("Local"), name)
+			
+			if communitySetups
+				for ignore, name in communitySetups[setupType]
+					if !inList(userSetups, name)
 						LV_Add("", translate("Community"), name)
 			
 			LV_ModifyCol()
@@ -968,9 +970,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 			LV_InsertCol(A_Index, "", column)
 		
-		tyresDB := new TyresDatabase()
-		
-		for ignore, info in tyresDB.getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
+		for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
+																		 , this.SelectedTrack, this.SelectedWeather)
 			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
 					 , translate(info.Compound), info.Count)
 	
@@ -983,6 +984,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	moduleAvailable(module) {
+		simulator := this.SelectedSimulator
+		car := this.SelectedCar
+		track := this.SelectedTrack
+		
+		if simulator {
+			this.iAvailableModules["Settings"] := true
+			
+			if ((car && (car != true)) && (track && (track != true))) {
+				this.iAvailableModules["Setups"] := true
+				this.iAvailableModules["Pressures"] := true
+			}
+			else {
+				this.iAvailableModules["Setups"] := false
+				this.iAvailableModules["Pressures"] := false
+			}
+		}
+		else {
+			this.iAvailableModules["Settings"] := false
+			this.iAvailableModules["Setups"] := false
+			this.iAvailableModules["Pressures"] := false
+		}
+		
 		return this.iAvailableModules[module]
 	}
 	
@@ -1013,7 +1036,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		GuiControl, , notesEdit, % this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		
-		this.selectModule(this.SelectedModule, true)
+		if this.moduleAvailable(this.SelectedModule)
+			this.selectModule(this.SelectedModule, true)
+		else
+			this.selectModule("Settings", true)
 	}
 	
 	updateNotes(notes) {
@@ -1187,8 +1213,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
-		tyresDB := new TyresDatabase()
-		
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
 		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
@@ -1210,8 +1234,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				else
 					compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 				
-				pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
-													, airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+				pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+																		   , this.SelectedTrack, this.SelectedWeather
+																		   , airTemperatureEdit, trackTemperatureEdit
+																		   , compound[1], compoundColor)
 
 				if (pressureInfos.Count() == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
@@ -1933,9 +1959,23 @@ chooseDatabaseScope() {
 			
 	GuiControlGet databaseScopeDropDown
 	
-	editor.UseCommunity := (databaseScopeDropDown == 2)
-	
-	editor.loadSimulator(editor.SelectedSimulator, true)
+	persistent := false
+		
+	if GetKeyState("Ctrl", "P") {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Modular Simulator Controller System")
+		MsgBox 262436, %title%, % translate("Do you really want to change the scope for all applications?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+			persistent := true
+	}
+		
+	if (persistent || ((databaseScopeDropDown == 2) != editor.UseCommunity)) {
+		editor.UseCommunity[persistent] := (databaseScopeDropDown == 2)
+		
+		editor.loadSimulator(editor.SelectedSimulator, true)
+	}
 }
 
 transferPressures() {
@@ -1958,10 +1998,10 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	tyresDB := new TyresDatabase()
-		
-	for ignore, pressureInfo in tyresDB.getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
-												   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
+	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
+																			, editor.SelectedTrack, editor.SelectedWeather
+																			, airTemperatureEdit, trackTemperatureEdit
+																			, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)

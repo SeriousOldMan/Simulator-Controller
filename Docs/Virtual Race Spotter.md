@@ -2,12 +2,6 @@
 
 Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simulator Controller. As a spotter, Elisa watches over your car and all the cars around you. Elisa will warn you about critical situations, for example, when a car appears in your blind spot, or when a car is chasing you from behind. Furthermore, Elisa will inform you periodically about other aspects of the traffic around you, for example, when one of the leading cars is closing in from behind and you are getting a blue flag.
 
-Please note, that this assistant is currently under development. Much of the planned functionality is still missing and the integration with the different simulation games will be optimized with future releases as well. This documentation will be updated and expanded with each release reflecting added functionality or added support for simulation features.
-
-Since Elisa does not support any voice commands yet, it will be best to provide *false* for *raceAssistantListener*, so that Elisa does not interfere with voice commands for Jona and/or Cato. So you can use the following plugin arguments for the plugin in "Simulator Configuration" for the moment:
-
-    raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false
-
 ## Alerts & Information
 
 The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:
@@ -32,11 +26,11 @@ The Spotter will give you critical and in most cases real time information about
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-6. Periodic Performance Update
+6. Distance Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you.
 
-7. Last laps announcement
+7. Last Laps Announcement
 
    You will get an announcement a few laps before the end of the race.
 
@@ -46,22 +40,32 @@ All these alerts and announcements can be individually configured or disabled wi
 
 Please note, that not every simulation will support all these capabilities and that the behaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
 
+### Enabling and disabling specific warnings and announcements
+
+As you have seen above, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:
+
+	[Please] No more *announcement* [please]
+
+As you might expect, the word "please" is optional. Available options for *announcement* are: "distance information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled according to the settings described above), you can reenable it with the following command:
+
+	[Please] Give me *announcement* [please]
+
 ## Simulator Integration
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                  | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| --------------------------- | -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                  | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert                | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
-| Yellow Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Full Course Yellow          | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow               | Yes                        | No              | No      | Yes                        | Yes       |
-| Yellow Distance             | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Pit Window                  | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
-| Start Performance Summary   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Periodic Performance Update | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Final Laps Announcement     | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Capability                | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
+| --------------------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| Side Alert                | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert              | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Yellow Flag               | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Full Course Yellow        | Yes                        | No              | No      | Yes                        | Yes       |
+| Sector Yellow             | Yes                        | No              | No      | Yes                        | Yes       |
+| Yellow Distance           | No                         | No              | No      | Yes                        | No        |
+| Blue Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Pit Window                | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
+| Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Distance Information      | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.

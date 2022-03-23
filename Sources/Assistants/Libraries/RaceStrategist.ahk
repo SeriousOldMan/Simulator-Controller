@@ -111,8 +111,10 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
-		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
+		
+		this.updateConfigurationValues({Warnings: {WeatherUpdate: true}})
 	}
 	
 	updateConfigurationValues(values) {
@@ -991,7 +993,7 @@ class RaceStrategist extends RaceAssistant {
 		local facts
 		local fact
 		
-		if strategy {
+		if (strategy && (this.Session == kSessionRace)) {
 			if !IsObject(strategy)
 				strategy := readConfiguration(strategy)
 		
@@ -1120,7 +1122,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.Speaker {
+		if (this.Speaker && (this.Session == kSessionRace) && this.Warnings["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1131,7 +1133,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if this.Speaker {
+			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 				

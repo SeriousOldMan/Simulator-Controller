@@ -137,21 +137,11 @@ class ClearDatabase extends DatabaseTest {
 
 class InitializeDatabase extends DatabaseTest {	
 	SimpleWritePressure_Test() {
-		try {
-			this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", [[26.1, 26.2, 26.3, 26.4]])
-		}
-		catch exception {
-			msgbox here
-		}
+		this.updatePressures(false, "Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black", [[26.1, 26.2, 26.3, 26.4]])
 		
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 		
-		try {
-			FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
-		}
-		catch exception {
-			msgbox here
-		}
+		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
 		
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}

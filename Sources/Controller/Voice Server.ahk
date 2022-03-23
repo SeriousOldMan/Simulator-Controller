@@ -60,11 +60,12 @@ class VoiceServer extends ConfigurationItem {
 	iActiveVoiceClient := false
 
 	iLanguage := "en"
-	iService := "Windows"
+	iSynthesizer := "dotNET"
 	iSpeaker := true
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
+	iRecognizer := "Desktop"
 	iListener := false
 	iPushToTalk := false
 	
@@ -85,11 +86,12 @@ class VoiceServer extends ConfigurationItem {
 		iPID := 0
 		
 		iLanguage := "en"
-		iService := "Windows"
+		iSynthesizer := "dotNET"
 		iSpeaker := true
 		iSpeakerVolume := 100
 		iSpeakerPitch := 0
 		iSpeakerSpeed := 0
+		iRecognizer := "Desktop"
 		iListener := false
 	
 		iSpeechSynthesizer := false
@@ -126,9 +128,9 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		Service[] {
+		Synthesizer[] {
 			Get {
-				return this.iService
+				return this.iSynthesizer
 			}
 		}
 		
@@ -141,6 +143,12 @@ class VoiceServer extends ConfigurationItem {
 		Speaking[] {
 			Get {
 				return this.iIsSpeaking
+			}
+		}
+		
+		Recognizer[] {
+			Get {
+				return this.iRecognizer
 			}
 		}
 		
@@ -205,7 +213,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (create && this.Speaker && !this.iSpeechSynthesizer) {
-					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Service, this.Speaker, this.Language)
+					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Synthesizer, this.Speaker, this.Language)
 					
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -219,19 +227,20 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (create && this.Listener && !this.iSpeechRecognizer)
-					this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
+					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				
 				return this.iSpeechRecognizer
 			}
 		}
 		
-		__New(voiceServer, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+		__New(voiceServer, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iPID := pid
 			this.iLanguage := language
-			this.iService := service
+			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker
+			this.iRecognizer := recognizer
 			this.iListener := listener
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
@@ -389,9 +398,9 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 		
-	Service[] {
+	Synthesizer[] {
 		Get {
-			return this.iService
+			return this.iSynthesizer
 		}
 	}
 	
@@ -404,6 +413,12 @@ class VoiceServer extends ConfigurationItem {
 	Speaking[] {
 		Get {
 			return this.iIsSpeaking
+		}
+	}
+		
+	Recognizer[] {
+		Get {
+			return this.iRecognizer
 		}
 	}
 	
@@ -446,7 +461,7 @@ class VoiceServer extends ConfigurationItem {
 	SpeechRecognizer[create := false] {
 		Get {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
-				this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
+				this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				
 				if !this.PushToTalk
 					this.startListening()
@@ -476,11 +491,13 @@ class VoiceServer extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		this.iService := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+		this.iSynthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer"
+												 , getConfigurationValue(configuration, "Voice Control", "Service", "dotNET"))
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
 		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		this.iRecognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
@@ -647,8 +664,8 @@ class VoiceServer extends ConfigurationItem {
 			this.iIsSpeaking := oldSpeaking
 		}
 	}
-	
-	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, service := true, speaker := true, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+																	
+	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -660,11 +677,14 @@ class VoiceServer extends ConfigurationItem {
 		if (speakerSpeed = kUndefined)
 			speakerSpeed := this.SpeakerSpeed
 		
-		if (service == true)
-			service := this.Service
+		if (synthesizer == true)
+			synthesizer := this.Synthesizer
 		
 		if (speaker == true)
 			speaker := this.Speaker
+		
+		if (recognizer == true)
+			recognizer := this.Recognizer
 		
 		if (listener == true)
 			listener := this.Listener
@@ -676,8 +696,8 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
-			
-		client := new this.VoiceClient(this, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		
+		client := new this.VoiceClient(this, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		

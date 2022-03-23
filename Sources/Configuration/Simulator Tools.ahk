@@ -898,7 +898,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
-viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
+viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
 	static dismissed := false
 	
 	dismissed := false
@@ -916,7 +916,7 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	Gui FV:-Border -Caption
 	Gui FV:Color, D0D0D0, D8D8D8
 	Gui FV:Font, s10 Bold
-	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System - Compiler")
+	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveBuildLogViewer, % translate("Modular Simulator Controller System - Compiler")
 	Gui FV:Font
 	Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	
@@ -948,7 +948,7 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	
 	buttonX := Round(width / 2) - 40
 	
-	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Ok")
+	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissBuildLogViewer, % translate("Ok")
 	
 	Gui FV:+AlwaysOnTop
 	Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
@@ -959,12 +959,12 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	Gui FV:Destroy
 }
 
-moveFileViewer() {
+moveBuildLogViewer() {
 	moveByMouse("FV")
 }
 
-dismissFileViewer() {
-	viewFile(false)
+dismissBuildLogViewer() {
+	viewBuildLog(false)
 }
 
 saveTargets() {
@@ -2029,7 +2029,7 @@ runSpecialTargets(ByRef buildProgress) {
 				}
 				
 				if !success
-					viewFile(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+					viewBuildLog(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 					
 				if FileExist(kTempDirectory . "build.out")
 					FileDelete %kTempDirectory%build.out

@@ -1,9 +1,9 @@
-## 4.0.0-release 03/25/22
+## 4.0.0-release 03/25/22 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Full implementation of the database consolidation and distribution process. Depending on your own consent, you will receive new tyre pressure information or even shared car setups from the community every 2 days. Because of this, you will be asked to renew your consent for sharing your own data, because you will only receive anything, if you are also willing to share.
-  4. New voice commands for the Virtual Race Spotter to enable or disable announcments while out on the track. You can say, for example: "No more performance updates please" or "Please give me blue flag warnings". See the corresponding [documentation](*) for more information.
+  4. New voice commands for the Virtual Race Spotter and the other assistants to enable or disable announcments and warnings while out on the track. You can say, for example: "No more weather warnings please" or "Please give me blue flag warnings". See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements) for more information.
   5. Support for .NET compatible TTS 5.1 voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
   6. Support for an additional voice recognition framework, which provide a much better recognition rate and quality, as long as you have a decent voice audio quality (for example when using a headset). The changes are documented [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well.
   7. [Developer] Added a class library for handling complex FTP operations.

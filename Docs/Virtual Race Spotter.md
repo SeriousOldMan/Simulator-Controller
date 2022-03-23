@@ -46,7 +46,7 @@ As you have seen above, Elisa will give you a lot of warnings and announcements 
 
 	[Please] No more *announcement* [please]
 
-As you might expect, the word "please" is optional. Available options for *announcement* are: "distance information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled according to the settings described above), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *announcement* are: "distance information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to the settings described above), you can reenable it with the following command:
 
 	[Please] Give me *announcement* [please]
 

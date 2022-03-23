@@ -40,6 +40,16 @@ All these alerts and announcements can be individually configured or disabled wi
 
 Please note, that not every simulation will support all these capabilities and that the behaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
 
+### Enabling and disabling specific warnings and announcements
+
+As you have seen above, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:
+
+	[Please] No more *announcement* [please]
+
+As you might expect, the word "please" is optional. Available options for *announcement* are: "distance information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled according to the settings described above), you can reenable it with the following command:
+
+	[Please] Give me *announcement* [please]
+
 ## Simulator Integration
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.

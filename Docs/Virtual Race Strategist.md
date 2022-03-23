@@ -72,6 +72,16 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
+### Enabling and disabling specific warnings and announcements
+
+Cato can give you information about the weather development and might recommend a strategy change. You may disable this warning by using a special voice command:
+
+	[Please] No more *warning* [please]
+
+As you might expect, the word "please" is optional. Only one option for *warning* is available at the moment: "weather warnings". After you have disabled the warning (it is enabled by default), you can reenable it with the following command:
+
+	[Please] Give me *warning* [please]
+
 ## Racing with Cato
 
 Cato will be active during practice and race sessions, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. Using Cato during a race is easy. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own like Jona does, but Cato will also collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.

@@ -8,7 +8,7 @@ Changes=Consolidation and update process for shared database, Many new commands 
 Version=3.9.8-release
 Date=03/18/2022
 Download=https://cntr.click/Qw8Nwb1
-Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase"
+Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase", Updated ACC car model information, Updated R3E car model information.
 [Current]
 Type=Development
 [Version]

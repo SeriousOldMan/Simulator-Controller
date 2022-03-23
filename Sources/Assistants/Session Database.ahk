@@ -152,8 +152,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	iLastTracks := []
 	
-	iAirTemperature := 27
-	iTrackTemperature := 31
+	iAirTemperature := 23
+	iTrackTemperature := 27
 	iTyreCompound := "Dry"
 	iTyreCompoundColor := "Black"
 	
@@ -275,7 +275,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	__New(simulator := false, car := false, track := false
 		, weather := false, airTemperature := false, trackTemperature := false, compound := false, compoundColor := false) {
 		if simulator {
-			this.iSelectedSimulator := simulator
+			this.iSelectedSimulator := this.SessionDatabase.getSimulatorName(simulator)
 			this.iSelectedCar := car
 			this.iSelectedTrack := track
 			this.iSelectedWeather := weather
@@ -2085,10 +2085,11 @@ showSessionDatabaseEditor() {
 		}
 	}
 	
-	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
-		airTemperature := false
-		trackTemperature := false
-	}
+	if (airTemperature <= 0)
+		airTemperature := 23
+	
+	if (trackTemperature <= 0)
+		trackTemperature := 27
 	
 	protectionOn()
 	

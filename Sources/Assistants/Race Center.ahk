@@ -2377,8 +2377,14 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					Process Exist
 					
-					options := ["-Simulator", this.Simulator, "-Car", this.Car, "-Track", this.Track, "-Weather", this.Weather
-							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Setup", ErrorLevel]
+					pid := ErrorLevel
+					
+					simulator := new SessionDatabase().getSimulatorName(this.Simulator)
+					
+					options := ["-Simulator", """" . simulator . """", "-Car", """" . this.Car . """", "-Track", """" . this.Track . """"
+							  , "-Weather", this.Weather
+							  , "-AirTemperature", Round(this.AirTemperature), "-TrackTemperature", Round(this.TrackTemperature)
+							  , "-Setup", pid]
 					options := values2String(A_Space, options*)
 					
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
@@ -2435,7 +2441,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	selectStrategy(strategy, show := false) {
 		if this.Strategy
-			this.Strategy.dipose()
+			this.Strategy.dispose()
 		
 		this.iStrategy := strategy
 		

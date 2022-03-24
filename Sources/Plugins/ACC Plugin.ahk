@@ -255,6 +255,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	requireUDPClient() {
+		Process Exist, ACC UDP Provider.exe
+		
+		if !ErrorLevel {
+			if this.iUDPClient
+				OnExit(this.iUDPClient, 0)
+			
+			this.iUDPClient := false
+		}
+		
 		if !this.UDPClient
 			this.startupUDPClient()
 	}
@@ -272,8 +281,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if (sessionState == kSessionRace)
 			this.startupUDPClient()
-		
-		if (sessionState == kSessionFinished) {
+		else if (sessionState == kSessionFinished) {
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 			

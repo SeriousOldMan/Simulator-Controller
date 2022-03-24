@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.0.0-dev](https://www.dropbox.com/s/rz1zushx01mtj5a/Simulator%20Controller%204.0.0-dev.zip?dl=1) (Early build for 4.0.0. New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information. Stable, with documentation and update procedure.)
+[4.0.0-beta](https://www.dropbox.com/s/hnz4rd4yz9ov09f/Simulator%20Controller%204.0.0-beta.zip?dl=1) (Test build for 4.0.0. New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information. Stable, with documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) of this version and all the versions you might have skipped, before installing and using this version.
 

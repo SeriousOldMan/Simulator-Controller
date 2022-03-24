@@ -9,7 +9,8 @@
   7. Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer" and introduced new parameter "raceAssistantRecognizer" for all race assistant plugins. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Integrated the new cars of the Challenger DLC into the car model file for ACC.
   9. Updated the spectator overlay file for R3E to reflect the latest additions in RaceRoom Racing Experience.
-  10. [Developer] Added a class library for handling complex FTP operations.
+  10. Spotter side proximity warnings may now be disabled as well.
+  11. [Developer] Added a class library for handling complex FTP operations.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) and check whether any manual updates to your local configuration might be necessary.
 

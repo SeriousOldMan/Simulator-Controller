@@ -281,11 +281,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if (sessionState == kSessionRace)
 			this.startupUDPClient()
-		else if (sessionState == kSessionFinished) {
-			this.iRepairSuspensionChosen := true
-			this.iRepairBodyworkChosen := true
+		else {
+			if (sessionState == kSessionFinished) {
+				this.iRepairSuspensionChosen := true
+				this.iRepairBodyworkChosen := true
+			}
 			
-			this.shutdownUDPClient()
+			if (sessionState != kSessionPaused)
+				this.shutdownUDPClient()
 		}
 	}
 	

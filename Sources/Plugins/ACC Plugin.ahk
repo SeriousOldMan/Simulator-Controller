@@ -212,7 +212,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if this.UDPConnection
 					options := ("-Connect " . this.UDPConnection)
 				
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide, pid
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide
 				
 				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
 				
@@ -252,8 +252,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			this.iUDPClient := false
 		}
-		
-		return false
 	}
 	
 	requireUDPClient() {

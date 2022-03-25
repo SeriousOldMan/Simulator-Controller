@@ -1,16 +1,16 @@
 [Development]
-Version=4.0.0-beta
+Version=4.0.0-release
 Target=4.0.0-release
-Date=03/23/2022
-Download=https://www.dropbox.com/s/hnz4rd4yz9ov09f/Simulator%20Controller%204.0.0-beta.zip?dl=1
+Date=03/25/2022
+Download=https://cntr.click/qZkSR66
 Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins
 [Release]
-Version=3.9.8-release
-Date=03/18/2022
-Download=https://cntr.click/Qw8Nwb1
-Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase", Updated ACC car model information, Updated R3E car model information.
+Version=4.0.0-release
+Date=03/25/2022
+Download=https://cntr.click/qZkSR66
+Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=3.9.8-release
-Development=4.0.0-beta
+Release=4.0.0-release
+Development=4.0.0-release

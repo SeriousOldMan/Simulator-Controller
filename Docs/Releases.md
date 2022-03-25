@@ -1,4 +1,4 @@
-## 4.0.0-release 03/25/22 (planned)
+## 4.0.0-release 03/25/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -10,7 +10,8 @@
   8. Integrated the new cars of the Challenger DLC into the car model file for ACC.
   9. Updated the spectator overlay file for R3E to reflect the latest additions in RaceRoom Racing Experience.
   10. Spotter side proximity warnings may now be disabled as well.
-  11. [Developer] Added a class library for handling complex FTP operations.
+  11. Fixed a bug in race report viewer, when a report shows up as empty although correct data is available.
+  12. [Developer] Added a class library for handling complex FTP operations.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) and check whether any manual updates to your local configuration might be necessary.
 

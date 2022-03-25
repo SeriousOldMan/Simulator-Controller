@@ -293,7 +293,10 @@ class RaceReportViewer {
 		gridPosition := getConfigurationValue(raceData, "Cars", "Car." . car . ".Position", kUndefined)
 		
 		if (gridPosition != kUndefined)
-			result.Push(gridPosition)
+			if (StrLen(Trim(gridPosition)) == 0)
+				result.Push(car)
+			else
+				result.Push(gridPosition)
 			
 		for ignore, lap in this.getReportLaps(raceData)
 			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
@@ -865,8 +868,14 @@ class RaceReportViewer {
 			if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
 				drawChartFunction .= ",`n[0"
 					
-				Loop % cars.Length()
-					drawChartFunction := (drawChartFunction . ", " . getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position"))
+				Loop % cars.Length() {
+					position := getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
+				
+					if (StrLen(Trim(position)) == 0)
+						position := A_Index
+					
+					drawChartFunction := (drawChartFunction . ", " . position)
+				}
 				
 				drawChartFunction .= "]"
 			}

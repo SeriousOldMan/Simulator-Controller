@@ -1,12 +1,10 @@
 Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
 
-Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully.
-
-If you want to integrate Jona, the Virtual Race Engineer,  you should read the information about [Release 2.1](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21) and, much more important, the [documentation on Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) itself, before heading on to the track.
+Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully. The same preparation applies for RaceRoom Racing Experience, which is described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
 
 ***
 
-Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new realse package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
+Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new release package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%20Alert.JPG)
 

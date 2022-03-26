@@ -38,6 +38,8 @@ class SpeechRecognizer {
 	_grammars := {}
 	
 	__New(engine, recognizer := false, language := false, silent := false) {
+		engine := "Azure|https://germanywestcentral.api.cognitive.microsoft.com/sts/v1.0/issuetoken|de7294571eef4c6b8a15c5f44646db50"
+		
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 		
@@ -62,7 +64,9 @@ class SpeechRecognizer {
 				engine := string2Values("|", engine)
 				
 				if !language
-					language := "EN"
+					language := "en-US"
+				
+				language := "en-US"
 				
 				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -251,15 +255,27 @@ class SpeechRecognizer {
 	}
 	
 	_onTextCallback(text) {
-		words := string2Values(A_Space, text)
+		local literal
 		
+		words := string2Values(A_Space, text)
+
+		for index, literal in words {
+			literal := StrReplace(literal, ".", "")
+			literal := StrReplace(literal, ",", "")
+			literal := StrReplace(literal, ";", "")
+			literal := StrReplace(literal, "?", "")
+			literal := StrReplace(literal, "-", "")
+			
+			words[index] := literal
+		}
+
 		for name, grammar in this._grammars
 			if grammar.Grammar.match(words) {
 				callback := grammar.Callback
 				
 				%callback%(name, words)
 				
-				break
+				return
 			}
 	}
 }
@@ -538,12 +554,16 @@ class AzureChoices {
 	}
 	
 	__New(choices) {
+		for index, choice in choices
+			if !IsObject(choice)
+				choices[index] := new AzureWords(choice)
+			
 		this.iChoices := choices
 	}
 	
 	matchWords(words, ByRef index) {
 		for ignore, choice in this.Choices
-			if choice.matchWords(words, running)
+			if choice.matchWords(words, choice)
 				return true
 		
 		return false
@@ -564,8 +584,20 @@ class AzureWords {
 	}
 	
 	__New(string) {
+		local literal
+		
 		if !IsObject(string)
 			string := string2Values(A_Space, string)
+		
+		for index, literal in string {
+			literal := StrReplace(literal, ".", "")
+			literal := StrReplace(literal, ",", "")
+			literal := StrReplace(literal, ";", "")
+			literal := StrReplace(literal, "?", "")
+			literal := StrReplace(literal, "-", "")
+
+			string[index] := literal
+		}
 		
 		this.iWords := string
 	}

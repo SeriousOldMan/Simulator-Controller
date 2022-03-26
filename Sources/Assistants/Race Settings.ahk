@@ -65,7 +65,7 @@ global vCar := false
 global vTrack := false
 global vWeather := "Dry"
 global vAirTemperature := 23
-global vTrackTemperature:= 27
+global vTrackTemperature := 27
 global vCompound := "Dry"
 global vCompoundColor := "Black"
 	
@@ -1423,10 +1423,11 @@ showRaceSettingsEditor() {
 		}
 	}
 	
-	if ((vAirTemperature <= 0) || (vTrackTemperature <= 0)) {
-		vAirTemperature := false
-		vTrackTemperature := false
-	}
+	if (vAirTemperature <= 0)
+		vAirTemperature := 23
+	
+	if (vTrackTemperature <= 0)
+		vTrackTemperature := 27
 	
 	fileName := kRaceSettingsFile
 	

@@ -260,58 +260,63 @@ namespace ACCUDPProvider {
             bool done = false;
 
             while (!done) {
-                Debug.Flush();
-                listener.Flush();
+                try {
+                    Debug.Flush();
+                    listener.Flush();
 
-                if (File.Exists(cmdFileName)) {
-                    StreamReader cmdStream = new StreamReader(cmdFileName);
+                    if (File.Exists(cmdFileName)) {
+                        StreamReader cmdStream = new StreamReader(cmdFileName);
 
-                    string command = cmdStream.ReadLine();
+                        string command = cmdStream.ReadLine();
 
-                    if (command == "Exit")
-                        done = true;
-                    else if (command == "Read") {
-                        StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
+                        if (command == "Exit")
+                            done = true;
+                        else if (command == "Read") {
+                            StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
 
-                        outStream.WriteLine("[Position Data]");
+                            outStream.WriteLine("[Position Data]");
 
-                        outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
+                            outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
-                        int index = 1;
+                            int index = 1;
 
-                        foreach (CarData car in Cars) {
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
+                            foreach (CarData car in Cars) {
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-                            LapData lastLap = car.LastLap;
+                                LapData lastLap = car.LastLap;
 
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
-                            outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
+                                outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
-                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
-                            DriverData currentDriver = car.CurrentDriver;
+                                DriverData currentDriver = car.CurrentDriver;
 
-                            if (currentDriver != null) {
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                                if (currentDriver != null) {
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                                }
+
+                                index += 1;
                             }
 
-                            index += 1;
+                            outStream.Close();
                         }
 
-                        outStream.Close();
+                        cmdStream.Close();
+
+                        File.Delete(cmdFileName);
                     }
-
-                    cmdStream.Close();
-
-                    File.Delete(cmdFileName);
+                    else
+                        Thread.Sleep(100);
                 }
-                else
-                    Thread.Sleep(100);
+                catch (Exception ex) {
+                    Debug.WriteLine(ex.Message);
+                }
             }
 
             client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
@@ -331,26 +336,35 @@ namespace ACCUDPProvider {
         }
 
         private void OnEntryListUpdate(string sender, CarInfo carInfo) {
-            CarData car = Cars.SingleOrDefault(x => x.CarIndex == carInfo.CarIndex);
+            try {
+                CarData car = Cars.SingleOrDefault(x => x.CarIndex == carInfo.CarIndex);
 
-            if (car == null) {
-                car = new CarData(carInfo.CarIndex);
+                if (car == null) {
+                    car = new CarData(carInfo.CarIndex);
 
-                Cars.Add(car);
+                    Cars.Add(car);
+                }
+
+                car.Update(carInfo);
             }
-
-            car.Update(carInfo);
+            catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void OnRealtimeCarUpdate(string sender, RealtimeCarUpdate carInfo) {
-            CarData car = Cars.FirstOrDefault(x => x.CarIndex == carInfo.CarIndex);
+            try {
+                CarData car = Cars.FirstOrDefault(x => x.CarIndex == carInfo.CarIndex);
 
-            if (car != null)
-                car.Update(carInfo);
+                if (car != null)
+                    car.Update(carInfo);
+            }
+            catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void OnRealtimeUpdate(string sender, RealtimeUpdate realtimeUpdate) {
-
             try {
                 if (trackMeters > 0) {
                     var sortedCars = Cars.OrderBy(x => x.SplinePosition).ToArray();

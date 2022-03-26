@@ -114,7 +114,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w3 := width - (x3 - x + 16) + 10
 		
 		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Disabled Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))

@@ -325,7 +325,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	proximityAlert(type, variables := false) {
-		if ((type != "Behind") || this.Warnings["RearProximity"]) {
+		if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
 			if (variables && !IsObject(variables)) {
 				values := {}
 				

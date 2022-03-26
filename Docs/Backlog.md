@@ -1,5 +1,5 @@
 #### Driver Support
-  1. [Target: V4.0.x] Configuration of assistant verbosity and overhaul (shortening) of phrases.
+  1. [Target: V4.x] Overhaul (shortening) of assistant phrases.
   2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
@@ -12,3 +12,4 @@
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game
   2. [Target: V4.x] Further simplification of the setup & configuration process
+  3. [Target: V4.x] Integration of Azure voice recognition support

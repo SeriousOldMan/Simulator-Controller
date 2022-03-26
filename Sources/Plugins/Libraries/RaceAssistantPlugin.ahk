@@ -1348,10 +1348,13 @@ prepareSessionDatabase(data) {
 	if !plugin
 		plugin := controller.findPlugin(kRaceStrategistPlugin)
 	
-	if plugin.Simulator
-		new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator()
-											, getConfigurationValue(data, "Session Data", "Car", "Unknown")
-											, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
+	if plugin.Simulator {
+		sessionDB := new SessionDatabase()
+		
+		sessionDB.prepareDatabase(sessionDB.getSimulatorCode(plugin.Simulator.runningSimulator())
+								, getConfigurationValue(data, "Session Data", "Car", "Unknown")
+								, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
+	}
 }
 
 getSimulatorOptions(plugin := false) {
@@ -1370,12 +1373,12 @@ getSimulatorOptions(plugin := false) {
 		data := readSimulatorData(plugin.Simulator.Code)
 		
 		if getConfigurationValue(data, "Session Data", "Active", false) {
-			options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"
+			options := "-Simulator """ . new SessionDatabase().getSimulatorName(plugin.Simulator.runningSimulator()) . """"
 			options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
 			options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
 			options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-			options .= " -AirTemperature " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
-			options .= " -TrackTemperature " . getConfigurationValue(data, "Track Data", "Temperature", "27")
+			options .= " -AirTemperature " . Round(getConfigurationValue(data, "Weather Data", "Temperature", "23"))
+			options .= " -TrackTemperature " . Round(getConfigurationValue(data, "Track Data", "Temperature", "27"))
 			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
 			options .= " -CompoundColor " . getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Dry")
 			options .= " -Map " . getConfigurationValue(data, "Car Data", "MAP", "n/a")

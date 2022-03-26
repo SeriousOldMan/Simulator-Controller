@@ -55,6 +55,14 @@ global vTrayMessageDuration = 1500
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+moveHTMLViewer() {
+	moveByMouse("HV")
+}
+
+dismissHTMLViewer() {
+	viewHTML(false)
+}
+
 createMessageReceiver() {
 	; Gui MR:-Border -Caption
 	Gui MR:New, , % A_ScriptName
@@ -636,6 +644,40 @@ shareSessionDatabase() {
 	}
 }
 
+checkForNews() {
+	if vDetachedInstallation
+		return
+	
+	if !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1]) {
+		check := !FileExist(kUserConfigDirectory . "NEWS")
+		
+		if !check {
+			FileGetTime lastModified, %kUserConfigDirectory%NEWS, M
+			
+			EnvAdd lastModified, 1, Days
+			
+			check := (lastModified < A_Now)
+		}
+		
+		if check {
+			URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
+			
+			news := readConfiguration(kUserConfigDirectory . "NEWS")
+			
+			for nr, html in getConfigurationSectionValues(readConfiguration(kTempDirectory . "NEWS"), "News")
+				if !getConfigurationValue(news, "News", nr, false) {
+					setConfigurationValue(news, "News", nr, true)
+					
+					writeConfiguration(kUserConfigDirectory . "NEWS", news)
+					
+					URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
+					
+					viewHTML(kTempDirectory . "NEWS.htm")
+				}
+		}
+	}
+}
+
 checkForUpdates() {
 	if vDetachedInstallation
 		return
@@ -926,6 +968,77 @@ initializeEnvironment() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+	static htmlViewer
+	static dismissed := false
+	
+	if !title
+		title := translate("News && Updates")
+	
+	dismissed := false
+	
+	if !fileName {
+		dismissed := true
+	
+		return
+	}
+	
+	FileRead html, %fileName%
+	
+	innerWidth := width - 16
+	
+	Gui HV:-Border -Caption
+	Gui HV:Color, D0D0D0, D8D8D8
+	Gui HV:Font, s10 Bold
+	Gui HV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveHTMLViewer, % translate("Modular Simulator Controller System")
+	Gui HV:Font
+	Gui HV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
+	
+	editHeight := height - 102
+	
+	Gui HV:Add, ActiveX, X8 YP+26 W%innerWidth% H%editHeight% vhtmlViewer, shell.explorer
+	
+	htmlViewer.Navigate("about:blank")
+	
+	htmlViewer.Document.open()
+	htmlViewer.Document.write(html)
+	htmlViewer.Document.close()
+			
+	SysGet mainScreen, MonitorWorkArea
+
+	if x is not integer
+		switch x {
+			case "Left":
+				x := 25
+			case "Right":
+				x := mainScreenRight - width - 25
+			default:
+				x := "Center"
+		}
+
+	if y is not integer
+		switch y {
+			case "Top":
+				y := 25
+			case "Bottom":
+				y := mainScreenBottom - height - 25
+			default:
+				y := "Center"
+		}
+	
+	buttonX := Round(width / 2) - 40
+	
+	Gui HV:Add, Button, Default X%buttonX% y+10 w80 gdismissHTMLViewer, % translate("Ok")
+	
+	Gui HV:+AlwaysOnTop
+	Gui HV:Show, X%x% Y%y% W%width% H%height% NoActivate
+	
+	while !dismissed
+		Sleep 100
+	
+	Gui HV:Destroy
+}
 
 showSplash(image, alwaysOnTop := true, video := false) {
 	image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
@@ -1983,6 +2096,7 @@ if !vDetachedInstallation {
 	checkForUpdates()
 	requestShareSessionDatabaseConsent()
 	shareSessionDatabase()
+	checkForNews()
 }
 
 initializeLoggingSystem()

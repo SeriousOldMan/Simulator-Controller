@@ -2166,12 +2166,17 @@ class RaceCenter extends ConfigurationItem {
 			simulator := this.Simulator
 			car := this.Car
 			track := this.Track
-			sessionDB := new SessionDatabase()
-			simulatorCode := sessionDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
-			
-			FileCreateDir %dirName%
+			if (car && track) {
+				sessionDB := new SessionDatabase()
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
+				
+				dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+				
+				FileCreateDir %dirName%
+			}
+			else
+				dirName := ""
 		}
 		else
 			dirName := ""
@@ -2377,8 +2382,18 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					Process Exist
 					
-					options := ["-Simulator", this.Simulator, "-Car", this.Car, "-Track", this.Track, "-Weather", this.Weather
-							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Setup", ErrorLevel]
+					pid := ErrorLevel
+					
+					options := ["-Setup", pid]
+							  
+					if (this.Simulator && this.Car && this.Track) {
+						simulator := new SessionDatabase().getSimulatorName(this.Simulator)
+						
+						options := concatenate(options, ["-Simulator", """" . simulator . """", "-Car", """" . this.Car . """", "-Track", """" . this.Track . """"
+													   , "-Weather", this.Weather
+													   , "-AirTemperature", Round(this.AirTemperature), "-TrackTemperature", Round(this.TrackTemperature)])
+					}
+					
 					options := values2String(A_Space, options*)
 					
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
@@ -2435,7 +2450,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	selectStrategy(strategy, show := false) {
 		if this.Strategy
-			this.Strategy.dipose()
+			this.Strategy.dispose()
 		
 		this.iStrategy := strategy
 		
@@ -3253,9 +3268,11 @@ class RaceCenter extends ConfigurationItem {
 		else
 			return
 		
-		directory := this.SessionDirectory . "Race Report\"
+		directory := this.SessionDirectory . "Race Report"
 		
 		FileCreateDir %directory%
+		
+		directory .= "\"
 		
 		data := readConfiguration(directory . "Race.data")
 		

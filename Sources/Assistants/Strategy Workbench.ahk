@@ -2845,10 +2845,11 @@ runStrategyWorkbench() {
 		}
 	}
 	
-	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
-		airTemperature := false
-		trackTemperature := false
-	}
+	if (airTemperature <= 0)
+		airTemperature := 23
+	
+	if (trackTemperature <= 0)
+		trackTemperature := 27
 	
 	current := fixIE(11)
 	

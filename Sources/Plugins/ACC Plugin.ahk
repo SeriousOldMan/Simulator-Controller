@@ -212,7 +212,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if this.UDPConnection
 					options := ("-Connect " . this.UDPConnection)
 				
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide, pid
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide
 				
 				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
 				
@@ -252,11 +252,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			this.iUDPClient := false
 		}
-		
-		return false
 	}
 	
 	requireUDPClient() {
+		Process Exist, ACC UDP Provider.exe
+		
+		if !ErrorLevel {
+			if this.iUDPClient
+				OnExit(this.iUDPClient, 0)
+			
+			this.iUDPClient := false
+		}
+		
 		if !this.UDPClient
 			this.startupUDPClient()
 	}
@@ -274,12 +281,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if (sessionState == kSessionRace)
 			this.startupUDPClient()
-		
-		if (sessionState == kSessionFinished) {
-			this.iRepairSuspensionChosen := true
-			this.iRepairBodyworkChosen := true
+		else {
+			if (sessionState == kSessionFinished) {
+				this.iRepairSuspensionChosen := true
+				this.iRepairBodyworkChosen := true
+			}
 			
-			this.shutdownUDPClient()
+			if (sessionState != kSessionPaused)
+				this.shutdownUDPClient()
 		}
 	}
 	

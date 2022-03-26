@@ -274,8 +274,8 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
 			
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30, %kIconsDirectory%Report Settings.ico
-		Gui %window%:Add, Text, x50 yp+5 w120 h26, % translate("Settings")
+		Gui %window%:Add, Picture, x16 yp+12 w30 h30, %kIconsDirectory%Road.ico
+		Gui %window%:Add, Text, x50 yp+5 w120 h26, % translate("Selection")
 			
 		Gui %window%:Font, s8 Norm, Arial
 		

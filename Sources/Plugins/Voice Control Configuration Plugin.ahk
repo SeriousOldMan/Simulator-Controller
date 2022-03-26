@@ -71,7 +71,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	iAzureRecognizerWidgets := []
 	iOtherWidgets := []
 	
-	iAzureWidgetsVisible := false
+	iTopAzureCredentialsVisible := false
+	iBottomAzureCredentialsVisible := false
 	
 	iCorrection := 0
 	
@@ -538,13 +539,26 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	showAzureSynthesizerEditor() {
+		wasOpen := false
+		
+		if this.iBottomAzureCredentialsVisible {
+			wasOpen := true
+			
+			this.hideAzureRecognizerEditor()
+		}
+		
 		showWidgets(this.iTopWidgets)
 		showWidgets(this.iAzureSynthesizerWidgets)
+		
+		this.iTopAzureCredentialsVisible := true
 		
 		if (this.iSynthesizerMode == false)
 			transposeWidgets(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
 		else
 			Throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
+		
+		if wasOpen
+			this.showAzureRecognizerEditor()
 		
 		showWidgets(this.iOtherWidgets)
 		
@@ -552,47 +566,74 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	hideAzureSynthesizerEditor() {
+		wasOpen := false
+		
+		if (this.iRecognizerMode = "Azure") {
+			wasOpen := true
+			
+			this.hideAzureRecognizerEditor()
+		}
+		
 		hideWidgets(this.iTopWidgets)
 		hideWidgets(this.iAzureSynthesizerWidgets)
 		hideWidgets(this.iOtherWidgets)
+		
+		this.iTopAzureCredentialsVisible := false
 		
 		if (this.iSynthesizerMode == "Azure")
 			transposeWidgets(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
 		else
 			Throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
 		
+		if wasOpen
+			this.showAzureRecognizerEditor()
+		
 		this.iSynthesizerMode := false
 	}
 	
 	showServerRecognizerEditor() {
-		
 		this.iRecognizerMode := "Server"
 	}
 	
 	hideServerRecognizerEditor() {
-		
 		this.iRecognizerMode := false
 	}
 	
 	showDesktopRecognizerEditor() {
-		
 		this.iRecognizerMode := "Desktop"
 	}
 	
 	hideDesktopRecognizerEditor() {
-		
 		this.iRecognizerMode := false
 	}
 	
 	showAzureRecognizerEditor() {
-		if (this.iSynthesizerMode != "Azure") {
+		if !this.iTopAzureCredentialsVisible {
+			if (this.iRecognizerMode == false) {
+				transposeWidgets(this.iAzureRecognizerWidgets, (24 * 7) - 3, this.iCorrection)
+				showWidgets(this.iAzureRecognizerWidgets)
+				transposeWidgets(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
+			}
+			else
+				Throw "Internal error detected in VoiceControlConfigurator.showAzureRecognizerEditor..."
+			
+			this.iBottomAzureCredentialsVisible := true
 		}
 		
 		this.iRecognizerMode := "Azure"
 	}
 	
 	hideAzureRecognizerEditor() {
-		if (this.iSynthesizerMode != "Azure") {
+		if !this.iTopAzureCredentialsVisible {
+			if (this.iRecognizerMode == "Azure") {
+				hideWidgets(this.iAzureRecognizerWidgets)
+				transposeWidgets(this.iAzureRecognizerWidgets, (-24 * 7) + 3, this.iCorrection)
+				transposeWidgets(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
+			}
+			else
+				Throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+			
+			this.iBottomAzureCredentialsVisible := false
 		}
 		
 		this.iRecognizerMode := false
@@ -811,23 +852,31 @@ chooseVoiceSynthesizer() {
 chooseVoiceRecognizer() {
 	oldChoice := voiceRecognizerDropDown
 	
-	GuiControlGet azureSubscriptionKeyEdit
-	GuiControlGet azureTokenIssuerEdit
 	GuiControlGet voiceRecognizerDropDown
 	
-	if (voiceRecognizerDropDown = 3) {
+	if (oldChoice == 1)
+		VoiceControlConfigurator.Instance.hideServerRecognizerEditor()
+	else if (oldChoice == 2)
+		VoiceControlConfigurator.Instance.hideDesktopRecognizerEditor()
+	else
+		VoiceControlConfigurator.Instance.hideAzureRecognizerEditor()
+	
+	if (voiceRecognizerDropDown == 1)
+		VoiceControlConfigurator.Instance.showServerRecognizerEditor()
+	else if (voiceRecognizerDropDown == 2)
+		VoiceControlConfigurator.Instance.showDesktopRecognizerEditor()
+	else {
+		GuiControlGet azureSubscriptionKeyEdit
+		GuiControlGet azureTokenIssuerEdit
+		
 		recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, false, true).getRecognizerList().Clone()
 		
-		if (oldChoice < 3)
-			VoiceControlConfigurator.Instance.showAzureRecognizerEditor()
+		VoiceControlConfigurator.Instance.showAzureRecognizerEditor()
 	}
-	else {
-		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, false, true).getRecognizerList().Clone()
 	
-		if (oldChoice == 3)
-			VoiceControlConfigurator.Instance.hideAzureRecognizerEditor()
-	}
-		
+	if (voiceRecognizerDropDown <= 2)
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, false, true).getRecognizerList().Clone()
+			
 	Loop % recognizers.Length()
 		recognizers[A_Index] := recognizers[A_Index].Name
 	

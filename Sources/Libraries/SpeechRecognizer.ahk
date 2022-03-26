@@ -38,8 +38,6 @@ class SpeechRecognizer {
 	_grammars := {}
 	
 	__New(engine, recognizer := false, language := false, silent := false) {
-		engine := "Azure|https://germanywestcentral.api.cognitive.microsoft.com/sts/v1.0/issuetoken|de7294571eef4c6b8a15c5f44646db50"
-		
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName
 		
@@ -65,8 +63,6 @@ class SpeechRecognizer {
 				
 				if !language
 					language := "en-US"
-				
-				language := "en-US"
 				
 				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))

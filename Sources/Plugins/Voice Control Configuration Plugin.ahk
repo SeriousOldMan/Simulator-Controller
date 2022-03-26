@@ -181,7 +181,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x%x% yp+42 w110 h23 +0x200 HWNDwidget21 vvoiceRecognizerLabel Hidden, % translate("Speech Recognizer")
 		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget29 gchooseVoiceRecognizer VvoiceRecognizerDropDown Hidden, % values2String("|", choices*)
-		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, false, true).getRecognizerList().Clone()
+		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
 		
 		Loop % recognizers.Length()
 			recognizers[A_Index] := recognizers[A_Index].Name

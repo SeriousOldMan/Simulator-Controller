@@ -102,7 +102,6 @@ namespace Speech {
         private int rate;
         private int volume;
 
-
         private DateTimeOffset nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
 
         public SpeechSynthesizer() {

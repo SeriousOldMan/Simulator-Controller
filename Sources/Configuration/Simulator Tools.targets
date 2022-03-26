@@ -66,6 +66,7 @@ Speech Interface.7=%kBinariesDirectory%Microsoft.CognitiveServices.Speech.extens
 Speech Interface.8=%kBinariesDirectory%Microsoft.CognitiveServices.Speech.extension.codec.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Microsoft.CognitiveServices.Speech.extension.codec.dll
 Speech Interface.9=%kBinariesDirectory%Microsoft.CognitiveServices.Speech.extension.kws.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Microsoft.CognitiveServices.Speech.extension.kws.dll
 Speech Interface.10=%kBinariesDirectory%Microsoft.CognitiveServices.Speech.extension.lu.dll <- %kSourcesDirectory%Special\Speech Synthesizer\Release\x64\Microsoft.CognitiveServices.Speech.extension.lu.dll
+Speech Interface.11=%kBinariesDirectory%Microsoft.CognitiveServices.Speech.extension.mas.dll <- %kSourcesDirectory%Special\Speech Recognizer\Release\x64\Microsoft.CognitiveServices.Speech.extension.mas.dll
 Stream Deck Interface.1=%kBinariesDirectory%SimulatorControllerPluginConnector.dll <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\SimulatorControllerPluginConnector.dll
 Stream Deck Interface.2=%kHomeDirectory%Utilities\de.thebigo.simulatorcontroller.sdPlugin <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\de.thebigo.simulatorcontroller.sdPlugin
 Controller Configuration.1=%kResourcesDirectory%Templates\Simulator Configuration.ini <- %kSourcesDirectory%Configuration\Simulator Configuration.ini

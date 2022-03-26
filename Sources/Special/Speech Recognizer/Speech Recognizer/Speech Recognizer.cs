@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Audio;
 
 // Get Started with Speech Recognition (Microsoft.Speech):
 // https://msdn.microsoft.com/en-us/library/hh378426(v=office.14).aspx
@@ -22,6 +26,16 @@ namespace Speech
         private string _engineType = "Unknown";
         private ServerSpeechRecognizer _serverRecognizer;
         private DesktopSpeechRecognizer _desktopRecognizer;
+        private AzureSpeechRecognizer _azureRecognizer;
+
+        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
+        {
+            this._engineType = "Azure";
+
+            this._azureRecognizer = new AzureSpeechRecognizer();
+
+            return this._azureRecognizer.Connect(tokenIssuerEndpoint, subscriptionKey, language, callback);
+        }
 
         public void SetEngine(string engine)
         {
@@ -39,7 +53,7 @@ namespace Speech
         /// <returns>OK</returns>
         public string OkCheck()
         {
-            if (_engineType == "Server" || _engineType == "Desktop")
+            if (_engineType == "Desktop" || _engineType == "Azure" || _engineType == "Server")
                 return "OK";
             else
                 return "Error";
@@ -47,27 +61,42 @@ namespace Speech
 
         public int GetRecognizerCount()
         {
-            return (_engineType == "Server") ? _serverRecognizer._recognizers.Count : _desktopRecognizer._recognizers.Count;
+            if (_engineType == "Azure")
+                return 1;
+            else
+                return (_engineType == "Server") ? _serverRecognizer._recognizers.Count : _desktopRecognizer._recognizers.Count;
         }
 
         public string GetRecognizerName(int recognizerId)
         {
-            return (_engineType == "Server") ? _serverRecognizer.GetRecognizerName(recognizerId) : _desktopRecognizer.GetRecognizerName(recognizerId);
+            if (_engineType == "Azure")
+                return "Neural speech to text engine";
+            else
+                return (_engineType == "Server") ? _serverRecognizer.GetRecognizerName(recognizerId) : _desktopRecognizer.GetRecognizerName(recognizerId);
         }
 
         public string GetRecognizerCultureName(int recognizerId)
         {
-            return (_engineType == "Server") ? _serverRecognizer.GetRecognizerCultureName(recognizerId) : _desktopRecognizer.GetRecognizerCultureName(recognizerId);
+            if (_engineType == "Azure")
+                return _azureRecognizer.GetLanguage() + "_XX";
+            else
+                return (_engineType == "Server") ? _serverRecognizer.GetRecognizerCultureName(recognizerId) : _desktopRecognizer.GetRecognizerCultureName(recognizerId);
         }
 
         public string GetRecognizerTwoLetterISOLanguageName(int recognizerId)
         {
-            return (_engineType == "Server") ? _serverRecognizer.GetRecognizerTwoLetterISOLanguageName(recognizerId) : _desktopRecognizer.GetRecognizerTwoLetterISOLanguageName(recognizerId);
+            if (_engineType == "Azure")
+                return _azureRecognizer.GetLanguage();
+            else
+                return (_engineType == "Server") ? _serverRecognizer.GetRecognizerTwoLetterISOLanguageName(recognizerId) : _desktopRecognizer.GetRecognizerTwoLetterISOLanguageName(recognizerId);
         }
 
         public string GetRecognizerLanguageDisplayName(int recognizerId)
         {
-            return (_engineType == "Server") ? _serverRecognizer.GetRecognizerLanguageDisplayName(recognizerId) : _desktopRecognizer.GetRecognizerLanguageDisplayName(recognizerId);
+            if (_engineType == "Azure")
+                return "Universal (" + _azureRecognizer.GetLanguage() + ")";
+            else
+                return (_engineType == "Server") ? _serverRecognizer.GetRecognizerLanguageDisplayName(recognizerId) : _desktopRecognizer.GetRecognizerLanguageDisplayName(recognizerId);
         }
 
         public void Initialize(int recognizerId = 0)
@@ -80,12 +109,32 @@ namespace Speech
 
         public bool StartRecognizer()
         {
-            return (_engineType == "Server") ? _serverRecognizer.StartRecognizer() : _desktopRecognizer.StartRecognizer();
+            switch (_engineType)
+            {
+                case "Azure":
+                    return _azureRecognizer.StartRecognizer();
+                case "Server":
+                    return _serverRecognizer.StartRecognizer();
+                case "Desktop":
+                    return _desktopRecognizer.StartRecognizer();
+                default:
+                    return false;
+            }
         }
 
         public bool StopRecognizer()
         {
-            return (_engineType == "Server") ? _serverRecognizer.StopRecognizer() : _desktopRecognizer.StopRecognizer();
+            switch (_engineType)
+            {
+                case "Azure":
+                    return _azureRecognizer.StopRecognizer();
+                case "Server":
+                    return _serverRecognizer.StopRecognizer();
+                case "Desktop":
+                    return _desktopRecognizer.StopRecognizer();
+                default:
+                    return false;
+            }
         }
 
         public Microsoft.Speech.Recognition.Choices GetServerChoices(string name)
@@ -133,6 +182,138 @@ namespace Speech
             else
                 return _desktopRecognizer.SubscribeVolume(callback);
         }
+    }
+
+    public class AzureSpeechRecognizer
+    {
+        private string _tokenIssuerEndpoint;
+        private string _subscriptionKey;
+        private string _region = "";
+
+        private SpeechConfig _config = null;
+        private string _token = null;
+
+        private DateTimeOffset _nextTokenRenewal = DateTime.Now - new TimeSpan(0, 10, 0);
+
+        private string _language;
+        private dynamic _callback;
+
+        private Microsoft.CognitiveServices.Speech.SpeechRecognizer _activeRecognizer;
+
+        public bool Connect(string tokenIssuerEndpoint, string subscriptionKey, string language, dynamic callback)
+        {
+            this._tokenIssuerEndpoint = tokenIssuerEndpoint;
+            this._subscriptionKey = subscriptionKey;
+            this._language = language.ToLower();
+            this._callback = callback;
+
+            _region = _tokenIssuerEndpoint.Substring(8);
+            _region = _region.Substring(0, _region.IndexOf(".api."));
+
+            try
+            {
+                RenewToken();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public string GetLanguage()
+        {
+            return this._language;
+        }
+
+        private void RenewToken()
+        {
+            if (_token == null || DateTime.Now >= _nextTokenRenewal)
+            {
+                _config = SpeechConfig.FromEndpoint(new System.Uri(_tokenIssuerEndpoint), _subscriptionKey);
+
+                try
+                {
+                    _token = GetToken();
+                }
+                catch (Exception e)
+                {
+                    _token = null;
+                }
+
+                _nextTokenRenewal = new DateTimeOffset(DateTime.Now + new TimeSpan(TimeSpan.TicksPerMinute * 9));
+            }
+        }
+
+        public string GetToken()
+        {
+            var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _subscriptionKey);
+
+            var result = httpClient.PostAsync(_tokenIssuerEndpoint, null).Result;
+
+            if (result.IsSuccessStatusCode)
+                return result.Content.ReadAsStringAsync().Result;
+            else
+                throw new HttpRequestException($"Cannot get token from {_tokenIssuerEndpoint}. Error: {result.StatusCode}");
+        }
+
+        public bool StartRecognizer()
+        {
+            RenewToken();
+
+            bool stopped = StopRecognizer();
+
+            if (stopped)
+                FromMicrophone();
+
+            return stopped;
+        }
+
+        public bool StopRecognizer()
+        {
+            Microsoft.CognitiveServices.Speech.SpeechRecognizer recognizer = _activeRecognizer;
+
+            if (recognizer == null)
+                return true;
+            else
+            {
+                recognizer.StopContinuousRecognitionAsync().Wait();
+
+                _activeRecognizer = null;
+
+                return true;
+            }
+        }
+
+        private async Task FromMicrophone()
+        {
+            SourceLanguageConfig language = SourceLanguageConfig.FromLanguage(_language);
+
+            _activeRecognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(_config, language);
+
+            _activeRecognizer.Recognized += OnRecognized;
+            _activeRecognizer.Canceled += OnCanceled;
+
+            await _activeRecognizer.StartContinuousRecognitionAsync();
+        }
+
+        private void OnCanceled(object sender, SpeechRecognitionCanceledEventArgs e)
+        {
+            string text = e.Result.Text.Trim();
+
+            if (text.Length > 0)
+                _callback(text);
+        }
+
+        private void OnRecognized(object sender, SpeechRecognitionEventArgs e)
+        {
+            _callback(e.Result.Text);
+        }
+
+        public event EventHandler<Microsoft.CognitiveServices.Speech.SpeechRecognitionEventArgs> Recognized;
     }
 
     public partial class ServerSpeechRecognizer

@@ -33,7 +33,9 @@
 class SpeechRecognizer {
 	iEngine := false
 	iChoices := {}
+	
 	_grammarCallbacks := {}
+	_grammars := {}
 	
 	__New(engine, recognizer := false, language := false, silent := false) {
 		dllName := "Speech.Recognizer.dll"
@@ -52,9 +54,32 @@ class SpeechRecognizer {
 
 			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
 			
-			instance.SetEngine(engine)
-			
 			this.Instance := instance
+			
+			if (InStr(engine, "Azure|") == 1) {
+				this.iEngine := "Azure"
+				
+				engine := string2Values("|", engine)
+				
+				if !language
+					language := "EN"
+				
+				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+				
+					Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				}
+				
+				choices := []
+				
+				Loop 100
+					choices.Push(A_Index . "")
+				
+				this.setChoices("percent", choices)
+			}
+			else
+				instance.SetEngine(engine)
 			
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -134,7 +159,7 @@ class SpeechRecognizer {
 	initialize(id) {
 		if (id > this.Instance.getRecognizerCount() - 1)
 			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
-		else
+		else if (this.iEngine != "Azure")
 			return this.Instance.Initialize(id)
 	}
 	
@@ -162,6 +187,8 @@ class SpeechRecognizer {
 	getChoices(name) {
 		if this.iChoices.HasKey(name)
 			return this.iChoices[name]
+		else if (this.iEngine = "Azure")
+			return false
 		else
 			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 	}
@@ -171,22 +198,42 @@ class SpeechRecognizer {
 	}
 	
 	newGrammar() {
-		return ((this.iEngine = "Server") ? this.Instance.NewServerGrammar() : this.Instance.NewDesktopGrammar())
+		switch this.iEngine {
+			case "Desktop":
+				return this.Instance.NewDesktopGrammar()
+			case "Azure":
+				return new AzureGrammar()
+			case "Server":
+				return this.Instance.NewServerGrammar()
+		}
 	}
 	
 	newChoices(choiceList) {
-		return ((this.iEngine = "Server") ? this.Instance.NewServerChoices(choiceList) : this.Instance.NewDesktopChoices(choiceList))
+		switch this.iEngine {
+			case "Desktop":
+				return this.Instance.NewDesktopChoices(IsObject(choiceList) ? values2String(", ", choices*) : choiceList)
+			case "Azure":
+				return new AzureChoices(!IsObject(choiceList) ? string2Values(",", choiceList) : choiceList)
+			case "Server":
+				return this.Instance.NewServerChoices(IsObject(choiceList) ? values2String(", ", choices*) : choiceList)
+		}
 	}
 	
 	loadGrammar(name, grammar, callback) {
 		if (this._grammarCallbacks.HasKey(name))
 			Throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
-		
+			
 		this._grammarCallbacks[name] := callback
-		
-		fn := this._onGrammarCallback.Bind(this)
-		
-		return this.Instance.LoadGrammar(grammar, name, fn)
+			
+		if (this.iEngine = "Azure") {
+			grammar := {Grammar: grammar, Callback: callback}
+			
+			this._grammars[name] := grammar
+			
+			return grammar
+		}
+		else
+			return this.Instance.LoadGrammar(grammar, name, fn)
 	}
 	
 	compileGrammar(text) {
@@ -197,10 +244,23 @@ class SpeechRecognizer {
 		return this.Instance.SubscribeVolume(cb)
 	}
 	
-	_onGrammarCallback(grammarName, wordArr) {
+	_onGrammarCallback(name, wordArr) {
 		words := this.getWords(wordArr)
 		
-		this._grammarCallbacks[grammarName].Call(grammarName, words)
+		this._grammarCallbacks[name].Call(name, words)
+	}
+	
+	_onTextCallback(text) {
+		words := string2Values(A_Space, text)
+		
+		for name, grammar in this._grammars
+			if grammar.Grammar.match(words) {
+				callback := grammar.Callback
+				
+				%callback%(name, words)
+				
+				break
+			}
 	}
 }
 
@@ -421,6 +481,115 @@ class GrammarCompiler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                       Grammar                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AzureGrammar {
+	iGrammar := []
+	
+	Grammar[] {
+		Get {
+			return this.iGrammar
+		}
+	}
+	
+	AppendChoices(choices) {
+		this.iGrammar.Push(choices)
+	}
+	
+	AppendString(string) {
+		this.iGrammar.Push(new AzureWords(string))
+	}
+	
+	AppendGrammars(grammars*) {
+		this.AppendChoices(new AzureChoices(grammars))
+	}
+	
+	match(words) {
+		index := 1
+		
+		return this.matchWords(words, index)
+	}
+	
+	matchWords(words, ByRef index) {
+		if (words.Length() < index)
+			return true
+		else {
+			for ignore, part in this.Grammar
+				if !part.matchWords(words, index)
+					return false
+			
+			return true
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                     AzureChoices                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AzureChoices {
+	iChoices := []
+	
+	Choices[] {
+		Get {
+			return this.iChoices
+		}
+	}
+	
+	__New(choices) {
+		this.iChoices := choices
+	}
+	
+	matchWords(words, ByRef index) {
+		for ignore, choice in this.Choices
+			if choice.matchWords(words, running)
+				return true
+		
+		return false
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                      AzureWords                                   ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AzureWords {
+	iWords := []
+	
+	Words[] {
+		Get {
+			return this.iWords
+		}
+	}
+	
+	__New(string) {
+		if !IsObject(string)
+			string := string2Values(A_Space, string)
+		
+		this.iWords := string
+	}
+	
+	matchWords(words, ByRef index) {
+		running := index
+		
+		for ignore, word in this.Words
+			if (words.Length() < running)
+				return false
+			else if !this.matchWord(words[running++], word)
+				return false
+		
+		index := running
+		
+		return true
+	}
+	
+	matchWord(word1, word2) {
+		return (word1 = word2)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                    GrammarParser                                  ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -552,7 +721,7 @@ class GrammarChoices {
 			choices.Push(choice.Value)
 		}
 		
-		return parser.Compiler.SpeechRecognizer.newChoices(values2String(", ", choices*))
+		return parser.Compiler.SpeechRecognizer.newChoices(choices)
 	}
 }
 

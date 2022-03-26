@@ -23,6 +23,135 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kAzureLanguages = {"af-ZA": "Afrikaans (South Africa)"
+						, "am-ET": "Amharic (Ethiopia)"
+						, "ar-DZ": "Arabic (Algeria)"
+						, "ar-BH": "Arabic (Bahrain)"
+						, "ar-EG": "Arabic (Egypt)"
+						, "ar-IQ": "Arabic (Iraq)"
+						, "ar-IL": "Arabic (Israel)"
+						, "ar-JO": "Arabic (Jordan)"
+						, "ar-KW": "Arabic (Kuwait)"
+						, "ar-LB": "Arabic (Lebanon)"
+						, "ar-LY": "Arabic (Libya)"
+						, "ar-MA": "Arabic (Morocco)"
+						, "ar-OM": "Arabic (Oman)"
+						, "ar-PS": "Arabic (Palestinian Authority)"
+						, "ar-QA": "Arabic (Qatar)"
+						, "ar-SA": "Arabic (Saudi Arabia)"
+						, "ar-SY": "Arabic (Syria)"
+						, "ar-TN": "Arabic (Tunisia)"
+						, "ar-AE": "Arabic (United Arab Emirates)"
+						, "ar-YE": "Arabic (Yemen)"
+						, "bg-BG": "Bulgarian (Bulgaria)"
+						, "my-MM": "Burmese (Myanmar)"
+						, "ca-ES": "Catalan (Spain)"
+						, "zh-HK": "Chinese (Cantonese, Traditional)"
+						, "zh-CN": "Chinese (Mandarin, Simplified)"
+						, "zh-TW": "Chinese (Taiwanese Mandarin)"
+						, "hr-HR": "Croatian (Croatia)"
+						, "cs-CZ": "Czech (Czech)"
+						, "da-DK": "Danish (Denmark)"
+						, "nl-BE": "Dutch (Belgium)"
+						, "nl-NL": "Dutch (Netherlands)"
+						, "en-AU": "English (Australia)"
+						, "en-CA": "English (Canada)"
+						, "en-GH": "English (Ghana)"
+						, "en-HK": "English (Hong Kong)"
+						, "en-IN": "English (India)"
+						, "en-IE": "English (Ireland)"
+						, "en-KE": "English (Kenya)"
+						, "en-NZ": "English (New Zealand)"
+						, "en-NG": "English (Nigeria)"
+						, "en-PH": "English (Philippines)"
+						, "en-SG": "English (Singapore)"
+						, "en-ZA": "English (South Africa)"
+						, "en-TZ": "English (Tanzania)"
+						, "en-GG": "English (United Kingdom)"
+						, "en-US": "English (United States)"}
+
+for culture, name in {"et-EE": "Estonian (Estonia)"
+					, "fil-PH": "Filipino (Philippines)"
+					, "fi-FI": "Finnish (Finland)"
+					, "fr-BE": "French (Belgium)"
+					, "fr-CA": "French (Canada)"
+					, "fr-FR": "French (France)"
+					, "fr-CH": "French (Switzerland)"
+					, "de-AT": "German (Austria)"
+					, "de-DE": "German (Germany)"
+					, "de-CH": "German (Switzerland)"
+					, "el-GR": "Greek (Greece)"
+					, "gu-IN": "Gujarati (Indian)"
+					, "he-IL": "Hebrew (Israel)"
+					, "hi-IN": "Hindi (India)"
+					, "hu-HU": "Hungarian (Hungary)"
+					, "is-IS": "Icelandic (Iceland)"
+					, "id-ID": "Indonesian (Indonesia)"
+					, "ga-IE": "Irish (Ireland)"
+					, "it-IT": "Italian (Italy)"
+					, "ja-JP": "Japanese (Japan)"
+					, "jv-ID": "Javanese (Indonesia)"
+					, "kn-IN": "Kannada (India)"
+					, "km-KH": "Khmer (Cambodia)"
+					, "ko-KR": "Korean (Korea)"
+					, "lo-LA": "Lao (Laos)"
+					, "lv-LV": "Latvian (Latvia)"
+					, "lt-LT": "Lithuanian (Lithuania)"
+					, "mk-MK": "Macedonian (North Macedonia)"
+					, "ms-MY": "Malay (Malaysia)"
+					, "mt-MT": "Maltese (Malta)"
+					, "mr-IN": "Marathi (India)"
+					, "nb-NO": "Norwegian (Bokmal, Norway)"
+					, "fa-IR": "Persian (Iran)"
+					, "pl-PL": "Polish (Poland)"
+					, "pt-BR": "Portuguese (Brazil)"
+					, "pt-PT": "Portuguese (Portugal)"
+					, "ro-RO": "Romanian (Romania)"
+					, "ru-RU": "Russian (Russia)"
+					, "sr-RS": "Serbian (Serbia)"
+					, "si-LK": "Sinhala (Sri Lanka)"
+					, "sk-SK": "Slovak (Slovakia)"
+					, "sl-SI": "Slovenian (Slovenia)"
+					, "es-AR": "Spanish (Argentina)"
+					, "es-BO": "Spanish (Bolivia)"
+					, "es-CL": "Spanish (Chile)"
+					, "es-CO": "Spanish (Colombia)"
+					, "es-CR": "Spanish (Costa Rica)"
+					, "es-CU": "Spanish (Cuba)"
+					, "es-DO": "Spanish (Dominican Republic)"
+					, "es-EC": "Spanish (Ecuador)"
+					, "es-SV": "Spanish (El Salvador)"
+					, "es-GQ": "Spanish (Equatorial Guinea)"
+					, "es-GT": "Spanish (Guatemala)"
+					, "es-HN": "Spanish (Honduras)"
+					, "es-MX": "Spanish (Mexico)"
+					, "es-NI": "Spanish (Nicaragua)"
+					, "es-PA": "Spanish (Panama)"
+					, "es-PY": "Spanish (Paraguay)"
+					, "es-PE": "Spanish (Peru)"
+					, "es-PR": "Spanish (Puerto Rico)"
+					, "es-ES": "Spanish (Spain)"
+					, "es-UY": "Spanish (Uruguay)"
+					, "es-US": "Spanish (USA)"
+					, "es-VE": "Spanish (Venezuela)"
+					, "sw-KE": "Swahili (Kenya)"
+					, "sw-TZ": "Swahili (Tanzania)"
+					, "sv-SE": "Swedish (Sweden)"
+					, "ta-IN": "Tamil (India)"
+					, "te-IN": "Telugu (India)"
+					, "th-TH": "Thai (Thailand)"
+					, "tr-TR": "Turkish (Turkey)"
+					, "uk-UA": "Ukrainian (Ukraine)"
+					, "uz-UZ": "Uzbek (Uzbekistan)"
+					, "vi-VN": "Vietnamese (Vietnam)"
+					, "zu-ZA": "Zulu (South Africa)"}
+	kAzureLanguages[culture] := name
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -102,7 +231,7 @@ class SpeechRecognizer {
 			
 			if ((recognizer == true) && language) {
 				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor["TwoLetterISOLanguageName"] = language) {
+					if (recognizerDescriptor["Language"] = language) {
 						recognizer := recognizerDescriptor["ID"]
 						
 						found := true
@@ -137,20 +266,29 @@ class SpeechRecognizer {
 	createRecognizerList() {
 		recognizerList := []
 		
-		Loop % this.Instance.GetRecognizerCount()
-		{
-			index := A_Index - 1
+		if (this.iEngine = "Azure") {
+			for culture, name in kAzureLanguages {
+				index := A_Index - 1
 			
-			recognizer := {ID: index, CultureName: this.Instance.GetRecognizerCultureName(index)
-									, TwoLetterISOLanguageName: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)
-									, LanguageDisplayName: this.Instance.GetRecognizerLanguageDisplayName(index)}
-			
-			if (this.iEngine = "Server")
-				recognizer["Name"] := this.Instance.GetRecognizerName(index)
-			else
-				recognizer["Name"] := (this.Instance.GetRecognizerName(index) . " (" . recognizer["CultureName"] . ")")
-			
-			recognizerList.Push(recognizer)
+				language := StrSplit(culture, "-")[1]
+				
+				recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language})
+			}
+		}
+		else {
+			Loop % this.Instance.GetRecognizerCount()
+			{
+				index := A_Index - 1
+				
+				recognizer := {ID: index, Culture: this.Instance.GetRecognizerCultureName(index), Language: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)}
+				
+				if (this.iEngine = "Server")
+					recognizer["Name"] := this.Instance.GetRecognizerName(index)
+				else
+					recognizer["Name"] := (this.Instance.GetRecognizerName(index) . " (" . recognizer["Culture"] . ")")
+				
+				recognizerList.Push(recognizer)
+			}
 		}
 		
 		return recognizerList
@@ -161,6 +299,8 @@ class SpeechRecognizer {
 			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 		else if (this.iEngine != "Azure")
 			return this.Instance.Initialize(id)
+		else
+			this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
 	}
 	
 	startRecognizer() {
@@ -559,7 +699,7 @@ class AzureChoices {
 	
 	matchWords(words, ByRef index) {
 		for ignore, choice in this.Choices
-			if choice.matchWords(words, choice)
+			if choice.matchWords(words, index)
 				return true
 		
 		return false

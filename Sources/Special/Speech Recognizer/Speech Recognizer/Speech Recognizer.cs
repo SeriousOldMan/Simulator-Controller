@@ -47,6 +47,11 @@ namespace Speech
                 _desktopRecognizer = new DesktopSpeechRecognizer();
         }
 
+        public void SetLanguage(string language)
+        {
+            _azureRecognizer.SetLanguage(language);
+        }
+
         /// <summary>
         /// Checks that you can speak to this Library
         /// </summary>
@@ -225,6 +230,11 @@ namespace Speech
         public string GetLanguage()
         {
             return this._language;
+        }
+
+        public void SetLanguage(string language)
+        {
+            this._language = language;
         }
 
         private void RenewToken()

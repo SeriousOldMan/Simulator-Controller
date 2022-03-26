@@ -2,7 +2,8 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Full support for cloud based voice recognition. Use *Azure Cognitive Services* for the best possible recognition quality. You can choose in the [configuration process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), which recognition language you want to use (as long as a grammar for this language is available).
+  3. Full support for cloud based voice recognition. Use *Azure Cognitive Services* for the best possible recognition quality. You can choose in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), which recognition language you want to use (as long as a grammar for this language is available).
+  4. The selection of the new cloud based voice recognition is also possible using the [plugin parameters](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the Virtual Race Assistants.
 
 ## 4.0.0-release 03/25/22
 

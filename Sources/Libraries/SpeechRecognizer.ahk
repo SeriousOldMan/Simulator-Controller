@@ -210,9 +210,6 @@ class SpeechRecognizer {
 			else
 				instance.SetEngine(engine)
 			
-			ratings := this.allMatches("Hello World", "world hello", "hello word", "noting at all")
-			match := this.bestMatch("Hello World", "world hello", "hello word", "noting at all")
-			
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
@@ -383,31 +380,43 @@ class SpeechRecognizer {
 		return new GrammarCompiler(this).compileGrammar(text)
 	}
 	
-	allMatches(string, strings*) {
+	allMatches(string, minRating, maxRating, strings*) {
 		ratings := []
 
 		for index, value in strings {
-			ratings[index, "Rating"] := this.Instance.Compare(string, value)
-			
-			ratings[index, "Target"] := value
-		}
-
-		bubbleSort(ratings, "compareRating")
+			rating := this.Instance.Compare(string, value)
 		
-		return {BestMatch: ratings[1], Ratings: ratings}
+			if (rating > minRating) {
+				ratings.Push({Rating: rating, Target: value})
+				
+				if (rating > maxRating)
+					break
+			}
+		}
+		
+		if (ratings.Length() > 0) {
+			bubbleSort(ratings, "compareRating")
+			
+			return {BestMatch: ratings[1], Ratings: ratings}
+		}
+		else
+			return {Ratings: []}
 	}
 
-	bestMatch(string, strings*) {
+	bestMatch(string, minRating, maxRating, strings*) {
 		highestRating := 0
 		bestMatch := false
 
 		for key, value in strings {
 			rating := this.Instance.Compare(string, value)
 		
-			if (highestRating < rating) {
+			if ((rating > minRating) && (highestRating < rating)) {
 				highestRating := rating
 				
 				bestMatch := value
+				
+				if (rating > maxRating)
+					break
 			}
 		}
 		
@@ -449,9 +458,9 @@ class SpeechRecognizer {
 				}
 			}
 			
-			if (bestMatch && (bestRating > 0.7)) {
+			if bestMatch {
 				callback := bestMatch.Callback
-					
+				
 				%callback%(bestMatch.Name, words)
 			}
 			else if this._grammars.HasKey("?") {
@@ -478,8 +487,10 @@ class SpeechRecognizer {
 		}
 	}
 	
-	match(words, grammar) {
-		return this.allMatches(words, grammar.Phrases*)["BestMatch"]["Rating"]
+	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
+		matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
+		
+		return (matches.HasKey("BestMatch") ? matches["BestMatch"]["Rating"] : false)
 	}
 }
 

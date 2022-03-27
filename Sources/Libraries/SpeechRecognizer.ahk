@@ -202,10 +202,10 @@ class SpeechRecognizer {
 				
 				choices := []
 				
-				Loop 100
-					choices.Push(A_Index . "")
+				Loop 101
+					choices.Push((A_Index - 1) . "")
 				
-				this.setChoices("percent", choices)
+				this.setChoices("Percent", choices)
 			}
 			else
 				instance.SetEngine(engine)
@@ -328,7 +328,7 @@ class SpeechRecognizer {
 		if this.iChoices.HasKey(name)
 			return this.iChoices[name]
 		else if (this.iEngine = "Azure")
-			return false
+			return []
 		else
 			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 	}
@@ -378,10 +378,6 @@ class SpeechRecognizer {
 	
 	compileGrammar(text) {
 		return new GrammarCompiler(this).compileGrammar(text)
-	}
-	
-	subscribeVolume(cb) {
-		return this.Instance.SubscribeVolume(cb)
 	}
 	
 	_onGrammarCallback(name, wordArr) {

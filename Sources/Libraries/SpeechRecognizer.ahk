@@ -210,6 +210,9 @@ class SpeechRecognizer {
 			else
 				instance.SetEngine(engine)
 			
+			ratings := this.allMatches("Hello World", "world hello", "hello word", "noting at all")
+			match := this.bestMatch("Hello World", "world hello", "hello word", "noting at all")
+			
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
@@ -366,7 +369,7 @@ class SpeechRecognizer {
 		this._grammarCallbacks[name] := callback
 			
 		if (this.iEngine = "Azure") {
-			grammar := {Grammar: grammar, Callback: callback}
+			grammar := {Name: name, Grammar: grammar, Callback: callback}
 			
 			this._grammars[name] := grammar
 			
@@ -378,6 +381,37 @@ class SpeechRecognizer {
 	
 	compileGrammar(text) {
 		return new GrammarCompiler(this).compileGrammar(text)
+	}
+	
+	allMatches(string, strings*) {
+		ratings := []
+
+		for index, value in strings {
+			ratings[index, "Rating"] := this.Instance.Compare(string, value)
+			
+			ratings[index, "Target"] := value
+		}
+
+		bubbleSort(ratings, "compareRating")
+		
+		return {BestMatch: ratings[1], Ratings: ratings}
+	}
+
+	bestMatch(string, strings*) {
+		highestRating := 0
+		bestMatch := false
+
+		for key, value in strings {
+			rating := this.Instance.Compare(string, value)
+		
+			if (highestRating < rating) {
+				highestRating := rating
+				
+				bestMatch := value
+			}
+		}
+		
+		return bestMatch
 	}
 	
 	_onGrammarCallback(name, wordArr) {
@@ -400,21 +434,33 @@ class SpeechRecognizer {
 			
 			words[index] := literal
 		}
-
-		for name, grammar in this._grammars
-			if grammar.Grammar.match(words) {
-				callback := grammar.Callback
-				
-				%callback%(name, words)
-				
-				return
-			}
 		
-		if this._grammars.HasKey("?") {
+		bestRating := 0
+		bestMatch := false
+		
+		for name, grammar in this._grammars {
+			rating := this.match(text, grammar.Grammar)
+		
+			if (rating > bestRating) {
+				bestRating := rating
+				bestMatch := grammar
+			}
+		}
+		
+		if (bestMatch && (bestRating > 0.7)) {
+			callback := bestMatch.Callback
+				
+			%callback%(bestMatch.Name, words)
+		}
+		else if this._grammars.HasKey("?") {
 			callback := this._grammars["?"].Callback
 			
 			%callback%("?", words)
 		}
+	}
+	
+	match(words, grammar) {
+		return this.allMatches(words, grammar.Phrases*)["BestMatch"]["Rating"]
 	}
 }
 
@@ -635,15 +681,25 @@ class GrammarCompiler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                       Grammar                                     ;;;
+;;; Class                    AzureGrammar                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AzureGrammar {
 	iGrammar := []
+	iPhrases := false
 	
 	Grammar[] {
 		Get {
 			return this.iGrammar
+		}
+	}
+	
+	Phrases[] {
+		Get {
+			if !this.iPhrases
+				this.iPhrases := this.allPhrases()
+			
+			return this.iPhrases
 		}
 	}
 	
@@ -676,10 +732,59 @@ class AzureGrammar {
 			return true
 		}
 	}
+	
+	allPhrases() {
+		result := []
+		
+		this.combinePhrases(result)
+		
+		return result
+	}
+	
+	combinePhrases(phrases) {
+		alternatives := false
+		pPhrases := []
+		
+		for index, part in this.Grammar {
+			if ((index == 1) && isInstance(part, AzureGrammar))
+				alternatives := true
+		
+			if alternatives
+				part.combinePhrases(phrases)
+			else {
+				temp := []
+			
+				part.combinePhrases(temp)
+				
+				pPhrases.Push(temp)
+			}
+		}
+		
+		if !alternatives {
+			parts := []
+			
+			for index, pParts in reverse(pPhrases) {
+				if (index == 1)
+					parts := pParts
+				else {
+					temp := []
+					
+					for ignore, p2 in parts
+						for ignore, p1 in pParts
+							temp.Push(p1 . A_Space . p2)
+					
+					parts := temp
+				}
+			}
+			
+			for ignore, part in parts
+				phrases.Push(part)
+		}
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                     AzureChoices                                  ;;;
+;;; Class                    AzureChoices                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AzureChoices {
@@ -706,10 +811,15 @@ class AzureChoices {
 		
 		return false
 	}
+	
+	combinePhrases(phrases) {
+		for ignore, choice in this.Choices
+			choice.combinePhrases(phrases)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                      AzureWords                                   ;;;
+;;; Class                    AzureWords                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AzureWords {
@@ -752,6 +862,10 @@ class AzureWords {
 		index := running
 		
 		return true
+	}
+	
+	combinePhrases(phrases) {
+		phrases.Push(values2String(A_Space, this.Words*))
 	}
 	
 	matchWord(word1, word2) {
@@ -919,8 +1033,8 @@ class GrammarBuiltinChoices {
 	parse(parser) {
 		choices := this.Builtin
 		
-		if (choices = "number")
-			choices := "percent"
+		if (choices = "Number")
+			choices := "Percent"
 		
 		return parser.Compiler.SpeechRecognizer.getChoices(choices)
 	}
@@ -977,4 +1091,13 @@ class GrammarLiteral {
 	toString() {
 		return this.Value
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+compareRating(r1, r2) {
+	return (r1.Rating < r2.Rating)
 }

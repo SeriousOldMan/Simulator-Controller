@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparer.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="Speech Recognizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

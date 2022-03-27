@@ -89,6 +89,7 @@ global vProgressCount = 0
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
 global installLocationPathEdit
 
 installOptions(options) {

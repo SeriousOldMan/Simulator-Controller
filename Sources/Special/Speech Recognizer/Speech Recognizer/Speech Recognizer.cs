@@ -52,10 +52,6 @@ namespace Speech
             _azureRecognizer.SetLanguage(language);
         }
 
-        /// <summary>
-        /// Checks that you can speak to this Library
-        /// </summary>
-        /// <returns>OK</returns>
         public string OkCheck()
         {
             if (_engineType == "Desktop" || _engineType == "Azure" || _engineType == "Server")
@@ -186,6 +182,11 @@ namespace Speech
                 return _serverRecognizer.SubscribeVolume(callback);
             else
                 return _desktopRecognizer.SubscribeVolume(callback);
+        }
+
+        public float Compare(string s1, string s2)
+        {
+            return (float)new Matcher(s1, s2).GetCoefficient();
         }
     }
 
@@ -322,8 +323,6 @@ namespace Speech
         {
             _callback(e.Result.Text);
         }
-
-        public event EventHandler<Microsoft.CognitiveServices.Speech.SpeechRecognitionEventArgs> Recognized;
     }
 
     public partial class ServerSpeechRecognizer

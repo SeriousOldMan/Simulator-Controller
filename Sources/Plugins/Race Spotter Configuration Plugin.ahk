@@ -190,12 +190,6 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		this.loadFromConfiguration(configuration)
 		
 		this.setSimulators(simulators)
-		
-		window := this.Editor.Window
-		
-		Gui %window%:Default
-		
-		GuiControl Disable, sideProximityDropDown
 	}
 	
 	loadSimulatorConfiguration(simulator := false) {

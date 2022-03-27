@@ -906,7 +906,7 @@ chooseVoiceRecognizer() {
 	}
 	
 	if (voiceRecognizerDropDown <= 2)
-			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
+		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).getRecognizerList().Clone()
 			
 	Loop % recognizers.Length()
 		recognizers[A_Index] := recognizers[A_Index].Name

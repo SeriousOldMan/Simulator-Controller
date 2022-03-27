@@ -650,7 +650,7 @@ class VoiceAssistant {
 	
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
-			showMessage("Command phrase recognized: " . grammar . " " . values2String(A_Space, words*))
+			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*))
 		
 		protectionOn()
 		

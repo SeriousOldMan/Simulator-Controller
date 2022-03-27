@@ -666,6 +666,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 																	
 	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+		local grammar
+		
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -701,7 +703,7 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients[descriptor] := client
 		
-		if activationCommand && listener {
+		if (activationCommand && listener) {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			

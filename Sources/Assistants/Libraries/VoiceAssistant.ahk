@@ -585,6 +585,8 @@ class VoiceAssistant {
 	}
 	
 	buildGrammars(speechRecognizer, language) {
+		local grammar
+		
 		grammars := this.getGrammars(language)
 		
 		for name, choices in getConfigurationSectionValues(grammars, "Choices", {})

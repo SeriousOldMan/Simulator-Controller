@@ -345,7 +345,7 @@ class SpeechRecognizer {
 			case "Desktop":
 				return this.Instance.NewDesktopGrammar()
 			case "Azure":
-				return new AzureGrammar()
+				return new Grammar()
 			case "Server":
 				return this.Instance.NewServerGrammar()
 		}
@@ -356,7 +356,7 @@ class SpeechRecognizer {
 			case "Desktop":
 				return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 			case "Azure":
-				return new AzureChoices(!IsObject(choices) ? string2Values(",", choices) : choices)
+				return new Grammar.Choices(!IsObject(choices) ? string2Values(",", choices) : choices)
 			case "Server":
 				return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 		}
@@ -421,6 +421,7 @@ class SpeechRecognizer {
 	}
 	
 	_onTextCallback(text) {
+		local grammar
 		local literal
 		
 		words := string2Values(A_Space, text)
@@ -435,27 +436,45 @@ class SpeechRecognizer {
 			words[index] := literal
 		}
 		
-		bestRating := 0
-		bestMatch := false
-		
-		for name, grammar in this._grammars {
-			rating := this.match(text, grammar.Grammar)
-		
-			if (rating > bestRating) {
-				bestRating := rating
-				bestMatch := grammar
+		if true {
+			bestRating := 0
+			bestMatch := false
+			
+			for name, grammar in this._grammars {
+				rating := this.match(text, grammar.Grammar)
+			
+				if (rating > bestRating) {
+					bestRating := rating
+					bestMatch := grammar
+				}
+			}
+			
+			if (bestMatch && (bestRating > 0.7)) {
+				callback := bestMatch.Callback
+					
+				%callback%(bestMatch.Name, words)
+			}
+			else if this._grammars.HasKey("?") {
+				callback := this._grammars["?"].Callback
+				
+				%callback%("?", words)
 			}
 		}
-		
-		if (bestMatch && (bestRating > 0.7)) {
-			callback := bestMatch.Callback
+		else {
+			for name, grammar in this._grammars
+				if grammar.Grammar.match(words) {
+					callback := grammar.Callback
+						
+					%callback%(name, words)
+					
+					return
+				}
+
+			if this._grammars.HasKey("?") {
+				callback := this._grammars["?"].Callback
 				
-			%callback%(bestMatch.Name, words)
-		}
-		else if this._grammars.HasKey("?") {
-			callback := this._grammars["?"].Callback
-			
-			%callback%("?", words)
+				%callback%("?", words)
+			}
 		}
 	}
 	
@@ -507,6 +526,7 @@ class GrammarCompiler {
 	}
 	
 	compileGrammar(text) {
+		local grammar
 		local nextCharIndex := 1
 		
 		grammar := this.readGrammar(text, nextCharIndex)
@@ -681,16 +701,103 @@ class GrammarCompiler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    AzureGrammar                                   ;;;
+;;; Class                    Grammar                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class AzureGrammar {
-	iGrammar := []
+class Grammar {
+	iParts := []
 	iPhrases := false
 	
-	Grammar[] {
+	class Choices {
+		iChoices := []
+		
+		Choices[] {
+			Get {
+				return this.iChoices
+			}
+		}
+		
+		__New(choices) {
+			for index, choice in choices
+				if !IsObject(choice)
+					choices[index] := new Grammar.Words(choice)
+				
+			this.iChoices := choices
+		}
+		
+		matchWords(words, ByRef index) {
+			running := index
+			
+			for ignore, choice in this.Choices
+				if choice.matchWords(words, running) {
+					index := running
+					
+					return true
+				}
+			
+			return false
+		}
+		
+		combinePhrases(phrases) {
+			for ignore, choice in this.Choices
+				choice.combinePhrases(phrases)
+		}
+	}
+	
+	class Words {
+		iWords := []
+		
+		Words[] {
+			Get {
+				return this.iWords
+			}
+		}
+		
+		__New(string) {
+			local literal
+			
+			if !IsObject(string)
+				string := string2Values(A_Space, string)
+			
+			for index, literal in string {
+				literal := StrReplace(literal, ".", "")
+				literal := StrReplace(literal, ",", "")
+				literal := StrReplace(literal, ";", "")
+				literal := StrReplace(literal, "?", "")
+				literal := StrReplace(literal, "-", "")
+
+				string[index] := literal
+			}
+			
+			this.iWords := string
+		}
+		
+		matchWords(words, ByRef index) {
+			running := index
+			
+			for ignore, word in this.Words
+				if (words.Length() < running)
+					return false
+				else if !this.matchWord(words[running++], word)
+					return false
+			
+			index := running
+			
+			return true
+		}
+		
+		combinePhrases(phrases) {
+			phrases.Push(values2String(A_Space, this.Words*))
+		}
+		
+		matchWord(word1, word2) {
+			return (word1 = word2)
+		}
+	}
+	
+	Parts[] {
 		Get {
-			return this.iGrammar
+			return this.iParts
 		}
 	}
 	
@@ -704,15 +811,15 @@ class AzureGrammar {
 	}
 	
 	AppendChoices(choices) {
-		this.iGrammar.Push(choices)
+		this.iParts.Push(choices)
 	}
 	
 	AppendString(string) {
-		this.iGrammar.Push(new AzureWords(string))
+		this.iParts.Push(new this.Words(string))
 	}
 	
 	AppendGrammars(grammars*) {
-		this.AppendChoices(new AzureChoices(grammars))
+		this.AppendChoices(new this.Choices(grammars))
 	}
 	
 	match(words) {
@@ -725,11 +832,30 @@ class AzureGrammar {
 		if (words.Length() < index)
 			return true
 		else {
-			for ignore, part in this.Grammar
-				if !part.matchWords(words, index)
-					return false
+			alternatives := false
+			running := index
 			
-			return true
+			for ignore, part in this.Parts {
+				if ((A_Index == 1) && isInstance(part, Grammar))
+					alternatives := true
+		
+				if alternatives {
+					if part.matchWords(words, index)
+						return true
+				}
+				else {
+					if !part.matchWords(words, running)
+						return false
+				}
+			}
+			
+			if alternatives
+				return false
+			else {
+				index := running
+			
+				return true
+			}
 		}
 	}
 	
@@ -745,8 +871,8 @@ class AzureGrammar {
 		alternatives := false
 		pPhrases := []
 		
-		for index, part in this.Grammar {
-			if ((index == 1) && isInstance(part, AzureGrammar))
+		for index, part in this.Parts {
+			if ((index == 1) && isInstance(part, Grammar))
 				alternatives := true
 		
 			if alternatives
@@ -784,96 +910,6 @@ class AzureGrammar {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    AzureChoices                                   ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class AzureChoices {
-	iChoices := []
-	
-	Choices[] {
-		Get {
-			return this.iChoices
-		}
-	}
-	
-	__New(choices) {
-		for index, choice in choices
-			if !IsObject(choice)
-				choices[index] := new AzureWords(choice)
-			
-		this.iChoices := choices
-	}
-	
-	matchWords(words, ByRef index) {
-		for ignore, choice in this.Choices
-			if choice.matchWords(words, index)
-				return true
-		
-		return false
-	}
-	
-	combinePhrases(phrases) {
-		for ignore, choice in this.Choices
-			choice.combinePhrases(phrases)
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    AzureWords                                     ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class AzureWords {
-	iWords := []
-	
-	Words[] {
-		Get {
-			return this.iWords
-		}
-	}
-	
-	__New(string) {
-		local literal
-		
-		if !IsObject(string)
-			string := string2Values(A_Space, string)
-		
-		for index, literal in string {
-			literal := StrReplace(literal, ".", "")
-			literal := StrReplace(literal, ",", "")
-			literal := StrReplace(literal, ";", "")
-			literal := StrReplace(literal, "?", "")
-			literal := StrReplace(literal, "-", "")
-
-			string[index] := literal
-		}
-		
-		this.iWords := string
-	}
-	
-	matchWords(words, ByRef index) {
-		running := index
-		
-		for ignore, word in this.Words
-			if (words.Length() < running)
-				return false
-			else if !this.matchWord(words[running++], word)
-				return false
-		
-		index := running
-		
-		return true
-	}
-	
-	combinePhrases(phrases) {
-		phrases.Push(values2String(A_Space, this.Words*))
-	}
-	
-	matchWord(word1, word2) {
-		return (word1 = word2)
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                    GrammarParser                                  ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -907,6 +943,8 @@ class GrammarParser {
 	}
 	
 	parseList(grammarList) {
+		local grammar
+		
 		newGrammar := this.Compiler.SpeechRecognizer.newGrammar()
 		
 		for ignore, grammar in grammarList.List
@@ -952,6 +990,8 @@ class GrammarGrammars {
 	}
 	
 	parse(parser) {
+		local grammar
+		
 		grammars := []
 		
 		for ignore, list in this.GrammarLists

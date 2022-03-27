@@ -942,7 +942,17 @@ initializeEnvironment() {
 			FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
 	}
 	
-	if !FileExist(kUserConfigDirectory . "ID") {
+	newID := !FileExist(kUserConfigDirectory . "ID") 
+	
+	if !newID {
+		idFileName := kUserConfigDirectory . "ID"
+			
+		FileReadLine id, %idFileName%, 1
+		
+		newID := ((id = false) || (Trim(id) = ""))
+	}
+	
+	if newID {
 		ticks := A_TickCount
 		
 		Random wait, 0, 100
@@ -956,6 +966,13 @@ initializeEnvironment() {
 		Random minor, 0, 10000
 		
 		id := values2String(".", A_TickCount, major, minor)
+		
+		try {
+			FileDelete %kUserConfigDirectory%ID
+		}
+		catch exception {
+			; ignore
+		}
 		
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}

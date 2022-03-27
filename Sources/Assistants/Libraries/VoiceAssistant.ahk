@@ -610,6 +610,11 @@ class VoiceAssistant {
 			else if (grammar != "Call")
 				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
+		
+		if speechRecognizer
+			speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+		else
+			raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 	}
 
 	handleVoiceCalls(event, data) {
@@ -645,7 +650,7 @@ class VoiceAssistant {
 	
 	phraseRecognized(grammar, words, remote := false) {
 		if (this.Debug[kDebugRecognitions] && !remote)
-			showMessage("Command phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Command phrase recognized: " . grammar . " " . values2String(A_Space, words*))
 		
 		protectionOn()
 		

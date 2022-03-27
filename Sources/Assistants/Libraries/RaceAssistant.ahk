@@ -465,8 +465,6 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
-			case "Catch":
-				this.getSpeaker().speakPhrase("Repeat")
 			case "AnnouncementsOn":
 				this.clearContinuation()
 				
@@ -475,6 +473,8 @@ class RaceAssistant extends ConfigurationItem {
 				this.clearContinuation()
 				
 				this.activateAnnouncement(words, false)
+			case "?":
+				this.getSpeaker().speakPhrase("Repeat")
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}

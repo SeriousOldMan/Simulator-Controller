@@ -1649,7 +1649,7 @@ substituteVariables(string, values := false) {
 }
 
 string2Values(delimiter, string, count := false) {
-	return (count ? StrSplit(string, delimiter, " `t", count) : StrSplit(string, delimiter, " `t"))
+	return (count ? StrSplit(Trim(string), delimiter, " `t", count) : StrSplit(Trim(string), delimiter, " `t"))
 }
 
 values2String(delimiter, values*) {

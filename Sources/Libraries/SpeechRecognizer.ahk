@@ -295,12 +295,12 @@ class SpeechRecognizer {
 	}
 	
 	initialize(id) {
-		if (id > this.Instance.getRecognizerCount() - 1)
-			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
-		else if (this.iEngine != "Azure")
-			return this.Instance.Initialize(id)
-		else
+		if (this.iEngine = "Azure")
 			this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
+		else if (id > this.Instance.getRecognizerCount() - 1)
+			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+		else
+			return this.Instance.Initialize(id)
 	}
 	
 	startRecognizer() {
@@ -333,8 +333,8 @@ class SpeechRecognizer {
 			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 	}
 	
-	setChoices(name, choiceList) {
-		this.iChoices[name] := this.newChoices(choiceList)
+	setChoices(name, choices) {
+		this.iChoices[name] := this.newChoices(choices)
 	}
 	
 	newGrammar() {
@@ -348,14 +348,14 @@ class SpeechRecognizer {
 		}
 	}
 	
-	newChoices(choiceList) {
+	newChoices(choices) {
 		switch this.iEngine {
 			case "Desktop":
-				return this.Instance.NewDesktopChoices(IsObject(choiceList) ? values2String(", ", choices*) : choiceList)
+				return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 			case "Azure":
-				return new AzureChoices(!IsObject(choiceList) ? string2Values(",", choiceList) : choiceList)
+				return new AzureChoices(!IsObject(choices) ? string2Values(",", choices) : choices)
 			case "Server":
-				return this.Instance.NewServerChoices(IsObject(choiceList) ? values2String(", ", choices*) : choiceList)
+				return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 		}
 	}
 	
@@ -372,8 +372,8 @@ class SpeechRecognizer {
 			
 			return grammar
 		}
-		else
-			return this.Instance.LoadGrammar(grammar, name, fn)
+		else 
+			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
 	}
 	
 	compileGrammar(text) {
@@ -409,6 +409,12 @@ class SpeechRecognizer {
 				
 				return
 			}
+		
+		if this._grammars.HasKey("?") {
+			callback := this._grammars["?"].Callback
+			
+			%callback%("?", words)
+		}
 	}
 }
 

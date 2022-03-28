@@ -304,7 +304,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := 17
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
+									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, "Azure|https://westeurope.api.cognitive.microsoft.com/sts/v1.0/issuetoken|cf619e9ec66e4225b2440f2276da7d72", true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

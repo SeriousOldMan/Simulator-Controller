@@ -36,7 +36,7 @@ Release 3.9.4=Release 3.9.2 -> updateTranslations, updateActionLabels, updateAct
 Release 3.9.6=Release 3.9.4 -> updateTranslations
 Release 3.9.8=Release 3.9.6 -> updateTranslations, updateInstallationForV398, updateConfigurationForV398, updatePluginsForV398
 Release 4.0.0=Release 3.9.8 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons, renewConsent, updateConfigurationForV400, updatePluginsForV400
-; Release 4.0.2=Release 4.0.0 -> updateTranslations
+; Release 4.0.2=Release 4.0.0 -> updateTranslations, updatePluginsForV402
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

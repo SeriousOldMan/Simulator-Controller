@@ -23,6 +23,7 @@ Release 4.0.2 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Enable Spotter Listener
 
 Release 4.0.0 Checklist
 =======================

@@ -10,6 +10,136 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Preset(s)                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class NamedPreset extends Preset {
+	iName := false
+	
+	Name[] {
+		Get {
+			return this.iName
+		}
+	}
+	
+	__New(name) {
+		this.iName := name
+	}
+	
+	getArguments() {
+		return Array(this.Name)
+	}
+}
+	
+class MutedAssistant extends NamedPreset {
+	iAssistant := false
+	
+	Assistant[] {
+		Get {
+			return this.iAssistant
+		}
+	}
+	
+	__New(name, assistant) {
+		base.__New(name)
+		
+		this.iAssistant := assistant
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.Assistant))
+	}
+	
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		if (getConfigurationValue(simulatorConfiguration, "Plugins", this.iAssistant, kUndefined) != kUndefined) {
+			assistant := new Plugin(this.iAssistant, simulatorConfiguration)
+			
+			assistant.setArgumentValue("raceAssistantSpeaker", false)
+			assistant.setArgumentValue("raceAssistantListener", false)
+			
+			assistant.saveToConfiguration(simulatorConfiguration)
+		}
+	}
+}
+
+class PassiveEngineer extends NamedPreset {
+	patchSimulatorConfiguration(wizard, configuration, settings) {
+		if (getConfigurationValue(configuration, "Plugins", "Race Engineer", kUndefined) != kUndefined) {
+			assistant := new Plugin("Race Engineer", configuration)
+			
+			assistant.setArgumentValue("openPitstopMFD", "Off")
+			
+			assistant.saveToConfiguration(configuration)
+		}
+	}
+}
+
+class DefaultButtonBox extends Preset {
+	iFile := false
+	
+	File[] {
+		Get {
+			return this.iFile
+		}
+	}
+	
+	__New(name, file) {
+		base.__New(name)
+		
+		this.iFile := substituteVariables(file)
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.File))
+	}
+	
+	install(wizard) {
+		file := this.iFile
+		
+		try {
+			FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
+}
+
+class DefaultStreamDeck extends Preset {
+	iFile := false
+	
+	File[] {
+		Get {
+			return this.iFile
+		}
+	}
+	
+	__New(name, file) {
+		base.__New(name)
+		
+		this.iFile := substituteVariables(file)
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.File))
+	}
+	
+	install(wizard) {
+		file := this.iFile
+		
+		try {
+			FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
+	uninstall(wizard) {
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -18,7 +148,7 @@ class ModulesStepWizard extends StepWizard {
 	
 	Pages[] {
 		Get {
-			return Ceil(this.Definition.Length() / 3)
+			return Ceil(this.Definition.Length() / 3) + 1
 		}
 	}
 	
@@ -52,6 +182,8 @@ class ModulesStepWizard extends StepWizard {
 		definition := this.Definition
 		
 		startY := y
+		checkX := x + width - 20
+		labelWidth := width - 30
 		
 		if (definition.Length() > 12)
 			Throw "Too many modules detected in ModulesStepWizard.createGui..."
@@ -76,8 +208,6 @@ class ModulesStepWizard extends StepWizard {
 			label := substituteVariables(translate("Module: %module%"), {module: module})
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
-			checkX := x + width - 20
-			labelWidth := width - 30
 			labelX := x + 35
 			labelY := y + 8
 
@@ -102,6 +232,21 @@ class ModulesStepWizard extends StepWizard {
 			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
 				y := startY
 		}
+		
+		y := startY
+		labelX := x + 35
+		labelY := y + 8
+		
+		Gui %window%:Font, s10 Bold, Arial
+			
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Presets && Special Configurations")
+		
+		Gui %window%:Font, s8 Norm, Arial
+	
+		Sleep 200
+		
+		this.registerWidgets(this.Pages, iconHandle, labelHandle)
 	}
 	
 	reset() {

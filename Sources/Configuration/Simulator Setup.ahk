@@ -86,6 +86,40 @@ global kDebugRules = 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Preset                                                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Preset {
+	Name[] {
+		Get {
+			Throw "Virtual property Preset.Name must be implemented in a subclass..."
+		}
+	}
+	
+	getArguments() {
+		Throw "Virtual method Preset.getArguments must be implemented in a subclass..."
+	}
+	
+	install(wizard) {
+	}
+	
+	uninstall(wizard) {
+	}
+	
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+	}
+	
+	patchSimulatorSettings(wizard, simulatorSettings) {
+	}
+	
+	patchButtonBoxConfiguration(wizard, buttonBoxConfiguration) {
+	}
+	
+	patchStreamDeckConfiguration(wizard, streamDeckConfiguration) {
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupWizard                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -115,6 +149,9 @@ class SetupWizard extends ConfigurationItem {
 	iSteps := {}
 	iStep := 0
 	iPage := 0
+	
+	iPresets := []
+	iInitialize := false
 	
 	Debug[option] {
 		Get {
@@ -183,6 +220,18 @@ class SetupWizard extends ConfigurationItem {
 	Page[] {
 		Get {
 			return this.iPage
+		}
+	}
+	
+	Initialize[] {
+		Get {
+			return this.iInitialize
+		}
+	}
+	
+	Presets[] {
+		Get {
+			return this.iPresets
 		}
 	}
 	
@@ -289,18 +338,30 @@ class SetupWizard extends ConfigurationItem {
 			
 			this.KnowledgeBase.addFact("Initialize", true)
 		}
-		else if !this.loadKnowledgeBase()
+		else if !this.loadKnowledgeBase() {
 			this.KnowledgeBase.addFact("Initialize", true)
+		
+			initialize := true
+		}
+		
+		this.iInitialize := initialize
 		
 		if isDebug()
 			Sleep 1000
 
+		if initialize {
+			this.addPatchFile("Settings", kUserHomeDirectory . "Setup\Settings Patch.ini")
+			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
+		}
+		
 		showProgress({progress: ++vProgressCount, message: translate("Starting AI Kernel...")})
 			
 		this.KnowledgeBase.produce()
 					
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
+		
+		this.iPresets := this.loadPresets()
 	}
 	
 	registerStepWizard(stepWizard) {
@@ -503,7 +564,49 @@ class SetupWizard extends ConfigurationItem {
 		this.nextPage()
 	}
 	
+	applyPatches(configuration, patches) {
+		for section, values in patches
+			if (InStr(section, "Substitute: ") == 1) {
+				section := StrReplace(section, "Substitute: ", "")
+				
+				for key, substitution in values {
+					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
+				
+					if (currentValue != kUndefinedd) {
+						substitution := string2Values("->", substitution)
+						
+						setConfigurationValue(configuration, section, key, StrReplace(currentValue, substitution[1], substitution[2]))
+					}
+				}
+			}
+			else if (InStr(section, "Add: ") == 1) {
+				section := StrReplace(section, "Add: ", "")
+				
+				for key, addition in values {
+					currentValue := getConfigurationValue(configuration, section, key, "")
+				
+					if !InStr(currentValue, addition)
+						setConfigurationValue(configuration, section, key, currentValue . addition)
+				}
+			}
+			else if (InStr(section, "Remove: ") == 1) {
+				section := StrReplace(section, "Remove: ", "")
+				
+				for key, deletion in values {
+					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
+				
+					if (currentValue != kUndefinedd)
+						setConfigurationValue(configuration, section, key, StrReplace(currentValue, deletion, ""))
+				}
+			}
+			else
+				for key, value in values
+					setConfigurationValue(configuration, section, key, value)
+	}
+	
 	finishSetup(save := true) {
+		local preset
+		
 		if (this.Step && this.Step.hidePage(this.Page)) {
 			window := this.WizardWindow
 	
@@ -525,26 +628,29 @@ class SetupWizard extends ConfigurationItem {
 					if (FileExist(kUserConfigDirectory . "Simulator Settings.ini") && FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini"))
 						FileMove %kUserConfigDirectory%Simulator Settings.ini, %kUserConfigDirectory%Simulator Settings.ini.bak, 1
 					
+					configuration := this.getSimulatorConfiguration()
+					
 					if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 						settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 					else
 						settings := newConfiguration()
 					
-					if FileExist(kUserHomeDirectory . "Setup\Settings Patch.ini")
-						for section, values in readConfiguration(kUserHomeDirectory . "Setup\Settings Patch.ini")
-							for key, value in values
-								setConfigurationValue(settings, section, key, value)
+					for ignore, file in this.getPatchFiles("Configuration")
+						if FileExist(file)
+							this.applyPatches(configuration, readConfiguration(file))
+					
+					for ignore, file in this.getPatchFiles("Settings")
+						if FileExist(file)
+							this.applyPatches(settings, readConfiguration(file))
+					
+					for ignore, preset in this.Presets {
+						preset.patchSimulatorConfiguration(this, configuration)
+						preset.patchSimulatorSettings(this, settings)
+					}
 					
 					if (settings.Count() > 0)
 						writeConfiguration(kUserConfigDirectory . "Simulator Settings.ini", settings)
 					
-					configuration := this.getSimulatorConfiguration()
-					
-					if FileExist(kUserHomeDirectory . "Setup\Configuration Patch.ini")
-						for section, values in readConfiguration(kUserHomeDirectory . "Setup\Configuration Patch.ini")
-							for key, value in values
-								setConfigurationValue(configuration, section, key, value)
-						
 					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 		
 					try {
@@ -573,12 +679,30 @@ class SetupWizard extends ConfigurationItem {
 						if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
 							FileMove %kUserConfigDirectory%Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini.bak, 1
 						
-						FileCopy %kUserHomeDirectory%Setup\Button Box Configuration.ini, %kUserConfigDirectory%Button Box Configuration.ini
+						buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+						
+						for ignore, file in this.getPatchFiles("Button Box")
+							if FileExist(file)
+								this.applyPatches(buttonBoxConfiguration, readConfiguration(file))
+						
+						for ignore, preset in this.Presets
+							preset.patchButtonBoxConfiguration(this, buttonBoxConfiguration)
+						
+						writeConfiguration(kUserConfigDirectory . "Button Box Configuration.ini", buttonBoxConfiguration)
 						
 						if FileExist(kUserConfigDirectory . "Stream Deck Configuration.ini")
 							FileMove %kUserConfigDirectory%Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini.bak, 1
 						
-						FileCopy %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, %kUserConfigDirectory%Stream Deck Configuration.ini
+						streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+						
+						for ignore, file in this.getPatchFiles("Stream Deck")
+							if FileExist(file)
+								this.applyPatches(streamDeckConfiguration, readConfiguration(file))
+						
+						for ignore, preset in this.Presets
+							preset.patchStreamDeckConfiguration(this, streamDeckConfiguration)
+						
+						writeConfiguration(kUserConfigDirectory . "Stream Deck Configuration.ini", streamDeckConfiguration)
 					}
 				}
 			}
@@ -786,6 +910,101 @@ class SetupWizard extends ConfigurationItem {
 			
 			Gui %window%:-Disabled
 		}
+	}
+	
+	installPreset(preset) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		preset.install(this)
+		
+		count := (knowledgeBase.getValue("Preset.Count", 0) + 1)
+		
+		knowledgeBase.addFact("Preset." . count . ".Class", preset.base.__Class)
+		knowledgeBase.addFact("Preset." . count . ".Arguments", values2String("###", preset.getArguments()*))
+		
+		knowledgeBase.setFact("Preset.Count", count)
+		
+		this.updateState()
+	}
+	
+	uninstallPreset(preset) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		preset.uninstall(this)
+		
+		class := preset.base.__Class
+		arguments := values2String("###", preset.getArguments()*)
+		
+		presets := []
+		found := false
+		
+		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		{
+			cClass := knowledgeBase.getValue("Preset." . A_Index . ".Class")
+			cArguments := knowledgeBase.getValue("Preset." . A_Index . ".Arguments")
+			
+			if (!found && (class = cClass) && (arguments = cArguments))
+				found := true
+			else
+				presets.Push(Array(cClass, cArguments))
+			
+			knowledgeBase.removeFact("Preset." . A_Index . ".Class")
+			knowledgeBase.removeFact("Preset." . A_Index . ".Arguments")
+		}
+		
+		for index, descriptor in presets {
+			knowledgeBase.addFact("Preset." . index . ".Class", descriptor[1])
+			knowledgeBase.addFact("Preset." . index . ".Arguments", descriptor[2])
+		}
+		
+		knowledgeBase.setFact("Preset.Count", presets.Length())
+		
+		this.updateState()
+	}
+	
+	loadPresets() {
+		local knowledgeBase := this.KnowledgeBase
+		
+		presets := []
+		
+		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		{
+			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
+			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
+			
+			if InStr(class, ".") {
+				class := StrSplit(class, ".")
+				outerClass := class[1]
+				
+				presets.Push(new %outerClass%[class[2]](arguments*))
+			}
+			else
+				presets.Push(new %class%(arguments*))
+		}
+		
+		return presets
+	}
+	
+	addPatchFile(type, file) {
+		value := this.KnowledgeBase.getValue("Patch." . type . ".Files", "")
+		
+		this.KnowledgeBase.setFact("Patch." . type . ".Files", (value = "") ? file : value . ";" . file)
+	}
+	
+	removePatchFile(type, file) {
+		files := string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", ""))
+		
+		index := inList(files, file)
+		
+		if index {
+			files.RemoveAt(index)
+		
+			this.KnowledgeBase.setValue("Patch." . type . ".Files", values2String(";", files*))
+		}
+	}
+	
+	getPatchFiles(type) {
+		return string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", ""))
 	}
 	
 	selectModule(module, selected, update := true) {
@@ -1815,6 +2034,18 @@ class StartStepWizard extends StepWizard {
 				imageViewer.Document.Close()
 			}
 			
+			/*
+			if initialize {
+				for ignore, preset in wizard.Presets
+					preset.initialize(this)
+				
+				wizard.Knowledgebase.produce()
+							
+				if wizard.Debug[kDebugKnowledgeBase]
+					wizard.dumpKnowledge(this.KnowledgeBase)
+			}
+			*/
+
 			return true
 		}
 		else
@@ -2006,6 +2237,14 @@ openSetupDocumentation() {
 elevateAndRestart() {
 	if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
 		try {
+			if SetupWizard.Instance.Initialize
+				try {
+					FileDelete %kUserHomeDirectory%Setup\Setup.data
+				}
+				catch exception {
+					; ignore
+				}
+				
 			if A_IsCompiled
 				Run *RunAs "%A_ScriptFullPath%" /restart
 			else
@@ -2157,6 +2396,8 @@ initializeSimulatorSetup() {
 }
 
 startupSimulatorSetup() {
+	local preset
+	
 	wizard := SetupWizard.Instance
 	
 	wizard.loadDefinition()

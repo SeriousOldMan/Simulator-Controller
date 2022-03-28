@@ -1,9 +1,9 @@
 [Development]
 Version=4.0.2-dev
 Target=4.0.0-release
-Date=03/26/2022
+Date=03/28/2022
 Download=
-Changes=Support for cloud based voice recognition using Azure Cognitive Services
+Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup"
 [Release]
 Version=4.0.0-release
 Date=03/25/2022

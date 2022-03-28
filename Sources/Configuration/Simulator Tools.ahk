@@ -1764,6 +1764,23 @@ updateConfigurationForV310() {
 		}
 }
 
+updatePluginsForV402() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		
+		if descriptor {
+			descriptor := StrReplace(descriptor, "raceAssistantListener: off", "raceAssistantListener: On")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV400() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

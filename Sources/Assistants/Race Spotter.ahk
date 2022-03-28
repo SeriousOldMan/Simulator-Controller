@@ -182,7 +182,7 @@ startRaceSpotter() {
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()
 		
-		RaceSpotter.Instance.createKnowledgeBase({})
+		RaceSpotter.Instance.updateDynamicValues({KnowledgeBase: RaceSpotter.Instance.createKnowledgeBase({})})
 	}
 	
 	if (spotterLogo && !kSilentMode)

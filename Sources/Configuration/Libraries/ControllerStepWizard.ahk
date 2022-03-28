@@ -61,6 +61,7 @@ class ControllerStepWizard extends StepWizard {
 		
 		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		
 		wizard := this.SetupWizard
 		
 		if wizard.isModuleSelected("Controller") {
@@ -196,12 +197,14 @@ class ControllerStepWizard extends StepWizard {
 	showPage(page) {
 		base.showPage(page)
 		
+		/*
 		if !FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Setup\Button Box Configuration.ini
 		
 		if !FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Stream Deck Configuration.ini, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini
-			
+		*/
+		
 		this.iControllerEditor := new this.StepControllerEditor("Default", this.SetupWizard.Configuration
 															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
 															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)

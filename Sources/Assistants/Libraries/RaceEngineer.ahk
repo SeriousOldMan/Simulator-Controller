@@ -408,9 +408,9 @@ class RaceEngineer extends RaceAssistant {
 			if tyreType {
 				action := false
 				
-				if inList(words, fragments["Increase"])
+				if (inList(words, fragments["Increase"]) || inList(words, fragments["More"]))
 					action := kIncrease
-				else if inList(words, fragments["Decrease"])
+				else if (inList(words, fragments["Decrease"]) || inList(words, fragments["Less"]))
 					action := kDecrease
 				
 				pointPosition := inList(words, fragments["Point"])
@@ -430,8 +430,6 @@ class RaceEngineer extends RaceAssistant {
 				}
 				else
 					for ignore, word in words {
-						showMessage(word)
-					
 						if word is float
 						{
 							psiValue := Floor(word)

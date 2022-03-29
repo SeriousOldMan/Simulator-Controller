@@ -462,10 +462,21 @@ class VoiceServer extends ConfigurationItem {
 		Get {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
-					this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language)
+					try {
+						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
+						
+						if (this.iSpeechRecognizer.RecognizerList.Length() = 0)
+							Throw "Server speech recognizer engine not installed..."
+					}
+					catch exception {
+						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
+						
+						if (this.iSpeechRecognizer.RecognizerList.Length() = 0)
+							Throw "Desktop speech recognizer engine not installed..."
+					}
 				}
 				catch exception {
-					this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language)
+					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				}
 				
 				if !this.PushToTalk

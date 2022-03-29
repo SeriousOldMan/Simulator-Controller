@@ -102,9 +102,10 @@ class DefaultButtonBox extends Preset {
 			if FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini") {
 				config := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 				
-				for key, value in getConfigurationSectionValues(readConfiguration(file), "Layouts", Object())
-					if (getConfigurationValue(config, "Layouts", key, kUndefined) == kUndefined)
-						setConfigurationValue(config, "Layouts", key, value)
+				for section, values in readConfiguration(file)
+					for key, value in values
+						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
+							setConfigurationValue(config, section, key, value)
 				
 				writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
 			}
@@ -143,9 +144,10 @@ class DefaultStreamDeck extends Preset {
 			if FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini") {
 				config := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 				
-				for key, value in getConfigurationSectionValues(readConfiguration(file), "Layouts", Object())
-					if (getConfigurationValue(config, "Layouts", key, kUndefined) == kUndefined)
-						setConfigurationValue(config, "Layouts", key, value)
+				for section, values in readConfiguration(file)
+					for key, value in values
+						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
+							setConfigurationValue(config, section, key, value)
 				
 				writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
 			}

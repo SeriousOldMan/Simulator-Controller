@@ -59,6 +59,7 @@ typedef int AC_FLAG_TYPE;
 #define AC_WHITE_FLAG 4
 #define AC_CHECKERED_FLAG 5
 #define AC_PENALTY_FLAG 6
+#define AC_GREEN_FLAG 7
 
 typedef int ACC_TRACK_GRIP_STATUS;
 

@@ -1468,6 +1468,12 @@ updateInstallationForV354() {
 	}
 }
 
+updateConfigurationForV402() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+	}
+}
 
 updateConfigurationForV400() {
 	try {

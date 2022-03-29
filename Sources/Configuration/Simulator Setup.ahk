@@ -1004,7 +1004,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	getPatchFiles(type) {
-		return string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", ""))
+		return map(string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", "")), "substituteVariables")
 	}
 	
 	selectModule(module, selected, update := true) {

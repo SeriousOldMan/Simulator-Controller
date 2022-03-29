@@ -51,26 +51,28 @@ class MutedAssistant extends NamedPreset {
 	}
 	
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
-		if (getConfigurationValue(simulatorConfiguration, "Plugins", this.iAssistant, kUndefined) != kUndefined) {
-			assistant := new Plugin(this.iAssistant, simulatorConfiguration)
-			
-			assistant.setArgumentValue("raceAssistantSpeaker", false)
-			assistant.setArgumentValue("raceAssistantListener", false)
-			
-			assistant.saveToConfiguration(simulatorConfiguration)
-		}
+		if wizard.isModuleSelected(this.Assistant)
+			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
+				assistant := new Plugin(this.Assistant, simulatorConfiguration)
+				
+				assistant.setArgumentValue("raceAssistantSpeaker", false)
+				assistant.setArgumentValue("raceAssistantListener", false)
+				
+				assistant.saveToConfiguration(simulatorConfiguration)
+			}
 	}
 }
 
 class PassiveEngineer extends NamedPreset {
 	patchSimulatorConfiguration(wizard, configuration, settings) {
-		if (getConfigurationValue(configuration, "Plugins", "Race Engineer", kUndefined) != kUndefined) {
-			assistant := new Plugin("Race Engineer", configuration)
-			
-			assistant.setArgumentValue("openPitstopMFD", "Off")
-			
-			assistant.saveToConfiguration(configuration)
-		}
+		if wizard.isModuleSelected("Race Engineer")
+			if (getConfigurationValue(configuration, "Plugins", "Race Engineer", kUndefined) != kUndefined) {
+				assistant := new Plugin("Race Engineer", configuration)
+				
+				assistant.setArgumentValue("openPitstopMFD", "Off")
+				
+				assistant.saveToConfiguration(configuration)
+			}
 	}
 }
 
@@ -97,7 +99,17 @@ class DefaultButtonBox extends Preset {
 		file := this.iFile
 		
 		try {
-			FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
+			if FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini") {
+				config := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+				
+				for key, value in getConfigurationSectionValues(readConfiguration(file), "Layouts", Object())
+					if (getConfigurationValue(config, "Layouts", key, kUndefined) == kUndefined)
+						setConfigurationValue(config, "Layouts", key, value)
+				
+				writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
+			}
+			else
+				FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
 		}
 		catch exception {
 			; ignore
@@ -128,7 +140,17 @@ class DefaultStreamDeck extends Preset {
 		file := this.iFile
 		
 		try {
-			FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
+			if FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini") {
+				config := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+				
+				for key, value in getConfigurationSectionValues(readConfiguration(file), "Layouts", Object())
+					if (getConfigurationValue(config, "Layouts", key, kUndefined) == kUndefined)
+						setConfigurationValue(config, "Layouts", key, value)
+				
+				writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
+			}
+			else
+				FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
 		}
 		catch exception {
 			; ignore

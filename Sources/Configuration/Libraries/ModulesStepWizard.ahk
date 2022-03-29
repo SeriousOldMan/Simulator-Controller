@@ -167,12 +167,29 @@ class DefaultStreamDeck extends Preset {
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+global presetsInfoText
+
 class ModulesStepWizard extends StepWizard {
 	iModuleSelectors := []
+	
+	iAvailablePresetsListView := false
+	iSelectedPresetsListView := false
 	
 	Pages[] {
 		Get {
 			return Ceil(this.Definition.Length() / 3) + 1
+		}
+	}
+	
+	AvailablePresetsListView[] {
+		Get {
+			return this.iAvailablePresetsListView
+		}
+	}
+	
+	SelectedPresetsListView[] {
+		Get {
+			return this.iSelectedPresetsListView
 		}
 	}
 	
@@ -257,20 +274,64 @@ class ModulesStepWizard extends StepWizard {
 				y := startY
 		}
 		
+		presetsIconHandle := false
+		presetsLabelHandle := false
+		availablePresetsLabelHandle := false
+		availablePresetsListViewHandle := false
+		selectedPresetsListViewHandle := false
+		selectedPresetsLabelHandle := false
+		moveLeftButtonHandle := false
+		moveRightButtonHandle := false
+		presetsInfoTextHandle := false
+		
 		y := startY
 		labelX := x + 35
 		labelY := y + 8
 		
+		listWidth := Round((width - 50) / 2)
+		x2 := x + listWidth + 50
+		
+		buttonWidth := 40
+		x3 := x + listWidth + 5
+		
 		Gui %window%:Font, s10 Bold, Arial
 			
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % translate("Presets && Special Configurations")
+		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpresetsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
+		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpresetsLabelHandle Hidden, % translate("Presets && Special Configurations")
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x%x% yp+30 w%listWidth% HWNDavailablePresetsLabelHandle Hidden Section, % translate("Available Presets")
+		
+		Gui %window%:Add, ListView, x%x% yp+24 w%listWidth% h200 -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle Hidden, % values2String("|", map(["Preset"], "translate")*)
+		
+		Gui %window%:Add, Text, x%x2% ys w%listWidth% HWNDselectedPresetsLabelHandle Hidden Section, % translate("Selected Presets")
+		
+		Gui %window%:Add, ListView, x%x2% yp+24 w%listWidth% h200 -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle Hidden, % values2String("|", map(["Preset"], "translate")*)
+		
+		Gui %window%:Font, s8 Bold, Arial
+		
+		Gui %window%:Add, Button, x%x3% ys+95 w%buttonWidth% HWNDmoveLeftButtonHandle Hidden, <
+		Gui %window%:Add, Button, x%x3% yp+30 w%buttonWidth% HWNDmoveRightButtonHandle Hidden, >
 		
 		Gui %window%:Font, s8 Norm, Arial
 	
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'> <hr style='width: 90%'></div>"
+
 		Sleep 200
 		
-		this.registerWidgets(this.Pages, iconHandle, labelHandle)
+		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h180 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		presetsInfoText.Navigate("about:blank")
+		presetsInfoText.Document.Write(html)
+		
+		this.iAvailablePresetsListView := availablePresetsListViewHandle
+		this.iSelectedPresetsListView := selectedPresetsListViewHandle
+		
+		this.registerWidgets(this.Pages, presetsIconHandle, presetsLabelHandle, availablePresetsLabelHandle, availablePresetsListViewHandle
+									   , selectedPresetsLabelHandle, selectedPresetsListViewHandle, moveLeftButtonHandle, moveRightButtonHandle, presetsInfoTextHandle)
 	}
 	
 	reset() {

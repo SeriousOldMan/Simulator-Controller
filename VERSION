@@ -1,9 +1,9 @@
 [Development]
 Version=4.0.2-dev
 Target=4.0.0-release
-Date=03/28/2022
+Date=03/29/2022
 Download=
-Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup"
+Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag
 [Release]
 Version=4.0.0-release
 Date=03/25/2022

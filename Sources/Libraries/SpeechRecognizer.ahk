@@ -205,7 +205,14 @@ class SpeechRecognizer {
 				Loop 101
 					choices.Push((A_Index - 1) . "")
 				
-				this.setChoices("Percent", choices)
+				this.setChoices("Number", choices)
+				
+				choices := []
+				
+				Loop 11
+					choices.Push((A_Index - 1) . "")
+				
+				this.setChoices("Digit", choices)
 			}
 			else
 				instance.SetEngine(engine)
@@ -1084,8 +1091,8 @@ class GrammarBuiltinChoices {
 	parse(parser) {
 		choices := this.Builtin
 		
-		if (choices = "Number")
-			choices := "Percent"
+		; if (choices = "Number")
+		; 	choices := "Percent"
 		
 		return parser.Compiler.SpeechRecognizer.getChoices(choices)
 	}

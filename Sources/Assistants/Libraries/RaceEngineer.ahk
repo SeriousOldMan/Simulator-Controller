@@ -414,6 +414,7 @@ class RaceEngineer extends RaceAssistant {
 					action := kDecrease
 				
 				pointPosition := inList(words, fragments["Point"])
+				found := false
 				
 				if pointPosition {
 					psiValue := words[pointPosition - 1]
@@ -423,8 +424,40 @@ class RaceEngineer extends RaceAssistant {
 					{
 						psiValue := numberFragmentsLookup[psiValue]
 						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
+						
+						found := true
 					}
+				}
+				else
+					for ignore, word in words {
+						showMessage(word)
 					
+						if word is float
+						{
+							psiValue := Floor(word)
+							tenthPsiValue := Round((word - psiValue) * 10)
+							
+							found := true
+							
+							break
+						}
+						else {
+							startChar := SubStr(word, 1, 1)
+						
+							if startChar is Integer
+								if (StrLen(word) = 2) {
+									psiValue := (startChar + 0)
+									tenthPsiValue := (SubStr(word, 2, 1) + 0)
+							
+									found := true
+									
+									break
+								}
+						}
+							
+					}
+				
+				if found {
 					tyre := tyreTypeFragments[tyreType]
 					action := fragments[action]
 					

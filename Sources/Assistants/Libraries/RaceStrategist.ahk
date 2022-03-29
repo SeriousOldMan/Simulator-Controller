@@ -275,7 +275,7 @@ class RaceStrategist extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		lapPosition := inList(words, fragments["Laps"])
-				
+		
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 			

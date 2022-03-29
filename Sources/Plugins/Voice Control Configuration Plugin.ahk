@@ -468,11 +468,23 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else if (listenerDropDown == false)
 			listenerDropDown := translate("Deactivated")
 
-		chosen := inList(this.iRecognizers, listenerDropDown)
+		if (voiceRecognizerDropDown = 3)
+			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
+		else
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
+		
+		Loop % recognizers.Length()
+			recognizers[A_Index] := recognizers[A_Index].Name
+		
+		recognizers.InsertAt(1, translate("Deactivated"))
+		recognizers.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(recognizers, listenerDropDown)
 		
 		if (chosen == 0)
 			chosen = 1
 		
+		GuiControl, , listenerDropDown, % "|" . values2String("|", recognizers*)
 		GuiControl Choose, listenerDropDown, % chosen
 		
 		GuiControl, , pushToTalkEdit, %pushToTalkEdit%

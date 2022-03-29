@@ -461,7 +461,12 @@ class VoiceServer extends ConfigurationItem {
 	SpeechRecognizer[create := false] {
 		Get {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
-				this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+				try {
+					this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language)
+				}
+				catch exception {
+					this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language)
+				}
 				
 				if !this.PushToTalk
 					this.startListening()
@@ -473,7 +478,7 @@ class VoiceServer extends ConfigurationItem {
 	
 	__New(configuration := false) {
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
-			
+		
 		base.__New(configuration)
 		
 		VoiceServer.Instance := this
@@ -513,10 +518,9 @@ class VoiceServer extends ConfigurationItem {
 		static lastDown := 0
 		static lastUp := 0
 		static clicks := 0
+		static activation := false
 		
-		theHotkey := this.PushToTalk
-		pressed := GetKeyState(theHotKey, "P")
-		activation := false
+		pressed := GetKeyState(this.PushToTalk, "P")
 		
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -524,8 +528,11 @@ class VoiceServer extends ConfigurationItem {
 			
 			if (((lastDown - lastUp) < 400) && (clicks == 1))
 				activation := true
-			else
+			else {
 				clicks := 0
+			
+				activation := false
+			}
 		}
 		else if (!pressed && isPressed) {
 			lastUp := A_TickCount
@@ -536,6 +543,9 @@ class VoiceServer extends ConfigurationItem {
 			else
 				clicks := 0
 		}
+		
+		if (((A_TickCount - lastDown) < 400) && !activation)
+			pressed := false
 		
 		if !this.Speaking && pressed {
 			if activation
@@ -714,7 +724,9 @@ class VoiceServer extends ConfigurationItem {
 			}
 				
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
+				command := recognizer.compileGrammar(activationCommand)
+				
+				recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -863,7 +875,7 @@ class VoiceServer extends ConfigurationItem {
 		
 	voiceCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Command phrase recognized: " . values2String(A_Space, words*), false, "Information.png", 5000)
 		
 		descriptor := voiceClient.VoiceCommands[grammar]
 

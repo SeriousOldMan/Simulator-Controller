@@ -304,15 +304,11 @@ class ModulesStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, Text, x%x% yp+30 w%listWidth% HWNDavailablePresetsLabelHandle Hidden Section, % translate("Available Presets")
+		Gui %window%:Add, ListView, x%x% yp+30 w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden Section, % values2String("|", map(["Available Presets"], "translate")*)
 		
-		Gui %window%:Add, ListView, x%x% yp+24 w%listWidth% h200 AltSubmit -Multi -LV0x10 -Hdr NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden, % values2String("|", map(["Preset"], "translate")*)
+		Gui %window%:Add, ListView, x%x2% ys w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", map(["Selected Presets"], "translate")*)
 		
-		Gui %window%:Add, Text, x%x2% ys w%listWidth% HWNDselectedPresetsLabelHandle Hidden Section, % translate("Selected Presets")
-		
-		Gui %window%:Add, ListView, x%x2% yp+24 w%listWidth% h200 AltSubmit -Multi -LV0x10 -Hdr NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", map(["Preset"], "translate")*)
-		
-		Gui %window%:Font, s8 Bold, Arial
+		Gui %window%:Font, s10 Bold, Arial
 		
 		Gui %window%:Add, Button, x%x3% ys+95 w%buttonWidth% HWNDmoveRightButtonHandle vinstallPresetButton ginstallPreset Hidden, >
 		Gui %window%:Add, Button, x%x3% yp+30 w%buttonWidth% HWNDmoveLeftButtonHandle vuninstallPresetButton guninstallPreset Hidden, <
@@ -486,11 +482,21 @@ class ModulesStepWizard extends StepWizard {
 		selected := LV_GetNext()
 		
 		if selected {
-			GuiControl Enable, installPresetButton
-			
 			LV_GetText(preset, selected)
 		
 			preset := this.presetName(preset)
+			
+			enable := true
+			
+			for ignore, candidate in this.SetupWizard.loadPresets()
+				if (candidate.Name = preset) {
+					enable := false
+					
+					break
+				}
+			
+			if enable			
+				GuiControl Enable, installPresetButton
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
 		}

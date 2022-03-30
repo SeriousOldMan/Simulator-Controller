@@ -47,6 +47,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Update is handled automatically, but you may want to check the possibilities of the new cloud based voice recognition. Details can be found in the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
+The assistant grammars has been modified with this release for the new voice recognition functionalities. Therefore, if you have modified or extended the grammar files of the race assistants, please check the original files and incorporate those changes into your own versions.
+
 ***
 
 ## Release 4.0.0

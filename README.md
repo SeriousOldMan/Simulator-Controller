@@ -45,7 +45,10 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.0.2-dev](https://www.dropbox.com/s/owbi0xc7uaf2d94/Simulator%20Controller%204.0.2-dev.zip?dl=1) (Early build for 4.0.2. New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for Assetto Corsa Competizione, rFactor 2 and Automobilsta 2. Stable, incl. update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
+
 
 ### Discord Community
 

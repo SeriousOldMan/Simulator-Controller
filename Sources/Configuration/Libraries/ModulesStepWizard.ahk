@@ -76,7 +76,7 @@ class PassiveEngineer extends NamedPreset {
 	}
 }
 
-class DefaultButtonBox extends Preset {
+class DefaultButtonBox extends NamedPreset {
 	iFile := false
 	
 	File[] {
@@ -118,7 +118,7 @@ class DefaultButtonBox extends Preset {
 	}
 }
 
-class DefaultStreamDeck extends Preset {
+class DefaultStreamDeck extends NamedPreset {
 	iFile := false
 	
 	File[] {
@@ -166,6 +166,9 @@ class DefaultStreamDeck extends Preset {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global installPresetButton
+global uninstallPresetButton
 
 global presetsInfoText
 
@@ -303,21 +306,22 @@ class ModulesStepWizard extends StepWizard {
 		
 		Gui %window%:Add, Text, x%x% yp+30 w%listWidth% HWNDavailablePresetsLabelHandle Hidden Section, % translate("Available Presets")
 		
-		Gui %window%:Add, ListView, x%x% yp+24 w%listWidth% h200 -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle Hidden, % values2String("|", map(["Preset"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+24 w%listWidth% h200 AltSubmit -Multi -LV0x10 -Hdr NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden, % values2String("|", map(["Preset"], "translate")*)
 		
 		Gui %window%:Add, Text, x%x2% ys w%listWidth% HWNDselectedPresetsLabelHandle Hidden Section, % translate("Selected Presets")
 		
-		Gui %window%:Add, ListView, x%x2% yp+24 w%listWidth% h200 -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle Hidden, % values2String("|", map(["Preset"], "translate")*)
+		Gui %window%:Add, ListView, x%x2% yp+24 w%listWidth% h200 AltSubmit -Multi -LV0x10 -Hdr NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", map(["Preset"], "translate")*)
 		
 		Gui %window%:Font, s8 Bold, Arial
 		
-		Gui %window%:Add, Button, x%x3% ys+95 w%buttonWidth% HWNDmoveLeftButtonHandle Hidden, <
-		Gui %window%:Add, Button, x%x3% yp+30 w%buttonWidth% HWNDmoveRightButtonHandle Hidden, >
+		Gui %window%:Add, Button, x%x3% ys+95 w%buttonWidth% HWNDmoveRightButtonHandle vinstallPresetButton ginstallPreset Hidden, >
+		Gui %window%:Add, Button, x%x3% yp+30 w%buttonWidth% HWNDmoveLeftButtonHandle vuninstallPresetButton guninstallPreset Hidden, <
 		
 		Gui %window%:Font, s8 Norm, Arial
-	
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'> <hr style='width: 90%'></div>"
-
+		
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			
 		Sleep 200
 		
 		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h180 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
@@ -338,6 +342,17 @@ class ModulesStepWizard extends StepWizard {
 		base.reset()
 		
 		this.iModuleSelectors := []
+	}
+	
+	showPage(page) {
+		base.showPage(page)
+		
+		if (page = this.Pages) {
+			this.loadAvailablePresets()
+			this.loadSelectedPresets()
+			
+			this.updatePresetState()
+		}
 	}
 	
 	updateState() {
@@ -385,12 +400,230 @@ class ModulesStepWizard extends StepWizard {
 			}
 		}
 	}
+	
+	loadAvailablePresets() {
+		local preset
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		definition := this.Definition
+		presets := []
+		
+		Gui, ListView, % this.AvailablePresetsListView
+		
+		LV_Delete()
+		
+		Loop % definition.Length()
+		{
+			module := definition[A_Index]
+		
+			if this.SetupWizard.isModuleSelected(module) {
+				modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+				
+				for ignore, preset in string2Values("|", modulePresets)
+					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+			}
+		}
+		
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+	}
+	
+	loadSelectedPresets() {
+		local preset
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		presets := []
+		
+		Gui, ListView, % this.SelectedPresetsListView
+		
+		LV_Delete()
+		
+		for ignore, preset in this.SetupWizard.loadPresets()
+			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset.Name . "." . getLanguage()))
+		
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+	}
+	
+	presetName(label) {
+		local preset
+		
+		definition := this.Definition
+		
+		Loop % definition.Length()
+		{
+			module := definition[A_Index]
+		
+			modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+				
+			for ignore, preset in string2Values("|", modulePresets)
+				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+					return preset
+		}
+		
+		return false
+	}
+	
+	updatePresetState() {
+		local preset
+		
+		window := this.Window
+		info := false
+		
+		Gui %window%:Default
+		
+		GuiControl Disable, installPresetButton
+		GuiControl Disable, uninstallPresetButton
+		
+		Gui, ListView, % this.AvailablePresetsListView
+		
+		selected := LV_GetNext()
+		
+		if selected {
+			GuiControl Enable, installPresetButton
+			
+			LV_GetText(preset, selected)
+		
+			preset := this.presetName(preset)
+			
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+		}
+		
+		Gui, ListView, % this.SelectedPresetsListView
+
+		selected := LV_GetNext()
+	
+		if selected {
+			GuiControl Enable, uninstallPresetButton
+
+			if !info {
+				LV_GetText(preset, selected)
+			
+				preset := this.presetName(preset)
+				
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+			}
+		}
+		
+		if !info
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+		
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+
+		presetsInfoText.Document.Open()
+		presetsInfoText.Document.Write(html)
+		presetsInfoText.Document.Close()
+	}
+	
+	installPreset() {
+		local preset
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui, ListView, % this.AvailablePresetsListView
+		
+		selected := LV_GetNext()
+		
+		if selected {
+			LV_GetText(label, selected)
+		
+			preset := this.presetName(label)
+			
+			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Class")
+			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Arguments"))
+					
+			this.SetupWizard.installPreset(new %class%(preset, arguments*))
+			
+			this.loadSelectedPresets()
+			
+			this.updatePresetState()
+		}
+	}
+	
+	uninstallPreset() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui, ListView, % this.SelectedPresetsListView
+		
+		selected := LV_GetNext()
+		
+		if selected {
+			this.SetupWizard.uninstallPreset(this.SetupWizard.loadPresets()[selected])
+			
+			LV_Delete(selected)
+			
+			this.updatePresetState()
+		}
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+choosePreset(list1, list2) {
+	step := SetupWizard.Instance.StepWizards["Modules"]
+		
+	window := step.Window
+	
+	Gui %window%:Default
+	
+	selected := LV_GetNext()
+	
+	Gui ListView, %list1%
+	
+	selected := LV_GetNext()
+	
+	while selected {
+		LV_Modify(selected, "-Select")
+	
+		selected := LV_GetNext()
+	}
+	
+	Gui, ListView, %list2%
+
+	if selected
+		LV_Modify(selected, "+Select")
+		
+	SetupWizard.Instance.StepWizards["Modules"].updatePresetState()
+}
+
+chooseAvailablePreset() {
+	if (A_GuiEvent = "Normal") {
+		step := SetupWizard.Instance.StepWizards["Modules"]
+		
+		choosePreset(step.SelectedPresetsListView, step.AvailablePresetsListView)
+	}
+}
+
+chooseSelectedPreset() {
+	if (A_GuiEvent = "Normal") {
+		step := SetupWizard.Instance.StepWizards["Modules"]
+		
+		choosePreset(step.AvailablePresetsListView, step.SelectedPresetsListView)
+	}
+}
+
+installPreset() {
+	SetupWizard.Instance.StepWizards["Modules"].installPreset()
+}
+
+uninstallPreset() {
+	SetupWizard.Instance.StepWizards["Modules"].uninstallPreset()
+}
 
 updateSelectedModules() {
 	SetupWizard.Instance.StepWizards["Modules"].updateSelectedModules()

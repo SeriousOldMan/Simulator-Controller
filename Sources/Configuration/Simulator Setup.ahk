@@ -150,7 +150,7 @@ class SetupWizard extends ConfigurationItem {
 	iStep := 0
 	iPage := 0
 	
-	iPresets := []
+	iPresets := false
 	iInitialize := false
 	
 	Debug[option] {
@@ -231,6 +231,9 @@ class SetupWizard extends ConfigurationItem {
 	
 	Presets[] {
 		Get {
+			if !this.iPresets
+				this.iPresets := this.loadPresets()
+			
 			return this.iPresets
 		}
 	}
@@ -360,8 +363,6 @@ class SetupWizard extends ConfigurationItem {
 					
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
-		
-		this.iPresets := this.loadPresets()
 	}
 	
 	registerStepWizard(stepWizard) {
@@ -924,6 +925,8 @@ class SetupWizard extends ConfigurationItem {
 		
 		knowledgeBase.setFact("Preset.Count", count)
 		
+		this.iPresets := false
+		
 		this.updateState()
 	}
 	
@@ -958,6 +961,8 @@ class SetupWizard extends ConfigurationItem {
 		}
 		
 		knowledgeBase.setFact("Preset.Count", presets.Length())
+		
+		this.iPresets := false
 		
 		this.updateState()
 	}

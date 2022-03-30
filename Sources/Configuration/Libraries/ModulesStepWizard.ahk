@@ -65,14 +65,23 @@ class MutedAssistant extends NamedPreset {
 
 class PassiveEngineer extends NamedPreset {
 	patchSimulatorConfiguration(wizard, configuration, settings) {
-		if wizard.isModuleSelected("Race Engineer")
-			if (getConfigurationValue(configuration, "Plugins", "Race Engineer", kUndefined) != kUndefined) {
-				assistant := new Plugin("Race Engineer", configuration)
-				
-				assistant.setArgumentValue("openPitstopMFD", "Off")
-				
-				assistant.saveToConfiguration(configuration)
+		local plugin
+		
+		if wizard.isModuleSelected("Race Engineer") {
+			definition := wizard.Definition
+	
+			for ignore, descriptor in getConfigurationSectionValues(definition, "Applications.Simulators", Object()) {
+				plugin := string2Values("|", descriptor)[1]
+			
+				if (getConfigurationValue(configuration, "Plugins", plugin, kUndefined) != kUndefined) {
+					assistant := new Plugin(plugin, configuration)
+					
+					assistant.setArgumentValue("openPitstopMFD", "Off")
+					
+					assistant.saveToConfiguration(configuration)
+				}
 			}
+		}
 	}
 }
 

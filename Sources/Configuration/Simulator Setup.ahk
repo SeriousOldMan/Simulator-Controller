@@ -2575,7 +2575,7 @@ findSoftware(definition, software) {
 	
 	return false
 }
-	
+
 getApplicationDescriptor(application) {
 	definition := SetupWizard.Instance.Definition
 	

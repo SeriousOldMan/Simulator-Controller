@@ -481,6 +481,8 @@ namespace RF2SHMSpotter {
 		}
 
 		public void Run() {
+			bool running = false;
+
 			while (true) {
 				if (!connected)
 					Connect();
@@ -498,20 +500,28 @@ namespace RF2SHMSpotter {
 					}
 
 					if (connected) {
-						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+						if (!running)
+							if (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)
+								running = true;
 
-						if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-							playerScoring.mPitState < (byte)Entering) {
-							if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-								checkPitWindow(ref playerScoring);
-						}
-						else
+						if (running)
 						{
-							lastSituation = CLEAR;
-							carBehind = false;
-							carBehindReported = false;
+							rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
-							lastFlagState = 0;
+							if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+								playerScoring.mPitState < (byte)Entering)
+							{
+								if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+									checkPitWindow(ref playerScoring);
+							}
+							else
+							{
+								lastSituation = CLEAR;
+								carBehind = false;
+								carBehindReported = false;
+
+								lastFlagState = 0;
+							}
 						}
 
 						Thread.Sleep(50);

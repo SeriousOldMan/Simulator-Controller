@@ -428,6 +428,8 @@ int main(int argc, char* argv[])
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
 
+	bool running = true;
+
 	while (true) {
 		g_data = NULL;
 		int tries = 3;
@@ -438,74 +440,85 @@ int main(int argc, char* argv[])
 				const irsdk_header* pHeader = irsdk_getHeader();
 
 				if (pHeader) {
-					if (!g_data || g_nData != pHeader->bufLen) {
-						// realocate our g_data buffer to fit, and lookup some data offsets
-						initData(pHeader, g_data, g_nData);
-
-						continue;
-					}
-					else
-						tries = 0;
-
 					char result[64];
-					bool running = true;
 
-					getDataValue(result, pHeader, g_data, "IsInGarage");
-					if (atoi(result))
-						running = false;
+					if (!running) {
+						getDataValue(result, pHeader, g_data, "SessionFlags");
 
-					getDataValue(result, pHeader, g_data, "IsReplayPlaying");
-					if (atoi(result))
-						running = false;
+						int flags = atoi(result);
 
-					/*
-					getDataValue(result, pHeader, g_data, "IsOnTrack");
-					if (!atoi(result))
-						running = false;
-
-					getDataValue(result, pHeader, g_data, "IsOnTrackCar");
-					if (atoi(result))
-						running = true;
-					*/
-
-					bool inPit = false;
-
-					char* rawValue;
-					char playerCarIdx[10] = "";
-					
-					getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
-					getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
-
-					if (((bool*)rawValue)[atoi(playerCarIdx)])
-						inPit = true;
-					/*
-					else {
-						getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
-
-						irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
-
-						inPit = (trkLoc & irsdk_InPitStall);
+						running = (flags & irsdk_startGo) != 0;
 					}
-					*/
-					
-					if (running && !inPit) {
-						if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
-							checkPitWindow(pHeader, g_data);
 
-						continue;
-					}
-					else {
-						lastSituation = CLEAR;
-						carBehind = false;
-						carBehindReported = false;
+					if (running) {
+						if (!g_data || g_nData != pHeader->bufLen) {
+							// realocate our g_data buffer to fit, and lookup some data offsets
+							initData(pHeader, g_data, g_nData);
 
-						lastFlagState = 0;
+							continue;
+						}
+						else
+							tries = 0;
 
-						Sleep(1000);
+						bool onTrack = true;
+
+						getDataValue(result, pHeader, g_data, "IsInGarage");
+						if (atoi(result))
+							onTrack = false;
+
+						getDataValue(result, pHeader, g_data, "IsReplayPlaying");
+						if (atoi(result))
+							onTrack = false;
+
+						/*
+						getDataValue(result, pHeader, g_data, "IsOnTrack");
+						if (!atoi(result))
+							onTrack = false;
+
+						getDataValue(result, pHeader, g_data, "IsOnTrackCar");
+						if (atoi(result))
+							onTrack = true;
+						*/
+
+						bool inPit = false;
+
+						char* rawValue;
+						char playerCarIdx[10] = "";
+
+						getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+						getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
+
+						if (((bool*)rawValue)[atoi(playerCarIdx)])
+							inPit = true;
+						/*
+						else {
+							getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
+
+							irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
+
+							inPit = (trkLoc & irsdk_InPitStall);
+						}
+						*/
+
+						if (onTrack && !inPit) {
+							if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
+								checkPitWindow(pHeader, g_data);
+
+							continue;
+						}
+						else {
+							lastSituation = CLEAR;
+							carBehind = false;
+							carBehindReported = false;
+
+							lastFlagState = 0;
+
+							Sleep(1000);
+						}
 					}
 				}
-				else
-					Sleep(1000);
+				
+				Sleep(1000);
 			}
 		}
 

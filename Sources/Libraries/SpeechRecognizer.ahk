@@ -166,6 +166,22 @@ class SpeechRecognizer {
 	_grammarCallbacks := {}
 	_grammars := {}
 	
+	Recognizers[language := false] {
+		Get {
+			result := []
+			
+			for ignore, recognizer in this.getRecognizerList()
+				if language {
+					if (recognizer.Language = language)
+						result.Push(recognizer.Name)
+				}
+				else
+					result.Push(recognizer.Name)
+			
+			return result
+		}
+	}
+	
 	__New(engine, recognizer := false, language := false, silent := false) {
 		dllName := "Speech.Recognizer.dll"
 		dllFile := kBinariesDirectory . dllName

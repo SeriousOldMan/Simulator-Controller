@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\SpeechSynthesizer.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -77,6 +84,57 @@ class PassiveEngineer extends NamedPreset {
 					assistant.setArgumentValue("openPitstopMFD", "Off")
 					
 					assistant.saveToConfiguration(simulatorConfiguration)
+				}
+			}
+		}
+	}
+}
+
+class DifferentVoices extends NamedPreset {
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		if wizard.isModuleSelected("Voice Control") {
+			synthesizer := getConfigurationValue(simulatorConfiguration, "Voice Control", "Synthesizer")
+			language := getConfigurationValue(simulatorConfiguration, "Voice Control", "Language")
+			speaker := getConfigurationValue(simulatorConfiguration, "Voice Control", "Speaker")
+			
+			voices := []
+			
+			if (speaker && (speaker != true))
+				voices.Push(speaker)
+			
+			for ignore, voice in new SpeechSynthesizer(synthesizer, true, language).Voices[language] {
+				found := false
+			
+				for ignore, candidate in voices {
+					voice1 := string2Values("(", voice)[1]
+					voice2 := string2Values("(", candidate)[1]
+					
+					if ((InStr(voice1, voice2) == 1) || (InStr(voice2, voice1) == 1)) {
+						found := true
+					
+						break
+					}
+				}
+				
+				if !found
+					voices.Push(voice)
+			}
+			
+			if (voices.Length() > 0) {
+				voices := reverse(voices)
+				
+				for ignore, assistant in string2Values("|", getConfigurationValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
+					if wizard.isModuleSelected(assistant)
+						if (getConfigurationValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
+							assistant := new Plugin(assistant, simulatorConfiguration)
+							
+							assistant.setArgumentValue("raceAssistantSpeaker", voices.Pop())
+							
+							assistant.saveToConfiguration(simulatorConfiguration)
+							
+							if (voices.Length() == 0)
+								break
+						}
 				}
 			}
 		}

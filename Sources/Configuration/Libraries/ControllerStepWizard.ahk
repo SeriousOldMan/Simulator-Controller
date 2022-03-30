@@ -888,7 +888,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			width := this.Width
 			height := this.Height
 			
-			Gui %window%:Add, DropDownList, x8 y8 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
+			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
 		}

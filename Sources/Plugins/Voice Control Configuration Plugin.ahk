@@ -149,7 +149,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		w4 := width - (x4 - x)
 		
 		Gui %window%:Add, Text, x%x% y%y% w110 h23 +0x200 HWNDwidget1 Hidden, % translate("Language")
-		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateVoices Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateLanguage Hidden, % values2String("|", choices*)
 		
 		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services"]
 		chosen := voiceSynthesizerDropDown
@@ -189,12 +189,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget29 gchooseVoiceRecognizer VvoiceRecognizerDropDown Hidden, % values2String("|", choices*)
 		
 		if (voiceRecognizerDropDown = 3)
-			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
+			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
-			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
-		
-		Loop % recognizers.Length()
-			recognizers[A_Index] := recognizers[A_Index].Name
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -238,7 +235,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		this.iAzureSynthesizerWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"], ["azureSpeakerLabel", "azureSpeakerDropDown"]]
 		this.iAzureRecognizerWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"]]
 
-		this.updateVoices()
+		this.updateLanguage(false)
 		
 		Loop 28
 			editor.registerWidget(this, widget%A_Index%)
@@ -469,12 +466,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			listenerDropDown := translate("Deactivated")
 
 		if (voiceRecognizerDropDown = 3)
-			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
+			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
-			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).getRecognizerList().Clone()
-		
-		Loop % recognizers.Length()
-			recognizers[A_Index] := recognizers[A_Index].Name
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -714,7 +708,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		return languageCode
 	}
 	
-	updateVoices() {
+	updateLanguage(recognizer := true) {
 		window := this.Editor.Window
 		
 		Gui %window%:Default
@@ -727,14 +721,35 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			this.updateDotNETVoices()
 		
 		this.updateAzureVoices()
+		
+		if recognizer {
+			GuiControlGet voiceRecognizerDropDown
+			
+			if (voiceRecognizerDropDown <= 2)
+				recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			else {
+				GuiControlGet azureSubscriptionKeyEdit
+				GuiControlGet azureTokenIssuerEdit
+				
+				recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			}
+			
+			recognizers.InsertAt(1, translate("Deactivated"))
+			recognizers.InsertAt(1, translate("Automatic"))
+			
+			chosen := 1
+			
+			GuiControl, , listenerDropDown, % "|" . values2String("|", recognizers*)
+			GuiControl Choose, listenerDropDown, 1
+		}
 	}
 	
-	loadVoices(type, configuration) {
+	loadVoices(synthesizer, configuration) {
 		voices := []
 		
 		language := this.getCurrentLanguage()
 			
-		voices := new SpeechSynthesizer(type, true, language).Voices[language].Clone()
+		voices := new SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
 		
 		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Automatic"))
@@ -831,8 +846,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateVoices() {
-	VoiceControlConfigurator.Instance.updateVoices()
+updateLanguage() {
+	VoiceControlConfigurator.Instance.updateLanguage()
 }
 
 updateAzureVoices() {
@@ -888,7 +903,7 @@ chooseVoiceSynthesizer() {
 		configurator.showAzureSynthesizerEditor()
 	
 	if ((oldChoice <= 2) && (voiceSynthesizerDropDown <= 2))
-		configurator.updateVoices()
+		configurator.updateLanguage(false)
 }
 
 chooseVoiceRecognizer() {
@@ -912,16 +927,13 @@ chooseVoiceRecognizer() {
 		GuiControlGet azureSubscriptionKeyEdit
 		GuiControlGet azureTokenIssuerEdit
 		
-		recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, configurator.getCurrentLanguage(), true).getRecognizerList().Clone()
+		recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
 		
 		configurator.showAzureRecognizerEditor()
 	}
 	
 	if (voiceRecognizerDropDown <= 2)
-		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).getRecognizerList().Clone()
-			
-	Loop % recognizers.Length()
-		recognizers[A_Index] := recognizers[A_Index].Name
+		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
 	
 	recognizers.InsertAt(1, translate("Deactivated"))
 	recognizers.InsertAt(1, translate("Automatic"))

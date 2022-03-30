@@ -55,8 +55,8 @@ class MutedAssistant extends NamedPreset {
 			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
 				assistant := new Plugin(this.Assistant, simulatorConfiguration)
 				
-				assistant.setArgumentValue("raceAssistantSpeaker", false)
-				assistant.setArgumentValue("raceAssistantListener", false)
+				assistant.setArgumentValue("raceAssistantSpeaker", "Off")
+				assistant.setArgumentValue("raceAssistantListener", "Off")
 				
 				assistant.saveToConfiguration(simulatorConfiguration)
 			}
@@ -64,21 +64,19 @@ class MutedAssistant extends NamedPreset {
 }
 
 class PassiveEngineer extends NamedPreset {
-	patchSimulatorConfiguration(wizard, configuration, settings) {
-		local plugin
-		
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
 		if wizard.isModuleSelected("Race Engineer") {
 			definition := wizard.Definition
 	
 			for ignore, descriptor in getConfigurationSectionValues(definition, "Applications.Simulators", Object()) {
-				plugin := string2Values("|", descriptor)[1]
+				name := string2Values("|", descriptor)[1]
 			
-				if (getConfigurationValue(configuration, "Plugins", plugin, kUndefined) != kUndefined) {
-					assistant := new Plugin(plugin, configuration)
+				if (getConfigurationValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
+					assistant := new Plugin(name, simulatorConfiguration)
 					
 					assistant.setArgumentValue("openPitstopMFD", "Off")
 					
-					assistant.saveToConfiguration(configuration)
+					assistant.saveToConfiguration(simulatorConfiguration)
 				}
 			}
 		}
@@ -449,7 +447,7 @@ class ModulesStepWizard extends StepWizard {
 		
 		LV_Delete()
 		
-		for ignore, preset in this.SetupWizard.loadPresets()
+		for ignore, preset in this.SetupWizard.Presets
 			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset.Name . "." . getLanguage()))
 		
 		LV_ModifyCol()
@@ -497,7 +495,7 @@ class ModulesStepWizard extends StepWizard {
 			
 			enable := true
 			
-			for ignore, candidate in this.SetupWizard.loadPresets()
+			for ignore, candidate in this.SetupWizard.Presets
 				if (candidate.Name = preset) {
 					enable := false
 					
@@ -575,7 +573,7 @@ class ModulesStepWizard extends StepWizard {
 		selected := LV_GetNext()
 		
 		if selected {
-			this.SetupWizard.uninstallPreset(this.SetupWizard.loadPresets()[selected])
+			this.SetupWizard.uninstallPreset(this.SetupWizard.Presets[selected])
 			
 			LV_Delete(selected)
 			

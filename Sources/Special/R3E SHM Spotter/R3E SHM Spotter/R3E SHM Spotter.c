@@ -441,7 +441,8 @@ int main()
 {
     BOOL mapped_r3e = FALSE;
 	int playerID = 0;
-	
+	BOOL running = TRUE;
+
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
 			if (!map_init()) {
@@ -450,19 +451,24 @@ int main()
 				playerID = getPlayerID();
 			}
 
-		if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-			if (!checkFlagState() && !checkPositions(playerID))
-				checkPitWindow();
+		if (!running)
+			running = (map_buffer->start_lights == R3E_SESSION_PHASE_GREEN);
+
+		if (running) {
+			if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
+				if (!checkFlagState() && !checkPositions(playerID))
+					checkPitWindow();
+			}
+			else {
+				lastSituation = CLEAR;
+				carBehind = FALSE;
+				carBehindReported = FALSE;
+
+				lastFlagState = 0;
+			}
 		}
-        else {
-            lastSituation = CLEAR;
-            carBehind = FALSE;
-            carBehindReported = FALSE;
-
-			lastFlagState = 0;
-        }
-
-        Sleep(50);
+        
+		Sleep(50);
     }
 
     map_close();

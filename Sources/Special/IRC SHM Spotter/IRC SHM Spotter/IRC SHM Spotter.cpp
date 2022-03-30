@@ -447,7 +447,7 @@ int main(int argc, char* argv[])
 
 						int flags = atoi(result);
 
-						running = (flags & irsdk_startGo) != 0;
+						running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0));
 					}
 
 					if (running) {

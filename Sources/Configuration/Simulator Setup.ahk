@@ -567,25 +567,21 @@ class SetupWizard extends ConfigurationItem {
 	
 	applyPatches(configuration, patches) {
 		for section, values in patches
-			if (InStr(section, "Substitute: ") == 1) {
-				section := StrReplace(section, "Substitute: ", "")
+			if (InStr(section, "Substitute:") == 1) {
+				section := Trim(StrReplace(section, "Substitute:", ""))
 				
 				for key, substitution in values {
-					if key = "Race Spotter"
-						MsgBox Inspect
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
 				
-					if (currentValue != kUndefined)
-						for ignore, substitute in string2Values("|", substitution) {
-							substitute := string2Values("->", substitute)
-							currentValue := StrReplace(currentValue, substitute[1], substitute[2])
-							
-							setConfigurationValue(configuration, section, key, currentValue)
-						}
+					if (currentValue != kUndefinedd) {
+						substitution := string2Values("->", substitution)
+						
+						setConfigurationValue(configuration, section, key, StrReplace(currentValue, substitution[1], substitution[2]))
+					}
 				}
 			}
-			else if (InStr(section, "Add: ") == 1) {
-				section := StrReplace(section, "Add: ", "")
+			else if (InStr(section, "Add:") == 1) {
+				section := Trim(StrReplace(section, "Add:", ""))
 				
 				for key, addition in values {
 					currentValue := getConfigurationValue(configuration, section, key, "")
@@ -594,8 +590,8 @@ class SetupWizard extends ConfigurationItem {
 						setConfigurationValue(configuration, section, key, currentValue . addition)
 				}
 			}
-			else if (InStr(section, "Remove: ") == 1) {
-				section := StrReplace(section, "Remove: ", "")
+			else if (InStr(section, "Delete:") == 1) {
+				section := Trim(StrReplace(section, "Delete:", ""))
 				
 				for key, deletion in values {
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)

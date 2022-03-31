@@ -385,7 +385,7 @@ class ModulesStepWizard extends StepWizard {
 			
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h180 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
+		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h210 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

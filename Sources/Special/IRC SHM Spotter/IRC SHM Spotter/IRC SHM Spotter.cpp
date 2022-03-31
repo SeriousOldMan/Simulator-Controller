@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
 	// ask for 1ms timer so sleeps are more precise
 	timeBeginPeriod(1);
 
-	bool running = true;
+	bool running = false;
 
 	while (true) {
 		g_data = NULL;
@@ -442,6 +442,15 @@ int main(int argc, char* argv[])
 				if (pHeader) {
 					char result[64];
 
+					if (!g_data || g_nData != pHeader->bufLen) {
+						// realocate our g_data buffer to fit, and lookup some data offsets
+						initData(pHeader, g_data, g_nData);
+
+						continue;
+					}
+					else
+						tries = 0;
+
 					if (!running) {
 						getDataValue(result, pHeader, g_data, "SessionFlags");
 
@@ -451,15 +460,6 @@ int main(int argc, char* argv[])
 					}
 
 					if (running) {
-						if (!g_data || g_nData != pHeader->bufLen) {
-							// realocate our g_data buffer to fit, and lookup some data offsets
-							initData(pHeader, g_data, g_nData);
-
-							continue;
-						}
-						else
-							tries = 0;
-
 						bool onTrack = true;
 
 						getDataValue(result, pHeader, g_data, "IsInGarage");

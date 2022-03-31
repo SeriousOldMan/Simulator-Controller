@@ -49,7 +49,6 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
 
-
 ### Discord Community
 
 If you want to become a part of the small and very young Community for Simulator Controller on Discord, please use [this invitation](https://discord.gg/5N8JrNr48H)...

@@ -1,8 +1,8 @@
 [Development]
-Version=4.0.2-rc1
+Version=4.0.2-rc2
 Target=4.0.0-release
 Date=03/31/2022
-Download=https://www.dropbox.com/s/c13q843dl4na9vf/Simulator%20Controller%204.0.2-rc1.zip?dl=1
+Download=https://www.dropbox.com/s/ae3ay05bs2g3fsg/Simulator%20Controller%204.0.2-rc2.zip?dl=1
 Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files
 [Release]
 Version=4.0.0-release
@@ -13,4 +13,4 @@ Changes=Consolidation and update process for shared database, Many new commands 
 Type=Development
 [Version]
 Release=4.0.0-release
-Development=4.0.2-rc1
+Development=4.0.2-rc2

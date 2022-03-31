@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.0.2-rc1](https://www.dropbox.com/s/c13q843dl4na9vf/Simulator%20Controller%204.0.2-rc1.zip?dl=1) (Release candidate for 4.0.2. New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files. Stable, incl. update procedure and documentation.)
+[4.0.2-rc2](https://www.dropbox.com/s/ae3ay05bs2g3fsg/Simulator%20Controller%204.0.2-rc2.zip?dl=1) (Release candidate for 4.0.2. New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files. Stable, incl. update procedure and documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -20,7 +20,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Settings.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Race Settings.ico
 ;@Ahk2Exe-ExeName Race Settings.exe
 
 
@@ -1373,7 +1373,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 }
 
 showRaceSettingsEditor() {
-	icon := kIconsDirectory . "Artificial Intelligence Settings.ico"
+	icon := kIconsDirectory . "Race Settings.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings

@@ -229,12 +229,12 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 	
-	Presets[] {
+	Presets[index := false] {
 		Get {
 			if !this.iPresets
 				this.iPresets := this.loadPresets()
 			
-			return this.iPresets
+			return (index ? this.iPresets[index] : this.iPresets)
 		}
 	}
 	
@@ -2463,6 +2463,8 @@ restartSetup:
 		
 		wizard.close()
 		wizard.reset()
+		
+		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 		
 		vProgressCount := 0
 		

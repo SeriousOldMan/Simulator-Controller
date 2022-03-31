@@ -223,8 +223,53 @@ class DefaultStreamDeck extends NamedPreset {
 			; ignore
 		}
 	}
+}
+
+class PitstopImages extends NamedPreset {
+	iDirectory := false
+	
+	Directory[] {
+		Get {
+			return this.iDirectory
+		}
+	}
+	
+	__New(name, directory) {
+		base.__New(name)
+		
+		this.iDirectory := substituteVariables(directory)
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.Directory))
+	}
+	
+	install(wizard) {
+		directory := this.iDirectory
+		
+		SplitPath directory, , , , name
+		
+		FileCreateDir %kUserHomeDirectory%Screen Images\%name%
+		
+		try {
+			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
 	
 	uninstall(wizard) {
+		directory := this.iDirectory
+		
+		SplitPath directory, , , , name
+		
+		try {
+			FileRemoveDir %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
+		}
 	}
 }
 
@@ -380,7 +425,7 @@ class ModulesStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 		Sleep 200
@@ -484,9 +529,12 @@ class ModulesStepWizard extends StepWizard {
 				modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 				
 				for ignore, preset in string2Values("|", modulePresets)
-					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
+		
+		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -506,7 +554,7 @@ class ModulesStepWizard extends StepWizard {
 		LV_Delete()
 		
 		for ignore, preset in this.SetupWizard.Presets
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset.Name . "." . getLanguage()))
+			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -524,9 +572,13 @@ class ModulesStepWizard extends StepWizard {
 			modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 				
 			for ignore, preset in string2Values("|", modulePresets)
-				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 					return preset
 		}
+		
+		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+				return preset
 		
 		return false
 	}
@@ -563,7 +615,7 @@ class ModulesStepWizard extends StepWizard {
 			if enable			
 				GuiControl Enable, installPresetButton
 			
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 		}
 		
 		Gui, ListView, % this.SelectedPresetsListView
@@ -578,12 +630,12 @@ class ModulesStepWizard extends StepWizard {
 			
 				preset := this.presetName(preset)
 				
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 			}
 		}
 		
 		if !info
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
@@ -610,8 +662,8 @@ class ModulesStepWizard extends StepWizard {
 		
 			preset := this.presetName(label)
 			
-			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Class")
-			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Arguments"))
+			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
+			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
 					
 			this.SetupWizard.installPreset(new %class%(preset, arguments*))
 			

@@ -38,13 +38,13 @@ In the lower part of the configuration dialog, you can choose the type of [splas
 
 Last, but not least, you can choose a simulation game from your list of Simulators and start it automatically, after all other startup tasks have finished.
 
-#### More Settings & Configurations
+### More Settings & Configurations
 
 Here is an overview for the all settings and configuration options for the various parts of Simulator Controller:
 
   1. *Simulator Settings*
   
-     Maintained by the "Simulator Settings" application and stored in the *Simulator Settings.ini* file in the *Simulator Controller\Config* folder in your user *Documents* folder. As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings), these settings influence the startup process of Simulator Controller and where on your screen the visual representations of your Button Boxes will appear.
+     Maintained by the "Simulator Settings" application and stored in the *Simulator Settings.ini* file in the *Simulator Controller\Config* folder in your user *Documents* folder. As described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings), these settings influence the startup process of Simulator Controller and where on your screen the visual representations of your Button Boxes will appear.
 
   2. *Simulator Configuration*
   

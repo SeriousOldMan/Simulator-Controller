@@ -702,7 +702,7 @@ class Plugin extends ConfigurationItem {
 			descriptor := StrSplit(descriptor, "|", " `t", 3)
 			
 			if (descriptor.Length() > 0) {
-				this.iIsActive := (descriptor[1] = kTrue) ? true : false
+				this.iIsActive := ((descriptor[1] == true) || (descriptor[1] = kTrue)) ? true : false
 				this.iSimulators := StrSplit(descriptor[2], [",", ";"], " `t")
 				this.iArguments := this.computeArgments(descriptor[3])
 			}

@@ -571,13 +571,17 @@ class SetupWizard extends ConfigurationItem {
 				section := StrReplace(section, "Substitute: ", "")
 				
 				for key, substitution in values {
+					if key = "Race Spotter"
+						MsgBox Inspect
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
 				
-					if (currentValue != kUndefinedd) {
-						substitution := string2Values("->", substitution)
-						
-						setConfigurationValue(configuration, section, key, StrReplace(currentValue, substitution[1], substitution[2]))
-					}
+					if (currentValue != kUndefined)
+						for ignore, substitute in string2Values("|", substitution) {
+							substitute := string2Values("->", substitute)
+							currentValue := StrReplace(currentValue, substitute[1], substitute[2])
+							
+							setConfigurationValue(configuration, section, key, currentValue)
+						}
 				}
 			}
 			else if (InStr(section, "Add: ") == 1) {

@@ -555,7 +555,7 @@ class VoiceServer extends ConfigurationItem {
 				clicks := 0
 		}
 		
-		if (((A_TickCount - lastDown) < 400) && !activation)
+		if (((A_TickCount - lastDown) < 200) && !activation)
 			pressed := false
 		
 		if !this.Speaking && pressed {

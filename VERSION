@@ -1,16 +1,16 @@
 [Development]
-Version=4.0.2-release
-Target=4.0.2-release
+Version=4.0.4-dev
+Target=4.0.4-release
 Date=04/01/2022
-Download=https://cntr.click/vsGR3Xs
-Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files
+Download=
+Changes=Fixed pitstop window requirements in "Strategy Workbench"
 [Release]
 Version=4.0.2-release
 Date=04/01/2022
 Download=https://cntr.click/vsGR3Xs
 Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.0.2-release
-Development=4.0.2-release
+Development=4.0.4-dev

@@ -33,21 +33,19 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.0.0-release](https://cntr.click/qZkSR66) (New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information.)
+[4.0.2-release](https://cntr.click/vsGR3Xs) (New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.9.8-release](https://cntr.click/Qw8Nwb1) (New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase".)
+[4.0.0-release](https://cntr.click/qZkSR66) (New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information.)
 
-[3.9.6-release](https://cntr.click/cY5vVT1) (New features: Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor", Fixed some rules in "Setup Advisor".)
+[3.9.8-release](https://cntr.click/Qw8Nwb1) (New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase".)
 
 #### Latest development build
 
-[4.0.2-rc2](https://www.dropbox.com/s/ae3ay05bs2g3fsg/Simulator%20Controller%204.0.2-rc2.zip?dl=1) (Release candidate for 4.0.2. New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files. Stable, incl. update procedure and documentation.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Discord Community
 

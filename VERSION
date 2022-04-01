@@ -1,16 +1,16 @@
 [Development]
-Version=4.0.2-rc2
-Target=4.0.0-release
-Date=03/31/2022
-Download=https://www.dropbox.com/s/ae3ay05bs2g3fsg/Simulator%20Controller%204.0.2-rc2.zip?dl=1
+Version=4.0.2-release
+Target=4.0.2-release
+Date=04/01/2022
+Download=https://cntr.click/vsGR3Xs
 Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files
 [Release]
-Version=4.0.0-release
-Date=03/25/2022
-Download=https://cntr.click/qZkSR66
-Changes=Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins
+Version=4.0.2-release
+Date=04/01/2022
+Download=https://cntr.click/vsGR3Xs
+Changes=Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.0.0-release
-Development=4.0.2-rc2
+Release=4.0.2-release
+Development=4.0.2-release

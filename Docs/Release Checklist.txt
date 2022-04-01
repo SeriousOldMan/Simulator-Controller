@@ -24,6 +24,7 @@ Release 4.0.2 Checklist
 1. Update Procedure
    a. Translations
    b. Enable Spotter Listener
+   c. Phrase Grammars
 2. (Number) -> (Digit)
    a. Mention in Update Notes
 

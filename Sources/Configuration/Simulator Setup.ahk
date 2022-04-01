@@ -567,8 +567,8 @@ class SetupWizard extends ConfigurationItem {
 	
 	applyPatches(configuration, patches) {
 		for section, values in patches
-			if (InStr(section, "Substitute:") == 1) {
-				section := Trim(StrReplace(section, "Substitute:", ""))
+			if (InStr(section, "Replace:") == 1) {
+				section := Trim(StrReplace(section, "Replace:", ""))
 				
 				for key, substitution in values {
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)

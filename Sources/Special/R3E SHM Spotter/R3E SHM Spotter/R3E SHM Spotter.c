@@ -441,7 +441,7 @@ int main()
 {
     BOOL mapped_r3e = FALSE;
 	int playerID = 0;
-	BOOL running = TRUE;
+	BOOL running = FALSE;
 
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
@@ -451,8 +451,8 @@ int main()
 				playerID = getPlayerID();
 			}
 
-		if (!running)
-			running = (map_buffer->start_lights == R3E_SESSION_PHASE_GREEN);
+		if (mapped_r3e && !running)
+			running = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
 
 		if (running) {
 			if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {

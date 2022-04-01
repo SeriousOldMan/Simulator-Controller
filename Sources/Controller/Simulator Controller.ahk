@@ -1981,7 +1981,7 @@ setMode(actionOrPlugin, mode := false) {
 		else {
 			theMode := controller.findMode(actionOrPlugin, mode)
 			
-			if ((theMode != false) && controller.isActive(mode))
+			if ((theMode != false) && controller.isActive(theMode))
 				controller.setMode(theMode)
 			else
 				trayMessage(translate("Controller"), translate("Mode: ") . translate(actionOrPlugin) . " - " . translate(mode) . translate(" is not available"), 10000)

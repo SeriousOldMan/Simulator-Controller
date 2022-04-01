@@ -465,13 +465,13 @@ class VoiceServer extends ConfigurationItem {
 					try {
 						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
 						
-						if (this.iSpeechRecognizer.RecognizerList.Length() = 0)
+						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							Throw "Server speech recognizer engine not installed..."
 					}
 					catch exception {
 						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
 						
-						if (this.iSpeechRecognizer.RecognizerList.Length() = 0)
+						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							Throw "Desktop speech recognizer engine not installed..."
 					}
 				}
@@ -555,7 +555,7 @@ class VoiceServer extends ConfigurationItem {
 				clicks := 0
 		}
 		
-		if (((A_TickCount - lastDown) < 400) && !activation)
+		if (((A_TickCount - lastDown) < 200) && !activation)
 			pressed := false
 		
 		if !this.Speaking && pressed {

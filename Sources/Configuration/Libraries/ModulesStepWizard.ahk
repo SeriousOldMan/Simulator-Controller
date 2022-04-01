@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\SpeechSynthesizer.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -77,6 +84,57 @@ class PassiveEngineer extends NamedPreset {
 					assistant.setArgumentValue("openPitstopMFD", "Off")
 					
 					assistant.saveToConfiguration(simulatorConfiguration)
+				}
+			}
+		}
+	}
+}
+
+class DifferentVoices extends NamedPreset {
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		if wizard.isModuleSelected("Voice Control") {
+			synthesizer := getConfigurationValue(simulatorConfiguration, "Voice Control", "Synthesizer")
+			language := getConfigurationValue(simulatorConfiguration, "Voice Control", "Language")
+			speaker := getConfigurationValue(simulatorConfiguration, "Voice Control", "Speaker")
+			
+			voices := []
+			
+			if (speaker && (speaker != true))
+				voices.Push(speaker)
+			
+			for ignore, voice in new SpeechSynthesizer(synthesizer, true, language).Voices[language] {
+				found := false
+			
+				for ignore, candidate in voices {
+					voice1 := string2Values("(", voice)[1]
+					voice2 := string2Values("(", candidate)[1]
+					
+					if ((InStr(voice1, voice2) == 1) || (InStr(voice2, voice1) == 1)) {
+						found := true
+					
+						break
+					}
+				}
+				
+				if !found
+					voices.Push(voice)
+			}
+			
+			if (voices.Length() > 0) {
+				voices := reverse(voices)
+				
+				for ignore, assistant in string2Values("|", getConfigurationValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
+					if wizard.isModuleSelected(assistant)
+						if (getConfigurationValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
+							assistant := new Plugin(assistant, simulatorConfiguration)
+							
+							assistant.setArgumentValue("raceAssistantSpeaker", voices.Pop())
+							
+							assistant.saveToConfiguration(simulatorConfiguration)
+							
+							if (voices.Length() == 0)
+								break
+						}
 				}
 			}
 		}
@@ -165,8 +223,53 @@ class DefaultStreamDeck extends NamedPreset {
 			; ignore
 		}
 	}
+}
+
+class PitstopImages extends NamedPreset {
+	iDirectory := false
+	
+	Directory[] {
+		Get {
+			return this.iDirectory
+		}
+	}
+	
+	__New(name, directory) {
+		base.__New(name)
+		
+		this.iDirectory := substituteVariables(directory)
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.Directory))
+	}
+	
+	install(wizard) {
+		directory := this.iDirectory
+		
+		SplitPath directory, , , , name
+		
+		FileCreateDir %kUserHomeDirectory%Screen Images\%name%
+		
+		try {
+			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
 	
 	uninstall(wizard) {
+		directory := this.iDirectory
+		
+		SplitPath directory, , , , name
+		
+		try {
+			FileRemoveDir %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
+		}
 	}
 }
 
@@ -322,12 +425,12 @@ class ModulesStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
 		Sleep 200
 		
-		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h180 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
+		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h210 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -426,9 +529,12 @@ class ModulesStepWizard extends StepWizard {
 				modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 				
 				for ignore, preset in string2Values("|", modulePresets)
-					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
+		
+		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -448,7 +554,7 @@ class ModulesStepWizard extends StepWizard {
 		LV_Delete()
 		
 		for ignore, preset in this.SetupWizard.Presets
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset.Name . "." . getLanguage()))
+			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
 		
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -466,9 +572,13 @@ class ModulesStepWizard extends StepWizard {
 			modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 				
 			for ignore, preset in string2Values("|", modulePresets)
-				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . "." . getLanguage()))
+				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 					return preset
 		}
+		
+		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+				return preset
 		
 		return false
 	}
@@ -505,7 +615,7 @@ class ModulesStepWizard extends StepWizard {
 			if enable			
 				GuiControl Enable, installPresetButton
 			
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 		}
 		
 		Gui, ListView, % this.SelectedPresetsListView
@@ -520,12 +630,12 @@ class ModulesStepWizard extends StepWizard {
 			
 				preset := this.presetName(preset)
 				
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Info." . getLanguage()))
+				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 			}
 		}
 		
 		if !info
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets.Info." . getLanguage()))
+			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 			
@@ -552,8 +662,8 @@ class ModulesStepWizard extends StepWizard {
 		
 			preset := this.presetName(label)
 			
-			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Class")
-			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Presets." . preset . ".Arguments"))
+			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
+			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
 					
 			this.SetupWizard.installPreset(new %class%(preset, arguments*))
 			

@@ -393,8 +393,11 @@ class StrategySimulation {
 	}
 	
 	validScenario(strategy) {
-		return (((strategy.RemainingFuel[true] - (strategy.RemainingLaps[true] * strategy.FuelConsumption[true])) > 0)
-			 && this.scenarioValid(strategy, strategy.Validator))
+		remainingFuel := strategy.RemainingFuel[true]
+		remainingLaps := strategy.RemainingLaps[true]
+		fuelConsumption := strategy.FuelConsumption[true]
+		
+		return (((remainingFuel - (remainingLaps * fuelConsumption)) > 0) && this.scenarioValid(strategy, strategy.Validator))
 	}
 	
 	compareScenarios(scenario1, scenario2) {
@@ -824,6 +827,8 @@ class Strategy extends ConfigurationItem {
 		iTyreCompoundColor := false
 		
 		iStintLaps := 0
+		iFixed := false
+		
 		iMap := 1
 		iFuelConsumption := 0
 		iAvgLapTime := 0
@@ -890,6 +895,12 @@ class Strategy extends ConfigurationItem {
 		StintLaps[] {
 			Get {
 				return this.iStintLaps
+			}
+		}
+		
+		Fixed[] {
+			Get {
+				return this.iFixed
 			}
 		}
 		
@@ -961,6 +972,8 @@ class Strategy extends ConfigurationItem {
 					stintLaps := Floor(Min(remainingLaps - lastStintLaps, strategy.StintLaps, strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
 				
 				this.iStintLaps := stintLaps
+				this.iFixed := ((id = 1) && IsObject(strategy.PitstopRule))
+				
 				this.iMap := strategy.Map[true]
 				this.iFuelConsumption := fuelConsumption
 				
@@ -976,7 +989,7 @@ class Strategy extends ConfigurationItem {
 						refuelAmount := adjustments[id].RefuelAmount
 					
 					if adjustments[id].HasKey("TyreChange")
-						tyreChange := adjustments[id].TyreChange
+						tyreChange := (adjustments[id].TyreChange != false)
 				}
 				
 				if ((id == 1) && (refuelRule = "Required") && (refuelAmount <= 0))
@@ -1826,7 +1839,7 @@ class Strategy extends ConfigurationItem {
 	calcRefuelAmount(targetFuel, startFuel, remainingLaps, stintLaps) {
 		currentFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption[true]))
 	
-		return (Min(this.FuelCapacity, targetFuel + this.SafetyFuel) - currentFuel)
+		return Min(this.FuelCapacity, targetFuel + this.SafetyFuel) - currentFuel
 	}
 	
 	calcPitstopDuration(refuelAmount, changeTyres) {
@@ -1949,7 +1962,7 @@ class Strategy extends ConfigurationItem {
 		this.iTyreLapsVariation := tyreLapsVariation
 		
 		Random rnd, -10, 100
-				
+		
 		variation := (tyreLapsVariation / 100 * rnd)
 			
 		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps / 100 * variation)) - currentTyreLaps, 0)
@@ -2075,14 +2088,21 @@ class Strategy extends ConfigurationItem {
 		numPitstops := pitstops.Length()
 		
 		if (numPitstops > 1) {
-			refuelAmount := Ceil((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount) / 2)
 			remainingLaps := Ceil(pitstops[numPitstops - 1].StintLaps + pitstops[numPitstops].StintLaps)
-			stintLaps := Ceil(remainingLaps / 2)
+				
+			if pitstops[numPitstops - 1].Fixed {
+				refuelAmount := pitstops[numPitstops - 1].RefuelAmount
+				stintLaps := pitstops[numPitstops - 1].StintLaps
+			}
+			else {
+				refuelAmount := Ceil((pitstops[numPitstops - 1].RefuelAmount + pitstops[numPitstops].RefuelAmount) / 2)
+				stintLaps := Ceil(remainingLaps / 2)
+			}
 			
 			adjustments := {}
 			
 			for index, pitstop in pitstops {
-				adjustments[index] := {Lap: pitstop.Lap}
+				adjustments[index] := ((index = numPitstops) ? {} : {Lap: pitstop.Lap})
 			
 				if pitstop.TyreChange
 					adjustments[index]["TyreChange"] := Array(pitstop.TyreCompound, pitstop.TyreCompoundColor)

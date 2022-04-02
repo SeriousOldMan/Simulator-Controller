@@ -912,7 +912,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lastY := imageY
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Strategy")
@@ -927,7 +927,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -989,7 +989,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lastY := imageY
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			if !inList(this.iPSOptions, "Refuel") {
@@ -1002,7 +1002,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -1224,7 +1224,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Select Driver")
@@ -1236,7 +1236,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload

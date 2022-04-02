@@ -94,7 +94,7 @@ class ACCPitstopTester extends Plugin {
 		
 		if !WinExist(window)
 			if isDebug()
-				this.logMessage("ACC not found...")
+				this.logMessage("ACC not running...")
 		
 		if !WinActive(window)
 			WinActivate %window%
@@ -138,7 +138,7 @@ class ACCPitstopTester extends Plugin {
 		else if !reported {
 			reported := true
 		
-			this.logMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			this.logMessage("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration")
 		}
 	}
 						
@@ -157,7 +157,7 @@ class ACCPitstopTester extends Plugin {
 		else if !reported {
 			reported := true
 		
-			this.logMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
+			this.logMessage("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration")
 		}
 	}
 	
@@ -169,7 +169,7 @@ class ACCPitstopTester extends Plugin {
 		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
 			reported := true
 			
-			this.logMessage(translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
+			this.logMessage("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin")
 			
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
@@ -189,6 +189,40 @@ class ACCPitstopTester extends Plugin {
 			return false
 		else
 			return this.iPSIsOpen
+	}
+	
+	updatePitstopState() {
+		beginTickCount := A_TickCount
+		lastY := 0
+		images := []
+		
+		try {
+			if !this.iPSImageSearchArea
+				lastY := this.searchPitstopLabel(images)
+			
+			if this.iPSIsOpen {
+				reload := this.searchStrategyLabel(lastY, images)
+				
+				; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
+				
+				reload := (this.searchTyreLabel(lastY, images) || reload)
+				
+				reload := (this.searchBrakeLabel(lastY, images) || reload)
+	
+				reload := (this.searchDriverLabel(lastY, images) || reload)
+				
+				this.logMessage("Complete update of pitstop state took " . A_TickCount - beginTickCount . " ms")
+				
+				this.logMessage("Found images:`n    " . values2String("`n    ", images*))
+				
+				return reload
+			}
+		}
+		catch exception {
+			this.iPSOpen := false
+		}
+		
+		return false
 	}
 	
 	getLabelFileNames(labelNames*) {
@@ -220,25 +254,9 @@ class ACCPitstopTester extends Plugin {
 		if (fileNames.Length() == 0)
 			this.logMessage("Label file '" . labelName . "' not found...")
 		else {
-			this.logMessage("Labels: " . values2String(", ", labelNames*) . "; Images: " . values2String(", ", fileNames*))
+			this.logMessage("Labels: " . values2String(", ", labelNames*) . "`nImages:`n    " . values2String("`n    ", fileNames*))
 			
 			return fileNames
-		}
-	}
-	
-	markFoundLabel(image, x, y) {
-		if isDebug() {
-			SplitPath image, fileName
-			
-			Gui LABEL:-Border -Caption +AlwaysOnTop
-			Gui LABEL:Color, D0D0D0, D8D8D8
-			Gui LABEL:Add, Text, x0 y0 w100 h23 +0x200 +0x1 BackgroundTrans, %fileName%
-			
-			Gui LABEL:Show, AutoSize x%x%, y%y%
-			
-			Sleep 1000
-			
-			Gui LABEL:Destroy
 		}
 	}
 	
@@ -264,22 +282,18 @@ class ACCPitstopTester extends Plugin {
 			if !this.iPSImageSearchArea {
 				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
 			}
 			else {
 				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
 			}
 			
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(pitstopLabel)
+				images.Push(pitstopLabel)
 					
-					this.markFoundLabel(pitstopLabel, imageX, imageY)
-				}
-			
 				break
 			}
 		}
@@ -323,21 +337,17 @@ class ACCPitstopTester extends Plugin {
 
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(pitStrategyLabel)
-					
-					this.markFoundLabel(pitStrategyLabel, imageX, imageY)
-				}
-			
+				images.Push(pitStrategyLabel)
+				
 				break
 			}
 		}
 
 		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 			else
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "Pit Strategy", ticks: A_TickCount - curTickCount}))
 		
 		if imageX is Integer
 		{
@@ -349,7 +359,7 @@ class ACCPitstopTester extends Plugin {
 			
 			lastY := imageY
 		
-			this.logMessage(translate("'Pit Strategy' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Pit Strategy' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Strategy")
@@ -360,7 +370,7 @@ class ACCPitstopTester extends Plugin {
 				reload := true
 			}
 		
-			this.logMessage(translate("'Pit Strategy' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Pit Strategy' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -390,21 +400,17 @@ class ACCPitstopTester extends Plugin {
 
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(noRefuelLabel)
-					
-					this.markFoundLabel(noRefuelLabel, imageX, imageY)
-				}
-			
+				images.Push(noRefuelLabel)
+				
 				break
 			}
 		}
 
 		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Refuel", ticks: A_TickCount - curTickCount}))
 			else
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Refuel", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "Refuel", ticks: A_TickCount - curTickCount}))
 		
 		if imageX is Integer
 		{
@@ -418,7 +424,7 @@ class ACCPitstopTester extends Plugin {
 			
 			lastY := imageY
 		
-			this.logMessage(translate("'Refuel' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Refuel' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			if !inList(this.iPSOptions, "Refuel") {
@@ -427,7 +433,7 @@ class ACCPitstopTester extends Plugin {
 				reload := true
 			}
 		
-			this.logMessage(translate("'Refuel' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Refuel' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -460,12 +466,8 @@ class ACCPitstopTester extends Plugin {
 
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(wetLabel)
-					
-					this.markFoundLabel(wetLabel, imageX, imageY)
-				}
-			
+				images.Push(wetLabel)
+				
 				break
 			}
 		}
@@ -501,12 +503,8 @@ class ACCPitstopTester extends Plugin {
 				
 				if imageX is Integer
 				{
-					if isDebug() {
-						images.Push(compoundLabel)
-						
-						this.markFoundLabel(compoundLabel, imageX, imageY)
-					}
-				
+					images.Push(compoundLabel)
+					
 					break
 				}
 			}
@@ -514,18 +512,18 @@ class ACCPitstopTester extends Plugin {
 		
 		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 			else
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "Tyre Set", ticks: A_TickCount - curTickCount}))
 	
 		if imageX is Integer
 		{
 			lastY := imageY
 			
-			this.logMessage(translate("Pitstop: Tyres are selected for change"))
+			this.logMessage("Pitstop: Tyres are selected for change")
 		}
 		else
-			this.logMessage(translate("Pitstop: Tyres are not selected for change"))
+			this.logMessage("Pitstop: Tyres are not selected for change")
 		
 		return reload
 	}
@@ -554,26 +552,22 @@ class ACCPitstopTester extends Plugin {
 			
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(frontBrakeLabel)
-					
-					this.markFoundLabel(frontBrakeLabel, imageX, imageY)
-				}
-			
+				images.Push(frontBrakeLabel)
+				
 				break
 			}
 		}
 		
 		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 			else 
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Front Brake", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "Front Brake", ticks: A_TickCount - curTickCount}))
 		
 		if imageX is Integer
-			this.logMessage(translate("Pitstop: Brakes are selected for change"))
+			this.logMessage("Pitstop: Brakes are selected for change")
 		else
-			this.logMessage(translate("Pitstop: Brakes are not selected for change"))
+			this.logMessage("Pitstop: Brakes are not selected for change")
 		
 		return reload
 	}
@@ -602,21 +596,17 @@ class ACCPitstopTester extends Plugin {
 		
 			if imageX is Integer
 			{
-				if isDebug() {
-					images.Push(selectDriverLabel)
-					
-					this.markFoundLabel(selectDriverLabel, imageX, imageY)
-				}
-			
+				images.Push(selectDriverLabel)
+				
 				break
 			}
 		}
 		
 		if (getLogLevel() <= kLogInfo)
 			if !this.iPSImageSearchArea
-				this.logMessage(substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Full search for '%image%' took %ticks% ms", {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 			else
-				this.logMessage(substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "Select Driver", ticks: A_TickCount - curTickCount}))
+				this.logMessage(substituteVariables("Fast search for '%image%' took %ticks% ms", {image: "Select Driver", ticks: A_TickCount - curTickCount}))
 		
 		if imageX is Integer
 		{
@@ -626,7 +616,7 @@ class ACCPitstopTester extends Plugin {
 				reload := true
 			}
 		
-			this.logMessage(translate("'Select Driver' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Select Driver' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Select Driver")
@@ -637,7 +627,7 @@ class ACCPitstopTester extends Plugin {
 				reload := true
 			}
 		
-			this.logMessage(translate("'Select Driver' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+			this.logMessage("'Select Driver' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -748,13 +738,17 @@ runACCPitstopTester() {
 	while true {
 		pitstopTester := new ACCPitstopTester()
 	
+		pitstopTester.logMessage("Pass #1: Learning MFD position and labels...`n`n")
+	
 		pitstopTester.requirePitstopMFD()
 		
 		Sleep 1000
 		
 		pitstopTester.closePitstopMFD()
 		
-		viewMessages(pitstopTester.Messages, "Search - First Run")
+		viewMessages(pitstopTester.Messages, translate("Search - Pass #1"))
+		
+		pitstopTester.logMessage("`n`nPass #2: Fast label search...`n`n")
 		
 		pitstopTester.requirePitstopMFD()
 		
@@ -762,7 +756,7 @@ runACCPitstopTester() {
 		
 		pitstopTester.closePitstopMFD()
 		
-		viewMessages(pitstopTester.Messages, "Search - Second Run")
+		viewMessages(pitstopTester.Messages, translate("Search - Pass #2"))
 	}
 }
 

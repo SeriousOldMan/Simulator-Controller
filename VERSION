@@ -1,9 +1,9 @@
 [Development]
 Version=4.0.4-dev
 Target=4.0.4-release
-Date=04/01/2022
+Date=04/02/2022
 Download=
-Changes=Fixed pitstop window requirements in "Strategy Workbench"
+Changes=Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions
 [Release]
 Version=4.0.2-release
 Date=04/01/2022

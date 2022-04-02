@@ -1,3 +1,10 @@
+## 4.0.4-release 04/08/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Improvements and fixes in several edge cases with required pitstops for "Strategy Workbench"
+  4. Many new presets for the ACC ptstop search images thanks to contributions from iEnki (Robert Deutsch).
+
 ## 4.0.2-release 04/01/22
 
   1. Bugfixes, as always

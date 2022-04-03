@@ -476,6 +476,8 @@ Note: The picture search will initially take some time, but the algorithm will l
 
 If you haven't taken the pictures or the system have trouble identifying the objects on the screen, Simulator Controller will use a fallback mechanism. You will hear the short standard Windows sound for errors to inform you that the picture search has failed, the first time Simulator Controller wants to tweak the pitstop settings. And you will find corresponding information in the "Simulator Controller Logs.txt" file located in the *Logs* folder in your user *Documents* folder. Since the fallback mechanism has no understanding of the actual structure and current selections of the Pitstop MFD, it will use a reasonable set of available settings and will navigate accordingly. To be precise, it works only for Dry tyres (since only then the Tyre Set option is available), it will assume that refueling is possible, that tyre change is selected, but brake change is deselected. It will also assume, that the "Select Driver" option is available, as this is the typical layout in an endurance race. For a single user race, refueling and tyre pressure selection will still function correctly, but repair options will be off by one in this case. But be aware, if any of the above conditions are not met, the selection of pitstop settings may fail. Therefore I strongly recommend, that you create the search pictures as described above.
 
+Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
+
 ## Plugin *AC*
 
 This plugin handles starting and stopping of the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration, and set the window title to "Assetto Corsa Launcher".
@@ -763,6 +765,8 @@ These pictures are located in the *Resources\Screen Images\R3E folder* in the in
 Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
 
 Second note: The image search algorithm used here is as good as it can be. But unfortunately, the Pitstop MFD in *RaceRoom Racing Experience* has very low contrast differences in several places, other than the Pitstop MFD of *Assetto Corsa Competizione*, Therefore, it is possible from time to time, that the search will yield false positives, which in the end will lead to false values and choices entered into fields of the Pitstop MFD. So please always double check, that everything is correct, before entering the pit lane.
+
+Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
 
 ## Plugin *AMS2*
 

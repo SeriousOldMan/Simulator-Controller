@@ -101,6 +101,18 @@ Three files will be created by the *Simulator Setup* tool at the end of the inst
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by "Simulator Setup". Please note, that ecach configuration change that you make with the "Simulator Configuration" tool, which is described in the following sections, will be overwritten, if you ever use "Simulator Setup" afterwards.
 
+### Presets & Special Configurations
+
+*Simulator Setup* provides a selection of presets for otherwise time-consuming configuration steps. These are mostly pre-configured layouts for Button Boxes and Stream Decks. Even if you do not find your particular layout here, it might be even helpful to start with one of these preconfigured layouts instead of starting from scratch. Simply select the one that fits best.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%203.JPG)
+
+You will also find a couple of packages in the list of available presets for the so called search images, which are used by Simulator Controller to *understand* the state and available option in the Pitstop MFDs of *Assetto Corsa Competizione* and *RaceRoom Racing Experience*. Detailed instructions for these search images can be found in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). The same applies here: If you don't find your specific language and/or screen resolution here, start with one which fits best and apply your changes afterwards.
+
+And last but not least, some very special configuration options are provided that cannot otherwise be created using the Setup Wizard. Although you can use "Simulator Configuration", the low level configuration tool, to achieve the same results, it requires a lot of knowledge about the inner workings of Simulator Controller.
+
+Please note, that you can remove presets later on. But depending on the type of the preset, the side effects will still remain, since you might have changed the underlying configuration in the meantime, for example a specific Button Box configuration.
+
 ### Patching the configuration
 
 Disclaimer: The following mechanism is only for very experienced users, everybody else can skip this section.

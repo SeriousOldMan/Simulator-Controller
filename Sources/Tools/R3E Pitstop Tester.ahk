@@ -82,6 +82,8 @@ class R3EPitstopTester extends Plugin {
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 		
 		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
+		
+		SetKeyDelay 5, 15
 	}
 	
 	logMessage(message) {
@@ -93,6 +95,8 @@ class R3EPitstopTester extends Plugin {
 		
 		if !WinActive(window)
 			WinActivate %window%
+		
+		Sleep 2000
 	}
 	
 	sendPitstopCommand(command) {
@@ -143,6 +147,8 @@ class R3EPitstopTester extends Plugin {
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 				
 			if !this.pitstopMFDIsOpen() {
+				this.activateR3EWindow()
+				
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 				
 				secondTry := true

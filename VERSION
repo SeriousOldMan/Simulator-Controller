@@ -3,7 +3,7 @@ Version=4.0.4-dev
 Target=4.0.4-release
 Date=04/02/2022
 Download=
-Changes=Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions
+Changes=Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions, Performance optimization in Strategist Rules, Fixed position reporting for R3E, Fixed various bugs in "Race Center", Introduced *Sector* handling in Race Assistants
 [Release]
 Version=4.0.2-release
 Date=04/01/2022

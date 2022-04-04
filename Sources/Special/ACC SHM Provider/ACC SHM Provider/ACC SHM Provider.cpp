@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 		wcout << "DriverForname=" << sf->playerName << endl;
 		wcout << "DriverSurname=" << sf->playerSurname << endl;
 		wcout << "DriverNickname=" << sf->playerNick << endl;
-		printData("Sector", gf->currentSectorIndex);
+		printData("Sector", gf->currentSectorIndex + 1);
 		printData("Laps", gf->completedLaps);
 		
 		printData("LapValid", gf->isValidLap ? "true" : "false");

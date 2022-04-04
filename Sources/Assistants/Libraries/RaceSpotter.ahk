@@ -286,11 +286,13 @@ class RaceSpotter extends RaceAssistant {
 		
 		if (this.Speaker && (this.Session = kSessionRace)) {
 			if !this.SpotterSpeaking {
+				lastLap := knowledgeBase.getValue("Lap", 0)
+						
+				this.updatePositionInfo(lastLap)
+			
 				this.SpotterSpeaking := true
 				
 				try {
-					lastLap := knowledgeBase.getValue("Lap", 0)
-						
 					if ((lastLap > 5) && this.Warnings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 						
@@ -316,11 +318,8 @@ class RaceSpotter extends RaceAssistant {
 					this.SpotterSpeaking := false
 				}
 			}
-			else {
-				callback := ObjBindMethod(this, "updateDriver")
-			
-				SetTimer %callback%, -1000
-			}
+			else
+				raiseEvent(kLocalMessage, "Race Spotter", "updateDriver")
 		}
 	}
 	
@@ -622,10 +621,8 @@ class RaceSpotter extends RaceAssistant {
 		result := base.addLap(lapNumber, data)
 		
 		if result {
-			this.updatePositionInfo(lapNumber)
-			
-			callback := ObjBindMethod(this, "updateDriver")
-			
+			callback := Func("raiseEvent").Bind(kLocalMessage, "Race Spotter", "updateDriver")
+		
 			SetTimer %callback%, -20000
 		}
 	
@@ -633,7 +630,15 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	updateLap(lapNumber, data) {
-		; this.KnowledgeBase.addFact("Sector", true)
+		static lastSector := 1
+		
+		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
+		
+		if (sector != lastSector) {
+			lastSector := sector
+			
+			this.KnowledgeBase.addFact("Sector", true)
+		}
 		
 		return base.updateLap(lapNumber, data)
 	}

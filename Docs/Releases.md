@@ -2,8 +2,13 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. Improvements and fixes in several edge cases with required pitstops for "Strategy Workbench"
-  4. Many new presets for the ACC ptstop search images thanks to contributions from iEnki (Robert Deutsch).
+  3. Improvements and fixes in several edge cases with required pitstops for "Strategy Workbench".
+  4. Many new presets for the ACC ptstop search images thanks to contributions from iEnki (Robert Deutsch), Manfred Gnadl and Martin Moser.
+  5. Fixed broken position reporting for RaceRoom Racing Experience.
+  6. A couple of minor fixes and improvements for "Race Center".
+  7. Improved standings, track gap and future prediction performance for the Virtual Race Strategist by 20%.
+  8. Initial preparation for sector based timing in the shared memory interfaces.
+  9. More frequent position and gap update for Race Strategist and Race Spotter.
 
 ## 4.0.2-release 04/01/22
 

@@ -724,7 +724,7 @@ class VoiceServer extends ConfigurationItem {
 		
 		this.VoiceClients[descriptor] := client
 		
-		if (activationCommand && listener) {
+		if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			

@@ -868,7 +868,15 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateLap(lapNumber, data) {
-		this.KnowledgeBase.addFact("Sector", true)
+		static lastSector := 1
+		
+		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
+		
+		if (sector != lastSector) {
+			lastSector := sector
+			
+			this.KnowledgeBase.addFact("Sector", true)
+		}
 		
 		return base.updateLap(lapNumber, data)
 	}

@@ -903,12 +903,16 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
 
 if !GetKeyState("Ctrl") {
+	startTime := A_TickCount
+	
 	AHKUnit.AddTestClass(FuelReporting)
 	AHKUnit.AddTestClass(DamageReporting)
 	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()
+	
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))

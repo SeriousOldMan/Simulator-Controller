@@ -60,19 +60,8 @@ class BasicReporting extends Assert {
 			
 			if (data.Count() == 0)
 				break
-			else {
-				startTime := A_TickCount
-			
+			else
 				strategist.addLap(A_Index, data)
-				
-				showMessage("Time for lap add: " . (A_TickCount - startTime) . " ms")
-				
-				startTime := A_TickCount
-			
-				strategist.updateLap(A_Index, data)
-				
-				showMessage("Time for lap update: " . (A_TickCount - startTime) . " ms")
-			}
 			
 			switch A_Index {
 				case 1, 2, 3:
@@ -248,6 +237,8 @@ class PositionProjection extends Assert {
 				
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 				
+				strategist.dumpKnowledge(strategist.KnowledgeBase)
+				
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
 			else if (A_Index = 5) {
@@ -305,12 +296,16 @@ class PitstopRecommendation extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 
 if !GetKeyState("Ctrl") {
+	startTime := A_TickCount
+	
 	AHKUnit.AddTestClass(BasicReporting)
 	AHKUnit.AddTestClass(PositionProjection)
 	AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()
+	
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := 17

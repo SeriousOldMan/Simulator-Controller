@@ -548,6 +548,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	DriverForname=The
 	DriverSurname=BigO
 	DriverNickname=TBO
+	Sector=2
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697

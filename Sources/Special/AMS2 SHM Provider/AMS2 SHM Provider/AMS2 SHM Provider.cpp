@@ -267,6 +267,7 @@ int main(int argc, char* argv[]) {
 		else
 			printf("LapBestTime=%ld\n", (long)(normalize(localCopy->mLastLapTime) * 1000));
 
+		printf("Sector=%ld\n", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mCurrentSector));
 		printf("Laps=%ld\n", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted));
 
 		long timeRemaining = getRemainingTime(localCopy);

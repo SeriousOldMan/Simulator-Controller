@@ -291,6 +291,7 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
+			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector));
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
 			long timeRemaining = (getRemainingTime() * 1000);

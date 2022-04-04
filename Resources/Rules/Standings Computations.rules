@@ -27,41 +27,41 @@ priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Standings.Front.Car),
 										 (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),
 										 (Clear: Position.Track.Behind.Car),
 										 (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
-[?Lap] => (Prove: updateStandingsStatics(?Lap))
+[?Lap] => (Prove: updateGrid(?Lap))
 {Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
 
-updateStandingsStatics(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
-							    Call(builtin0, getTime, ?time), Set(Standings.Lap, ?lap, Time, ?time),
-								Set(Standings.Lap, ?lap, Car.Count, !Car.Count), updateStandingsGrid(?lap, !Car.Count)
+updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
+					Call(builtin0, getTime, ?time), Set(Standings.Lap, ?lap, Time, ?time),
+					Set(Standings.Lap, ?lap, Car.Count, !Car.Count), updateGrid(?lap, !Car.Count)
 
-updateStandingsGrid(?, ?car) <= =<(?car, 0), !
-updateStandingsGrid(?lap, ?car) <= carDriverForname(?car, ?forname), carDriverSurname(?car, ?surname),
-								   carDriverNickname(?car, ?nickname), carNumber(?car, ?carNumber),
-								   Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
-								   Set(?prefix, Nr, ?carNumber), Set(?prefix, Driver.Forname, ?forname),
-								   Set(?prefix, Driver.Surname, ?surname), Set(?prefix, Driver.Nickname, ?nickname),
-								   ?nextCar = ?car - 1, updateStandingsGrid(?lap, ?nextCar)
+updateGrid(?, ?car) <= =<(?car, 0), !
+updateGrid(?lap, ?car) <= carDriverForname(?car, ?forname), carDriverSurname(?car, ?surname),
+						  carDriverNickname(?car, ?nickname), carNumber(?car, ?carNumber),
+						  Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
+						  Set(?prefix, Nr, ?carNumber), Set(?prefix, Driver.Forname, ?forname),
+						  Set(?prefix, Driver.Surname, ?surname), Set(?prefix, Driver.Nickname, ?nickname),
+						  ?nextCar = ?car - 1, updateGrid(?lap, ?nextCar)
 
 updatePositions(?lap) <= carLaps(!Driver.Car, FULL, ?driverLaps), carLaps(!Driver.Car, RUNNING, ?driverRunning),
 						 updatePositions(?lap, !Car.Count, ?driverLaps, ?driverRunning)
 
 updatePositions(?, ?car, ?, ?) <= =<(?car, 0), !
 updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
-		carPosition(!Driver.Car, ?position), Set(Position, ?position), Set(Standings.Lap, ?driverLaps, Position, ?position),
+		carPosition(!Driver.Car, ?position), Set(Position, ?position), Set(Standings.Lap, ?lap, Position, ?position),
 		Append(Standings.Lap., ?lap, .Car., !Driver.Car, ?prefix),
-		Set(?prefix, Delta, 0), Set(?prefix, Laps, ?laps), Set(?prefix, Position, ?position),
+		Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
-		carPosition(?car, ?position),carLaps(?car, FULL, ?carLaps),
-		lapTime(?lap, ?lapTime), ?distance = ?driverLaps - ?carLaps, ?delta = ?lapTime * ?distance,
+		lapTime(?lap, ?lapTime), carPosition(?car, ?position), carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),  
+		?standingsDistance = ?driverLaps - ?carLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
 		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
-		Set(?prefix, Delta, ?delta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
-		updateStandingsFront(?lap, ?car, ?distance, ?delta),
-		updateStandingsBehind(?lap, ?car, ?distance, ?delta),
-		updateStandingsLeader(?lap, ?car, ?distance, ?delta),
-		carLaps(?car, RUNNING, ?carRunning),  ?distance = ?driverRunning - ?carRunning, ?delta = ?lapTime * ?distance,
-		updateTrackFront(?lap, ?car, ?distance, ?delta), updateTrackBehind(?lap, ?car, ?distance, ?delta),	
+		Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
+		updateStandingsFront(?lap, ?car, ?standingsDistance, ?standingsDelta),
+		updateStandingsBehind(?lap, ?car, ?standingsDistance, ?standingsDelta),
+		updateStandingsLeader(?lap, ?car, ?standingsDistance, ?standingsDelta),
+		?trackDistance = ?driverRunning - ?carRunning, ?trackDelta = ?lapTime * ?trackDistance,
+		updateTrackFront(?lap, ?car, ?trackDistance, ?trackDelta), updateTrackBehind(?lap, ?car, ?trackDistance, ?trackDelta),	
 		?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <= ?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
 
@@ -83,9 +83,9 @@ updateStandingsBehind(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.St
 													 Set(Position.Standings.Behind.Delta, ?delta)
 updateStandingsBehind(?, ?, ?, ?)
 
-updateStandingsLeader(?lap, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Standings.Leader.Car, ?car),
-														Set(Position.Standings.Leader.Distance, ?distance),
-														Set(Position.Standings.Leader.Delta, ?delta)
+updateStandingsLeader(?, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Standings.Leader.Car, ?car),
+													 Set(Position.Standings.Leader.Distance, ?distance),
+													 Set(Position.Standings.Leader.Delta, ?delta)
 updateStandingsLeader(?, ?, ?, ?)
 						
 updateTrackFront(?, ?car, ?distance, ?delta) <= ?distance < 0, unbound?(!Position.Track.Front.Car), !, Set(Position.Track.Front.Car, ?car),

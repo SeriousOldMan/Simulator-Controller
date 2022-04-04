@@ -38,6 +38,8 @@ class RaceSpotter extends RaceAssistant {
 	iRaceStartSummarized := true
 	iFinalLapsAnnounced := false
 	
+	iDriverUpdate := 0
+	
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
 		iFastSpeechSynthesizer := false
 			
@@ -285,11 +287,11 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase = this.KnowledgeBase
 		
 		if (this.Speaker && (this.Session = kSessionRace)) {
+			lastLap := knowledgeBase.getValue("Lap", 0)
+					
+			this.updatePositionInfo(lastLap)
+				
 			if !this.SpotterSpeaking {
-				lastLap := knowledgeBase.getValue("Lap", 0)
-						
-				this.updatePositionInfo(lastLap)
-			
 				this.SpotterSpeaking := true
 				
 				try {
@@ -319,7 +321,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			else
-				raiseEvent(kLocalMessage, "Race Spotter", "updateDriver")
+				this.iDriverUpdate := 2
 		}
 	}
 	
@@ -620,27 +622,32 @@ class RaceSpotter extends RaceAssistant {
 	addLap(lapNumber, data) {
 		result := base.addLap(lapNumber, data)
 		
-		if result {
-			callback := Func("raiseEvent").Bind(kLocalMessage, "Race Spotter", "updateDriver")
-		
-			SetTimer %callback%, -20000
-		}
+		if result
+			this.iDriverUpdate := 4
 	
 		return result
 	}
 	
 	updateLap(lapNumber, data) {
-		static lastSector := 1
+		if (this.iDriverUpdate > 0)
+			this.iDriverUpdate := (this.iDriverUpdate - 1)
 		
-		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
-		
-		if (sector != lastSector) {
-			lastSector := sector
+		if (this.iDriverUpdate = 1) {
+			this.iDriverUpdate := 0
 			
 			this.KnowledgeBase.addFact("Sector", true)
+			
+			update := true
 		}
+		else
+			update := false
 		
-		return base.updateLap(lapNumber, data)
+		result := base.updateLap(lapNumber, data)
+		
+		if update
+			this.updateDriver()
+		
+		return result
 	}
 	
 	shutdownSession(phase) {

@@ -875,7 +875,7 @@ class RaceStrategist extends RaceAssistant {
 		if (sector != lastSector) {
 			lastSector := sector
 			
-			this.KnowledgeBase.addFact("Sector", true)
+			this.KnowledgeBase.addFact("Sector", sector)
 		}
 		
 		return base.updateLap(lapNumber, data)
@@ -1001,23 +1001,31 @@ class RaceStrategist extends RaceAssistant {
 		local facts
 		local fact
 		
-		if (strategy && (this.Session == kSessionRace)) {
-			if !IsObject(strategy)
-				strategy := readConfiguration(strategy)
-		
-			this.clearStrategy()
+		if strategy {
+			if (this.Session == kSessionRace) {
+				if !IsObject(strategy)
+					strategy := readConfiguration(strategy)
 			
-			facts := {}
+				this.clearStrategy()
+				
+				facts := {}
+				
+				this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
+				
+				for fact, value in facts
+					knowledgeBase.setFact(fact, value)
 			
-			this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
-			
-			for fact, value in facts
-				knowledgeBase.setFact(fact, value)
+				this.dumpKnowledge(knowledgeBase)
+				
+				this.updateSessionValues({Strategy: strategy})
+			}
 		}
-		else
+		else {
 			this.cancelStrategy(false)
 		
-		this.updateSessionValues({Strategy: strategy})
+			this.updateSessionValues({Strategy: false})
+		}
+		
 		this.updateDynamicValues({StrategyReported: false})
 	}
 	

@@ -136,7 +136,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						this.RaceStrategist.updateStrategy(false)
 					else {
 						try {
-							FileDelete %kTempDirectory%Race Strategy.update
+							if FileExist(kTempDirectory . "Race Strategy.update")
+								FileDelete %kTempDirectory%Race Strategy.update
 							
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}

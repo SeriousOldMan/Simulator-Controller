@@ -30,7 +30,7 @@ priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Standings.Front.Car),
 [?Lap] => (Prove: updateGrid(?Lap))
 {Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
-
+							  
 updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
 					Call(builtin0, getTime, ?time), Set(Standings.Lap, ?lap, Time, ?time),
 					Set(Standings.Lap, ?lap, Car.Count, !Car.Count), updateGrid(?lap, !Car.Count)
@@ -48,15 +48,17 @@ updatePositions(?lap) <= carLaps(!Driver.Car, FULL, ?driverLaps), carLaps(!Drive
 
 updatePositions(?, ?car, ?, ?) <= =<(?car, 0), !
 updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
-		carPosition(!Driver.Car, ?position), Set(Position, ?position), Set(Standings.Lap, ?lap, Position, ?position),
+		carLapTime(!Driver.Car, ?lapTime), carPosition(!Driver.Car, ?position),
+		Set(Position, ?position), Set(Standings.Lap, ?lap, Position, ?position),
 		Append(Standings.Lap., ?lap, .Car., !Driver.Car, ?prefix),
-		Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
+		Set(?prefix, Time, ?lapTime), Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
-		lapTime(?lap, ?lapTime), carPosition(?car, ?position), carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),  
+		carLapTime(?car, ?carLapTime), lapTime(?lap, ?lapTime), carPosition(?car, ?position),
+		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),  
 		?standingsDistance = ?driverLaps - ?carLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
 		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
-		Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
+		Set(?prefix, Time, ?carLapTime), Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
 		updateStandingsFront(?lap, ?car, ?standingsDistance, ?standingsDelta),
 		updateStandingsBehind(?lap, ?car, ?standingsDistance, ?standingsDelta),
 		updateStandingsLeader(?lap, ?car, ?standingsDistance, ?standingsDelta),

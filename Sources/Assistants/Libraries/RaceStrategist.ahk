@@ -868,7 +868,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateLap(lapNumber, data) {
-		; this.KnowledgeBase.addFact("Sector", true)
+		this.KnowledgeBase.addFact("Sector", true)
 		
 		return base.updateLap(lapNumber, data)
 	}

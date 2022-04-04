@@ -60,8 +60,19 @@ class BasicReporting extends Assert {
 			
 			if (data.Count() == 0)
 				break
-			else
+			else {
+				startTime := A_TickCount
+			
 				strategist.addLap(A_Index, data)
+				
+				showMessage("Time for lap add: " . (A_TickCount - startTime) . " ms")
+				
+				startTime := A_TickCount
+			
+				strategist.updateLap(A_Index, data)
+				
+				showMessage("Time for lap update: " . (A_TickCount - startTime) . " ms")
+			}
 			
 			switch A_Index {
 				case 1, 2, 3:

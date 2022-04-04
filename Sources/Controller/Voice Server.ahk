@@ -733,16 +733,16 @@ class VoiceServer extends ConfigurationItem {
 				
 				showMessage("Register activation phrase: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())					  
 			}
-				
+			
 			try {
 				command := recognizer.compileGrammar(activationCommand)
 				
 				recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
+				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))
 			
-				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: activationCommand})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}

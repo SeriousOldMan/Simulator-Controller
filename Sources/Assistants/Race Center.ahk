@@ -1293,7 +1293,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		this.loadSessions()
-		this.loadSessionDrivers()
 	}
 	
 	loadSessions() {
@@ -1369,6 +1368,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		this.initializeSession()
+		this.loadSessionDrivers()
 	}
 	
 	addDriver(driver) {
@@ -1631,9 +1631,11 @@ class RaceCenter extends ConfigurationItem {
 				time := string2Values(":", time)
 				
 				currentTime := "20200101000000"
-				
-				EnvAdd currentTime, time[1], Hours
-				EnvAdd currentTime, time[2], Minutes
+					
+				if (time.Length() = 2) {
+					EnvAdd currentTime, time[1], Hours
+					EnvAdd currentTime, time[2], Minutes
+				}
 			}
 			
 			lastTime := 0
@@ -2853,6 +2855,8 @@ class RaceCenter extends ConfigurationItem {
 		GuiControlGet sessionDateCal
 		GuiControlGet sessionTimeEdit
 		
+
+		this.iVersion := false
 		this.iDate := sessionDateCal
 		this.iTime := sessionTimeEdit
 		
@@ -2866,6 +2870,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.iTyreCompound := false
 		this.iTyreCompoundColor := false
+		
+		this.iStrategy := false
 	
 		this.showChart(false)
 		this.showDetails(false, false)
@@ -7058,8 +7064,10 @@ choosePlan() {
 		
 		currentTime := "20200101000000"
 		
-		EnvAdd currentTime, time[1], Hours
-		EnvAdd currentTime, time[2], Minutes
+		if (time.Length() = 2) {
+			EnvAdd currentTime, time[1], Hours
+			EnvAdd currentTime, time[2], Minutes
+		}
 		
 		timePlanned := currentTime
 		
@@ -7067,8 +7075,10 @@ choosePlan() {
 		
 		currentTime := "20200101000000"
 		
-		EnvAdd currentTime, time[1], Hours
-		EnvAdd currentTime, time[2], Minutes
+		if (time.Length() = 2) {
+			EnvAdd currentTime, time[1], Hours
+			EnvAdd currentTime, time[2], Minutes
+		}
 		
 		timeActual := currentTime
 		

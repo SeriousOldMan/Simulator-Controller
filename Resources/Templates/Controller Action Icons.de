@@ -347,6 +347,9 @@ GapToBehindTrack.Activate=
 StrategyOverview.Activate=
 NextPitstop.Activate=
 [Race Spotter]
+Call.Activate=
+Accept.Activate=
+Reject.Activate=
 RaceAssistant.Toggle=
 [Team Server]
 TeamServer.Toggle=

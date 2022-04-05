@@ -23,6 +23,7 @@ Release 4.0.4 Checklist
 0. Search for new links (*)
    a. Translations
    b. Phrase Grammars
+   c. Action Labels & Icons
 
 Release 4.0.2 Checklist
 =======================

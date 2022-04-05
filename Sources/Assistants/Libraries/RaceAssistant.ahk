@@ -995,7 +995,7 @@ class RaceAssistant extends ConfigurationItem {
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Now")
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
 			compound := knowledgeBase.getValue("Tyre.Compound")
 			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 			

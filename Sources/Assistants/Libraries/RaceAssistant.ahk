@@ -444,6 +444,8 @@ class RaceAssistant extends ConfigurationItem {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "Time":
+				this.timeRecognized(words)
 			case "Yes":
 				continuation := this.Continuation
 				
@@ -478,6 +480,12 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+	
+	timeRecognized(words) {
+		FormatTime time, %A_Now%, Time
+		
+		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
 	
 	activateAnnouncement(words, active) {

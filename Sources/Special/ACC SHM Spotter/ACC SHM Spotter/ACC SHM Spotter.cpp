@@ -409,7 +409,7 @@ void checkPitWindow() {
 
 		sendMessage("pitWindow:Open");
 	}
-	else if (sf->PitWindowEnd > currentTime && !pitWindowClosedReported) {
+	else if (sf->PitWindowEnd < currentTime && !pitWindowClosedReported) {
 		pitWindowClosedReported = true;
 		pitWindowOpenReported = false;
 

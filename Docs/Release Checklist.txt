@@ -24,6 +24,9 @@ Release 4.0.4 Checklist
    a. Translations
    b. Phrase Grammars
    c. Action Labels & Icons
+1. New Elisa Commands
+   a. Update Commands on Discord
+   b. Mention in Update Notes
 
 Release 4.0.2 Checklist
 =======================

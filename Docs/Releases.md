@@ -6,9 +6,11 @@
   4. Many new presets for the ACC ptstop search images thanks to contributions from iEnki (Robert Deutsch), Manfred Gnadl and Martin Moser.
   5. Fixed broken position reporting for RaceRoom Racing Experience.
   6. A couple of minor fixes and improvements for "Race Center".
-  7. Improved standings, track gap and future prediction performance for the Virtual Race Strategist by 20%.
+  7. Performance improvements for the Virtual Race Strategist by 20% for standings, track gap and future predictions.
   8. Initial preparation for sector based timing in the shared memory interfaces.
   9. More frequent position and gap update for Race Strategist and Race Spotter.
+  10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
+  11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on.
 
 ## 4.0.2-release 04/01/22
 

@@ -168,6 +168,8 @@ class RaceStrategist extends RaceAssistant {
 				this.weatherRecognized(words)
 			case "Position":
 				this.positionRecognized(words)
+			case "LapTimes":
+				this.lapTimesRecognized(words)
 			case "FuturePosition":
 				this.futurePositionRecognized(words)
 			case "GapToFront":
@@ -176,8 +178,6 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
-			case "LapTimes":
-				this.lapTimesRecognized(words)
 			case "StrategyOverview":
 				this.strategyOverviewRecognized(words)
 			case "CancelStrategy":
@@ -881,10 +881,10 @@ class RaceStrategist extends RaceAssistant {
 				this.lapsRemainingRecognized([])
 			case "Weather":
 				this.weatherRecognized([])
-			case "LapTimes":
-				this.lapTimesRecognized([])
 			case "Position":
 				this.positionRecognized([])
+			case "LapTimes":
+				this.lapTimesRecognized([])
 			case "GapToFrontStandings":
 				this.gapToFrontRecognized([])
 			case "GapToFrontTrack":

@@ -343,6 +343,36 @@ With *raceAssistantRecognizer* you specify the engine used for voice recognition
  
 With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Elisa. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Elisa can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied, the values from the general voice control configuration will be taken as default. For more information about Elisa, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
+Similar as for Cato, you can use the following parameters to trigger some of Elisas service without using voice commands:
+
+	assistantCommands: Call *callFunction*, Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+	
+All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. To *answer* "Yes" to one of the questions of Elisa, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Elisa and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Elisa" activation command.
+
+Furthermore, you can request a lot of information from Elisa about the current race situation, similar to the corrsponding requests for Cato. Thefore, you can supply the *InformationRequest* parameter multiple times.
+
+Example:
+
+	assistantCommands: ...,
+					   InformationRequest Position Button.1,
+					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToRear Track Button.3,
+					   ...
+	
+Please see the following table for available information commands.
+
+| Command | Description |
+| ------ | ------ |
+| Time | You will be told the current time of your local computer. |
+| Position | Cato will tell you your current position. |
+| LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| GapToFront [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
+
+Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
+
 ## Plugin *Team Server*
 
 This is a supporting plugin for the Virtual Race Assistants. It supports the connection to a central server which manages the state and knowledge of the Virtual Race Assistants during a multiplayer team session, for example a 24 hour endurance race. See the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) on the *Team Server* for more information. The following configuration parameters are available:

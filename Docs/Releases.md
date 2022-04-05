@@ -10,7 +10,7 @@
   8. Initial preparation for sector based timing in the shared memory interfaces.
   9. More frequent position and gap update for Race Strategist and Race Spotter.
   10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
-  11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on.
+  11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on. These commands are available as voice commands and also as actions for your hardware controller. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for more information, which commands are available.
 
 ## 4.0.2-release 04/01/22
 

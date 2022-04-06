@@ -47,6 +47,14 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Update is handled automatically, but you will want to check the changes in the grammar files and in the action labels and icons, when you have made changes there. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information on action labels and icons, but grammar files must be handled with a text editor.
 
+Please note, that from now on, only the changed items in translatable configuration files must be saved to the local configuration database. All items that are not present in the local file will be loaded from the standard file that resides in the program directories of Simulator Controller. This affects the following type of files:
+
+  1. Translations
+  2. Phrase Grammars
+  3. Controller Action Labels
+  4. Controller Action Icons
+  5. Settings Definition Files for "Session Database"
+
 ***
 
 ## Release 4.0.2

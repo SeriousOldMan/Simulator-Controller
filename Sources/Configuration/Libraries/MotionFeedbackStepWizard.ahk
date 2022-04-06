@@ -554,7 +554,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(getFileName("Controller Action Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
+		pluginLabels := getControllerActionLabels()
 		
 		LV_Delete()
 		

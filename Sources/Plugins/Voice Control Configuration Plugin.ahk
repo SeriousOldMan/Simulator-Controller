@@ -116,7 +116,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				enIndex := A_Index
 		}
 			
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+		for ignore, grammarFile in concatenate(getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Strategist.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Spotter.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)) {
 			SplitPath grammarFile, , , code
 		
 			if !languages.HasKey(code) {

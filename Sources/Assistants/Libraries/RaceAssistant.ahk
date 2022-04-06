@@ -143,12 +143,17 @@ class RaceAssistant extends ConfigurationItem {
 	
 		getGrammars(language) {
 			prefix := this.RaceAssistant.AssistantType . ".grammars."
+			fileName := (prefix . language)
 			
-			grammars := readConfiguration(getFileName(prefix . language, kUserGrammarsDirectory, kGrammarsDirectory))
+			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
+				fileName := (prefix . "en")
 			
-			if (grammars.Count() == 0)
-				grammars := readConfiguration(getFileName(prefix . "en", kUserGrammarsDirectory, kGrammarsDirectory))
+			grammars := readConfiguration(kGrammarsDirectory . fileName)
 			
+			for section, values in readConfiguration(kUserGrammarsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(grammars, section, key, value)
+				
 			return grammars
 		}
 		
@@ -444,6 +449,8 @@ class RaceAssistant extends ConfigurationItem {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "Time":
+				this.timeRecognized(words)
 			case "Yes":
 				continuation := this.Continuation
 				
@@ -478,6 +485,12 @@ class RaceAssistant extends ConfigurationItem {
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+	
+	timeRecognized(words) {
+		FormatTime time, %A_Now%, Time
+		
+		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
 	
 	activateAnnouncement(words, active) {
@@ -987,7 +1000,7 @@ class RaceAssistant extends ConfigurationItem {
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Now")
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
 			compound := knowledgeBase.getValue("Tyre.Compound")
 			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 			

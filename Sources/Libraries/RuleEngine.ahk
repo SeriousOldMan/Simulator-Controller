@@ -3057,7 +3057,10 @@ class RuleEngine {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RuleCompiler {
-	compile(fileName, ByRef productions, ByRef reductions, path := false) {
+	compile(fileName, ByRef productions, ByRef reductions, path := false, includes := false) {
+		if !includes
+			includes := []
+		
 		if !path {
 			if !IsObject(productions)
 				productions := false
@@ -3069,10 +3072,13 @@ class RuleCompiler {
 		FileRead text, %fileName%
 		SplitPath fileName, , path
 		
-		this.compileRules(text, productions, reductions, path)
+		this.compileRules(text, productions, reductions, path, includes)
 	}
 	
-	compileRules(text, ByRef productions, ByRef reductions, path := false) {
+	compileRules(text, ByRef productions, ByRef reductions, path := false, includes := false) {
+		if !includes
+			includes := []
+		
 		if !path {
 			if !IsObject(productions)
 				productions := []
@@ -3090,18 +3096,22 @@ class RuleCompiler {
 			if (InStr(line, "#Include") == 1) {
 				fileName := substituteVariables(Trim(SubStr(line, 9)))
 				
-				currentDirectory := A_WorkingDir
-				
-				try {
-					if (path && (Trim(path) != ""))
-						SetWorkingDir %path%
+				if !inList(includes, fileName) {
+					currentDirectory := A_WorkingDir
 					
-					SplitPath fileName, , path
-				
-					this.compile(fileName, productions, reductions, path)
-				}
-				finally {
-					SetWorkingDir %currentDirectory%
+					try {
+						includes.Push(fileName)
+						
+						if (path && (Trim(path) != ""))
+							SetWorkingDir %path%
+						
+						SplitPath fileName, , path
+					
+						this.compile(fileName, productions, reductions, path, includes)
+					}
+					finally {
+						SetWorkingDir %currentDirectory%
+					}
 				}
 			}
 			else {

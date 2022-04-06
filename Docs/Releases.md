@@ -1,3 +1,18 @@
+## 4.0.4-release 04/08/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Improvements and fixes in several edge cases with required pitstops for "Strategy Workbench".
+  4. Many new presets for the ACC ptstop search images thanks to contributions from iEnki (Robert Deutsch), Manfred Gnadl and Martin Moser.
+  5. Fixed broken position reporting for RaceRoom Racing Experience.
+  6. A couple of minor fixes and improvements for "Race Center".
+  7. Performance improvements for the Virtual Race Strategist by 20% for standings, track gap and future predictions.
+  8. Initial preparation for sector based timing in the shared memory interfaces.
+  9. More frequent position and gap update for Race Strategist and Race Spotter.
+  10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
+  11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on. These commands are available as voice commands and also as actions for your hardware controller. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for more information, which commands are available.
+  12. The translation management for various items has been reworked. All new functionality will be available with the next release.
+
 ## 4.0.2-release 04/01/22
 
   1. Bugfixes, as always

@@ -1216,7 +1216,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iTrackTemperature := trackTemperature
 	}
 	
-	loadDataType(dataType, force := false) {
+	loadDataType(dataType, force := false, reload := false) {
 		local compound
 		
 		if (force || (this.SelectedDataType != dataType)) {
@@ -1285,7 +1285,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				GuiControl, , dataY2DropDown, |
 				GuiControl, , dataY3DropDown, |
 			}
-			else {
+			else if !reload {
 				schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
 					
 				GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
@@ -2547,9 +2547,11 @@ chooseDataType() {
 									, workbench.SelectedTrack).cleanupData(workbench.SelectedWeather
 																		 , workbench.SelectedCompound, workbench.SelectedCompoundColor)
 		
+				workbench.loadDataType(workbench.SelectedDataType, true, true)
+				
 				GuiControlGet compoundDropDown
 				
-				workbench.loadCompound(kQualifiedTyreCompounds[compoundDropDown], true)
+				workbench.loadCompound(workbench.AvailableCompounds[compoundDropDown], true)
 			}
 		}
 		

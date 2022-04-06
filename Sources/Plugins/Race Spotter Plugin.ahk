@@ -52,6 +52,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceSpotter(pid)
 	}
 	
+	requestInformation(arguments*) {
+		if (this.RaceSpotter && inList(["Time", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader"], arguments[1])) {
+			this.RaceSpotter.requestInformation(arguments*)
+		
+			return true
+		}
+		else
+			return false
+	}
+	
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
 		data := base.acquireSessionData(telemetryData, positionsData)
 		

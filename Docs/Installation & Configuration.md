@@ -575,7 +575,7 @@ Please note, that you can start new lines in the label using **\n**.
 	ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg  
 	...
 
-In this example, four icons will be displayed on the Stream Deck for increasing and decreasing the pedal vibration for traction control and ABS effects. You can to edit the definition file in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the "Simulator Configuration" tool, as mentioned above. There are a lot of icons for the Stream Deck available out there, for example [this one](https://www.racedepartment.com/downloads/buttondeck-for-stream-deck.24348/) or the icons from the collection of iEnki in the **#share-your-mods** channel on our [Discord](https://discord.gg/5N8JrNr48H), and I will also build an icon collection during the next releases.
+In this example, four icons will be displayed on the Stream Deck for increasing and decreasing the pedal vibration for traction control and ABS effects. You can to edit the definition file in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the "Simulator Configuration" tool, as mentioned above. There are a lot of icons for the Stream Deck available out there, for example [this one](https://www.racedepartment.com/downloads/buttondeck-for-stream-deck.24348/) or the icons from the collection of iEnki in the **#share-your-mods** channel on our [Discord](https://discord.gg/5N8JrNr48H).
 
 As you expect, there is a graphical tool to edit this language specific configuration files:
 

@@ -136,7 +136,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						this.RaceStrategist.updateStrategy(false)
 					else {
 						try {
-							FileDelete %kTempDirectory%Race Strategy.update
+							if FileExist(kTempDirectory . "Race Strategy.update")
+								FileDelete %kTempDirectory%Race Strategy.update
 							
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}
@@ -163,7 +164,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	requestInformation(arguments*) {
-		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
+		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
 		
 			return true

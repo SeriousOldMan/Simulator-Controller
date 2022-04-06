@@ -174,6 +174,7 @@ namespace RF2SHMProvider {
 				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
+				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
 				long time = GetRemainingTime(ref playerScoring);

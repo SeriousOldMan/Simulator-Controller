@@ -5,6 +5,10 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 dampingFactor(?distance, ?maxDistance, ?damping, ?factor) <= ?distance < ?maxDistance, ?temp = ?distance * ?damping, ?factor = 1 - ?temp, !
 dampingFactor(?, ?, ?, 0)
 

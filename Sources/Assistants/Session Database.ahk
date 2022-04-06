@@ -1087,12 +1087,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	getAvailableSettings(selection := false) {
 		if (vSettingDescriptors.Count() = 0) {
-			fileName := getFileName("Settings." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory)
+			fileName := ("Settings." . getLanguage())
 			
-			if !FileExist(fileName)
-				fileName := getFileName("Settings.en", kUserTranslationsDirectory, kTranslationsDirectory)
+			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory))
+				fileName := "Settings.en"
 			
-			vSettingDescriptors := readConfiguration(fileName)
+			vSettingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+			
+			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(vSettingDescriptors, section, key, value)
 		}
 		
 		settings := []

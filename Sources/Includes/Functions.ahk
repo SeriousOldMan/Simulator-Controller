@@ -981,6 +981,21 @@ initializeEnvironment() {
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
 }
 
+getControllerActionDefinitions(type) {
+	fileName := ("Controller Action " . type . "." . getLanguage())
+	
+	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
+		fileName := ("Controller Action " . type . ".en")
+		
+	definitions := readConfiguration(kTranslationsDirectory . fileName)
+	
+	for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+		for key, value in values
+			setConfigurationValue(definitions, section, key, value)
+	
+	return definitions
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -1421,26 +1436,39 @@ availableLanguages() {
 }
 
 readTranslations(targetLanguageCode, withUserTranslations := true) {
-	directories := withUserTranslations ? [kUserTranslationsDirectory, kTranslationsDirectory] : [kTranslationsDirectory]
+	fileNames := []
+	fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
+	
+	if FileExist(fileName)
+		fileNames.Push(fileName)
+	
+	if withUserTranslations {
+		fileName := (kUserTranslationsDirectory . "Translations." . targetLanguageCode)
+		
+		if FileExist(fileName)
+			fileNames.Push(fileName)
+	}
+	
 	translations := {}
 	
-	Loop Read, % getFileName("Translations." . targetLanguageCode, directories*)
-	{
-		translation := A_LoopReadLine
-		
-		translation := StrReplace(translation, "\=", "=")
-		translation := StrReplace(translation, "\\", "\")
-		translation := StrReplace(translation, "\n", "`n")
-				
-		translation := StrSplit(translation, "=>")
-		enString := translation[1]
-		
-		if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
-			if (translations.HasKey(enString) && (translations[enString] != translation[2]))
-				Throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
-			else
-				translations[enString] := translation[2]
-	}
+	for ignore, fileName in fileNames
+		Loop Read, %fileName%
+		{
+			translation := A_LoopReadLine
+			
+			translation := StrReplace(translation, "\=", "=")
+			translation := StrReplace(translation, "\\", "\")
+			translation := StrReplace(translation, "\n", "`n")
+					
+			translation := StrSplit(translation, "=>")
+			enString := translation[1]
+			
+			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
+				if ((A_Index == 1) && (translations.HasKey(enString) && (translations[enString] != translation[2])))
+					Throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
+				else
+					translations[enString] := translation[2]
+		}
 	
 	return translations
 }
@@ -2045,6 +2073,14 @@ getControllerConfiguration(configuration := false) {
 	
 	
 	return readConfiguration(kUserConfigDirectory . "Simulator Controller.config")
+}
+
+getControllerActionLabels() {
+	return getControllerActionDefinitions("Labels")
+}
+
+getControllerActionIcons() {
+	return getControllerActionDefinitions("Icons")
 }
 
 

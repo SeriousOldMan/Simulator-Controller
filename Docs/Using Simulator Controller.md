@@ -76,7 +76,7 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 *After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the assistants), you can test the dialog with two different assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
 
-	D:\Controller\Binaries>"Voice Server.exe"
+	D:\Controller\Binaries>"Voice Server.exe" -Debug true
 
 	D:\Controller\Binaries>"Race Engineer.exe" -Debug true -Speaker true -Listener true -Language DE -Name Jona -Logo true
 
@@ -99,6 +99,12 @@ Using the technology developed for Jona, Release 3.1 introduced an additional Ra
 #### Elisa, the Virtual Race Spotter
 
 The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for more information.
+
+### Controller Commands
+
+If you have configured one or more hardware controllers (Button Boxes and/or Stream Decks), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
+
+Please note, that you can mix voice commands and commands triggered by the controller hardware freely, so choose your weapon depending on the current situation on the track.
 
 ## And now it's time
 

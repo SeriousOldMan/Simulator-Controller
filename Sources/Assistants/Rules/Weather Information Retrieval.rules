@@ -5,6 +5,10 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
 
 weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)

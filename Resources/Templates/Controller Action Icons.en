@@ -347,7 +347,20 @@ GapToBehindTrack.Activate=
 StrategyOverview.Activate=
 NextPitstop.Activate=
 [Race Spotter]
+Call.Activate=
+Accept.Activate=
+Reject.Activate=
 RaceAssistant.Toggle=
+Time.Activate=Time
+Position.Activate=
+LapTimes.Activate=
+GapToFront.Activate=
+GapToBehind.Activate=
+GapToLeader.Activate=
+GapToFrontStandings.Activate=
+GapToBehindStandings.Activate=
+GapToFrontTrack.Activate=
+GapToBehindTrack.Activate=
 [Team Server]
 TeamServer.Toggle=
 RaceSettingsOpen.Activate=

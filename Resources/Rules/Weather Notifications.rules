@@ -5,6 +5,18 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;-------------------------------------------------------------------------;;;
+;;;                            Rule Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Tyre Information Retrieval.rules
+#Include %kResourcesDirectory%Rules\Session Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex(10Min))
 priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex(30Min))
 

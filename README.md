@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.0.4-dev](https://www.dropbox.com/s/4rcwma2exgyy5e7/Simulator%20Controller%204.0.4-dev.zip?dl=1) (Early build for Release 4.0.4. New features: Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions, Performance optimization in Strategist Rules, Fixed position reporting for R3E, Fixed various bugs in "Race Center", Introduced *Sector* handling in Race Assistants, More frequent position and gap update for Race Strategist and Race Spotter, Fixed Spotter endlessly announcing pit window in ACC, Rework of translation management. Stable, incl. documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-404) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

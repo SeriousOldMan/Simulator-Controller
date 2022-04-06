@@ -1252,6 +1252,7 @@ editTargets(command := "") {
 }
 
 updatePhraseGrammars() {
+	/* Obsolete sind 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, filePrefix in ["Race Engineer.grammars.", "Race Strategist.grammars.", "Race Spotter.grammars."]
@@ -1268,9 +1269,11 @@ updatePhraseGrammars() {
 						
 			writeConfiguration(grammarFileName, userGrammars)
 		}
+	*/
 }
 
 updateTranslations() {
+	/* Obsolete sind 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, translationFileName in getFileNames("Translations.*", kUserTranslationsDirectory, kUserConfigDirectory) {
@@ -1289,6 +1292,7 @@ updateTranslations() {
 				
 		writeTranslations(languageCode, languages[languageCode], translations)
 	}
+	*/
 }
 
 deleteActionLabels() {
@@ -1305,15 +1309,8 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 		}
 }
 
-updateActionLabels() {
-	updateActionDefinitions("Controller Action Labels")
-}
-
-updateActionIcons() {
-	updateActionDefinitions("Controller Action Icons")
-}
-
 updateActionDefinitions(fileName := "Controller Plugin Labels") {
+	/* Obsolete sind 4.0.4...
 	languages := availableLanguages()
 	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	
@@ -1357,6 +1354,15 @@ updateActionDefinitions(fileName := "Controller Plugin Labels") {
 		if changed
 			writeConfiguration(userDefinitionsFile, userDefinitions)
 	}
+	*/
+}
+
+updateActionLabels() {
+	updateActionDefinitions("Controller Action Labels")
+}
+
+updateActionIcons() {
+	updateActionDefinitions("Controller Action Icons")
 }
 
 updateCustomCalls(startNumber, endNumber) {

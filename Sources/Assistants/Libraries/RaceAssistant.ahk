@@ -143,12 +143,17 @@ class RaceAssistant extends ConfigurationItem {
 	
 		getGrammars(language) {
 			prefix := this.RaceAssistant.AssistantType . ".grammars."
+			fileName := (prefix . language)
 			
-			grammars := readConfiguration(getFileName(prefix . language, kUserGrammarsDirectory, kGrammarsDirectory))
+			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
+				fileName := (prefix . "en")
 			
-			if (grammars.Count() == 0)
-				grammars := readConfiguration(getFileName(prefix . "en", kUserGrammarsDirectory, kGrammarsDirectory))
+			grammars := readConfiguration(kGrammarsDirectory . fileName)
 			
+			for section, values in readConfiguration(kUserGrammarsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(grammars, section, key, value)
+				
 			return grammars
 		}
 		

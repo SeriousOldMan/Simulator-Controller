@@ -1478,14 +1478,8 @@ class ControllerPlugin extends Plugin {
 	}
 	
 	getLabel(descriptor, default := false) {
-		if !this.sLabelsDatabase {
-			languageCode := getLanguage()
-			
-			this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
-			
-			if (this.sLabelsDatabase.Count() = 0)
-				this.sLabelsDatabase := readConfiguration(getFileName("Controller Action Labels.en", kUserTranslationsDirectory, kTranslationsDirectory))
-		}
+		if !this.sLabelsDatabase
+			this.sLabelsDatabase := getControllerActionLabels()
 		
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
 		
@@ -1496,14 +1490,8 @@ class ControllerPlugin extends Plugin {
 	}
 	
 	getIcon(descriptor, default := false) {
-		if !this.sIconsDatabase {
-			languageCode := getLanguage()
-			
-			this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons." . languageCode, kUserTranslationsDirectory, kTranslationsDirectory))
-			
-			if (this.sIconsDatabase.Count() = 0)
-				this.sIconsDatabase := readConfiguration(getFileName("Controller Action Icons.en", kUserTranslationsDirectory, kTranslationsDirectory))
-		}
+		if !this.sIconsDatabase
+			this.sIconsDatabase := getControllerActionIcons()
 		
 		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
 		

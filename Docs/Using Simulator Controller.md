@@ -76,7 +76,7 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 *After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the assistants), you can test the dialog with two different assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
 
-	D:\Controller\Binaries>"Voice Server.exe"
+	D:\Controller\Binaries>"Voice Server.exe" -Debug true
 
 	D:\Controller\Binaries>"Race Engineer.exe" -Debug true -Speaker true -Listener true -Language DE -Name Jona -Logo true
 

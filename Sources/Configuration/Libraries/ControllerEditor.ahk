@@ -12,7 +12,7 @@
 #Include ..\Configuration\Libraries\ConfigurationItemList.ahk
 #Include ..\Configuration\Libraries\ButtonBoxPreview.ahk
 #Include ..\Configuration\Libraries\StreamDeckPreview.ahk
-#Include ..\Configuration\Libraries\PluginActionsEditor.ahk
+#Include ..\Configuration\Libraries\ControllerActionsEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -160,7 +160,7 @@ class ControllerEditor extends ConfigurationItem {
 		if saveAndCancel {
 			Gui CTRLE:Add, Text, x8 y620 w424 0x10
 			
-			Gui CTRLE:Add, Button, x8 yp+10 w140 h23 gopenPluginActionsEditor, % translate("Edit Labels && Icons...")
+			Gui CTRLE:Add, Button, x8 yp+10 w140 h23 gopenControllerActionsEditor, % translate("Edit Labels && Icons...")
 		
 			Gui CTRLE:Add, Button, x260 yp w80 h23 Default GsaveControllerEditor, % translate("Save")
 			Gui CTRLE:Add, Button, x352 yp w80 h23 GcancelControllerEditor, % translate("Cancel")
@@ -2019,13 +2019,13 @@ openDisplayRulesEditor() {
 	LayoutsList.Instance.openDisplayRulesEditor()
 }
 
-openPluginActionsEditor() {
+openControllerActionsEditor() {
 	owner := ControllerEditor.Instance.Window
 	Gui CTRLE:+Disabled
 		
 	Gui PAE:+OwnerCTRLE
 	
-	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions()
+	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
 	
 	Gui CTRLE:-Disabled
 }

@@ -39,7 +39,7 @@ ListLines Off					; Disable execution history
 #Include ..\Libraries\RuleEngine.ahk
 #Include Libraries\SettingsEditor.ahk
 #Include Libraries\ConfigurationEditor.ahk
-#Include Libraries\PluginActionsEditor.ahk
+#Include Libraries\ControllerActionsEditor.ahk
 #Include Libraries\ControllerEditor.ahk
 #Include ..\Plugins\Voice Control Configuration Plugin.ahk
 #Include ..\Plugins\Race Engineer Configuration Plugin.ahk
@@ -2498,7 +2498,7 @@ openLabelsAndIconsEditor() {
 		
 	Gui PAE:+Owner%owner%
 	
-	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions()
+	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
 	
 	Gui %owner%:-Disabled
 }

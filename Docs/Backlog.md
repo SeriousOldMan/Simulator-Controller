@@ -12,4 +12,3 @@
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game
   2. [Target: V4.x] Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"
-  3. [Target: V4.0.6] Implement a true inheritance mechanism for Translations, Plugin Labels/Actions, Settings and Phrase Grammars

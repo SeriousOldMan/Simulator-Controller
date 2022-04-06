@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Plugin Actions Editor           ;;;
+;;;   Modular Simulator Controller System - Controller Actions Editor       ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -25,13 +25,13 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; PluginActionsEditor                                                     ;;;
+;;; ControllerActionsEditor                                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global paLanguageDropDown
-global paPluginDropDown
+global caLanguageDropDown
+global caPluginDropDown
 
-class PluginActionsEditor extends ConfigurationItem {
+class ControllerActionsEditor extends ConfigurationItem {
 	iClosed := false
 	
 	iPluginActionsList := false
@@ -96,7 +96,7 @@ class PluginActionsEditor extends ConfigurationItem {
 		
 		base.__New(configuration)
 		
-		PluginActionsEditor.Instance := this
+		ControllerActionsEditor.Instance := this
 		
 		this.createGui(configuration)
 	}
@@ -109,7 +109,7 @@ class PluginActionsEditor extends ConfigurationItem {
 
 		Gui PAE:Font, Bold, Arial
 
-		Gui PAE:Add, Text, w388 Center gmovePluginActionsEditor, % translate("Modular Simulator Controller System") 
+		Gui PAE:Add, Text, w388 Center gmoveControllerActionsEditor, % translate("Modular Simulator Controller System") 
 		
 		Gui PAE:Font, Norm, Arial
 		Gui PAE:Font, Italic Underline, Arial
@@ -131,7 +131,7 @@ class PluginActionsEditor extends ConfigurationItem {
 		}
 		
 		Gui PAE:Add, Text, x16 yp+10 w86 h23 +0x200, % translate("Language")
-		Gui PAE:Add, DropDownList, x110 yp w120 Choose%chosen% VpaLanguageDropDown gchoosePALanguage, % values2String("|", choices*)
+		Gui PAE:Add, DropDownList, x110 yp w120 Choose%chosen% VcaLanguageDropDown gchooseCALanguage, % values2String("|", choices*)
 		
 		choices := []
 		
@@ -140,14 +140,14 @@ class PluginActionsEditor extends ConfigurationItem {
 		}
 		
 		Gui PAE:Add, Text, x16 yp+24 w86 h23 +0x200, % translate("Plugin")
-		Gui PAE:Add, DropDownList, x110 yp w120 Choose1 VpaPluginDropDown gchoosePAPlugin, % values2String("|", choices*)
+		Gui PAE:Add, DropDownList, x110 yp w120 Choose1 VcaPluginDropDown gchooseCAPlugin, % values2String("|", choices*)
 		
 		this.iPluginActionsList.createGui(configuration)
 		
 		Gui PAE:Add, Text, x50 yp+50 w310 0x10
 		
-		Gui PAE:Add, Button, x106 yp+10 w80 h23 Default GsavePluginActionsEditor, % translate("Save")
-		Gui PAE:Add, Button, x214 yp w80 h23 GcancelPluginActionsEditor, % translate("&Cancel")
+		Gui PAE:Add, Button, x106 yp+10 w80 h23 Default GsaveControllerActionsEditor, % translate("Save")
+		Gui PAE:Add, Button, x214 yp w80 h23 GcancelControllerActionsEditor, % translate("&Cancel")
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -168,21 +168,31 @@ class PluginActionsEditor extends ConfigurationItem {
 		plugins := []
 			
 		for language, ignore in availableLanguages() {
-			fileName := getFileName("Controller Action Labels." . language
-								  , kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\")
+			fileName := ("Controller Action Labels." . language)
 			
-			if FileExist(fileName)
-				this.iActionLabels[language] := readConfiguration(fileName)
-			else
-				this.iActionLabels[language] := readConfiguration(getFileName("Controller Action Labels.EN", kUserTranslationsDirectory, kTranslationsDirectory))
+			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+				fileName := "Controller Action Labels.EN"
+				
+			labels := readConfiguration(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 			
-			fileName := getFileName("Controller Action Icons." . language
-								  , kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\")
+			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(labels, section, key, value)
+				
+			this.iActionLabels[language] := labels
 			
-			if FileExist(fileName)
-				this.iActionIcons[language] := readConfiguration(fileName)
-			else
-				this.iActionIcons[language] := readConfiguration(getFileName("Controller Action Icons.EN", kUserTranslationsDirectory, kTranslationsDirectory))
+			fileName := ("Controller Action Icons." . language)
+			
+			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+				fileName := "Controller Action Icons.EN"
+				
+			icons := readConfiguration(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+			
+			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(icons, section, key, value)
+				
+			this.iActionIcons[language] := icons
 			
 			for thePlugin, ignore in this.ActionLabels[language]
 				if !inList(plugins, thePlugin)
@@ -196,6 +206,33 @@ class PluginActionsEditor extends ConfigurationItem {
 		this.iPlugins := plugins
 	}
 	
+	saveModifiedPluginActions(actions, type, language) {
+		fileName := ("Controller Action " . type "." . language)
+		
+		if FileExist(kTranslationsDirectory . fileName) {
+			configuration := newConfiguration()
+			stdConfiguration := readConfiguration(kTranslationsDirectory . fileName)
+			
+			for section, values in actions
+				for key, value in values
+					if (type = "Labels") {
+						if (getConfigurationValue(stdConfiguration, section, key, kUndefined) != value)
+							setConfigurationValue(configuration, section, key, value)
+					}
+					else {
+						if (value == false)
+							value := ""
+					
+						if (value != getConfigurationValue(stdConfiguration, section, key, ""))
+							setConfigurationValue(configuration, section, key, value)
+					}
+		}
+		else
+			configuration := actions
+		
+		writeConfiguration(kUserTranslationsDirectory . "Controller Action " . type "." . language, configuration)
+	}
+	
 	savePluginActions() {
 		if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin)
 			return false
@@ -203,10 +240,10 @@ class PluginActionsEditor extends ConfigurationItem {
 		for language, ignore in availableLanguages() {
 			if this.Changed[language] {
 				if this.ActionLabels[language]
-					writeConfiguration(kUserTranslationsDirectory . "Controller Action Labels." . language, this.ActionLabels[language])
+					this.saveModifiedPluginActions(this.ActionLabels[language], "Labels", language)
 				
 				if this.ActionIcons[language]
-					writeConfiguration(kUserTranslationsDirectory . "Controller Action Icons." . language, this.ActionIcons[language])
+					this.saveModifiedPluginActions(this.ActionIcons[language], "Icons", language)
 			}
 		}
 		
@@ -262,12 +299,12 @@ restart:
 			
 			if !force
 				if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
-					GuiControl Choose, paLanguageDropDown, % inList(languages, this.SelectedLanguage)
+					GuiControl Choose, caLanguageDropDown, % inList(languages, this.SelectedLanguage)
 					
 					return
 				}
 				
-			GuiControl Choose, paLanguageDropDown, % inList(languages, language)
+			GuiControl Choose, caLanguageDropDown, % inList(languages, language)
 			
 			this.iSelectedLanguage := language
 			
@@ -279,12 +316,12 @@ restart:
 		if ((plugin != this.SelectedPlugin) || force) {
 			if !force
 				if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
-					GuiControl Choose, paPluginDropDown, % inList(this.Plugins, this.SelectedPlugin)
+					GuiControl Choose, caPluginDropDown, % inList(this.Plugins, this.SelectedPlugin)
 					
 					return
 				}
 				
-			GuiControl Choose, paPluginDropDown, % inList(this.Plugins, plugin)
+			GuiControl Choose, caPluginDropDown, % inList(this.Plugins, plugin)
 			
 			this.iSelectedPlugin := plugin
 			
@@ -334,7 +371,7 @@ class PluginActionsList extends ConfigurationItemList {
 	loadPluginActions(plugin) {
 		local action
 		
-		editor := PluginActionsEditor.Instance
+		editor := ControllerActionsEditor.Instance
 		actions := {}
 		
 		for theAction, label in getConfigurationSectionValues(editor.ActionLabels, plugin, Object()) {
@@ -381,7 +418,7 @@ class PluginActionsList extends ConfigurationItemList {
 		this.clearEditor()
 		this.selectItem(false)
 		
-		editor := PluginActionsEditor.Instance
+		editor := ControllerActionsEditor.Instance
 		
 		actionLabels := getConfigurationSectionValues(editor.ActionLabels, plugin)
 		actionIcons := getConfigurationSectionValues(editor.ActionIcons, plugin)
@@ -542,15 +579,15 @@ class PluginActionsList extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-savePluginActionsEditor() {
-	PluginActionsEditor.Instance.closeEditor(true)
+saveControllerActionsEditor() {
+	ControllerActionsEditor.Instance.closeEditor(true)
 }
 
-cancelPluginActionsEditor() {
-	PluginActionsEditor.Instance.closeEditor(false)
+cancelControllerActionsEditor() {
+	ControllerActionsEditor.Instance.closeEditor(false)
 }
 
-movePluginActionsEditor() {
+moveControllerActionsEditor() {
 	moveByMouse("PAE")
 }
 
@@ -558,21 +595,21 @@ openPluginActionsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor
 }
 
-choosePALanguage() {
-	GuiControlGet paLanguageDropDown
+chooseCALanguage() {
+	GuiControlGet caLanguageDropDown
 	
 	for code, language in availableLanguages()
-		if (language = paLanguageDropDown) {
-			PluginActionsEditor.Instance.selectLanguage(code)
+		if (language = caLanguageDropDown) {
+			ControllerActionsEditor.Instance.selectLanguage(code)
 			
 			break
 		}
 }
 
-choosePAPlugin() {
-	GuiControlGet paPluginDropDown
+chooseCAPlugin() {
+	GuiControlGet caPluginDropDown
 	
-	PluginActionsEditor.Instance.selectPlugin(paPluginDropDown)
+	ControllerActionsEditor.Instance.selectPlugin(caPluginDropDown)
 }
 
 deleteIcon() {

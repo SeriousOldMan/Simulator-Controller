@@ -1476,6 +1476,25 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 writeTranslations(languageCode, languageName, translations) {
 	fileName := kUserTranslationsDirectory . "Translations." . languageCode
 	
+	stdTranslations := readTranslations(languageCode, false)
+	hasValues := false
+	
+	for ignore, value in stdTranslations {
+		hasValues := true
+		
+		break
+	}
+	
+	if hasValues {
+		temp := {}
+	
+		for key, value in translations
+			if (!stdTranslations.HasKey(key) || (stdTranslations[key] != value))
+				temp[key] := value
+		
+		translations := temp
+	}
+	
 	try {
 		FileDelete %fileName%
 	}

@@ -49,10 +49,10 @@ Update is handled automatically, but you will want to check the changes in the g
 
 Please note, that from now on, only the changed items in translatable configuration files must be saved to the local configuration database. All items that are not present in the local file will be loaded from the standard file that resides in the program directories of Simulator Controller. This affects the following type of files:
 
-  1. Translations
+  1. Translations (handled by the [Translation editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor))
   2. Phrase Grammars
-  3. Controller Action Labels
-  4. Controller Action Icons
+  3. Controller Action Labels (handled by the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+  4. Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
   5. Settings Definition Files for "Session Database"
 
 ***

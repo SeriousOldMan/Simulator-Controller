@@ -12,11 +12,12 @@
   10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
   11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on. These commands are available as voice commands and also as actions for your hardware controller. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for more information, which commands are available.
   12. The translation management for various items has been reworked. Only changed values are stored in the local configuration database. This affects the following categories:
-      1. Translations
-	  2. Phrase Grammars
-	  3. Controller Action Labels
-	  4. Controller Action Icons
-	  5. Settings Definition Files for "Session Database"
+  
+      - Translations (handled by the [Translation editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor))
+      - Phrase Grammars
+      - Controller Action Labels (handled by the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+      - Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+      - Settings Definition Files for "Session Database"
 
 ## 4.0.2-release 04/01/22
 

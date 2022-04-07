@@ -1,8 +1,8 @@
 [Development]
-Version=4.0.4-beta
+Version=4.0.4-rc1
 Target=4.0.4-release
 Date=04/07/2022
-Download=https://www.dropbox.com/s/0dms9p716onpxja/Simulator%20Controller%204.0.4-beta.zip?dl=1
+Download=https://www.dropbox.com/s/y5f0icmabzxz9hz/Simulator%20Controller%204.0.4-rc1.zip?dl=1
 Changes=Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions, Performance optimization in Strategist Rules, Fixed position reporting for R3E, Fixed various bugs in "Race Center", Introduced *Sector* handling in Race Assistants, More frequent position and gap update for Race Strategist and Race Spotter, Fixed Spotter endlessly announcing pit window in ACC, Rework of translation management
 [Release]
 Version=4.0.2-release
@@ -13,4 +13,4 @@ Changes=Support for cloud based voice recognition using Azure Cognitive Services
 Type=Development
 [Version]
 Release=4.0.2-release
-Development=4.0.4-beta
+Development=4.0.4-rc1

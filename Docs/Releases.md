@@ -14,10 +14,10 @@
   12. [Experts Only] The translation management for various items has been reworked. Only changed values are stored in the local configuration database. This affects the following categories:
   
       - Translations (handled by the [Translation editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor))
-      - Phrase Grammars
+      - Phrase Grammars (handled as plain text file)
       - Controller Action Labels (handled by the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
       - Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
-      - Settings Definition Files for "Session Database"
+      - Settings Definition Files for "Session Database" (handled as plain text file)
 
 ## 4.0.2-release 04/01/22
 

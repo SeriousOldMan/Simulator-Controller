@@ -1597,6 +1597,9 @@ class StrategyWorkbench extends ConfigurationItem {
 						if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")
 						
+						if (getConfigurationValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
+							GuiControl, , fuelCapacityEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.Amount")
+						
 						if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
 						 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound")

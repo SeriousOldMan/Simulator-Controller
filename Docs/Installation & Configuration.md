@@ -52,6 +52,18 @@ You might still encounter execution errors later on because of Windows security 
 	takeown.exe /F . /R /D N
 	Get-ChildItem -Path '.' -Recurse | Unblock-File
 
+## Installing Microsoft Language Runtimes
+
+Several low level components of Simulator Controller are based on low level language runtimes from Microsoft, namely the *.NET Framwork Runtimes* in the version 4.7.2 and 4.8 and the *Visual C++ Redistributable* for Visual Studio 2022. Normally, these runtimes will be installed on your system, but in some rare conditions they might be not of the required version. You can check whether your system has the required versions installed using the Windows settings dialog in the Apps section. If you need to install a specific version, you can find the installer at various Microsoft Websites:
+
+  [Microsoft Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+  
+  [.NET Framework 4.7.2](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net472)
+  
+  [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+  
+For your convience, you can find these installers also in the *Utilities\3rd Party\Windows Runtimes* folder.
+
 ## Installing additional components
 
 As already mentioned in the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md#third-party-applications) file, you might want to install additional third party applications, that will be used and controlled by Simulator Controller or will enhance the overall user experience. "Simulator Setup" will guide you through the installation of all these applications, but you can do it on your own as well. Please take a look at the list of applications and decide, which ones you want to install during the installation & configuration process. If you want to start your own plugin development or even change the code of the Simulator Controller itself, you additionally need to install [AutoHotkey](https://www.autohotkey.com/). Beginning with Release 2.1, an installation of [VisualStudio Community Edition](https://visualstudio.microsoft.com/de/vs/community/) might also be required, if you want do dig into the heavylifting part of telemetry data acquisition or voice recognition. But you can stick with the precompiled binaries from the distribution, if that is not your domain.

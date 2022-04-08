@@ -148,7 +148,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSelectedSimulator := false
 	iSelectedCar := true
 	iSelectedTrack := true
-	iSelectedWeather := "Dry"
+	iSelectedWeather := true
 	
 	iLastTracks := []
 	
@@ -2026,7 +2026,7 @@ testSettings() {
 																 
 		writeConfiguration(fileName, settings)
 				
-		options := "-NoTeam -File """ . fileName . """"
+		options := "-NoTeam -Test -File """ . fileName . """"
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
@@ -2047,7 +2047,7 @@ showSessionDatabaseEditor() {
 	simulator := false
 	car := false
 	track := false
-	weather := "Dry"
+	weather := false
 	airTemperature := 23
 	trackTemperature:= 27
 	compound := "Dry"

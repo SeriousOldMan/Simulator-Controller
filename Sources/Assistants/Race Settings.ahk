@@ -59,6 +59,7 @@ global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 global vSilentMode := kSilentMode
 global vTeamMode := true
+global vTestMode := false
 
 global vSimulator := false
 global vCar := false
@@ -804,9 +805,14 @@ restart:
 		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
-				
-		Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		
+		if !vTestMode {
+			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		}
+		else
+			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelSettings, % translate("Close")
+		
 		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
 		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
 		
@@ -1443,6 +1449,9 @@ showRaceSettingsEditor() {
 	
 	if inList(A_Args, "-NoTeam")
 		vTeamMode := false
+	
+	if inList(A_Args, "-Test")
+		vTestMode := true
 	
 	index := inList(A_Args, "-Import")
 	

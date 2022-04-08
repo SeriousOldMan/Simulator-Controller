@@ -33,21 +33,20 @@ Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.0.2-release](https://cntr.click/vsGR3Xs) (New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files.)
+[4.0.4-release](https://cntr.click/NbqY9MC) (New features: Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions, Performance optimization in Strategist Rules, Fixed position reporting for R3E, Fixed various bugs in "Race Center", Introduced *Sector* handling in Race Assistants, More frequent position and gap update for Race Strategist and Race Spotter, Fixed Spotter endlessly announcing pit window in ACC, Rework of translation management.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-404) of this version and all the versions you might have skipped, before installing and using this version.
+
 
 ##### Earlier release builds
 
-[4.0.0-release](https://cntr.click/qZkSR66) (New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information.)
+[4.0.2-release](https://cntr.click/vsGR3Xs) (New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files.)
 
-[3.9.8-release](https://cntr.click/Qw8Nwb1) (New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase".)
+[4.0.0-release](https://cntr.click/qZkSR66) (New features: Consolidation and update process for shared database, Many new commands for the race assistants to control the warning verbosity, Support for .NET compatible TTS 5.1 voices for voice output, Renamed assistant plugin parameter "raceAssistantService" to "raceAssistantSynthesizer", New plugin parameter "raceAssistantRecognizer" for all assistant plugins, Updated ACC car model information, Updated R3E car model information.)
 
 #### Latest development build
 
-[4.0.4-rc1](https://www.dropbox.com/s/y5f0icmabzxz9hz/Simulator%20Controller%204.0.4-rc1.zip?dl=1) (Release candidate for Release 4.0.4. New features: Fixed pitstop window requirements in "Strategy Workbench", Many more search image presets in "Simulator Setup" thanks to community contributions, Performance optimization in Strategist Rules, Fixed position reporting for R3E, Fixed various bugs in "Race Center", Introduced *Sector* handling in Race Assistants, More frequent position and gap update for Race Strategist and Race Spotter, Fixed Spotter endlessly announcing pit window in ACC, Rework of translation management. Stable, incl. documentation and update procedure.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-404) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Discord Community
 

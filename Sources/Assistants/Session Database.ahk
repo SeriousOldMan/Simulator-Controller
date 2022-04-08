@@ -354,7 +354,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		chosen := inList(kWeatherOptions, weather)
 		
 		if (!chosen && (choices.Length() > 0)) {
-			weather := choices[1]
+			weather := true
 			chosen := 1
 		}
 		

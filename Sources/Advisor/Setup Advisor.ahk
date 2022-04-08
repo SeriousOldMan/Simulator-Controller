@@ -704,7 +704,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Characteristics.Push(characteristic)
 							
 							if !isDebug()
-								Sleep 20
+								Sleep 50
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -726,7 +726,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Characteristics.Push(characteristic)
 							
 						if !isDebug()
-							Sleep 20
+							Sleep 50
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -765,7 +765,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Settings.Push(setting)
 							
 							if !isDebug()
-								Sleep 20
+								Sleep 50
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -787,7 +787,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Settings.Push(setting)
 							
 						if !isDebug()
-							Sleep 20
+							Sleep 50
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")

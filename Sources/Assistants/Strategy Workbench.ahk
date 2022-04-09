@@ -1539,7 +1539,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simulataneous") = "Simulataneous") ? 1 : 2
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 							
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
@@ -1592,7 +1592,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
 						
 						if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simulataneous") ? 1 : 2
+							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2
 						
 						if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")

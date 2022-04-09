@@ -790,19 +790,24 @@ class RaceReportViewer {
 			drawChartFunction := ""
 			
 			drawChartFunction .= "function drawChart() {"
-			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-			drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
 			
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentials*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
-			
-			drawChartFunction .= ("`n]);")
-			
-			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			if (potentials && (potentials.Length() > 0)) {
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
+				
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentials*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
+				
+				drawChartFunction .= ("`n]);")
+				
+				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
+				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else
+				drawChartFunction .= "}"
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)
@@ -862,6 +867,7 @@ class RaceReportViewer {
 			}
 			
 			drawChartFunction := ""
+			hasData := false
 			
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
@@ -882,6 +888,8 @@ class RaceReportViewer {
 			
 			for ignore, lap in this.getReportLaps(raceData) {
 				if (positions.Length() >= lap) {
+					hasData := true
+					
 					drawChartFunction .= (",`n[" . lap)
 					
 					Loop % cars.Length() {
@@ -897,10 +905,14 @@ class RaceReportViewer {
 				}
 			}
 			
-			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D8D8D8' };`n")
+			if hasData {
+				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D8D8D8' };`n")
 
-			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else
+				drawChartFunction := "function drawChart() {}"
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)

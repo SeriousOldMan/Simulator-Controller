@@ -1,3 +1,8 @@
+## 4.0.6-release 04/15/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+
 ## 4.0.4-release 04/08/22
 
   1. Bugfixes, as always

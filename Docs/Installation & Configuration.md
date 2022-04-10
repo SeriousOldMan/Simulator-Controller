@@ -52,9 +52,17 @@ You might still encounter execution errors later on because of Windows security 
 	takeown.exe /F . /R /D N
 	Get-ChildItem -Path '.' -Recurse | Unblock-File
 
+## User Account Control settings
+
+Another Windows security function is the so called User Account Control. It jumps in when files, settings or other low level stuff is about to be changed on your computer by an application. I think all of you know the dimmed desktop, when a new software should be installed.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/User%20Account%20Control.JPG)
+
+It has been reported, that the UAC can interfere in rare cases with the operation of Simulator Controller. Especially the C#-based Stream Deck plugin crashes, when the UAC is set at a too high level. If you experience such problems, try to lower the UAC. If this helps, give the respective application or library of Simulator Controller administration rights and bring the UAC level up again. This usually helps.
+
 ## Installing Microsoft Language Runtimes
 
-Several low level components of Simulator Controller are based on low level language runtimes from Microsoft, namely the *.NET Framwork Runtimes* in the version 4.7.2 and 4.8 and the *Visual C++ Redistributable* for Visual Studio 2022. Normally, these runtimes will be installed on your system, but in some rare conditions they might be not of the required version. You can check whether your system has the required versions installed using the Windows settings dialog in the Apps section. If you need to install a specific version, you can find the installer at various Microsoft Websites:
+Several components of Simulator Controller are based on low level language runtimes from Microsoft, namely the *.NET Framwork Runtimes* in the version 4.7.2 and 4.8 and the *Visual C++ Redistributable* for Visual Studio 2022. Normally, these runtimes will be installed on your system, but in some rare conditions they might be not of the required version. You can check whether your system has the required versions installed using the Windows settings dialog in the Apps section. If you need to install a specific version, you can find the installer at various Microsoft Websites:
 
   [Microsoft Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
   

@@ -655,11 +655,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
-		Gui %window%:Add, Edit, x%x1% yp w45 h20 Limit3 Number VsimAvgLapTimeEdit, %simAvgLapTimeEdit%
+		Gui %window%:Add, Edit, x%x1% yp w45 h20 VsimAvgLapTimeEdit gvalidateLapTime, %simAvgLapTimeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit, %simFuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit gvalidateFuel, %simFuelConsumptionEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
 		
 		x := 222
@@ -2437,6 +2437,28 @@ validatePitstopRule(full := false) {
 					GuiControl, , pitstopWindowEdit, % Round(pitOpen) . " - " . Round(pitClose)
 			}
 		}
+	}
+}
+
+validateLapTime() {
+	GuiControlGet simAvgLapTimeEdit
+	
+	if simAvgLapTimeEdit is not Number
+	{
+		simAvgLapTimeEdit := 0.0
+		
+		GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+	}
+}
+
+validateFuel() {
+	GuiControlGet simFuelConsumptionEdit
+	
+	if simFuelConsumptionEdit is not Number
+	{
+		simFuelConsumptionEdit := 0.0
+		
+		GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 	}
 }
 

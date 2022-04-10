@@ -56,7 +56,7 @@ You might still encounter execution errors later on because of Windows security 
 
 Another Windows security function is the so called User Account Control. It jumps in when files, settings or other low level stuff is about to be changed on your computer by an application. I think all of you know the dimmed desktop, when a new software should be installed.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/User%20Account%20Control.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/User%20Account%20Control.jpg)
 
 It has been reported, that the UAC can interfere in rare cases with the operation of Simulator Controller. Especially the C#-based Stream Deck plugin crashes, when the UAC is set at a too high level. If you experience such problems, try to lower the UAC. If this helps, give the respective application or library of Simulator Controller administration rights and bring the UAC level up again. This usually helps.
 

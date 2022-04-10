@@ -1433,7 +1433,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							pitstopWindowEdit := values2String("-", pitstopRule*)
 						}
 						else {
-							GuiControl Choose, pitstopRequirementsDropDown, 3
+							GuiControl Choose, pitstopRequirementsDropDown, 2
 						
 							pitstopWindowEdit := pitstopRule
 						}

@@ -347,7 +347,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Wetter")
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Weather")
 		
 		choices := map(kWeatherOptions, "translate")
 		choices.InsertAt(1, translate("All"))

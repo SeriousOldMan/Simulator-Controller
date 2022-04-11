@@ -3,7 +3,7 @@ Version=4.0.6-dev
 Target=4.0.4-release
 Date=04/11/2022
 Download=
-Changes=Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields
+Changes=Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields, Extensive logging for Team Server and "Race Center", Showing lap times in "M:SS.s" format
 [Release]
 Version=4.0.4-release
 Date=04/08/2022

@@ -156,10 +156,10 @@ global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
-global pitstopPressureFLEdit
-global pitstopPressureFREdit
-global pitstopPressureRLEdit
-global pitstopPressureRREdit
+global pitstopPressureFLEdit := ""
+global pitstopPressureFREdit := ""
+global pitstopPressureRLEdit := ""
+global pitstopPressureRREdit := ""
 global pitstopRepairsDropDown
 
 class RaceCenter extends ConfigurationItem {
@@ -1184,11 +1184,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h20, % translate("Pressures")
 		
-		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit
+		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit gvalidatePitstopPressureFL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit gvalidatePitstopPressureFR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
-		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit
+		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit gvalidatePitstopPressureRL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit gvalidatePitstopPressureRR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
@@ -6805,6 +6805,35 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 	
 	return previousValue
+}
+
+validateNumber(field) {
+	oldValue := %field%
+	
+	GuiControlGet %field%
+	
+	if %field% is not Number
+	{
+		%field%:= oldValue
+		
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validatePitstopPressureFL() {
+	validateNumber("pitstopPressureFLEdit")
+}
+
+validatePitstopPressureFR() {
+	validateNumber("pitstopPressureFREdit")
+}
+
+validatePitstopPressureRL() {
+	validateNumber("pitstopPressureRLEdit")
+}
+
+validatePitstopPressureRR() {
+	validateNumber("pitstopPressureRREdit")
 }
 
 displayValue(value) {

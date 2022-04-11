@@ -198,7 +198,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static accountEMailEdit
 	static accountPasswordEdit
 	static accountContractDropDown
-	static accountMinutesEdit
+	static accountMinutesEdit := 120
 	
 	static createPasswordButton
 	static copyPasswordButton
@@ -621,7 +621,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional"], "translate")*)
-		Gui ADM:Add, Edit, x%x3% yp w60 h21  vaccountMinutesEdit
+		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
 		setButtonIcon(availableMinutesButtonHandle, kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")

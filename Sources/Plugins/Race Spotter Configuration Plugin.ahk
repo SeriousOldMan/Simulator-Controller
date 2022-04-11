@@ -100,7 +100,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
 		Gui %window%:Add, Text, x%x0% ys+24 w120 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit HWNDwidget13 Hidden
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit gvalidateRSPDampingFactor HWNDwidget13 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
 		Gui %window%:Font, Norm, Arial
@@ -212,7 +212,9 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			
 			GuiControl Text, rspLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rspLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-			GuiControl Text, rspDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			rspDampingFactorEdit := configuration["HistoryLapsDamping"]
+			GuiControl Text, rspDampingFactorEdit, %rspDampingFactorEdit%
 			
 			GuiControl Choose, sideProximityDropDown, % (configuration["SideProximity"] + 1)
 			GuiControl Choose, rearProximityDropDown, % (configuration["RearProximity"] + 1)
@@ -286,6 +288,19 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+validateRSPDampingFactor() {
+	oldValue := rspDampingFactorEdit
+	
+	GuiControlGet rspDampingFactorEdit
+	
+	if rspDampingFactorEdit is not Number
+	{
+		rspDampingFactorEdit := oldValue
+		
+		GuiControl, , rspDampingFactorEdit, %rspDampingFactorEdit%
+	}
+}
 
 chooseRaceSpotterSimulator() {
 	configurator := RaceSpotterConfigurator.Instance

@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Optimized pitstop search pictures for R3E.
   4. Fixed initialization of service order in "Strategy Workbench".
+  5. Optimized chart drawing algorithms.
 
 ## 4.0.4-release 04/08/22
 

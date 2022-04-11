@@ -681,7 +681,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			GuiControl Choose, settingDropDown, 0
 			GuiControl Choose, settingValueDropDown, 0
-			GuiControl, , settingValueEdit, % ""
+			
+			settingValueEdit := ""
+			GuiControl, , settingValueEdit, %settingValueEdit%
 		}
 		
 		if (this.getAvailableSettings().Length() == 0)
@@ -1611,8 +1613,11 @@ chooseSetting() {
 		
 		GuiControlGet settingValueEdit
 		
-		if (settingValueEdit != value)
-			GuiControl, , settingValueEdit, % value
+		if (settingValueEdit != value) {
+			settingValueEdit := value
+		
+			GuiControl, , settingValueEdit, %value%
+		}
 	}
 	
 	editor.updateState()
@@ -1673,6 +1678,7 @@ addSetting() {
 		else if (type = "Text")
 			value := ""
 		
+		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
 	}
 	
@@ -1776,6 +1782,7 @@ selectSetting() {
 		else if (type = "Text")
 			value := ""
 		
+		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
 	}
 	
@@ -1823,12 +1830,14 @@ changeSetting() {
 		value := settingValueCheck
 	}
 	else {
+		oldValue := settingValueEdit
+	
 		GuiControlGet settingValueEdit
 	
 		if (type = "Integer") {
 			if settingValueEdit is not Integer
 			{
-				settingValueEdit := Round(settingValueEdit)
+				settingValueEdit := oldValue
 				
 				GuiControl, , settingValueEdit, %settingValueEdit%
 			}
@@ -1836,7 +1845,7 @@ changeSetting() {
 		else if (type = "Float") {
 			if settingValueEdit is not Number
 			{
-				settingValueEdit := 0.0
+				settingValueEdit := oldValue
 				
 				GuiControl, , settingValueEdit, %settingValueEdit%
 			}

@@ -422,7 +422,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.iDriverNickName := driver.NickName
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetched Driver (Driver: ") . this.Driver . translate(", Name: ") . driver.ForName . A_Space . driver.SurName . translate(")"))
+					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver.ForName . A_Space . driver.SurName . translate(")"))
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while fetching driver names (Driver: ") . this.Driver . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -484,7 +484,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.Connector.FinishSession(this.Session)
 				
 					if (getLogLevel() <= kLogInfo)
-						logMessage(kLogInfo, translate("Finished session (Session: ") . this.Session . translate(")"))
+						logMessage(kLogInfo, translate("Finishing session (Session: ") . this.Session . translate(")"))
 				}
 			}
 			catch exception {
@@ -543,7 +543,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				driver := this.Connector.GetSessionDriver(this.Session)
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Requested current driver (Session: ") . this.Session . translate(", Driver: ") . driver . translate(")"))
+					logMessage(kLogInfo, translate("Requesting current driver (Session: ") . this.Session . translate(", Driver: ") . driver . translate(")"))
 				
 				return driver
 			}
@@ -563,7 +563,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				value := this.Connector.GetSessionValue(this.Session, name)
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetched session data (Session: ") . this.Session . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 				
 				if isDebug()
 					showMessage("Fetching session value: " . name . " => " . value)
@@ -590,7 +590,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.Connector.SetSessionValue(this.Session, name, value)
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Saved session data (Session: ") . this.Session . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -610,7 +610,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					value := this.Connector.GetStintValue(stint, name)
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetched stint data (Session: ") . this.Session . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Fetching stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 
 				if isDebug()
 					showMessage("Fetching value for " . stint . ": " . name . " => " . value)
@@ -648,7 +648,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Saved stint data (Session: ") . this.Session . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Storing stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -666,7 +666,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				lapNr := this.parseObject(this.Connector.GetLap(lap)).Nr
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetched lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
+					logMessage(kLogInfo, translate("Fetching lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
 				
 				return lapNr
 			}
@@ -693,7 +693,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Fetching value for " . lap . ": " . name . " => " . value)
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetched lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			
 				return value
 			}
@@ -728,7 +728,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 				
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Saved lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(", Value: ") . value . translate(")"))
+					logMessage(kLogInfo, translate("Storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))

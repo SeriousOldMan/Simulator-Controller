@@ -21,15 +21,18 @@ Release 4.0.6 Checklist
 =======================
 
 0. Search for new links (*)
+1. Update Procedure
+   a. Translations
 
 Release 4.0.4 Checklist
 =======================
 
 0. Search for new links (*)
+1. Update Procedure
    a. Translations
    b. Phrase Grammars
    c. Action Labels & Icons
-1. New Elisa Commands
+2. New Elisa Commands
    a. Update Commands on Discord
    b. Mention in Update Notes
 

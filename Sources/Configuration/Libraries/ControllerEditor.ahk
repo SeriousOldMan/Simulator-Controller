@@ -958,14 +958,16 @@ class LayoutsList extends ConfigurationItemList {
 	addItem() {
 		base.addItem()
 		
-		type := this.ItemList[this.CurrentItem][2]["Type"]
-		
-		GuiControl Text, layoutRowEdit, %layoutRowEdit%
-		
-		preview := ControllerEditor.Instance.ControllerPreview
-		
-		if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
+		if this.CurrentItem {
+			type := this.ItemList[this.CurrentItem][2]["Type"]
+			
+			GuiControl Text, layoutRowEdit, %layoutRowEdit%
+			
+			preview := ControllerEditor.Instance.ControllerPreview
+			
+			if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+				ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
+		}
 	}
 	
 	clearEditor() {

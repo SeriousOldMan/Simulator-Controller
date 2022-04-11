@@ -561,12 +561,12 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.SessionActive {
 			try {
 				value := this.Connector.GetSessionValue(this.Session, name)
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 				
 				if isDebug()
 					showMessage("Fetching session value: " . name . " => " . value)
+
+				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
+					logMessage(kLogInfo, translate("Fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			
 				return value
 			}
@@ -584,13 +584,18 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Saving session value: " . name . " => " . value)
 				
-				if (!value || (value == ""))
+				if (!value || (value == "")) {
 					this.Connector.DeleteSessionValue(this.Session, name)
-				else
+				
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Deleting session data (Session: ") . this.Session . translate(", Name: ") . name . translate(")"))
+				}
+				else {
 					this.Connector.SetSessionValue(this.Session, name, value)
 				
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
+				}
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -609,11 +614,11 @@ class TeamServerPlugin extends ControllerPlugin {
 				else
 					value := this.Connector.GetStintValue(stint, name)
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetching stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
-
 				if isDebug()
 					showMessage("Fetching value for " . stint . ": " . name . " => " . value)
+
+				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
+					logMessage(kLogInfo, translate("Fetching stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			
 				return value
 			}
@@ -692,7 +697,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug()
 					showMessage("Fetching value for " . lap . ": " . name . " => " . value)
 
-				if (getLogLevel() <= kLogInfo)
+				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
 					logMessage(kLogInfo, translate("Fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			
 				return value
@@ -719,16 +724,19 @@ class TeamServerPlugin extends ControllerPlugin {
 						this.Connector.DeleteSessionLapValue(session, lap, name)
 					else
 						this.Connector.DeleteLapValue(lap, name, value)
+				
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Deleting lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(")"))
 				}
 				else {
 					if lap is integer
 						this.Connector.SetSessionLapValue(session, lap, name, value)
 					else
 						this.Connector.SetLapValue(lap, name, value)
-				}
 				
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Storing lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
+				}
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))

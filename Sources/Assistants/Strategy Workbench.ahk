@@ -2466,43 +2466,29 @@ validatePitstopRule(full := false) {
 	}
 }
 
-validateSimAvgLapTime() {
-	oldValue := simAvgLapTimeEdit
+validateNumber(field) {
+	oldValue := %field%
 	
-	GuiControlGet simAvgLapTimeEdit
+	GuiControlGet %field%
 	
-	if simAvgLapTimeEdit is not Number
+	if %field% is not Number
 	{
-		simAvgLapTimeEdit := oldValue
+		%field%:= oldValue
 		
-		GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+		GuiControl, , %field%, %oldValue%
 	}
+}
+
+validateSimAvgLapTime() {
+	validateNumber("simAvgLapTimeEdit")
 }
 
 validateSimFuelConsumption() {
-	oldValue := simFuelConsumptionEdit
-	
-	GuiControlGet simFuelConsumptionEdit
-	
-	if simFuelConsumptionEdit is not Number
-	{
-		simFuelConsumptionEdit := oldValue
-		
-		GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
-	}
+	validateNumber("simFuelConsumptionEdit")
 }
 
 validatePitstopFuelService() {
-	oldValue := pitstopFuelServiceEdit
-	
-	GuiControlGet pitstopFuelServiceEdit
-	
-	if pitstopFuelServiceEdit is not Number
-	{
-		pitstopFuelServiceEdit := oldValue
-		
-		GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
-	}
+	validateNumber("pitstopFuelServiceEdit")
 }
 
 filterSchema(schema) {

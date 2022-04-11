@@ -45,6 +45,26 @@ class StrategyViewer {
 		this.iStrategyViewer := strategyViewer
 	}
 	
+	lapTimeDisplayValue(lapTime) {
+		if lapTime is Number
+		{
+			seconds := Floor(lapTime)
+			fraction := (lapTime - seconds)
+			minutes := Floor(seconds / 60)
+			
+			fraction := Round(fraction * 10)
+			
+			seconds := ((seconds - (minutes * 60)) . "")
+			
+			if (StrLen(seconds) = 1)
+				seconds := ("0" . seconds)
+			
+			return (minutes . ":" . seconds . "." . fraction)
+		}
+		else
+			return lapTime
+	}
+	
 	createStrategyInfo(strategy) {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (strategy.Simulator ? strategy.Simulator : translate("Unknown")) . "</td></tr>")
@@ -92,7 +112,7 @@ class StrategyViewer {
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">1</th></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . strategy.AvgLapTime . "</td></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th><td class=""td-std"">" . strategy.FuelConsumption . "</td></tr>")
 			html .= "</table>"
 			
@@ -126,7 +146,7 @@ class StrategyViewer {
 				stints.Push("<th class=""th-std"">" . A_Index . "</th>")
 				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
 				laps.Push("<td class=""td-std"">" . Max(pitstopLap, 0) . "</td>")
-				lapTimes.Push("<td class=""td-std"">" . Round(lastLapTime, 1) . "</td>")
+				lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
 				refuels.Push("<td class=""td-std"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
@@ -155,7 +175,7 @@ class StrategyViewer {
 			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + 1) . "</th>")
 			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
 			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
-			lapTimes.Push("<td class=""td-std"">" . Round(lastLapTime, 1) . "</td>")
+			lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 			fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 			pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
 			refuels.Push("<td class=""td-std"">" . Ceil(lastRefuel) . "</td>")
@@ -170,7 +190,7 @@ class StrategyViewer {
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", lapTimes*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", map(lapTimes, ObjBindMethod(this, "lapTimeDisplayValue"))*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th>" . values2String("", fuelConsumptions*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop Lap") . "</th>" . values2String("", pitstopLaps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Refuel Amount") . "</th>" . values2String("", refuels*) . "</tr>")

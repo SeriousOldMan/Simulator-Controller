@@ -3139,7 +3139,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							   , translate(stint.Compound), stint.Laps.Length()
-							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		
 		this.updatePlan(stint)
@@ -3212,7 +3212,7 @@ class RaceCenter extends ConfigurationItem {
 				for ignore, stint in newStints {
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					
 					stint.Row := LV_GetCount()
@@ -3231,7 +3231,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -4364,7 +4364,7 @@ class RaceCenter extends ConfigurationItem {
 					
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 				}
 				
@@ -4383,9 +4383,9 @@ class RaceCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (LV_GetCount() + 1)
 					
-					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 				}
-				
+		
 		LV_ModifyCol()
 		
 		Loop % LV_GetCount("Col")
@@ -5469,8 +5469,8 @@ class RaceCenter extends ConfigurationItem {
 	
 	createLapDetails(stint) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . stint.AvgLapTime . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . stint.BestLapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(stint.BestLapTime) . "</td></tr>")
 		html .= "</table>"
 		
 		lapData := []
@@ -5482,7 +5482,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, lap in stint.Laps {
 			lapData.Push("<th class=""th-std"">" . lap.Nr . "</th>")
 			mapData.Push("<td class=""td-std"">" . lap.Map . "</td>")
-			lapTimeData.Push("<td class=""td-std"">" . lap.Laptime . "</td>")
+			lapTimeData.Push("<td class=""td-std"">" . lapTimeDisplayValue(lap.Laptime) . "</td>")
 			fuelConsumptionData.Push("<td class=""td-std"">" . lap.FuelConsumption . "</td>")
 			accidentData.Push("<td class=""td-std"">" . (lap.Accident ? "x" : "") . "</td>")
 		}
@@ -5592,7 +5592,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lap.LapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . lap.FuelConsumption . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . lap.FuelRemaining . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
@@ -5701,7 +5701,7 @@ class RaceCenter extends ConfigurationItem {
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
 																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
-																						 , lapTime, laps, delta)
+																						 , lapTimeDisplayValue(lapTime), laps, delta)
 				   . "</td></tr>")
 		}
 		
@@ -5776,7 +5776,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
-			avgLapTimesData.Push("<td class=""td-std"">" . Round(average(lapTimes), 1) . "</td>")
+			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
 			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
@@ -6017,7 +6017,7 @@ class RaceCenter extends ConfigurationItem {
 				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
@@ -6101,7 +6101,7 @@ class RaceCenter extends ConfigurationItem {
 				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
@@ -6886,6 +6886,10 @@ validatePitstopPressureRR() {
 	validateNumber("pitstopPressureRREdit")
 }
 
+lapTimeDisplayValue(lapTime) {
+	return RaceReportViewer.lapTimeDisplayValue(lapTime)
+}
+
 displayValue(value) {
 	return (isNull(value) ? "-" : value)
 }
@@ -7004,7 +7008,7 @@ loadDrivers(connector, team) {
 			catch exception {
 				; ignore
 			}
-		}			
+		}
 	
 	return drivers
 }

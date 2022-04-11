@@ -86,6 +86,26 @@ class RaceReportViewer {
 		this.iInfoViewer := infoViewer
 	}
 	
+	lapTimeDisplayValue(lapTime) {
+		if lapTime is Number
+		{
+			seconds := Floor(lapTime)
+			fraction := (lapTime - seconds)
+			minutes := Floor(seconds / 60)
+			
+			fraction := Round(fraction * 10)
+			
+			seconds := ((seconds - (minutes * 60)) . "")
+			
+			if (StrLen(seconds) = 1)
+				seconds := ("0" . seconds)
+			
+			return (minutes . ":" . seconds . "." . fraction)
+		}
+		else
+			return lapTime
+	}
+	
 	showReportChart(drawChartFunction) {
 		if this.ChartViewer {
 			window := this.Window
@@ -640,7 +660,7 @@ class RaceReportViewer {
 				hasDNF := (hasDNF || (result = "DNF"))
 				
 				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
+							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 			
 			Loop % carsCount
@@ -659,8 +679,8 @@ class RaceReportViewer {
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Best Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Avg Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
 			
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
@@ -721,7 +741,7 @@ class RaceReportViewer {
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 									, "'" . consumption . "'"
-									, "'" . lapTime . "'"
+									, "'" . this.lapTimeDisplayValue(lapTime) . "'"
 									, "'" . (pitstop ? translate("x") : "") . "'")
 											
 				rows.Push("[" . row	. "]")

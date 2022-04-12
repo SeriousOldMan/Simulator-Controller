@@ -42,6 +42,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	iTeamServerEnabled := false
 	
 	iSessionActive := false
+	iLapData := {Telemetry: {}, Positions: {}}
 	
 	class TeamServerToggleAction extends ControllerAction {
 		iPlugin := false
@@ -455,6 +456,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage("Starting team session: " . car . ", " . track)
 			
 			try {
+				this.iLapData := {Telemetry: {}, Positions: {}}
+				
 				this.Connector.StartSession(this.Session, duration, car, track)
 			
 				this.Connector.SetSessionValue(this.Session, "Time", A_Now)
@@ -494,6 +497,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 		}
 		
+		this.iLapData := {Telemetry: {}, Positions: {}}
 		this.iSessionActive := false	
 	}
 	
@@ -509,7 +513,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				else {
 					if isDebug()
 						showMessage("Joining team session: " . car . ", " . track)
-				
+		
+					this.iLapData := {Telemetry: {}, Positions: {}}		
 					this.iSessionActive := true
 				}
 				
@@ -531,8 +536,10 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.finishSession()
 		}
-		else
+		else {
+			this.iLapData := {Telemetry: {}, Positions: {}}
 			this.iSessionActive := false
+		}
 	}
 	
 	getCurrentDriver() {
@@ -802,22 +809,26 @@ class TeamServerPlugin extends ControllerPlugin {
 				
 				lap := this.Connector.CreateLap(stint, lapNumber)
 				
-				if telemetryData {
+				if (telemetryData && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
 					telemetryData := printConfiguration(telemetryData)
 					
 					if isDebug()
 						showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryData)
 					
 					this.setLapValue(lapNumber, "Telemetry Data", telemetryData)
+					
+					this.iLapData["Telemetry"][lapNumber] := true
 				}
 			
-				if positionsData {
+				if (positionsData && !this.iLapData["Positions"].HasKey(lapNumber)) {
 					positionsData := printConfiguration(positionsData)
 					
 					if isDebug()
 						showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
 					
 					this.setLapValue(lapNumber, "Positions Data", positionsData)
+					
+					this.iLapData["Positions"][lapNumber] := true
 				}
 			}
 			catch exception {

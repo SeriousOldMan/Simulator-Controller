@@ -408,6 +408,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Send %command%
 		}
+		
+		if !this.iImageMode
+			Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false, update := true) {
@@ -811,33 +814,41 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitstopLabels.Length()
+		Loop 3
 		{
-			pitstopLabel := pitstopLabels[A_Index]
-			
-			if !this.iPSImageSearchArea {
-				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
+			Loop % pitstopLabels.Length()
+			{
+				pitstopLabel := pitstopLabels[A_Index]
+				
+				if !this.iPSImageSearchArea {
+					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
-			}
-			else {
-				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				else {
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				
+				if imageX is Integer
+				{
+					if isDebug() {
+						images.Push(pitstopLabel)
+						
+						this.markFoundLabel(pitstopLabel, imageX, imageY)
+					}
+				
+					break
+				}
 			}
 			
 			if imageX is Integer
-			{
-				if isDebug() {
-					images.Push(pitstopLabel)
-					
-					this.markFoundLabel(pitstopLabel, imageX, imageY)
-				}
-			
 				break
-			}
+			else
+				Sleep 500
 		}
 		
 		lastY := false

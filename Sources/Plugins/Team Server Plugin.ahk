@@ -282,6 +282,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		if register
 			controller.registerPlugin(this)
 		
+		if this.TeamServerEnabled
+			this.updateTrayLabel(true)
+		
 		this.keepAlive()
 	}
 	
@@ -331,10 +334,23 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 	}
 	
+	updateTrayLabel(enabled) {
+		if enabled {
+			if !InStr(A_IconTip, translate(" (Team)"))
+				Menu Tray, Tip, % A_IconTip . translate(" (Team)")
+		}
+		else {
+			if InStr(A_IconTip, translate(" (Team)"))
+				Menu Tray, Tip, % StrReplace(A_IconTip, translate(" (Team)"), "")
+		}
+	}
+	
 	enableTeamServer() {
 		this.iTeamServerEnabled := true
 		
 		this.updateActions(kSessionFinished)
+		
+		this.updateTrayLabel(true)
 	}
 	
 	disableTeamServer() {
@@ -343,6 +359,8 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iTeamServerEnabled := false
 		
 		this.updateActions(kSessionFinished)
+		
+		this.updateTrayLabel(false)
 	}
 	
 	parseObject(properties) {

@@ -1579,7 +1579,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				if (simulator && car && track) {
 					settingsDB := new SettingsDatabase()
-										
+					
 					settings := new SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 					
 					if (settings.Count() > 0) {
@@ -2078,12 +2078,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		maxTyreLaps := simMaxTyreLapsEdit
 		
-		if (tyreCompound = "Dry")
-			tyrePressures := [27.7, 27.7, 27.7, 27.7]
-		else
-			tyrePressures := [30.0, 30.0, 30.0, 30.0]
+		tyrePressures := false
 		
-		telemetryDB := new TelemetryDatabase(this.Simulator, this.Car, this.Track)
+		telemetryDB := new TelemetryDatabase(simulator, car, track)
 		lowestLapTime := false
 		
 		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
@@ -2095,6 +2092,21 @@ class StrategyWorkbench extends ConfigurationItem {
 				tyrePressures := [Round(row["Tyre.Pressure.Front.Left"], 1), Round(row["Tyre.Pressure.Front.Right"], 1)
 								, Round(row["Tyre.Pressure.Rear.Left"], 1), Round(row["Tyre.Pressure.Rear.Right"], 1)]
 			}
+		}
+		
+		if !tyrePressures {
+			settings := new SettingsDatabase().loadSettings(simulator, car, track, weather)
+			
+			if (tyreCompound = "Dry")
+				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)]
+			else
+				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 30.0)]
 		}
 	}
 	

@@ -104,7 +104,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
 		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrsDampingFactorEdit HWNDwidget13 Hidden
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrsDampingFactorEdit gvalidateRSDampingFactor HWNDwidget13 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
 		choices := map(["Ask", "Always save", "No action"], "translate")
@@ -199,7 +199,9 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			GuiControl Choose, rsSaveTelemetryDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTelemetry"])
 			GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-			GuiControl Text, rsDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			rsDampingFactorEdit := configuration["HistoryLapsDamping"]
+			GuiControl Text, rsDampingFactorEdit, %rsDampingFactorEdit%
 		}
 	}
 	
@@ -250,6 +252,19 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+validateRSDampingFactor() {
+	oldValue := rsDampingFactorEdit
+	
+	GuiControlGet rsDampingFactorEdit
+	
+	if rsDampingFactorEdit is not Number
+	{
+		rsDampingFactorEdit := oldValue
+		
+		GuiControl, , rsDampingFactorEdit, %rsDampingFactorEdit%
+	}
+}
 
 chooseRaceReportsPath() {
 	GuiControlGet raceReportsPathEdit

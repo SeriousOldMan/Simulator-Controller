@@ -433,7 +433,7 @@ class ControllerStepWizard extends StepWizard {
 							conflict := ""
 						
 						if (functionTriggers.Length() > 0) {
-							triggers := values2String(" | ", functionTriggers*)
+							triggers := values2String(" `; ", functionTriggers*)
 							
 							if load
 								this.iFunctionTriggers[function] := functionTriggers
@@ -542,7 +542,7 @@ class ControllerStepWizard extends StepWizard {
 			
 			function := (type . "." . number)
 			
-			trigger := this.iFunctionTriggers[function]
+			trigger := (this.iFunctionTriggers.HasKey(function) ? this.iFunctionTriggers[function] : false)
 			
 			title := translate("Modular Simulator Controller System")
 			prompt := translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
@@ -573,7 +573,10 @@ class ControllerStepWizard extends StepWizard {
 				if ErrorLevel
 					return
 				
-				this.iFunctionTriggers[function] := [key1, key2]
+				if ((key1 = "") && (key2 = ""))
+					this.iFunctionTriggers.Delete(function)
+				else
+					this.iFunctionTriggers[function] := [key1, key2]
 			}
 			else
 				this.iFunctionTriggers[function] := [key1]
@@ -587,6 +590,45 @@ class ControllerStepWizard extends StepWizard {
 			Gui ListView, % this.iFunctionsListView
 			
 			LV_Modify(row, "Vis")
+		}
+	}
+	
+	clearFunctionTriggerAndHotkey(row) {
+		local function
+		
+		wizard := this.SetupWizard
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		Gui ListView, % this.iFunctionsListView
+		
+		LV_GetText(trigger, row, 5)
+		
+		if (trigger != translate("n/a")) {
+			LV_GetText(type, row, 3)
+			LV_GetText(key, row, 4)
+			
+			double := false
+			
+			switch type {
+				case translate(k2WayToggleType):
+					type := k2WayToggleType
+					double := true
+				case translate(kDialType):
+					type := kDialType
+					double := true
+				case translate(k1WayToggleType):
+					type := k1WayToggleType
+				case translate(kButtonType):
+					type := kButtonType
+			}
+			
+			function := (type . "." . number)
+			
+			this.iFunctionTriggers.Delete(function)
+			
+			LV_Modify(row, "Col5", "")
 		}
 	}
 	
@@ -1480,6 +1522,7 @@ updateFunctionTriggers() {
 			LV_GetText(control, row, 2)
 			LV_GetText(function, row, 3)
 			LV_GetText(number, row, 4)
+			LV_GetText(trigger, row, 5)
 			
 			menuItem := ConfigurationItem.descriptor(control, number)
 			
@@ -1496,21 +1539,31 @@ updateFunctionTriggers() {
 			
 			Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
 			Menu ContextMenu, Disable, %menuItem%
-			Menu ContextMenu, Add
 			
-			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-			
-			menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
-			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-			
-			menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
-			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
+			if (trigger != translate("n/a")) {
+				Menu ContextMenu, Add
+				
+				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+				
+				menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+				
+				menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				Menu ContextMenu, Add
+								
+				menuItem := translate("Clear Trigger && Hotkey")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "clearFunctionTriggerAndHotkey", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+			}
 			
 			Menu ContextMenu, Show
 		}

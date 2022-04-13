@@ -156,10 +156,10 @@ global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
-global pitstopPressureFLEdit
-global pitstopPressureFREdit
-global pitstopPressureRLEdit
-global pitstopPressureRREdit
+global pitstopPressureFLEdit := ""
+global pitstopPressureFREdit := ""
+global pitstopPressureRLEdit := ""
+global pitstopPressureRREdit := ""
 global pitstopRepairsDropDown
 
 class RaceCenter extends ConfigurationItem {
@@ -1184,11 +1184,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h20, % translate("Pressures")
 		
-		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit
+		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit gvalidatePitstopPressureFL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit gvalidatePitstopPressureFR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
-		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit
+		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit gvalidatePitstopPressureRL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit gvalidatePitstopPressureRR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
@@ -2908,7 +2908,10 @@ class RaceCenter extends ConfigurationItem {
 				identifier := stint.Identifier
 				
 				driver := this.addDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
-				
+
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Load stint (Stint: ") . stint.Nr . translate(", Driver: ") . driver.FullName . translate(")"))
+		
 				stint.Driver := driver
 				driver.Stints.Push(stint)
 				stint.FuelConsumption := 0.0
@@ -2978,8 +2981,12 @@ class RaceCenter extends ConfigurationItem {
 					else
 						Sleep 400
 				}
-				else
+				else {
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Load lap data (Lap: ") . lap.Nr . translate("), Data:`n`n") . rawData . "`n")
+		
 					break
+				}
 			}
 			
 			if (stint.Laps.Length() == 0)
@@ -3132,34 +3139,21 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							   , translate(stint.Compound), stint.Laps.Length()
-							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		
 		this.updatePlan(stint)
 	}
 	
-	syncLaps() {
+	syncLaps(lastLap) {
 		session := this.SelectedSession[true]
 		
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		try {
-			lastLap := this.Connector.GetSessionLastLap(session)
-			
-			if lastLap {
-				lastLap := parseObject(this.Connector.GetLap(lastLap))
-				lastLap.Nr := (lastLap.Nr + 0)
-			}
-				
-		}
-		catch exception {
-			lastLap := false
-		}
-		
-		if !lastLap
-			return false
+		if (getLogLevel() <= kLogInfo)
+			logMessage(kLogInfo, translate("Syncing laps (Lap: ") . lastLap.Nr . translate(")"))
 		
 		try {
 			currentStint := this.Connector.GetSessionCurrentStint(session)
@@ -3203,7 +3197,7 @@ class RaceCenter extends ConfigurationItem {
 				for ignore, stint in newStints {
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					
 					stint.Row := LV_GetCount()
@@ -3222,7 +3216,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -3287,6 +3281,9 @@ class RaceCenter extends ConfigurationItem {
 		else
 			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
 		
+		if (getLogLevel() <= kLogInfo)
+			logMessage(kLogInfo, translate("Syncing race report (Lap: ") . lap . translate(")"))
+		
 		if (lap == 1) {
 			try {
 				try {
@@ -3329,8 +3326,12 @@ class RaceCenter extends ConfigurationItem {
 				else
 					lapData := false
 				
-				if (lapData && (lapData != ""))
+				if (lapData && (lapData != "")) {
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Updating race report (Lap: ") . lap . translate("), Data:`n`n") . lapData . "`n")
+		
 					lapData := parseConfiguration(lapData)
+				}
 				else if (lap = lastLap)
 					Throw "No data..."
 				else {
@@ -3413,6 +3414,9 @@ class RaceCenter extends ConfigurationItem {
 		newData := false
 		
 		if !load {
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, translate("Syncing telemetry data (Lap: ") . lastLap . translate(")"))
+		
 			session := this.SelectedSession[true]
 			telemetryDB := this.TelemetryDatabase
 			
@@ -3448,8 +3452,12 @@ class RaceCenter extends ConfigurationItem {
 							else
 								Sleep 400
 						}
-						else
+						else {
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data:`n`n") . telemetryData . "`n")
+		
 							break
+						}
 					}
 				}
 				catch exception {
@@ -3576,6 +3584,9 @@ class RaceCenter extends ConfigurationItem {
 				lastLap := lastLap.Nr
 			else
 				return
+		
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, translate("Syncing tyre pressures (Lap: ") . lastLap . translate(")"))
 			
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 			lap := pressuresTable.Length()
@@ -3606,8 +3617,12 @@ class RaceCenter extends ConfigurationItem {
 							else
 								Sleep 400
 						}
-						else
+						else {
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data:`n`n") . lapPressures . "`n")
+			
 							break
+						}
 					}
 				}
 				catch exception {
@@ -3669,6 +3684,9 @@ class RaceCenter extends ConfigurationItem {
 			}
 		
 		if (state && (state != "")) {
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, translate("Updating pitstops, State:`n`n") . state . "`n")
+			
 			state := parseConfiguration(state)
 				
 			lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
@@ -3736,8 +3754,14 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.getSessionValue(session, "Race Strategy Version")
 			
 			if (version && (version != "")) {
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
+					
 				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
 					strategy := this.Connector.getSessionValue(session, "Race Strategy")
+				
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Updating session strategy, Strategy:`n`n") . strategy . "`n")
 				
 					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy)))
 				}
@@ -3765,6 +3789,9 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.getSessionValue(session, "Stint Plan Version")
 			
 			if (version && (version != "")) {
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
+				
 				window := this.Window
 				
 				Gui %window%:Default
@@ -3774,13 +3801,21 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.Version || (this.Version < version)) {
 					info := this.Connector.getSessionValue(session, "Stint Plan Info")
 					plan := this.Connector.getSessionValue(session, "Stint Plan")
-					
+				
 					if (plan = "CLEAR") {
-						if this.Version
+						if (this.Version && (LV_GetCount() > 0)) {
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Clearing stint plan, Info:`n`n") . info . "`n")
+					
 							LV_Delete()
+						}
 					}
-					else
+					else {
+						if (getLogLevel() <= kLogInfo)
+							logMessage(kLogInfo, translate("Updating stint plan, Info:`n`n") . info . translate("`nPlan:`n`n") . plan . "`n")
+					
 						this.loadPlan(info, plan)
+					}
 				}
 			}
 		}
@@ -3792,20 +3827,47 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local strategy
 		
+		static hadLastLap := false
+		
 		if this.SessionActive {
 			window := this.Window
 			
 			Gui %window%:Default
 	
 			try {
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing session"))
+		
+				try {
+					lastLap := this.Connector.GetSessionLastLap(this.SelectedSession[true])
+					
+					if lastLap {
+						lastLap := parseObject(this.Connector.GetLap(lastLap))
+						lastLap.Nr := (lastLap.Nr + 0)
+					}
+				}
+				catch exception {
+					lastLap := false
+				}
+				
+				if (hadLastLap && !lastLap) {
+					this.initializeSession()
+					
+					hadLastLap := false
+					
+					return
+				}
+				else if lastLap
+					hadLastLap := true
+					
 				this.syncPlan()
 				this.syncStrategy()
 				
 				newLaps := false
 				newData := false
-				
-				if this.syncLaps()
-					newLaps := true
+			
+				if lastLap
+					newLaps := this.syncLaps(lastLap)
 				
 				if this.syncRaceReport()
 					newData := true
@@ -3815,8 +3877,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				if this.syncTyrePressures()
 					newData := true
-				
-				this.syncStandings()
 				
 				if newLaps
 					this.syncPitstops()
@@ -4313,7 +4373,7 @@ class RaceCenter extends ConfigurationItem {
 					
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 				}
 				
@@ -4332,9 +4392,9 @@ class RaceCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (LV_GetCount() + 1)
 					
-					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 				}
-				
+		
 		LV_ModifyCol()
 		
 		Loop % LV_GetCount("Col")
@@ -4511,7 +4571,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.syncTelemetry(true)
 				this.syncTyrePressures(true)
-				this.syncStandings(true)
 			
 				this.ReportViewer.setReport(folder . "Race Report")
 			
@@ -5419,8 +5478,8 @@ class RaceCenter extends ConfigurationItem {
 	
 	createLapDetails(stint) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . stint.AvgLapTime . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . stint.BestLapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(stint.BestLapTime) . "</td></tr>")
 		html .= "</table>"
 		
 		lapData := []
@@ -5432,7 +5491,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, lap in stint.Laps {
 			lapData.Push("<th class=""th-std"">" . lap.Nr . "</th>")
 			mapData.Push("<td class=""td-std"">" . lap.Map . "</td>")
-			lapTimeData.Push("<td class=""td-std"">" . lap.Laptime . "</td>")
+			lapTimeData.Push("<td class=""td-std"">" . lapTimeDisplayValue(lap.Laptime) . "</td>")
 			fuelConsumptionData.Push("<td class=""td-std"">" . lap.FuelConsumption . "</td>")
 			accidentData.Push("<td class=""td-std"">" . (lap.Accident ? "x" : "") . "</td>")
 		}
@@ -5542,7 +5601,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lap.LapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . lap.FuelConsumption . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . lap.FuelRemaining . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
@@ -5651,7 +5710,7 @@ class RaceCenter extends ConfigurationItem {
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
 																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
-																						 , lapTime, laps, delta)
+																						 , lapTimeDisplayValue(lapTime), laps, delta)
 				   . "</td></tr>")
 		}
 		
@@ -5726,7 +5785,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
-			avgLapTimesData.Push("<td class=""td-std"">" . Round(average(lapTimes), 1) . "</td>")
+			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
 			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
@@ -5967,7 +6026,7 @@ class RaceCenter extends ConfigurationItem {
 				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
@@ -6051,7 +6110,7 @@ class RaceCenter extends ConfigurationItem {
 				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
@@ -6807,6 +6866,39 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+validateNumber(field) {
+	oldValue := %field%
+	
+	GuiControlGet %field%
+	
+	if %field% is not Number
+	{
+		%field%:= oldValue
+		
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validatePitstopPressureFL() {
+	validateNumber("pitstopPressureFLEdit")
+}
+
+validatePitstopPressureFR() {
+	validateNumber("pitstopPressureFREdit")
+}
+
+validatePitstopPressureRL() {
+	validateNumber("pitstopPressureRLEdit")
+}
+
+validatePitstopPressureRR() {
+	validateNumber("pitstopPressureRREdit")
+}
+
+lapTimeDisplayValue(lapTime) {
+	return RaceReportViewer.lapTimeDisplayValue(lapTime)
+}
+
 displayValue(value) {
 	return (isNull(value) ? "-" : value)
 }
@@ -6925,7 +7017,7 @@ loadDrivers(connector, team) {
 			catch exception {
 				; ignore
 			}
-		}			
+		}
 	
 	return drivers
 }

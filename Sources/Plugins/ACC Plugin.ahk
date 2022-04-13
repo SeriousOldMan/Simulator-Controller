@@ -48,7 +48,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
-	iImageMode := true
+	iFallbackMode := false
 	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -408,6 +408,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false, update := true) {
@@ -424,7 +426,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
 			
-				if this.iImageMode
+				if !this.iFallbackMode
 					if (update || !wasOpen) {
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
@@ -471,16 +473,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	requirePitstopMFD() {
 		static reported := false
 		
+		if (this.iFallbackMode = "Retry")
+			this.iFallbackMode := false
+		
 		this.openPitstopMFD()
 		
-		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
-			reported := true
-			
-			logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
-			
+		if (this.OpenPitstopMFDHotkey = "Off")
+			return false
+		else if !this.iPSIsOpen {
+			if !reported {
+				reported := true
+				
+				logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
+				
+				Loop 2
+					SoundPlay %kResourcesDirectory%Sounds\Critical.wav, Wait
+			}
+				
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
-			this.iImageMode := false
+			this.iFallbackMode := true
 			
 			SetTimer updatePitstopState, Off
 			
@@ -498,12 +510,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			return true
 		}
-		else if reported
-			return true
-		else if (this.OpenPitstopMFDHotkey == "Off")
-			return false
 		else
-			return this.iPSIsOpen
+			return true
 	}
 	
 	selectPitstopOption(option, retry := true) {
@@ -811,33 +819,50 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitstopLabels.Length()
-		{
-			pitstopLabel := pitstopLabels[A_Index]
-			
-			if !this.iPSImageSearchArea {
-				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+		localLabels := false
+		
+		for ignore, fileName in pitstopLabels
+			if InStr(fileName, kUserScreenImagesDirectory) {
+				localLabels := true
+				
+				break
 			}
-			else {
-				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+			
+		Loop % (localLabels ? 3 : 1)
+		{
+			Loop % pitstopLabels.Length()
+			{
+				pitstopLabel := pitstopLabels[A_Index]
+				
+				if !this.iPSImageSearchArea {
+					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				else {
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				
+				if imageX is Integer
+				{
+					if isDebug() {
+						images.Push(pitstopLabel)
+						
+						this.markFoundLabel(pitstopLabel, imageX, imageY)
+					}
+				
+					break
+				}
 			}
 			
 			if imageX is Integer
-			{
-				if isDebug() {
-					images.Push(pitstopLabel)
-					
-					this.markFoundLabel(pitstopLabel, imageX, imageY)
-				}
-			
 				break
-			}
+			else
+				Sleep 500
 		}
 		
 		lastY := false
@@ -1325,7 +1350,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
-		openPitstopMFD()
+		if this.iFallbackMode
+			this.iFallbackMode := "Retry"
+		
+		withProtection(ObjBindMethod(this, "requirePitstopMFD"))
 	}
 
 	finishPitstopSetup(pitstopNumber) {

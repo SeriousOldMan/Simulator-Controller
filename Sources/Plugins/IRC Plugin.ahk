@@ -99,6 +99,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false) {

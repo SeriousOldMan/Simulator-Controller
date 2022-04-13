@@ -135,6 +135,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	pitstopMFDIsOpen() {

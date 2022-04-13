@@ -596,18 +596,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit gvalidatePitstopFuelService, %pitstopFuelServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
 		
 		Gui %window%:Add, Text, x%x% yp+24 w160 h23, % translate("Service")
 		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui %window%:Add, Text, x%x% yp+27 w85 h20 +0x200, % translate("Fuel Capacity")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number VfuelCapacityEdit, %fuelCapacityEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit3 VfuelCapacityEdit, %fuelCapacityEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
 		
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number VsafetyFuelEdit, %safetyFuelEdit%
+		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
 		
@@ -655,11 +655,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
-		Gui %window%:Add, Edit, x%x1% yp w45 h20 Limit3 Number VsimAvgLapTimeEdit, %simAvgLapTimeEdit%
+		Gui %window%:Add, Edit, x%x1% yp w45 h20 VsimAvgLapTimeEdit gvalidateSimAvgLapTime, %simAvgLapTimeEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Sec.")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit, %simFuelConsumptionEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit gvalidateSimFuelConsumption, %simFuelConsumptionEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
 		
 		x := 222
@@ -754,16 +754,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartMapEdit, %strategyStartMapEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartMapEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartMapEdit Disabled, %strategyStartMapEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartMapEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartTCEdit, %strategyStartTCEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartTCEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartTCEdit Disabled, %strategyStartTCEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartTCEdit%
 		
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("ABS")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit, %strategyStartABSEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %strategyStartABSEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit Disabled, %strategyStartABSEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartABSEdit%
 		
 		x := 222
 		x0 := x + 50
@@ -789,23 +789,23 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		Gui %window%:Add, DropDownList, x%x1% yp w85 AltSubmit Choose%chosen% VstrategyCompoundDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w85 AltSubmit Choose%chosen% VstrategyCompoundDropDown Disabled, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x%x% yp+26 w85 h20 +0x200, % translate("Pressure")
 		Gui %window%:Add, Text, x%x0% yp w85 h20 +0x200, % translate("FL")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFLEdit, %strategyPressureFLEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFLEdit Disabled, %strategyPressureFLEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("FR")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFREdit, %strategyPressureFREdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFREdit Disabled, %strategyPressureFREdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RL")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRLEdit, %strategyPressureRLEdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRLEdit Disabled, %strategyPressureRLEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RR")
-		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit, %strategyPressureRREdit%
+		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit Disabled, %strategyPressureRREdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 		
 		x := 407
@@ -1416,7 +1416,10 @@ class StrategyWorkbench extends ConfigurationItem {
 					if strategy {
 						GuiControl, , pitstopDeltaEdit, % strategy.PitstopDelta
 						GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
-						GuiControl, , pitstopFuelServiceEdit, % strategy.PitstopFuelService
+						
+						pitstopFuelServiceEdit := strategy.PitstopFuelService
+						GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+						
 						GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
 						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
 						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
@@ -1433,7 +1436,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							pitstopWindowEdit := values2String("-", pitstopRule*)
 						}
 						else {
-							GuiControl Choose, pitstopRequirementsDropDown, 3
+							GuiControl Choose, pitstopRequirementsDropDown, 2
 						
 							pitstopWindowEdit := pitstopRule
 						}
@@ -1478,8 +1481,12 @@ class StrategyWorkbench extends ConfigurationItem {
 						
 						GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
 						
-						GuiControl, , simAvgLapTimeEdit, % Round(strategy.AvgLapTime, 1)
-						GuiControl, , simFuelConsumptionEdit, % Round(strategy.FuelConsumption, 2)
+						simAvgLapTimeEdit := Round(strategy.AvgLapTime, 1)
+						GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+						
+						simFuelConsumptionEdit := Round(strategy.FuelConsumption, 2)
+						GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+						
 						GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
 						
 						GuiControl, , simInitialFuelAmountEdit, % Round(strategy.RemainingFuel)
@@ -1538,7 +1545,10 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							
+							pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+
 							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 							
@@ -1547,8 +1557,11 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
 							
-							GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
-							GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+							simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+							
+							simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 						}
 					}
 				}
@@ -1566,7 +1579,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				
 				if (simulator && car && track) {
 					settingsDB := new SettingsDatabase()
-										
+					
 					settings := new SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 					
 					if (settings.Count() > 0) {
@@ -1588,8 +1601,11 @@ class StrategyWorkbench extends ConfigurationItem {
 						if (getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
 							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres")
 						
-						if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined)
-							GuiControl, , pitstopFuelServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
+						if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
+							pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
+							
+							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+						}
 						
 						if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
 							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2
@@ -1608,11 +1624,17 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl Choose, simCompoundDropDown, % inList(kQualifiedTyreCompounds, qualifiedCompound(compound, compoundColor))
 						}
 						
-						if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
-							GuiControl, , simAvgLapTimeEdit, % Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+						if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined) {
+							simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+							
+							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+						}
 						
-						if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
-							GuiControl, , simFuelConsumptionEdit, % Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
+						if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined) {
+							simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
+							
+							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+						}
 					}
 				}
 				else {
@@ -1635,8 +1657,12 @@ class StrategyWorkbench extends ConfigurationItem {
 							fastestLapTime := lapTime
 							
 							GuiControl, , simMapEdit, % row["Map"]
-							GuiControl, , simAvgLapTimeEdit, % Round(lapTime, 1)
-							GuiControl, , simFuelConsumptionEdit, % Round(row["Fuel.Consumption"], 2)
+							
+							simAvgLapTimeEdit := Round(lapTime, 1)
+							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+							
+							simFuelConsumptionEdit := Round(row["Fuel.Consumption"], 2)
+							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 						}
 					}
 				}
@@ -2052,12 +2078,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		maxTyreLaps := simMaxTyreLapsEdit
 		
-		if (tyreCompound = "Dry")
-			tyrePressures := [27.7, 27.7, 27.7, 27.7]
-		else
-			tyrePressures := [30.0, 30.0, 30.0, 30.0]
+		tyrePressures := false
 		
-		telemetryDB := new TelemetryDatabase(this.Simulator, this.Car, this.Track)
+		telemetryDB := new TelemetryDatabase(simulator, car, track)
 		lowestLapTime := false
 		
 		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
@@ -2069,6 +2092,21 @@ class StrategyWorkbench extends ConfigurationItem {
 				tyrePressures := [Round(row["Tyre.Pressure.Front.Left"], 1), Round(row["Tyre.Pressure.Front.Right"], 1)
 								, Round(row["Tyre.Pressure.Rear.Left"], 1), Round(row["Tyre.Pressure.Rear.Right"], 1)]
 			}
+		}
+		
+		if !tyrePressures {
+			settings := new SettingsDatabase().loadSettings(simulator, car, track, weather)
+			
+			if (tyreCompound = "Dry")
+				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)]
+			else
+				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 30.0)]
 		}
 	}
 	
@@ -2438,6 +2476,31 @@ validatePitstopRule(full := false) {
 			}
 		}
 	}
+}
+
+validateNumber(field) {
+	oldValue := %field%
+	
+	GuiControlGet %field%
+	
+	if %field% is not Number
+	{
+		%field%:= oldValue
+		
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validateSimAvgLapTime() {
+	validateNumber("simAvgLapTimeEdit")
+}
+
+validateSimFuelConsumption() {
+	validateNumber("simFuelConsumptionEdit")
+}
+
+validatePitstopFuelService() {
+	validateNumber("pitstopFuelServiceEdit")
 }
 
 filterSchema(schema) {

@@ -744,7 +744,7 @@ class RaceEngineer extends RaceAssistant {
 		facts["Session.Setup.Tyre.Wet.Pressure.RR"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
-				
+		
 		return facts
 	}
 	
@@ -941,40 +941,60 @@ class RaceEngineer extends RaceAssistant {
 		
 		lastLap := lapNumber
 		
-		if (this.hasEnoughData(false) && (this.SaveTyrePressures != kNever)) {
+		if (this.SaveTyrePressures != kNever) {
 			knowledgeBase := this.KnowledgeBase
 		
 			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
 			currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
-			targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
-			targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
-		
-			airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
-			trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
 			
-			if (airTemperature = 0)
-				airTemperature := Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+			if this.hasEnoughData(false) {
+				targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
+				targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
+			}
+			else {
+				targetCompound := currentCompound
+				targetCompoundColor := currentCompoundColor
+			}
 			
-			if (trackTemperature = 0)
-				trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
-		
-			weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-			
-			lastValid := knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Valid", true)
-		
-			if (lastValid && currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor)) {
-				coldPressures := values2String(",", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+			if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor)) {
+				if (lapNumber <= knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)) {
+					if (currentCompound = "Dry")
+						prefix := "Session.Setup.Tyre.Dry.Pressure."
+					else
+						prefix := "Session.Setup.Tyre.Wet.Pressure."
+				}
+				else if this.hasEnoughData(false)
+					prefix := "Tyre.Pressure.Target."
+				else
+					prefix := false
 				
-				hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
-												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
-												 
-				this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator"), knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-									, weatherNow, airTemperature, trackTemperature, currentCompound, currentCompoundColor, coldPressures, hotPressures)
+				if prefix {
+					coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
+													  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
+													  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
+													  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
+					
+					hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
+													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)
+													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
+													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
+			
+					airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
+					trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
+					
+					if (airTemperature = 0)
+						airTemperature := Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+					
+					if (trackTemperature = 0)
+						trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
+				
+					weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+													 
+					this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
+										, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+										, weatherNow, airTemperature, trackTemperature
+										, currentCompound, currentCompoundColor, coldPressures, hotPressures)
+				}
 			}
 		}
 		

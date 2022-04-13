@@ -127,7 +127,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget21 Hidden, % translate("Laps")
 		
 		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget22 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vreDampingFactorEdit HWNDwidget23 Hidden
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vreDampingFactorEdit gvalidateREDampingFactor HWNDwidget23 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget24 Hidden, % translate("p. Lap")
 
 		Gui %window%:Add, Text, x%x0% ys+30 w160 h23 +0x200 Section HWNDwidget25 Hidden, % translate("Adjust Lap Time")
@@ -228,7 +228,9 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			
 			GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-			GuiControl Text, reDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			reDampingFactorEdit := configuration["HistoryLapsDamping"]
+			GuiControl Text, reDampingFactorEdit, %reDampingFactorEdit%
 			
 			GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
 			
@@ -297,6 +299,19 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+validateREDampingFactor() {
+	oldValue := reDampingFactorEdit
+	
+	GuiControlGet reDampingFactorEdit
+	
+	if reDampingFactorEdit is not Number
+	{
+		reDampingFactorEdit := oldValue
+		
+		GuiControl, , reDampingFactorEdit, %reDampingFactorEdit%
+	}
+}
 
 chooseRaceEngineerSimulator() {
 	configurator := RaceEngineerConfigurator.Instance

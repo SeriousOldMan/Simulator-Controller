@@ -86,6 +86,26 @@ class RaceReportViewer {
 		this.iInfoViewer := infoViewer
 	}
 	
+	lapTimeDisplayValue(lapTime) {
+		if lapTime is Number
+		{
+			seconds := Floor(lapTime)
+			fraction := (lapTime - seconds)
+			minutes := Floor(seconds / 60)
+			
+			fraction := Round(fraction * 10)
+			
+			seconds := ((seconds - (minutes * 60)) . "")
+			
+			if (StrLen(seconds) = 1)
+				seconds := ("0" . seconds)
+			
+			return (minutes . ":" . seconds . "." . fraction)
+		}
+		else
+			return lapTime
+	}
+	
 	showReportChart(drawChartFunction) {
 		if this.ChartViewer {
 			window := this.Window
@@ -640,7 +660,7 @@ class RaceReportViewer {
 				hasDNF := (hasDNF || (result = "DNF"))
 				
 				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-							  , "{v: " . min . ", f: '" . format("{:.1f}", min) . "'}", "{v: " . avg . ", f: '" . format("{:.1f}", avg) . "'}", result))
+							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 			
 			Loop % carsCount
@@ -659,8 +679,8 @@ class RaceReportViewer {
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Best Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Avg Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
 			
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
@@ -721,7 +741,7 @@ class RaceReportViewer {
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
 									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 									, "'" . consumption . "'"
-									, "'" . lapTime . "'"
+									, "'" . this.lapTimeDisplayValue(lapTime) . "'"
 									, "'" . (pitstop ? translate("x") : "") . "'")
 											
 				rows.Push("[" . row	. "]")
@@ -790,19 +810,24 @@ class RaceReportViewer {
 			drawChartFunction := ""
 			
 			drawChartFunction .= "function drawChart() {"
-			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-			drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
 			
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentials*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
-			drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
-			
-			drawChartFunction .= ("`n]);")
-			
-			drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			if (potentials && (potentials.Length() > 0)) {
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
+				
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentials*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Race Craft") . "'", raceCrafts*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Speed") . "'", speeds*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
+				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
+				
+				drawChartFunction .= ("`n]);")
+				
+				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
+				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else
+				drawChartFunction .= "}"
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)
@@ -862,6 +887,7 @@ class RaceReportViewer {
 			}
 			
 			drawChartFunction := ""
+			hasData := false
 			
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
@@ -882,6 +908,8 @@ class RaceReportViewer {
 			
 			for ignore, lap in this.getReportLaps(raceData) {
 				if (positions.Length() >= lap) {
+					hasData := true
+					
 					drawChartFunction .= (",`n[" . lap)
 					
 					Loop % cars.Length() {
@@ -897,10 +925,14 @@ class RaceReportViewer {
 				}
 			}
 			
-			drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-			drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D8D8D8' };`n")
+			if hasData {
+				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "' }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0' }, backgroundColor: 'D8D8D8' };`n")
 
-			drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			}
+			else
+				drawChartFunction := "function drawChart() {}"
 			
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)

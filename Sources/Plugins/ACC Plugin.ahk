@@ -48,7 +48,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
-	iImageMode := true
+	iFallbackMode := false
 	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -409,8 +409,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				Send %command%
 		}
 		
-		if !this.iImageMode
-			Sleep 20
+		Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false, update := true) {
@@ -427,7 +426,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
 			
-				if this.iImageMode
+				if !this.iFallbackMode
 					if (update || !wasOpen) {
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
@@ -474,16 +473,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	requirePitstopMFD() {
 		static reported := false
 		
+		if (this.iFallbackMode = "Retry")
+			this.iFallbackMode := false
+		
 		this.openPitstopMFD()
 		
-		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
-			reported := true
-			
-			logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
-			
+		if (this.OpenPitstopMFDHotkey = "Off")
+			return false
+		else if !this.iPSIsOpen {
+			if !reported {
+				reported := true
+				
+				logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
+				
+				Loop 2
+					SoundPlay %kResourcesDirectory%Sounds\Critical.wav, Wait
+			}
+				
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
-			this.iImageMode := false
+			this.iFallbackMode := true
 			
 			SetTimer updatePitstopState, Off
 			
@@ -501,12 +510,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			return true
 		}
-		else if reported
+		else {
+			this.iFallbackMode := false
+		
 			return true
-		else if (this.OpenPitstopMFDHotkey == "Off")
-			return false
-		else
-			return this.iPSIsOpen
+		}
 	}
 	
 	selectPitstopOption(option, retry := true) {
@@ -814,7 +822,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop 3
+		localLabels := false
+		
+		for ignore, fileName in pitstopLabels
+			if InStr(fileName, kUserScreenImagesDirectory) {
+				localLabels := true
+				
+				break
+			}
+			
+		Loop % (localLabels ? 3 : 1)
 		{
 			Loop % pitstopLabels.Length()
 			{
@@ -1336,7 +1353,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
-		openPitstopMFD()
+		if this.iFallbackMode
+			this.iFallbackMode := "Retry"
+		
+		withProtection(ObjBindMethod(this, "requirePitstopMFD"))
 	}
 
 	finishPitstopSetup(pitstopNumber) {

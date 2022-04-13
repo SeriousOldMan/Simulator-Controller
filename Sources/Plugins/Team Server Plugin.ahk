@@ -340,8 +340,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				Menu Tray, Tip, % A_IconTip . translate(" (Team)")
 		}
 		else {
-			if InStr(A_IconTip, translate(" (Team)"))
-				Menu Tray, Tip, % StrReplace(A_IconTip, translate(" (Team)"), "")
+			index := InStr(A_IconTip, translate(" (Team)"))
+			
+			if index
+				Menu Tray, Tip, % SubStr(A_IconTip, 1, index - 1)
 		}
 	}
 	
@@ -409,6 +411,9 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch exception {
 				this.iConnected := false
+				
+				if !InStr(A_IconTip, translate(" - Invalid"))
+					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
 				
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 				
@@ -867,6 +872,9 @@ class TeamServerPlugin extends ControllerPlugin {
 				nextPing := 60000
 			}
 			catch exception {
+				if !InStr(A_IconTip, translate(" - Invalid"))
+					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
+				
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 				
 				this.iConnected := false

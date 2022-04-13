@@ -3145,28 +3145,13 @@ class RaceCenter extends ConfigurationItem {
 		this.updatePlan(stint)
 	}
 	
-	syncLaps() {
+	syncLaps(lastLap) {
 		session := this.SelectedSession[true]
 		
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		try {
-			lastLap := this.Connector.GetSessionLastLap(session)
-			
-			if lastLap {
-				lastLap := parseObject(this.Connector.GetLap(lastLap))
-				lastLap.Nr := (lastLap.Nr + 0)
-			}
-		}
-		catch exception {
-			lastLap := false
-		}
-		
-		if !lastLap
-			return false
-					
 		if (getLogLevel() <= kLogInfo)
 			logMessage(kLogInfo, translate("Syncing laps (Lap: ") . lastLap.Nr . translate(")"))
 		
@@ -3842,6 +3827,8 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local strategy
 		
+		static hadLastLap := false
+		
 		if this.SessionActive {
 			window := this.Window
 			
@@ -3850,15 +3837,37 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session"))
+		
+				try {
+					lastLap := this.Connector.GetSessionLastLap(this.SelectedSession[true])
+					
+					if lastLap {
+						lastLap := parseObject(this.Connector.GetLap(lastLap))
+						lastLap.Nr := (lastLap.Nr + 0)
+					}
+				}
+				catch exception {
+					lastLap := false
+				}
+				
+				if (hadLastLap && !lastLap) {
+					this.initializeSession()
+					
+					hadLastLap := false
+					
+					return
+				}
+				else if lastLap
+					hadLastLap := true
 					
 				this.syncPlan()
 				this.syncStrategy()
 				
 				newLaps := false
 				newData := false
-				
-				if this.syncLaps()
-					newLaps := true
+			
+				if lastLap
+					newLaps := this.syncLaps(lastLap)
 				
 				if this.syncRaceReport()
 					newData := true

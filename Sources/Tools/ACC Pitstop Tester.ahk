@@ -106,6 +106,8 @@ class ACCPitstopTester extends Plugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false, update := true) {

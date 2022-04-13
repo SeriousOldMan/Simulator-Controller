@@ -941,14 +941,21 @@ class RaceEngineer extends RaceAssistant {
 		
 		lastLap := lapNumber
 		
-		if (this.hasEnoughData(false) && (this.SaveTyrePressures != kNever)) {
+		if (this.SaveTyrePressures != kNever) {
 			knowledgeBase := this.KnowledgeBase
 		
 			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
 			currentCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color", false)
-			targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
-			targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
-		
+			
+			if this.hasEnoughData(false) {
+				targetCompound := knowledgeBase.getValue("Tyre.Compound.Target", false)
+				targetCompoundColor := knowledgeBase.getValue("Tyre.Compound.Color.Target", false)
+			}
+			else {
+				targetCompound := currentCompound
+				targetCompoundColor := currentCompoundColor
+			}
+			
 			airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 			trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
 			
@@ -960,13 +967,18 @@ class RaceEngineer extends RaceAssistant {
 		
 			weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
 			
-			lastValid := knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Valid", true)
-		
-			if (lastValid && currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor)) {
-				coldPressures := values2String(",", Round(knowledgeBase.getValue("Tyre.Pressure.Target.FL"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.FR"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RL"), 1)
-												  , Round(knowledgeBase.getValue("Tyre.Pressure.Target.RR"), 1))
+			if (currentCompound && (currentCompound = targetCompound) && (currentCompoundColor = targetCompoundColor)) {
+				if this.hasEnoughData(false)
+					prefix := "Tyre.Pressure.Target."
+				else if (currentCompound = "Dry")
+					prefix := "Session.Settings.Tyre.Dry.Pressure.Target."
+				else
+					prefix := "Session.Settings.Tyre.Wet.Pressure.Target."
+				
+				coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
+												  , Round(knowledgeBase.getValue(prefix . "FR"), 1)
+												  , Round(knowledgeBase.getValue(prefix . "RL"), 1)
+												  , Round(knowledgeBase.getValue(prefix . "RR"), 1))
 				
 				hotPressures := values2String(",", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FL"), 1)
 												 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.FR"), 1)

@@ -112,6 +112,8 @@ class R3EPitstopTester extends Plugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	pitstopMFDIsOpen() {

@@ -37,7 +37,6 @@ An automated update mechanism for local configuration databases exists since Rel
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-404) of this version and all the versions you might have skipped, before installing and using this version.
 
-
 ##### Earlier release builds
 
 [4.0.2-release](https://cntr.click/vsGR3Xs) (New features: Support for cloud based voice recognition using Azure Cognitive Services, Presets and Special Configurations for "Simulator Setup", Spotter announcements will start with the green flag for all simulators, Extended patch mechanism for generated configuration files.)
@@ -46,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.0.6-dev](https://www.dropbox.com/s/rtq8b7dfdljtdpj/Simulator%20Controller%204.0.6-dev.zip?dl=1) (Early build for 4.0.6. New features: Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields, Extensive logging for Team Server and "Race Center", Showing lap times in "M:SS.s" format, Display initial cold pressures in "Race Center" after first lap, Increased robustness of ACC Pitstop fallback algorithm. Stable, incl. documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-406) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

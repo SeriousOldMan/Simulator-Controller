@@ -250,7 +250,7 @@ Note: You can deactivate or delete all plugins except *System*. The *System* plu
 
 ### Tab *Applications*
 
-Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want a voice recognition software to be started together with the Simulator Controller to be able to handle all activaties not only by the Button Box, but by voice commands as well. The possibilities are endless. To be able to do that, Simulator Controller needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
+Simulator Controller can handle as many applications as you want. Beside the simulation games itself, you may want to launch your favorite telemetry or voice chat application with a push of a button. Or you want an image recognition software to be started together with the Simulator Controller to be able to translate your head movement to the *freetrack* protocol to control your viewing angle. The possibilities are endless. To be able to do that, Simulator Controller needs knowledge about these applications, where to find them and how to handle them. This is the purpose of the *Applications* tab.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%203.JPG)
 
@@ -258,11 +258,11 @@ There are three diffenrent types of applications, "Core", "Feedback" and "Other"
 
 Note: To change the category of an application, you need to directly edit the *Simulator Configuration.ini* file.
 
-An application must a have a unique name, you must supply the path to the executable file and sometimes also to a special working directory, and you may supply a [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) according to the AutoHotkey specification. This is used to detect, whether the application is running.
+An application must a have a unique name, you must supply the path to the executable file and sometimes also to a special working directory, and you may supply a [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) according to the AutoHotkey specification. This is used to detect whether the application is running.
 
 Second note: Although you cannot delete any application in the "Core" or "Feedback" category, you still can disable them in the [settings for the startup process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 
-For developers: Sometimes you want magic stuff to happen, when an application is started. For example, you may automatically swith to your favorite team channel when starting your voice chat software. This need some code support, which can be provided in a plugin. You *simply* define a function, which handles this special stuff and reference it here in the application configuration. See the plugins [Core Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Core%20Plugin.ahk), [RST Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RST%20Plugin.ahk) and [AC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) for some examples.
+For developers: Sometimes you want magic stuff to happen, when an application is started. For example, you may automatically switch to your favorite team channel when starting your voice chat software. This need some code support, which can be provided in a plugin. You *simply* define a function, which handles this special stuff and reference it here in the application configuration. See the plugins [Core Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Core%20Plugin.ahk), [RST Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RST%20Plugin.ahk) and [AC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) for some examples.
 
 ### Tab *Controller*
 
@@ -567,7 +567,7 @@ As you have seen before, you can define in the layout editor for every button wh
 
 You can select with the drop down menu in the upper area, whether the exceptions apply to the currently edited Stream Deck layout from the "Layouts" list or whether they might apply to all Stream Deck layouts.
 
-Please note, that the order of rules applied goes from the most specific rules for 1. button and icon specific exceptions for a given layout, over 2. icon, but not button specific exceptions for a given layout to 3. layout unspecific exceptions for a given icon. Sorry for that complexity, probably you will never use this stuff, but it's good that it's there, if you may ever need it.
+Please note, that the order of rules applied goes from the most specific rules for 1. button and layout specific exceptions for a given icon, over 2. layout, but not button specific exceptions for a given icon to 3. layout unspecific exceptions for a given icon. Sorry for that complexity, probably you will never use this stuff, but it's good that it's there, if you may ever need it.
 
 ## Action Labels & Icons
 

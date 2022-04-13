@@ -410,7 +410,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		this.iSettingsListView := settingsListViewHandle
 		
-		Gui %window%:Add, Text, x296 yp+224 w80 h23 +0x200, % translate("Setting")
+		Gui %window%:Add, Text, x296 yp+228 w80 h23 +0x200, % translate("Setting")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 vsettingDropDown gselectSetting
 		
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")

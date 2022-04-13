@@ -8,6 +8,8 @@
   6. Better validation for number entry fields.
   7. Support for extensive logging for Team Server and "Race Center" (Log Level: Info).
   8. Display lap times in "M:SS.s" format in all applications of Simulator Controller.
+  9  Display initial cold pressures in "Race Center" after first lap.
+  10. Increased robustness of ACC Pitstop fallback algorithm.
 
 ## 4.0.4-release 04/08/22
 

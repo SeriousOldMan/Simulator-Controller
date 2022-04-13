@@ -744,7 +744,7 @@ class RaceEngineer extends RaceAssistant {
 		facts["Session.Setup.Tyre.Wet.Pressure.RR"] := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)
 		facts["Session.Setup.Tyre.Compound"] := getConfigurationValue(data, "Car Data", "TyreCompound", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"] := getConfigurationValue(data, "Car Data", "TyreCompoundColor", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
-				
+		
 		return facts
 	}
 	
@@ -971,9 +971,9 @@ class RaceEngineer extends RaceAssistant {
 				if this.hasEnoughData(false)
 					prefix := "Tyre.Pressure.Target."
 				else if (currentCompound = "Dry")
-					prefix := "Session.Settings.Tyre.Dry.Pressure.Target."
+					prefix := "Session.Setup.Tyre.Dry.Pressure."
 				else
-					prefix := "Session.Settings.Tyre.Wet.Pressure.Target."
+					prefix := "Session.Setup.Tyre.Wet.Pressure."
 				
 				coldPressures := values2String(",", Round(knowledgeBase.getValue(prefix . "FL"), 1)
 												  , Round(knowledgeBase.getValue(prefix . "FR"), 1)

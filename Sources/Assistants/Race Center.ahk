@@ -2835,7 +2835,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
-		GuiControl, , driverDropDownMenu, % "|"
+		if this.SessionActive
+			this.loadSessionDrivers()
+		else
+			GuiControl, , driverDropDownMenu, % "|"
 		
 		this.iDrivers := []
 		this.iStints := {}
@@ -2854,7 +2857,6 @@ class RaceCenter extends ConfigurationItem {
 
 		GuiControlGet sessionDateCal
 		GuiControlGet sessionTimeEdit
-		
 
 		this.iVersion := false
 		this.iDate := sessionDateCal

@@ -510,11 +510,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			return true
 		}
-		else {
-			this.iFallbackMode := false
-		
+		else
 			return true
-		}
 	}
 	
 	selectPitstopOption(option, retry := true) {

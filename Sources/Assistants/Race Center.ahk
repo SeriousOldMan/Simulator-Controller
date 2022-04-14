@@ -7409,17 +7409,25 @@ syncSessionAsync() {
 runTasks() {
 	rCenter := RaceCenter.Instance
 	
-	if rCenter.startWorking() {
-		try {
-			while (rCenter.iTasks.Length() > 0) {
-				task := rCenter.iTasks.RemoveAt(1)
+	try {
+		if rCenter.startWorking() {
+			try {
+				if (rCenter.iTasks.Length() = 0)
+					Sleep 500
 				
-				%task%()
+				while (rCenter.iTasks.Length() > 0) {
+					task := rCenter.iTasks.RemoveAt(1)
+					
+					%task%()
+				}
+			}
+			finally {
+				rCenter.finishWorking()
 			}
 		}
-		finally {
-			rCenter.finishWorking()
-		}
+	}
+	finally {
+		SetTimer runTasks, -2000
 	}
 }
 
@@ -7440,7 +7448,7 @@ startupRaceCenter() {
 		
 		registerEventHandler("Setup", "functionEventHandler")
 		
-		SetTimer runTasks, 500
+		SetTimer runTasks, -2000
 		
 		rCenter.show()
 		

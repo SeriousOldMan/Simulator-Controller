@@ -1347,6 +1347,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	selectSession(identifier) {
+		SetTimer syncSession, Off
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1368,6 +1370,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.initializeSession()
 		this.loadSessionDrivers()
+		
+		syncSession()
 	}
 	
 	addDriver(driver) {
@@ -2786,6 +2790,10 @@ class RaceCenter extends ConfigurationItem {
 	
 	finishWorking() {
 		this.startWorking(false)
+	}
+	
+	isWorking() {
+		return (vWorking > 0)
 	}
 	
 	initializeSession() {
@@ -7407,27 +7415,32 @@ syncSessionAsync() {
 }
 
 runTasks() {
+	worked := false
+	
 	rCenter := RaceCenter.Instance
 	
 	try {
-		if rCenter.startWorking() {
-			try {
-				if (rCenter.iTasks.Length() = 0)
-					Sleep 500
-				
-				while (rCenter.iTasks.Length() > 0) {
-					task := rCenter.iTasks.RemoveAt(1)
-					
-					%task%()
+		if rCenter.isWorking()
+			return
+		else if (rCenter.iTasks.Length() > 0) {
+			if rCenter.startWorking() {
+				try {
+					while (rCenter.iTasks.Length() > 0) {
+						task := rCenter.iTasks.RemoveAt(1)
+						
+						worked := true
+						
+						%task%()
+					}
 				}
-			}
-			finally {
-				rCenter.finishWorking()
+				finally {
+					rCenter.finishWorking()
+				}
 			}
 		}
 	}
 	finally {
-		SetTimer runTasks, -2000
+		SetTimer runTasks, % worked ? -2000 : -500
 	}
 }
 

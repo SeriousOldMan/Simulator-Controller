@@ -2785,7 +2785,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	finishWorking() {
-		return this.startWorking(false)
+		this.startWorking(false)
 	}
 	
 	initializeSession() {

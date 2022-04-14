@@ -1640,7 +1640,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		
 		Gui IRE:Add, Text, x50 yp+30 w232 0x10
 		
-		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
+		Gui IRE:Add, Button, x80 yp+10 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
 		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
 		
 		this.loadLayoutButtons()

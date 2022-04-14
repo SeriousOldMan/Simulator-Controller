@@ -6,10 +6,11 @@
   4. Fixed initialization of pitstop service order in "Strategy Workbench".
   5. Optimized chart drawing algorithms.
   6. Better validation for number entry fields.
-  7. Support for extensive logging for Team Server and "Race Center" (use Log Level: Info).
+  7. Support for extensive logging for Team Server and "Race Center" (use "Info" log level).
   8. Display lap times in "M:SS.s" format in all applications of Simulator Controller.
   9  Display initial cold pressures in "Race Center" after first lap.
   10. Increased robustness of ACC Pitstop fallback algorithm.
+  11. Improved handling of background data processing in "Race Center".
 
 ## 4.0.4-release 04/08/22
 

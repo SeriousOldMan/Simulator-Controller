@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.0.6-dev](https://www.dropbox.com/s/rtq8b7dfdljtdpj/Simulator%20Controller%204.0.6-dev.zip?dl=1) (Early build for 4.0.6. New features: Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields, Extensive logging for Team Server and "Race Center", Showing lap times in "M:SS.s" format, Display initial cold pressures in "Race Center" after first lap, Increased robustness of ACC Pitstop fallback algorithm. Stable, incl. documentation and update procedure.)
+[4.0.6-beta](https://www.dropbox.com/s/rpaeqzxa8w7t970/Simulator%20Controller%204.0.6-beta.zip?dl=1) (Test version for 4.0.6. New features: Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields, Extensive logging for Team Server and "Race Center", Showing lap times in "M:SS.s" format, Display initial cold pressures in "Race Center" after first lap, Increased robustness of ACC Pitstop fallback algorithm. Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-406) of this version and all the versions you might have skipped, before installing and using this version.
 

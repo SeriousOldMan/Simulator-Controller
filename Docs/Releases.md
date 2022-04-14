@@ -3,10 +3,10 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Optimized pitstop search pictures for R3E.
-  4. Fixed initialization of service order in "Strategy Workbench".
+  4. Fixed initialization of pitstop service order in "Strategy Workbench".
   5. Optimized chart drawing algorithms.
   6. Better validation for number entry fields.
-  7. Support for extensive logging for Team Server and "Race Center" (Log Level: Info).
+  7. Support for extensive logging for Team Server and "Race Center" (use Log Level: Info).
   8. Display lap times in "M:SS.s" format in all applications of Simulator Controller.
   9  Display initial cold pressures in "Race Center" after first lap.
   10. Increased robustness of ACC Pitstop fallback algorithm.

@@ -632,7 +632,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	HasData[] {
 		Get {
-			return (this.SessionActive || this.SessionLoaded)
+			return ((this.SessionActive && this.CurrentStint) || this.SessionLoaded)
 		}
 	}
 	
@@ -806,9 +806,8 @@ class RaceCenter extends ConfigurationItem {
 	
 	SessionDatabase[] {
 		Get {
-			if (!this.iSessionDatabase && this.HasData) {
+			if !this.iSessionDatabase
 				this.iSessionDatabase := new Database(this.SessionDirectory, kSessionDataSchemas)
-			}
 			
 			return this.iSessionDatabase
 		}

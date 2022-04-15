@@ -1252,7 +1252,7 @@ editTargets(command := "") {
 }
 
 updatePhraseGrammars() {
-	/* Obsolete sind 4.0.4...
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, filePrefix in ["Race Engineer.grammars.", "Race Strategist.grammars.", "Race Spotter.grammars."]
@@ -1273,7 +1273,7 @@ updatePhraseGrammars() {
 }
 
 updateTranslations() {
-	/* Obsolete sind 4.0.4...
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, translationFileName in getFileNames("Translations.*", kUserTranslationsDirectory, kUserConfigDirectory) {
@@ -1310,7 +1310,7 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 }
 
 updateActionDefinitions(fileName := "Controller Plugin Labels") {
-	/* Obsolete sind 4.0.4...
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	

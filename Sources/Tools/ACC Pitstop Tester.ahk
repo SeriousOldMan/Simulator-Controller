@@ -634,6 +634,42 @@ class ACCPitstopTester extends Plugin {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+readSimulatorData(simulator, options := "", protocol := "SHM") {
+	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	
+	Random postfix, 1, 1000000
+	
+	FileCreateDir %kTempDirectory%%simulator% Data
+	
+	dataFile := (kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data")
+	
+	try {
+		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
+	}
+	catch exception {
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
+												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+												   . kBinariesDirectory . translate(")"))
+			
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+									  , {exePath: exePath, simulator: simulator, protocol: protocol})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+	
+	data := readConfiguration(dataFile)
+	
+	try {
+		FileDelete %dataFile%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+	
+	return data
+}
+
 viewMessages(messages, title := "Search Result", x := "Center", y := "Center", width := 800, height := 400) {
 	static hasWindow := false
 	static dismissed := false
@@ -733,7 +769,14 @@ runACCPitstopTester() {
 	while true {
 		pitstopTester := new ACCPitstopTester()
 	
-		pitstopTester.logMessage("Pass #1: Learning MFD position and labels...`n`n")
+		pitstopTester.logMessage("Peparation: Reading current MFD settings...`n`n")
+		
+		data := readSimulatorData("ACC", "-Setup")
+		
+		for key, value in getConfigurationSectionValues(data, "Setup Data")
+			pitstopTester.logMessage(key . " = " . value)
+	
+		pitstopTester.logMessage("`n`nPPass #1: Learning MFD position and labels...`n`n")
 	
 		pitstopTester.requirePitstopMFD()
 		

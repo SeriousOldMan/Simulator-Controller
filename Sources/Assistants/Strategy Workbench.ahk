@@ -1548,7 +1548,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							
 							pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
 							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
-							
+
 							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 							

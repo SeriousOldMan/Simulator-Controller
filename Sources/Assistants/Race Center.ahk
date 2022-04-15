@@ -632,7 +632,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	HasData[] {
 		Get {
-			return (this.SessionActive || this.SessionLoaded)
+			return ((this.SessionActive && this.CurrentStint) || this.SessionLoaded)
 		}
 	}
 	
@@ -806,9 +806,8 @@ class RaceCenter extends ConfigurationItem {
 	
 	SessionDatabase[] {
 		Get {
-			if (!this.iSessionDatabase && this.HasData) {
+			if !this.iSessionDatabase
 				this.iSessionDatabase := new Database(this.SessionDirectory, kSessionDataSchemas)
-			}
 			
 			return this.iSessionDatabase
 		}
@@ -1348,6 +1347,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	selectSession(identifier) {
+		SetTimer syncSession, Off
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1369,6 +1370,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.initializeSession()
 		this.loadSessionDrivers()
+		
+		syncSession()
 	}
 	
 	addDriver(driver) {
@@ -2786,7 +2789,11 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	finishWorking() {
-		return this.startWorking(false)
+		this.startWorking(false)
+	}
+	
+	isWorking() {
+		return (vWorking > 0)
 	}
 	
 	initializeSession() {
@@ -2835,7 +2842,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
-		GuiControl, , driverDropDownMenu, % "|"
+		if this.SessionActive
+			this.loadSessionDrivers()
+		else
+			GuiControl, , driverDropDownMenu, % "|"
 		
 		this.iDrivers := []
 		this.iStints := {}
@@ -2854,7 +2864,6 @@ class RaceCenter extends ConfigurationItem {
 
 		GuiControlGet sessionDateCal
 		GuiControlGet sessionTimeEdit
-		
 
 		this.iVersion := false
 		this.iDate := sessionDateCal
@@ -7406,19 +7415,32 @@ syncSessionAsync() {
 }
 
 runTasks() {
+	worked := false
+	
 	rCenter := RaceCenter.Instance
 	
-	if rCenter.startWorking() {
-		try {
-			while (rCenter.iTasks.Length() > 0) {
-				task := rCenter.iTasks.RemoveAt(1)
-				
-				%task%()
+	try {
+		if rCenter.isWorking()
+			return
+		else if (rCenter.iTasks.Length() > 0) {
+			if rCenter.startWorking() {
+				try {
+					while (rCenter.iTasks.Length() > 0) {
+						task := rCenter.iTasks.RemoveAt(1)
+						
+						worked := true
+						
+						%task%()
+					}
+				}
+				finally {
+					rCenter.finishWorking()
+				}
 			}
 		}
-		finally {
-			rCenter.finishWorking()
-		}
+	}
+	finally {
+		SetTimer runTasks, % worked ? -2000 : -500
 	}
 }
 
@@ -7439,7 +7461,7 @@ startupRaceCenter() {
 		
 		registerEventHandler("Setup", "functionEventHandler")
 		
-		SetTimer runTasks, 500
+		SetTimer runTasks, -2000
 		
 		rCenter.show()
 		

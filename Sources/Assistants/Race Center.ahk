@@ -869,7 +869,7 @@ class RaceCenter extends ConfigurationItem {
 		dllFile := kBinariesDirectory . dllName
 		
 		try {
-			if (!FileExist(dllFile)) {
+			if !FileExist(dllFile) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 				
 				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
@@ -5825,7 +5825,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				value := chartValue(null(lap.Laptime))
 				
-				if (!isNull(value))
+				if !isNull(value)
 					driverTimes.Push(value)
 			}
 			

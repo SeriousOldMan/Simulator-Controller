@@ -319,7 +319,8 @@ class RaceReportViewer {
 				result.Push(gridPosition)
 			
 		for ignore, lap in this.getReportLaps(raceData)
-			result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
+			if positions.HasKey(lap)
+				result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
 		
 		return result
 	}
@@ -333,19 +334,20 @@ class RaceReportViewer {
 		result := []
 		
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
-			for ignore, lap in this.getReportLaps(raceData) {
-				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-				time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
-				
-				if (time > 0) {
-					if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
-						result.Push(avg)
+			for ignore, lap in this.getReportLaps(raceData)
+				if times.hasKey(lap) {
+					time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					
+					if (time > 0) {
+						if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))
+							result.Push(avg)
+						else
+							result.Push(time)
+					}
 					else
-						result.Push(time)
+						result.Push(avg)
 				}
-				else
-					result.Push(avg)
-			}
 		
 		return result
 	}
@@ -353,13 +355,14 @@ class RaceReportViewer {
 	getDriverPace(raceData, times, car, ByRef min, ByRef max, ByRef avg, ByRef stdDev) {
 		validTimes := []
 		
-		for ignore, lap in this.getReportLaps(raceData) {
-			time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-			time := (isNull(time) ? 0 : Round(time, 1))
-				
-			if (time > 0)
-				validTimes.Push(time)
-		}
+		for ignore, lap in this.getReportLaps(raceData)
+			if times.HasKey(lap) {
+				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+				time := (isNull(time) ? 0 : Round(time, 1))
+					
+				if (time > 0)
+					validTimes.Push(time)
+			}
 		
 		min := Round(minimum(validTimes) / 1000, 1)
 		
@@ -452,14 +455,15 @@ class RaceReportViewer {
 			carControl := 1
 			threshold := (avg + ((max - avg) / 4))
 			
-			for ignore, lap in this.getReportLaps(raceData) {
-				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-				time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
-				
-				if (time > 0)
-					if (time > threshold)
-						carControl *= 0.90
-			}
+			for ignore, lap in this.getReportLaps(raceData)
+				if times.hasKey(lap) {
+					time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					
+					if (time > 0)
+						if (time > threshold)
+							carControl *= 0.90
+				}
 			
 			return carControl
 		}
@@ -867,13 +871,14 @@ class RaceReportViewer {
 				valid := false
 				
 				for ignore, lap in this.getReportLaps(raceData)
-					if (positions[lap].HasKey(car) && (positions[lap][car] > 0)) {
-						valid := true
-						
-						break
-					}
-					else
-						positions[A_Index][car] := kNull ; carsCount
+					if positions.HasKey(lap)
+						if (positions[lap].HasKey(car) && (positions[lap][car] > 0)) {
+							valid := true
+							
+							break
+						}
+						else
+							positions[A_Index][car] := kNull ; carsCount
 				
 				if valid {
 					carIndices.Push(car)
@@ -883,7 +888,8 @@ class RaceReportViewer {
 				}
 				else
 					for ignore, lap in this.getReportLaps(raceData)
-						positions[lap].RemoveAt(car)
+						if positions.HasKey(lap)
+							positions[lap].RemoveAt(car)
 			}
 			
 			drawChartFunction := ""
@@ -1332,7 +1338,8 @@ editReportSettings(raceReport, report := false, options := false) {
 										} Until (index = endLap)
 						}
 						else if lap is integer
-							laps[lap] := lap
+							if laps.HasKey(lap)
+								laps[lap] := lap
 					
 					newlaps := []
 					

@@ -1501,14 +1501,21 @@ class ResultSet {
 		while (vDisposedChoicePoints.Length() > 0) {
 			cp := vDisposedChoicePoints.Pop()
 		
-			if cp.iNextChoicePoint
-				cp.iNextChoicePoint.dispose()
+			nextCP := cp.iNextChoicePoint
 			
-			if cp.iPreviousChoicePoint
-				cp.iPreviousChoicePoint.dispose()
+			if nextCP {
+				cp.iNextChoicePoint := false
 			
-			cp.iNextChoicePoint := false
-			cp.iPreviousChoicePoint := false
+				nextCP.dispose()
+			}
+			
+			previousCP := cp.iPreviousChoicePoint
+			
+			if previousCP {
+				cp.iPreviousChoicePoint := false
+				
+				previousCP.dispose()
+			}
 		}
 		
 		this.iChoicePoint := false
@@ -1844,10 +1851,11 @@ class RulesChoicePoint extends ChoicePoint {
 	disposeSubChoicePoints() {
 		this.removeSubChoicePoints()
 		
-		for ignore, cp in this.iSubChoicePoints
-			vDisposedChoicePoints.Push(cp)
-		
+		subChoicePoints := this.iSubChoicePoints
 		this.iSubChoicePoints := []
+		
+		for ignore, cp in subChoicePoints
+			vDisposedChoicePoints.Push(cp)
 	}
 	
 	dispose() {

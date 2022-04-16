@@ -3029,8 +3029,11 @@ class RaceCenter extends ConfigurationItem {
 			
 			if ((lap.Nr == 1) || (stint.Laps[1] == lap))
 				lap.FuelConsumption := "-"
-			else
-				lap.FuelConsumption := Round((this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining), 1)
+			else {
+				fuelConsumption := (this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining)
+			
+				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 1) : "-")
+			}
 			
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 			

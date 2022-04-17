@@ -201,8 +201,8 @@ class RaceReportViewer {
 		}
 	}
 	
-	getReportLaps(raceData) {
-		if this.Settings.HasKey("Laps")
+	getReportLaps(raceData, alwaysAll := false) {
+		if (!alwaysAll && this.Settings.HasKey("Laps"))
 			return this.Settings["Laps"]
 		else {
 			laps := []
@@ -604,7 +604,7 @@ class RaceReportViewer {
 				car := A_Index
 				valid := false
 				
-				for ignore, lap in this.getReportLaps(raceData)
+				for ignore, lap in this.getReportLaps(raceData, true)
 					if (positions.Length() >= lap) {
 						if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
 							valid := true
@@ -617,7 +617,7 @@ class RaceReportViewer {
 				if valid
 					cars.Push(Array(getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"), getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")))
 				else
-					for ignore, lap in this.getReportLaps(raceData) {
+					for ignore, lap in this.getReportLaps(raceData, true) {
 						if (drivers.Length() >= lap) {
 							drivers[lap].RemoveAt(car)
 							positions[lap].RemoveAt(car)
@@ -715,7 +715,7 @@ class RaceReportViewer {
 			
 			pitstops := string2Values(",", getConfigurationValue(raceData, "Laps", "Pitstops", ""))
 			
-			for ignore, lap in this.getReportLaps(raceData) {
+			for ignore, lap in this.getReportLaps(raceData, true) {
 				weather := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")
 				weather := (weather ? translate(weather) : "n/a")
 			
@@ -872,7 +872,7 @@ class RaceReportViewer {
 				
 				for ignore, lap in this.getReportLaps(raceData)
 					if positions.HasKey(lap)
-						if (positions[lap].HasKey(car) && (positions[lap][car] > 0)) {
+						if (positions[lap].HasKey(car) && (positions[lap][car] != kNull) && (positions[lap][car] > 0)) {
 							valid := true
 							
 							break
@@ -897,20 +897,24 @@ class RaceReportViewer {
 			
 			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 			
-			if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
-				drawChartFunction .= ",`n[0"
+			if !this.Settings.HasKey("Laps")
+				if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
+					drawChartFunction .= ",`n[0"
+						
+					Loop % cars.Length() {
+						position := getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
 					
-				Loop % cars.Length() {
-					position := getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
-				
-					if (StrLen(Trim(position)) == 0)
-						position := A_Index
+						if (StrLen(Trim(position)) == 0)
+							position := A_Index
+						else if (position != "null")
+							if position is not number
+								position := "null"
+						
+						drawChartFunction := (drawChartFunction . ", " . position)
+					}
 					
-					drawChartFunction := (drawChartFunction . ", " . position)
+					drawChartFunction .= "]"
 				}
-				
-				drawChartFunction .= "]"
-			}
 			
 			for ignore, lap in this.getReportLaps(raceData) {
 				if (positions.Length() >= lap) {
@@ -918,9 +922,9 @@ class RaceReportViewer {
 					
 					drawChartFunction .= (",`n[" . lap)
 					
-					Loop % cars.Length() {
-						lapPositions := positions[lap]
+					lapPositions := positions[lap]
 					
+					Loop % cars.Length() {
 						if lapPositions.HasKey(A_Index)
 							drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
 						else

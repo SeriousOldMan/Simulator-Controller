@@ -390,14 +390,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
 		
-		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 		teamServerToggle := this.getArgumentValue("teamServer", false)
 		
 		if (teamServerToggle && teamServer && teamServer.Active) {
 			arguments := string2Values(A_Space, teamServerToggle)
 	
 			if (arguments.Length() == 0)
-				arguments := ["On"]
+				arguments := ["Off"]
 			
 			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
 				arguments.InsertAt(1, "Off")

@@ -1,9 +1,9 @@
 [Development]
 Version=4.0.8-dev
 Target=4.0.8-release
-Date=04/15/2022
+Date=04/17/2022
 Download=
-Changes=
+Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants
 [Release]
 Version=4.0.6-release
 Date=04/15/2022

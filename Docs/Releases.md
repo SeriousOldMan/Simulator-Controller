@@ -2,6 +2,9 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
+  3. Fixed fuel consumption displayed as negative after pitstop in "Race Center".
+  4. Default value for the "teamServer:" plugin argument is now *Off* in generated configuration.
+  5. Fixed a critical stack overflow with blocking error message in the Race Assistants, when corrupt data is processed from the ACC server backend.
 
 ## 4.0.6-release 04/15/22
 

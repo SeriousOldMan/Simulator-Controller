@@ -209,7 +209,8 @@ The "Race Engineer" plugin handles the interaction of the currently active simul
 	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
-	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey; raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
+	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
 	teamServer: [*initialState*] [*onOffFunction*];
 	openRaceSettings: *settingsFunction*; importSetup: *importFunction*;
 	openSessionDatabase: *setupsFunction*; openSetupAdvisor: *advisorFunction*; openRaceCenter: *centerFunction*
@@ -268,7 +269,8 @@ The "Race Strategist" plugin handles the interaction of the currently active sim
 	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
-	raceAssistantRecognizer: Server | Desktop; raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
+	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
 	teamServer: [*initialState*] [*onOffFunction*];
 	openRaceSettings: *settingsFunction*; openSessionDatabase: *setupsFunction*;
 	openStrategyWorkbench: *strategyFunction*; openRaceCenter: *centerFunction*
@@ -313,8 +315,8 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
-| GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
@@ -329,7 +331,8 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 	raceAssistantLanguage: DE | EN | ...; raceAssistantSynthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey;
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
-	raceAssistantSynthesizer: Server | Desktop; raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*
+	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
+	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*
 	
 For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Elias". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Spotter dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 
@@ -367,8 +370,8 @@ Please see the following table for available information commands.
 | Time | You will be told the current time of your local computer. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
-| GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToFront [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.

@@ -127,7 +127,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 								case "RaceAssistant":
 									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
 								case "TeamServer":
-									arguments .= ("; teamServer: On " . values2String(A_Space, function*))
+									arguments .= ("; teamServer: Off " . values2String(A_Space, function*))
 								case "SessionDatabaseOpen", "SetupDatabaseOpen":
 									arguments .= ("; openSessionDatabase: " . values2String(A_Space, function*))
 								case "RaceSettingsOpen":
@@ -150,7 +150,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			else
 				new Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
 		
-		new Plugin("Team Server", false, assistantActive, "", "teamServer: On").saveToConfiguration(configuration)
+		new Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration)
 	}
 	
 	createGui(wizard, x, y, width, height) {

@@ -48,17 +48,17 @@ EffectIntensity.Dial=
 EffectIntensity.Increase=
 EffectIntensity.Decrease=
 [Pedal Calibration]
-CurveShapte.Activate=
-CurveShapte.Linear.Activate=
-CurveShapte.Sense+1.Activate=
-CurveShapte.Sense+2.Activate=
-CurveShapte.Sense-1.Activate=
-CurveShapte.Sense-2.Activate=
-CurveShapte.S-Shape.Activate=
+CurveShape.Activate=
+CurveShape.Linear.Activate=
+CurveShape.Sense+1.Activate=
+CurveShape.Sense+2.Activate=
+CurveShape.Sense-1.Activate=
+CurveShape.Sense-2.Activate=
+CurveShape.S-Shape.Activate=
 CurveShape.S on Side.Activate=
-CurveShapte.Slow Start.Activate=
-CurveShapte.Slow End.Activate=
-CurveShapte.Custom.Activate=
+CurveShape.Slow Start.Activate=
+CurveShape.Slow End.Activate=
+CurveShape.Custom.Activate=
 [ACC]
 Strategy.Dial=
 Strategy.Increase=

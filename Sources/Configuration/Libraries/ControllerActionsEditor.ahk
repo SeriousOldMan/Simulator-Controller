@@ -537,7 +537,7 @@ class PluginActionsList extends ConfigurationItemList {
 	loadEditor(item) {
 		GuiControl, , labelEdit, % item[4]
 		
-		icon := (item[1] ? item[1] : (kIconsDirectory . "Empty.png"))
+		icon := (item[1] ? substituteVariables(item[1]) : (kIconsDirectory . "Empty.png"))
 		
 		try {
 			GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
@@ -631,7 +631,7 @@ clickIcon() {
 		else {
 			title := translate("Select Image...")
 	
-			pictureFile := (actionsList.iCurrentIcon ? actionsList.iCurrentIcon : "")
+			pictureFile := (actionsList.iCurrentIcon ? substituteVariables(actionsList.iCurrentIcon) : "")
 			
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 			FileSelectFile pictureFile, 1, %pictureFile%, %title%, Image (*.ico; *.png; *.jpg; *.gif)

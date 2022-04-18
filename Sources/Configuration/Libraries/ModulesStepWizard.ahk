@@ -245,7 +245,7 @@ class PitstopImages extends NamedPreset {
 	}
 	
 	install(wizard) {
-		directory := this.iDirectory
+		directory := this.Directory
 		
 		SplitPath directory, , , , name
 		
@@ -260,7 +260,7 @@ class PitstopImages extends NamedPreset {
 	}
 	
 	uninstall(wizard) {
-		directory := this.iDirectory
+		directory := this.Directory
 		
 		SplitPath directory, , , , name
 		
@@ -269,6 +269,55 @@ class PitstopImages extends NamedPreset {
 		}
 		catch exception {
 			; ignore
+		}
+	}
+}
+
+class StreamDeckIcons extends NamedPreset {
+	iFiles := []
+	
+	Files[] {
+		Get {
+			return this.iFiles
+		}
+	}
+	
+	__New(name, files) {
+		base.__New(name)
+		
+		if !IsObject(files)
+			files := string2Values(",", files)
+		
+		for ignore, file in files
+			files[index] := substituteVariables(file)
+		
+		this.iFiles := files
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), values2String(",", this.Files*))
+	}
+	
+	install(wizard) {
+		for ignore, file in this.Files
+			try {
+				FileCopy %file%, %kUserTranslationsDirectory%, 1
+			}
+			catch exception {
+				; ignore
+			}
+	}
+	
+	uninstall(wizard) {
+		for ignore, file in this.Files {
+			SplitPath file, , , , name
+			
+			try {
+				FileDelete %kUserTranslationsDirectory%%name%
+			}
+			catch exception {
+				; ignore
+			}
 		}
 	}
 }

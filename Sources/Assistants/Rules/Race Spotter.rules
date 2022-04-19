@@ -99,7 +99,7 @@ clearStanding(?)
 
 clearStanding(?, 0) <= !
 clearStanding(?, ?car) <= ?car < 0, !
-clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Nr, Delta, Laps, Time, Time.Average,
 														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 

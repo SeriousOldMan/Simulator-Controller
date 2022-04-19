@@ -56,13 +56,6 @@ global kTraceOff = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variables Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vDisposedChoicePoints = []
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1496,9 +1489,7 @@ class ResultSet {
 	
 	dispose() {
 		if this.iChoicePoint
-			this.iChoicePoint.dispose()
-		
-		disposeChoicePoints()
+			this.iChoicePoint.remove()
 		
 		this.iChoicePoint := false
 	}
@@ -1574,8 +1565,6 @@ class ResultSet {
 		choicePoint := this.ChoicePoint[true]
 			
 		Loop {
-			disposeChoicePoints()
-		
 			if choicePoint.nextChoice() {
 				choicePoint := choicePoint.next()
 				
@@ -1722,6 +1711,16 @@ class ChoicePoint {
 		}
 	}
 	
+	SubChoicePoints[] {
+		Get {
+			return []
+		}
+		
+		Set {
+			return value
+		}
+	}
+	
 	__New(resultSet, goal, environment) {
 		this.iResultSet := resultSet
 		this.iGoal := goal
@@ -1731,13 +1730,6 @@ class ChoicePoint {
 	dispose() {
 		this.iResultSet := false
 		this.iGoal := false
-		
-		if !inList(vDisposedChoicePoints, this)
-			vDisposedChoicePoints.Push(this)
-		else if isDebug()
-			Throw "Internal error detected in ChoicePoint.removeSubChoicePoints..."
-		else
-			logMessage(kLogCritical, translate("Internal error detected in ChoicePoint.removeSubChoicePoints..."))
 	}
 	
 	nextChoice() {
@@ -1757,16 +1749,6 @@ class ChoicePoint {
 		this.iSavedVariables := {}
 	}
 	
-	reset() {
-		this.resetVariables()
-		
-		this.ResultSet.resetChoicePoint(this)
-	}
-	
-	cut() {
-		this.reset()
-	}
-	
 	append(afterChoicePoint) {
 		local resultSet := this.ResultSet
 		
@@ -1782,7 +1764,10 @@ class ChoicePoint {
 			this.iNextChoicePoint.iPreviousChoicePoint := this
 	}
 	
-	remove() {
+	unlink() {
+		this.iResultSet := false
+		this.iGoal := false
+		
 		next := this.iNextChoicePoint
 		previous := this.iPreviousChoicePoint
 		
@@ -1794,6 +1779,51 @@ class ChoicePoint {
 		
 		this.iNextChoicePoint := false
 		this.iPreviousChoicePoint := false
+	}
+	
+	remove(removeables := false) {
+		if !removeables
+			removeables := [this]
+		
+		last := removeables.Length()
+		
+		while (last > 0) {
+			cp := removeables[last]
+		
+			subChoicePoints := cp.SubChoicePoints
+		
+			if (subChoicePoints.Length() > 0) {
+				cp.SubChoicePoints := []
+				
+				for ignore, theChoicePoint in reverse(subChoicePoints)
+					removeables.Push(theChoicePoint)
+			}
+			else
+				removeables.Pop().unlink()
+			
+			last := removeables.Length()
+		}
+	}
+	
+	reset() {
+		subChoicePoints := this.SubChoicePoints
+		
+		if (subChoicePoints.Length() > 0) {
+			removeables := []
+			
+			for ignore, theChoicePoint in reverse(subChoicePoints)
+				removeables.Push(theChoicePoint)
+			
+			this.remove(removeables)
+		}
+				
+		this.resetVariables()
+		
+		this.ResultSet.resetChoicePoint(this)
+	}
+	
+	cut() {
+		this.reset()
 	}
 	
 	previous() {
@@ -1815,6 +1845,16 @@ class RulesChoicePoint extends ChoicePoint {
 	iNextRuleIndex := 1
 	
 	iSubChoicePoints := []
+	
+	SubChoicePoints[] {
+		Get {
+			return this.iSubChoicePoints
+		}
+		
+		Set {
+			return (this.iSubChoicePoints := value)
+		}
+	}
 		
 	Reductions[reset := false] {
 		Get {
@@ -1840,14 +1880,8 @@ class RulesChoicePoint extends ChoicePoint {
 		}
 	}
 	
-	disposeSubChoicePoints() {
-		this.removeSubChoicePoints()
-	}
-	
 	dispose() {
 		this.iSubstitutedReductions := {}
-		
-		this.disposeSubChoicePoints()
 		
 		base.dispose()
 	}
@@ -1894,7 +1928,7 @@ class RulesChoicePoint extends ChoicePoint {
 	addSubChoicePoints(goals) {
 		local choicePoint
 		
-		this.iSubChoicePoints := []
+		this.SubChoicePoints := []
 
 		previous := this
 		
@@ -1904,41 +1938,12 @@ class RulesChoicePoint extends ChoicePoint {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Pushing subgoal " . theGoal.toString(this.ResultSet))
 			
-			this.iSubChoicePoints.Push(choicePoint)
+			this.SubChoicePoints.Push(choicePoint)
 			
 			choicePoint.append(previous)
 			
 			previous := choicePoint
 		}
-	}
-	
-	removeSubChoicePoints() {
-		subChoicePoints := this.iSubChoicePoints
-		
-		this.iSubChoicePoints := []
-		
-		for ignore, theChoicePoint in subChoicePoints
-			if ((theChoicePoint != this) && !inList(vDisposedChoicePoints, theChoicePoint)) {
-				vDisposedChoicePoints.Push(theChoicePoint)
-	
-				theChoicePoint.remove()
-			}
-			else if isDebug()
-				Throw "Internal error detected in ChoicePoint.removeSubChoicePoints..."
-			else
-				logMessage(kLogCritical, translate("Internal error detected in ChoicePoint.removeSubChoicePoints..."))
-	}
-	
-	reset() {
-		this.removeSubChoicePoints()
-	
-		base.reset()
-	}
-	
-	remove() {
-		this.removeSubChoicePoints()
-		
-		base.remove()
 	}
 	
 	cut() {
@@ -3985,28 +3990,6 @@ class NilParser extends Parser {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-disposeChoicePoints() {
-	while (vDisposedChoicePoints.Length() > 0) {
-		cp := vDisposedChoicePoints.Pop()
-	
-		nextCP := cp.iNextChoicePoint
-		
-		if nextCP {
-			cp.iNextChoicePoint := false
-		
-			nextCP.dispose()
-		}
-		
-		previousCP := cp.iPreviousChoicePoint
-		
-		if previousCP {
-			cp.iPreviousChoicePoint := false
-			
-			previousCP.dispose()
-		}
-	}
-}
 
 msgBox(ignore, args*) {
 	MsgBox % values2String(A_Space, args*)

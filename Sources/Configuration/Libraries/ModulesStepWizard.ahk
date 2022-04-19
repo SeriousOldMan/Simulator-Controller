@@ -234,20 +234,17 @@ class StreamDeckIcons extends NamedPreset {
 		}
 	}
 	
-	__New(name, files) {
+	__New(name, files*) {
 		base.__New(name)
 		
-		if !IsObject(files)
-			files := string2Values(",", files)
-		
-		for ignore, file in files
+		for index, file in files
 			files[index] := substituteVariables(file)
 		
 		this.iFiles := files
 	}
 	
 	getArguments() {
-		return concatenate(base.getArguments(), values2String(",", this.Files*))
+		return concatenate(base.getArguments(), this.Files)
 	}
 	
 	install(wizard) {
@@ -262,7 +259,7 @@ class StreamDeckIcons extends NamedPreset {
 	
 	uninstall(wizard) {
 		for ignore, file in this.Files {
-			SplitPath file, , , , name
+			SplitPath file, name
 			
 			try {
 				FileDelete %kUserTranslationsDirectory%%name%

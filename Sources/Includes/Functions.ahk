@@ -2101,8 +2101,9 @@ getControllerActionLabels() {
 getControllerActionIcons() {
 	icons := getControllerActionDefinitions("Icons")
 	
-	for index, icon in icons
-		icons[index] := substituteVariables(icon)
+	for section, values in icons
+		for key, value in values
+			values[key] := substituteVariables(value)
 	
 	return icons
 }

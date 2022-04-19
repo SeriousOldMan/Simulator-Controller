@@ -1416,6 +1416,9 @@ class RaceEngineer extends RaceAssistant {
 				case "Repair Bodywork":
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
 			}
+			
+			if this.Speaker
+				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")
 		}
 	}
 	

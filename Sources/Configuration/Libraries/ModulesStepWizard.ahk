@@ -225,54 +225,6 @@ class DefaultStreamDeck extends NamedPreset {
 	}
 }
 
-class PitstopImages extends NamedPreset {
-	iDirectory := false
-	
-	Directory[] {
-		Get {
-			return this.iDirectory
-		}
-	}
-	
-	__New(name, directory) {
-		base.__New(name)
-		
-		this.iDirectory := substituteVariables(directory)
-	}
-	
-	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Directory))
-	}
-	
-	install(wizard) {
-		directory := this.Directory
-		
-		SplitPath directory, , , , name
-		
-		FileCreateDir %kUserHomeDirectory%Screen Images\%name%
-		
-		try {
-			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
-		}
-		catch exception {
-			; ignore
-		}
-	}
-	
-	uninstall(wizard) {
-		directory := this.Directory
-		
-		SplitPath directory, , , , name
-		
-		try {
-			FileRemoveDir %kUserHomeDirectory%Screen Images\%name%, 1
-		}
-		catch exception {
-			; ignore
-		}
-	}
-}
-
 class StreamDeckIcons extends NamedPreset {
 	iFiles := []
 	
@@ -318,6 +270,54 @@ class StreamDeckIcons extends NamedPreset {
 			catch exception {
 				; ignore
 			}
+		}
+	}
+}
+
+class PitstopImages extends NamedPreset {
+	iDirectory := false
+	
+	Directory[] {
+		Get {
+			return this.iDirectory
+		}
+	}
+	
+	__New(name, directory) {
+		base.__New(name)
+		
+		this.iDirectory := substituteVariables(directory)
+	}
+	
+	getArguments() {
+		return concatenate(base.getArguments(), Array(this.Directory))
+	}
+	
+	install(wizard) {
+		directory := this.Directory
+		
+		SplitPath directory, , , , name
+		
+		FileCreateDir %kUserHomeDirectory%Screen Images\%name%
+		
+		try {
+			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
+		}
+	}
+	
+	uninstall(wizard) {
+		directory := this.Directory
+		
+		SplitPath directory, , , , name
+		
+		try {
+			FileRemoveDir %kUserHomeDirectory%Screen Images\%name%, 1
+		}
+		catch exception {
+			; ignore
 		}
 	}
 }

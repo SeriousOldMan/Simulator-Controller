@@ -2,8 +2,8 @@
 Version=4.0.8-dev
 Target=4.0.8-release
 Date=04/19/2022
-Download=
-Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions
+Download=https://www.dropbox.com/s/uqsfwogcki5dotg/Simulator%20Controller%204.0.8-dev.zip?dl=1
+Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions, Acknowledge of pitstop options change after a pitstop has been prepared
 [Release]
 Version=4.0.6-release
 Date=04/15/2022

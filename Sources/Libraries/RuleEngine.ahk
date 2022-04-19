@@ -1791,12 +1791,13 @@ class ChoicePoint {
 			cp := removeables[last]
 		
 			subChoicePoints := cp.SubChoicePoints
-		
-			if (subChoicePoints.Length() > 0) {
+			scpLength := subChoicePoints.Length()
+			
+			if (scpLength > 0) {
 				cp.SubChoicePoints := []
-				
-				for ignore, theChoicePoint in reverse(subChoicePoints)
-					removeables.Push(theChoicePoint)
+			
+				Loop %scpLength%
+					removeables.Push(subChoicePoints[scpLength - A_Index + 1])
 			}
 			else
 				removeables.Pop().unlink()

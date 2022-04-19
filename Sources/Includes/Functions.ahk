@@ -154,10 +154,10 @@ changeProtection(up) {
 	
 	if (level > 0) {
         Critical 100
-		BlockInput On
+		; BlockInput On
 	}
 	else if (level == 0) {
-		BlockInput Off
+		; BlockInput Off
         Critical Off
 	}
 	else if (level <= 0)

@@ -132,7 +132,7 @@ Sorts the given array in place, using *comparator* to define the order of the el
 ***
 
 ## Localization & Translation ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Config* folders.
+A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Simulator Controller\Translations* folder in you user *Documents* folder.
 
 #### *availableLanguages()*
 Returns a map, where the key defines the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and the value the language name (example: *{en: English, de: Deutsch}*. The map is populated with all available translations.

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.0.8-dev](https://www.dropbox.com/s/uqsfwogcki5dotg/Simulator%20Controller%204.0.8-dev.zip?dl=1) (Early build for 4.0.8. New features: Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions, Acknowledge of pitstop options change after a pitstop has been prepared. Stable, incl. update procedure and documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-408) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Discord Community
 

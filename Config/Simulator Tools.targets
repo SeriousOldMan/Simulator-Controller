@@ -39,6 +39,7 @@ Release 4.0.0=Release 3.9.8 -> updateTranslations, updatePhraseGrammars, updateA
 Release 4.0.2=Release 4.0.0 -> updateTranslations, updatePhraseGrammars, updatePluginsForV402
 Release 4.0.4=Release 4.0.2 -> updateTranslations, updatePhraseGrammars, updateActionLabels, updateActionIcons
 Release 4.0.6=Release 4.0.4 -> updateTranslations
+Release 4.0.8=Release 4.0.6 -> updateTranslations, updateActionLabels, updateActionIcons
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

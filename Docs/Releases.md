@@ -3,9 +3,9 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Fixed fuel consumption displayed as negative after pitstop in "Race Center".
-  4. Default value for the "teamServer:" plugin argument is now *Off* in generated configuration.
+  4. Default value for the "teamServer:" plugin argument is now *Off* in a new generated configuration. Please pay attention to this, when generating a new configuration using "Simulator Setp" and create an action binding for the "TeamServer" action for at least one of the Virtual Race Assistants.
   5. Fixed a critical stack overflow with blocking error message in the Race Assistants, when corrupt data is processed from the ACC server backend.
-  6. All new icon set for Stream Deck actions. Included as a preset for "Simulator Setup".
+  6. All new icon set for Stream Deck actions. Included as a preset in "Simulator Setup".
   7. Race Engineer now acknowledges any additional change of pitstop options after a pitstop has been prepared in ACC or RF2.
 
 ## 4.0.6-release 04/15/22

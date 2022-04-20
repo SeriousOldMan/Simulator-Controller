@@ -222,6 +222,8 @@ class ControllerActionsEditor extends ConfigurationItem {
 					else {
 						if (value == false)
 							value := ""
+						else if (InStr(value, kResourcesDirectory) == 1)
+							value := StrReplace(value, kResourcesDirectory, "%kResourcesDirectory%")
 					
 						if (value != getConfigurationValue(stdConfiguration, section, key, ""))
 							setConfigurationValue(configuration, section, key, value)

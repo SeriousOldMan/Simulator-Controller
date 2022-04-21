@@ -220,6 +220,8 @@ class RaceCenter extends ConfigurationItem {
 	iLapsListView := false
 	iPitstopsListView := false
 	
+	iSelectedPlanStint := false
+	
 	iSessionDatabase := false
 	iTelemetryDatabase := false
 	iPressuresDatabase := false
@@ -801,6 +803,12 @@ class RaceCenter extends ConfigurationItem {
 	PitstopsListView[] {
 		Get {
 			return this.iPitstopsListView
+		}
+	}
+	
+	SelectedPlanStint[] {
+		Get {
+			return this.iSelectedPlanStint
 		}
 	}
 	
@@ -1479,6 +1487,13 @@ class RaceCenter extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
+		if (selected != this.SelectedPlanStint) {
+			this.iSelectedPlanStint := false
+			selected := false
+			
+			LV_Modify(selected, "-Select")
+		}
+		
 		if selected {
 			GuiControl Enable, driverDropDownMenu
 			GuiControl Enable, planTimeEdit
@@ -1574,6 +1589,11 @@ class RaceCenter extends ConfigurationItem {
 			
 			Gui ListView, % this.PlanListView
 		
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			
 			pitstops := this.Strategy.Pitstops
 			
 			numStints := (pitstops.Length() + 1)
@@ -1688,6 +1708,8 @@ class RaceCenter extends ConfigurationItem {
 				
 				LV_Delete()
 				
+				this.iSelectedPlanStint := false
+			
 				this.updateState()
 			}
 		}
@@ -1700,6 +1722,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui ListView, % this.PlanListView
 		
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
+		
+		this.iSelectedPlanStint := false
+			
 		if IsObject(minutesOrStint) {
 			if (LV_GetCount() > 0) {
 				time := this.computeStartTime(minutesOrStint)
@@ -1749,6 +1776,14 @@ class RaceCenter extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
+		if (selected != this.SelectedPlanStint) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			selected := false
+		}
+			
 		if selected {
 			position := ((position = "After") ? selected + 1 : selected)
 			
@@ -1772,10 +1807,16 @@ class RaceCenter extends ConfigurationItem {
 		
 		initial := ((stintNr = 1) ? "-" : "")
 			
-		if position
+		if position {
 			LV_Insert(position, "Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
-		else
+			
+			this.iSelectedPlanStint := position
+		}
+		else {
 			LV_Add("Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
+		
+			this.iSelectedPlanStint := LV_GetCount()
+		}
 		
 		GuiControl Choose, driverDropDownMenu, 1
 		GuiControl, , planTimeEdit, 20200101000000
@@ -1801,6 +1842,14 @@ class RaceCenter extends ConfigurationItem {
 		Gui ListView, % this.PlanListView
 		
 		selected := LV_GetNext(0)
+		
+		if (selected != this.SelectedPlanStint) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			selected := false
+		}
 		
 		if selected {
 			LV_Delete(selected)
@@ -2830,6 +2879,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
+		this.iSelectedPlanStint := false
+		
 		Gui ListView, % this.StintsListView
 		
 		LV_Delete()
@@ -3828,6 +3879,8 @@ class RaceCenter extends ConfigurationItem {
 					
 						this.loadPlan(info, plan)
 					}
+					
+					this.iSelectedPlanStint := false
 				}
 			}
 		}
@@ -4432,6 +4485,8 @@ class RaceCenter extends ConfigurationItem {
 		Gui ListView, % this.PlanListView
 		
 		LV_Delete()
+		
+		this.iSelectedPlanStint := false
 		
 		if plan {
 			fileName := (this.SessionDirectory . "Plan.Data.CSV")
@@ -6093,40 +6148,6 @@ class RaceCenter extends ConfigurationItem {
 		
 		html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
 		
-		stints := []
-		drivers := []
-		laps := []
-		durations := []
-		numLaps := []
-		positions := []
-		avgLapTimes := []
-		fuelConsumptions := []
-		accidents := []
-		
-		currentStint := this.CurrentStint
-		
-		if currentStint
-			Loop % currentStint.Nr
-			{
-				stint := this.Stints[A_Index]
-				
-				stints.Push("<th class=""th-std"">" . stint.Nr . "</th>")
-				drivers.Push("<td class=""td-std"">" . StrReplace(stint.Driver.Nickname, "'", "\'") . "</td>")
-				laps.Push("<td class=""td-std"">" . stint.Lap . "</td>")
-				
-				duration := 0
-				
-				for ignore, lap in stint.Laps
-					duration += lap.Laptime
-				
-				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
-				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
-				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
-				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
-				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
-			}
-		
 		html .= "<br><br><table class=""table-std"">"
 		
 		html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
@@ -7142,6 +7163,8 @@ updateTime() {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
+	rCenter.iSelectedPlanStint := false
+	
 	rCenter.updateState()
 }
 
@@ -7155,6 +7178,8 @@ choosePlan() {
 		
 		Gui ListView, % rCenter.PlanListView
 
+		rCenter.iSelectedPlanStint := A_EventInfo
+		
 		LV_GetText(stint, A_EventInfo, 1)
 		LV_GetText(driver, A_EventInfo, 2)
 		LV_GetText(timePlanned, A_EventInfo, 3)
@@ -7213,6 +7238,13 @@ updatePlanAsync() {
 	
 	row := LV_GetNext(0)
 	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
+	
 	if (row > 0) {
 		GuiControlGet driverDropDownMenu
 		GuiControlGet planTimeEdit
@@ -7254,7 +7286,16 @@ addPlan() {
 	
 	Gui ListView, % rCenter.PlanListView
 	
-	if LV_GetNext(0) {
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
+	
+	if row {
 		title := translate("Insert")
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
@@ -7282,6 +7323,15 @@ deletePlan() {
 	Gui %window%:Default
 	
 	Gui ListView, % rCenter.PlanListView
+	
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
 	
 	if LV_GetNext(0) {
 		title := translate("Delete")

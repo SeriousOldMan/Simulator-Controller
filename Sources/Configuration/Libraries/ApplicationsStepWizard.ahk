@@ -71,8 +71,6 @@ class ApplicationsStepWizard extends StepWizard {
 		for group, applications in groups
 			for ignore, theApplication in applications
 				setConfigurationValue(configuration, "Applications", group . "." . A_Index, theApplication)
-		
-		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 	
 	createGui(wizard, x, y, width, height) {

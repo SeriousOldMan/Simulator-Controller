@@ -53,10 +53,14 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
+		simulators := []
+		
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
 			
 			if wizard.isApplicationSelected(simulator) {
+				simulators.Push(simulator)
+				
 				arguments := ""
 				
 				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
@@ -100,6 +104,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			else
 				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 		}
+		
+		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 	
 	createGui(wizard, x, y, width, height) {

@@ -101,8 +101,43 @@ installOptions(options) {
 	
 	static result := false
 	
-	if (options == kOk)
-		result := kOk
+	if (options == kOk) {
+		GuiControlGet installLocationPathEdit
+		
+		directory := installLocationPathEdit
+		
+		valid := true
+		empty := true
+		
+		if !FileExist(directory)
+			try {
+				FileCreateDir %directory%
+			}
+			catch exception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+				OnMessage(0x44, "")
+				
+				valid := false
+			}
+		else
+			Loop Files, %directory%\*.*, FD
+			{
+				empty := false
+				
+				break
+			}
+		
+		if (empty && valid)
+			result := kOk
+		else if !empty {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The installation folder must be empty.")
+			OnMessage(0x44, "")
+		}
+	}
 	else if (options == kCancel)
 		result := kCancel
 	else {
@@ -285,8 +320,39 @@ chooseInstallLocationPath() {
 	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
 	OnMessage(0x44, "")
 
-	if (directory != "")
-		GuiControl Text, installLocationPathEdit, %directory%
+	if (directory != "") {
+		valid := true
+		empty := true
+		
+		if !FileExist(directory)
+			try {
+				FileCreateDir %directory%
+			}
+			catch exception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+				OnMessage(0x44, "")
+				
+				valid := false
+			}
+		else
+			Loop Files, %directory%\*.*, FD
+			{
+				empty := false
+				
+				break
+			}
+		
+		if (empty && valid)
+			GuiControl Text, installLocationPathEdit, %directory%
+		else if !empty {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The installation folder must be empty.")
+			OnMessage(0x44, "")
+		}
+	}
 }
 
 openInstallDocumentation() {

@@ -88,17 +88,6 @@ downloadSimulatorController() {
 	version := getConfigurationValue(release, (devVersion ? "Development" : "Release"), "Version", getConfigurationValue(release, "Version", "Release", false))
 
 	if version {
-		version := StrSplit(version, "-", , 2)
-		current := StrSplit(kVersion, "-", , 2)
-		
-		dottedVersion := version[1]
-		
-		versionPostfix := version[2]
-		currentPostfix := current[2]
-		
-		version := values2String("", string2Values(".", version[1])*)
-		current := values2String("", string2Values(".", current[1])*)
-		
 		if devVersion
 			download := getConfigurationValue(release, "Development", "Download", false)
 		else

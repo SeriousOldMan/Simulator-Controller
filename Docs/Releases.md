@@ -1,3 +1,7 @@
+## 4.0.9-release 04/22/22
+
+  1. Prevent installation to non-empty directories.
+
 ## 4.0.8-release 04/22/22
 
   1. Bugfixes, as always

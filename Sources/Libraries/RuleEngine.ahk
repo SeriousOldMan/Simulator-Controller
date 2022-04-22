@@ -1488,8 +1488,19 @@ class ResultSet {
 	}
 	
 	dispose() {
-		if this.iChoicePoint
-			this.iChoicePoint.remove()
+		cp := this.iChoicePoint
+		
+		if cp {
+			removeables := []
+			
+			while cp {
+				removeables.Push(cp)
+			
+				cp := cp.next()
+			}
+			
+			ChoicePoint.remove(removeables)
+		}
 		
 		this.iChoicePoint := false
 	}

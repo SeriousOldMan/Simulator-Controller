@@ -708,8 +708,17 @@ checkForUpdates() {
 				versionPostfix := version[2]
 				currentPostfix := current[2]
 				
-				version := values2String("", string2Values(".", version[1])*)
-				current := values2String("", string2Values(".", current[1])*)
+				version := string2Values(".", version[1])
+				current := string2Values(".", current[1])
+		
+				while (version.Length() < current.Length())
+					version.Push("0")
+				
+				while (current.Length() < version.Length())
+					current.Push("0")
+				
+				version := values2String("", version*)
+				current := values2String("", current*)
 				
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

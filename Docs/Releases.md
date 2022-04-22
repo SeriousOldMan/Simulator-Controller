@@ -1,4 +1,4 @@
-## 4.0.8-release 04/22/22 (planned)
+## 4.0.8-release 04/22/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -8,6 +8,7 @@
   6. All new icon set for Stream Deck actions. Included as a preset in "Simulator Setup".
   7. Race Engineer now acknowledges any additional change of pitstop options after a pitstop has been prepared in ACC or RF2.
   8. Fixed a bug in in "Simulator Setup", so that "Assetto Corsa" is registered as a valid simulator.
+  9. Changed update frequency for icons on large or multiple Stream Decks in order to increase responsiveness.
 
 ## 4.0.6-release 04/15/22
 

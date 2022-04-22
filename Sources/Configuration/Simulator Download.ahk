@@ -103,7 +103,20 @@ downloadSimulatorController() {
 			
 			SetTimer %updateProgress%, 1500
 			
-			URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+			try {
+				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+				
+				if ErrorLevel
+					Throw "No valid installation file..."
+			}
+			catch exception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")
+				OnMessage(0x44, "")
+				
+				ExitApp 0
+			}
 			
 			SetTimer %updateProgress%, Off
 			

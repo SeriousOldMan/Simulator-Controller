@@ -75,6 +75,16 @@ class VoiceAssistant {
 				return this.iAssistant
 			}
 		}
+	
+		Speaking[] {
+			Get {
+				return this.Assistant.Speaking
+			}
+			
+			Set {
+				return (this.Assistant.Speaking := value)
+			}
+		}
 		
 		Phrases[key := false] {
 			Get {
@@ -131,6 +141,16 @@ class VoiceAssistant {
 		Assistant[] {
 			Get {
 				return this.iAssistant
+			}
+		}
+	
+		Speaking[] {
+			Get {
+				return this.Assistant.Speaking
+			}
+			
+			Set {
+				return (this.Assistant.Speaking := value)
 			}
 		}
 		

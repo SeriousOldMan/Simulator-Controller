@@ -35,8 +35,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										 , "Compound", "Compound.Color", "Pressures", "Temperatures"]}
 										 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
-		__New(remotePID) {
-			base.__New("Race Strategist", remotePID)
+		__New(plugin, remotePID) {
+			base.__New(plugin, "Race Strategist", remotePID)
 		}
 		
 		recommendPitstop(arguments*) {
@@ -113,7 +113,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceStrategist(pid)
+		return new this.RemoteRaceStrategist(this, pid)
 	}
 	
 	startSession(settingsFile, dataFile, teamSession) {

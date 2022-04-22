@@ -44,8 +44,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iFinished := false
 	
 	class RemoteRaceAssistant {
+		iPlugin := false
 		iRemoteEvent := false
 		iRemotePID := false
+		
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
 		
 		RemotePID[] {
 			Get {
@@ -53,12 +60,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(remoteEvent, remotePID) {
+		__New(plugin, remoteEvent, remotePID) {
+			this.iPlugin := plugin
 			this.iRemoteEvent := remoteEvent
 			this.iRemotePID := remotePID
 		}
 		
 		callRemote(function, arguments*) {
+			Process Exist, % (this.Plugin.Plugin . ".exe")
+			
+			if ErrorLevel {
+				if (ErrorLevel != this.RemotePID)
+					this.iRemotePID := ErrorLevel
+			}
+			else
+				return
+				
 			raiseEvent(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 		

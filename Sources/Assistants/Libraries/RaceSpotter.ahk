@@ -28,7 +28,6 @@ class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
 	
 	iSessionDataActive := false
-	iSpotterSpeaking := false
 	
 	iGridPosition := false
 	
@@ -591,17 +590,19 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	startupSpotter() {
-		code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
-		
-		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
-		
-		if FileExist(exePath) {
-			this.shutdownSpotter()
+		if !this.iSpotterPID {
+			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 			
-			Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+			exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 			
-			if ((ErrorLevel != "Error") && spotterPID)
-				this.iSpotterPID := spotterPID
+			if FileExist(exePath) {
+				this.shutdownSpotter()
+				
+				Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				
+				if ((ErrorLevel != "Error") && spotterPID)
+					this.iSpotterPID := spotterPID
+			}
 		}
 	}
 	
@@ -614,10 +615,21 @@ class RaceSpotter extends RaceAssistant {
 		
 		processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 		
-		Process Exist, %processName%
-			
-		if ErrorLevel
-			Process Close, %ErrorLevel%
+		tries := 5
+		
+		while (tries-- > 0) {
+			Process Exist, %processName%
+		
+			if ErrorLevel {
+				Process Close, %ErrorLevel%
+				
+				Sleep 500
+			}
+			else
+				break
+		}
+		
+		this.iSpotterPID := false
 	}
 				
 	createSession(settings, data) {

@@ -33,8 +33,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	iLapDatabase := false
 	
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
-		__New(remotePID) {
-			base.__New("Race Engineer", remotePID)
+		__New(plugin, remotePID) {
+			base.__New(plugin, "Race Engineer", remotePID)
 		}
 		
 		planPitstop(arguments*) {
@@ -115,7 +115,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceEngineer(pid)
+		return new this.RemoteRaceEngineer(this, pid)
 	}
 	
 	prepareSettings(data) {

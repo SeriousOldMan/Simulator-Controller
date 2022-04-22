@@ -25,8 +25,8 @@ global kRaceSpotterPlugin = "Race Spotter"
 
 class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
-		__New(remotePID) {
-			base.__New("Race Spotter", remotePID)
+		__New(plugin, remotePID) {
+			base.__New(plugin, "Race Spotter", remotePID)
 		}
 	}
 	
@@ -49,7 +49,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceSpotter(pid)
+		return new this.RemoteRaceSpotter(this, pid)
 	}
 	
 	requestInformation(arguments*) {

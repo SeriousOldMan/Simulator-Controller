@@ -858,6 +858,9 @@ class RaceStrategist extends RaceAssistant {
 	updateLap(lapNumber, data) {
 		static lastSector := 1
 		
+		if !IsObject(data)
+			data := readConfiguration(data)
+		
 		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
 		
 		if (sector != lastSector) {

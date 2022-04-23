@@ -14,6 +14,8 @@
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
+#MaxMem 128
+
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
@@ -3258,6 +3260,8 @@ class RaceCenter extends ConfigurationItem {
 				Gui ListView, % this.StintsListView
 				
 				for ignore, stint in newStints {
+					Gui ListView, % this.StintsListView
+				
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
 							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
@@ -3279,6 +3283,8 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
+						Gui ListView, % this.LapsListView
+				
 						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
@@ -3425,11 +3431,18 @@ class RaceCenter extends ConfigurationItem {
 			laps := getConfigurationValue(lapData, "Laps", lap)
 			drivers := getConfigurationValue(lapData, "Drivers", lap)
 			
-			Loop %missingLaps% {
-				times .= ("`n" . times)
-				positions .= ("`n" . positions)
-				laps .= ("`n" . laps)
-				drivers .= ("`n" . drivers)
+			if (missingLaps > 0) {
+				mTimes := times
+				mPositions := positions
+				mLaps := laps
+				mDrivers := drivers
+				
+				Loop %missingLaps% {
+					times .= ("`n" . mTimes)
+					positions .= ("`n" . mPositions)
+					laps .= ("`n" . mLaps)
+					drivers .= ("`n" . mDrivers)
+				}
 			}
 			
 			missingLaps := 0
@@ -4436,6 +4449,8 @@ class RaceCenter extends ConfigurationItem {
 					stint := this.Stints[A_Index]
 					stint.Row := (LV_GetCount() + 1)
 					
+					Gui ListView, % this.StintsListView
+			
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
 							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
@@ -4457,6 +4472,8 @@ class RaceCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (LV_GetCount() + 1)
 					
+					Gui ListView, % this.LapsListView
+			
 					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 				}
 		
@@ -4503,10 +4520,13 @@ class RaceCenter extends ConfigurationItem {
 			this.SessionDatabase.reload("Plan.Data", false)
 		}
 		
-		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"]
+		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"] {
+			Gui ListView, % this.PlanListView
+		
 			LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
 					 , plan["Lap.Planned"], plan["Lap.Actual"]
 					 , plan["Fuel.Amount"], plan["Tyre.Change"])
+		}
 				
 		LV_ModifyCol()
 		
@@ -4540,11 +4560,13 @@ class RaceCenter extends ConfigurationItem {
 			pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
 										   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
 				
+			Gui ListView, % this.PitstopsListView
+		
 			LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
 					 , translate(compound(pitstop["Tyre.Compound"], pitstop["Tyre.Compound.Color"]))
 					 , pitstop["Tyre.Set"], pressures, repairs)
 		}
-				
+		
 		LV_ModifyCol()
 		
 		Loop % LV_GetCount("Col")

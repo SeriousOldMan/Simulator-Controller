@@ -1336,7 +1336,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				case "Tyre Compound":
 					data := readSimulatorData(this.Code, "-Setup")
 					
-					return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+					return [getConfigurationValue(data, "Setup Data", "TyreCompound", false), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", false)]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":

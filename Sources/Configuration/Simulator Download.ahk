@@ -82,7 +82,20 @@ downloadSimulatorController() {
 
 	devVersion := (cState != false)
 				
-	URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
+	try {
+		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
+				
+		if ErrorLevel
+			Throw "No valid installation file..."
+	}
+	catch exception {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		title := translate("Error")
+		MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")
+		OnMessage(0x44, "")
+		
+		ExitApp 0
+	}
 			
 	release := readConfiguration(kTempDirectory . "VERSION")
 	version := getConfigurationValue(release, (devVersion ? "Development" : "Release"), "Version", getConfigurationValue(release, "Version", "Release", false))

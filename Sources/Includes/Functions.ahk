@@ -660,20 +660,37 @@ checkForNews() {
 		}
 		
 		if check {
-			URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
-			
+			try {
+				URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
+				
+				if ErrorLevel
+					Throw "Error while downloading NEWS..."
+			}
+			catch exception {
+				check := false
+			}
+		}
+		
+		if check {
 			news := readConfiguration(kUserConfigDirectory . "NEWS")
 			
 			for nr, html in getConfigurationSectionValues(readConfiguration(kTempDirectory . "NEWS"), "News")
-				if !getConfigurationValue(news, "News", nr, false) {
-					setConfigurationValue(news, "News", nr, true)
+				if !getConfigurationValue(news, "News", nr, false)
+					try {
+						URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
+			
+						if ErrorLevel
+							Throw "Error while downloading NEWS..."
+							
+						setConfigurationValue(news, "News", nr, true)
 					
-					writeConfiguration(kUserConfigDirectory . "NEWS", news)
-					
-					URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
-					
-					viewHTML(kTempDirectory . "NEWS.htm")
-				}
+						writeConfiguration(kUserConfigDirectory . "NEWS", news)
+						
+						viewHTML(kTempDirectory . "NEWS.htm")
+					}
+					catch exception {
+						; ignore
+					}
 		}
 	}
 }
@@ -694,8 +711,18 @@ checkForUpdates() {
 		}
 		
 		if check {
-			URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
+			try {
+				URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
+				
+				if ErrorLevel
+					Throw "Error while checking VERSION..."
+			}
+			catch exception {
+				check := false
+			}
+		}
 			
+		if check {
 			release := readConfiguration(kUserConfigDirectory . "VERSION")
 			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
 			

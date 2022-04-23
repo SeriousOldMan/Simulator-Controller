@@ -1,16 +1,16 @@
 [Development]
-Version=4.0.9-release
-Target=4.0.9-release
-Date=04/22/2022
-Download=https://cntr.click/L5vsr8A
-Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions, Acknowledge of pitstop options change after a pitstop has been prepared, Removed no longer needed template files, Fixed setup of "Assetto Corsa" in "Simulator Setup", Changed update frequency of Stream Deck Icons
+Version=4.1.0-dev
+Target=4.1.0-release
+Date=04/23/2022
+Download=
+Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup"
 [Release]
 Version=4.0.9-release
 Date=04/22/2022
 Download=https://cntr.click/L5vsr8A
 Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions, Acknowledge of pitstop options change after a pitstop has been prepared, Removed no longer needed template files, Fixed setup of "Assetto Corsa" in "Simulator Setup", Changed update frequency of Stream Deck Icons
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.0.9-release
-Development=4.0.9-release
+Development=4.1.0-dev

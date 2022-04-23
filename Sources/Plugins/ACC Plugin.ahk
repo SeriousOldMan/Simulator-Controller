@@ -647,6 +647,19 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
 			}
 	}
+	
+	notifyPitstopChanged(option) {
+		if this.RaceEngineer
+			switch option {
+				case "Change Tyres":
+					newValues := this.getPitstopOptionValues("Tyre Compound")
+					
+					if newValues
+						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
+				default:
+					base.notifyPitstopChanged(option)
+			}
+	}
 
 	changeStrategy(selection, steps := 1) {
 		if (this.requirePitstopMFD() && this.selectPitstopOption("Strategy"))
@@ -1334,9 +1347,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					
 					return [getConfigurationValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
-					data := readSimulatorData(this.Code, "-Setup")
+					if this.iPSChangeTyres {
+						data := readSimulatorData(this.Code, "-Setup")
 					
-					return [getConfigurationValue(data, "Setup Data", "TyreCompound", false), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", false)]
+						return [getConfigurationValue(data, "Setup Data", "TyreCompound", false), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", false)]
+					}
+					else
+						return [false, false]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":

@@ -1294,7 +1294,7 @@ class SetupWizard extends ConfigurationItem {
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
 			
 			if (function.Length() > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" | ", function*))
+				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
 		}
 		
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length())
@@ -1303,7 +1303,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	getControllerFunctionTriggers(function) {
-		return string2Values("|", this.KnowledgeBase.getValue("Controller.Function." . function . ".Triggers", ""))
+		return string2Values("###", this.KnowledgeBase.getValue("Controller.Function." . function . ".Triggers", ""))
 	}
 	
 	setSimulatorActionFunctions(simulator, mode, functions) {

@@ -469,7 +469,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
 		
 		try {
-			Menu ControlMenu, DeleteAll
+			Menu MainMenu, DeleteAll
 		}
 		catch exception {
 			; ignore

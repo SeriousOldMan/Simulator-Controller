@@ -384,7 +384,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		
 		teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 		
-		if (teamServer && !this.Controller.isActive(teamServer))
+		if (teamServer && this.Controller.isActive(teamServer))
 			this.iTeamServer := teamServer
 		else
 			teamServer := false

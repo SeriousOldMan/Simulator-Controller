@@ -1046,8 +1046,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 y750 w1200 0x10
 		
-		Gui %window%:Add, Text, x16 y759 w554 vmessageField
-		Gui %window%:Add, Button, x574 y756 w80 h23 GcloseRaceCenter, % translate("Close")
+		Gui %window%:Add, Text, x16 y762 w554 vmessageField
+		Gui %window%:Add, Button, x574 y759 w80 h23 GcloseRaceCenter, % translate("Close")
 
 		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		

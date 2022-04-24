@@ -663,9 +663,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	prepareSession(settings, data) {
-		base.prepareSession(settings, data)
-		
+	initializeWarning(data) {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
@@ -684,11 +682,20 @@ class RaceSpotter extends RaceAssistant {
 			
 			this.updateConfigurationValues({Warnings: warnings})
 		}
-		
+	}
+	
+	initializeGridPosition(data) {
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 		
 		if driver
 			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+	}
+	
+	prepareSession(settings, data) {
+		base.prepareSession(settings, data)
+		
+		this.initializeWarnings(data)
+		this.initializeGridPosition(data)
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -701,11 +708,20 @@ class RaceSpotter extends RaceAssistant {
 	startSession(settings, data) {
 		local facts
 		
+		joined := (!this.Warnings || (this.Warnings.Count() = 0))
+		
 		if !IsObject(settings)
 			settings := readConfiguration(settings)
 		
 		if !IsObject(data)
 			data := readConfiguration(data)
+		
+		if joined {
+			this.initializeWarnings(data)
+			
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Greeting")
+		}
 		
 		facts := this.createSession(settings, data)
 		
@@ -736,7 +752,13 @@ class RaceSpotter extends RaceAssistant {
 		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
-		this.startupSpotter()
+		if joined {
+			callback := ObjBindMethod(this, "startupSpotter")
+		
+			SetTimer %callback%, -10000
+		}
+		else
+			this.startupSpotter()
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)

@@ -1223,7 +1223,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	showMessage(message, prefix := false) {
 		if !prefix
-			prefix := translate("Task: ")
+			prefix := translate("Step: ")
 		
 		window := this.Window
 		
@@ -3052,7 +3052,11 @@ class RaceCenter extends ConfigurationItem {
 				if (!rawData || (rawData == "")) {
 					tries -= 1
 					
+					this.showMessage(translate("Waiting for data"))
+								
 					if (tries <= 0) {
+						this.showMessage(translate("Give up - use default values"))
+								
 						newLaps.RemoveAt(A_Index, newLaps.Length() - A_Index + 1)
 						
 						return newLaps
@@ -3135,8 +3139,13 @@ class RaceCenter extends ConfigurationItem {
 					if (!rawData || (rawData = "")) {
 						tries -= 1
 						
-						if (tries <= 0)
+						this.showMessage(translate("Waiting for data"))
+								
+						if (tries <= 0) {
+							this.showMessage(translate("Give up - use default values"))
+						
 							Throw "No data..."
+						}
 						else
 							Sleep 400
 					}
@@ -3556,8 +3565,13 @@ class RaceCenter extends ConfigurationItem {
 						if (!telemetryData || (telemetryData == "")) {
 							tries -= 1
 							
-							if (tries <= 0)
+							this.showMessage(translate("Waiting for data"))
+								
+							if (tries <= 0) {
+								this.showMessage(translate("Give up - use default values"))
+							
 								Throw "No data..."
+							}
 							else
 								Sleep 400
 						}
@@ -3727,8 +3741,13 @@ class RaceCenter extends ConfigurationItem {
 						if (!lapPressures || (lapPressures == "")) {
 							tries -= 1
 							
-							if (tries <= 0)
+							this.showMessage(translate("Waiting for data"))
+								
+							if (tries <= 0) {
+								this.showMessage(translate("Give up - use default values"))
+							
 								Throw "No data..."
+							}
 							else
 								Sleep 400
 						}
@@ -5406,9 +5425,14 @@ class RaceCenter extends ConfigurationItem {
 							
 							if (!standingsData || (standingsData == "")) {
 								tries -= 1
+
+								this.showMessage(translate("Waiting for data"))
 								
-								if (tries <= 0)
+								if (tries <= 0) {
+									this.showMessage(translate("Give up - use default values"))
+								
 									Throw "No data..."
+								}
 								else
 									Sleep 400
 							}

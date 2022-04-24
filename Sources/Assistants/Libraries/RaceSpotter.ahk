@@ -663,7 +663,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	initializeWarning(data) {
+	initializeWarnings(data) {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		

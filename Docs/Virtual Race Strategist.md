@@ -373,7 +373,7 @@ Beside these predicates, which access the data of the current scenario, you have
 
 ##### Integrating into Strategy Workbench
 
-Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench".
+Once you have created a set of validation rules similar to the examples above, you can put the script in a file with the ".rules" extension and place this file in the *Validators* folder which is located in the *Simulator Controller* folder in your user *Documents* folder. Once you have done this, you can activate the *validator* in the "Settings" menu of "Simulator Workbench". And from now on, you can hold down the control key while selecting the validator from the menu to start a text editor for this file.
 
 ### Pitstop & Service
 

@@ -1731,21 +1731,40 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (line > 9) {
 					validators := []
 					
-					for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-						SplitPath fileName, , , , validator
-			
-						if !inList(validators, validator)
-							validators.Push(validator)
+					if GetKeyState("Ctrl", "P") {
+						index := 0
+						
+						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+							SplitPath fileName, , , , validator
+				
+							if !inList(validators, validator) {
+								if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
+									Run notepad %fileName%
+								
+									break
+								}
+							}
+							else
+								validators.Push(validator)
+						}
 					}
-					
-					validator := validators[line - 9]
-					
-					if (this.iSelectedValidator = validator)
-						this.iSelectedValidator := false
-					else
-						this.iSelectedValidator := validator
-					
-					this.updateSettingsMenu()
+					else {
+						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+							SplitPath fileName, , , , validator
+				
+							if !inList(validators, validator)
+								validators.Push(validator)
+						}
+						
+						validator := validators[line - 9]
+						
+						if (this.iSelectedValidator = validator)
+							this.iSelectedValidator := false
+						else
+							this.iSelectedValidator := validator
+						
+						this.updateSettingsMenu()
+					}
 				}
 		}
 	}

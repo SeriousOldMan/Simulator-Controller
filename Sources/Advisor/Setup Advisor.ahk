@@ -1015,6 +1015,8 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				Sleep 1000
 				
+				this.iSetup := false
+				
 				hideProgress()
 			}
 			finally {
@@ -1310,7 +1312,7 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				editor.createGui(editor.Configuration)
 				
-				this.Setup := editor.editSetup(this.Setup)
+				this.iSetup := editor.editSetup(this.Setup)
 			}
 			finally {
 				this.iEditor := false
@@ -1543,20 +1545,27 @@ class SetupEditor extends ConfigurationItem {
 	}
 	
 	close() {
+		this.iClosed := true
+	}
+	
+	destroy() {
 		window := this.Window
 			
 		Gui %window%:Destroy
-		
-		this.iClosed := true
 	}
 	
 	editSetup(setup := false) {
 		this.iSetup := (setup ? setup : new Setup())
 		
 		this.show()
-		
-		while !this.iClosed
-			Sleep 200
+	
+		try {
+			while !this.iClosed
+				Sleep 200
+		}
+		finally {
+			this.destroy()
+		}
 		
 		return this.Setup
 	}

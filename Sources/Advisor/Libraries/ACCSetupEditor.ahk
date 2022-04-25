@@ -20,14 +20,36 @@
 ;;; ACCBrakeBalanceConverter                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCBrakeBalanceConverter extends IdentityConverter {
+class ACCBrakeBalanceConverter extends OffsetConverter {
+	__New() {
+		base.__New(47.0, 47.0, 60.0)
+	}
+	
+	convertToDisplayValue(value) {
+		return Round(base.convertToDisplayValue(value / 5), 1)
+	}
+	
+	convertToRawValue(value) {
+		return Round((value - this.Offset) * 5)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ACCTyrePressureConverter                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCTyrePressureConverter extends IdentityConverter {
+class ACCTyrePressureConverter extends OffsetConverter {
+	__New() {
+		base.__New(20.3, 20.4)
+	}
+	
+	convertToDisplayValue(value) {
+		return Round(base.convertToDisplayValue(value / 10), 1)
+	}
+	
+	convertToRawValue(value) {
+		return Round((value - this.Offset) * 10)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -55,21 +77,48 @@ class ACCBumpstopRangeConverter extends IdentityConverter {
 ;;; ACCDamperConverter                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCDamperConverter extends IdentityConverter {
+class ACCDamperConverter extends ClickConverter {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ACCToeConverter                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCToeConverter extends IdentityConverter {
+class ACCToeConverter extends OffsetConverter {
+	convertToDisplayValue(value) {
+		return Round(base.convertToDisplayValue(value / 100), 2)
+	}
+	
+	convertToRawValue(value) {
+		return Round((value - this.Offset) * 100)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ACCFrontToeConverter                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ACCFrontToeConverter extends ACCToeConverter {
+	__New() {
+		base.__New(-0.48, -0.48, 1.0)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ACCRearToeConverter                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ACCRearToeConverter extends ACCToeConverter {
+	__New() {
+		base.__New(-0.1, -0.1, 2.0)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ACCCamberConverter                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCCamberConverter extends IdentityConverter {
+class ACCCamberConverter extends ClickConverter {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

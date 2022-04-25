@@ -22,7 +22,7 @@
 
 class ACCBrakeBalanceConverter extends OffsetConverter {
 	__New() {
-		base.__New(47.0, 47.0, 60.0)
+		base.__New(47.0, 47.0, 68.0)
 	}
 	
 	convertToDisplayValue(value) {
@@ -40,7 +40,7 @@ class ACCBrakeBalanceConverter extends OffsetConverter {
 
 class ACCTyrePressureConverter extends OffsetConverter {
 	__New() {
-		base.__New(20.3, 20.4)
+		base.__New(20.3, 20.3, 35.0)
 	}
 	
 	convertToDisplayValue(value) {
@@ -63,7 +63,18 @@ class ACCSpringRateConverter extends IdentityConverter {
 ;;; ACCBumpstopRateConverter                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCBumpstopRateConverter extends IdentityConverter {
+class ACCBumpstopRateConverter extends OffsetConverter {
+	__New() {
+		base.__New(300, 300, 2500)
+	}
+	
+	convertToDisplayValue(value) {
+		return Round(base.convertToDisplayValue(value * 100))
+	}
+	
+	convertToRawValue(value) {
+		return Round((value - this.Offset) / 100)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -100,7 +111,7 @@ class ACCToeConverter extends OffsetConverter {
 
 class ACCFrontToeConverter extends ACCToeConverter {
 	__New() {
-		base.__New(-0.48, -0.48, 1.0)
+		base.__New(-0.48, -0.48, 0.44)
 	}
 }
 
@@ -110,7 +121,7 @@ class ACCFrontToeConverter extends ACCToeConverter {
 
 class ACCRearToeConverter extends ACCToeConverter {
 	__New() {
-		base.__New(-0.1, -0.1, 2.0)
+		base.__New(-0.1, -0.1, 0.4)
 	}
 }
 

@@ -77,9 +77,15 @@ global carDropDown
 global trackDropDown
 global weatherDropDown
 
+global editSetupButton
+
 global settingsViewer
 
 global characteristicsButton
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SetupAdvisor                                                            ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SetupAdvisor extends ConfigurationItem {
 	iDebug := kDebugOff
@@ -101,6 +107,9 @@ class SetupAdvisor extends ConfigurationItem {
 	
 	iSelectedCharacteristics := []
 	iSelectedCharacteristicsWidgets := {}
+
+	iEditor := false
+	iSetup := false
 	
 	iKnowledgeBase := false
 	
@@ -229,6 +238,18 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	Setup[] {
+		Get {
+			return this.iSetup
+		}
+	}
+	
 	KnowledgeBase[] {
 		Get {
 			return this.iKnowledgeBase
@@ -319,8 +340,11 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 		
 		Gui %window%:Add, DropDownList, x100 yp w220 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
-			
-		Gui %window%:Add, Text, x8 yp+30 w400 0x10
+		
+		Gui %window%:Add, Button, x329 ys+49 w70 h70 Disabled HWNDsetupButton veditSetupButton geditSetup
+		setButtonIcon(setupButton, kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
+		
+		Gui %window%:Add, Text, x8 yp+79 w400 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -333,7 +357,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 382, W: 482, Height: 439, H: 439}
 		
-		Gui %window%:Add, Button, x318 yp-24 w80 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
+		Gui %window%:Add, Button, x328 yp-24 w70 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
 		
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -655,6 +679,12 @@ class SetupAdvisor extends ConfigurationItem {
 			GuiControl Enable, characteristicsButton
 		else
 			GuiControl Disable, characteristicsButton
+		
+		if (this.SimulatorDefinition && getConfigurationValue(this.SimulatorDefinition, "Setup", "Editor", false))
+			GuiControl Enable, editSetupButton
+		else
+			GuiControl Disable, editSetupButton
+			
 	}
 	
 	loadRules(ByRef productions, ByRef reductions) {
@@ -1262,6 +1292,299 @@ class SetupAdvisor extends ConfigurationItem {
 			
 		this.updateState()
 	}
+	
+	editSetup() {
+		editorClass := getConfigurationValue(this.SimulatorDefinition, "Setup", "Editor", false)
+			
+		if editorClass {
+			editor := new %editorClass%(this)
+			
+			this.iEditor := editor
+
+			aWindow := this.Window
+			eWindow := editor.Window
+			
+			Gui %eWIndow%:+Owner%aWindow%
+			Gui %aWindow%:+Disabled
+			
+			try {
+				editor.createGui(editor.Configuration)
+				
+				this.Setup := editor.editSetup(this.Setup)
+			}
+			finally {
+				this.iEditor := false
+				
+				Gui %aWindow%:-Disabled
+			}
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Setup                                                                   ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Setup {
+	iEditor := false
+	
+	iOriginalFileName := false
+	iModifiedFileName := false
+	
+	iOriginalSetup := ""
+	iModifiedSetup := ""
+	
+	Editor[] {
+		Get {
+			return this.iEditor
+		}
+	}
+	
+	FileName[original := false] {
+		Get {
+			return (original ? this.iOriginalFileName : this.iModifiedFileName)
+		}
+	}
+	
+	Setup[original := false] {
+		Get {
+			return ((original || !this.iModifiedSetup) ? this.iOriginalSetup : this.iModifiedSetup)
+		}
+	}
+	
+	__New(editor, originalFileName := false) {
+		local setup
+		
+		this.iEditor := editor
+		this.iOriginalFileName := originalFileName
+		
+		if (originalFileName && FileExist(originalFileName)) {
+			FileRead setup, %originalFileName%
+			
+			this.iOriginalSetup := setup
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Converter                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Converter {
+	MinValue[] {
+		Get {
+			return -2147483648
+		}
+	}
+			
+	MaxValue[] {
+		Get {
+			return 2147483647
+		}
+	}
+	
+	validValue(displayValue) {
+		return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
+	}
+	
+	convertToDisplayValue(value) {
+		Throw "Virtual method Converter.convertToDisplayValue must be implemented in a subclass..."
+	}
+	
+	convertToRawValue(value) {
+		Throw "Virtual method Converter.convertToRawValue must be implemented in a subclass..."
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; OffsetConverter                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class OffsetConverter extends Converter {
+	iOffset := false
+	iMinValue := kUndefined
+	iMaxValue := kUndefined
+	
+	Offset[] {
+		Get {
+			return this.iOffset
+		}
+	}
+	
+	MinValue[] {
+		Get {
+			return ((this.iMinValue != kUndefined) ? this.iMinValue : base.MinValue)
+		}
+	}
+	
+	MaxValue[] {
+		Get {
+			return ((this.iMaxValue != kUndefined) ? this.iMaxValue : base.MaxValue)
+		}
+	}
+	
+	__New(offset, minValue := "__Undefined__", maxValue := "__Undefined__") {
+		this.iOffset := offset
+		this.iMinValue := minValue
+		this.iMaxValue := maxValue
+	}
+	
+	convertToDisplayValue(value) {
+		return (value + this.Offset)
+	}
+	
+	convertToRawValue(value) {
+		return (value - this.Offset)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; IdentityConverter                                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class IdentityConverter extends OffsetConverter {
+	__New() {
+		base.__New(0)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ClickConverter                                                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ClickConverter extends OffsetConverter {
+	__New(minValue := "__Undefined__", maxValue := "__Undefined__") {
+		base.__New(0, minValue, maxValue)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SetupEditor                                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+global setupViewer
+
+class SetupEditor extends ConfigurationItem {
+	iAdvisor := false
+	iSetup := false
+	
+	iSettingsListView := false
+	
+	iClosed := false
+	
+	Advisor[] {
+		Get {
+			return this.iAdvisor
+		}
+	}
+	
+	Setup[] {
+		Get {
+			return this.iSetup
+		}
+	}
+	
+	SettingsListView[] {
+		Get {
+			return this.iSettingsListView
+		}
+	}
+	
+	Window[] {
+		Get {
+			return "Editor"
+		}
+	}
+	
+	__New(advisor, configuration := false) {
+		this.iAdvisor := advisor
+		
+		base.__New(configuration ? configuration : advisor.SimulatorDefinition)
+	}
+	
+	createGui(configuration) {
+		window := this.Window
+		
+		Gui %window%:Default
+	
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w784 Center gmoveEditor, % translate("Modular Simulator Controller System") 
+		
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, YP+20 w784 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
+		
+		Gui %window%:Font, s8 Norm, Arial
+		
+		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
+		
+		Gui %window%:Add, ListView, x16 ys+10 w350 h360 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
+		
+		this.iSettingsListView := settingsListView
+		
+		Gui %window%:Add, Edit, x380 ys+10 w417 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
+		
+		Gui %window%:Add, Text, x8 y506 w800 0x10
+		
+		Gui %window%:Add, Button, x374 y514 w80 h23 GcloseEditor, % translate("Close")
+	}
+	
+	show() {
+		window := this.Window
+			
+		Gui %window%:Show
+		
+		this.loadSetup()
+	}
+	
+	close() {
+		window := this.Window
+			
+		Gui %window%:Destroy
+		
+		this.iClosed := true
+	}
+	
+	editSetup(setup := false) {
+		this.iSetup := (setup ? setup : new Setup())
+		
+		this.show()
+		
+		while !this.iClosed
+			Sleep 200
+		
+		return this.Setup
+	}
+	
+	createConverter(setting) {
+		local converter := getConfigurationValue(this.Configuration, "Setup.Settings.Converter", setting, false)
+		
+		if converter {
+			converter := string2Values("(", SubStr(converter, 1, StrLen(converter) - 1))
+			
+			converterClass := converter[1]
+			
+			return new %converterClass%(string2Values(",", converter[2])*)
+		}
+		else
+			Throw "Unknown converter encoutered in SetupEditor.createConverter..."
+	}
+	
+	loadSetup(ByRef setup := false) {
+		if !setup
+			setup := this.Setup
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
+	}
 }
 
 
@@ -1401,6 +1724,10 @@ saveSetup() {
 	}
 }
 
+editSetup() {
+	SetupAdvisor.Instance.editSetup()
+}
+
 closeAdvisor() {
 	if GetKeyState("Ctrl", "P")
 		SetupAdvisor.Instance.saveState()
@@ -1414,6 +1741,18 @@ moveAdvisor() {
 
 openAdvisorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor
+}
+
+closeEditor() {
+	SetupAdvisor.Instance.Editor.close()
+}
+
+moveEditor() {
+	moveByMouse(SetupAdvisor.Instance.Editor.Window)
+}
+
+openEditorDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#Setup-Editor
 }
 
 chooseSimulator() {
@@ -1495,6 +1834,13 @@ runSetupAdvisor() {
 		fixIE(current)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Editor Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include Libraries\ACCSetupEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

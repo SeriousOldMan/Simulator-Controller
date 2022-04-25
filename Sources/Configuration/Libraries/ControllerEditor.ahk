@@ -1077,9 +1077,12 @@ class LayoutsList extends ConfigurationItemList {
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
 		
-		result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
-		
-		Gui CTRLE:-Disabled
+		try {
+			result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
+		}
+		finally {
+			Gui CTRLE:-Disabled
+		}
 		
 		if result {
 			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())

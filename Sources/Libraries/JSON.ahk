@@ -31,6 +31,18 @@ class JSON {
 			return false
 	}
 	
+	print(object, js := false, indent := "") {
+		if js
+			text := this.JS.JSON.stringify(object, "", indent)
+		else
+			text := this.JS.eval("JSON.stringify(" . this._ObjToString(object) . ",'','" . indent . "')")
+		
+		text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\""", """"), "\\", "\")
+		text := SubStr(text, 1, StrLen(text) - 1)
+		
+		return SubStr(text, 2, StrLen(text) - 1)
+	}
+	
 	stringify(object, js := false, indent := "") {
 		if js
 			return this.JS.JSON.stringify(object, "", indent)

@@ -11,6 +11,7 @@
 
 global ApplicationClass = Application	; Spooky, sometimes the reference to Application is lost
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;

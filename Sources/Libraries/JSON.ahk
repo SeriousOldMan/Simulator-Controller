@@ -37,10 +37,10 @@ class JSON {
 		else
 			text := this.JS.eval("JSON.stringify(" . this._ObjToString(object) . ",'','" . indent . "')")
 		
-		text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\""", """"), "\\", "\")
-		text := SubStr(text, 1, StrLen(text) - 1)
+		if !js
+			text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\""", """"), "\\", "\")
 		
-		return SubStr(text, 2, StrLen(text) - 1)
+		return text
 	}
 	
 	stringify(object, js := false, indent := "") {

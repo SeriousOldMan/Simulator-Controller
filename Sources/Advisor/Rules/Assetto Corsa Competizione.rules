@@ -16,8 +16,6 @@
 [?Initialize] => (Prove: addSettings(Assetto\ Corsa\ Competizione, *, *)),
 				 (Prove: removeSetting(Assetto\ Corsa\ Competizione, *, Aero.Wing.Front))
 
-[?Initialize] => (Prove: removeSetting(Assetto\ Corsa\ Competizione, McLaren\ 720s\ GT3, Aero.Splitter.Front))
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Setup Recommendations                           ;;;

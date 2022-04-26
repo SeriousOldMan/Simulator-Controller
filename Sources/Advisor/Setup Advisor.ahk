@@ -611,9 +611,16 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		hasGeneric := false
 		
+		fileNames := {}
+		
 		Loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
-		{
-			SplitPath, A_LoopFileName, , , , simulator
+			fileNames[A_LoopFileName] := true
+		
+		Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
+			fileNames[A_LoopFileName] := true
+		
+		for fileName, ignore in fileNames {
+			SplitPath, fileName, , , , simulator
 			
 			if (simulator = "Generic")
 				hasGeneric := true
@@ -675,6 +682,10 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	updateState() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
 		if (this.SelectedCharacteristics.Length() < kMaxCharacteristics)
 			GuiControl Enable, characteristicsButton
 		else
@@ -685,6 +696,16 @@ class SetupAdvisor extends ConfigurationItem {
 		else
 			GuiControl Disable, editSetupButton
 			
+	}
+	
+	compileRules(fileName, ByRef productions, ByRef reductions) {
+		local rules
+		
+		if (fileName && (fileName != "") && FileExist(fileName)) {
+			FileRead rules, %fileName%
+			
+			compiler.compileRules(rules, productions, reductions)
+		}
 	}
 	
 	loadRules(ByRef productions, ByRef reductions) {
@@ -699,13 +720,14 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		compiler.compileRules(rules, productions, reductions)
 		
-		fileName := substituteVariables(getConfigurationValue(this.SimulatorDefinition, "Simulator", "Rules", ""))
+		simulator := this.SelectedSimulator
+		car := this.SelectedCar
 		
-		if (fileName && (fileName != "")) {
-			FileRead rules, %fileName%
-			
-			compiler.compileRules(rules, productions, reductions)
-		}
+		this.compileRules(getFileName("Advisor\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
+		this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
+		
+		if (car != true)
+			this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
 	}
 	
 	loadCharacteristics(definition, simulator := false, car := false, track := false) {
@@ -853,9 +875,90 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
 	
-	loadSimulator(simulator, force := false) {
+	initializeAdvisor(phase1 := "Initializing Setup Advisor", phase2 := "Starting Setup Advisor", phase3 := "Loading Car") {
 		local knowledgeBase
 		
+		simulator := this.SelectedSimulator
+		
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+		
+		vProgressCount := 0
+		
+		showProgress({x: x, y: y, color: "Blue", title: translate(phase1), message: translate("Clearing Problems...")})
+		
+		Sleep 200
+		
+		this.clearCharacteristics()
+		
+		showProgress({progress: vProgressCount++, message: translate("Preparing Knowledgebase...")})
+
+		Sleep 200
+		
+		productions := false
+		reductions := false
+	
+		this.loadRules(productions, reductions)
+		
+		knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+		
+		this.iKnowledgeBase := knowledgeBase
+					
+		if this.Debug[kDebugRules]
+			this.dumpRules(this.KnowledgeBase)
+
+		this.loadCharacteristics(this.Definition)
+		this.loadSettings(this.Definition)
+		
+		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase2), message: translate("Starting AI Kernel...")})
+		
+		knowledgeBase.addFact("Initialize", true)
+			
+		knowledgeBase.produce()
+
+		Sleep 200
+		
+		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
+		
+		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
+
+		Sleep 200
+		
+		this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
+		
+		Sleep 200
+		
+		knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
+		knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
+		knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
+		
+		knowledgeBase.addFact("Calculate", true)
+			
+		knowledgeBase.produce()
+					
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(knowledgeBase)
+		
+		showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
+		
+		Sleep 200
+		
+		this.updateRecommendations(false, false)
+
+		this.showSettingsChart(false)
+		
+		showProgress({message: translate("Finished...")})
+		
+		Sleep 1000
+				
+		this.iSetup := false
+		
+		hideProgress()
+		
+		this.updateState()
+	}
+	
+	loadSimulator(simulator, force := false) {
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 		
@@ -864,84 +967,17 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			try {
 				this.iSelectedSimulator := simulator
-				
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
-				
-				vProgressCount := 0
-				
-				showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Advisor"), message: translate("Preparing Knowledgebase...")})
 		
-				Sleep 200
-				
-				this.clearCharacteristics()
-				
 				this.initializeSimulator((simulator == true) ? "Generic" : simulator)
-		
+
 				simulators := this.getSimulators()
-		
+
 				if (simulators.Length() > 0)
 					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
-		
+
 				this.loadCars(this.AvailableCars[true], false)
 				
-				productions := false
-				reductions := false
-			
-				this.loadRules(productions, reductions)
-				
-				knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
-				
-				this.iKnowledgeBase := knowledgeBase
-							
-				if this.Debug[kDebugRules]
-					this.dumpRules(this.KnowledgeBase)
-		
-				this.loadCharacteristics(this.Definition)
-				this.loadSettings(this.Definition)
-				
-				showProgress({progress: vProgressCount++, color: "Green", title: translate("Starting Setup Advisor"), message: translate("Starting AI Kernel...")})
-				
-				knowledgeBase.addFact("Initialize", true)
-					
-				knowledgeBase.produce()
-		
-				Sleep 200
-				
-				showProgress({progress: vProgressCount++, color: "Green", title: translate("Loading Car"), message: translate("Loading Car Settings...")})
-				
-				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
-		
-				Sleep 200
-				
-				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
-				
-				Sleep 200
-				
-				knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
-				knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
-				knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
-				
-				knowledgeBase.addFact("Calculate", true)
-					
-				knowledgeBase.produce()
-							
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(knowledgeBase)
-				
-				showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
-				
-				Sleep 200
-				
-				this.updateRecommendations(false)
-		
-				this.showSettingsChart(false)
-				
-				showProgress({message: translate("Finished...")})
-				
-				Sleep 1000
-				
-				hideProgress()
+				this.initializeAdvisor()
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -958,66 +994,16 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	loadCar(car, force := false) {
-		local knowledgeBase := this.KnowledgeBase
-		
 		if (force || (car != this.SelectedCar[false])) {
-			this.iSelectedCar := car
-			
 			window := this.Window
 		
 			Gui %window%:Default
 			Gui %window%:+Disabled
 			
 			try {
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
-				
-				vProgressCount := 0
-				
-				showProgress({x: x, y: y, color: "Green", title: translate("Loading Car"), message: translate("Clearing Problems...")})
-		
-				Sleep 200
-				
-				this.clearCharacteristics()
-				
-				showProgress({progress: (vProgressCount += 10), color: "Green", message: translate("Loading Car Settings...")})
-		
-				Sleep 200
-				
-				this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
-		
-				Sleep 200
-				
-				this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
-				
-				Sleep 200
-				
-				knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
-				knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
-				knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
-				
-				knowledgeBase.addFact("Calculate", true)
-					
-				knowledgeBase.produce()
-							
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(knowledgeBase)
-				
-				showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
-				
-				Sleep 200
-				
-				this.updateRecommendations(false)
-		
-				this.showSettingsChart(false)
-				
-				showProgress({message: translate("Finished...")})
-				
-				Sleep 1000
-				
-				this.iSetup := false
-				
-				hideProgress()
+				this.iSelectedCar := car
+			
+				this.initializeAdvisor()
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -1243,7 +1229,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.updateRecommendations()
 	}
 	
-	updateRecommendations(draw := true) {
+	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		window := this.Window
@@ -1287,12 +1273,13 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				this.showSettingsDeltas(settings)
 			}
+			
+			if update
+				this.updateState()
 		}
 		finally {
 			Gui %window%:-Disabled
 		}
-			
-		this.updateState()
 	}
 	
 	editSetup() {
@@ -1352,6 +1339,10 @@ class Setup {
 		Get {
 			return ((original || !this.iModifiedSetup) ? this.iOriginalSetup : this.iModifiedSetup)
 		}
+		
+		Set {
+			return (original ? (this.iOriginalSetup := value) : (this.iModifiedSetup := value))
+		}
 	}
 	
 	__New(editor, originalFileName := false) {
@@ -1366,13 +1357,51 @@ class Setup {
 			this.iOriginalSetup := setup
 		}
 	}
+	
+	reset() {
+		this.iModifiedSetup := false
+	}
+	
+	getValue(setting, original := false, default := false) {
+		Throw "Virtual method Setup.getValue must be implemented in a subclass..."
+	}
+	
+	setValue(setting, value) {
+		Throw "Virtual method Setup.setValue must be implemented in a subclass..."
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Converter                                                               ;;;
+;;; SettingHandler                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class Converter {
+class SettingHandler {
+	validValue(displayValue) {
+		Throw "Virtual method SettingHandler.validValue must be implemented in a subclass..."
+	}
+	
+	convertToDisplayValue(value) {
+		Throw "Virtual method SettingHandler.convertToDisplayValue must be implemented in a subclass..."
+	}
+	
+	convertToRawValue(value) {
+		Throw "Virtual method SettingHandler.convertToRawValue must be implemented in a subclass..."
+	}
+	
+	increaseValue(displayValue) {
+		Throw "Virtual method SettingHandler.increaseValue must be implemented in a subclass..."
+	}
+	
+	decreaseValue(displayValue) {
+		Throw "Virtual method SettingHandler.decreaseValue must be implemented in a subclass..."
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; NumberHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class NumberHandler {
 	MinValue[] {
 		Get {
 			return -2147483648
@@ -1388,28 +1417,27 @@ class Converter {
 	validValue(displayValue) {
 		return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
 	}
-	
-	convertToDisplayValue(value) {
-		Throw "Virtual method Converter.convertToDisplayValue must be implemented in a subclass..."
-	}
-	
-	convertToRawValue(value) {
-		Throw "Virtual method Converter.convertToRawValue must be implemented in a subclass..."
-	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; OffsetConverter                                                         ;;;
+;;; DiscreteValuesHandler                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class OffsetConverter extends Converter {
-	iOffset := false
+class DiscreteValuesHandler extends NumberHandler {
+	iZero := false
+	iIncrement := false
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
 	
-	Offset[] {
+	Zero[] {
 		Get {
-			return this.iOffset
+			return this.iZero
+		}
+	}
+	
+	Increment[] {
+		Get {
+			return this.iIncrement
 		}
 	}
 	
@@ -1425,38 +1453,93 @@ class OffsetConverter extends Converter {
 		}
 	}
 	
-	__New(offset, minValue := "__Undefined__", maxValue := "__Undefined__") {
-		this.iOffset := offset
+	__New(zero := 0, increment := 1, minValue := "__Undefined__", maxValue := "__Undefined__") {
+		this.iZero := zero
+		this.iIncrement := increment
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 	}
 	
-	convertToDisplayValue(value) {
-		return (value + this.Offset)
+	convertToDisplayValue(rawValue) {
+		return (this.Zero + (rawValue * this.Increment))
 	}
 	
-	convertToRawValue(value) {
-		return (value - this.Offset)
+	convertToRawValue(displayValue) {
+		return Round((displayValue - this.Zero) / this.Increment)
+	}
+	
+	increaseValue(displayValue) {
+		value := (displayValue + this.Increment)
+		
+		if this.validValue(value)
+			return value
+		else
+			return displayValue
+	}
+	
+	decreaseValue(displayValue) {
+		value := (displayValue - this.Increment)
+		
+		if this.validValue(value)
+			return value
+		else
+			return displayValue
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; IdentityConverter                                                       ;;;
+;;; IntegerValueHandler                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class IdentityConverter extends OffsetConverter {
-	__New() {
-		base.__New(0)
+class IntegerHandler extends DiscreteValuesHandler {
+	validValue(displayValue) {
+		rawValue := this.convertToRawValue(displayValue)
+		
+		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
+	}
+	
+	convertToDisplayValue(rawValue) {
+		return Round(this.Zero + (rawValue * this.Increment))
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ClickConverter                                                          ;;;
+;;; FloatValueHandler                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ClickConverter extends OffsetConverter {
-	__New(minValue := "__Undefined__", maxValue := "__Undefined__") {
-		base.__New(0, minValue, maxValue)
+class FloatHandler extends DiscreteValuesHandler {
+	iPrecision := false
+	
+	Precision[] {
+		Get {
+			return this.iPrecision
+		}
+	}
+	
+	__New(zero := 0.0, increment := 1.0, precision := 0, minValue := "__Undefined__", maxValue := "__Undefined__") {
+		this.iPrecision := precision
+		
+		base.__New(zero, increment, minValue, maxValue)
+	}
+		
+	validValue(displayValue) {
+		rawValue := this.convertToRawValue(displayValue)
+		
+		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
+	}
+	
+	convertToDisplayValue(rawValue) {
+		return Round(this.Zero + (rawValue * this.Increment), this.Precision)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ClicksHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ClicksHandler extends IntegerHandler {
+	__New(minValue := 0, maxValue := "__Undefined__") {
+		base.__New(0, 1, minValue, maxValue)
 	}
 }
 
@@ -1465,11 +1548,18 @@ class ClickConverter extends OffsetConverter {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global setupViewer
+global fileNameViewer
+
+global decreaseSettingButton
+global increaseSettingButton
+
+global resetSetupButton
 
 class SetupEditor extends ConfigurationItem {
 	iAdvisor := false
 	iSetup := false
 	
+	iSettings := []
 	iSettingsListView := false
 	
 	iClosed := false
@@ -1483,6 +1573,16 @@ class SetupEditor extends ConfigurationItem {
 	Setup[] {
 		Get {
 			return this.iSetup
+		}
+	}
+	
+	Setings[key := false] {
+		Get {
+			return (key ? this.iSettings[key] : this.iSettings)
+		}
+		
+		Set {
+			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 	
@@ -1501,7 +1601,26 @@ class SetupEditor extends ConfigurationItem {
 	__New(advisor, configuration := false) {
 		this.iAdvisor := advisor
 		
-		base.__New(configuration ? configuration : advisor.SimulatorDefinition)
+		if !configuration {
+			simulator := advisor.SelectedSimulator
+			car := advisor.SelectedCar
+			
+			configuration := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+			
+			for section, values in readConfiguration(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
+				for key, value in values
+					setConfigurationValue(configuration, section, key, value)
+			
+			if (car != true) {
+				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
+				
+				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory . "Advisor\"))
+					for key, value in values
+						setConfigurationValue(configuration, section, key, value)
+			}
+		}
+		
+		base.__New(configuration)
 	}
 	
 	createGui(configuration) {
@@ -1525,9 +1644,19 @@ class SetupEditor extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 		
-		Gui %window%:Add, ListView, x16 ys+10 w350 h360 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("File:")
+		Gui %window%:Add, Text, x85 ys+14 w281 vfileNameViewer
+		
+		Gui %window%:Add, ListView, x16 ys+40 w350 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
 		
 		this.iSettingsListView := settingsListView
+		
+		Gui %window%:Add, Button, x16 yp+324 w80 Disabled gdecreaseSetting vdecreaseSettingButton, % translate("Decrease")
+		Gui %window%:Add, Button, x286 yp w80 Disabled gincreaseSetting vincreaseSettingButton, % translate("Increase")
+				
+		Gui %window%:Add, Button, x16 ys+420 w80 gapplyRecommendations, % translate("Apply")
+		Gui %window%:Add, Button, x100 ys+420 w80 gresetSetup vresetSetupButton, % translate("Reset")
+		Gui %window%:Add, Button, x286 ys+420 w80, % translate("Save...")
 		
 		Gui %window%:Add, Edit, x380 ys+10 w417 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
 		
@@ -1570,18 +1699,39 @@ class SetupEditor extends ConfigurationItem {
 		return this.Setup
 	}
 	
-	createConverter(setting) {
-		local converter := getConfigurationValue(this.Configuration, "Setup.Settings.Converter", setting, false)
+	updateState() {
+		window := this.Window
 		
-		if converter {
-			converter := string2Values("(", SubStr(converter, 1, StrLen(converter) - 1))
+		Gui %window%:Default
+		
+		Gui ListView, % this.SettingsListView
+		
+		if LV_GetNext(0) {
+			GuiControl Enable, increaseSettingButton
+			GuiControl Enable, decreaseSettingButton
+		}
+		else {
+			GuiControl Disable, increaseSettingButton
+			GuiControl Disable, decreaseSettingButton
+		}
+	}
+	
+	createSettingHandler(setting) {
+		handler := getConfigurationValue(this.Configuration, "Setup.Settings.Handler", setting, false)
+		
+		if handler {
+			handler := string2Values("(", SubStr(handler, 1, StrLen(handler) - 1))
 			
-			converterClass := converter[1]
+			handlerClass := handler[1]
 			
-			return new %converterClass%(string2Values(",", converter[2])*)
+			return new %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
-			Throw "Unknown converter encoutered in SetupEditor.createConverter..."
+			Throw "Unknown handler encoutered in SetupEditor.createSettingHandler..."
+	}
+	
+	chooseSetup() {
+		Throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
 	}
 	
 	loadSetup(ByRef setup := false) {
@@ -1592,7 +1742,72 @@ class SetupEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
+		Gui ListView, % this.SettingsListView
+		
+		LV_Delete()
+		
+		this.Settings := []
+		
+		GuiControl Text, fileNameViewer, % (setup ? setup.FileName[true] : "")
 		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
+		
+		this.updateState()
+	}
+	
+	increaseSetting() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.SettingsListView
+		
+		row := LV_GetNext(0)
+		
+		if row {
+			setting := this.Settings[row]
+			handler := this.createSettingHandler(setting)
+			
+			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
+			
+			GuiControl Text, setupViewer, % (this.Setup ? this.Setup.Setup : "")
+		}
+		
+		this.updateState()
+	}
+	
+	decreaseSetting() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.SettingsListView
+		
+		row := LV_GetNext(0)
+		
+		if row {
+			setting := this.Settings[row]
+			handler := this.createSettingHandler(setting)
+			
+			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
+			
+			GuiControl Text, setupViewer, % (this.Setup ? this.Setup.Setup : "")
+		}
+		
+		this.updateState()
+	}
+	
+	applyRecommendations() {
+		this.resetSetup()
+	}
+	
+	resetSetup() {
+		this.Setup.reset()
+		
+		this.loadSetup(this.Setup)
+	}
+	
+	updateSetting(setting, newValue) {
+		Throw "Virtual method SetupEditor.updateSetting must be implemented in a subclass..."
 	}
 }
 
@@ -1762,6 +1977,30 @@ moveEditor() {
 
 openEditorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#Setup-Editor
+}
+
+chooseSetupFile() {
+	SetupAdvisor.Instance.Editor.chooseSetup()
+}
+
+selectSetting() {
+	SetupAdvisor.Instance.Editor.updateState()
+}
+
+increaseSetting() {
+	SetupAdvisor.Instance.Editor.increaseSetting()
+}
+
+decreaseSetting() {
+	SetupAdvisor.Instance.Editor.decreaseSetting()
+}
+
+applyRecommendations() {
+	SetupAdvisor.Instance.Editor.applyRecommendations()
+}
+
+resetSetup() {
+	SetupAdvisor.Instance.Editor.resetSetup()
 }
 
 chooseSimulator() {

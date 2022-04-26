@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         McLaren 720s GT3                ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,15 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(Assetto\ Corsa\ Competizione)),
-				 (Prove: addCharacteristics(Assetto\ Corsa\ Competizione, *, *, *))
-
-[?Initialize] => (Prove: addSettings(Assetto\ Corsa\ Competizione, *, *)),
-				 (Prove: removeSetting(Assetto\ Corsa\ Competizione, *, Aero.Wing.Front))
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Setup Recommendations                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules
+[?Initialize] => (Prove: removeSetting(Assetto\ Corsa\ Competizione, McLaren\ 720s\ GT3, Aero.Splitter.Front))

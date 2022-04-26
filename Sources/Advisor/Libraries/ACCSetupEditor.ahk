@@ -183,9 +183,9 @@ class ACCSetupEditor extends SetupEditor {
 			if (originalValue = modifiedValue)
 				value := originalValue
 			else if (modifiedValue > originalValue)
-				value := (modifiedValue . A_Space . translate("(") . "+" . (modifiedValue - originalValue) . translate(")"))
+				value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
 			else
-				value := (modifiedValue . A_Space . translate("(") . "-" . (originalValue - modifiedValue) . translate(")"))
+				value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
 			
 			LV_Add("", settingsLabels[setting], value, settingsUnits[setting])
 			
@@ -197,6 +197,36 @@ class ACCSetupEditor extends SetupEditor {
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
 		LV_ModifyCol(3, "AutoHdr")
+	}
+	
+	saveSetup() {
+		fileName := this.Setup.FileName
+		
+		if fileName = this.Setup.FileName[true]
+			SplitPath fileName, , directory
+		else
+			directory := fileName
+		
+		title := translate("Save ACC Setup File...")
+	
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+		FileSelectFile fileName, S17, %directory%, %title%, Setup (*.json)
+		OnMessage(0x44, "")
+
+		if (fileName != "") {
+			try {
+				FileDelete %fileName%
+			}
+			catch exception {
+				; ignore
+			}
+			
+			text := this.Setup.Setup
+			
+			FileAppend %text%, %fileName%
+			
+			this.Setup.FileName := fileName
+		}
 	}
 	
 	updateSetting(setting, newValue) {
@@ -219,9 +249,9 @@ class ACCSetupEditor extends SetupEditor {
 		if (originalValue = modifiedValue)
 			value := originalValue
 		else if (modifiedValue > originalValue)
-			value := (modifiedValue . A_Space . translate("(") . "+" . (modifiedValue - originalValue) . translate(")"))
+			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(modifiedValue - originalValue) . translate(")"))
 		else
-			value := (modifiedValue . A_Space . translate("(") . "-" . (originalValue - modifiedValue) . translate(")"))
+			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
 		
 		LV_Modify(row, "+Vis Col2", value)
 		LV_ModifyCol(2, "AutoHdr")

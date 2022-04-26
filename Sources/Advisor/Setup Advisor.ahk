@@ -1331,7 +1331,11 @@ class Setup {
 	
 	FileName[original := false] {
 		Get {
-			return (original ? this.iOriginalFileName : this.iModifiedFileName)
+			return (original ? this.iOriginalFileName : (this.iModifiedFileName ? this.iModifiedFileName : this.iOriginalFileName))
+		}
+		
+		Set {
+			return (original ? (this.iOriginalFileName := value) : (this.iModifiedFileName := value))
 		}
 	}
 	
@@ -1378,6 +1382,10 @@ class Setup {
 class SettingHandler {
 	validValue(displayValue) {
 		Throw "Virtual method SettingHandler.validValue must be implemented in a subclass..."
+	}
+	
+	formatValue(value) {
+		return value
 	}
 	
 	convertToDisplayValue(value) {
@@ -1461,7 +1469,7 @@ class DiscreteValuesHandler extends NumberHandler {
 	}
 	
 	convertToDisplayValue(rawValue) {
-		return (this.Zero + (rawValue * this.Increment))
+		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 	
 	convertToRawValue(displayValue) {
@@ -1498,8 +1506,8 @@ class IntegerHandler extends DiscreteValuesHandler {
 		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
 	}
 	
-	convertToDisplayValue(rawValue) {
-		return Round(this.Zero + (rawValue * this.Increment))
+	formatValue(value) {
+		return Round(value)
 	}
 }
 
@@ -1528,8 +1536,8 @@ class FloatHandler extends DiscreteValuesHandler {
 		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
 	}
 	
-	convertToDisplayValue(rawValue) {
-		return Round(this.Zero + (rawValue * this.Increment), this.Precision)
+	formatValue(value) {
+		return Round(value, this.Precision)
 	}
 }
 
@@ -1644,21 +1652,21 @@ class SetupEditor extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 		
-		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("File:")
-		Gui %window%:Add, Text, x85 ys+14 w281 vfileNameViewer
+		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("Setup:")
+		Gui %window%:Add, Text, x85 ys+14 w275 vfileNameViewer
 		
-		Gui %window%:Add, ListView, x16 ys+40 w350 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
 		
 		this.iSettingsListView := settingsListView
 		
 		Gui %window%:Add, Button, x16 yp+324 w80 Disabled gdecreaseSetting vdecreaseSettingButton, % translate("Decrease")
-		Gui %window%:Add, Button, x286 yp w80 Disabled gincreaseSetting vincreaseSettingButton, % translate("Increase")
+		Gui %window%:Add, Button, x280 yp w80 Disabled gincreaseSetting vincreaseSettingButton, % translate("Increase")
 				
-		Gui %window%:Add, Button, x16 ys+420 w80 gapplyRecommendations, % translate("Apply")
-		Gui %window%:Add, Button, x100 ys+420 w80 gresetSetup vresetSetupButton, % translate("Reset")
-		Gui %window%:Add, Button, x286 ys+420 w80, % translate("Save...")
+		Gui %window%:Add, Button, x16 ys+420 w80 gapplyRecommendations, % translate("&Apply")
+		Gui %window%:Add, Button, x100 ys+420 w80 gresetSetup vresetSetupButton, % translate("&Reset")
+		Gui %window%:Add, Button, x280 ys+420 w80 gsaveModifiedSetup, % translate("&Save...")
 		
-		Gui %window%:Add, Edit, x380 ys+10 w417 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
+		Gui %window%:Add, Edit, x374 ys+10 w423 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
 		
 		Gui %window%:Add, Text, x8 y506 w800 0x10
 		
@@ -1754,14 +1762,21 @@ class SetupEditor extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	increaseSetting() {
+	saveSetup() {
+		Throw "Virtual method SetupEditor.saveSetup must be implemented in a subclass..."
+	}
+	
+	increaseSetting(setting := false) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
 		Gui ListView, % this.SettingsListView
 		
-		row := LV_GetNext(0)
+		if setting
+			row := inList(this.Settings, setting)
+		else
+			row := LV_GetNext(0)
 		
 		if row {
 			setting := this.Settings[row]
@@ -1775,14 +1790,17 @@ class SetupEditor extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	decreaseSetting() {
+	decreaseSetting(setting := false) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
 		Gui ListView, % this.SettingsListView
 		
-		row := LV_GetNext(0)
+		if setting
+			row := inList(this.Settings, setting)
+		else
+			row := LV_GetNext(0)
 		
 		if row {
 			setting := this.Settings[row]
@@ -1797,7 +1815,35 @@ class SetupEditor extends ConfigurationItem {
 	}
 	
 	applyRecommendations() {
+		local knowledgeBase := this.Advisor.KnowledgeBase
+		
 		this.resetSetup()
+		
+		settings := {}
+		
+		min := 1
+		
+		for ignore, setting in this.Advisor.Settings {
+			delta := knowledgeBase.getValue(setting . ".Delta", kUndefined)
+			
+			if (delta != kUndefined)
+				if (delta != 0) {
+					min := Min(Abs(delta), min)
+					
+					settings[setting] := delta
+				}
+		}
+		
+		for setting, delta in settings {
+			increment := Round(delta / min)
+		
+			if (increment < 0)
+				Loop % Abs(increment)
+					this.decreaseSetting(setting)
+			else
+				Loop % Abs(increment)
+					this.increaseSetting(setting)
+		}
 	}
 	
 	resetSetup() {
@@ -2001,6 +2047,10 @@ applyRecommendations() {
 
 resetSetup() {
 	SetupAdvisor.Instance.Editor.resetSetup()
+}
+
+saveModifiedSetup() {
+	SetupAdvisor.Instance.Editor.saveSetup()
 }
 
 chooseSimulator() {

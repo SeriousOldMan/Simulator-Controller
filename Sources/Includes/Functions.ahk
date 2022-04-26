@@ -956,6 +956,8 @@ initializeEnvironment() {
 	FileCreateDir %A_MyDocuments%\Simulator Controller
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Rules
+	FileCreateDir %kUserHomeDirectory%Advisor
+	FileCreateDir %kUserHomeDirectory%Advisor\Cars
 	FileCreateDir %kUserHomeDirectory%Validators
 	FileCreateDir %kUserHomeDirectory%Logs
 	FileCreateDir %kUserHomeDirectory%Splash Media

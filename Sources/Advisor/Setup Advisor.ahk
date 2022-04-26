@@ -611,20 +611,23 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		hasGeneric := false
 		
-		fileNames := {}
-		
 		Loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
-			fileNames[A_LoopFileName] := true
+		{
+			SplitPath A_LoopFileName, , , , simulator
 		
-		Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
-			fileNames[A_LoopFileName] := true
-		
-		for fileName, ignore in fileNames {
-			SplitPath, fileName, , , , simulator
-			
 			if (simulator = "Generic")
 				hasGeneric := true
-			else
+			else if !inList(simulators, simulator)
+				simulators.Push(simulator)
+		}
+		
+		Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
+		{
+			SplitPath A_LoopFileName, , , , simulator
+		
+			if (simulator = "Generic")
+				hasGeneric := true
+			else if !inList(simulators, simulator)
 				simulators.Push(simulator)
 		}
 		
@@ -632,6 +635,44 @@ class SetupAdvisor extends ConfigurationItem {
 			simulators.InsertAt(1, true)
 		
 		return simulators
+	}
+	
+	getCars(simulator) {
+		cars := []
+		
+		if ((simulator != true) && (simulator != "*")) {
+			Loop Files, %kResourcesDirectory%Advisor\Definitions\Cars\%simulator%.*.ini, F
+			{
+				SplitPath A_LoopFileName, , , , descriptor
+			
+				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
+			
+				if ((car != "Generic") && !inList(cars, car))
+					cars.Push(car)
+			}
+			
+			Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
+			{
+				SplitPath A_LoopFileName, , , , descriptor
+			
+				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
+			
+				if ((car != "Generic") && !inList(cars, car))
+					cars.Push(car)
+			}
+		}
+		
+		cars.InsertAt(1, "*")
+		
+		return cars
+	}
+	
+	getTracks(simulator) {
+		tracks := []
+		
+		tracks.InsertAt(1, "*")
+		
+		return tracks
 	}
 	
 	dumpKnowledge(knowledgeBase) {
@@ -730,7 +771,7 @@ class SetupAdvisor extends ConfigurationItem {
 			this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
 	}
 	
-	loadCharacteristics(definition, simulator := false, car := false, track := false) {
+	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iCharacteristics := []
@@ -755,7 +796,7 @@ class SetupAdvisor extends ConfigurationItem {
 						
 							this.Characteristics.Push(characteristic)
 							
-							if !isDebug()
+							if (!fast && !isDebug())
 								Sleep 50
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
@@ -777,7 +818,7 @@ class SetupAdvisor extends ConfigurationItem {
 						
 						this.Characteristics.Push(characteristic)
 							
-						if !isDebug()
+						if (!fast && !isDebug())
 							Sleep 50
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
@@ -791,7 +832,7 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 	}
 	
-	loadSettings(definition, simulator := false, car := false) {
+	loadSettings(definition, simulator := false, car := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iSettings := []
@@ -816,7 +857,7 @@ class SetupAdvisor extends ConfigurationItem {
 						
 							this.Settings.Push(setting)
 							
-							if !isDebug()
+							if (!fast && !isDebug())
 								Sleep 50
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
@@ -838,7 +879,7 @@ class SetupAdvisor extends ConfigurationItem {
 						
 						this.Settings.Push(setting)
 							
-						if !isDebug()
+						if (!fast && !isDebug())
 							Sleep 50
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
@@ -864,8 +905,11 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSimulatorDefinition := definition
 		
 		simulator := getConfigurationValue(definition, "Simulator", "Simulator")
-		cars := string2Values(",", getConfigurationValue(definition, "Simulator", "Cars"))
-		tracks := string2Values(",", getConfigurationValue(definition, "Simulator", "Tracks"))
+		; cars := string2Values(",", getConfigurationValue(definition, "Simulator", "Cars"))
+		; tracks := string2Values(",", getConfigurationValue(definition, "Simulator", "Tracks"))
+		
+		cars := this.getCars(simulator)
+		tracks := this.getTracks(simulator)
 		
 		this.iSimulatorSettings := {Name: name, Simulator: simulator, Cars: cars, Tracks: tracks}
 		
@@ -875,7 +919,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
 	
-	initializeAdvisor(phase1 := "Initializing Setup Advisor", phase2 := "Starting Setup Advisor", phase3 := "Loading Car") {
+	initializeAdvisor(phase1 := "Initializing Setup Advisor", phase2 := "Starting Setup Advisor", phase3 := "Loading Car", fast := false) {
 		local knowledgeBase
 		
 		simulator := this.SelectedSimulator
@@ -907,8 +951,8 @@ class SetupAdvisor extends ConfigurationItem {
 		if this.Debug[kDebugRules]
 			this.dumpRules(this.KnowledgeBase)
 
-		this.loadCharacteristics(this.Definition)
-		this.loadSettings(this.Definition)
+		this.loadCharacteristics(this.Definition, false, false, false, fast)
+		this.loadSettings(this.Definition, false, false, fast)
 		
 		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase2), message: translate("Starting AI Kernel...")})
 		
@@ -920,11 +964,11 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
 		
-		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"])
+		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"], fast)
 
 		Sleep 200
 		
-		this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"])
+		this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], fast)
 		
 		Sleep 200
 		
@@ -1003,7 +1047,7 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				this.iSelectedCar := car
 			
-				this.initializeAdvisor()
+				this.initializeAdvisor("Loading Car", "Loading Car", "Loading Car", true)
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -1756,7 +1800,15 @@ class SetupEditor extends ConfigurationItem {
 		
 		this.Settings := []
 		
-		GuiControl Text, fileNameViewer, % (setup ? setup.FileName[true] : "")
+		fileName := ""
+		
+		if setup {
+			fileName := setup.FileName[true]
+			
+			SplitPath fileName, , , , fileName
+		}
+		
+		GuiControl Text, fileNameViewer, %fileName%
 		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
 		
 		this.updateState()
@@ -2111,7 +2163,7 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 	
-	current := fixIE(11)
+	current := fixIE()
 	
 	try {
 		advisor := new SetupAdvisor()
@@ -2129,7 +2181,7 @@ runSetupAdvisor() {
 		}
 	}
 	finally {
-		fixIE(current)
+		; fixIE(current)
 	}
 }
 

@@ -183,9 +183,9 @@ class ACCSetupEditor extends SetupEditor {
 			if (originalValue = modifiedValue)
 				value := originalValue
 			else if (modifiedValue > originalValue)
-				value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
+				value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 			else
-				value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
+				value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 			
 			LV_Add("", settingsLabels[setting], value, settingsUnits[setting])
 			
@@ -249,9 +249,9 @@ class ACCSetupEditor extends SetupEditor {
 		if (originalValue = modifiedValue)
 			value := originalValue
 		else if (modifiedValue > originalValue)
-			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(modifiedValue - originalValue) . translate(")"))
+			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 		else
-			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(originalValue - modifiedValue) . translate(")"))
+			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 		
 		LV_Modify(row, "+Vis Col2", value)
 		LV_ModifyCol(2, "AutoHdr")

@@ -1889,6 +1889,9 @@ class SetupEditor extends ConfigurationItem {
 		for setting, delta in settings {
 			increment := Round(delta / min)
 		
+			if getConfigurationValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
+				increment *= -1
+			
 			if (increment < 0)
 				Loop % Abs(increment)
 					this.decreaseSetting(setting)

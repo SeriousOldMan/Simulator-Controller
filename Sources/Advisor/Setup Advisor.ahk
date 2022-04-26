@@ -2042,7 +2042,7 @@ saveSetup() {
 	OnMessage(0x44, "")
 
 	if (fileName != "") {
-		if !InStr(fileName, ".")
+		if !InStr(fileName, ".setup")
 			fileName := (fileName . ".setup")
 		
 		SetupAdvisor.Instance.saveState(fileName)

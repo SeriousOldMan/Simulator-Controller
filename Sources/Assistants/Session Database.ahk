@@ -1352,7 +1352,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 		
 		if (fileName != "") {
-			
 			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 			
 			try {

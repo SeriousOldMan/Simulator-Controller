@@ -1853,7 +1853,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, "")
 				
 					if (file != "") {
-						if !InStr(file, ".")
+						if !InStr(file, ".strategy")
 							file := (file . ".strategy")
 			
 						SplitPath file, , , , name

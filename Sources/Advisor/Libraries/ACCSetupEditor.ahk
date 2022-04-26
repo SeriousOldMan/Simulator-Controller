@@ -216,6 +216,9 @@ class ACCSetupEditor extends SetupEditor {
 		OnMessage(0x44, "")
 
 		if (fileName != "") {
+			if !InStr(fileName, ".json")
+				fileName := (fileName . ".json")
+			
 			try {
 				FileDelete %fileName%
 			}

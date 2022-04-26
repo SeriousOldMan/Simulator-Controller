@@ -1771,7 +1771,7 @@ class SetupEditor extends ConfigurationItem {
 	createSettingHandler(setting) {
 		handler := getConfigurationValue(this.Configuration, "Setup.Settings.Handler", setting, false)
 		
-		if handler {
+		if (handler && (handler != "")) {
 			handler := string2Values("(", SubStr(handler, 1, StrLen(handler) - 1))
 			
 			handlerClass := handler[1]

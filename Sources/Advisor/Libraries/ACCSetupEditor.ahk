@@ -177,19 +177,21 @@ class ACCSetupEditor extends SetupEditor {
 		for ignore, setting in this.Advisor.Settings {
 			handler := this.createSettingHandler(setting)
 			
-			originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
-			modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
-			
-			if (originalValue = modifiedValue)
-				value := originalValue
-			else if (modifiedValue > originalValue)
-				value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
-			else
-				value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
-			
-			LV_Add("", settingsLabels[setting], value, settingsUnits[setting])
-			
-			this.Settings.Push(setting)
+			if handler {
+				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+				
+				if (originalValue = modifiedValue)
+					value := originalValue
+				else if (modifiedValue > originalValue)
+					value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+				else
+					value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+				
+				LV_Add("", settingsLabels[setting], value, settingsUnits[setting])
+				
+				this.Settings.Push(setting)
+			}
 		}
 		
 		LV_ModifyCol()

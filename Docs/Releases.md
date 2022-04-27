@@ -1,4 +1,4 @@
-## 4.1.0-release 04/29/22
+## 4.1.0-release 04/29/22 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always

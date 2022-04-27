@@ -1,3 +1,14 @@
+## 4.1.0-release 04/29/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support "No Tyre Change" for post-preparing pitstop option changes.
+  4. Support for multiple hotkeys in "Simulator Setup".
+  5. Stability improvements in "Race Center".
+  6. New Stream Deck icons for Chat messages.
+  7. Support editing of validation rules directly from "Strategy Workbench". See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#integrating-into-strategy-workbench) for more information.
+  8. "Setup Advisor" is now able to [load, modify and save setup files](*) from Assetto Corsa Competizione.
+
 ## 4.0.9-release 04/22/22
 
   1. Prevent installation to non-empty directories.

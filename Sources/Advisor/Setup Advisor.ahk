@@ -651,7 +651,7 @@ class SetupAdvisor extends ConfigurationItem {
 					cars.Push(car)
 			}
 			
-			Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
+			Loop Files, %kUserHomeDirectory%Advisor\Definitions\Cars\*.ini, F
 			{
 				SplitPath A_LoopFileName, , , , descriptor
 			
@@ -2077,7 +2077,7 @@ moveEditor() {
 }
 
 openEditorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#Setup-Editor
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#Managing-Car-Setups
 }
 
 chooseSetupFile() {

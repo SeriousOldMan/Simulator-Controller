@@ -161,7 +161,7 @@ resetCharacteristics() <= resetCharacteristics(!Characteristics.Count)
 
 resetCharacteristics(0) <= !
 resetCharacteristics(?index) <= Get(Characteristic, ?index, ?characteristic), Set(?characteristic, Correction, 0),
-							   ?nIndex = ?index - 1, resetCharacteristics(?nIndex)
+								?nIndex = ?index - 1, resetCharacteristics(?nIndex)
 
 updateCharacteristics() <= updateCharacteristics(!Advisor.Simulator, !Advisor.Car, !Advisor.Track, !Characteristics.Count)
 

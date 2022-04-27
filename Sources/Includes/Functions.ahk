@@ -957,7 +957,10 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Config
 	FileCreateDir %kUserHomeDirectory%Rules
 	FileCreateDir %kUserHomeDirectory%Advisor
-	FileCreateDir %kUserHomeDirectory%Advisor\Cars
+	FileCreateDir %kUserHomeDirectory%Advisor\Definitions
+	FileCreateDir %kUserHomeDirectory%Advisor\Rules
+	FileCreateDir %kUserHomeDirectory%Advisor\Definitions\Cars
+	FileCreateDir %kUserHomeDirectory%Advisor\Rules\Cars
 	FileCreateDir %kUserHomeDirectory%Validators
 	FileCreateDir %kUserHomeDirectory%Logs
 	FileCreateDir %kUserHomeDirectory%Splash Media

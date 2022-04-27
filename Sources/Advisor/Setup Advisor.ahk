@@ -2078,7 +2078,7 @@ moveEditor() {
 }
 
 openEditorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#Managing-Car-Setups
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups
 }
 
 chooseSetupFile() {

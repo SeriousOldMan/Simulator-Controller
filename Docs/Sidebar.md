@@ -80,7 +80,8 @@
   - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#describing-setup-issues)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#understanding-the-recommendations)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#how-it-works)
-
+  - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups)
+  - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#extending-and-cutomizing-setup-advisor)
 
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 ------

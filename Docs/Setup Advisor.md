@@ -89,7 +89,7 @@ The changes will also be reflected in the internal format at the right, but this
 
 Note: The Setup Editor is currently only available for *Assetto Corsa Competizione*. More simulators will be supported with future releases.
 
-## Extending and cutomizing the "Setup Advisor"
+## Extending and cutomizing "Setup Advisor"
 
 As you might have noticed, the "Setup Advisor" implements a quite generic, but also to a large extent general approach to car handling problems. But it is also possible to introduce simulator specific or even car specific rules for the AI processing and you can also describe the car specific settings, their ranges and rules for reading and modifying setup files. All builtin definitions and rules can be found in the *Resources\Advisor\Definitions* and in the *Resources\Advisor\Rules* folder in the program directory. But you can introduce their own versions of these files or even new ones in the *Simulator Controller\Advisor* folder in your user *Documents* folder. You can use the definition and rule files which are located in the programm directory as a template when creating your own files.
 

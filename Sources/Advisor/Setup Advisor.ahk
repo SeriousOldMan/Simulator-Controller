@@ -1627,6 +1627,10 @@ class SetupEditor extends ConfigurationItem {
 		Get {
 			return this.iSetup
 		}
+		
+		Set {
+			return (this.iSetup := value)
+		}
 	}
 	
 	Setings[key := false] {

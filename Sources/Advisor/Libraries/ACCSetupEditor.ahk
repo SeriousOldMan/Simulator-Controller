@@ -128,8 +128,11 @@ class ACCSetupEditor extends SetupEditor {
 
 		if theSetup
 			return base.editSetup(theSetup)
-		else
+		else {
+			this.destroy()
+		
 			return false
+		}
 	}
 	
 	chooseSetup(load := true) {
@@ -157,6 +160,8 @@ class ACCSetupEditor extends SetupEditor {
 
 		if fileName {
 			theSetup := new ACCSetup(this, fileName)
+			
+			this.Setup := theSetup
 			
 			if load
 				this.loadSetup(theSetup)

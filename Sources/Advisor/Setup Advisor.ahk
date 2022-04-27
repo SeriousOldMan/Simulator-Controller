@@ -317,16 +317,17 @@ class SetupAdvisor extends ConfigurationItem {
 			if (name == true)
 				simulators[index] := translate("Generic")
 	
-		Gui %window%:Add, DropDownList, x100 yp w220 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		Gui %window%:Add, DropDownList, x100 yp w196 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
 		
 		if (simulator > 0)
 			simulator := simulators[simulator]
 		else
 			simulator := false
 		
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car / Track")
-		Gui %window%:Add, DropDownList, x100 yp w108 Choose1 vcarDropDown gchooseCar, % translate("All")
-		Gui %window%:Add, DropDownList, x212 yp w108 Disabled Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car")
+		Gui %window%:Add, DropDownList, x100 yp w196 Choose1 vcarDropDown gchooseCar, % translate("All")
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
+		Gui %window%:Add, DropDownList, x100 yp w196 Disabled Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
 		
@@ -339,12 +340,12 @@ class SetupAdvisor extends ConfigurationItem {
 			chosen := 1
 		}
 		
-		Gui %window%:Add, DropDownList, x100 yp w220 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x100 yp w196 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
 		
-		Gui %window%:Add, Button, x329 ys+49 w70 h70 Disabled HWNDsetupButton veditSetupButton geditSetup
+		Gui %window%:Add, Button, x305 ys+49 w94 h94 Disabled HWNDsetupButton veditSetupButton geditSetup
 		setButtonIcon(setupButton, kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
 		
-		Gui %window%:Add, Text, x8 yp+79 w400 0x10
+		Gui %window%:Add, Text, x8 yp+103 w400 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -355,7 +356,7 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Font, s8 Norm
 		Gui %window%:Add, GroupBox, x16 yp+30 w382 h469 -Theme
 		
-		this.iCharacteristicsArea := {X: 16, Y: 238, Width: 382, W: 482, Height: 439, H: 439}
+		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 		
 		Gui %window%:Add, Button, x328 yp-24 w70 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
 		
@@ -367,7 +368,7 @@ class SetupAdvisor extends ConfigurationItem {
 			
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui %window%:Add, ActiveX, x420 yp+30 w775 h595 Border vsettingsViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x420 yp+30 w775 h621 Border vsettingsViewer, shell.explorer
 	
 		settingsViewer.Navigate("about:blank")
 		
@@ -375,12 +376,12 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y706 w1200 0x10
+		Gui %window%:Add, Text, x8 y730 w1200 0x10
 		
-		Gui %window%:Add, Button, x16 y714 w77 h23 gloadSetup, % translate("&Load...")
-		Gui %window%:Add, Button, x98 y714 w77 h23 gsaveSetup, % translate("&Save...")
+		Gui %window%:Add, Button, x16 y738 w77 h23 gloadSetup, % translate("&Load...")
+		Gui %window%:Add, Button, x98 y738 w77 h23 gsaveSetup, % translate("&Save...")
 		
-		Gui %window%:Add, Button, x574 y714 w80 h23 GcloseAdvisor, % translate("Close")
+		Gui %window%:Add, Button, x574 y738 w80 h23 GcloseAdvisor, % translate("Close")
 	}
 	
 	saveState(fileName := false) {

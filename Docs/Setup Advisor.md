@@ -170,19 +170,52 @@ Here is an extract from the definition file for the "McLaren 720s GT3":
 	Geometry.Toe.Rear.Right=Degrees
 	...
 
-The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers can be used:
+The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers are available:
 
-  - ClicksHandler(minValue, maxValue)
+  - **ClicksHandler(minValue, maxValue)**
   
     Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers.
 
-  - IntegerHandler(baseValue, increment, minValue, maxValue)
+  - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   
     This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file.
 
-  - FloatHandler(baseValue, increment, precision, minValue, maxValue)
+  - **FloatHandler(baseValue, increment, precision, minValue, maxValue)**
   
-    Similar in behaviour to the *IntegerHandler* but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
+    Similar in behaviour to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
 
 The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
 
+### Introducing new simulators
+
+Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. Therefore, let's take a look into the simulator specific configuration.
+
+Similar to cars, each simulator has a definition file which is located in the *Resources\Advisor\Definitions* folder in the program directory. You can add your own, as mentioned above, by adding them to *Simulator Controller\Advisor\Definitions* folder in your local *Documents* folder. A rule file for a given simulator is also available, which is located (I think you can guess it) in the *Resources\Advisor\Rules* folder in the program directory. You can also add your own here by adding them to *Simulator Controller\Advisor\Rules* folder in your local *Documents* folder.
+
+"Setup Advisor" scans both directories at startup and compiles the list of available simulators. Let's now take a look at the simulator specific configuration.
+
+### Assetto Corsa Competizione
+
+The access paths for the JSON-based setup files of *Assetto Corsa Competizione* are stored in the *Assetto Corsa Competizione.ini* file. Here is excerpt from this file:
+
+	[Simulator]
+	Simulator=Assetto Corsa Competizione
+	[Setup]
+	Editor=ACCSetupEditor
+	Type=JSON
+	[Setup.Settings]
+	Electronics.TC=basicSetup.electronics.tC1
+	Electronics.ABS=basicSetup.electronics.abs
+	Brake.Pressure=advancedSetup.mechanicalBalance.brakeTorque
+	Brake.Balance=advancedSetup.mechanicalBalance.brakeBias
+	Brake.Duct.Front=advancedSetup.aeroBalance.brakeDuct[1]
+	Brake.Duct.Rear=advancedSetup.aeroBalance.brakeDuct[2]
+	...
+
+As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Advisor".
+
+## Notes
+
+  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing and saving setup files. Other simulators will follow with future releases.
+  2. The implementation for *Assetto Corsa Competizione* provides a generic car model and a couple of very detailed car specifications at the moment. More will be added in the future. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
+  3. Last but not least, specifications for specific car models are missing as well at the moment for all other simulators, only a generic car is supported here. But only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 

@@ -480,7 +480,7 @@ class SetupAdvisor extends ConfigurationItem {
 					
 					showProgress({progress: 100, message: translate("Finished...")})
 					
-					Sleep 1000
+					Sleep 500
 					
 					hideProgress()
 				}
@@ -500,6 +500,9 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	showSettingsChart(content) {
+		if !content
+			content := [translate("Please describe your car handling problems.")]
+			
 		isChart := !IsObject(content)
 		
 		if this.SettingsViewer {

@@ -11,4 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting(Assetto\ Corsa\ Competizione, McLaren\ 720s\ GT3, Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "McLaren 720s GT3", Aero.Splitter.Front))

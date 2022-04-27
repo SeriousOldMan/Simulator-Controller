@@ -9,10 +9,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(rFactor\ 2)),
-				 (Prove: addCharacteristics(rFactor\ 2, *, *, *)),
-				 (Prove: addSettings(rFactor\ 2, *, *)),
-				 (Prove: removeSetting(rFactor\ 2, *, Aero.Splitter.Front))
+[?Initialize] => (Prove: addSimulator("rFactor 2")),
+				 (Prove: addCharacteristics("rFactor 2", *, *, *)),
+				 (Prove: addSettings("rFactor 2", *, *)),
+				 (Prove: removeSetting("rFactor 2", *, Aero.Splitter.Front))
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -3529,11 +3529,17 @@ class RuleCompiler {
 		
 		beginCharIndex := nextCharIndex
 		quoted := false
+		hasQuote := false
 		
 		Loop {
 			character := SubStr(text, nextCharIndex, 1)
 		
-			if (character == "\") {
+			if ((A_Index == 1) && ((character == """") || (character == "'")))
+				hasQuote := true
+			else if (hasQuote && (A_Index == 2))
+				delimiters := """'"
+			
+			if (!hasQuote && (character == "\")) {
 				nextCharIndex := nextCharIndex + 2
 				
 				quoted := true
@@ -3541,16 +3547,21 @@ class RuleCompiler {
 				continue
 			}
 			
-			if (InStr(delimiters, character) || (nextCharIndex > length)) {
+			isDelimiter := InStr(delimiters, character)
+			
+			if (isDelimiter || (nextCharIndex > length)) {
 				literal := SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex)
 				
-				if (delimiters == """")
-					return literal
+				if (hasQuote && isDelimiter) {
+					nextCharIndex += 1
+					
+					return SubStr(literal, 2, StrLen(literal) - 1)
+				}
 				else if (literal = kTrue)
 					return true
 				else if (literal = kFalse)
 					return false
-				else if quoted {
+				else if (!hasQuote && quoted) {
 					Random rand, 1, 100000
 				
 					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rand . "###"), "\", ""), "###" . rand . "###", "\")

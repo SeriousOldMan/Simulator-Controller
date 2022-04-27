@@ -99,7 +99,7 @@ Although it is possible to introduce support for a completely new simulator, muc
 
 Each simulator comes with a set of default settings which will be available for all cars. A specific car might restrict or change this set by using a car specific rule file. Let's start with a simple example:
 
-	[?Initialize] => (Prove: removeSetting(Assetto\ Corsa\ Competizione, McLaren\ 720s\ GT3, Aero.Splitter.Front))
+	[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "McLaren 720s GT3", Aero.Splitter.Front))
 
 This rule removes the front splitter setting from the set of available settings in *Assetto Corsa Competizione* for the "McLaren 720s GT3" upon initialization of the rule set, since this car does not have an adjustable front splitter.
 
@@ -111,9 +111,25 @@ with [Simulator] and [Car] substituted by the specific names.
 
 These rules are loaded and activated, when you select a specific car in "Setup Advisor". In most cases, the car specific rules will alter the set of available car settings, but it is also possible to modify, add or remove rules for the problem analysis as described above.
 
-Here is a more complex example for the "Porsche 992 GT3 Cup" which follows a very minimalistic approach, when it comes to car setup possibilities.
+Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very minimalistic approach, when it comes to car setup possibilities:
 
-	????
+	[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 992 GT3 Cup",
+				[Electronics.TC, Aero.Splitter.Front,
+				 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
+				 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
+				 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+				 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+				 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+				 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
+				 Damper.Compression.Slow.Front.Left, Damper.Compression.Slow.Front.Right,
+				 Damper.Compression.Slow.Rear.Left, Damper.Compression.Slow.Rear.Right,
+				 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+				 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+				 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right,
+				 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right,
+				 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+				 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
+				 Differential.Preload, AntiRollBar.Rear]))
 
 Beside the rules, which influence the way, the "Setup Advisor" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Advisor\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Advisor\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 

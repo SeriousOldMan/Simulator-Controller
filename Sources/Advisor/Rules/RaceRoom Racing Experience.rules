@@ -10,10 +10,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(RaceRoom\ Racing\ Experience)),
-				 (Prove: addCharacteristics(RaceRoom\ Racing\ Experience, *, *, *)),
-				 (Prove: addSettings(RaceRoom\ Racing\ Experience, *, *)),
-				 (Prove: removeSettings(RaceRoom\ Racing\ Experience, *, [Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+[?Initialize] => (Prove: addSimulator("RaceRoom Racing Experience")),
+				 (Prove: addCharacteristics("RaceRoom Racing Experience", *, *, *)),
+				 (Prove: addSettings("RaceRoom Racing Experience", *, *)),
+				 (Prove: removeSettings("RaceRoom Racing Experience", *, [Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 																		  Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 																		  Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 																		  Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right]))

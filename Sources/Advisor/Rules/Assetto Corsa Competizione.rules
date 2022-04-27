@@ -10,11 +10,11 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(Assetto\ Corsa\ Competizione)),
-				 (Prove: addCharacteristics(Assetto\ Corsa\ Competizione, *, *, *))
+[?Initialize] => (Prove: addSimulator("Assetto Corsa Competizione")),
+				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
 
-[?Initialize] => (Prove: addSettings(Assetto\ Corsa\ Competizione, *, *)),
-				 (Prove: removeSetting(Assetto\ Corsa\ Competizione, *, Aero.Wing.Front))
+[?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front))
 
 
 ;;;-------------------------------------------------------------------------;;;

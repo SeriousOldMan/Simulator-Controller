@@ -184,7 +184,5 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   
     Similar in behaviour to the *IntegerHandler* but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
 
-The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a possible translation).
-
-#### Assetto Corsa Competizione
+The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
 

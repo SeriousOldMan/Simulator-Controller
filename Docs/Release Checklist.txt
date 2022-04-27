@@ -23,6 +23,7 @@ Release 4.1.0 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Phrase Grammars
 
 Release 4.0.8 Checklist
 =======================

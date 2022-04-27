@@ -499,7 +499,9 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Show
 	}
 	
-	showSettingsChart(drawChartFunction) {
+	showSettingsChart(content) {
+		isChart := !IsObject(content)
+		
 		if this.SettingsViewer {
 			window := this.Window
 			
@@ -507,36 +509,74 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			this.SettingsViewer.Document.open()
 			
-			if (drawChartFunction && (drawChartFunction != "")) {
-				before =
-				(
-				<html>
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-							.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-							.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
-				)
+			if (content && (content != "")) {
+				if isChart {
+					before =
+					(
+					<html>
+						<meta charset='utf-8'>
+						<head>
+							<style>
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+								.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+								.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+							</style>
+							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+							<script type="text/javascript">
+								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
+					)
 
-				width := this.SettingsViewer.Width
-				height := (this.SettingsViewer.Height - 1)
+					width := this.SettingsViewer.Width
+					height := (this.SettingsViewer.Height - 1)
+					
+					after =
+					(
+							</script>
+						</head>
+						<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+						</body>
+					</html>
+					)
 				
-				after =
-				(
-						</script>
-					</head>
-					<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-					</body>
-				</html>
-				)
+					this.SettingsViewer.Document.write(before . content . after)
+				}
+				else {
+					width := this.SettingsViewer.Width
+					height := (this.SettingsViewer.Height - 1)
+					
+					html := ""
+					
+					for index, message in content {
+						if (index > 1)
+							html .= "<br><br>"
+						
+						html .= message
+					}
+						
+					
+					html =
+					(
+					<html>
+						<meta charset='utf-8'>
+						<head>
+						</head>
+						<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<div style="width: %width%px; height: %height%px; text-align: center">
+								<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
+									<br>
+									<br>
+									<br>
+									<br>
+									%html%
+								</p>
+							</div>
+						</body>
+					</html>
+					)
 				
-				this.SettingsViewer.Document.write(before . drawChartFunction . after)
+					this.SettingsViewer.Document.write(html)
+				}
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
@@ -551,50 +591,54 @@ class SetupAdvisor extends ConfigurationItem {
 	showSettingsDeltas(settings) {
 		this.showSettingsChart(false)
 		
-		if (settings && (settings.Length() > 0)) {
-			drawChartFunction := "function drawChart() {"
-			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+		if settings {
+			if (settings.Length() > 0) {
+				drawChartFunction := "function drawChart() {"
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 
-			if false {
-				names := []
-				values := []
+				if false {
+					names := []
+					values := []
+				}
+				else {
+					names := [translate("Settings")]
+					values := [0.0]
+				}
+					
+				for ignore, setting in settings {
+					names.Push(setting[1])
+					values.Push(setting[2])
+				}
+				
+				max := Max(Abs(maximum(values)), Abs(minimum(values)))
+				
+				for index, value in values
+					values[index] := (value / max)
+				
+				if false {
+					drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
+					
+					Loop % names.Length()
+						drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
+					
+					drawChartFunction .= "`n]);"
+					
+					drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
+				}
+				else {
+					drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
+					
+					drawChartFunction .= "`n[" . values2String(",", values*) . "]"
+					
+					drawChartFunction .= "`n]);"
+					
+					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
+				}
+				
+				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
-			else {
-				names := [translate("Settings")]
-				values := [0.0]
-			}
-				
-			for ignore, setting in settings {
-				names.Push(setting[1])
-				values.Push(setting[2])
-			}
-			
-			max := Max(Abs(maximum(values)), Abs(minimum(values)))
-			
-			for index, value in values
-				values[index] := (value / max)
-			
-			if false {
-				drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
-				
-				Loop % names.Length()
-					drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
-				
-				drawChartFunction .= "`n]);"
-				
-				drawChartFunction := drawChartFunction . "`nvar options = { legend: 'none', vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '5%', bottom: '5%' } };"
-			}
-			else {
-				drawChartFunction .= "`n['" . values2String("', '", names*) . "'],"
-				
-				drawChartFunction .= "`n[" . values2String(",", values*) . "]"
-				
-				drawChartFunction .= "`n]);"
-				
-				drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
-			}
-			
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			else
+				drawChartFunction := [translate("I can't help you with that."), translate("You are on your own this time.")]
 			
 			this.showSettingsChart(drawChartFunction)
 		}
@@ -1283,7 +1327,11 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:+Disabled
 			
 		try {
+			noProblem := true
+			
 			for ignore, characteristic in this.SelectedCharacteristics {
+				noProblem := false
+			
 				widgets := this.SelectedCharacteristicsWidgets[characteristic]
 			
 				GuiControlGet value1, , % widgets[1]
@@ -1315,8 +1363,11 @@ class SetupAdvisor extends ConfigurationItem {
 						if (delta != 0)
 							settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
 				}
-				
-				this.showSettingsDeltas(settings)
+					
+				if noProblem
+					this.showSettingsChart(false)
+				else
+					this.showSettingsDeltas(settings)
 			}
 			
 			if update

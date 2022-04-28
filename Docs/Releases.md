@@ -8,6 +8,7 @@
   6. New Stream Deck icons for Chat messages.
   7. Support editing of validation rules directly from "Strategy Workbench". See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#integrating-into-strategy-workbench) for more information.
   8. "Setup Advisor" is now able to [load, modify and save setup files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for *Assetto Corsa Competizione*.
+  9. Track names are now displayed in non-internal format for ACC tracks.
 
 ## 4.0.9-release 04/22/22
 

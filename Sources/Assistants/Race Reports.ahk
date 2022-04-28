@@ -448,7 +448,7 @@ class RaceReports extends ConfigurationItem {
 			tracks := this.getTracks(this.SelectedSimulator, car)
 			
 			GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car)
-			GuiControl, , trackDropDown, % "|" . values2String("|", tracks*)
+			GuiControl, , trackDropDown, % "|" . values2String("|", map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", this.SelectedSimulator))*)
 			
 			this.loadTrack((tracks.Length() > 0) ? tracks[1] : false, true)
 		}
@@ -466,7 +466,7 @@ class RaceReports extends ConfigurationItem {
 			this.iAvailableRaces := []
 			this.iSelectedRace := false
 			this.iSelectedReport := false
-				
+			
 			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, this.SelectedCar), track)
 			GuiControl Disable, reportsDropDown
 			GuiControl Disable, reportSettingsButton
@@ -654,7 +654,11 @@ chooseTrack() {
 	
 	GuiControlGet trackDropDown
 	
-	reports.loadTrack(trackDropDown)
+	simulator := reports.SelectedSimulator
+	tracks := reports.getTracks(simulator, reports.SelectedCar)
+	trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
+	
+	reports.loadTrack(tracks[inList(trackNames, trackDropDown)])
 }
 
 chooseRace() {

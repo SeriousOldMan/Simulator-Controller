@@ -1174,7 +1174,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			tracks := this.getTracks(this.SelectedSimulator, car)
 			
 			GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car)
-			GuiControl, , trackDropDown, % "|" . values2String("|", tracks*)
+			GuiControl, , trackDropDown, % "|" . values2String("|", map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", this.SelectedSimulator))*)
 			
 			this.loadTrack((tracks.Length() > 0) ? tracks[1] : false, true)
 		}
@@ -1190,7 +1190,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			car := this.SelectedCar
 			
 			this.iSelectedTrack := track
-				
+			
 			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, car), track)
 			
 			this.loadWeather(this.SelectedWeather, true)
@@ -2574,7 +2574,11 @@ chooseTrack() {
 	
 	GuiControlGet trackDropDown
 	
-	workbench.loadTrack(trackDropDown)
+	simulator := workbench.SelectedSimulator
+	tracks := workbench.getTracks(simulator, workbench.SelectedCar)
+	trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
+	
+	workbench.loadTrack(tracks[inList(trackNames, trackDropDown)])
 }
 
 chooseWeather() {

@@ -197,6 +197,21 @@ class SessionDatabase extends ConfigurationItem {
 			return car
 	}
 	
+	getTrackName(simulator, track) {
+		static trackNames := false
+		
+		code := this.getSimulatorCode(simulator)
+		
+		if (code == "ACC") {
+			if !trackNames
+				trackNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Model.ini")
+		
+			return getConfigurationValue(trackNames, "Track Model", track, track)
+		}
+		else
+			return track
+	}
+	
 	readNotes(simulator, car, track) {
 		simulatorCode := this.getSimulatorCode(simulator)
 		

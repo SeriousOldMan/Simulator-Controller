@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.0-dev
 Target=4.1.0-release
-Date=04/27/2022
+Date=04/28/2022
 Download=https://www.dropbox.com/s/7yo965kxij5i24h/Simulator%20Controller%204.1.0-dev.zip?dl=1
-Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor"
+Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
 [Release]
 Version=4.0.9-release
 Date=04/22/2022

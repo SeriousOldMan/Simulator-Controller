@@ -677,18 +677,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w100 h20 +0x200, % translate("Consumption")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w60 0x10 Range0-100 ToolTip VsimConsumptionWeight, %simConsumptionWeight%
 		
-		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Initial Fuel")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimInitialFuelWeight, %simInitialFuelWeight%
+		Gui %window%:Add, Text, x%x% yp+22 w100 h20 +0x200, % translate("Initial Fuel")
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w60 0x10 Range0-100 ToolTip VsimInitialFuelWeight, %simInitialFuelWeight%
 		
-		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Usage")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
+		Gui %window%:Add, Text, x%x% yp+22 w100 h20 +0x200, % translate("Tyre Usage")
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w60 0x10 Range0-100 ToolTip VsimTyreUsageWeight, %simTyreUsageWeight%
 		
-		Gui %window%:Add, Text, x%x% yp+24 w100 h20 +0x200, % translate("Tyre Compound")
-		Gui %window%:Add, Slider, x%x1% yp w60 0x10 Range0-100 ToolTip VsimtyreCompoundVariationWeight, %simtyreCompoundVariationWeight%
+		Gui %window%:Add, Text, x%x% yp+22 w100 h20 +0x200, % translate("Tyre Compound")
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w60 0x10 Range0-100 ToolTip VsimtyreCompoundVariationWeight, %simtyreCompoundVariationWeight%
 		
-		Gui %window%:Add, Text, x214 yp+32 w40 h23 +0x200, % translate("Use")
+		Gui %window%:Add, Text, x214 yp+30 w40 h23 +0x200, % translate("Use")
 		
 		choices := map(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], "translate")
 

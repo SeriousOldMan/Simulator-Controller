@@ -472,11 +472,16 @@ class SetupAdvisor extends ConfigurationItem {
 						showProgress({progress: (vProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
 					
 						this.addCharacteristic(characteristic, getConfigurationValue(state, "Characteristics", characteristic . ".Weight")
-															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value"))
+															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value")
+															 , false)
 					
 						while !vCharacteristicFinished
 							Sleep 50
 					}
+					
+					this.updateRecommendations()
+					
+					this.updateState()
 					
 					showProgress({progress: 100, message: translate("Finished...")})
 					
@@ -1133,7 +1138,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.showSettingsChart(false)
 	}
 	
-	addCharacteristic(characteristic, weight := 50, value := 33) {
+	addCharacteristic(characteristic, weight := 50, value := 33, draw := true) {
 		numCharacteristics := this.SelectedCharacteristics.Length()
 		
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
@@ -1179,11 +1184,11 @@ class SetupAdvisor extends ConfigurationItem {
 				
 				x := x + 120
 				
-				Gui %window%:Add, Slider, x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
+				Gui %window%:Add, Slider, Center Thick15 x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
 				
 				x := x + 123
 				
-				Gui %window%:Add, Slider, x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
+				Gui %window%:Add, Slider, Center Thick15 x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
 				
 				callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
 				
@@ -1194,9 +1199,11 @@ class SetupAdvisor extends ConfigurationItem {
 		
 				initializeSlider(slider1, weight, slider2, value)
 		
-				this.updateRecommendations()
-				
-				this.updateState()
+				if draw {
+					this.updateRecommendations()
+					
+					this.updateState()
+				}
 			}
 			finally {
 				vCharacteristicFinished := true

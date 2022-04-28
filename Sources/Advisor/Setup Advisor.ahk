@@ -464,7 +464,7 @@ class SetupAdvisor extends ConfigurationItem {
 					
 					vProgressCount := 0
 					
-					showProgress({x: x, y: y, color: "Green", title: translate("Loading Setup"), message: translate("Preparing Characteristics...")})
+					showProgress({x: x, y: y, color: "Green", title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
 			
 					Sleep 200
 					
@@ -530,7 +530,15 @@ class SetupAdvisor extends ConfigurationItem {
 					)
 
 					width := this.SettingsViewer.Width
-					height := (this.SettingsViewer.Height - 1)
+					height := (this.SettingsViewer.Height - 110 - 1)
+					
+					info := getConfigurationValue(this.Definition, "Setup.Info." . getLanguage(), "ChangeWarning", false)
+					
+					if !info
+						info := getConfigurationValue(this.Definition, "Setup.Info.EN", "ChangeWarning", false)
+					
+					iWidth := width - 10
+					iHeight := 90
 					
 					after =
 					(
@@ -538,6 +546,13 @@ class SetupAdvisor extends ConfigurationItem {
 						</head>
 						<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+							<div style="width: %iWidth%px; height: %iHeight%px">
+								<p style="font-family: Arial; font-size: 16px; margin: 5px">
+									<br>
+									<br>
+									%info%
+								</p>
+							</div>
 						</body>
 					</html>
 					)
@@ -1041,7 +1056,7 @@ class SetupAdvisor extends ConfigurationItem {
 		
 		showProgress({message: translate("Finished...")})
 		
-		Sleep 1000
+		Sleep 500
 				
 		this.iSetup := false
 		
@@ -1094,6 +1109,8 @@ class SetupAdvisor extends ConfigurationItem {
 			
 			try {
 				this.iSelectedCar := car
+				
+				GuiControl Choose, carDropDown, % inList(this.AvailableCars, this.SelectedCar)
 			
 				this.initializeAdvisor("Loading Car", "Loading Car", "Loading Car", true)
 			}
@@ -1662,6 +1679,8 @@ global increaseSettingButton
 
 global resetSetupButton
 
+global applyStrengthSlider = 100
+
 class SetupEditor extends ConfigurationItem {
 	iAdvisor := false
 	iSetup := false
@@ -1756,7 +1775,8 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 		
 		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("Setup:")
-		Gui %window%:Add, Text, x85 ys+14 w275 vfileNameViewer
+		Gui %window%:Add, Text, x85 ys+14 w193 vfileNameViewer
+		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 		
 		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
 		
@@ -1766,7 +1786,9 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Button, x280 yp w80 Disabled gincreaseSetting vincreaseSettingButton, % translate("Increase")
 				
 		Gui %window%:Add, Button, x16 ys+420 w80 gapplyRecommendations, % translate("&Apply")
-		Gui %window%:Add, Button, x100 ys+420 w80 gresetSetup vresetSetupButton, % translate("&Reset")
+		Gui %window%:Add, Slider, x100 ys+422 w60 0x10 Range20-100 ToolTip vapplyStrengthSlider, %applyStrengthSlider%
+		Gui %window%:Add, Text, x162 ys+425, % translate("%")
+		
 		Gui %window%:Add, Button, x280 ys+420 w80 gsaveModifiedSetup, % translate("&Save...")
 		
 		Gui %window%:Add, Edit, x374 ys+10 w423 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
@@ -1925,7 +1947,7 @@ class SetupEditor extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	applyRecommendations() {
+	applyRecommendations(percentage) {
 		local knowledgeBase := this.Advisor.KnowledgeBase
 		
 		this.resetSetup()
@@ -1946,17 +1968,19 @@ class SetupEditor extends ConfigurationItem {
 		}
 		
 		for setting, delta in settings {
-			increment := Round(delta / min)
+			increment := Round((delta / min) * (percentage / 100))
 		
-			if getConfigurationValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
-				increment *= -1
-			
-			if (increment < 0)
-				Loop % Abs(increment)
-					this.decreaseSetting(setting)
-			else
-				Loop % Abs(increment)
-					this.increaseSetting(setting)
+			if (increment > 0) {
+				if getConfigurationValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
+					increment *= -1
+				
+				if (increment < 0)
+					Loop % Abs(increment)
+						this.decreaseSetting(setting)
+				else
+					Loop % Abs(increment)
+						this.increaseSetting(setting)
+			}
 		}
 	}
 	
@@ -2156,7 +2180,9 @@ decreaseSetting() {
 }
 
 applyRecommendations() {
-	SetupAdvisor.Instance.Editor.applyRecommendations()
+	GuiControlGet applyStrengthSlider
+	
+	SetupAdvisor.Instance.Editor.applyRecommendations(applyStrengthSlider)
 }
 
 resetSetup() {

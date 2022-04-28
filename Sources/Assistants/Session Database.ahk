@@ -914,11 +914,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case "AllWeather":
 						reference := (translate("Weather: ") . translate("All"))
 					case "Car":
-						reference := (translate("Car: ") . this.SelectedCar)
+						reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
 					case "Track":
-						reference := (translate("Track: ") . this.SelectedTrack)
+						reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
 					case "Weather":
-						reference := (translate("Weather: ") . this.SelectedWeather)
+						reference := (translate("Weather: ") . translate(this.SelectedWeather))
 				}
 				
 				LV_Add("", reference, count)

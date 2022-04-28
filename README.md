@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.1.0-beta](https://www.dropbox.com/s/sw0217unwp7ai1b/Simulator%20Controller%204.1.0-beta.zip?dl=1) (Test version for 4.1.0. New features: Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks. Stable, incl. documentation and update procedure.)
+[4.1.0-rc1](https://www.dropbox.com/s/s4gf1wfbbtjn63i/Simulator%20Controller%204.1.0-rc1.zip?dl=1) (Release candidate for 4.1.0. New features: Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks. Stable, incl. documentation and update procedure.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-410) of this version and all the versions you might have skipped, before installing and using this version.
 

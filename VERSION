@@ -1,8 +1,8 @@
 [Development]
-Version=4.1.0-beta
+Version=4.1.0-rc1
 Target=4.1.0-release
 Date=04/28/2022
-Download=https://www.dropbox.com/s/sw0217unwp7ai1b/Simulator%20Controller%204.1.0-beta.zip?dl=1
+Download=https://www.dropbox.com/s/s4gf1wfbbtjn63i/Simulator%20Controller%204.1.0-rc1.zip?dl=1
 Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
 [Release]
 Version=4.0.9-release
@@ -13,4 +13,4 @@ Changes=Default value for "teamServer:" is now "Off", Fixed negative fuel consum
 Type=Development
 [Version]
 Release=4.0.9-release
-Development=4.1.0-beta
+Development=4.1.0-rc1

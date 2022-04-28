@@ -136,21 +136,16 @@ class ACCSetupEditor extends SetupEditor {
 	}
 	
 	chooseSetup(load := true) {
-		static carModels := false
+		static carNames := false
 		
-		if !carModels
-			carModels := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+		if !carNames
+			carNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Names")
 		
 		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		car := this.Advisor.SelectedCar
 		
 		if (car && (car != true))
-			for name, candidate in getConfigurationSectionValues(carModels, "Car Model")
-				if (candidate = car) {
-					directory .= ("\" . name)
-					
-					break
-				}
+			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
 					
 		title := translate("Load ACC Setup File...")
 	

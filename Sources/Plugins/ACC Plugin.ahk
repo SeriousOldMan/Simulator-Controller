@@ -293,7 +293,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updatePositionsData(data) {
-		static carNames := false
+		static carIDs := false
 		static lastDriverCar := false
 		
 		if (this.SessionState == kSessionRace)
@@ -301,8 +301,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		else if !this.UDPClient
 			return
 		
-		if !carNames
-			carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+		if !carIDs
+			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
 		
 		fileName := kTempDirectory . "ACCUDP.cmd"
 		
@@ -346,7 +346,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if (carID == kUndefined)
 					break
 				else {
-					car := getConfigurationValue(carNames, "Car Model", carID, "Unknown")
+					car := (carIDs.HasKey(carID) ? carIDs[carID] : "Unknown")
 					
 					if ((car = "Unknown") && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")

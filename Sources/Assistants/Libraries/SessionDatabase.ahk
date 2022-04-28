@@ -189,24 +189,24 @@ class SessionDatabase extends ConfigurationItem {
 		
 		if (code == "ACC") {
 			if !carNames
-				carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+				carNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Names")
 		
-			return getConfigurationValue(carNames, "Car Model", car, car)
+			return (carNames.HasKey(car) ? carNames[car] : car)
 		}
 		else
 			return car
 	}
 	
-	getTrackName(simulator, track) {
+	getTrackName(simulator, track, long := true) {
 		static trackNames := false
 		
 		code := this.getSimulatorCode(simulator)
 		
 		if (code == "ACC") {
 			if !trackNames
-				trackNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Model.ini")
+				trackNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Data.ini")
 		
-			return getConfigurationValue(trackNames, "Track Model", track, track)
+			return getConfigurationValue(trackNames, long ? "Track Names Long" : "Track Names Short", track, track)
 		}
 		else
 			return track

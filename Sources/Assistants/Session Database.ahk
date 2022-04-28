@@ -565,6 +565,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return this.SessionDatabase.getCarName(simulator, car)
 	}
 	
+	getTrackName(simulator, track) {
+		return this.SessionDatabase.getTrackName(simulator, track, false)
+	}
+	
 	updateState() {
 		window := this.Window
 	
@@ -733,7 +737,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			if (car && (car != true)) {
 				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
-				trackNames := map(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator))
+				trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 				
 				tracks.InsertAt(1, true)
 				trackNames.InsertAt(1, translate("All"))
@@ -1507,7 +1511,7 @@ chooseTrack() {
 	else {
 		simulator := editor.SelectedSimulator
 		tracks := editor.getTracks(simulator, editor.SelectedCar)
-		trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
+		trackNames := map(tracks, ObjBindMethod(editor, "getTrackName", simulator))
 		
 		editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
 	}

@@ -87,7 +87,7 @@ On the right side, you will see the simulator specific content of the setup file
 
 The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The Setup Editor is currently only available for *Assetto Corsa Competizione*. More simulators will be supported with future releases.
+Note: The Setup Editor is currently only available for *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
 
 ## Extending and cutomizing "Setup Advisor"
 
@@ -216,6 +216,6 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing and saving setup files. Other simulators will follow with future releases.
+  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic in other simulators.
   2. The implementation for *Assetto Corsa Competizione* provides a generic car model and a couple of very detailed car specifications at the moment. More will be added in the future. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
   3. Last but not least, specifications for specific car models are missing as well at the moment for all other simulators, only a generic car is supported here. But only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 

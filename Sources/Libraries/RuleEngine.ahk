@@ -3535,9 +3535,9 @@ class RuleCompiler {
 			character := SubStr(text, nextCharIndex, 1)
 		
 			if ((A_Index == 1) && ((character == """") || (character == "'")))
-				hasQuote := true
+				hasQuote := character
 			else if (hasQuote && (A_Index == 2))
-				delimiters := """'"
+				delimiters := hasQuote
 			
 			if (!hasQuote && (character == "\")) {
 				nextCharIndex := nextCharIndex + 2

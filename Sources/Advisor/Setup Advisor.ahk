@@ -1970,7 +1970,7 @@ class SetupEditor extends ConfigurationItem {
 		for setting, delta in settings {
 			increment := Round((delta / min) * (percentage / 100))
 		
-			if (increment > 0) {
+			if (increment != 0) {
 				if getConfigurationValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
 					increment *= -1
 				

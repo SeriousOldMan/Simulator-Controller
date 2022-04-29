@@ -116,7 +116,13 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(Math.Round(Normalize(vehicle.mLastLapTime) * 1000));
+				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
+				int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
+				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
+				int sector3Time = lapTime - sector1Time - sector2Time;
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors"); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetStringFromBytes(vehicle.mVehicleName));
 

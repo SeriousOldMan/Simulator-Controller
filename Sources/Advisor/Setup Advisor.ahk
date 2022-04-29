@@ -327,7 +327,7 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car")
 		Gui %window%:Add, DropDownList, x100 yp w196 Choose1 vcarDropDown gchooseCar, % translate("All")
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
-		Gui %window%:Add, DropDownList, x100 yp w196 Disabled Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		Gui %window%:Add, DropDownList, x100 yp w196 Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
 		
@@ -735,13 +735,23 @@ class SetupAdvisor extends ConfigurationItem {
 		return cars
 	}
 	
-	getTracks(simulator) {
+	getTracks(simulator, car) {
 		tracks := []
+		
+		if (car && (car != true))
+			tracks := new SessionDatabase().getTracks(simulator, car)
 		
 		tracks.InsertAt(1, "*")
 		
 		return tracks
 	}
+	
+	getTrackName(simulator, track) {
+		if ((track = "*") || (track == true))
+			return translate("All")
+		else
+			return new SessionDatabase().getTrackName(simulator, track)
+	}	
 	
 	dumpKnowledge(knowledgeBase) {
 		try {
@@ -977,7 +987,7 @@ class SetupAdvisor extends ConfigurationItem {
 		; tracks := string2Values(",", getConfigurationValue(definition, "Simulator", "Tracks"))
 		
 		cars := this.getCars(simulator)
-		tracks := this.getTracks(simulator)
+		tracks := this.getTracks(simulator, true)
 		
 		this.iSimulatorSettings := {Name: name, Simulator: simulator, Cars: cars, Tracks: tracks}
 		
@@ -1116,7 +1126,13 @@ class SetupAdvisor extends ConfigurationItem {
 				this.iSelectedCar := car
 				
 				GuiControl Choose, carDropDown, % inList(this.AvailableCars, this.SelectedCar)
-			
+
+				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
+				trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+				
+				GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
+				GuiControl Choose, trackDropDown, 1
+				
 				this.initializeAdvisor("Loading Car", "Loading Car", "Loading Car", true)
 			}
 			finally {
@@ -1126,6 +1142,25 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 	
 	loadTrack(track, force := false) {
+		if (force || (track != this.SelectedTrack[false])) {
+			window := this.Window
+		
+			Gui %window%:Default
+			Gui %window%:+Disabled
+			
+			try {
+				this.iSelectedTrack := track
+				
+				if (track == true)
+					GuiControl Choose, trackDropDown, 1
+				else
+					GuiControl Choose, trackDropDown, % inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track)
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
+				
 	}
 	
 	loadWeather(weather, force := false) {
@@ -2223,7 +2258,6 @@ chooseCar() {
 }
 
 chooseTrack() {
-	/*
 	advisor := SetupAdvisor.Instance
 	window := advisor.Window
 	
@@ -2231,8 +2265,15 @@ chooseTrack() {
 	
 	GuiControlGet trackDropDown
 	
-	advisor.loadTrack(trackDropDown = translate("All")) ? true : trackDropDown)
-	*/
+	if (trackDropDown = translate("All"))
+		advisor.loadTrack(true)
+	else {
+		simulator := advisor.SelectedSimulator
+		tracks := advisor.getTracks(simulator, advisor.SelectedCar)
+		trackNames := map(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
+	
+		advisor.loadTrack(tracks[inList(trackNames, trackDropDown)])
+	}
 }
 
 chooseWeather() {

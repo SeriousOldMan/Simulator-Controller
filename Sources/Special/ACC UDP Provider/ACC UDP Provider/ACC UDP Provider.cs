@@ -288,9 +288,18 @@ namespace ACCUDPProvider {
 
                                 LapData lastLap = car.LastLap;
 
+                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
+
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
                                 outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
+                                outStream.Write("Car."); outStream.Write(index);
+                                if (lastLap != null) {
+                                    outStream.Write(".Time.Sectors="); outStream.WriteLine(lastLap.Split1MS + "," + lastLap.Split2MS + "," + lastLap.Split3MS);
+                                }
+                                else
+                                    outStream.WriteLine(".Time.Sectors=0,0,0");
+                                
                                 outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
                                 DriverData currentDriver = car.CurrentDriver;

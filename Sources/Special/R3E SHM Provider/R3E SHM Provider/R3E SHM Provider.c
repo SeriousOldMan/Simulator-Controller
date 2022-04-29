@@ -164,8 +164,15 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Car.%d.Position=%d\n", carNr, position);
 				wprintf_s(L"Car.%d.Lap=%d\n", carNr, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", carNr, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
-				wprintf_s(L"Car.%d.Time=%ld\n", carNr, (long)((vehicle.sector_time_previous_self[0] + vehicle.sector_time_previous_self[1] + vehicle.sector_time_previous_self[2]) * 1000));
-				
+				wprintf_s(L"Car.%d.Lap.Valid=%s\n", carNr, vehicle.current_lap_valid ? L"true" : L"false");
+
+				long sector1Time = ((long)vehicle.sector_time_previous_self[0] * 1000);
+				long sector2Time = ((long)vehicle.sector_time_previous_self[1] * 1000);
+				long sector3Time = ((long)vehicle.sector_time_previous_self[2] * 1000);
+
+				wprintf_s(L"Car.%d.Time=%ld\n", carNr, sector1Time + sector2Time + sector3Time);
+				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", carNr, sector1Time, sector2Time, sector3Time);
+
 				char buffer[33];
 
 				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);

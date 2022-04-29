@@ -13,4 +13,4 @@ Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Supp
 Type=Development
 [Version]
 Release=4.1.0-release
-Development=4.1.0-release
+Development=4.1.2-dev

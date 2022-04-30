@@ -945,7 +945,7 @@ class RaceStrategist extends RaceAssistant {
 	reportStrategy(options := true) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.Speaker && this.hasEnoughData() {
+		if this.Speaker {
 			strategyName := knowledgeBase.getValue("Strategy.Name", false)
 			speaker := this.getSpeaker()
 		

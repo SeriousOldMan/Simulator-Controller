@@ -1837,7 +1837,7 @@ class Strategy extends ConfigurationItem {
 	}
 	
 	calcRefuelAmount(targetFuel, startFuel, remainingLaps, stintLaps) {
-		if (((remainigLaps - stintLaps) <= 0) && this.PostRaceLap)
+		if (((remainingLaps - stintLaps) <= 0) && this.PostRaceLap)
 			stintLaps += 1
 		
 		currentFuel := Max(0, startFuel - (stintLaps * this.FuelConsumption[true]))

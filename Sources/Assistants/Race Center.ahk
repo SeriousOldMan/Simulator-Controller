@@ -6765,6 +6765,9 @@ class TrafficSimulation extends StrategySimulation {
 	
 		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 		
+		if initialLap
+			formationLap := false
+		
 		useStartConditions := false
 		useTelemetryData := false
 		consumption := 0
@@ -6855,6 +6858,10 @@ class TrafficSimulation extends StrategySimulation {
 											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
 										
 										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
+										
+										if formationLap
+											startFuelAmount -= currentConsumption
+		
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 									
@@ -6899,6 +6906,10 @@ class TrafficSimulation extends StrategySimulation {
 											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
 										
 										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
+													
+										if formationLap
+											startFuelAmount -= currentConsumption
+
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 									

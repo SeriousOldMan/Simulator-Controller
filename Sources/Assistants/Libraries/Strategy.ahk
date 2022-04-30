@@ -602,7 +602,7 @@ class VariationSimulation extends StrategySimulation {
 		initialFuel := 0
 		
 		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
-		
+			
 		consumptionSteps := consumption / 10
 		tyreUsageSteps := tyreUsage
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
@@ -669,6 +669,10 @@ class VariationSimulation extends StrategySimulation {
 										startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
 									
 									startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
+									
+									if formationLap
+										startFuelAmount -= currentConsumption
+		
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 								
@@ -713,6 +717,10 @@ class VariationSimulation extends StrategySimulation {
 										startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
 									
 									startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
+												
+									if formationLap
+										startFuelAmount -= currentConsumption
+		
 									lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 								
@@ -1858,10 +1866,7 @@ class Strategy extends ConfigurationItem {
 		
 		fuelConsumption := this.FuelConsumption[true]
 			
-		if ((pitstopNr == 1) && this.FormationLap)
-			remainingFuel := Max(0, remainingFuel - fuelConsumption)
-			
-		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, remainingFuel / fuelConsumption, this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
+		targetLap := (currentLap + Floor(Min(this.StintLaps, remainingTyreLaps, this.getMaxFuelLaps(remainingFuel, fuelConsumption))))
 		
 		if (pitstopNr = 1) {
 			pitstopRule := this.PitstopRule

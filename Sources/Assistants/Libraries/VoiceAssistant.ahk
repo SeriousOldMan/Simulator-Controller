@@ -72,7 +72,7 @@ class VoiceAssistant {
 	
 		iIsTalking := false
 		iText := ""
-		iQuestion := false
+		iFocus := false
 		
 		Assistant[] {
 			Get {
@@ -130,26 +130,26 @@ class VoiceAssistant {
 		finishTalk() {
 			if this.Talking {
 				text := this.iText
-				question := this.iQuestion
+				focus := this.iFocus
 				
 				this.iText := ""
-				this.iQuestion := false
+				this.iFocus := false
 				this.iIsTalking := false
 				
-				this.speak(text, question)
+				this.speak(text, focus)
 			}
 		}
 		
-		speak(text, question := false) {
+		speak(text, focus := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
-				this.iQuestion := (this.iQuestion || question)
+				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, question), this.Assistant.VoiceServer)
+				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
 		}
 		
-		speakPhrase(phrase, variables := false, question := false) {
+		speakPhrase(phrase, variables := false, focus := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -161,7 +161,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase, question)
+				this.speak(phrase, focus)
 		}
 	}
 	
@@ -172,7 +172,7 @@ class VoiceAssistant {
 		
 		iIsTalking := false
 		iText := ""
-		iQuestion := false
+		iFocus := false
 		
 		Assistant[] {
 			Get {
@@ -229,20 +229,20 @@ class VoiceAssistant {
 		finishTalk() {
 			if this.Talking {
 				text := this.iText
-				question := this.iQuestion
+				focus := this.iFocus
 				
 				this.iText := ""
-				this.iQuestion := false
+				this.iFocus := false
 				this.iIsTalking := false
 				
-				this.speak(text, question)
+				this.speak(text, focus)
 			}
 		}
 		
 		speak(text, focus := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
-				this.iQuestion := (this.iQuestion || question)
+				this.iFocus := (this.iFocus || focus)
 			}
 			else {
 				stopped := this.Assistant.stopListening()

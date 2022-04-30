@@ -524,8 +524,8 @@ startMessageManager() {
 	
 	OnExit("stopMessageManager")
 	
-	SetTimer messageQueue, -100
-	SetTimer messageDispatcher, -200
+	SetTimer messageQueue, -2000
+	SetTimer messageDispatcher, -4000
 }
 
 logError(exception) {
@@ -542,7 +542,7 @@ initializeLoggingSystem() {
 }
 
 startTrayMessageManager() {
-	SetTimer trayMessageQueue, -500
+	SetTimer trayMessageQueue, -1000
 }
 
 requestShareSessionDatabaseConsent() {

@@ -69,6 +69,10 @@ class VoiceAssistant {
 		
 		iSpeaker := false
 		iLanguage := false
+	
+		iIsTalking := false
+		iTalk := ""
+		iQuestion := false
 		
 		Assistant[] {
 			Get {
@@ -83,6 +87,12 @@ class VoiceAssistant {
 			
 			Set {
 				return (this.Assistant.Speaking := value)
+			}
+		}
+	
+		Talking[] {
+			Get {
+				return this.iIsTalking
 			}
 		}
 		
@@ -113,8 +123,26 @@ class VoiceAssistant {
 			this.iLanguage := language
 		}
 		
+		startTalk() {
+			this.iIsTalking := true
+		}
+		
+		finishTalk() {
+			if this.Talking {
+				this.speak(this.iTalk, this.iQuestion)
+				
+				this.iTalk := ""
+				this.iQuestion := false
+			}
+		}
+		
 		speak(text, question := false) {
-			raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, question), this.Assistant.VoiceServer)
+			if this.Talking {
+				this.iTalk .= (A_Space . text)
+				this.iQuestion := (this.iQuestion || question)
+			}
+			else
+				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, question), this.Assistant.VoiceServer)
 		}
 		
 		speakPhrase(phrase, variables := false, question := false) {
@@ -138,6 +166,10 @@ class VoiceAssistant {
 		iFragments := {}
 		iPhrases := {}
 		
+		iIsTalking := false
+		iTalk := ""
+		iQuestion := false
+		
 		Assistant[] {
 			Get {
 				return this.iAssistant
@@ -151,6 +183,12 @@ class VoiceAssistant {
 			
 			Set {
 				return (this.Assistant.Speaking := value)
+			}
+		}
+	
+		Talking[] {
+			Get {
+				return this.iIsTalking
 			}
 		}
 		
@@ -180,22 +218,41 @@ class VoiceAssistant {
 			base.__New(synthesizer, speaker, language)
 		}
 		
+		startTalk() {
+			this.iIsTalking := true
+		}
+		
+		finishTalk() {
+			if this.Talking {
+				this.speak(this.iTalk, this.iQuestion)
+				
+				this.iTalk := ""
+				this.iQuestion := false
+			}
+		}
+		
 		speak(text, focus := false) {
-			stopped := this.Assistant.stopListening()
-			
-			try {
-				this.Speaking := true
+			if this.Talking {
+				this.iTalk .= (A_Space . text)
+				this.iQuestion := (this.iQuestion || question)
+			}
+			else {
+				stopped := this.Assistant.stopListening()
 			
 				try {
-					base.speak(text, true)
+					this.Speaking := true
+				
+					try {
+						base.speak(text, true)
+					}
+					finally {
+						this.Speaking := false
+					}
 				}
 				finally {
-					this.Speaking := false
+					if (stopped && !this.Assistant.PushToTalk)
+						this.Assistant.startListening()
 				}
-			}
-			finally {
-				if (stopped && !this.Assistant.PushToTalk)
-					this.Assistant.startListening()
 			}
 		}
 		

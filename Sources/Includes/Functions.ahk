@@ -388,7 +388,7 @@ sendFileMessage(pid, event, data) {
 }
 
 receiveMessage() {
-	return (receivePipeMessage() || receiveFileMessage())
+	return (receiveFileMessage() || receivePipeMessage())
 }
 
 sendMessage() {
@@ -402,7 +402,7 @@ sendMessage() {
 
 messageDispatcher() {
 	try {
-		if (vIncomingMessages.Length() > 0) {
+		while (vIncomingMessages.Length() > 0) {
 			descriptor := vIncomingMessages.RemoveAt(1)
 		
 			withProtection(descriptor[1], descriptor[2], descriptor[3])
@@ -423,7 +423,7 @@ messageQueue() {
 	finally {
 		protectionOff()
 		
-		SetTimer messageQueue, -400
+		SetTimer messageQueue, -100
 	}
 }
 
@@ -524,7 +524,7 @@ startMessageManager() {
 	
 	OnExit("stopMessageManager")
 	
-	SetTimer messageQueue, -400
+	SetTimer messageQueue, -100
 	SetTimer messageDispatcher, -200
 }
 

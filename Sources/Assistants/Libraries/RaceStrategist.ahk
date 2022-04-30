@@ -448,16 +448,25 @@ class RaceStrategist extends RaceAssistant {
 		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
-			this.getSpeaker().speakPhrase("LapTime", {time: Format("{:.1f}", driverLapTime)})
+			speaker := this.getSpeaker()
 		
-			if (position > 2)
-				this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
+			speaker.startTalk()
 			
-			if (position < cars)
-				this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+			try {
+				speaker.speakPhrase("LapTime", {time: Format("{:.1f}", driverLapTime)})
 			
-			if (position > 1)
-				this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
+				if (position > 2)
+					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
+				
+				if (position < cars)
+					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+				
+				if (position > 1)
+					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 	

@@ -2,6 +2,14 @@
 
   1. Bugfixes, as always
   2. Documentation updates, as always
+  3. Support track choice for ACC cars in "Setup Advisor".
+  4. Improved responsiveness of voice generation and recognition. Reaction time is now twice as fast in many cases.
+  5. Improved handling of formation lap and post race lap in strategy devlopment.
+
+## 4.1.0-release 04/29/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
   3. Support "No Tyre Change" for post-preparing pitstop option changes.
   4. Support for multiple hotkeys in "Simulator Setup".
   5. Stability improvements in "Race Center".

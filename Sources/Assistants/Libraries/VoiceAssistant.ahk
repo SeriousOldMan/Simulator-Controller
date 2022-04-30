@@ -71,7 +71,7 @@ class VoiceAssistant {
 		iLanguage := false
 	
 		iIsTalking := false
-		iTalk := ""
+		iText := ""
 		iQuestion := false
 		
 		Assistant[] {
@@ -129,16 +129,20 @@ class VoiceAssistant {
 		
 		finishTalk() {
 			if this.Talking {
-				this.speak(this.iTalk, this.iQuestion)
+				text := this.iText
+				question := this.iQuestion
 				
-				this.iTalk := ""
+				this.iText := ""
 				this.iQuestion := false
+				this.iIsTalking := false
+				
+				this.speak(text, question)
 			}
 		}
 		
 		speak(text, question := false) {
 			if this.Talking {
-				this.iTalk .= (A_Space . text)
+				this.iText .= (A_Space . text)
 				this.iQuestion := (this.iQuestion || question)
 			}
 			else
@@ -167,7 +171,7 @@ class VoiceAssistant {
 		iPhrases := {}
 		
 		iIsTalking := false
-		iTalk := ""
+		iText := ""
 		iQuestion := false
 		
 		Assistant[] {
@@ -224,16 +228,20 @@ class VoiceAssistant {
 		
 		finishTalk() {
 			if this.Talking {
-				this.speak(this.iTalk, this.iQuestion)
+				text := this.iText
+				question := this.iQuestion
 				
-				this.iTalk := ""
+				this.iText := ""
 				this.iQuestion := false
+				this.iIsTalking := false
+				
+				this.speak(text, question)
 			}
 		}
 		
 		speak(text, focus := false) {
 			if this.Talking {
-				this.iTalk .= (A_Space . text)
+				this.iText .= (A_Space . text)
 				this.iQuestion := (this.iQuestion || question)
 			}
 			else {

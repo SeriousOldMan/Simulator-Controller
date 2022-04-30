@@ -249,10 +249,17 @@ class RaceStrategist extends RaceAssistant {
 		else if inList(words, speaker.Fragments["Laps"])
 			this.futurePositionRecognized(words)
 		else {
-			speaker.speakPhrase("Position", {position: position})
-			
-			if (position <= 3)
-				speaker.speakPhrase("Great")
+			speaker.startTalk()
+		
+			try {
+				speaker.speakPhrase("Position", {position: position})
+				
+				if (position <= 3)
+					speaker.speakPhrase("Great")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 	
@@ -281,26 +288,33 @@ class RaceStrategist extends RaceAssistant {
 				else {
 					car := knowledgeBase.getValue("Driver.Car")
 					
-					speaker.speakPhrase("Confirm")
-				
-					sendMessage()
+					speaker.startTalk()
 					
-					Loop 10
-						Sleep 500
+					try {
+						speaker.speakPhrase("Confirm")
 					
-					knowledgeBase.setFact("Standings.Extrapolate", lap)
-		
-					knowledgeBase.produce()
-					
-					if this.Debug[kDebugKnowledgeBase]
-						this.dumpKnowledge(this.KnowledgeBase)
-					
-					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
-					
-					if position
-						speaker.speakPhrase("FuturePosition", {position: position})
-					else
-						speaker.speakPhrase("NoFuturePosition")
+						sendMessage()
+						
+						Loop 10
+							Sleep 500
+						
+						knowledgeBase.setFact("Standings.Extrapolate", lap)
+			
+						knowledgeBase.produce()
+						
+						if this.Debug[kDebugKnowledgeBase]
+							this.dumpKnowledge(this.KnowledgeBase)
+						
+						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
+						
+						if position
+							speaker.speakPhrase("FuturePosition", {position: position})
+						else
+							speaker.speakPhrase("NoFuturePosition")
+					}
+					finally {
+						speaker.finishTalk()
+					}
 				}
 				
 				return
@@ -329,14 +343,21 @@ class RaceStrategist extends RaceAssistant {
 		delta := knowledgeBase.getValue("Position.Track.Front.Delta", 0)
 		
 		if (delta != 0) {
-			speaker.speakPhrase("TrackGapToFront", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+			speaker.startTalk()
 			
-			lap := knowledgeBase.getValue("Lap")
-			driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-			otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Front.Car") . ".Laps"))
-			
-			if (driverLap < otherLap)
-			  speaker.speakPhrase("NotTheSameLap")
+			try {
+				speaker.speakPhrase("TrackGapToFront", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+				
+				lap := knowledgeBase.getValue("Lap")
+				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Front.Car") . ".Laps"))
+				
+				if (driverLap < otherLap)
+				  speaker.speakPhrase("NotTheSameLap")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 		else
 			speaker.speakPhrase("NoTrackGap")
@@ -373,14 +394,21 @@ class RaceStrategist extends RaceAssistant {
 		delta := knowledgeBase.getValue("Position.Track.Behind.Delta", 0)
 		
 		if (delta != 0) {
-			speaker.speakPhrase("TrackGapToBehind", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+			speaker.startTalk()
 			
-			lap := knowledgeBase.getValue("Lap")
-			driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-			otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
-			
-			if (driverLap > (otherLap + 1))
-			  speaker.speakPhrase("NotTheSameLap")
+			try {
+				speaker.speakPhrase("TrackGapToBehind", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+				
+				lap := knowledgeBase.getValue("Lap")
+				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
+				
+				if (driverLap > (otherLap + 1))
+				  speaker.speakPhrase("NotTheSameLap")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 		else
 			speaker.speakPhrase("NoTrackGap")
@@ -922,38 +950,45 @@ class RaceStrategist extends RaceAssistant {
 			speaker := this.getSpeaker()
 		
 			if strategyName {
-				if ((options == true) || options.Strategy)
-					speaker.speakPhrase("Strategy")
+				speaker.startTalk()
 				
-				numPitstops := knowledgeBase.getValue("Strategy.Pitstop.Count")
+				try {
+					if ((options == true) || options.Strategy)
+						speaker.speakPhrase("Strategy")
 					
-				if ((options == true) || options.Pitstops)
-					speaker.speakPhrase("Pitstops", {pitstops: numPitstops})
-				
-				nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
-				
-				if nextPitstop {
-					lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
-					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
-					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+					numPitstops := knowledgeBase.getValue("Strategy.Pitstop.Count")
+						
+					if ((options == true) || options.Pitstops)
+						speaker.speakPhrase("Pitstops", {pitstops: numPitstops})
 					
-					if ((options == true) || options.NextPitstop)
-						speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
+					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 					
-					if ((options == true) || options.Refuel)
-						speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
+					if nextPitstop {
+						lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
+						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+						
+						if ((options == true) || options.NextPitstop)
+							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
+						
+						if ((options == true) || options.Refuel)
+							speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
+						
+						if ((options == true) || options.TyreChange)
+							speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+					}
+					else if ((options == true) || options.NextPitstop || options.Refuel || options.TyreChange)
+						speaker.speakPhrase("NoNextPitstop")
+			
+					if ((options == true) || options.Map) {
+						map := knowledgeBase.getValue("Strategy.Map")
 					
-					if ((options == true) || options.TyreChange)
-						speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+						if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
+							speaker.speakPhrase("StrategyMap", {map: map})
+					}
 				}
-				else if ((options == true) || options.NextPitstop || options.Refuel || options.TyreChange)
-					speaker.speakPhrase("NoNextPitstop")
-		
-				if ((options == true) || options.Map) {
-					map := knowledgeBase.getValue("Strategy.Map")
-				
-					if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
-						speaker.speakPhrase("StrategyMap", {map: map})
+				finally {
+					speaker.finishTalk()
 				}
 			}
 			else
@@ -1058,14 +1093,21 @@ class RaceStrategist extends RaceAssistant {
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
-			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+			speaker.startTalk()
 		
-			Process Exist, Race Engineer.exe
+			try {
+				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 			
-			if ErrorLevel {
-				speaker.speakPhrase("ConfirmInformEngineer", false, true)
+				Process Exist, Race Engineer.exe
 				
-				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
+				if ErrorLevel {
+					speaker.speakPhrase("ConfirmInformEngineer", false, true)
+					
+					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
+				}
+			}
+			finally {
+				speaker.finishTalk()
 			}
 		}
 	}
@@ -1152,16 +1194,23 @@ class RaceStrategist extends RaceAssistant {
 			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
+			
+				speaker.startTalk()
 				
-				speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
-								  , {minutes: minutes, compound: fragments[recommendedCompound]})
-				
-				Process Exist, Race Engineer.exe
+				try {
+					speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+									  , {minutes: minutes, compound: fragments[recommendedCompound]})
 					
-				if ErrorLevel {
-					speaker.speakPhrase("ConfirmInformEngineer", false, true)
-					
-					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					Process Exist, Race Engineer.exe
+						
+					if ErrorLevel {
+						speaker.speakPhrase("ConfirmInformEngineer", false, true)
+						
+						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					}
+				}
+				finally {
+					speaker.finishTalk()
 				}
 			}
 	}
@@ -1187,20 +1236,27 @@ class RaceStrategist extends RaceAssistant {
 			}
 			
 			laps := (plannedPitstopLap - knowledgeBase.getValue("Lap"))
+
+			speaker.startTalk()
 			
-			speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: laps})
-			
-			Process Exist, Race Engineer.exe
+			try {
+				speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: laps})
 				
-			if ErrorLevel {
-				speaker.speakPhrase("ConfirmInformEngineer", false, true)
-				
-				nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")
-				
-				refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
-				tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+				Process Exist, Race Engineer.exe
 					
-				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, tyreChange))
+				if ErrorLevel {
+					speaker.speakPhrase("ConfirmInformEngineer", false, true)
+					
+					nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")
+					
+					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+						
+					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, tyreChange))
+				}
+			}
+			finally {
+				speaker.finishTalk()
 			}
 		}
 	}

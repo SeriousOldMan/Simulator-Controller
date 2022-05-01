@@ -1,3 +1,7 @@
+## 4.1.1-release 05/01/22
+
+  1. Fixed a critical bug, when cold tyre pressures are not initialized correctly.
+
 ## 4.1.0-release 04/29/22
 
   1. Bugfixes, as always

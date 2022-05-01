@@ -3,7 +3,7 @@ Version=4.1.2-dev
 Target=4.1.2-release
 Date=05/01/2022
 Download=
-Changes=Support track choices in "Setup Advisor", Improved responsiveness for voice generation and recognition, Improved handling of formation lap and post race lap in strategy devlopment, Spotter notifies about opponent performance before overtake
+Changes=Support track choices in "Setup Advisor", Improved responsiveness for voice generation and recognition, Improved handling of formation lap and post race lap in strategy devlopment, Spotter notifies about opponent performance before overtake, Spotter informs that the car in front is to be lapped
 [Release]
 Version=4.1.0-release
 Date=04/29/2022

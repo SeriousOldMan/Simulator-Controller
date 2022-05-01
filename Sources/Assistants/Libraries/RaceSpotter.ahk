@@ -430,8 +430,6 @@ class RaceSpotter extends RaceAssistant {
 				
 				reported := positionInfo["Behind"].Reported
 			}
-			else if (behindStandingsDelta < 1)
-				difference := true
 			else
 				difference := false
 			

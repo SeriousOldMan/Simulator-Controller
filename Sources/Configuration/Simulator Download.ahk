@@ -110,7 +110,7 @@ downloadSimulatorController() {
 			x := Round((A_ScreenWidth - 300) / 2)
 			y := A_ScreenHeight - 150
 			
-			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . dottedVersion})
+			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
 			updateProgress := Func("updateProgress").Bind(45)
 			

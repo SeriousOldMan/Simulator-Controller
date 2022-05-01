@@ -1147,8 +1147,6 @@ class RaceStrategist extends RaceAssistant {
 		
 		result := knowledgeBase.produce()
 		
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
-		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(knowledgeBase)
 		

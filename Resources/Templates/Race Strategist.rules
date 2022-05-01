@@ -367,8 +367,7 @@ bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestP
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             Pitstop Performed                           ;;;
 ;;;                                                                         ;;;
-;;; After a pitstop has been performed, the pitstop plan is copied to the   ;;;
-;;; history memory as a reference for future calculations.                  ;;;
+;;; Records a performed pitstop.                                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 [?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))

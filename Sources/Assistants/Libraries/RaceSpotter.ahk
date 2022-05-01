@@ -447,7 +447,7 @@ class RaceSpotter extends RaceAssistant {
 		try {
 			if (positionInfo.HasKey("Front") && (positionInfo["Front"].DeltaDifference > 0)) {
 				delta := positionInfo["Front"].Delta
-				lapTimeDifference := positionInfo["Behind"].LapTimeDifference
+				lapTimeDifference := positionInfo["Front"].LapTimeDifference
 				
 				if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {
 					speaker.speakPhrase((delta < 1) ? "GotHim" : "GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
@@ -880,6 +880,11 @@ class RaceSpotter extends RaceAssistant {
 	
 	addLap(lapNumber, data) {
 		result := base.addLap(lapNumber, data)
+	
+		lastPitstop := this.KnowledgeBase.getValue("Pitstop.Last", false)
+		
+		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
+			this.iPositionInfo := {}
 		
 		if result
 			this.iDriverUpdate := 4
@@ -907,6 +912,28 @@ class RaceSpotter extends RaceAssistant {
 			this.updateDriver()
 		
 		return result
+	}
+	
+	performPitstop(lapNumber := false) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		this.iPositionInfo := {}
+	
+		this.startPitstop(lapNumber)
+		
+		base.performPitstop(lapNumber)
+			
+		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
+		
+		result := knowledgeBase.produce()
+		
+		if this.Debug[kDebugKnowledgeBase]
+			this.dumpKnowledge(knowledgeBase)
+		
+		this.finishPitstop(lapNumber)
+		
+		return result
+	}
 	}
 	
 	requestInformation(category, arguments*) {

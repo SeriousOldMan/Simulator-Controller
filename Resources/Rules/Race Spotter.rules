@@ -23,6 +23,14 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;; "Pitstop.Lap" must be set to the lap number, where the pitstop has been ;;;
+;;; done.                                                                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Pitstop.Lap] => ...
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;; "Cleanup" can be set to remove unnecessary knowledge from the memory.   ;;;
 ;;; Set "Cleanup" to "Laps" to remove all recent laps, that are outside the ;;;
 ;;; the statistical window. This is done automatically after a pitstop.     ;;;
@@ -64,6 +72,21 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
 ;;;-------------------------------------------------------------------------;;;
 
 #Include %kResourcesDirectory%Rules\Standings Computations.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                             Pitstop Performed                           ;;;
+;;;                                                                         ;;;
+;;; After a pitstop has been performed, the pitstop plan is copied to the   ;;;
+;;; history memory as a reference for future calculations.                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))
+priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap)
+
+updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), Get(Pitstop, ?last, Lap, ?lap), !
+updatePitstopLap(?lap) <= Get(Pitstop.Last, ?last), ?next = ?last + 1, Set(Pitstop, ?next, Lap, ?lap), Set(Pitstop.Last, ?next), !
+updatePitstopLap(?lap) <= Set(Pitstop.1.Lap, ?lap), Set(Pitstop.Last, 1)
 
 
 ;;;-------------------------------------------------------------------------;;;

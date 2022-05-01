@@ -362,21 +362,54 @@ class RaceSpotter extends RaceAssistant {
 		driverLapTime := Round(knowledgeBase.getValue("Car." . driver . ".Time") / 1000, 1)
 		position := Round(knowledgeBase.getValue("Position", 0))
 		
+		frontTrackDelta := Round(Abs(knowledgeBase.getValue("Position.Track.Front.Delta", 0)) / 1000, 1)
+		frontTrackCar := knowledgeBase.getValue("Position.Track.Front.Car", 0)
 		frontStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0)) / 1000, 1)
+		frontStandingsCar := knowledgeBase.getValue("Position.Standings.Front.Car", 0)
 		
-		if ((frontStandingsDelta = 0) || (position = 1))
-			positionInfo.Delete("Front")
-		else {
-			car := knowledgeBase.getValue("Position.Standings.Front.Car")
-			
-			if (positionInfo.HasKey("Front") && (positionInfo["Front"].Car != car))
+		if ((frontTrackCar != frontStandingsCar) && (frontTrackDelta <= 2)) {
+			if (positionInfo.HasKey("Front") && (positionInfo["Front"].Car != frontTrackCar))
 				positionInfo.Delete("Front")
 			
-			frontLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+			frontLapTime := Round(knowledgeBase.getValue("Car." . frontTrackCar . ".Time") / 1000, 1)
+			reported := false
 			
-			difference := Round(positionInfo.HasKey("Front") ? (positionInfo["Front"].Delta - frontStandingsDelta) : false, 1)
+			if positionInfo.HasKey("Front") {
+				difference := Round(positionInfo["Front"].Delta - frontTrackDelta, 1)
+				
+				reported := positionInfo["Front"].Reported
+			}
+			else if (frontTrackDelta <= 2)
+				difference := true
+			else
+				difference := false
 			
-			positionInfo["Front"] := {Car: car, Delta: frontStandingsDelta, DeltaDifference: difference, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
+			positionInfo["Front"] := {Car: frontTrackCar, Lapped: true, Reported: reported
+									, Delta: frontTrackDelta, DeltaDifference: difference
+									, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
+		}
+		else if ((frontStandingsDelta = 0) || (position = 1))
+			positionInfo.Delete("Front")
+		else {
+			if (positionInfo.HasKey("Front") && (positionInfo["Front"].Car != frontStandingsCar))
+				positionInfo.Delete("Front")
+			
+			frontLapTime := Round(knowledgeBase.getValue("Car." . frontStandingsCar . ".Time") / 1000, 1)
+			reported := false
+			
+			if positionInfo.HasKey("Front") {
+				difference := Round(positionInfo["Front"].Delta - frontStandingsDelta, 1)
+				
+				reported := positionInfo["Front"].Reported
+			}
+			else if (frontStandingsDelta < 1)
+				difference := true
+			else
+				difference := false
+			
+			positionInfo["Front"] := {Car: frontStandingsCar, Lapped: false, Reported: reported
+									, Delta: frontStandingsDelta, DeltaDifference: difference
+									, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
 		}
 		
 		behindStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0)) / 1000, 1)
@@ -390,10 +423,21 @@ class RaceSpotter extends RaceAssistant {
 				positionInfo.Delete("Behind")
 			
 			behindLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+			reported := false
 			
-			difference := Round(positionInfo.HasKey("Behind") ? (positionInfo["Behind"].Delta - behindStandingsDelta) : false, 1)
+			if positionInfo.HasKey("Behind") {
+				difference := Round(positionInfo["Behind"].Delta - behindStandingsDelta)
+				
+				reported := positionInfo["Behind"].Reported
+			}
+			else if (behindStandingsDelta < 1)
+				difference := true
+			else
+				difference := false
 			
-			positionInfo["Behind"] := {Car: car, Delta: behindStandingsDelta, DeltaDifference: difference, LapTimeDifference: Round(behindLapTime - driverLapTime, 1)}
+			positionInfo["Behind"] := {Car: car, Reported: reported
+									 , Delta: behindStandingsDelta, DeltaDifference: difference
+									 , LapTimeDifference: Round(behindLapTime - driverLapTime, 1)}
 		}
 	}
 
@@ -455,7 +499,14 @@ class RaceSpotter extends RaceAssistant {
 			if positionInfo.HasKey("Front") {
 				delta := positionInfo["Front"].Delta
 				
-				if ((delta < 1) || (positionInfo["Front"].DeltaDifference > 0)) {
+				if (positionInfo["Front"].Lapped && (delta <= 2)) {
+					if !positionInfo["Front"].Reported {
+						positionInfo["Front"].Reported := true
+						
+						speaker.speakPhrase("LappedDriver")
+					}
+				}
+				else if ((delta < 1) || (positionInfo["Front"].DeltaDifference > 0)) {
 					lapTimeDifference := positionInfo["Front"].LapTimeDifference
 					
 					if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {

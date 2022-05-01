@@ -346,7 +346,7 @@ class RaceAssistant extends ConfigurationItem {
 	
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
 	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
-		this.iDebug := (true || isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 		

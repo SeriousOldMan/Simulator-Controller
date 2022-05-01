@@ -295,7 +295,20 @@ namespace ACCUDPProvider {
 
                                 outStream.Write("Car."); outStream.Write(index);
                                 if (lastLap != null) {
-                                    outStream.Write(".Time.Sectors="); outStream.WriteLine(lastLap.Split1MS + "," + lastLap.Split2MS + "," + lastLap.Split3MS);
+                                    string split1MS = lastLap.Split1MS + "";
+                                    string split2MS = lastLap.Split2MS + "";
+                                    string split3MS = lastLap.Split3MS + "";
+
+                                    if (split1MS.Length == 0)
+                                        split1MS = "0";
+
+                                    if (split2MS.Length == 0)
+                                        split2MS = "0";
+
+                                    if (split3MS.Length == 0)
+                                        split3MS = "0";
+
+                                    outStream.Write(".Time.Sectors="); outStream.WriteLine(split1MS + "," + split2MS + "," + split3MS);
                                 }
                                 else
                                     outStream.WriteLine(".Time.Sectors=0,0,0");

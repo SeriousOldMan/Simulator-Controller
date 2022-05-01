@@ -111,7 +111,8 @@ class RaceSpotter extends RaceAssistant {
 		if (this.Session == kSessionFinished) {
 			this.iLastDistanceInformationLap := false
 			this.iPositionInfo := {}
-			
+			this.iGridPosition := false
+	
 			this.iRaceStartSummarized := false
 			this.iFinalLapsAnnounced := false
 		}
@@ -402,7 +403,7 @@ class RaceSpotter extends RaceAssistant {
 		if (this.Session == kSessionRace) {
 			speaker := this.getSpeaker(true)
 			driver := knowledgeBase.getValue("Driver.Car", false)
-			
+				
 			if (driver && this.GridPosition) {
 				currentPosition := knowledgeBase.getValue("Car." . driver . ".Position")
 			
@@ -430,8 +431,14 @@ class RaceSpotter extends RaceAssistant {
 				finally {
 					speaker.finishTalk()
 				}
+				
+				return true
 			}
+			else
+				return false
 		}
+		else
+			return false
 	}
 	
 	updatePerformance(lastLap) {
@@ -539,14 +546,13 @@ class RaceSpotter extends RaceAssistant {
 						this.announceFinalLaps(lastLap)
 					}
 					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap >= 2)) {
-						this.iRaceStartSummarized := true
-
-						this.summarizeRaceStart(lastLap)
+						if this.summarizeRaceStart(lastLap)
+							this.iRaceStartSummarized := true
 					}
 					else if (lastLap > 2) {
 						distanceInformation := this.Warnings["DistanceInformation"]
 						
-						if (true || distanceInformation && (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))) {
+						if (distanceInformation && (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))) {
 							this.iLastDistanceInformationLap := lastLap
 							
 							this.updatePerformance(lastLap)
@@ -615,13 +621,16 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	blueFlag() {
+		local knowledgeBase := this.KnowledgeBase
+		
 		if (this.Warnings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
-				delta := this.KnowledgeBase.getValue("Position.Standings.Behind.Delta", false)
+				delta := knowledgeBase.getValue("Position.Standings.Behind.Delta", false)
+				last := (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 				
-				if (delta && (delta < 2000))
+				if (!last && delta && (delta < 2000))
 					this.getSpeaker(true).speakPhrase("BlueForPosition")
 				else
 					this.getSpeaker(true).speakPhrase("Blue")
@@ -812,6 +821,9 @@ class RaceSpotter extends RaceAssistant {
 		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
+		if !this.GridPosition
+			this.initializeGridPosition(data)
+		
 		if joined {
 			callback := ObjBindMethod(this, "startupSpotter")
 		
@@ -909,6 +921,9 @@ class RaceSpotter extends RaceAssistant {
 			this.iPositionInfo := {}
 			this.iLastDistanceInformationLap := false
 		}
+		
+		if !this.GridPosition
+			this.initializeGridPosition(data)
 		
 		if result
 			this.iDriverUpdate := 4

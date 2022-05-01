@@ -20,7 +20,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Settings.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Race Settings.ico
 ;@Ahk2Exe-ExeName Race Settings.exe
 
 
@@ -59,13 +59,14 @@ global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
 
 global vSilentMode := kSilentMode
 global vTeamMode := true
+global vTestMode := false
 
 global vSimulator := false
 global vCar := false
 global vTrack := false
 global vWeather := "Dry"
 global vAirTemperature := 23
-global vTrackTemperature:= 27
+global vTrackTemperature := 27
 global vCompound := "Dry"
 global vCompoundColor := "Black"
 	
@@ -87,6 +88,19 @@ global changeTyreThresholdLabel
 global spSetupTyreCompoundDropDown
 global spSetupTyreSetEdit
 global spPitstopTyreSetEdit
+
+global fuelConsumptionEdit
+global tyrePressureDeviationEdit
+global pitstopRefuelServiceEdit
+	
+global tpDryFrontLeftEdit
+global tpDryFrontRightEdit
+global tpDryRearLeftEdit
+global tpDryRearRightEdit
+global tpWetFrontLeftEdit
+global tpWetFrontRightEdit
+global tpWetRearLeftEdit
+global tpWetRearRightEdit
 
 global spDryFrontLeftEdit
 global spDryFrontRightEdit
@@ -425,7 +439,7 @@ getValues(map) {
 	
 	return values
 }
-
+	
 editSettings(ByRef settingsOrCommand, arguments*) {
 	static result
 	static newSettings
@@ -436,27 +450,15 @@ editSettings(ByRef settingsOrCommand, arguments*) {
 	static trafficConsideredEdit
 	static pitstopStrategyWindowEdit
 	
-	static tyrePressureDeviationEdit
 	static temperatureCorrectionCheck
 	static setupPressureCompareCheck
-	
-	static tpDryFrontLeftEdit
-	static tpDryFrontRightEdit
-	static tpDryRearLeftEdit
-	static tpDryRearRightEdit
-	static tpWetFrontLeftEdit
-	static tpWetFrontRightEdit
-	static tpWetRearLeftEdit
-	static tpWetRearRightEdit
 	
 	static raceDurationEdit
 	static avgLaptimeEdit
 	static formationLapCheck
 	static postRaceLapCheck
-	static fuelConsumptionEdit
 	static pitstopDeltaEdit
 	static pitstopTyreServiceEdit
-	static pitstopRefuelServiceEdit
 	static pitstopServiceDropDown
 	static safetyFuelEdit
 	
@@ -616,7 +618,9 @@ restart:
 		
 		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit, pitstopRefuelServiceEdit
 				   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
-				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit)
+				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
+				   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
+				   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
 		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
 		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -656,7 +660,7 @@ restart:
 		
 		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 2))
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", safetyFuelEdit)
 		
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
@@ -804,9 +808,14 @@ restart:
 		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
-				
-		Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
-		Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		
+		if !vTestMode {
+			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+		}
+		else
+			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelSettings, % translate("Close")
+		
 		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
 		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
 		
@@ -832,7 +841,7 @@ restart:
 	
 		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", choices*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit, %repairSuspensionThresholdEdit%
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit gvalidateRepairSuspensionThreshold, %repairSuspensionThresholdEdit%
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairSuspensionState()
@@ -845,7 +854,7 @@ restart:
 		
 		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", choices*)
 		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit, %repairBodyworkThresholdEdit%
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit gvalidateRepairBodyworkThreshold, %repairBodyworkThresholdEdit%
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairBodyworkState()
@@ -872,7 +881,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		Gui RES:Add, Text, x16 yp+30 w105 h20 Section, % translate("Deviation Threshold")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit, %tyrePressureDeviationEdit%
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit gvalidateTyrePressureDeviation, %tyrePressureDeviationEdit%
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("PSI")
 		
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
@@ -891,22 +900,22 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit, %tpDryFrontLeftEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit gvalidateTPDryFrontLeft, %tpDryFrontLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit, %tpDryFrontRightEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit gvalidateTPDryFrontRight, %tpDryFrontRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit, %tpDryRearLeftEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit gvalidateTPDryRearLeft, %tpDryRearLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit, %tpDryRearRightEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit gvalidateTPDryRearRight, %tpDryRearRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
@@ -918,22 +927,22 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit, %tpWetFrontLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit gvalidateTPWetFrontLeft, %tpWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit, %tpWetFrontRightEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit gvalidateTPWetFrontRight, %tpWetFrontRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit, %tpWetRearLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit gvalidateTPWetRearLeft, %tpWetRearLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit, %tpWetRearRightEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit gvalidateTPWetRearRight, %tpWetRearRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
@@ -950,7 +959,7 @@ restart:
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
 
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Fuel Consumption")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit, %fuelConsumptionEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit gvalidateFuelConsumption, %fuelConsumptionEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Ltr.")
 
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
@@ -1009,22 +1018,22 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit, %spDryFrontLeftEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit gvalidateSPDryFrontLeft, %spDryFrontLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit, %spDryFrontRightEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit gvalidateSPDryFrontRight, %spDryFrontRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit, %spDryRearLeftEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit gvalidateSPDryRearLeft, %spDryRearLeftEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit, %spDryRearRightEdit%
+		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit gvalidateSPDryRearRight, %spDryRearRightEdit%
 		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
@@ -1036,22 +1045,22 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit, %spWetFrontLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit gvalidateSPWetFrontLeft, %spWetFrontLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit, %spWetFrontRightEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit gvalidateSPWetFrontRight, %spWetFrontRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit, %spWetRearLeftEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit gvalidateSPWetRearLeft, %spWetRearLeftEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit, %spWetRearRightEdit%
+		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit gvalidateSPWetRearRight, %spWetRearRightEdit%
 		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
@@ -1091,7 +1100,7 @@ restart:
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
 
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Refuel Service")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit, %pitstopRefuelServiceEdit%
+		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
@@ -1208,6 +1217,103 @@ restart:
 		
 		return result
 	}
+}
+
+validateNumber(field) {
+	oldValue := %field%
+	
+	GuiControlGet %field%
+	
+	if %field% is not Number
+	{
+		%field% := oldValue
+		
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validateRepairSuspensionThreshold() {
+	validateNumber("repairSuspensionThresholdEdit")
+}
+
+validateRepairBodyworkThreshold() {
+	validateNumber("repairBodyworkThresholdEdit")
+}
+
+validateTPDryFrontLeft() {
+	validateNumber("tpDryFrontLeftEdit")
+}
+
+validateTPDryFrontRight() {
+	validateNumber("tpDryFrontRightEdit")
+}
+
+validateTPDryRearLeft() {
+	validateNumber("tpDryRearLeftEdit")
+}
+
+validateTPDryRearRight() {
+	validateNumber("tpDryRearRightEdit")
+}
+
+validateTPWetFrontLeft() {
+	validateNumber("tpWetFrontLeftEdit")
+}
+
+validateTPWetFrontRight() {
+	validateNumber("tpWetFrontRightEdit")
+}
+
+validateTPWetRearLeft() {
+	validateNumber("tpWetRearLeftEdit")
+}
+
+validateTPWetRearRight() {
+	validateNumber("tpWetRearRightEdit")
+}
+
+validateSPDryFrontLeft() {
+	validateNumber("spDryFrontLeftEdit")
+}
+
+validateSPDryFrontRight() {
+	validateNumber("spDryFrontRightEdit")
+}
+
+validateSPDryRearLeft() {
+	validateNumber("spDryRearLeftEdit")
+}
+
+validateSPDryRearRight() {
+	validateNumber("spDryRearRightEdit")
+}
+
+validateSPWetFrontLeft() {
+	validateNumber("spWetFrontLeftEdit")
+}
+
+validateSPWetFrontRight() {
+	validateNumber("spWetFrontRightEdit")
+}
+
+validateSPWetRearLeft() {
+	validateNumber("spWetRearLeftEdit")
+}
+
+validateSPWetRearRight() {
+	validateNumber("spWetRearRightEdit")
+}
+
+validateTyrePressureDeviation() {
+	validateNumber("tyrePressureDeviationEdit")
+}
+
+validateFuelConsumption() {
+	validateNumber("fuelConsumptionEdit")
+}
+
+validatePitstopRefuelService() {
+	validateNumber("pitstopRefuelServiceEdit")
 }
 
 readSimulatorData(simulator) {
@@ -1373,7 +1479,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 }
 
 showRaceSettingsEditor() {
-	icon := kIconsDirectory . "Artificial Intelligence Settings.ico"
+	icon := kIconsDirectory . "Race Settings.ico"
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
@@ -1423,10 +1529,11 @@ showRaceSettingsEditor() {
 		}
 	}
 	
-	if ((vAirTemperature <= 0) || (vTrackTemperature <= 0)) {
-		vAirTemperature := false
-		vTrackTemperature := false
-	}
+	if (vAirTemperature <= 0)
+		vAirTemperature := 23
+	
+	if (vTrackTemperature <= 0)
+		vTrackTemperature := 27
 	
 	fileName := kRaceSettingsFile
 	
@@ -1442,6 +1549,9 @@ showRaceSettingsEditor() {
 	
 	if inList(A_Args, "-NoTeam")
 		vTeamMode := false
+	
+	if inList(A_Args, "-Test")
+		vTestMode := true
 	
 	index := inList(A_Args, "-Import")
 	

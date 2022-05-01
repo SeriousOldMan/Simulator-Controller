@@ -12,7 +12,7 @@
 #Include ..\Configuration\Libraries\ConfigurationItemList.ahk
 #Include ..\Configuration\Libraries\ButtonBoxPreview.ahk
 #Include ..\Configuration\Libraries\StreamDeckPreview.ahk
-#Include ..\Configuration\Libraries\PluginActionsEditor.ahk
+#Include ..\Configuration\Libraries\ControllerActionsEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -160,7 +160,7 @@ class ControllerEditor extends ConfigurationItem {
 		if saveAndCancel {
 			Gui CTRLE:Add, Text, x8 y620 w424 0x10
 			
-			Gui CTRLE:Add, Button, x8 yp+10 w140 h23 gopenPluginActionsEditor, % translate("Edit Labels && Icons...")
+			Gui CTRLE:Add, Button, x8 yp+10 w140 h23 gopenControllerActionsEditor, % translate("Edit Labels && Icons...")
 		
 			Gui CTRLE:Add, Button, x260 yp w80 h23 Default GsaveControllerEditor, % translate("Save")
 			Gui CTRLE:Add, Button, x352 yp w80 h23 GcancelControllerEditor, % translate("Cancel")
@@ -958,14 +958,16 @@ class LayoutsList extends ConfigurationItemList {
 	addItem() {
 		base.addItem()
 		
-		type := this.ItemList[this.CurrentItem][2]["Type"]
-		
-		GuiControl Text, layoutRowEdit, %layoutRowEdit%
-		
-		preview := ControllerEditor.Instance.ControllerPreview
-		
-		if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
+		if this.CurrentItem {
+			type := this.ItemList[this.CurrentItem][2]["Type"]
+			
+			GuiControl Text, layoutRowEdit, %layoutRowEdit%
+			
+			preview := ControllerEditor.Instance.ControllerPreview
+			
+			if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
+				ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
+		}
 	}
 	
 	clearEditor() {
@@ -1075,9 +1077,12 @@ class LayoutsList extends ConfigurationItemList {
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
 		
-		result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
-		
-		Gui CTRLE:-Disabled
+		try {
+			result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
+		}
+		finally {
+			Gui CTRLE:-Disabled
+		}
 		
 		if result {
 			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())
@@ -1638,7 +1643,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		
 		Gui IRE:Add, Text, x50 yp+30 w232 0x10
 		
-		Gui IRE:Add, Button, x80 yp+20 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
+		Gui IRE:Add, Button, x80 yp+10 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
 		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
 		
 		this.loadLayoutButtons()
@@ -2019,13 +2024,13 @@ openDisplayRulesEditor() {
 	LayoutsList.Instance.openDisplayRulesEditor()
 }
 
-openPluginActionsEditor() {
+openControllerActionsEditor() {
 	owner := ControllerEditor.Instance.Window
 	Gui CTRLE:+Disabled
 		
 	Gui PAE:+OwnerCTRLE
 	
-	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions()
+	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
 	
 	Gui CTRLE:-Disabled
 }

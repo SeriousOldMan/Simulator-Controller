@@ -11,6 +11,7 @@
 
 global ApplicationClass = Application	; Spooky, sometimes the reference to Application is lost
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -71,8 +72,6 @@ class ApplicationsStepWizard extends StepWizard {
 		for group, applications in groups
 			for ignore, theApplication in applications
 				setConfigurationValue(configuration, "Applications", group . "." . A_Index, theApplication)
-		
-		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -100,7 +99,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+30 w%width% h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -132,7 +131,7 @@ class ApplicationsStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+30 w%width% h260 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h260 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"

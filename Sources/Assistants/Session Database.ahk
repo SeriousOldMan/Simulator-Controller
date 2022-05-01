@@ -148,12 +148,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSelectedSimulator := false
 	iSelectedCar := true
 	iSelectedTrack := true
-	iSelectedWeather := "Dry"
+	iSelectedWeather := true
 	
 	iLastTracks := []
+	iLastTrackNames := []
 	
-	iAirTemperature := 27
-	iTrackTemperature := 31
+	iAirTemperature := 23
+	iTrackTemperature := 27
 	iTyreCompound := "Dry"
 	iTyreCompoundColor := "Black"
 	
@@ -168,19 +169,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	iSettings := []
 	
+	class EditorTyresDatabase extends TyresDatabase {
+		__New(controllerConfiguration := false) {
+			base.__New()
+			
+			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity
+		}
+	}
+	
 	Window[] {
 		Get {
 			return "SDE"
 		}
 	}
 	
-	UseCommunity[] {
+	UseCommunity[persistent := false] {
 		Get {
 			return this.SessionDatabase.UseCommunity
 		}
 		
 		Set {
-			return (this.SessionDatabase.UseCommunity := value)
+			return (this.SessionDatabase.UseCommunity[persistent] := value)
 		}
 	}
 	
@@ -267,7 +276,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	__New(simulator := false, car := false, track := false
 		, weather := false, airTemperature := false, trackTemperature := false, compound := false, compoundColor := false) {
 		if simulator {
-			this.iSelectedSimulator := simulator
+			this.iSelectedSimulator := this.SessionDatabase.getSimulatorName(simulator)
 			this.iSelectedCar := car
 			this.iSelectedTrack := track
 			this.iSelectedWeather := weather
@@ -339,14 +348,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
 		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vtrackDropDown gchooseTrack, % translate("All")
 		
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Wetter")
+		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Weather")
 		
 		choices := map(kWeatherOptions, "translate")
 		choices.InsertAt(1, translate("All"))
 		chosen := inList(kWeatherOptions, weather)
 		
 		if (!chosen && (choices.Length() > 0)) {
-			weather := choices[1]
+			weather := true
 			chosen := 1
 		}
 		
@@ -402,7 +411,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		this.iSettingsListView := settingsListViewHandle
 		
-		Gui %window%:Add, Text, x296 yp+224 w80 h23 +0x200, % translate("Setting")
+		Gui %window%:Add, Text, x296 yp+228 w80 h23 +0x200, % translate("Setting")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 vsettingDropDown gselectSetting
 		
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
@@ -556,6 +565,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return this.SessionDatabase.getCarName(simulator, car)
 	}
 	
+	getTrackName(simulator, track) {
+		return this.SessionDatabase.getTrackName(simulator, track, false)
+	}
+	
 	updateState() {
 		window := this.Window
 	
@@ -566,34 +579,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		track := this.SelectedTrack
 		
 		if simulator {
-			this.iAvailableModules["Settings"] := true
-			
-			if ((car && (car != true)) && (track && (track != true))) {
-				this.iAvailableModules["Setups"] := true
-				this.iAvailableModules["Pressures"] := true
-			}
-			else {
-				this.iAvailableModules["Setups"] := false
-				this.iAvailableModules["Pressures"] := false
-				
+			if !((car && (car != true)) && (track && (track != true)))
 				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
-			}
 		}
-		else {
-			this.iAvailableModules["Settings"] := false
-			this.iAvailableModules["Setups"] := false
-			this.iAvailableModules["Pressures"] := false
-			
+		else
 			GuiControl Choose, settingsTab, 0
-		}
 		
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg1
+			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -601,10 +601,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg2
+			GuiControl, , settingsImg2, %kIconsDirectory%Tools Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -612,10 +614,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Pressures") {
 			GuiControl Enable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg3
+			GuiControl, , settingsImg3, %kIconsDirectory%Pressure Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -682,7 +686,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			GuiControl Choose, settingDropDown, 0
 			GuiControl Choose, settingValueDropDown, 0
-			GuiControl, , settingValueEdit, % ""
+			
+			settingValueEdit := ""
+			GuiControl, , settingValueEdit, %settingValueEdit%
 		}
 		
 		if (this.getAvailableSettings().Length() == 0)
@@ -699,6 +705,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			this.iSelectedSimulator := simulator
 			this.iLastTracks := []
+			this.iLastTrackNames := []
 			
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 			
@@ -729,20 +736,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car) + 1
 			
 			if (car && (car != true)) {
-				choices := this.getTracks(this.SelectedSimulator, car)
+				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
+				trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 				
-				this.iLastTracks := choices.Clone()
+				tracks.InsertAt(1, true)
+				trackNames.InsertAt(1, translate("All"))
 				
-				choices.InsertAt(1, translate("All"))
-			
-				GuiControl, , trackDropDown, % "|" . values2String("|", choices*)
+				this.iLastTracks := tracks
+				this.iLastTrackNames := trackNames
+				
+				GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
 				
 				this.loadTrack(true, true)
 			}
-			else if (this.iLastTracks.Length() > 0)
+			else if (this.iLastTrackNames.Length() > 0)
 				this.updateModules()
-			else
+			else {
+				GuiControl, , trackDropDown, % "|" . translate("All")
+			
 				this.loadTrack(true, true)
+			}
 		}
 	}
 	
@@ -755,22 +768,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %window%:Default
 			
 			if (track == true) {
-				if (this.iLastTracks.Length() > 0) {
-					index := (inList(this.iLastTracks, track) + 1)
-					
-					if (index == 1)
-						this.iSelectedTrack := true
-					
-					GuiControl Choose, trackDropDown, % index
-				}
-				else
-					GuiControl Choose, trackDropDown, 1
+				this.iSelectedTrack := true
+				
+				GuiControl Choose, trackDropDown, 1
 			}
 			else if (this.iLastTracks.Length() > 0)
-				GuiControl Choose, trackDropDown, % inList(this.iLastTracks, track) + 1
+				GuiControl Choose, trackDropDown, % inList(this.iLastTracks, track)
 			else
-				GuiControl Choose, trackDropDown, % inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1
-		
+				GuiControl Choose, trackDropDown, % (inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
+			
 			this.updateModules()
 		}
 	}
@@ -807,18 +813,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
 
 			userSetups := true
-			communitySetups := true
+			communitySetups := this.UseCommunity
 			
 			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
 			
-			for type, setups in userSetups
-				if (type = setupType)
-					for ignore, name in setups
-						LV_Add("", translate("Local"), name)
+			userSetups := userSetups[setupType]
 			
-			for type, setups in communitySetups
-				if (type = setupType)
-					for ignore, name in setups
+			for ignore, name in userSetups
+				LV_Add("", translate("Local"), name)
+			
+			if communitySetups
+				for ignore, name in communitySetups[setupType]
+					if !inList(userSetups, name)
 						LV_Add("", translate("Community"), name)
 			
 			LV_ModifyCol()
@@ -908,11 +914,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case "AllWeather":
 						reference := (translate("Weather: ") . translate("All"))
 					case "Car":
-						reference := (translate("Car: ") . this.SelectedCar)
+						reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
 					case "Track":
-						reference := (translate("Track: ") . this.SelectedTrack)
+						reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
 					case "Weather":
-						reference := (translate("Weather: ") . this.SelectedWeather)
+						reference := (translate("Weather: ") . translate(this.SelectedWeather))
 				}
 				
 				LV_Add("", reference, count)
@@ -968,9 +974,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 			LV_InsertCol(A_Index, "", column)
 		
-		tyresDB := new TyresDatabase()
-		
-		for ignore, info in tyresDB.getPressureInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather)
+		for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
+																		 , this.SelectedTrack, this.SelectedWeather)
 			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
 					 , translate(info.Compound), info.Count)
 	
@@ -983,6 +988,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	moduleAvailable(module) {
+		simulator := this.SelectedSimulator
+		car := this.SelectedCar
+		track := this.SelectedTrack
+		
+		if simulator {
+			this.iAvailableModules["Settings"] := true
+			
+			if ((car && (car != true)) && (track && (track != true))) {
+				this.iAvailableModules["Setups"] := true
+				this.iAvailableModules["Pressures"] := true
+			}
+			else {
+				this.iAvailableModules["Setups"] := false
+				this.iAvailableModules["Pressures"] := false
+			}
+		}
+		else {
+			this.iAvailableModules["Settings"] := false
+			this.iAvailableModules["Setups"] := false
+			this.iAvailableModules["Pressures"] := false
+		}
+		
 		return this.iAvailableModules[module]
 	}
 	
@@ -1013,7 +1040,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		GuiControl, , notesEdit, % this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 		
-		this.selectModule(this.SelectedModule, true)
+		if this.moduleAvailable(this.SelectedModule)
+			this.selectModule(this.SelectedModule, true)
+		else
+			this.selectModule("Settings", true)
 	}
 	
 	updateNotes(notes) {
@@ -1061,12 +1091,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 	getAvailableSettings(selection := false) {
 		if (vSettingDescriptors.Count() = 0) {
-			fileName := getFileName("Settings." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory)
+			fileName := ("Settings." . getLanguage())
 			
-			if !FileExist(fileName)
-				fileName := getFileName("Settings.en", kUserTranslationsDirectory, kTranslationsDirectory)
+			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory))
+				fileName := "Settings.en"
 			
-			vSettingDescriptors := readConfiguration(fileName)
+			vSettingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+			
+			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(vSettingDescriptors, section, key, value)
 		}
 		
 		settings := []
@@ -1187,8 +1221,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
-		tyresDB := new TyresDatabase()
-		
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
 		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
@@ -1210,8 +1242,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				else
 					compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 				
-				pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedWeather
-													, airTemperatureEdit, trackTemperatureEdit, compound[1], compoundColor)
+				pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+																		   , this.SelectedTrack, this.SelectedWeather
+																		   , airTemperatureEdit, trackTemperatureEdit
+																		   , compound[1], compoundColor)
 
 				if (pressureInfos.Count() == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
@@ -1278,10 +1312,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 			
-		GuiControlGet simulatorDropDown
-		GuiControlGet carDropDown
-		GuiControlGet trackDropDown
-
 		title := translate("Upload Setup File...")
 					
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
@@ -1309,10 +1339,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 			
-		GuiControlGet simulatorDropDown
-		GuiControlGet carDropDown
-		GuiControlGet trackDropDown
-
 		title := translate("Download Setup File...")
 					
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
@@ -1320,7 +1346,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 		
 		if (fileName != "") {
-			
 			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 			
 			try {
@@ -1351,10 +1376,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		IfMsgBox Yes
 		{
-			GuiControlGet simulatorDropDown
-			GuiControlGet carDropDown
-			GuiControlGet trackDropDown
-			
 			this.SessionDatabase.removeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName)
 			
 			this.loadSetups(this.SelectedSetupType, true)
@@ -1376,10 +1397,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
 		
 		if !ErrorLevel {
-			GuiControlGet simulatorDropDown
-			GuiControlGet carDropDown
-			GuiControlGet trackDropDown
-			
 			if (StrLen(curExtension) > 0)
 				newName .= ("." . curExtension)
 			
@@ -1487,7 +1504,17 @@ chooseTrack() {
 	
 	GuiControlGet trackDropDown
 	
-	editor.loadTrack((trackDropDown = translate("All")) ? true : trackDropDown)
+	if (trackDropDown = translate("All"))
+		editor.loadTrack(true)
+	else if (editor.iLastTrackNames.Length() > 0)
+		editor.loadTrack(editor.iLastTracks[inList(editor.iLastTrackNames, trackDropDown)])
+	else {
+		simulator := editor.SelectedSimulator
+		tracks := editor.getTracks(simulator, editor.SelectedCar)
+		trackNames := map(tracks, ObjBindMethod(editor, "getTrackName", simulator))
+		
+		editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
+	}
 }
 
 chooseWeather() {
@@ -1581,8 +1608,11 @@ chooseSetting() {
 		
 		GuiControlGet settingValueEdit
 		
-		if (settingValueEdit != value)
-			GuiControl, , settingValueEdit, % value
+		if (settingValueEdit != value) {
+			settingValueEdit := value
+		
+			GuiControl, , settingValueEdit, %value%
+		}
 	}
 	
 	editor.updateState()
@@ -1643,6 +1673,7 @@ addSetting() {
 		else if (type = "Text")
 			value := ""
 		
+		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
 	}
 	
@@ -1746,6 +1777,7 @@ selectSetting() {
 		else if (type = "Text")
 			value := ""
 		
+		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
 	}
 	
@@ -1793,12 +1825,14 @@ changeSetting() {
 		value := settingValueCheck
 	}
 	else {
+		oldValue := settingValueEdit
+	
 		GuiControlGet settingValueEdit
 	
 		if (type = "Integer") {
 			if settingValueEdit is not Integer
 			{
-				settingValueEdit := Round(settingValueEdit)
+				settingValueEdit := oldValue
 				
 				GuiControl, , settingValueEdit, %settingValueEdit%
 			}
@@ -1806,7 +1840,7 @@ changeSetting() {
 		else if (type = "Float") {
 			if settingValueEdit is not Number
 			{
-				settingValueEdit := 0.0
+				settingValueEdit := oldValue
 				
 				GuiControl, , settingValueEdit, %settingValueEdit%
 			}
@@ -1933,9 +1967,23 @@ chooseDatabaseScope() {
 			
 	GuiControlGet databaseScopeDropDown
 	
-	editor.UseCommunity := (databaseScopeDropDown == 2)
-	
-	editor.loadSimulator(editor.SelectedSimulator, true)
+	persistent := false
+		
+	if GetKeyState("Ctrl", "P") {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Modular Simulator Controller System")
+		MsgBox 262436, %title%, % translate("Do you really want to change the scope for all applications?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+			persistent := true
+	}
+		
+	if (persistent || ((databaseScopeDropDown == 2) != editor.UseCommunity)) {
+		editor.UseCommunity[persistent] := (databaseScopeDropDown == 2)
+		
+		editor.loadSimulator(editor.SelectedSimulator, true)
+	}
 }
 
 transferPressures() {
@@ -1958,10 +2006,10 @@ transferPressures() {
 	
 	compound := compound[1]
 	
-	tyresDB := new TyresDatabase()
-		
-	for ignore, pressureInfo in tyresDB.getPressures(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, editor.SelectedWeather
-												   , airTemperatureEdit, trackTemperatureEdit, compound, compoundColor)
+	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
+																			, editor.SelectedTrack, editor.SelectedWeather
+																			, airTemperatureEdit, trackTemperatureEdit
+																			, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 	
 	raiseEvent(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)
@@ -1982,7 +2030,7 @@ testSettings() {
 																 
 		writeConfiguration(fileName, settings)
 				
-		options := "-NoTeam -File """ . fileName . """"
+		options := "-NoTeam -Test -File """ . fileName . """"
 		
 		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
@@ -2003,7 +2051,7 @@ showSessionDatabaseEditor() {
 	simulator := false
 	car := false
 	track := false
-	weather := "Dry"
+	weather := false
 	airTemperature := 23
 	trackTemperature:= 27
 	compound := "Dry"
@@ -2045,10 +2093,11 @@ showSessionDatabaseEditor() {
 		}
 	}
 	
-	if ((airTemperature <= 0) || (trackTemperature <= 0)) {
-		airTemperature := false
-		trackTemperature := false
-	}
+	if (airTemperature <= 0)
+		airTemperature := 23
+	
+	if (trackTemperature <= 0)
+		trackTemperature := 27
 	
 	protectionOn()
 	

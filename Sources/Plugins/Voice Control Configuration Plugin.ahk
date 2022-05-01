@@ -45,6 +45,8 @@ global soXPathLabel1
 global soXPathLabel2
 global soXPathEdit = ""
 global soXPathButton
+global voiceRecognizerLabel
+global voiceRecognizerDropDown = 1
 global listenerLabel
 global listenerDropDown = ""
 global pushToTalkLabel
@@ -59,12 +61,18 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	iLanguages := []
 	iRecognizers := []
 	
-	iMode := false
-
+	iSynthesizerMode := false
+	iRecognizerMode := false
+	
 	iTopWidgets := []
-	iWindowsVoiceWidgets := []
-	iAzureVoiceWidgets := []
+	iBottomWidgets := []
+	iWindowsSynthesizerWidgets := []
+	iAzureSynthesizerWidgets := []
+	iAzureRecognizerWidgets := []
 	iOtherWidgets := []
+	
+	iTopAzureCredentialsVisible := false
+	iBottomAzureCredentialsVisible := false
 	
 	iCorrection := 0
 	
@@ -108,7 +116,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				enIndex := A_Index
 		}
 			
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+		for ignore, grammarFile in concatenate(getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Strategist.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)
+											 , getFileNames("Race Spotter.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory)) {
 			SplitPath grammarFile, , , code
 		
 			if !languages.HasKey(code) {
@@ -137,15 +147,17 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		w2 := w1 - 26
 		
 		x3 := x1 + w2 + 2
+		x4 := x2 + 24 + 8
+		w4 := width - (x4 - x)
 		
 		Gui %window%:Add, Text, x%x% y%y% w110 h23 +0x200 HWNDwidget1 Hidden, % translate("Language")
-		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateVoices Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateLanguage Hidden, % values2String("|", choices*)
 		
-		choices := ["Windows Speech", "Azure Cognitive Services"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services"]
 		chosen := voiceSynthesizerDropDown
 		
 		Gui %window%:Add, Text, x%x% yp+32 w110 h23 +0x200 HWNDwidget3 Section Hidden, % translate("Speech Synthesizer")
-		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget4 gchooseVoiceSynthesizer VvoiceSynthesizerDropDown Hidden, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget4 gchooseVoiceSynthesizer VvoiceSynthesizerDropDown Hidden, % values2String("|", choices*)
 		
 		this.iTopWidgets := [[widget1, widget2], [widget3, widget4]]
 		
@@ -155,27 +167,33 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% HWNDwidget6 VwindowsSpeakerDropDown Hidden, % values2String("|", voices*)
 		
 		Gui %window%:Add, Text, x%x% ys+24 w110 h23 +0x200 HWNDwidget6 VwindowsSpeakerVolumeLabel Hidden, % translate("Volume")
-		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range0-100 ToolTip HWNDwidget7 VspeakerVolumeSlider Hidden, % speakerVolumeSlider
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range0-100 ToolTip HWNDwidget7 VspeakerVolumeSlider Hidden, % speakerVolumeSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget8 VwindowsSpeakerPitchLabel Hidden, % translate("Pitch")
-		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range-10-10 ToolTip HWNDwidget9 VspeakerPitchSlider Hidden, % speakerPitchSlider
+		Gui %window%:Add, Text, x%x% yp+22 w110 h23 +0x200 HWNDwidget8 VwindowsSpeakerPitchLabel Hidden, % translate("Pitch")
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range-10-10 ToolTip HWNDwidget9 VspeakerPitchSlider Hidden, % speakerPitchSlider
 		
-		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget10 VwindowsSpeakerSpeedLabel Hidden, % translate("Speed")
-		Gui %window%:Add, Slider, x%x1% yp w135 0x10 Range-10-10 ToolTip HWNDwidget11 VspeakerSpeedSlider Hidden, % speakerSpeedSlider
+		Gui %window%:Add, Text, x%x% yp+22 w110 h23 +0x200 HWNDwidget10 VwindowsSpeakerSpeedLabel Hidden, % translate("Speed")
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range-10-10 ToolTip HWNDwidget11 VspeakerSpeedSlider Hidden, % speakerSpeedSlider
 		
-		this.iWindowsVoiceWidgets := [["windowsSpeakerLabel", "windowsSpeakerDropDown"]]
+		this.iWindowsSynthesizerWidgets := [["windowsSpeakerLabel", "windowsSpeakerDropDown"]]
 		
-		Gui %window%:Add, Text, x%x% yp+24 w140 h23 +0x200 HWNDwidget12 VsoXPathLabel1 Hidden, % translate("SoX Folder (optional)")
+		Gui %window%:Add, Text, x%x% yp+26 w140 h23 +0x200 HWNDwidget12 VsoXPathLabel1 Hidden, % translate("SoX Folder (optional)")
 		Gui %window%:Font, c505050 s8
 		Gui %window%:Add, Text, x%x0% yp+18 w133 h23 HWNDwidget13 VsoXPathLabel2 Hidden, % translate("(Post Processing)")
 		Gui %window%:Font
 		Gui %window%:Add, Edit, x%x1% yp-19 w%w2% h21 HWNDwidget14 VsoXPathEdit Hidden, %soXPathEdit%
 		Gui %window%:Add, Button, x%x3% yp w23 h23 gchooseSoXPath HWNDwidget15 VsoXPathButton Hidden, % translate("...")
 
-		recognizers := new SpeechRecognizer(false, false, true).getRecognizerList().Clone()
+		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services"]
+		chosen := voiceRecognizerDropDown
 		
-		Loop % recognizers.Length()
-			recognizers[A_Index] := recognizers[A_Index].Name
+		Gui %window%:Add, Text, x%x% yp+42 w110 h23 +0x200 HWNDwidget21 vvoiceRecognizerLabel Hidden, % translate("Speech Recognizer")
+		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget29 gchooseVoiceRecognizer VvoiceRecognizerDropDown Hidden, % values2String("|", choices*)
+		
+		if (voiceRecognizerDropDown = 3)
+			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		else
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -187,23 +205,23 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := 1
 		
-		Gui %window%:Add, Text, x%x% yp+42 w110 h23 +0x200 HWNDwidget16 VlistenerLabel Hidden, % translate("Speech Recognizer")
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget16 VlistenerLabel Hidden, % translate("Recognizer Engine")
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% Choose%chosen% HWNDwidget17 VlistenerDropDown Hidden, % values2String("|", recognizers*)
 		
-		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget18 VpushToTalkLabel Hidden, % translate("Push To Talk")
+		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget18 VpushToTalkLabel Hidden, % translate("P2T / Activation")
 		Gui %window%:Add, Edit, x%x1% yp w110 h21 HWNDwidget19 VpushToTalkEdit Hidden, %pushToTalkEdit%
 		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 HWNDwidget20 ggetPTTHotkey VpushToTalkButton Hidden
 		setButtonIcon(widget20, kIconsDirectory . "Key.ico", 1)
+		Gui %window%:Add, Edit, x%x4% yp+1 w%w4% h21 HWNDwidget22 VactivationCommandEdit Hidden, %activationCommandEdit%
 		
-		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget21 VactivationCommandLabel Hidden, % translate("Activation Command")
-		Gui %window%:Add, Edit, x%x1% yp w135 h21 HWNDwidget22 VactivationCommandEdit Hidden, %activationCommandEdit%
-		
+		this.iBottomWidgets := [["listenerLabel", "listenerDropDown"]
+							  , ["pushToTalkLabel", "pushToTalkEdit", "pushToTalkButton", "activationCommandEdit"]]
 		this.iOtherWidgets := [["windowsSpeakerVolumeLabel", "speakerVolumeSlider"]
 							 , ["windowsSpeakerPitchLabel", "speakerPitchSlider"]
 							 , ["windowsSpeakerSpeedLabel", "speakerSpeedSlider"]
 							 , ["soXPathLabel1", "soXPathLabel2", "soXPathEdit", "soXPathButton"]
-							 , ["listenerLabel", "listenerDropDown"], ["pushToTalkLabel", "pushToTalkEdit", "pushToTalkButton"],
-							 , ["activationCommandLabel", "activationCommandEdit"]]
+							 , ["voiceRecognizerLabel", "voiceRecognizerDropDown"], ["listenerLabel", "listenerDropDown"]
+							 , ["pushToTalkLabel", "pushToTalkEdit", "pushToTalkButton", "activationCommandEdit"]]
 		
 		Gui %window%:Add, Text, x%x% ys+24 w140 h23 +0x200 HWNDwidget23 VazureSubscriptionKeyLabel Hidden, % translate("Subscription Key")
 		Gui %window%:Add, Edit, x%x1% yp w%w1% h21 HWNDwidget24 VazureSubscriptionKeyEdit GupdateAzureVoices Hidden, %azureSubscriptionKeyEdit%
@@ -216,22 +234,32 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+24 w110 h23 +0x200 HWNDwidget27 VazureSpeakerLabel Hidden, % translate("Voice")
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% HWNDwidget28 VazureSpeakerDropDown Hidden, % values2String("|", voices*)
 		
-		this.iAzureVoiceWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"], ["azureSpeakerLabel", "azureSpeakerDropDown"]]
+		this.iAzureSynthesizerWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"], ["azureSpeakerLabel", "azureSpeakerDropDown"]]
+		this.iAzureRecognizerWidgets := [["azureSubscriptionKeyLabel", "azureSubscriptionKeyEdit"], ["azureTokenIssuerLabel", "azureTokenIssuerEdit"]]
 
-		this.updateVoices()
+		this.updateLanguage(false)
 		
 		Loop 28
 			editor.registerWidget(this, widget%A_Index%)
 		
 		hideWidgets(this.iTopWidgets)
-		hideWidgets(this.iWindowsVoiceWidgets)
-		hideWidgets(this.iAzureVoiceWidgets)
+		hideWidgets(this.iWindowsSynthesizerWidgets)
+		hideWidgets(this.iAzureSynthesizerWidgets)
 		hideWidgets(this.iOtherWidgets)
 		
 		if (voiceSynthesizerDropDown == 1)
-			this.showWindowsVoiceEditor()
+			this.showWindowsSynthesizerEditor()
+		else if (voiceSynthesizerDropDown == 2)
+			this.showDotNETSynthesizerEditor()
 		else
-			this.showAzureVoiceEditor()
+			this.showAzureSynthesizerEditor()
+		
+		if (voiceRecognizerDropDown == 1)
+			this.showServerRecognizerEditor()
+		else if (voiceRecognizerDropDown== 2)
+			this.showDesktopRecognizerEditor()
+		else
+			this.showAzureRecognizerEditor()
 	}
 	
 	loadFromConfiguration(configuration) {
@@ -245,7 +273,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else
 			voiceLanguageDropDown := languageCode
 		
-		voiceSynthesizerDropDown := inList(["Windows", "Azure"], getConfigurationValue(configuration, "Voice Control", "Synthesizer", "Windows"))
+		synthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+		if (InStr(synthesizer, "Azure") == 1)
+			synthesizer := "Azure"
+		
+		recognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
+		if (InStr(recognizer, "Azure") == 1)
+			recognizer := "Azure"
+		
+		voiceSynthesizerDropDown := inList(["Windows", "dotNET", "Azure"], synthesizer)
+		voiceRecognizerDropDown := inList(["Server", "Desktop", "Azure"], recognizer)
 		
 		azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
 		windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(configuration, "Voice Control", "Speaker", true))
@@ -269,16 +306,22 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (activationCommandEdit = false)
 			activationCommandEdit := ""
 		
-		if (windowsSpeakerDropDown == true)
-			windowsSpeakerDropDown := translate("Automatic")
-		else if (windowsSpeakerDropDown == false)
-			windowsSpeakerDropDown := translate("Deactivated")
-
-		if this.Configuration
+		if this.Configuration {
+			if (windowsSpeakerDropDown == true)
+				windowsSpeakerDropDown := translate("Automatic")
+			else if (windowsSpeakerDropDown == false)
+				windowsSpeakerDropDown := translate("Deactivated")
+			
+			if (azureSpeakerDropDown == true)
+				azureSpeakerDropDown := translate("Automatic")
+			else if (azureSpeakerDropDown == false)
+				azureSpeakerDropDown := translate("Deactivated")
+		
 			if (listenerDropDown == true)
 				listenerDropDown := translate("Automatic")
 			else if (listenerDropDown == false)
 				listenerDropDown := translate("Deactivated")
+		}
 	}
 	
 	saveToConfiguration(configuration) {
@@ -291,9 +334,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 			
 		GuiControlGet voiceSynthesizerDropDown
-		
-		setConfigurationValue(configuration, "Voice Control", "Synthesizer", ["Windows", "Azure"][voiceSynthesizerDropDown])
-		
+		GuiControlGet voiceRecognizerDropDown
 		GuiControlGet windowsSpeakerDropDown
 		GuiControlGet azureSpeakerDropDown
 		GuiControlGet azureSubscriptionKeyEdit
@@ -304,24 +345,31 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else if ((windowsSpeakerDropDown = translate("Deactivated")) || (windowsSpeakerDropDown = A_Space))
 			windowsSpeakerDropDown := false
 
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
-		
 		if (azureSpeakerDropDown = translate("Automatic"))
 			azureSpeakerDropDown := true
 		else if ((azureSpeakerDropDown = translate("Deactivated")) || (azureSpeakerDropDown = A_Space))
 			azureSpeakerDropDown := false
 		
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
-		
-		if (voiceSynthesizerDropDown == 1) {
-			setConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+		if (voiceSynthesizerDropDown = 1) {
+			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "Windows")
 			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		}
+		else if (voiceSynthesizerDropDown = 2) {
+			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeakerDropDown)
 		}
 		else {
-			setConfigurationValue(configuration, "Voice Control", "Service", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
+			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
 			setConfigurationValue(configuration, "Voice Control", "Speaker", azureSpeakerDropDown)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
-
+		
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "SubscriptionKey", azureSubscriptionKeyEdit)
 		setConfigurationValue(configuration, "Voice Control", "TokenIssuer", azureTokenIssuerEdit)
 
@@ -342,6 +390,11 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			listenerDropDown := true
 		else if ((listenerDropDown = translate("Deactivated")) || (listenerDropDown = A_Space))
 			listenerDropDown := false
+		
+		if (voiceRecognizerDropDown <= 2)
+			setConfigurationValue(configuration, "Voice Control", "Recognizer", ["Server", "Desktop"][voiceRecognizerDropDown])
+		else
+			setConfigurationValue(configuration, "Voice Control", "Recognizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
 		
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
@@ -389,11 +442,16 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControl Choose, voiceLanguageDropDown, %chosen%
 		
 		GuiControl Choose, voiceSynthesizerDropDown, %voiceSynthesizerDropDown%
+		GuiControl Choose, voiceRecognizerDropDown, %voiceRecognizerDropDown%
 		
 		GuiControl, , azureSubscriptionKeyEdit, %azureSubscriptionKeyEdit%
 		GuiControl, , azureTokenIssuerEdit, %azureTokenIssuerEdit%
 		
-		this.updateWindowsVoices(configuration)
+		if (voiceSynthesizerDropDown = 1)
+			this.updateWindowsVoices(configuration)
+		else if (voiceSynthesizerDropDown = 2)
+			this.updateDotNETVoices(configuration)
+		
 		this.updateAzureVoices(configuration)
 		
 		GuiControl, , speakerVolumeSlider, %speakerVolumeSlider%
@@ -409,11 +467,20 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else if (listenerDropDown == false)
 			listenerDropDown := translate("Deactivated")
 
-		chosen := inList(this.iRecognizers, listenerDropDown)
+		if (voiceRecognizerDropDown = 3)
+			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		else
+			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+		
+		recognizers.InsertAt(1, translate("Deactivated"))
+		recognizers.InsertAt(1, translate("Automatic"))
+		
+		chosen := inList(recognizers, listenerDropDown)
 		
 		if (chosen == 0)
 			chosen = 1
 		
+		GuiControl, , listenerDropDown, % "|" . values2String("|", recognizers*)
 		GuiControl Choose, listenerDropDown, % chosen
 		
 		GuiControl, , pushToTalkEdit, %pushToTalkEdit%
@@ -421,80 +488,192 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	showWidgets() {
+		GuiControlGet voiceSynthesizerDropDown
+		
 		if !voiceSynthesizerDropDown
 			voiceSynthesizerDropDown := 1
 		
 		if (voiceSynthesizerDropDown == 1)
-			this.showWindowsVoiceEditor()
+			this.showWindowsSynthesizerEditor()
+		else if (voiceSynthesizerDropDown == 2)
+			this.showDotNETSynthesizerEditor()
 		else
-			this.showAzureVoiceEditor()
+			this.showAzureSynthesizerEditor()
+		
+		GuiControlGet voiceRecognizerDropDown
+		
+		if !voiceRecognizerDropDown
+			voiceRecognizerDropDown := 1
+		
+		if (voiceRecognizerDropDown == 1)
+			this.showServerRecognizerEditor()
+		else if (voiceRecognizerDropDown == 2)
+			this.showDesktopRecognizerEditor()
+		else
+			this.showAzureRecognizerEditor()
 	}
 	
 	hideWidgets() {
-		if (this.iMode = "Windows")
-			this.hideWindowsVoiceEditor()
-		else if (this.iMode = "Azure")
-			this.hideAzureVoiceEditor()
+		if (this.iSynthesizerMode = "Windows")
+			this.hideWindowsSynthesizerEditor()
+		else if (this.iSynthesizerMode = "dotNET")
+			this.hideDotNETSynthesizerEditor()
+		else if (this.iSynthesizerMode = "Azure")
+			this.hideAzureSynthesizerEditor()
 		else {
 			hideWidgets(this.iTopWidgets)
-			hideWidgets(this.iWindowsVoiceWidgets)
-			hideWidgets(this.iAzureVoiceWidgets)
+			hideWidgets(this.iWindowsSynthesizerWidgets)
+			hideWidgets(this.iAzureSynthesizerWidgets)
 			hideWidgets(this.iOtherWidgets)
 		}
+		
+		if (this.iRecognizerMode = "Server")
+			this.hideServerRecognizerEditor()
+		else if (this.iRecognizerMode = "Desktop")
+			this.hideDesktopRecognizerEditor()
+		else if (this.iRecognizerMode = "Azure")
+			this.hideAzureRecognizerEditor()
+	
+		this.iTopAzureCredentialsVisible := false
+		this.iBottomAzureCredentialsVisible := false
 	}
 	
-	showWindowsVoiceEditor() {
+	showWindowsSynthesizerEditor() {
 		showWidgets(this.iTopWidgets)
-		showWidgets(this.iWindowsVoiceWidgets)
+		showWidgets(this.iWindowsSynthesizerWidgets)
 
-		if (this.iMode == false)
-			transposeWidgets(this.iOtherWidgets, 24 * this.iWindowsVoiceWidgets.Length(), this.iCorrection)
+		if (this.iSynthesizerMode == false)
+			transposeWidgets(this.iOtherWidgets, 24 * this.iWindowsSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.showWindowsVoiceEditor..."
+			Throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
 		
 		showWidgets(this.iOtherWidgets)
 		
-		this.iMode := "Windows"
+		this.iSynthesizerMode := "Windows"
 	}
 	
-	hideWindowsVoiceEditor() {
+	showDotNETSynthesizerEditor() {
+		this.showWindowsSynthesizerEditor()
+		
+		this.iSynthesizerMode := "dotNET"
+	}
+	
+	hideWindowsSynthesizerEditor() {
 		hideWidgets(this.iTopWidgets)
-		hideWidgets(this.iWindowsVoiceWidgets)
+		hideWidgets(this.iWindowsSynthesizerWidgets)
 		hideWidgets(this.iOtherWidgets)
 		
-		if (this.iMode == "Windows")
-			transposeWidgets(this.iOtherWidgets, -24 * this.iWindowsVoiceWidgets.Length(), this.iCorrection)
+		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
+			transposeWidgets(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.hideWindowsVoiceEditor..."
+			Throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
 		
-		this.iMode := false
+		this.iSynthesizerMode := false
 	}
 	
-	showAzureVoiceEditor() {
+	hideDotNETSynthesizerEditor() {
+		this.hideWindowsSynthesizerEditor()
+	}
+	
+	showAzureSynthesizerEditor() {
+		wasOpen := false
+		
+		if this.iBottomAzureCredentialsVisible {
+			wasOpen := true
+			
+			this.hideAzureRecognizerEditor()
+		}
+		
 		showWidgets(this.iTopWidgets)
-		showWidgets(this.iAzureVoiceWidgets)
+		showWidgets(this.iAzureSynthesizerWidgets)
 		
-		if (this.iMode == false)
-			transposeWidgets(this.iOtherWidgets, 24 * this.iAzureVoiceWidgets.Length(), this.iCorrection)
+		this.iTopAzureCredentialsVisible := true
+		
+		if (this.iSynthesizerMode == false)
+			transposeWidgets(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.showAzureVoiceEditor..."
+			Throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
+		
+		if wasOpen
+			this.showAzureRecognizerEditor()
 		
 		showWidgets(this.iOtherWidgets)
 		
-		this.iMode := "Azure"
+		this.iSynthesizerMode := "Azure"
 	}
 	
-	hideAzureVoiceEditor() {
+	hideAzureSynthesizerEditor() {
+		wasOpen := false
+		
+		if (this.iRecognizerMode = "Azure") {
+			wasOpen := true
+			
+			this.hideAzureRecognizerEditor()
+		}
+		
 		hideWidgets(this.iTopWidgets)
-		hideWidgets(this.iAzureVoiceWidgets)
+		hideWidgets(this.iAzureSynthesizerWidgets)
 		hideWidgets(this.iOtherWidgets)
 		
-		if (this.iMode == "Azure")
-			transposeWidgets(this.iOtherWidgets, -24 * this.iAzureVoiceWidgets.Length(), this.iCorrection)
-		else
-			Throw "Internal error detected in VoiceControlConfigurator.hideAzureVoiceEditor..."
+		this.iTopAzureCredentialsVisible := false
 		
-		this.iMode := false
+		if (this.iSynthesizerMode == "Azure")
+			transposeWidgets(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
+		else
+			Throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
+		
+		if wasOpen
+			this.showAzureRecognizerEditor()
+		
+		this.iSynthesizerMode := false
+	}
+	
+	showServerRecognizerEditor() {
+		this.iRecognizerMode := "Server"
+	}
+	
+	hideServerRecognizerEditor() {
+		this.iRecognizerMode := false
+	}
+	
+	showDesktopRecognizerEditor() {
+		this.iRecognizerMode := "Desktop"
+	}
+	
+	hideDesktopRecognizerEditor() {
+		this.iRecognizerMode := false
+	}
+	
+	showAzureRecognizerEditor() {
+		if !this.iTopAzureCredentialsVisible {
+			if (this.iRecognizerMode == false) {
+				transposeWidgets(this.iAzureRecognizerWidgets, (24 * 7) - 3, this.iCorrection)
+				showWidgets(this.iAzureRecognizerWidgets)
+				transposeWidgets(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
+			}
+			else
+				Throw "Internal error detected in VoiceControlConfigurator.showAzureRecognizerEditor..."
+			
+			this.iBottomAzureCredentialsVisible := true
+		}
+		
+		this.iRecognizerMode := "Azure"
+	}
+	
+	hideAzureRecognizerEditor() {
+		if !this.iTopAzureCredentialsVisible {
+			if (this.iRecognizerMode == "Azure") {
+				hideWidgets(this.iAzureRecognizerWidgets)
+				transposeWidgets(this.iAzureRecognizerWidgets, (-24 * 7) + 3, this.iCorrection)
+				transposeWidgets(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
+			}
+			else
+				Throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+			
+			this.iBottomAzureCredentialsVisible := false
+		}
+		
+		this.iRecognizerMode := false
 	}
 	
 	getCurrentLanguage() {
@@ -531,31 +710,93 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		return languageCode
 	}
 	
-	updateVoices() {
-		this.updateWindowsVoices()
+	updateLanguage(recognizer := true) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+		
+		GuiControlGet voiceSynthesizerDropDown
+		
+		if (voiceSynthesizerDropDown = 1)
+			this.updateWindowsVoices()
+		else if (voiceSynthesizerDropDown = 2)
+			this.updateDotNETVoices()
+		
 		this.updateAzureVoices()
+		
+		if recognizer {
+			GuiControlGet voiceRecognizerDropDown
+			
+			if (voiceRecognizerDropDown <= 2)
+				recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			else {
+				GuiControlGet azureSubscriptionKeyEdit
+				GuiControlGet azureTokenIssuerEdit
+				
+				recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+			}
+			
+			recognizers.InsertAt(1, translate("Deactivated"))
+			recognizers.InsertAt(1, translate("Automatic"))
+			
+			chosen := 1
+			
+			GuiControl, , listenerDropDown, % "|" . values2String("|", recognizers*)
+			GuiControl Choose, listenerDropDown, 1
+		}
 	}
 	
-	updateWindowsVoices(configuration := false) {
+	loadVoices(synthesizer, configuration) {
 		voices := []
 		
+		language := this.getCurrentLanguage()
+			
+		voices := new SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Automatic"))
+		
+		return voices
+	}
+	
+	loadWindowsVoices(configuration) {
 		if configuration
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
+			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows", getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
 		else {
 			GuiControlGet windowsSpeakerDropDown
 			
 			configuration := this.Configuration
 		}
 		
-		if (configuration && !windowsSpeakerDropDown)
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
-		
-		language := this.getCurrentLanguage()
+		return this.loadVoices("Windows", configuration)
+	}
+	
+	loadDotNETVoices(configuration)	{
+		if configuration
+			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		else {
+			GuiControlGet windowsSpeakerDropDown
 			
-		voices := new SpeechSynthesizer("Windows", true, language).Voices[language].Clone()
+			configuration := this.Configuration
+		}
+	
+		return this.loadVoices("dotNET", configuration)
+	}
+	
+	updateWindowsVoices(configuration := false) {
+		voices := this.loadWindowsVoices(configuration)
 		
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Automatic"))
+		chosen := inList(voices, windowsSpeakerDropDown)
+		
+		if (chosen == 0)
+			chosen := 1
+		
+		GuiControl, , windowsSpeakerDropDown, % "|" . values2String("|", voices*)
+		GuiControl Choose, windowsSpeakerDropDown, % chosen
+	}
+	
+	updateDotNETVoices(configuration := false) {
+		voices := this.loadDotNETVoices(configuration)
 		
 		chosen := inList(voices, windowsSpeakerDropDown)
 		
@@ -607,8 +848,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateVoices() {
-	VoiceControlConfigurator.Instance.updateVoices()
+updateLanguage() {
+	VoiceControlConfigurator.Instance.updateLanguage()
 }
 
 updateAzureVoices() {
@@ -644,19 +885,65 @@ transposeWidgets(widgets, offset, correction) {
 }
 
 chooseVoiceSynthesizer() {
+	configurator := VoiceControlConfigurator.Instance
 	oldChoice := voiceSynthesizerDropDown
 	
 	GuiControlGet voiceSynthesizerDropDown
 	
 	if (oldChoice == 1)
-		VoiceControlConfigurator.Instance.hideWindowsVoiceEditor()
+		configurator.hideWindowsSynthesizerEditor()
+	else if (oldChoice == 2)
+		configurator.hideDotNETSynthesizerEditor()
 	else
-		VoiceControlConfigurator.Instance.hideAzureVoiceEditor()
+		configurator.hideAzureSynthesizerEditor()
 	
 	if (voiceSynthesizerDropDown == 1)
-		VoiceControlConfigurator.Instance.showWindowsVoiceEditor()
+		configurator.showWindowsSynthesizerEditor()
+	else if (voiceSynthesizerDropDown == 2)
+		configurator.showDotNETSynthesizerEditor()
 	else
-		VoiceControlConfigurator.Instance.showAzureVoiceEditor()
+		configurator.showAzureSynthesizerEditor()
+	
+	if ((oldChoice <= 2) && (voiceSynthesizerDropDown <= 2))
+		configurator.updateLanguage(false)
+}
+
+chooseVoiceRecognizer() {
+	configurator := VoiceControlConfigurator.Instance
+	oldChoice := voiceRecognizerDropDown
+	
+	GuiControlGet voiceRecognizerDropDown
+	
+	if (oldChoice == 1)
+		configurator.hideServerRecognizerEditor()
+	else if (oldChoice == 2)
+		configurator.hideDesktopRecognizerEditor()
+	else
+		configurator.hideAzureRecognizerEditor()
+	
+	if (voiceRecognizerDropDown == 1)
+		configurator.showServerRecognizerEditor()
+	else if (voiceRecognizerDropDown == 2)
+		configurator.showDesktopRecognizerEditor()
+	else {
+		GuiControlGet azureSubscriptionKeyEdit
+		GuiControlGet azureTokenIssuerEdit
+		
+		recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
+		
+		configurator.showAzureRecognizerEditor()
+	}
+	
+	if (voiceRecognizerDropDown <= 2)
+		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
+	
+	recognizers.InsertAt(1, translate("Deactivated"))
+	recognizers.InsertAt(1, translate("Automatic"))
+	
+	chosen := 1
+	
+	GuiControl, , listenerDropDown, % "|" . values2String("|", recognizers*)
+	GuiControl Choose, listenerDropDown, 1
 }
 
 setPTTHotkey(hotkey) {

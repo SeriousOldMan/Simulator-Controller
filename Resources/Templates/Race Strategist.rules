@@ -131,19 +131,6 @@ projectedTyreTemperature(?lap, ?temperature) <=
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                           Lap Time Calculation                          ;;;
-;;;                                                                         ;;;
-;;; Updates the laptimes for all cars each lap.                             ;;;
-;;;-------------------------------------------------------------------------;;;
-
-{Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
-
-updateLapTimes(?, ?car) <= =<(?car, 0), !
-updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),
-							  ?nextCar = ?car - 1, updateLapTimes(?lap, ?nextCar)
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                      Position & Lap Delta Calculation                   ;;;
 ;;;                                                                         ;;;
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;

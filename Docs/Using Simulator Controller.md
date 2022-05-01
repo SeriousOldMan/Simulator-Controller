@@ -14,7 +14,7 @@ Beside maintaining this startup configuration, you can jump to the [configuratio
 
 ### Customizing Startup Configuration
 
-In the first group, you can decide which of the core appications configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool should be started during the startup process. Normally you want to start all of them, after all they are core applications, right? But there can be situations, where things might look a little bit different and these application are not needed or even would create problems. For example, you want to deactivate a voice control software, if you're taking part in an 24h race event and will have a voice chat with your team colleagues. It might not be helpful, if your voice control software would kick in and will stop your simulation while you are on your best lap of your life.
+In the first group, you can decide which of the core applications configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool should be started during the startup process. Normally you want to start all of them, after all they are core applications, right? But there can be situations, where things might look a little bit different and these application are not needed or even would create problems. For example, you want to deactivate a voice control software, if you're taking part in an 24h race event and will have a voice chat with your team colleagues. It might not be helpful, if your voice control software would kick in and will stop your simulation while you are on your best lap of your life.
 
 The second group lets you decide whether to start the different feedback components of your simulation rig. In the configuration, that is part of the standard distribution of Simulator Controller, feedback is handled by the ["Tactile Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) and ["Motion Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback) plugins, which on their side will use the [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/) applications to implement their functionalities. These two applications may be started in advance during the startup process, but they also can be started later from your hardware controller. Me, myself and I, for example, almost always start *SimHub* in advance, since I will always use vibration effects to get a better understanding about what my tyres are doing, but I will start motion feedback later depending on the track and the kind of driving, I am in (training, racing, having fun with friends, and so on).
 
@@ -30,13 +30,29 @@ If you click on then button "Controller Automation...", a neeew dialog will open
 
 You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers  exclusively.
 
-### Other Settings
+### Themes configuration
 
 In the lower part of the configuration dialog, you can choose the type of [splash theme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the themes editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Splash%20Screen.JPG)
 
 Last, but not least, you can choose a simulation game from your list of Simulators and start it automatically, after all other startup tasks have finished.
+
+### More Settings & Configurations
+
+Here is an overview for the all settings and configuration options for the various parts of Simulator Controller:
+
+  1. *Simulator Settings*
+  
+     Maintained by the "Simulator Settings" application and stored in the *Simulator Settings.ini* file in the *Simulator Controller\Config* folder in your user *Documents* folder. As described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings), these settings influence the startup process of Simulator Controller and where on your screen the visual representations of your Button Boxes will appear.
+
+  2. *Simulator Configuration*
+  
+     Maintained by the "Simulator Configuration" and the more simple "Simulator Setup" applications and stored in *Simulator Configuration.ini*, *Button Box Configuration.ini* and *Stream Deck Configuration.ini* files in the *Simulator Controller\Config* folder in your user *Documents* folder. This configuration contains the complete configuration of all your hardware and software with regards to Simulator Controller. Typically this will be very static, once you have found a satisfying configuration, at least, until you add another piece of hardware or new software. See the documentation for the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for more information.
+
+  3. *Race (Assistant) Settings*
+  
+     Maintained by the "Race Settings" and "Session Database" applications and stored in the *Race.settings* file in the *Simulator Controller\Config* folder in your user *Documents* folder. Whenever you start a race (or even a training session), the Virtual Race Assistants will use these settings to control various functionality, for example, how to react to damages, when to change tyres after a severe weather change, and so on. You can edit these settings with the "Race Settings" application just before each session, or you can manage a lot of the setting values by using the "Session Database" application and store default values depending on a given car / track / weather combination. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) for more information.
 
 ## Using Simulator Controller
 
@@ -60,13 +76,13 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 *After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the assistants), you can test the dialog with two different assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
 
-	D:\Controller\Binaries>"Voice Server.exe"
+	D:\Controller\Binaries>"Voice Server.exe" -Debug true
 
 	D:\Controller\Binaries>"Race Engineer.exe" -Debug true -Speaker true -Listener true -Language DE -Name Jona -Logo true
 
 	D:\Controller\Binaries>"Race Strategist.exe" -Debug true -Speaker true -Listener true -language EN -Name Cato -Logo true
 	
-Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?"
+Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no great use, since the Spotter does not answer questions.
 
 Note: If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 
@@ -79,6 +95,16 @@ Release 2.1 introduced Jona, an artificial Race Engineer as an optional componen
 #### Cato, the Virtual Race Strategist
 
 Using the technology developed for Jona, Release 3.1 introduced an additional Race Assitant. This Assistant is named Cato and is a kind of Race Strategy Expert. It is also fully covered in a separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist).
+
+#### Elisa, the Virtual Race Spotter
+
+The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) for more information.
+
+### Controller Commands
+
+If you have configured one or more hardware controllers (Button Boxes and/or Stream Decks), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
+
+Please note, that you can mix voice commands and commands triggered by the controller hardware freely, so choose your weapon depending on the current situation on the track.
 
 ## And now it's time
 

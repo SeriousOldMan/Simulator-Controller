@@ -56,13 +56,6 @@ global kTraceOff = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variables Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vDisposedChoicePoints = []
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1495,20 +1488,18 @@ class ResultSet {
 	}
 	
 	dispose() {
-		if this.iChoicePoint
-			this.iChoicePoint.dispose()
+		cp := this.iChoicePoint
 		
-		while (vDisposedChoicePoints.Length() > 0) {
-			cp := vDisposedChoicePoints.Pop()
-		
-			if cp.iNextChoicePoint
-				cp.iNextChoicePoint.dispose()
+		if cp {
+			removeables := []
 			
-			if cp.iPreviousChoicePoint
-				cp.iPreviousChoicePoint.dispose()
+			while cp {
+				removeables.Push(cp)
 			
-			cp.iNextChoicePoint := false
-			cp.iPreviousChoicePoint := false
+				cp := cp.next()
+			}
+			
+			ChoicePoint.remove(removeables)
 		}
 		
 		this.iChoicePoint := false
@@ -1731,6 +1722,16 @@ class ChoicePoint {
 		}
 	}
 	
+	SubChoicePoints[] {
+		Get {
+			return []
+		}
+		
+		Set {
+			return value
+		}
+	}
+	
 	__New(resultSet, goal, environment) {
 		this.iResultSet := resultSet
 		this.iGoal := goal
@@ -1740,8 +1741,6 @@ class ChoicePoint {
 	dispose() {
 		this.iResultSet := false
 		this.iGoal := false
-		
-		vDisposedChoicePoints.Push(this)
 	}
 	
 	nextChoice() {
@@ -1761,17 +1760,7 @@ class ChoicePoint {
 		this.iSavedVariables := {}
 	}
 	
-	reset() {
-		this.resetVariables()
-		
-		this.ResultSet.resetChoicePoint(this)
-	}
-	
-	cut() {
-		this.reset()
-	}
-	
-	insert(afterChoicePoint) {
+	append(afterChoicePoint) {
 		local resultSet := this.ResultSet
 		
 		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
@@ -1786,7 +1775,10 @@ class ChoicePoint {
 			this.iNextChoicePoint.iPreviousChoicePoint := this
 	}
 	
-	remove() {
+	unlink() {
+		this.iResultSet := false
+		this.iGoal := false
+		
 		next := this.iNextChoicePoint
 		previous := this.iPreviousChoicePoint
 		
@@ -1795,6 +1787,55 @@ class ChoicePoint {
 			
 		if previous
 			previous.iNextChoicePoint := next
+		
+		this.iNextChoicePoint := false
+		this.iPreviousChoicePoint := false
+	}
+	
+	remove(removeables := false) {
+		if !removeables
+			removeables := [this]
+		
+		last := removeables.Length()
+		
+		while (last > 0) {
+			cp := removeables[last]
+		
+			subChoicePoints := cp.SubChoicePoints
+			scpLength := subChoicePoints.Length()
+			
+			if (scpLength > 0) {
+				cp.SubChoicePoints := []
+			
+				Loop %scpLength%
+					removeables.Push(subChoicePoints[scpLength - A_Index + 1])
+			}
+			else
+				removeables.Pop().unlink()
+			
+			last := removeables.Length()
+		}
+	}
+	
+	reset() {
+		subChoicePoints := this.SubChoicePoints
+		
+		if (subChoicePoints.Length() > 0) {
+			removeables := []
+			
+			for ignore, theChoicePoint in reverse(subChoicePoints)
+				removeables.Push(theChoicePoint)
+			
+			this.remove(removeables)
+		}
+				
+		this.resetVariables()
+		
+		this.ResultSet.resetChoicePoint(this)
+	}
+	
+	cut() {
+		this.reset()
 	}
 	
 	previous() {
@@ -1816,6 +1857,16 @@ class RulesChoicePoint extends ChoicePoint {
 	iNextRuleIndex := 1
 	
 	iSubChoicePoints := []
+	
+	SubChoicePoints[] {
+		Get {
+			return this.iSubChoicePoints
+		}
+		
+		Set {
+			return (this.iSubChoicePoints := value)
+		}
+	}
 		
 	Reductions[reset := false] {
 		Get {
@@ -1841,17 +1892,8 @@ class RulesChoicePoint extends ChoicePoint {
 		}
 	}
 	
-	disposeSubChoicePoints() {
-		this.removeSubChoicePoints()
-		
-		for ignore, cp in this.iSubChoicePoints
-			vDisposedChoicePoints.Push(cp)
-		
-		this.iSubChoicePoints := []
-	}
-	
 	dispose() {
-		this.disposeSubChoicePoints()
+		this.iSubstitutedReductions := {}
 		
 		base.dispose()
 	}
@@ -1898,7 +1940,7 @@ class RulesChoicePoint extends ChoicePoint {
 	addSubChoicePoints(goals) {
 		local choicePoint
 		
-		this.iSubChoicePoints := []
+		this.SubChoicePoints := []
 
 		previous := this
 		
@@ -1908,29 +1950,12 @@ class RulesChoicePoint extends ChoicePoint {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Pushing subgoal " . theGoal.toString(this.ResultSet))
 			
-			this.iSubChoicePoints.Push(choicePoint)
+			this.SubChoicePoints.Push(choicePoint)
 			
-			choicePoint.insert(previous)
+			choicePoint.append(previous)
 			
 			previous := choicePoint
 		}
-	}
-	
-	removeSubChoicePoints() {
-		for ignore, theChoicePoint in this.iSubChoicePoints
-			theChoicePoint.remove()
-	}
-	
-	reset() {
-		this.removeSubChoicePoints()
-		
-		base.reset()
-	}
-	
-	remove() {
-		this.disposeSubChoicePoints()
-		
-		base.remove()
 	}
 	
 	cut() {
@@ -3057,7 +3082,10 @@ class RuleEngine {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RuleCompiler {
-	compile(fileName, ByRef productions, ByRef reductions, path := false) {
+	compile(fileName, ByRef productions, ByRef reductions, path := false, includes := false) {
+		if !includes
+			includes := []
+		
 		if !path {
 			if !IsObject(productions)
 				productions := false
@@ -3069,10 +3097,13 @@ class RuleCompiler {
 		FileRead text, %fileName%
 		SplitPath fileName, , path
 		
-		this.compileRules(text, productions, reductions, path)
+		this.compileRules(text, productions, reductions, path, includes)
 	}
 	
-	compileRules(text, ByRef productions, ByRef reductions, path := false) {
+	compileRules(text, ByRef productions, ByRef reductions, path := false, includes := false) {
+		if !includes
+			includes := []
+		
 		if !path {
 			if !IsObject(productions)
 				productions := []
@@ -3090,18 +3121,22 @@ class RuleCompiler {
 			if (InStr(line, "#Include") == 1) {
 				fileName := substituteVariables(Trim(SubStr(line, 9)))
 				
-				currentDirectory := A_WorkingDir
-				
-				try {
-					if (path && (Trim(path) != ""))
-						SetWorkingDir %path%
+				if !inList(includes, fileName) {
+					currentDirectory := A_WorkingDir
 					
-					SplitPath fileName, , path
-				
-					this.compile(fileName, productions, reductions, path)
-				}
-				finally {
-					SetWorkingDir %currentDirectory%
+					try {
+						includes.Push(fileName)
+						
+						if (path && (Trim(path) != ""))
+							SetWorkingDir %path%
+						
+						SplitPath fileName, , path
+					
+						this.compile(fileName, productions, reductions, path, includes)
+					}
+					finally {
+						SetWorkingDir %currentDirectory%
+					}
 				}
 			}
 			else {
@@ -3494,11 +3529,17 @@ class RuleCompiler {
 		
 		beginCharIndex := nextCharIndex
 		quoted := false
+		hasQuote := false
 		
 		Loop {
 			character := SubStr(text, nextCharIndex, 1)
 		
-			if (character == "\") {
+			if ((A_Index == 1) && ((character == """") || (character == "'")))
+				hasQuote := character
+			else if (hasQuote && (A_Index == 2))
+				delimiters := hasQuote
+			
+			if (!hasQuote && (character == "\")) {
 				nextCharIndex := nextCharIndex + 2
 				
 				quoted := true
@@ -3506,16 +3547,21 @@ class RuleCompiler {
 				continue
 			}
 			
-			if (InStr(delimiters, character) || (nextCharIndex > length)) {
+			isDelimiter := InStr(delimiters, character)
+			
+			if (isDelimiter || (nextCharIndex > length)) {
 				literal := SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex)
 				
-				if (delimiters == """")
-					return literal
+				if (hasQuote && isDelimiter) {
+					nextCharIndex += 1
+					
+					return SubStr(literal, 2, StrLen(literal) - 1)
+				}
 				else if (literal = kTrue)
 					return true
 				else if (literal = kFalse)
 					return false
-				else if quoted {
+				else if (!hasQuote && quoted) {
 					Random rand, 1, 100000
 				
 					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rand . "###"), "\", ""), "###" . rand . "###", "\")

@@ -52,6 +52,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceAssistant := false
 	
+	iWarnings := false
+	
 	iRemoteHandler := false
 	
 	iSessionTime := false
@@ -141,12 +143,17 @@ class RaceAssistant extends ConfigurationItem {
 	
 		getGrammars(language) {
 			prefix := this.RaceAssistant.AssistantType . ".grammars."
+			fileName := (prefix . language)
 			
-			grammars := readConfiguration(getFileName(prefix . language, kUserGrammarsDirectory, kGrammarsDirectory))
+			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
+				fileName := (prefix . "en")
 			
-			if (grammars.Count() == 0)
-				grammars := readConfiguration(getFileName(prefix . "en", kUserGrammarsDirectory, kGrammarsDirectory))
+			grammars := readConfiguration(kGrammarsDirectory . fileName)
 			
+			for section, values in readConfiguration(kUserGrammarsDirectory . fileName)
+				for key, value in values
+					setConfigurationValue(grammars, section, key, value)
+				
 			return grammars
 		}
 		
@@ -210,6 +217,16 @@ class RaceAssistant extends ConfigurationItem {
 	Listener[] {
 		Get {
 			return this.VoiceAssistant.Listener
+		}
+	}
+	
+	Warnings[key := false] {
+		Get {
+			return (key ? this.iWarnings[key] : this.iWarnings)
+		}
+		
+		Set {
+			return (key ? (this.iWarnings[key] := value) : (this.iWarnings := value))
 		}
 	}
 	
@@ -328,7 +345,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
-	    , service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
+	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
@@ -341,9 +358,10 @@ class RaceAssistant extends ConfigurationItem {
 			listener := ((speaker != false) ? listener : false)
 			
 			options["Language"] := ((language != false) ? language : options["Language"])
-			options["Service"] := ((service == true) ? options["Service"] : service)
+			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
 			options["Vocalics"] := (vocalics ? string2Values(",", vocalics) : options["Vocalics"])
+			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 		}
@@ -357,11 +375,12 @@ class RaceAssistant extends ConfigurationItem {
 		options := this.iOptions
 		
 		options["Language"] := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		options["Service"] := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+		options["Synthesizer"] := getConfigurationValue(configuration, "Voice Control", "Synthesizer", getConfigurationValue(configuration, "Voice Control", "Service", "dotNET"))
 		options["Speaker"] := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		options["Vocalics"] := Array(getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 								   , getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
 								   , getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0))
+		options["Recognizer"] := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		options["Listener"] := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 	}
@@ -379,6 +398,9 @@ class RaceAssistant extends ConfigurationItem {
 		
 		if values.HasKey("LearningLaps")
 			this.iLearningLaps := values["LearningLaps"]
+		
+		if values.HasKey("Warnings")
+			this.iWarnings := values["Warnings"]
 	}
 	
 	updateSessionValues(values) {
@@ -427,14 +449,18 @@ class RaceAssistant extends ConfigurationItem {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "Time":
+				this.timeRecognized(words)
 			case "Yes":
 				continuation := this.Continuation
 				
 				this.clearContinuation()
 				
-				if continuation {
+				if isInstance(continuation, VoiceAssistant.VoiceContinuation)
+					continuation.continue()
+				else if continuation {
 					this.getSpeaker().speakPhrase("Confirm")
-
+		
 					%continuation%()
 				}
 			case "No":
@@ -446,11 +472,57 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
-			case "Catch":
+			case "AnnouncementsOn":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, true)
+			case "AnnouncementsOff":
+				this.clearContinuation()
+				
+				this.activateAnnouncement(words, false)
+			case "?":
 				this.getSpeaker().speakPhrase("Repeat")
 			default:
 				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}
+	}
+	
+	timeRecognized(words) {
+		FormatTime time, %A_Now%, Time
+		
+		this.getSpeaker().speakPhrase("Time", {time: time})
+	}
+	
+	activateAnnouncement(words, active) {
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+		
+		announcements := []
+		
+		for key, value in this.Warnings
+			announcements.Push(key)
+		
+		announcement := false
+		
+		for ignore, fragment in announcements
+			if fragments.HasKey(fragment)
+				if matchFragment(words, fragments[fragment]) {
+					announcement := fragment
+					
+					break
+				}
+		
+		if announcement {
+			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
+				
+			this.setContinuation(new VoiceAssistant.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
+		}
+		else
+			speaker.speakPhrase("Repeat")
+	}
+	
+	updateAnnouncement(announcement, value) {
+		this.Warnings[announcement] := value
 	}
 	
 	call() {
@@ -487,7 +559,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 			
 	setContinuation(continuation) {
-		this.VoiceAssistant.setContinuation(continuation)
+		if isInstance(continuation, VoiceAssistant.VoiceContinuation)
+			this.VoiceAssistant.setContinuation(continuation)
+		else
+			this.VoiceAssistant.setContinuation(new VoiceAssistant.VoiceContinuation(this, continuation, "Confirm"))
 	}
 			
 	clearContinuation() {
@@ -915,47 +990,44 @@ class RaceAssistant extends ConfigurationItem {
 	}
 	
 	saveSessionSettings() {
-		/*
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 		
 		if knowledgeBase {
 			settingsDB := this.SettingsDatabase
 			
-			simulatorName := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
 			car := knowledgeBase.getValue("Session.Car")
 			track := knowledgeBase.getValue("Session.Track")
 			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Now")
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
 			compound := knowledgeBase.getValue("Tyre.Compound")
 			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
 			
-			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadSettings", "Default")
-			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", oldValue)
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulator . ".LoadSettings", oldValue)
 		
-			duration := (Round((duration / 60) / 5) * 300)
-			
-			values := {AvgFuelConsumption: this.AvgFuelConsumption, Compound: compound, CompoundColor: compoundColor, Duration: duration}
-			
 			lapTime := Round(this.BestLapTime / 1000)
 			
-			if (lapTime > 10)
-				values["AvgLapTime"] := lapTime
-			
-			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase"))
-				settingsDB.updateSettings(simulatorName, car, track
-										, {Duration: duration, Weather: weather, Compound: compound, CompoundColor: compoundColor}, values)
+			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
+				settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				
+				if (lapTime > 10)
+					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
+			}
 			else {
 				fileName := getFileName("Race.settings", kUserConfigDirectory)
 				
 				settings := readConfiguration(fileName)
 				
-				settingsDB.updateSettingsValues(settings, values)
+				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				
+				if (lapTime > 10)
+					setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
 				
 				writeConfiguration(fileName, settings)
 			}
 		}
-		*/
 	}
 	
 	dumpKnowledge(knowledgeBase) {
@@ -1003,4 +1075,17 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 		return value
 	else
 		return getConfigurationValue(data, oldSection, key, default)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+matchFragment(words, fragment) {
+	for ignore, word in string2Values(A_Space, fragment)
+		if !inList(words, word)
+			return false
+	
+	return true
 }

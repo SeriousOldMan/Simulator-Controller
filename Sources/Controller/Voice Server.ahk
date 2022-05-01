@@ -60,11 +60,12 @@ class VoiceServer extends ConfigurationItem {
 	iActiveVoiceClient := false
 
 	iLanguage := "en"
-	iService := "Windows"
+	iSynthesizer := "dotNET"
 	iSpeaker := true
 	iSpeakerVolume := 100
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
+	iRecognizer := "Desktop"
 	iListener := false
 	iPushToTalk := false
 	
@@ -85,11 +86,12 @@ class VoiceServer extends ConfigurationItem {
 		iPID := 0
 		
 		iLanguage := "en"
-		iService := "Windows"
+		iSynthesizer := "dotNET"
 		iSpeaker := true
 		iSpeakerVolume := 100
 		iSpeakerPitch := 0
 		iSpeakerSpeed := 0
+		iRecognizer := "Desktop"
 		iListener := false
 	
 		iSpeechSynthesizer := false
@@ -126,9 +128,9 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 		
-		Service[] {
+		Synthesizer[] {
 			Get {
-				return this.iService
+				return this.iSynthesizer
 			}
 		}
 		
@@ -141,6 +143,12 @@ class VoiceServer extends ConfigurationItem {
 		Speaking[] {
 			Get {
 				return this.iIsSpeaking
+			}
+		}
+		
+		Recognizer[] {
+			Get {
+				return this.iRecognizer
 			}
 		}
 		
@@ -205,7 +213,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (create && this.Speaker && !this.iSpeechSynthesizer) {
-					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Service, this.Speaker, this.Language)
+					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Synthesizer, this.Speaker, this.Language)
 					
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -219,19 +227,20 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (create && this.Listener && !this.iSpeechRecognizer)
-					this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
+					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				
 				return this.iSpeechRecognizer
 			}
 		}
 		
-		__New(voiceServer, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+		__New(voiceServer, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iPID := pid
 			this.iLanguage := language
-			this.iService := service
+			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker
+			this.iRecognizer := recognizer
 			this.iListener := listener
 			this.iSpeakerVolume := speakerVolume
 			this.iSpeakerPitch := speakerPitch
@@ -389,9 +398,9 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 		
-	Service[] {
+	Synthesizer[] {
 		Get {
-			return this.iService
+			return this.iSynthesizer
 		}
 	}
 	
@@ -404,6 +413,12 @@ class VoiceServer extends ConfigurationItem {
 	Speaking[] {
 		Get {
 			return this.iIsSpeaking
+		}
+	}
+		
+	Recognizer[] {
+		Get {
+			return this.iRecognizer
 		}
 	}
 	
@@ -446,7 +461,23 @@ class VoiceServer extends ConfigurationItem {
 	SpeechRecognizer[create := false] {
 		Get {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
-				this.iSpeechRecognizer := new SpeechRecognizer(this.Listener, this.Language)
+				try {
+					try {
+						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
+						
+						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
+							Throw "Server speech recognizer engine not installed..."
+					}
+					catch exception {
+						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
+						
+						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
+							Throw "Desktop speech recognizer engine not installed..."
+					}
+				}
+				catch exception {
+					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+				}
 				
 				if !this.PushToTalk
 					this.startListening()
@@ -458,7 +489,7 @@ class VoiceServer extends ConfigurationItem {
 	
 	__New(configuration := false) {
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
-			
+		
 		base.__New(configuration)
 		
 		VoiceServer.Instance := this
@@ -476,11 +507,13 @@ class VoiceServer extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 		
 		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		this.iService := getConfigurationValue(configuration, "Voice Control", "Service", "Windows")
+		this.iSynthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer"
+												 , getConfigurationValue(configuration, "Voice Control", "Service", "dotNET"))
 		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
 		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
 		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
 		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		this.iRecognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 		
@@ -496,10 +529,9 @@ class VoiceServer extends ConfigurationItem {
 		static lastDown := 0
 		static lastUp := 0
 		static clicks := 0
+		static activation := false
 		
-		theHotkey := this.PushToTalk
-		pressed := GetKeyState(theHotKey, "P")
-		activation := false
+		pressed := GetKeyState(this.PushToTalk, "P")
 		
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -507,8 +539,11 @@ class VoiceServer extends ConfigurationItem {
 			
 			if (((lastDown - lastUp) < 400) && (clicks == 1))
 				activation := true
-			else
+			else {
 				clicks := 0
+			
+				activation := false
+			}
 		}
 		else if (!pressed && isPressed) {
 			lastUp := A_TickCount
@@ -519,6 +554,9 @@ class VoiceServer extends ConfigurationItem {
 			else
 				clicks := 0
 		}
+		
+		if (((A_TickCount - lastDown) < 200) && !activation)
+			pressed := false
 		
 		if !this.Speaking && pressed {
 			if activation
@@ -647,8 +685,10 @@ class VoiceServer extends ConfigurationItem {
 			this.iIsSpeaking := oldSpeaking
 		}
 	}
-	
-	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, service := true, speaker := true, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+																	
+	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+		local grammar
+		
 		static counter := 1
 		
 		if (speakerVolume = kUndefined)
@@ -660,11 +700,14 @@ class VoiceServer extends ConfigurationItem {
 		if (speakerSpeed = kUndefined)
 			speakerSpeed := this.SpeakerSpeed
 		
-		if (service == true)
-			service := this.Service
+		if (synthesizer == true)
+			synthesizer := this.Synthesizer
 		
 		if (speaker == true)
 			speaker := this.Speaker
+		
+		if (recognizer == true)
+			recognizer := this.Recognizer
 		
 		if (listener == true)
 			listener := this.Listener
@@ -676,12 +719,12 @@ class VoiceServer extends ConfigurationItem {
 		
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
-			
-		client := new this.VoiceClient(this, descriptor, pid, language, service, speaker, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		
+		client := new this.VoiceClient(this, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 		
 		this.VoiceClients[descriptor] := client
 		
-		if activationCommand && listener {
+		if (activationCommand && (StrLen(Trim(activationCommand)) > 0) && listener) {
 			recognizer := this.SpeechRecognizer[true]
 			grammar := (descriptor . "." . counter++)
 			
@@ -690,14 +733,16 @@ class VoiceServer extends ConfigurationItem {
 				
 				showMessage("Register activation phrase: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())					  
 			}
-				
+			
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(activationCommand), ObjBindMethod(this, "recognizeActivationCommand", client))
+				command := recognizer.compileGrammar(activationCommand)
+				
+				recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
+				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))
 			
-				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: activationCommand})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
@@ -841,7 +886,7 @@ class VoiceServer extends ConfigurationItem {
 		
 	voiceCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Command phrase recognized: " . values2String(A_Space, words*), false, "Information.png", 5000)
 		
 		descriptor := voiceClient.VoiceCommands[grammar]
 

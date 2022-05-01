@@ -48,7 +48,10 @@ class StreamDeck extends FunctionController {
 	
 	iFunctionTitles := {}
 	iFunctionImages := {}
-		
+	
+	iChangedFunctionTitles := {}
+	iChangedFunctionImages := {}
+	
 	iRefreshActive := false
 	iPendingUpdates := []
 	
@@ -395,6 +398,13 @@ class StreamDeck extends FunctionController {
 			return
 		}
 		else {
+			if this.iFunctionTitles.HasKey(function) {
+				if (this.iFunctionTitles[function] != title)
+					this.iChangedFunctionTitles[function] := true
+			}
+			else
+				this.iChangedFunctionTitles[function] := true
+			
 			this.iFunctionTitles[function] := title
 		
 			this.Connector.SetTitle(function, title)
@@ -413,6 +423,14 @@ class StreamDeck extends FunctionController {
 		}
 		else {
 			; showMessage("S: " . function . " - " . icon)
+		
+			if this.iFunctionImages.HasKey(function) {
+				if (this.iFunctionImages[function] != icon)
+					this.iChangedFunctionImages[function] := true
+			}
+			else
+				this.iChangedFunctionImages[function] := true
+			
 			this.iFunctionImages[function] := icon
 		
 			this.Connector.SetImage(function, icon)
@@ -420,6 +438,16 @@ class StreamDeck extends FunctionController {
 	}
 	
 	refresh() {
+		static cycle := 0
+		
+		if (cycle++ > 2) {
+			fullRefresh := true
+			
+			cycle := 0
+		}
+		else
+			fullRefresh := false
+		
 		if this.RefreshActive
 			return
 		else {
@@ -427,10 +455,15 @@ class StreamDeck extends FunctionController {
 		
 			try {
 				for theFunction, title in this.iFunctionTitles
-					this.setFunctionTitle(theFunction, title, true)
+					if (fullRefresh || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
+						this.setFunctionTitle(theFunction, title, true)
 				
 				for theFunction, image in this.iFunctionImages
-					this.setFunctionImage(theFunction, image, true)
+					if (fullRefresh || (this.iChangedFunctionImages.HasKey(theFunction) && this.iChangedFunctionImages[theFunction]))
+						this.setFunctionImage(theFunction, image, true)
+				
+				this.iChangedFunctionTitles := {}
+				this.iChangedFunctionImages := {}
 			}
 			finally {
 				this.iRefreshActive := false

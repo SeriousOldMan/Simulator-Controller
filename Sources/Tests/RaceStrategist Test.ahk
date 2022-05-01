@@ -36,8 +36,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceStrategist extends RaceStrategist {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, listener, voiceServer)
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 		
 		this.updateConfigurationValues({Settings: settings})
 	}
@@ -237,6 +237,8 @@ class PositionProjection extends Assert {
 				
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 				
+				strategist.dumpKnowledge(strategist.KnowledgeBase)
+				
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
 			else if (A_Index = 5) {
@@ -294,17 +296,21 @@ class PitstopRecommendation extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 
 if !GetKeyState("Ctrl") {
+	startTime := A_TickCount
+	
 	AHKUnit.AddTestClass(BasicReporting)
 	AHKUnit.AddTestClass(PositionProjection)
 	AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()
+	
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := 17
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "de", "Windows", true, true)
+									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
 	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
 	

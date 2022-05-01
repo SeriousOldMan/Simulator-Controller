@@ -1,16 +1,16 @@
 [Development]
-Version=3.9.8-release
-Target=3.9.8-release
-Date=03/18/2022
-Download=https://cntr.click/Qw8Nwb1
-Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase"
+Version=4.1.0-release
+Target=4.1.0-release
+Date=04/29/2022
+Download=https://cntr.click/3098VwR
+Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
 [Release]
-Version=3.9.8-release
-Date=03/18/2022
-Download=https://cntr.click/Qw8Nwb1
-Changes=Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase"
+Version=4.1.0-release
+Date=04/29/2022
+Download=https://cntr.click/3098VwR
+Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
 [Current]
 Type=Release
 [Version]
-Release=3.9.8-release
-Development=3.9.8-release
+Release=4.1.0-release
+Development=4.1.0-release

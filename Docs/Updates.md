@@ -1,12 +1,10 @@
 Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
 
-Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully.
-
-If you want to integrate Jona, the Virtual Race Engineer,  you should read the information about [Release 2.1](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21) and, much more important, the [documentation on Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) itself, before heading on to the track.
+Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully. The same preparation applies for RaceRoom Racing Experience, which is described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
 
 ***
 
-Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new realse package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
+Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs. After you installed the new release package, the system will check, whether an update to the configuration database is necessary for this release (and possibly for releases, you left out) and will greet you with the following dialog:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Update%20Alert.JPG)
 
@@ -44,6 +42,56 @@ The update procedure itself is handled by the application *Simulator Tools*. It 
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
+
+## Release 4.1.0
+
+Everything is handled automatically.
+
+***
+
+## Release 4.0.8
+
+Nothing to do this time.
+
+***
+
+## Release 4.0.6
+
+Nothing to see here, move on.
+
+***
+
+## Release 4.0.4
+
+Update is handled automatically, but you will want to check the changes in the grammar files and in the action labels and icons, when you have made changes there. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information on action labels and icons, but grammar files must be handled with a text editor.
+
+Please note, that from now on, only the changed items in translatable configuration files must be saved to the local configuration database. All items that are not present in the local file will be loaded from the standard file that resides in the program directories of Simulator Controller. This affects the following type of files:
+
+  1. Translations (handled by the [Translation editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor))
+  2. Phrase Grammars (handled as plain text file)
+  3. Controller Action Labels (handled by the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+  4. Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+  5. Settings Definition Files for "Session Database" (handled as plain text file)
+
+***
+
+## Release 4.0.2
+
+Update is handled automatically, but you may want to check the possibilities of the new cloud based voice recognition. Details can be found in the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
+
+The assistant grammars has been modified with this release for the new voice recognition functionalities. Therefore, if you have modified or extended the grammar files of the race assistants, please check the original files and incorporate those changes into your own versions. A new placeholder variable "(Digit)" has been introduced for single-digit numbers. Use it whereever possible, it will increase recognition performance. The usage of "(Number)" for values between 0 and 100 is discouraged where not necessary.
+
+***
+
+## Release 4.0.0
+
+The shared database consolidation and distribution process is enabled with this release. Since you only will receive any data, when you also contribute to the content of the database, you will get a new chance to review your consent regarding the shared data.
+
+Beside that, this version introduces new voice commands for the Race Assistants and also for the Virtual Race Spotter to enable or disable the different announcements and warnings while you are out on the track. Since this is the first time that you can talk to the Spotter, you have to enable the voice listener for the Race Spotter in the configuration, which might be not enabled currently. The update procedure will try to fix this for you, but if that fails, you have to add "raceAssistantListener: On" to the list of plugin arguments for the "Race Spotter" plugin in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
+Other changes will be handled automatically. You will notice that the plugin parameter "raceAssistantService" has been renamed to "raceAssistantSynthesizer" and a new paramater "raceAssistantRecognizer" has been introduced.
+
+***
 
 ## Release 3.9.8
 
@@ -218,7 +266,7 @@ This release introduces a fully automatic program installation and update proces
 
 Important: Make a backup copy of the files "Simulator Configuration.ini", "Button Box Configuration.ini" and "Simlator Settings.ini" from your *Simulator Controller\Config* folder in your user *Documents* folder, before using the new "Simulator Setup" Wizard. It has been tested extensively, but it is a complex piece of software, so just to be safe...
 
-The biggest change in this release is the introduction of the all-new [Setup Wizard](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool). In the course of implementing this very challenging tool, the labels for the visual representation of the Button Boxes were extensively revised. Therefore the [plugin label files](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Controller%20Plugin%20Labels.de) will be completely overwritten in this release (the old files will be retained as backfiles in this case).
+The biggest change in this release is the introduction of the all-new [Setup Wizard](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool). In the course of implementing this very challenging tool, the labels for the visual representation of the Button Boxes were extensively revised. Therefore the [plugin label files](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Controller%20Plugin%20Labels.de) will be completely overwritten in this release (the old files will be retained as backup files in this case).
 
 Therefore: If you have edited your local files in the *Simulator Controller\Translations* folder in your *Documents* folder and introduced your own label identifiers, be sure to re-integrate your changes after running the update. You may have to manually copy the original files from the *Resources\Translations* folder to the *Simulator Controller\Translations* folder in your user *Documents* folder before re-integrating your changes, if you do **not** start the editor from inside the "Simulator Configuration* application.
 

@@ -105,9 +105,10 @@ startRaceEngineer() {
 	engineerName := "Jona"
 	engineerLogo := false
 	engineerLanguage := false
-	engineerService := true
+	engineerSynthesizer := true
 	engineerSpeaker := false
 	engineerSpeakerVocalics := false
+	engineerRecognizer := true
 	engineerListener := false
 	debug := false
 	
@@ -131,14 +132,17 @@ startRaceEngineer() {
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]
 				index += 2
-			case "-Service":
-				engineerService := A_Args[index + 1]
+			case "-Synthesizer":
+				engineerSynthesizer := A_Args[index + 1]
 				index += 2
 			case "-Speaker":
 				engineerSpeaker := A_Args[index + 1]
 				index += 2
 			case "-SpeakerVocalics":
 				engineerSpeakerVocalics := A_Args[index + 1]
+				index += 2
+			case "-Recognizer":
+				engineerRecognizer := A_Args[index + 1]
 				index += 2
 			case "-Listener":
 				engineerListener := A_Args[index + 1]
@@ -170,14 +174,15 @@ startRaceEngineer() {
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
 											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 											, engineerName, engineerLanguage
-											, engineerService, engineerSpeaker, engineerSpeakerVocalics, engineerListener, voiceServer)
+											, engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
+											, engineerRecognizer, engineerListener, voiceServer)
 	
 	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")
 	
 	if (debug && engineerSpeaker) {
 		RaceEngineer.Instance.getSpeaker()
 		
-		RaceEngineer.Instance.createKnowledgeBase({})
+		RaceEngineer.Instance.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
 	}
 	
 	if (engineerLogo && !kSilentMode)

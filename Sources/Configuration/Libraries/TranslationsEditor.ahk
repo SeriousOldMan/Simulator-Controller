@@ -459,7 +459,14 @@ class TranslationsList extends ConfigurationItemList {
 					translations[original] := translated
 				}
 				
-				writeTranslations(isoCodeEdit, languageNameEdit, translations)
+				Gui TE:+Disabled
+				
+				try {
+					writeTranslations(isoCodeEdit, languageNameEdit, translations)
+				}
+				finally {
+					Gui TE:-Disabled
+				}
 				
 				return true
 			}

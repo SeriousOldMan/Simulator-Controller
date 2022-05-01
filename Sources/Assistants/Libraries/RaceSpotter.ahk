@@ -28,17 +28,16 @@ class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
 	
 	iSessionDataActive := false
-	iSpotterSpeaking := false
 	
 	iGridPosition := false
-
-	iAnnouncementSettings := false
 	
-	iLastPerformanceUpdateLap := false
+	iLastDistanceInformationLap := false
 	iPositionInfo := {}
 	
 	iRaceStartSummarized := true
 	iFinalLapsAnnounced := false
+	
+	iDriverUpdate := 0
 	
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
 		iFastSpeechSynthesizer := false
@@ -46,7 +45,7 @@ class RaceSpotter extends RaceAssistant {
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Service, this.Speaker, this.Language
+					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
 				
 					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
@@ -83,12 +82,6 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	AnnouncementSettings[key := false] {
-		Get {
-			return (key ? this.iAnnouncementSettings[key] : this.iAnnouncementSettings)
-		}
-	}
-	
 	GridPosition[] {
 		Get {
 			return this.iGridPosition
@@ -102,8 +95,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
-		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 		
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
@@ -112,18 +105,11 @@ class RaceSpotter extends RaceAssistant {
 		return new this.SpotterVoiceAssistant(this, name, options)
 	}
 	
-	updateConfigurationValues(values) {
-		base.updateConfigurationValues(values)
-		
-		if values.HasKey("AnnouncementSettings")
-			this.iAnnouncementSettings := values["AnnouncementSettings"]
-	}
-	
 	updateSessionValues(values) {
 		base.updateSessionValues(values)
 		
 		if (this.Session == kSessionFinished) {
-			this.iLastPerformanceUpdateLap := false
+			this.iLastDistanceInformationLap := false
 			this.iPositionInfo := {}
 			
 			this.iRaceStartSummarized := false
@@ -137,9 +123,200 @@ class RaceSpotter extends RaceAssistant {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
+			case "Position":
+				this.positionRecognized(words)
+			case "LapTimes":
+				this.lapTimesRecognized(words)
+			case "GapToFront":
+				this.gapToFrontRecognized(words)
+			case "GapToBehind":
+				this.gapToBehindRecognized(words)
+			case "GapToLeader":
+				this.gapToLeaderRecognized(words)
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
+	}
+	
+	positionRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		speaker := this.getSpeaker()
+		position := Round(knowledgeBase.getValue("Position", 0))
+		
+		if (position == 0)
+			speaker.speakPhrase("Later")
+		else if inList(words, speaker.Fragments["Laps"])
+			this.futurePositionRecognized(words)
+		else {
+			speaker.speakPhrase("Position", {position: position})
+			
+			if (position <= 3)
+				speaker.speakPhrase("Great")
+		}
+	}
+	
+	gapToFrontRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if inList(words, this.getSpeaker().Fragments["Car"])
+			this.trackGapToFrontRecognized(words)
+		else
+			this.standingsGapToFrontRecognized(words)
+	}
+	
+	trackGapToFrontRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		speaker := this.getSpeaker()
+		
+		delta := knowledgeBase.getValue("Position.Track.Front.Delta", 0)
+		
+		if (delta != 0) {
+			speaker.speakPhrase("TrackGapToFront", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+			
+			lap := knowledgeBase.getValue("Lap")
+			driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+			otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Front.Car") . ".Laps"))
+			
+			if (driverLap < otherLap)
+			  speaker.speakPhrase("NotTheSameLap")
+		}
+		else
+			speaker.speakPhrase("NoTrackGap")
+	}
+	
+	standingsGapToFrontRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+			this.getSpeaker().speakPhrase("NoGapToFront")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Front.Delta", 0) / 1000, 1))
+			
+			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: Format("{:.1f}", delta)})
+		}
+	}
+	
+	gapToBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if inList(words, this.getSpeaker().Fragments["Car"])
+			this.trackGapToBehindRecognized(words)
+		else
+			this.standingsGapToBehindRecognized(words)
+	}
+	
+	trackGapToBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		speaker := this.getSpeaker()
+		
+		delta := knowledgeBase.getValue("Position.Track.Behind.Delta", 0)
+		
+		if (delta != 0) {
+			speaker.speakPhrase("TrackGapToBehind", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+			
+			lap := knowledgeBase.getValue("Lap")
+			driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+			otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
+			
+			if (driverLap > (otherLap + 1))
+			  speaker.speakPhrase("NotTheSameLap")
+		}
+		else
+			speaker.speakPhrase("NoTrackGap")
+	}
+	
+	standingsGapToBehindRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
+			this.getSpeaker().speakPhrase("NoGapToBehind")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000, 1))
+		
+			this.getSpeaker().speakPhrase("StandingsGapToBehind", {delta: Format("{:.1f}", delta)})
+		}
+	}
+	
+	gapToLeaderRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+			this.getSpeaker().speakPhrase("NoGapToFront")
+		else {
+			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000, 1))
+		
+			this.getSpeaker().speakPhrase("GapToLeader", {delta: Format("{:.1f}", delta)})
+		}
+	}
+	
+	reportLapTime(phrase, driverLapTime, car) {
+		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+		
+		if lapTime {
+			lapTime := Round(lapTime / 1000, 1)
+			
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
+			
+			speaker.speakPhrase(phrase, {time: Format("{:.1f}", lapTime)})
+			
+			delta := (driverLapTime - lapTime)
+		
+			if (Abs(delta) > 0.5)
+				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", Abs(delta))
+															 , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+		}
+	}
+	
+	lapTimesRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		car := knowledgeBase.getValue("Driver.Car")
+		lap := knowledgeBase.getValue("Lap")
+		position := Round(knowledgeBase.getValue("Position"))
+		cars := Round(knowledgeBase.getValue("Car.Count"))
+		
+		driverLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+		
+		if (lap == 0)
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			this.getSpeaker().speakPhrase("LapTime", {time: Format("{:.1f}", driverLapTime)})
+		
+			if (position > 2)
+				this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
+			
+			if (position < cars)
+				this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+			
+			if (position > 1)
+				this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
+		}
+	}
+	
+	updateAnnouncement(announcement, value) {
+		if (value && (announcement = "DistanceInformation")) {
+			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", value)
+			
+			if !value
+				value := 2
+		}
+		
+		base.updateAnnouncement(announcement, value)
 	}
 	
 	getSpeaker(fast := false) {
@@ -288,28 +465,30 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase = this.KnowledgeBase
 		
 		if (this.Speaker && (this.Session = kSessionRace)) {
+			lastLap := knowledgeBase.getValue("Lap", 0)
+					
+			this.updatePositionInfo(lastLap)
+				
 			if !this.SpotterSpeaking {
 				this.SpotterSpeaking := true
 				
 				try {
-					lastLap := knowledgeBase.getValue("Lap", 0)
-						
-					if ((lastLap > 5) && this.AnnouncementSettings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
+					if ((lastLap > 5) && this.Warnings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 						
 						this.announceFinalLaps(lastLap)
 					}
-					else if (this.AnnouncementSettings["StartSummary"] && !this.iRaceStartSummarized && (lastLap = 2)) {
+					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap = 2)) {
 						this.iRaceStartSummarized := true
 
-						if this.AnnouncementSettings["StartSummary"]
+						if this.Warnings["StartSummary"]
 							this.summarizeRaceStart(lastLap)
 					}
 					else if (lastLap > 2) {
-						performanceUpdates := this.AnnouncementSettings["PerformanceUpdates"]
+						distanceInformation := this.Warnings["DistanceInformation"]
 						
-						if (performanceUpdates && (lastLap >= (this.iLastPerformanceUpdateLap + performanceUpdates))) {
-							this.iLastPerformanceUpdateLap := lastLap
+						if (distanceInformation && (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))) {
+							this.iLastDistanceInformationLap := lastLap
 							
 							this.updatePerformance(lastLap)
 						}
@@ -319,16 +498,13 @@ class RaceSpotter extends RaceAssistant {
 					this.SpotterSpeaking := false
 				}
 			}
-			else {
-				callback := ObjBindMethod(this, "updateDriver")
-			
-				SetTimer %callback%, -1000
-			}
+			else
+				this.iDriverUpdate := 2
 		}
 	}
 	
 	proximityAlert(type, variables := false) {
-		if ((type != "Behind") || this.AnnouncementSettings["RearProximity"]) {
+		if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
 			if (variables && !IsObject(variables)) {
 				values := {}
 				
@@ -355,7 +531,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	yellowFlag(type, arguments*) {
-		if (this.AnnouncementSettings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -380,7 +556,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	blueFlag() {
-		if (this.AnnouncementSettings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -398,7 +574,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	pitWindow(state) {
-		if (this.AnnouncementSettings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
+		if (this.Warnings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
 			this.SpotterSpeaking := true
 			
 			try {
@@ -414,17 +590,19 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	startupSpotter() {
-		code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
-		
-		exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
-		
-		if FileExist(exePath) {
-			this.shutdownSpotter()
+		if !this.iSpotterPID {
+			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 			
-			Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+			exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 			
-			if ((ErrorLevel != "Error") && spotterPID)
-				this.iSpotterPID := spotterPID
+			if FileExist(exePath) {
+				this.shutdownSpotter()
+				
+				Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				
+				if ((ErrorLevel != "Error") && spotterPID)
+					this.iSpotterPID := spotterPID
+			}
 		}
 	}
 	
@@ -437,10 +615,21 @@ class RaceSpotter extends RaceAssistant {
 		
 		processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 		
-		Process Exist, %processName%
-			
-		if ErrorLevel
-			Process Close, %ErrorLevel%
+		tries := 5
+		
+		while (tries-- > 0) {
+			Process Exist, %processName%
+		
+			if ErrorLevel {
+				Process Close, %ErrorLevel%
+				
+				Sleep 500
+			}
+			else
+				break
+		}
+		
+		this.iSpotterPID := false
 	}
 				
 	createSession(settings, data) {
@@ -474,31 +663,39 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	prepareSession(settings, data) {
-		base.prepareSession(settings, data)
-		
+	initializeWarnings(data) {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		
-		if !this.AnnouncementSettings {
+		if (!this.Warnings || (this.Warnings.Count() = 0)) {
 			configuration := this.Configuration
 			
-			announcementSettings := {}
+			warnings := {}
 			
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"] 
-				announcementSettings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+				warnings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 				
-			announcementSettings["PerformanceUpdates"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 			
-			this.updateConfigurationValues({AnnouncementSettings: announcementSettings})
+			warnings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 			
+			this.updateConfigurationValues({Warnings: warnings})
 		}
-		
+	}
+	
+	initializeGridPosition(data) {
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 		
 		if driver
 			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+	}
+	
+	prepareSession(settings, data) {
+		base.prepareSession(settings, data)
+		
+		this.initializeWarnings(data)
+		this.initializeGridPosition(data)
 		
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
@@ -511,18 +708,26 @@ class RaceSpotter extends RaceAssistant {
 	startSession(settings, data) {
 		local facts
 		
+		joined := (!this.Warnings || (this.Warnings.Count() = 0))
+		
 		if !IsObject(settings)
 			settings := readConfiguration(settings)
 		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
+		if joined {
+			this.initializeWarnings(data)
+			
+			if this.Speaker
+				this.getSpeaker().speakPhrase("Greeting")
+		}
+		
 		facts := this.createSession(settings, data)
 		
 		simulatorName := this.Simulator
 		configuration := this.Configuration
 		
-		/*
 		Process Exist, Race Engineer.exe
 		
 		if (ErrorLevel > 0)
@@ -535,9 +740,6 @@ class RaceSpotter extends RaceAssistant {
 			else
 				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
-		*/
-		
-		saveSettings := kNever
 		
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 									  , SaveSettings: saveSettings})
@@ -547,10 +749,16 @@ class RaceSpotter extends RaceAssistant {
 								, EnoughData: false})
 		
 		this.iFinalLapsAnnounced := false
-		this.iLastPerformanceUpdateLap := false
+		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
-		this.startupSpotter()
+		if joined {
+			callback := ObjBindMethod(this, "startupSpotter")
+		
+			SetTimer %callback%, -10000
+		}
+		else
+			this.startupSpotter()
 		
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
@@ -623,21 +831,57 @@ class RaceSpotter extends RaceAssistant {
 	addLap(lapNumber, data) {
 		result := base.addLap(lapNumber, data)
 		
-		if result {
-			this.updatePositionInfo(lapNumber)
-			
-			callback := ObjBindMethod(this, "updateDriver")
-			
-			SetTimer %callback%, -20000
-		}
+		if result
+			this.iDriverUpdate := 4
 	
 		return result
 	}
 	
 	updateLap(lapNumber, data) {
-		; this.KnowledgeBase.addFact("Sector", true)
+		if (this.iDriverUpdate > 0)
+			this.iDriverUpdate := (this.iDriverUpdate - 1)
 		
-		return base.updateLap(lapNumber, data)
+		if (this.iDriverUpdate = 1) {
+			this.iDriverUpdate := 0
+			
+			this.KnowledgeBase.addFact("Sector", true)
+			
+			update := true
+		}
+		else
+			update := false
+		
+		result := base.updateLap(lapNumber, data)
+		
+		if update
+			this.updateDriver()
+		
+		return result
+	}
+	
+	requestInformation(category, arguments*) {
+		switch category {
+			case "Time":
+				this.timeRecognized([])
+			case "Position":
+				this.positionRecognized([])
+			case "LapTimes":
+				this.lapTimesRecognized([])
+			case "GapToFrontStandings":
+				this.gapToFrontRecognized([])
+			case "GapToFrontTrack":
+				this.gapToFrontRecognized(["Car"])
+			case "GapToFront":
+				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToBehindStandings":
+				this.gapToBehindRecognized([])
+			case "GapToBehindTrack":
+				this.gapToBehindRecognized(["Car"])
+			case "GapToBehind":
+				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToLeader":
+				this.gapToLeaderRecognized([])
+		}
 	}
 	
 	shutdownSession(phase) {

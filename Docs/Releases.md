@@ -1,3 +1,98 @@
+## 4.1.0-release 04/29/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support "No Tyre Change" for post-preparing pitstop option changes.
+  4. Support for multiple hotkeys in "Simulator Setup".
+  5. Stability improvements in "Race Center".
+  6. New Stream Deck icons for Chat messages.
+  7. Support editing of validation rules directly from "Strategy Workbench". See the revised [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#integrating-into-strategy-workbench) for more information.
+  8. "Setup Advisor" is now able to [load, modify and save setup files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for *Assetto Corsa Competizione*.
+  9. Track names are now displayed in non-internal format for ACC tracks.
+
+## 4.0.9-release 04/22/22
+
+  1. Prevent installation to non-empty directories.
+
+## 4.0.8-release 04/22/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Fixed fuel consumption displayed as negative after pitstop in "Race Center".
+  4. Default value for the "teamServer:" plugin argument is now *Off* in a new generated configuration. Please pay attention to this, when generating a new configuration using "Simulator Setup" and create an action binding for the "TeamServer" action for at least one of the Virtual Race Assistants.
+  5. Fixed a critical stack overflow with blocking error message in the Race Assistants, when corrupt data is processed from the ACC server backend.
+  6. All new icon set for Stream Deck actions. Included as a preset in "Simulator Setup".
+  7. Race Engineer now acknowledges any additional change of pitstop options after a pitstop has been prepared in ACC or RF2.
+  8. Fixed a bug in in "Simulator Setup", so that "Assetto Corsa" is registered as a valid simulator.
+  9. Changed update frequency for icons on large or multiple Stream Decks in order to increase responsiveness.
+
+## 4.0.6-release 04/15/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Optimized pitstop search pictures for R3E.
+  4. Fixed initialization of pitstop service order in "Strategy Workbench".
+  5. Optimized chart drawing algorithms.
+  6. Better validation for number entry fields.
+  7. Support for extensive logging for Team Server and "Race Center" (use "Info" log level).
+  8. Display lap times in "M:SS.s" format in all applications of Simulator Controller.
+  9  Display initial cold pressures in "Race Center" after first lap.
+  10. Increased robustness of ACC Pitstop fallback algorithm.
+  11. Improved handling of background data processing in "Race Center".
+
+## 4.0.4-release 04/08/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Improvements and fixes in several edge cases with required pitstops for "Strategy Workbench".
+  4. Many new presets for the ACC pitstop search images thanks to contributions from iEnki (Robert Deutsch), Manfred Gnadl and Martin Moser.
+  5. Fixed broken position reporting for RaceRoom Racing Experience.
+  6. A couple of minor fixes and improvements for "Race Center".
+  7. Performance improvements for the Virtual Race Strategist by 20% for standings, track gap and future predictions.
+  8. Initial preparation for sector based timing in the shared memory interfaces.
+  9. More frequent position and gap update for Race Strategist and Race Spotter.
+  10. Fixed a bug where the Spotter got into an endless loop announcing pit window in Assetto Corsa Competizione.
+  11. Allow the Spotter to give the same information as the Strategist about track and standings gaps, the current race position and so on. These commands are available as voice commands and also as actions for your hardware controller. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for more information, which commands are available.
+  12. [Experts Only] The translation management for various items has been reworked. Only changed values are stored in the local configuration database. This affects the following categories:
+  
+      - Translations (handled by the [Translation editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor))
+      - Phrase Grammars (handled as plain text file)
+      - Controller Action Labels (handled by the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+      - Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
+      - Settings Definition Files for "Session Database" (handled as plain text file)
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-404) and check whether any manual updates to your local configuration might be necessary.
+
+## 4.0.2-release 04/01/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full support for cloud based voice recognition. Use *Azure Cognitive Services* for the best possible recognition quality. You can choose in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), which recognition language you want to use (as long as a grammar for this language is available).
+  4. The selection of the new cloud based voice recognition is also possible using the [plugin parameters](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the Virtual Race Assistants.
+  5. A new preset function in "Simulator Setup" let you pre-install Button Box and Stream Deck layouts and gives you control over some very special configuration options.
+  6. The Race Spotter will start with its announcements when the race is started. Implemented for all simulators.
+  7. [Experts Only] The [patch mechanism](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for configuration files generated by "Simulator Setup" has been extended.
+  8. [Experts Only] The phrase grammars have changed and were extended. So, if you have your own files here, you have to merge your changes. A new placeholder variable "(Digit)" has been introduced for single-digit numbers. Use it whereever possible, it will increase recognition performance.
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-402) and check whether any manual updates to your local configuration might be necessary.
+
+## 4.0.0-release 03/25/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Full implementation of the database consolidation and distribution process. Depending on your own consent, you will receive new tyre pressure information or even shared car setups from the community every 2 days. Because of this, you will be asked to renew your consent for sharing your own data, because you will only receive anything, if you are also willing to share.
+  4. New voice commands for the Virtual Race Spotter and the other assistants to enable or disable announcments and warnings while out on the track. You can say, for example: "No more weather warnings please" or "Please give me blue flag warnings". See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements) for more information.
+  5. Support for .NET compatible TTS 5.1 voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
+  6. Support for an additional voice recognition framework, which provide a much better recognition rate and quality, as long as you have a decent voice audio quality (for example when using a headset). The changes are documented [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well.
+  7. Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer" and introduced new parameter "raceAssistantRecognizer" for all race assistant plugins. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
+  8. Integrated the new cars of the Challenger DLC into the car model file for ACC.
+  9. Updated the spectator overlay file for R3E to reflect the latest additions in RaceRoom Racing Experience.
+  10. Spotter side proximity warnings may now be disabled as well.
+  11. Fixed a bug in race report viewer, when a report shows up as empty although correct data is available.
+  12. [Developer] Added a class library for handling complex FTP operations.
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-400) and check whether any manual updates to your local configuration might be necessary.
+
 ## 3.9.8-release 03/18/22
 
   1. Bugfixes, as always

@@ -1,15 +1,15 @@
 #### Driver Support
-  1. [Target: V4.0.x] Configuration of assistant verbosity and overhaul (shortening) of phrases.
+  1. [Target: V4.x] Overhaul (shortening) of assistant phrases
   2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
+  5. [Target: V4.2][Race Spotter Plugin] Supply in-depth performance and safety analysis for the car in front before overtaking.
 
 #### Strategy Development
-  1. [Target: V3.x - V4.0] Using the technology of Jona, implement a Race Strategy Expert
-     - Adjust pitstop strategy depending on upcoming weather conditions
+  1. [Target: V4.x] Enhancements for Race Strategist
+     - Automatically adjust pitstop strategy depending on upcoming weather conditions
+	 - Support in Race Center to simulate alternative strategies for possible weather development
 
-#### Setup Development
-  1. [Target: VV4.0.x] Consolidating the shared database and build a distribution process
-  
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game
+  2. [Target: V4.x] Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"

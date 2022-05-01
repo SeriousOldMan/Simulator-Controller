@@ -168,6 +168,16 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
+### Enabling and disabling specific warnings and announcements
+
+Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings by using a special voice command:
+
+	[Please] No more *warning* [please]
+
+As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
+
+	[Please] Give me *warning* [please]
+
 ## Racing with Jona
 
 Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions.
@@ -371,7 +381,7 @@ When your data is transferred, no direct or indirect personal data is involved. 
 
 Note: You can give separate consents for sharing your tyre pressure setups and your mechanical and aerodynamic car setups, since the later might be considered to be some sort of private secret, for example. Furthermore, you must explicitly upload car setup data to include it to the session database, so you can decide which data you want to share. On the other hand, tyre pressures will be collected automatically by Jona, but you will be asked whether to include them in the session database (see below).
 
-If you have given your consents, all data of your local races will be transferred to a cloud database once a week. For the moment, nothing more will happen. The functionality will come to live with a later Release of the Version 3 cycle. You will get a payback in terms of a consolidated database of all contributors and Jona will use the data to help you in your setup task in the pit, but also during a race, when radical weather changes are upcoming. This database will then be updated for you once a week too, so you will always get the latest and greatest setup data.
+If you have given your consents, the data collected in your local sessions will be transferred to a cloud database once a week. You will get a payback in terms of a consolidated database of all contributors and Jona will use the data to help you in your setup task in the pit, but also during a race, when radical weather changes are upcoming. This community database will be updated on your local PC every two days, so you will always get the latest and greatest setup data. The update process works completely in the background, so nothing to do on your side.
 
 For the moment, the data collection consist of tyre and car setup information for the different track and weather conditions, as long, as they are available in the different simulation telemetry interfaces. But there will be more in the future. For example, there are ideas in the backlog to use race position data and pitstop events from the races to optimize the pitstop strategy with regards to the most positive effect on race position. Neural networks and reenforcment learning algorithms will be used for that, but to be able to do this, our joint database needs to have enough data points, so this will take some time.
 
@@ -395,11 +405,12 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community"). Since the community setups have not been consolidated yet, these two settings are identical for the moment.
+With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community").
 
-Note: You can use the local database, even if you do not have given consent to share your tyre pressure setups with the community.
+Important:
 
-Important: Simulator Controller does not know anything about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+  1. If you change the scope using the dropdown menu mentioned above, this will affect only the behaviour and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values ​​by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
+  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
 
 Following you will find an overview about the different database topics:
 
@@ -441,6 +452,18 @@ This tab allows you to store your preferred car setup files for different condit
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
 Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator.
+
+##### Naming conventions
+
+Although technically not strictly necessary, it would be benificial that everybody who contributes to the setup collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
+
+	[Nickname] [T Air] [T Track] [Weather] [Track Surface] [Compound]
+
+Example: "TBO 21 27 Drizzle Damp Dry(Soft)" - (TBO is my nickname (for TheBigO), Dry(Soft) is the tyre compound, the rest is self-explanatory)
+
+Why so complex? There is a strong dependency between the track surface state, air and track temperatures and the needed tyre pressures. Following this convention will give any user of the setup enough information how to alter the pressures for different conditions.
+
+Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
 #### Tyre Pressure Advisor
 
@@ -508,7 +531,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hand it over to Jona. Small applications "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. These readers run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0
@@ -525,6 +548,7 @@ A considerable part of the knowledge of Jona comes from the telemetry informatio
 	DriverForname=The
 	DriverSurname=BigO
 	DriverNickname=TBO
+	Sector=2
 	Laps=3
 	LapLastTime=116697
 	LapBestTime=116697
@@ -581,9 +605,9 @@ It has been reported, that the system sound volume gets sometimes significantly 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Microphon%20Properties.JPG)
 
-Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user *Documents* folder. If you think, that you found a bug, it  would be very helpful for me, when you attach this file to any reported issue.
+Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user *Documents* folder. If you think, that you have found a bug in Jonas behaviour, it would be very helpful for me, when you attach this file to any reported issue.
 
-And, last but not least, you might have a problem with the Shared Memory Reader for a simulation game. Please check, if a file "SHM.data" exists in the *Simulator Controller\Temp\XXX Data* folder (where XXX is the three letter short code for the simulation), which is located in your user *Documents* folder. If this file does not exist, you might try a complete reinstall.
+And, last but not least, you might have a problem with the Shared Memory Reader for a simulation game. Please check, if files named "Race Engineer Lap X.Y.data" (where X and Y are consecutive running numbers) exists in the *Simulator Controller\Temp\XXX Data* folder (where XXX is the three letter short code for the simulation), which is located in your user *Documents* folder. Use a text editor to check whether these files have a content as shown a bove in the section about [telemetry integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration). If these files do not exist or haven't a meaningful content, you might try a complete reinstall.
 
 If you still have problems with voice recognition, you might try this combination:
 

@@ -58,19 +58,6 @@ priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                           Lap Time Calculation                          ;;;
-;;;                                                                         ;;;
-;;; Updates the laptimes for all cars each lap.                             ;;;
-;;;-------------------------------------------------------------------------;;;
-
-{Any: [?Lap], [?Sector]} => (Prove: updateLapTimes(?Lap, !Car.Count))
-
-updateLapTimes(?, ?car) <= =<(?car, 0), !
-updateLapTimes(?lap, ?car) <= carLapTime(?car, ?lapTime), Set(Standings.Lap, ?lap, Car, ?car, Time, ?lapTime),
-							  ?nextCar = ?car - 1, updateLapTimes(?lap, ?nextCar)
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                      Position & Lap Delta Calculation                   ;;;
 ;;;                                                                         ;;;
 ;;; Updates the gaps and lap time deltas for various cars each lap.         ;;;
@@ -112,7 +99,7 @@ clearStanding(?)
 
 clearStanding(?, 0) <= !
 clearStanding(?, ?car) <= ?car < 0, !
-clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Delta, Laps, Time, Time.Average,
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Nr, Delta, Laps, Time, Time.Average,
 														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 

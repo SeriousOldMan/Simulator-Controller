@@ -53,10 +53,14 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		wizard := this.SetupWizard
 		
+		simulators := []
+		
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
 			
 			if wizard.isApplicationSelected(simulator) {
+				simulators.Push(simulator)
+				
 				arguments := ""
 				
 				for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
@@ -100,6 +104,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			else
 				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 		}
+		
+		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -192,7 +198,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, Norm, Arial
 		
-		Gui Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -334,7 +340,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(getFileName("Controller Action Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
+		pluginLabels := getControllerActionLabels()
 		
 		code := getApplicationDescriptor(simulator)[1]
 		

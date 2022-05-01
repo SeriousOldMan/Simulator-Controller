@@ -48,7 +48,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	
-	iImageMode := true
+	iFallbackMode := false
 	
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -212,7 +212,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if this.UDPConnection
 					options := ("-Connect " . this.UDPConnection)
 				
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide, pid
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide
 				
 				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
 				
@@ -252,11 +252,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			this.iUDPClient := false
 		}
-		
-		return false
 	}
 	
 	requireUDPClient() {
+		Process Exist, ACC UDP Provider.exe
+		
+		if !ErrorLevel {
+			if this.iUDPClient
+				OnExit(this.iUDPClient, 0)
+			
+			this.iUDPClient := false
+		}
+		
 		if !this.UDPClient
 			this.startupUDPClient()
 	}
@@ -274,17 +281,19 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		
 		if (sessionState == kSessionRace)
 			this.startupUDPClient()
-		
-		if (sessionState == kSessionFinished) {
-			this.iRepairSuspensionChosen := true
-			this.iRepairBodyworkChosen := true
+		else {
+			if (sessionState == kSessionFinished) {
+				this.iRepairSuspensionChosen := true
+				this.iRepairBodyworkChosen := true
+			}
 			
-			this.shutdownUDPClient()
+			if (sessionState != kSessionPaused)
+				this.shutdownUDPClient()
 		}
 	}
 	
 	updatePositionsData(data) {
-		static carNames := false
+		static carIDs := false
 		static lastDriverCar := false
 		
 		if (this.SessionState == kSessionRace)
@@ -292,8 +301,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		else if !this.UDPClient
 			return
 		
-		if !carNames
-			carNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Model.ini")
+		if !carIDs
+			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
 		
 		fileName := kTempDirectory . "ACCUDP.cmd"
 		
@@ -337,7 +346,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if (carID == kUndefined)
 					break
 				else {
-					car := getConfigurationValue(carNames, "Car Model", carID, "Unknown")
+					car := (carIDs.HasKey(carID) ? carIDs[carID] : "Unknown")
 					
 					if ((car = "Unknown") && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
@@ -399,6 +408,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			default:
 				Send %command%
 		}
+		
+		Sleep 20
 	}
 	
 	openPitstopMFD(descriptor := false, update := true) {
@@ -415,7 +426,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
 			
-				if this.iImageMode
+				if !this.iFallbackMode
 					if (update || !wasOpen) {
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
@@ -462,16 +473,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	requirePitstopMFD() {
 		static reported := false
 		
+		if (this.iFallbackMode = "Retry")
+			this.iFallbackMode := false
+		
 		this.openPitstopMFD()
 		
-		if (!this.iPSIsOpen && !reported && (this.OpenPitstopMFDHotkey != "Off")) {
-			reported := true
-			
-			logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
-			
+		if (this.OpenPitstopMFDHotkey = "Off")
+			return false
+		else if !this.iPSIsOpen {
+			if !reported {
+				reported := true
+				
+				logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
+				
+				Loop 2
+					SoundPlay %kResourcesDirectory%Sounds\Critical.wav, Wait
+			}
+				
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 			
-			this.iImageMode := false
+			this.iFallbackMode := true
 			
 			SetTimer updatePitstopState, Off
 			
@@ -489,12 +510,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			return true
 		}
-		else if reported
-			return true
-		else if (this.OpenPitstopMFDHotkey == "Off")
-			return false
 		else
-			return this.iPSIsOpen
+			return true
 	}
 	
 	selectPitstopOption(option, retry := true) {
@@ -628,6 +645,19 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						this.changePitstopOption(activity, "Increase")
 				default:
 					Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
+			}
+	}
+	
+	notifyPitstopChanged(option) {
+		if this.RaceEngineer
+			switch option {
+				case "Change Tyres":
+					newValues := this.getPitstopOptionValues("Tyre Compound")
+					
+					if newValues
+						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
+				default:
+					base.notifyPitstopChanged(option)
 			}
 	}
 
@@ -802,33 +832,50 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitstopLabels.Length()
-		{
-			pitstopLabel := pitstopLabels[A_Index]
-			
-			if !this.iPSImageSearchArea {
-				ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+		localLabels := false
+		
+		for ignore, fileName in pitstopLabels
+			if InStr(fileName, kUserScreenImagesDirectory) {
+				localLabels := true
+				
+				break
 			}
-			else {
-				ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+			
+		Loop % (localLabels ? 3 : 1)
+		{
+			Loop % pitstopLabels.Length()
+			{
+				pitstopLabel := pitstopLabels[A_Index]
+				
+				if !this.iPSImageSearchArea {
+					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopLabel%
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				else {
+					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopLabel%
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: "PITSTOP", ticks: A_TickCount - curTickCount}))
+				}
+				
+				if imageX is Integer
+				{
+					if isDebug() {
+						images.Push(pitstopLabel)
+						
+						this.markFoundLabel(pitstopLabel, imageX, imageY)
+					}
+				
+					break
+				}
 			}
 			
 			if imageX is Integer
-			{
-				if isDebug() {
-					images.Push(pitstopLabel)
-					
-					this.markFoundLabel(pitstopLabel, imageX, imageY)
-				}
-			
 				break
-			}
+			else
+				Sleep 500
 		}
 		
 		lastY := false
@@ -903,7 +950,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lastY := imageY
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Pit Strategy' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Strategy")
@@ -918,7 +965,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Pit Strategy' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -980,7 +1027,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lastY := imageY
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Refuel' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			if !inList(this.iPSOptions, "Refuel") {
@@ -993,7 +1040,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Refuel' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -1215,7 +1262,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
 			position := inList(this.iPSOptions, "Select Driver")
@@ -1227,7 +1274,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		
 			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: " . values2String(", ", this.iPSOptions*)))
+				logMessage(kLogInfo, translate("'Select Driver' not detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		
 		return reload
@@ -1300,9 +1347,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					
 					return [getConfigurationValue(data, "Setup Data", "TyreSet", 0)]
 				case "Tyre Compound":
-					data := readSimulatorData(this.Code, "-Setup")
+					if this.iPSChangeTyres {
+						data := readSimulatorData(this.Code, "-Setup")
 					
-					return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+						return [getConfigurationValue(data, "Setup Data", "TyreCompound", false), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", false)]
+					}
+					else
+						return [false, false]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":
@@ -1316,7 +1367,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
-		openPitstopMFD()
+		if this.iFallbackMode
+			this.iFallbackMode := "Retry"
+		
+		withProtection(ObjBindMethod(this, "requirePitstopMFD"))
 	}
 
 	finishPitstopSetup(pitstopNumber) {

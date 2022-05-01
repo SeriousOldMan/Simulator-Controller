@@ -23,9 +23,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantName := false
 	iRaceAssistantLogo := false
 	iRaceAssistantLanguage := false
-	iRaceAssistantService := false
+	iRaceAssistantSynthesizer := false
 	iRaceAssistantSpeaker := false
 	iRaceAssistantSpeakerVocalics := false
+	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
 	
 	iRaceAssistant := false
@@ -43,8 +44,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iFinished := false
 	
 	class RemoteRaceAssistant {
+		iPlugin := false
 		iRemoteEvent := false
 		iRemotePID := false
+		
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
 		
 		RemotePID[] {
 			Get {
@@ -52,12 +60,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 		
-		__New(remoteEvent, remotePID) {
+		__New(plugin, remoteEvent, remotePID) {
+			this.iPlugin := plugin
 			this.iRemoteEvent := remoteEvent
 			this.iRemotePID := remotePID
 		}
 		
 		callRemote(function, arguments*) {
+			Process Exist, % (this.Plugin.Plugin . ".exe")
+			
+			if ErrorLevel {
+				if (ErrorLevel != this.RemotePID)
+					this.iRemotePID := ErrorLevel
+			}
+			else
+				return
+				
 			raiseEvent(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 		
@@ -328,9 +346,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
-	RaceAssistantService[] {
+	RaceAssistantSynthesizer[] {
 		Get {
-			return this.iRaceAssistantService
+			return this.iRaceAssistantSynthesizer
 		}
 	}
 	
@@ -346,6 +364,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 	
+	RaceAssistantRecognizer[] {
+		Get {
+			return this.iRaceAssistantRecognizer
+		}
+	}
+	
 	RaceAssistantListener[] {
 		Get {
 			return this.iRaceAssistantListener
@@ -358,7 +382,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (!this.Active && !isDebug())
 			return
 		
-		this.iTeamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		teamServer := this.Controller.findPlugin(kTeamServerPlugin)
+		
+		if (teamServer && this.Controller.isActive(teamServer))
+			this.iTeamServer := teamServer
+		else
+			teamServer := false
 		
 		this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
 		this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
@@ -383,14 +412,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
 		
-		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
 		teamServerToggle := this.getArgumentValue("teamServer", false)
 		
 		if (teamServerToggle && teamServer && teamServer.Active) {
 			arguments := string2Values(A_Space, teamServerToggle)
 	
 			if (arguments.Length() == 0)
-				arguments := ["On"]
+				arguments := ["Off"]
 			
 			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
 				arguments.InsertAt(1, "Off")
@@ -437,7 +465,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 		
-		this.iRaceAssistantService := this.getArgumentValue("raceAssistantService", false)
+		this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
 		
 		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
 		
@@ -445,6 +473,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 		
 			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+		
+			this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
 		
 			assistantListener := this.getArgumentValue("raceAssistantListener", false)
 			
@@ -543,7 +573,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					theAction.Function.disable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.TeamServerToggleAction) {
-				teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+				teamServer := this.TeamServer
 				
 				theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
 				
@@ -590,14 +620,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 	
 	enableTeamServer() {
-		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.Active)
 			teamServer.enableTeamServer()
 	}
 	
 	disableTeamServer() {
-		teamServer := this.Controller.FindPlugin(kTeamServerPlugin)
+		teamServer := this.TeamServer
 		
 		if (teamServer && teamServer.Active)
 			teamServer.disableTeamServer()
@@ -628,14 +658,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if this.RaceAssistantLanguage
 					options .= " -Language """ . this.RaceAssistantLanguage . """"
 				
-				if this.RaceAssistantService
-					options .= " -Service """ . this.RaceAssistantService . """"
+				if this.RaceAssistantSynthesizer
+					options .= " -Synthesizer """ . this.RaceAssistantSynthesizer . """"
 				
 				if this.RaceAssistantSpeaker
 					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
 				
 				if this.RaceAssistantSpeakerVocalics
 					options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
+				
+				if this.RaceAssistantRecognizer
+					options .= " -Recognizer """ . this.RaceAssistantRecognizer . """"
 				
 				if this.RaceAssistantListener
 					options .= " -Listener """ . this.RaceAssistantListener . """"
@@ -1095,7 +1128,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 					
-						if (this.iLastLapCounter = 5) {
+						if (this.iLastLapCounter = 3) {
 							dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
 								
 							writeConfiguration(dataFile, data)
@@ -1333,37 +1366,45 @@ prepareSessionDatabase(data) {
 	
 	plugin := controller.findPlugin(kRaceEngineerPlugin)
 	
-	if !plugin
+	if (!plugin || !controller.isActive(plugin))
 		plugin := controller.findPlugin(kRaceStrategistPlugin)
 	
-	if plugin.Simulator
-		new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator()
-											, getConfigurationValue(data, "Session Data", "Car", "Unknown")
-											, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceSpotterPlugin)
+	
+	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+		sessionDB := new SessionDatabase()
+		
+		sessionDB.prepareDatabase(sessionDB.getSimulatorCode(plugin.Simulator.runningSimulator())
+								, getConfigurationValue(data, "Session Data", "Car", "Unknown")
+								, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
+	}
 }
 
 getSimulatorOptions(plugin := false) {
 	controller := SimulatorController.Instance
 	
-	if !plugin {
+	if (!plugin || !controller.isActive(plugin))
 		plugin := controller.findPlugin(kRaceEngineerPlugin)
 		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceStrategistPlugin)
+		
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceSpotterPlugin)
 	
 	options := ""
 	
-	if plugin.Simulator {
+	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
 		data := readSimulatorData(plugin.Simulator.Code)
 		
 		if getConfigurationValue(data, "Session Data", "Active", false) {
-			options := "-Simulator """ . plugin.Simulator.runningSimulator() . """"
+			options := "-Simulator """ . new SessionDatabase().getSimulatorName(plugin.Simulator.runningSimulator()) . """"
 			options .= " -Car """ . getConfigurationValue(data, "Session Data", "Car", "Unknown") . """"
 			options .= " -Track """ . getConfigurationValue(data, "Session Data", "Track", "Unknown") . """"
 			options .= " -Weather " . getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-			options .= " -AirTemperature " . getConfigurationValue(data, "Weather Data", "Temperature", "23")
-			options .= " -TrackTemperature " . getConfigurationValue(data, "Track Data", "Temperature", "27")
+			options .= " -AirTemperature " . Round(getConfigurationValue(data, "Weather Data", "Temperature", "23"))
+			options .= " -TrackTemperature " . Round(getConfigurationValue(data, "Track Data", "Temperature", "27"))
 			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
 			options .= " -CompoundColor " . getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Dry")
 			options .= " -Map " . getConfigurationValue(data, "Car Data", "MAP", "n/a")
@@ -1384,12 +1425,14 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 	exePath := kBinariesDirectory . "Race Settings.exe"
 	controller := SimulatorController.Instance
 	
-	if !plugin {
+	if (!plugin || !controller.isActive(plugin))
 		plugin := controller.findPlugin(kRaceEngineerPlugin)
 		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceStrategistPlugin)
+		
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceSpotterPlugin)
 	
 	if !fileName
 		fileName := kUserConfigDirectory . "Race.settings"
@@ -1398,7 +1441,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		if import {
 			options := "-File """ . fileName . """ -Import"
 			
-			if (plugin && plugin.Simulator)
+			if (plugin && controller.isActive(plugin) && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
 			
 			if silent
@@ -1412,11 +1455,16 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 		}
 		
-		if pid {
-			callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
+		if pid
+			for ignore, plugin in [kRaceEngineerPlugin, kRaceStrategistPlugin, kRaceSpotterPlugin] {
+				plugin := controller.findPlugin(plugin)
 			
-			SetTimer %callback%, -1000
-		}
+				if (plugin && controller.isActive(plugin)) {
+					callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
+					
+					SetTimer %callback%, -1000
+				}
+			}
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1428,14 +1476,6 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 
 openSessionDatabase(plugin := false) {
 	exePath := kBinariesDirectory . "Session Database.exe"	
-	controller := SimulatorController.Instance
-	
-	if !plugin {
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
 	
 	try {
 		options := getSimulatorOptions(plugin)
@@ -1452,14 +1492,6 @@ openSessionDatabase(plugin := false) {
 
 openSetupAdvisor(plugin := false) {
 	exePath := kBinariesDirectory . "Setup Advisor.exe"	
-	controller := SimulatorController.Instance
-	
-	if !plugin {
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
 	
 	try {
 		options := getSimulatorOptions(plugin)
@@ -1476,14 +1508,6 @@ openSetupAdvisor(plugin := false) {
 
 openStrategyWorkbench(plugin := false) {
 	exePath := kBinariesDirectory . "Strategy Workbench.exe"	
-	controller := SimulatorController.Instance
-	
-	if !plugin {
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
 	
 	try {
 		options := getSimulatorOptions(plugin)
@@ -1500,14 +1524,6 @@ openStrategyWorkbench(plugin := false) {
 
 openRaceCenter(plugin := false) {
 	exePath := kBinariesDirectory . "Race Center.exe"	
-	controller := SimulatorController.Instance
-	
-	if !plugin {
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-		
-		if !plugin
-			plugin := controller.findPlugin(kRaceStrategistPlugin)
-	}
 	
 	try {
 		options := getSimulatorOptions(plugin)

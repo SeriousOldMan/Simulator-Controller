@@ -355,6 +355,8 @@ int main(int argc, char* argv[]) {
 		unsigned int updateIndex(0);
 		unsigned int indexChange(0);
 
+		bool running = false;
+
 		while (true)
 		{
 			if (sharedData->mSequenceNumber % 2)
@@ -374,17 +376,22 @@ int main(int argc, char* argv[]) {
 				// More writes had happened during the read. Should be rare, but can happen.
 				continue;
 			}
+			
+			if (!running)
+				running = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
 
-			if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-				if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-					checkPitWindow(localCopy);
-			}
-			else {
-				lastSituation = CLEAR;
-				carBehind = false;
-				carBehindReported = false;
+			if (running) {
+				if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
+					if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+						checkPitWindow(localCopy);
+				}
+				else {
+					lastSituation = CLEAR;
+					carBehind = false;
+					carBehindReported = false;
 
-				lastFlagState = 0;
+					lastFlagState = 0;
+				}
 			}
 
 			Sleep(50);

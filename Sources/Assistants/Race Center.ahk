@@ -14,6 +14,8 @@
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
+#MaxMem 128
+
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
@@ -95,6 +97,8 @@ global vWorking := 0
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global messageField
+
 global serverURLEdit
 global serverTokenEdit
 global teamDropDownMenu
@@ -156,10 +160,10 @@ global pitstopLapEdit
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
-global pitstopPressureFLEdit
-global pitstopPressureFREdit
-global pitstopPressureRLEdit
-global pitstopPressureRREdit
+global pitstopPressureFLEdit := ""
+global pitstopPressureFREdit := ""
+global pitstopPressureRLEdit := ""
+global pitstopPressureRREdit := ""
 global pitstopRepairsDropDown
 
 class RaceCenter extends ConfigurationItem {
@@ -219,6 +223,8 @@ class RaceCenter extends ConfigurationItem {
 	iStintsListView := false
 	iLapsListView := false
 	iPitstopsListView := false
+	
+	iSelectedPlanStint := false
 	
 	iSessionDatabase := false
 	iTelemetryDatabase := false
@@ -632,7 +638,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	HasData[] {
 		Get {
-			return (this.SessionActive || this.SessionLoaded)
+			return ((this.SessionActive && this.CurrentStint) || this.SessionLoaded)
 		}
 	}
 	
@@ -804,11 +810,16 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	SelectedPlanStint[] {
+		Get {
+			return this.iSelectedPlanStint
+		}
+	}
+	
 	SessionDatabase[] {
 		Get {
-			if (!this.iSessionDatabase && this.HasData) {
+			if !this.iSessionDatabase
 				this.iSessionDatabase := new Database(this.SessionDirectory, kSessionDataSchemas)
-			}
 			
 			return this.iSessionDatabase
 		}
@@ -869,7 +880,7 @@ class RaceCenter extends ConfigurationItem {
 		dllFile := kBinariesDirectory . dllName
 		
 		try {
-			if (!FileExist(dllFile)) {
+			if !FileExist(dllFile) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 				
 				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
@@ -1035,7 +1046,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x8 y750 w1200 0x10
 		
-		Gui %window%:Add, Button, x574 y756 w80 h23 GcloseRaceCenter, % translate("Close")
+		Gui %window%:Add, Text, x16 y762 w554 vmessageField
+		Gui %window%:Add, Button, x574 y759 w80 h23 GcloseRaceCenter, % translate("Close")
 
 		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
@@ -1184,11 +1196,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h20, % translate("Pressures")
 		
-		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit
+		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit gvalidatePitstopPressureFL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit gvalidatePitstopPressureFR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
-		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit
-		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit
+		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit gvalidatePitstopPressureRL
+		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit gvalidatePitstopPressureRR
 		Gui %window%:Add, Text, x214 yp+2 w30 h20, % translate("PSI")
 		
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
@@ -1207,6 +1219,17 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.updateStrategyMenu()
 		this.updateState()
+	}
+	
+	showMessage(message, prefix := false) {
+		if !prefix
+			prefix := translate("Step: ")
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		GuiControl Text, messageField, % ((message && (message != "")) ? (translate(prefix) . message) : "")
 	}
 	
 	connect(silent := false) {
@@ -1293,7 +1316,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		this.loadSessions()
-		this.loadSessionDrivers()
 	}
 	
 	loadSessions() {
@@ -1349,6 +1371,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	selectSession(identifier) {
+		SetTimer syncSession, Off
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1369,6 +1393,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		this.initializeSession()
+		this.loadSessionDrivers()
+		
+		syncSession()
 	}
 	
 	addDriver(driver) {
@@ -1476,6 +1503,13 @@ class RaceCenter extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
+		if (selected != this.SelectedPlanStint) {
+			this.iSelectedPlanStint := false
+			selected := false
+			
+			LV_Modify(selected, "-Select")
+		}
+		
 		if selected {
 			GuiControl Enable, driverDropDownMenu
 			GuiControl Enable, planTimeEdit
@@ -1571,6 +1605,11 @@ class RaceCenter extends ConfigurationItem {
 			
 			Gui ListView, % this.PlanListView
 		
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			
 			pitstops := this.Strategy.Pitstops
 			
 			numStints := (pitstops.Length() + 1)
@@ -1631,9 +1670,11 @@ class RaceCenter extends ConfigurationItem {
 				time := string2Values(":", time)
 				
 				currentTime := "20200101000000"
-				
-				EnvAdd currentTime, time[1], Hours
-				EnvAdd currentTime, time[2], Minutes
+					
+				if (time.Length() = 2) {
+					EnvAdd currentTime, time[1], Hours
+					EnvAdd currentTime, time[2], Minutes
+				}
 			}
 			
 			lastTime := 0
@@ -1683,6 +1724,8 @@ class RaceCenter extends ConfigurationItem {
 				
 				LV_Delete()
 				
+				this.iSelectedPlanStint := false
+			
 				this.updateState()
 			}
 		}
@@ -1695,6 +1738,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui ListView, % this.PlanListView
 		
+		Loop % LV_GetCount()
+			LV_Modify(A_Index, "-Select")
+		
+		this.iSelectedPlanStint := false
+			
 		if IsObject(minutesOrStint) {
 			if (LV_GetCount() > 0) {
 				time := this.computeStartTime(minutesOrStint)
@@ -1744,6 +1792,14 @@ class RaceCenter extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
+		if (selected != this.SelectedPlanStint) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			selected := false
+		}
+			
 		if selected {
 			position := ((position = "After") ? selected + 1 : selected)
 			
@@ -1767,10 +1823,16 @@ class RaceCenter extends ConfigurationItem {
 		
 		initial := ((stintNr = 1) ? "-" : "")
 			
-		if position
+		if position {
 			LV_Insert(position, "Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
-		else
+			
+			this.iSelectedPlanStint := position
+		}
+		else {
 			LV_Add("Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
+		
+			this.iSelectedPlanStint := LV_GetCount()
+		}
 		
 		GuiControl Choose, driverDropDownMenu, 1
 		GuiControl, , planTimeEdit, 20200101000000
@@ -1796,6 +1858,14 @@ class RaceCenter extends ConfigurationItem {
 		Gui ListView, % this.PlanListView
 		
 		selected := LV_GetNext(0)
+		
+		if (selected != this.SelectedPlanStint) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedPlanStint := false
+			selected := false
+		}
 		
 		if selected {
 			LV_Delete(selected)
@@ -2166,12 +2236,17 @@ class RaceCenter extends ConfigurationItem {
 			simulator := this.Simulator
 			car := this.Car
 			track := this.Track
-			sessionDB := new SessionDatabase()
-			simulatorCode := sessionDB.getSimulatorCode(simulator)
 			
-			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
-			
-			FileCreateDir %dirName%
+			if (car && track) {
+				sessionDB := new SessionDatabase()
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
+				
+				dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+				
+				FileCreateDir %dirName%
+			}
+			else
+				dirName := ""
 		}
 		else
 			dirName := ""
@@ -2377,8 +2452,18 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					Process Exist
 					
-					options := ["-Simulator", this.Simulator, "-Car", this.Car, "-Track", this.Track, "-Weather", this.Weather
-							  , "-AirTemperature", this.AirTemperature, "-TrackTemperature", this.TrackTemperature, "-Setup", ErrorLevel]
+					pid := ErrorLevel
+					
+					options := ["-Setup", pid]
+							  
+					if (this.Simulator && this.Car && this.Track) {
+						simulator := new SessionDatabase().getSimulatorName(this.Simulator)
+						
+						options := concatenate(options, ["-Simulator", """" . simulator . """", "-Car", """" . this.Car . """", "-Track", """" . this.Track . """"
+													   , "-Weather", this.Weather
+													   , "-AirTemperature", Round(this.AirTemperature), "-TrackTemperature", Round(this.TrackTemperature)])
+					}
+					
 					options := values2String(A_Space, options*)
 					
 					Run "%exePath%" %options%, %kBinariesDirectory%, , pid
@@ -2435,7 +2520,7 @@ class RaceCenter extends ConfigurationItem {
 	
 	selectStrategy(strategy, show := false) {
 		if this.Strategy
-			this.Strategy.dipose()
+			this.Strategy.dispose()
 		
 		this.iStrategy := strategy
 		
@@ -2769,7 +2854,11 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	finishWorking() {
-		return this.startWorking(false)
+		this.startWorking(false)
+	}
+	
+	isWorking() {
+		return (vWorking > 0)
 	}
 	
 	initializeSession() {
@@ -2806,6 +2895,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
+		this.iSelectedPlanStint := false
+		
 		Gui ListView, % this.StintsListView
 		
 		LV_Delete()
@@ -2818,7 +2909,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
-		GuiControl, , driverDropDownMenu, % "|"
+		if this.SessionActive
+			this.loadSessionDrivers()
+		else
+			GuiControl, , driverDropDownMenu, % "|"
 		
 		this.iDrivers := []
 		this.iStints := {}
@@ -2837,7 +2931,8 @@ class RaceCenter extends ConfigurationItem {
 
 		GuiControlGet sessionDateCal
 		GuiControlGet sessionTimeEdit
-		
+
+		this.iVersion := false
 		this.iDate := sessionDateCal
 		this.iTime := sessionTimeEdit
 		
@@ -2851,6 +2946,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.iTyreCompound := false
 		this.iTyreCompoundColor := false
+		
+		this.iStrategy := false
 	
 		this.showChart(false)
 		this.showDetails(false, false)
@@ -2887,7 +2984,13 @@ class RaceCenter extends ConfigurationItem {
 				identifier := stint.Identifier
 				
 				driver := this.addDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
+
+				message := (translate("Load stint (Stint: ") . stint.Nr . translate(", Driver: ") . driver.FullName . translate(")"))
 				
+				this.showMessage(message)
+				
+				logMessage(kLogInfo, message)
+		
 				stint.Driver := driver
 				driver.Stints.Push(stint)
 				stint.FuelConsumption := 0.0
@@ -2949,7 +3052,11 @@ class RaceCenter extends ConfigurationItem {
 				if (!rawData || (rawData == "")) {
 					tries -= 1
 					
+					this.showMessage(translate("Waiting for data"))
+								
 					if (tries <= 0) {
+						this.showMessage(translate("Give up - use default values"))
+								
 						newLaps.RemoveAt(A_Index, newLaps.Length() - A_Index + 1)
 						
 						return newLaps
@@ -2957,8 +3064,14 @@ class RaceCenter extends ConfigurationItem {
 					else
 						Sleep 400
 				}
-				else
+				else {
+					this.showMessage(translate("Load lap data (Lap: ") . lap.Nr . translate(")"))
+				
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Load lap data (Lap: ") . lap.Nr . translate("), Data: `n`n") . rawData . "`n")
+		
 					break
+				}
 			}
 			
 			if (stint.Laps.Length() == 0)
@@ -2992,8 +3105,11 @@ class RaceCenter extends ConfigurationItem {
 			
 			if ((lap.Nr == 1) || (stint.Laps[1] == lap))
 				lap.FuelConsumption := "-"
-			else
-				lap.FuelConsumption := Round((this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining), 1)
+			else {
+				fuelConsumption := (this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining)
+			
+				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 1) : "-")
+			}
 			
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 			
@@ -3023,8 +3139,13 @@ class RaceCenter extends ConfigurationItem {
 					if (!rawData || (rawData = "")) {
 						tries -= 1
 						
-						if (tries <= 0)
+						this.showMessage(translate("Waiting for data"))
+								
+						if (tries <= 0) {
+							this.showMessage(translate("Give up - use default values"))
+						
 							Throw "No data..."
+						}
 						else
 							Sleep 400
 					}
@@ -3111,34 +3232,25 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							   , translate(stint.Compound), stint.Laps.Length()
-							   , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		
 		this.updatePlan(stint)
 	}
 	
-	syncLaps() {
+	syncLaps(lastLap) {
 		session := this.SelectedSession[true]
 		
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		try {
-			lastLap := this.Connector.GetSessionLastLap(session)
-			
-			if lastLap {
-				lastLap := parseObject(this.Connector.GetLap(lastLap))
-				lastLap.Nr := (lastLap.Nr + 0)
-			}
-				
-		}
-		catch exception {
-			lastLap := false
-		}
+		message := (translate("Syncing laps (Lap: ") . lastLap.Nr . translate(")"))
 		
-		if !lastLap
-			return false
+		this.showMessage(message)
+		
+		if (getLogLevel() <= kLogInfo)
+			logMessage(kLogInfo, message)
 		
 		try {
 			currentStint := this.Connector.GetSessionCurrentStint(session)
@@ -3180,9 +3292,11 @@ class RaceCenter extends ConfigurationItem {
 				Gui ListView, % this.StintsListView
 				
 				for ignore, stint in newStints {
+					Gui ListView, % this.StintsListView
+				
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					
 					stint.Row := LV_GetCount()
@@ -3201,7 +3315,9 @@ class RaceCenter extends ConfigurationItem {
 				
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
-						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						Gui ListView, % this.LapsListView
+				
+						LV_Add("", lap.Nr, stint.Nr, stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					
 						lap.Row := LV_GetCount()
 					}
@@ -3253,9 +3369,11 @@ class RaceCenter extends ConfigurationItem {
 		else
 			return
 		
-		directory := this.SessionDirectory . "Race Report\"
+		directory := this.SessionDirectory . "Race Report"
 		
 		FileCreateDir %directory%
+		
+		directory .= "\"
 		
 		data := readConfiguration(directory . "Race.data")
 		
@@ -3263,6 +3381,13 @@ class RaceCenter extends ConfigurationItem {
 			lap := 1
 		else
 			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
+		
+		message := (translate("Syncing race report (Lap: ") . lap . translate(")"))
+		
+		this.showMessage(message)
+		
+		if (getLogLevel() <= kLogInfo)
+			logMessage(kLogInfo, message)
 		
 		if (lap == 1) {
 			try {
@@ -3306,8 +3431,14 @@ class RaceCenter extends ConfigurationItem {
 				else
 					lapData := false
 				
-				if (lapData && (lapData != ""))
+				if (lapData && (lapData != "")) {
+					this.showMessage(translate("Updating race report (Lap: ") . lap . translate(")"))
+					
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Updating race report (Lap: ") . lap . translate("), Data: `n`n") . lapData . "`n")
+		
 					lapData := parseConfiguration(lapData)
+				}
 				else if (lap = lastLap)
 					Throw "No data..."
 				else {
@@ -3338,11 +3469,18 @@ class RaceCenter extends ConfigurationItem {
 			laps := getConfigurationValue(lapData, "Laps", lap)
 			drivers := getConfigurationValue(lapData, "Drivers", lap)
 			
-			Loop %missingLaps% {
-				times .= ("`n" . times)
-				positions .= ("`n" . positions)
-				laps .= ("`n" . laps)
-				drivers .= ("`n" . drivers)
+			if (missingLaps > 0) {
+				mTimes := times
+				mPositions := positions
+				mLaps := laps
+				mDrivers := drivers
+				
+				Loop %missingLaps% {
+					times .= ("`n" . mTimes)
+					positions .= ("`n" . mPositions)
+					laps .= ("`n" . mLaps)
+					drivers .= ("`n" . mDrivers)
+				}
 			}
 			
 			missingLaps := 0
@@ -3390,6 +3528,13 @@ class RaceCenter extends ConfigurationItem {
 		newData := false
 		
 		if !load {
+			message := (translate("Syncing telemetry data (Lap: ") . lastLap . translate(")"))
+			
+			this.showMessage(message)
+			
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, message)
+		
 			session := this.SelectedSession[true]
 			telemetryDB := this.TelemetryDatabase
 			
@@ -3420,13 +3565,24 @@ class RaceCenter extends ConfigurationItem {
 						if (!telemetryData || (telemetryData == "")) {
 							tries -= 1
 							
-							if (tries <= 0)
+							this.showMessage(translate("Waiting for data"))
+								
+							if (tries <= 0) {
+								this.showMessage(translate("Give up - use default values"))
+							
 								Throw "No data..."
+							}
 							else
 								Sleep 400
 						}
-						else
+						else {
+							this.showMessage(translate("Updating telemetry data (Lap: ") . lap . translate(")"))
+						
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data: `n`n") . telemetryData . "`n")
+		
 							break
+						}
 					}
 				}
 				catch exception {
@@ -3553,6 +3709,13 @@ class RaceCenter extends ConfigurationItem {
 				lastLap := lastLap.Nr
 			else
 				return
+		
+			message := (translate("Syncing tyre pressures (Lap: ") . lastLap . translate(")"))
+			
+			this.showMessage(message)
+			
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, message)
 			
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
 			lap := pressuresTable.Length()
@@ -3578,13 +3741,24 @@ class RaceCenter extends ConfigurationItem {
 						if (!lapPressures || (lapPressures == "")) {
 							tries -= 1
 							
-							if (tries <= 0)
+							this.showMessage(translate("Waiting for data"))
+								
+							if (tries <= 0) {
+								this.showMessage(translate("Give up - use default values"))
+							
 								Throw "No data..."
+							}
 							else
 								Sleep 400
 						}
-						else
+						else {
+							this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
+						
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
+			
 							break
+						}
 					}
 				}
 				catch exception {
@@ -3646,6 +3820,11 @@ class RaceCenter extends ConfigurationItem {
 			}
 		
 		if (state && (state != "")) {
+			this.showMessage(translate("Updating pitstops"))
+			
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
+			
 			state := parseConfiguration(state)
 				
 			lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
@@ -3713,8 +3892,18 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.getSessionValue(session, "Race Strategy Version")
 			
 			if (version && (version != "")) {
+				this.showMessage(translate("Syncing session strategy"))
+				
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
+				
 				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
 					strategy := this.Connector.getSessionValue(session, "Race Strategy")
+				
+					this.showMessage(translate("Updating session strategy"))
+					
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Updating session strategy, Strategy: `n`n") . strategy . "`n")
 				
 					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy)))
 				}
@@ -3742,6 +3931,11 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.getSessionValue(session, "Stint Plan Version")
 			
 			if (version && (version != "")) {
+				this.showMessage(translate("Syncing stint plan"))
+				
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
+				
 				window := this.Window
 				
 				Gui %window%:Default
@@ -3751,13 +3945,27 @@ class RaceCenter extends ConfigurationItem {
 				if (!this.Version || (this.Version < version)) {
 					info := this.Connector.getSessionValue(session, "Stint Plan Info")
 					plan := this.Connector.getSessionValue(session, "Stint Plan")
-					
+				
 					if (plan = "CLEAR") {
-						if this.Version
+						if (this.Version && (LV_GetCount() > 0)) {
+							this.showMessage(translate("Clearing stint plan"))
+							
+							if (getLogLevel() <= kLogInfo)
+								logMessage(kLogInfo, translate("Clearing stint plan, Info: `n`n") . info . "`n")
+					
 							LV_Delete()
+						}
 					}
-					else
+					else {
+						this.showMessage(translate("Updating stint plan"))
+					
+						if (getLogLevel() <= kLogInfo)
+							logMessage(kLogInfo, translate("Updating stint plan, Info: `n`n") . info . translate(" `nPlan: `n`n") . plan . "`n")
+					
 						this.loadPlan(info, plan)
+					}
+					
+					this.iSelectedPlanStint := false
 				}
 			}
 		}
@@ -3769,20 +3977,49 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local strategy
 		
+		static hadLastLap := false
+		
 		if this.SessionActive {
 			window := this.Window
 			
 			Gui %window%:Default
 	
 			try {
+				this.showMessage(translate("Syncing session"))
+				
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing session"))
+		
+				try {
+					lastLap := this.Connector.GetSessionLastLap(this.SelectedSession[true])
+					
+					if lastLap {
+						lastLap := parseObject(this.Connector.GetLap(lastLap))
+						lastLap.Nr := (lastLap.Nr + 0)
+					}
+				}
+				catch exception {
+					lastLap := false
+				}
+				
+				if (hadLastLap && !lastLap) {
+					this.initializeSession()
+					
+					hadLastLap := false
+					
+					return
+				}
+				else if lastLap
+					hadLastLap := true
+					
 				this.syncPlan()
 				this.syncStrategy()
 				
 				newLaps := false
 				newData := false
-				
-				if this.syncLaps()
-					newLaps := true
+			
+				if lastLap
+					newLaps := this.syncLaps(lastLap)
 				
 				if this.syncRaceReport()
 					newData := true
@@ -3792,8 +4029,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				if this.syncTyrePressures()
 					newData := true
-				
-				this.syncStandings()
 				
 				if newLaps
 					this.syncPitstops()
@@ -3812,8 +4047,15 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			catch exception {
-				showMessage(translate("Cannot connect to the Team Server.") . "`n`n" . translate("Retry in 10 seconds."))
+				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: "))
+				
+				if (getLogLevel() <= kLogWarn)
+					logMessage(kLogWarn, message)
+			
+				Sleep 2000
 			}
+			
+			this.showMessage(false)
 		}
 	}
 	
@@ -4288,9 +4530,11 @@ class RaceCenter extends ConfigurationItem {
 					stint := this.Stints[A_Index]
 					stint.Row := (LV_GetCount() + 1)
 					
+					Gui ListView, % this.StintsListView
+			
 					LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 							 , translate(stint.Compound), stint.Laps.Length()
-							 , stint.StartPosition, stint.EndPosition, stint.AvgLaptime, stint.FuelConsumption, stint.Accidents
+							 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
 							 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 				}
 				
@@ -4309,9 +4553,11 @@ class RaceCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (LV_GetCount() + 1)
 					
-					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lap.Laptime, displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+					Gui ListView, % this.LapsListView
+			
+					LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.Fullname, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 				}
-				
+		
 		LV_ModifyCol()
 		
 		Loop % LV_GetCount("Col")
@@ -4338,6 +4584,8 @@ class RaceCenter extends ConfigurationItem {
 		
 		LV_Delete()
 		
+		this.iSelectedPlanStint := false
+		
 		if plan {
 			fileName := (this.SessionDirectory . "Plan.Data.CSV")
 			
@@ -4353,10 +4601,13 @@ class RaceCenter extends ConfigurationItem {
 			this.SessionDatabase.reload("Plan.Data", false)
 		}
 		
-		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"]
+		for ignore, plan in this.SessionDatabase.Tables["Plan.Data"] {
+			Gui ListView, % this.PlanListView
+		
 			LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
 					 , plan["Lap.Planned"], plan["Lap.Actual"]
 					 , plan["Fuel.Amount"], plan["Tyre.Change"])
+		}
 				
 		LV_ModifyCol()
 		
@@ -4390,11 +4641,13 @@ class RaceCenter extends ConfigurationItem {
 			pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
 										   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
 				
+			Gui ListView, % this.PitstopsListView
+		
 			LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
 					 , translate(compound(pitstop["Tyre.Compound"], pitstop["Tyre.Compound.Color"]))
 					 , pitstop["Tyre.Set"], pressures, repairs)
 		}
-				
+		
 		LV_ModifyCol()
 		
 		Loop % LV_GetCount("Col")
@@ -4488,7 +4741,6 @@ class RaceCenter extends ConfigurationItem {
 				
 				this.syncTelemetry(true)
 				this.syncTyrePressures(true)
-				this.syncStandings(true)
 			
 				this.ReportViewer.setReport(folder . "Race Report")
 			
@@ -5173,9 +5425,14 @@ class RaceCenter extends ConfigurationItem {
 							
 							if (!standingsData || (standingsData == "")) {
 								tries -= 1
+
+								this.showMessage(translate("Waiting for data"))
 								
-								if (tries <= 0)
+								if (tries <= 0) {
+									this.showMessage(translate("Give up - use default values"))
+								
 									Throw "No data..."
+								}
 								else
 									Sleep 400
 							}
@@ -5396,8 +5653,8 @@ class RaceCenter extends ConfigurationItem {
 	
 	createLapDetails(stint) {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . stint.AvgLapTime . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . stint.BestLapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(stint.BestLapTime) . "</td></tr>")
 		html .= "</table>"
 		
 		lapData := []
@@ -5409,7 +5666,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, lap in stint.Laps {
 			lapData.Push("<th class=""th-std"">" . lap.Nr . "</th>")
 			mapData.Push("<td class=""td-std"">" . lap.Map . "</td>")
-			lapTimeData.Push("<td class=""td-std"">" . lap.Laptime . "</td>")
+			lapTimeData.Push("<td class=""td-std"">" . lapTimeDisplayValue(lap.Laptime) . "</td>")
 			fuelConsumptionData.Push("<td class=""td-std"">" . lap.FuelConsumption . "</td>")
 			accidentData.Push("<td class=""td-std"">" . (lap.Accident ? "x" : "") . "</td>")
 		}
@@ -5519,7 +5776,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lap.LapTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . lap.FuelConsumption . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . lap.FuelRemaining . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
@@ -5628,7 +5885,7 @@ class RaceCenter extends ConfigurationItem {
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
 																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
-																						 , lapTime, laps, delta)
+																						 , lapTimeDisplayValue(lapTime), laps, delta)
 				   . "</td></tr>")
 		}
 		
@@ -5703,8 +5960,8 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
-			avgLapTimesData.Push("<td class=""td-std"">" . Round(average(lapTimes), 1) . "</td>")
-			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 1) . "</td>")
+			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
+			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
 			
@@ -5743,7 +6000,7 @@ class RaceCenter extends ConfigurationItem {
 				
 				value := chartValue(null(lap.Laptime))
 				
-				if (!isNull(value))
+				if !isNull(value)
 					driverTimes.Push(value)
 			}
 			
@@ -5944,7 +6201,7 @@ class RaceCenter extends ConfigurationItem {
 				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
+				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
@@ -5998,40 +6255,6 @@ class RaceCenter extends ConfigurationItem {
 		Gui ListView, % this.PlanListView
 		
 		html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
-		
-		stints := []
-		drivers := []
-		laps := []
-		durations := []
-		numLaps := []
-		positions := []
-		avgLapTimes := []
-		fuelConsumptions := []
-		accidents := []
-		
-		currentStint := this.CurrentStint
-		
-		if currentStint
-			Loop % currentStint.Nr
-			{
-				stint := this.Stints[A_Index]
-				
-				stints.Push("<th class=""th-std"">" . stint.Nr . "</th>")
-				drivers.Push("<td class=""td-std"">" . StrReplace(stint.Driver.Nickname, "'", "\'") . "</td>")
-				laps.Push("<td class=""td-std"">" . stint.Lap . "</td>")
-				
-				duration := 0
-				
-				for ignore, lap in stint.Laps
-					duration += lap.Laptime
-				
-				durations.Push("<td class=""td-std"">" . Round(duration / 60) . "</td>")
-				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
-				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
-				avgLapTimes.Push("<td class=""td-std"">" . stint.AvgLaptime . "</td>")
-				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
-				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
-			}
 		
 		html .= "<br><br><table class=""table-std"">"
 		
@@ -6784,6 +7007,39 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+validateNumber(field) {
+	oldValue := %field%
+	
+	GuiControlGet %field%
+	
+	if %field% is not Number
+	{
+		%field%:= oldValue
+		
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validatePitstopPressureFL() {
+	validateNumber("pitstopPressureFLEdit")
+}
+
+validatePitstopPressureFR() {
+	validateNumber("pitstopPressureFREdit")
+}
+
+validatePitstopPressureRL() {
+	validateNumber("pitstopPressureRLEdit")
+}
+
+validatePitstopPressureRR() {
+	validateNumber("pitstopPressureRREdit")
+}
+
+lapTimeDisplayValue(lapTime) {
+	return RaceReportViewer.lapTimeDisplayValue(lapTime)
+}
+
 displayValue(value) {
 	return (isNull(value) ? "-" : value)
 }
@@ -6902,7 +7158,7 @@ loadDrivers(connector, team) {
 			catch exception {
 				; ignore
 			}
-		}			
+		}
 	
 	return drivers
 }
@@ -7015,6 +7271,8 @@ updateTime() {
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
+	rCenter.iSelectedPlanStint := false
+	
 	rCenter.updateState()
 }
 
@@ -7028,6 +7286,8 @@ choosePlan() {
 		
 		Gui ListView, % rCenter.PlanListView
 
+		rCenter.iSelectedPlanStint := A_EventInfo
+		
 		LV_GetText(stint, A_EventInfo, 1)
 		LV_GetText(driver, A_EventInfo, 2)
 		LV_GetText(timePlanned, A_EventInfo, 3)
@@ -7041,8 +7301,10 @@ choosePlan() {
 		
 		currentTime := "20200101000000"
 		
-		EnvAdd currentTime, time[1], Hours
-		EnvAdd currentTime, time[2], Minutes
+		if (time.Length() = 2) {
+			EnvAdd currentTime, time[1], Hours
+			EnvAdd currentTime, time[2], Minutes
+		}
 		
 		timePlanned := currentTime
 		
@@ -7050,8 +7312,10 @@ choosePlan() {
 		
 		currentTime := "20200101000000"
 		
-		EnvAdd currentTime, time[1], Hours
-		EnvAdd currentTime, time[2], Minutes
+		if (time.Length() = 2) {
+			EnvAdd currentTime, time[1], Hours
+			EnvAdd currentTime, time[2], Minutes
+		}
 		
 		timeActual := currentTime
 		
@@ -7081,6 +7345,13 @@ updatePlanAsync() {
 	Gui ListView, % rCenter.PlanListView
 	
 	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
 	
 	if (row > 0) {
 		GuiControlGet driverDropDownMenu
@@ -7123,7 +7394,16 @@ addPlan() {
 	
 	Gui ListView, % rCenter.PlanListView
 	
-	if LV_GetNext(0) {
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
+	
+	if row {
 		title := translate("Insert")
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
@@ -7151,6 +7431,15 @@ deletePlan() {
 	Gui %window%:Default
 	
 	Gui ListView, % rCenter.PlanListView
+	
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedPlanStint) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedPlanStint := false
+	}
 	
 	if LV_GetNext(0) {
 		title := translate("Delete")
@@ -7287,19 +7576,32 @@ syncSessionAsync() {
 }
 
 runTasks() {
+	worked := false
+	
 	rCenter := RaceCenter.Instance
 	
-	if rCenter.startWorking() {
-		try {
-			while (rCenter.iTasks.Length() > 0) {
-				task := rCenter.iTasks.RemoveAt(1)
-				
-				%task%()
+	try {
+		if rCenter.isWorking()
+			return
+		else if (rCenter.iTasks.Length() > 0) {
+			if rCenter.startWorking() {
+				try {
+					while (rCenter.iTasks.Length() > 0) {
+						task := rCenter.iTasks.RemoveAt(1)
+						
+						worked := true
+						
+						%task%()
+					}
+				}
+				finally {
+					rCenter.finishWorking()
+				}
 			}
 		}
-		finally {
-			rCenter.finishWorking()
-		}
+	}
+	finally {
+		SetTimer runTasks, % worked ? -2000 : -500
 	}
 }
 
@@ -7320,7 +7622,7 @@ startupRaceCenter() {
 		
 		registerEventHandler("Setup", "functionEventHandler")
 		
-		SetTimer runTasks, 500
+		SetTimer runTasks, -2000
 		
 		rCenter.show()
 		

@@ -409,7 +409,7 @@ void checkPitWindow() {
 
 		sendMessage("pitWindow:Open");
 	}
-	else if (sf->PitWindowEnd > currentTime && !pitWindowClosedReported) {
+	else if (sf->PitWindowEnd < currentTime && !pitWindowClosedReported) {
 		pitWindowClosedReported = true;
 		pitWindowOpenReported = false;
 
@@ -422,24 +422,31 @@ int main(int argc, char* argv[])
 	initPhysics();
 	initGraphics();
 	initStatic();
+	
+	bool running = false;
 
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	while (true) {
-		if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
-			sessionDuration = gf->sessionTimeLeft;
-		
-		if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-			if (!checkFlagState() && !checkPositions())
-				checkPitWindow();
-		}
-		else {
-			lastSituation = CLEAR;
-			carBehind = false;
-			carBehindReported = false;
+		if (!running)
+			running = (gf->flag == AC_GREEN_FLAG);
 
-			lastFlagState = 0;
+		if (running) {
+			if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
+				sessionDuration = gf->sessionTimeLeft;
+
+			if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+				if (!checkFlagState() && !checkPositions())
+					checkPitWindow();
+			}
+			else {
+				lastSituation = CLEAR;
+				carBehind = false;
+				carBehindReported = false;
+
+				lastFlagState = 0;
+			}
 		}
 
 		Sleep(50);

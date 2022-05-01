@@ -35,8 +35,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										 , "Compound", "Compound.Color", "Pressures", "Temperatures"]}
 										 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
-		__New(remotePID) {
-			base.__New("Race Strategist", remotePID)
+		__New(plugin, remotePID) {
+			base.__New(plugin, "Race Strategist", remotePID)
 		}
 		
 		recommendPitstop(arguments*) {
@@ -113,7 +113,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceStrategist(pid)
+		return new this.RemoteRaceStrategist(this, pid)
 	}
 	
 	startSession(settingsFile, dataFile, teamSession) {
@@ -136,7 +136,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						this.RaceStrategist.updateStrategy(false)
 					else {
 						try {
-							FileDelete %kTempDirectory%Race Strategy.update
+							if FileExist(kTempDirectory . "Race Strategy.update")
+								FileDelete %kTempDirectory%Race Strategy.update
 							
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}
@@ -163,7 +164,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 	
 	requestInformation(arguments*) {
-		if (this.RaceStrategist && inList(["LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
+		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
 		
 			return true

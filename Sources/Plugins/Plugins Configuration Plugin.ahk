@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Configuration\Libraries\PluginActionsEditor.ahk
+#Include ..\Configuration\Libraries\ControllerActionsEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -242,7 +242,7 @@ openActionsEditor() {
 		
 	Gui PAE:+Owner%owner%
 	
-	new PluginActionsEditor(kSimulatorConfiguration).editPluginActions(pluginEdit)
+	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(pluginEdit)
 	
 	Gui %owner%:-Disabled
 }

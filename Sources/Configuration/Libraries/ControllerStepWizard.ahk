@@ -61,6 +61,7 @@ class ControllerStepWizard extends StepWizard {
 		
 		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		
 		wizard := this.SetupWizard
 		
 		if wizard.isModuleSelected("Controller") {
@@ -161,7 +162,7 @@ class ControllerStepWizard extends StepWizard {
 		
 		Gui %window%:Font, s8 Norm, Arial
 		
-		Gui Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
 		
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -196,12 +197,14 @@ class ControllerStepWizard extends StepWizard {
 	showPage(page) {
 		base.showPage(page)
 		
+		/*
 		if !FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Button Box Configuration.ini, %kUserHomeDirectory%Setup\Button Box Configuration.ini
 		
 		if !FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 			FileCopy %kResourcesDirectory%Setup\Stream Deck Configuration.ini, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini
-			
+		*/
+		
 		this.iControllerEditor := new this.StepControllerEditor("Default", this.SetupWizard.Configuration
 															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
 															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
@@ -430,7 +433,7 @@ class ControllerStepWizard extends StepWizard {
 							conflict := ""
 						
 						if (functionTriggers.Length() > 0) {
-							triggers := values2String(" | ", functionTriggers*)
+							triggers := values2String(" `; ", functionTriggers*)
 							
 							if load
 								this.iFunctionTriggers[function] := functionTriggers
@@ -539,7 +542,7 @@ class ControllerStepWizard extends StepWizard {
 			
 			function := (type . "." . number)
 			
-			trigger := this.iFunctionTriggers[function]
+			trigger := (this.iFunctionTriggers.HasKey(function) ? this.iFunctionTriggers[function] : false)
 			
 			title := translate("Modular Simulator Controller System")
 			prompt := translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
@@ -570,7 +573,10 @@ class ControllerStepWizard extends StepWizard {
 				if ErrorLevel
 					return
 				
-				this.iFunctionTriggers[function] := [key1, key2]
+				if ((key1 = "") && (key2 = ""))
+					this.iFunctionTriggers.Delete(function)
+				else
+					this.iFunctionTriggers[function] := [key1, key2]
 			}
 			else
 				this.iFunctionTriggers[function] := [key1]
@@ -584,6 +590,45 @@ class ControllerStepWizard extends StepWizard {
 			Gui ListView, % this.iFunctionsListView
 			
 			LV_Modify(row, "Vis")
+		}
+	}
+	
+	clearFunctionTriggerAndHotkey(row) {
+		local function
+		
+		wizard := this.SetupWizard
+		
+		window := this.Window
+		
+		Gui %window%:Default
+		Gui ListView, % this.iFunctionsListView
+		
+		LV_GetText(trigger, row, 5)
+		
+		if (trigger != translate("n/a")) {
+			LV_GetText(type, row, 3)
+			LV_GetText(key, row, 4)
+			
+			double := false
+			
+			switch type {
+				case translate(k2WayToggleType):
+					type := k2WayToggleType
+					double := true
+				case translate(kDialType):
+					type := kDialType
+					double := true
+				case translate(k1WayToggleType):
+					type := k1WayToggleType
+				case translate(kButtonType):
+					type := kButtonType
+			}
+			
+			function := (type . "." . number)
+			
+			this.iFunctionTriggers.Delete(function)
+			
+			LV_Modify(row, "Col5", "")
 		}
 	}
 	
@@ -885,7 +930,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			width := this.Width
 			height := this.Height
 			
-			Gui %window%:Add, DropDownList, x8 y8 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
+			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
 			
 			this.iModeDropDownHandle := modeDropDownHandle
 		}
@@ -1477,6 +1522,7 @@ updateFunctionTriggers() {
 			LV_GetText(control, row, 2)
 			LV_GetText(function, row, 3)
 			LV_GetText(number, row, 4)
+			LV_GetText(trigger, row, 5)
 			
 			menuItem := ConfigurationItem.descriptor(control, number)
 			
@@ -1493,21 +1539,31 @@ updateFunctionTriggers() {
 			
 			Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
 			Menu ContextMenu, Disable, %menuItem%
-			Menu ContextMenu, Add
 			
-			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-			
-			menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
-			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
-			
-			multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-			
-			menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
-			handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
-			
-			Menu ContextMenu, Add, %menuItem%, %handler%
+			if (trigger != translate("n/a")) {
+				Menu ContextMenu, Add
+				
+				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+				
+				menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+				
+				menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+				
+				Menu ContextMenu, Add
+								
+				menuItem := translate("Clear Trigger && Hotkey")
+				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "clearFunctionTriggerAndHotkey", row)
+				
+				Menu ContextMenu, Add, %menuItem%, %handler%
+			}
 			
 			Menu ContextMenu, Show
 		}

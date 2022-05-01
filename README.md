@@ -26,26 +26,32 @@ If you don't want to use the automated installer (or you can't cause of your Ant
 
 #### Automated Installer
 
-Simply download and run [Simulator Controller.exe](https://bit.ly/3vCSIa1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3rah5vqxt6uev/Simulator%20Controller.exe?dl=1) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 #### Latest release build
 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[3.9.8-release](https://cntr.click/Qw8Nwb1) (New features: Finetuning for average lap times in Strategy simulation, Comprehensive revision of the Session / Setup Database backend, All new user interface for "Setup Database", Renamed "Setup Database" to "Session Database", Renamed action function and plugin parameter "openSetupDatabase" to "openSessionDatabase".)
+[4.1.0-release](https://cntr.click/3098VwR) (New features: Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-398) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-410) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[3.9.6-release](https://cntr.click/cY5vVT1) (New features: Support for *Intermediate* tyres in all parts of Simulator Controller, "Import from Strategy" command in "Strategy Workbench", Stint time variation based on tyre usage depending laptime degradation in Strategy simulation, Setting for disallowed refueling and disallowed tyre change in Strategy simulation, Support for scenario validation rules in Strategy simulation, Correct handling of tyre set restrictions in "Race Center", Improved data quality for missing laps in "Race Center", Preparation for simulation and car specific rules in "Setup Advisor", Removed unsupported setup settings from each simulation in "Setup Advisor", Fixed some rules in "Setup Advisor".)
+[4.0.9-release](https://cntr.click/L5vsr8A) (New features: Default value for "teamServer:" is now "Off", Fixed negative fuel consumption in "Race Center", Fixed a stack overflow with blocking error message for the Race Assistants, All new icon set for Stream Deck actions, Acknowledge of pitstop options change after a pitstop has been prepared, Removed no longer needed template files, Fixed setup of "Assetto Corsa" in "Simulator Setup", Changed update frequency of Stream Deck Icons. **4.0.9 is a fix release for 4.0.8**)
 
-[3.9.4-release](https://cntr.click/wDvdX7Z) (New features: New assistant tool "Setup Advisor", New plugin parameter "openSetupAdvisor" for "Race Engineer" plugin, New action function "openSetupAdvisor", Frequency of blue flag warnings drastically reduced, Fixed sporadic cacophony of Race Assistants, Support for tyre compound variation in Strategy simulations.)
+[4.0.6-release](https://cntr.click/86mnRPd) (New features: Fixed settings initialization in "Strategy Workbench", Fixed some pitstop search pictures for R3E, Optimized chart drawing, Validation methods for all float fields, Extensive logging for Team Server and "Race Center", Showing lap times in "M:SS.s" format, Display initial cold pressures in "Race Center" after first lap, Increased robustness of ACC Pitstop fallback algorithm, Improved thread management in "Race Center".)
 
 #### Latest development build
 
 None for the moment...
+
+### Documentation
+
+A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+
+The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
 ### Discord Community
 
@@ -150,25 +156,15 @@ The following applications are not part of the distribution and are not strictly
 | [Visual Studio](https://visualstudio.microsoft.com/de/vs/) | [Development Only] Development environment for Windows applications. Used for the development of the different telemetry interfaces of the supported simulation games. |
 | [NirCmd](https://www.nirsoft.net/utils/nircmd.html) | [Optional] Extended Windows command shell. Used by Simulator Controller to control ingame sound volume settings during startup. |
 | [SoX](http://sox.sourceforge.net/) | [Optional] Audio processing utility. Used by the race assistants for audio post processing to achieve a team radio like audio quality. |
-| [VoiceMacro](http://www.voicemacro.net/) | [Recommended] Connects to your microphone and translates voice commands to complex keyboard and/or mouse input. These macros can be connected to Simulator Controller as external input to control functions and actions identical to your hardware controller. |
+| [VoiceMacro](http://www.voicemacro.net/) | [Optional] Connects to your microphone and translates voice commands to complex keyboard and/or mouse input. These macros can be connected to Simulator Controller as external input to control functions and actions identical to your hardware controller. |
 | [AITrack](https://github.com/AIRLegend/aitrack) | [Optional] Neat little tool which uses neural networks to detect your viewing angle on a dashcam video stream. Used in conjunction with opentrack to control your ingame viewing angle. |
-| [opentrack](https://sourceforge.net/projects/opentrack.mirror/) | [Recommended] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, for example analog joysticks or UDP based sources such as AITrack. |
-| [SimHub](https://www.simhubdash.com/) | [Recommended] Versatile, multipurpose software collection for simulation games. Generates vibration using bass shakers or vibration motors and provides a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. A special plugin is part of Simulator Controller to control the tactile feedback options of SimHub, such as vibration strength, with a touch of a button. |
+| [opentrack](https://sourceforge.net/projects/opentrack.mirror/) | [Optional] Connects to your simulation game and controls the viewing angle using the freetrack protocol. Several input methods are supported, for example analog joysticks or UDP based sources such as AITrack. |
+| [SimHub](https://www.simhubdash.com/) | [Optional] Versatile, multipurpose software collection for simulation games. Generates vibration using bass shakers or vibration motors and provides a fully integrated Arduino development environment. Additional features support the definition of custom dashboards. A special plugin is part of Simulator Controller to control the tactile feedback options of SimHub, such as vibration strength, with a touch of a button. |
 | [SimFeedback](https://www.opensfx.com/) | [Optional] Not only a software, but a complete DIY project for building motion rigs. SimFeedback controls the motion actuators using visual control curves, which translate the ingame physics data to complex and very fast rig movements. Here also, a plugin is integrated in Simulator Controller to use your hardware controller for controlling SimFeedback. |
 | [SFX-100-Streamdeck](https://github.com/ashupp/SFX-100-Streamdeck) | [Optional] This extension for SimFeedback is used to connect to SimFeedback in order to control effect states and intensities. If not used, a subset of the SimFeedback settings will be controlled by mouse automation, which on a side effect requires the SimFeedback window to be the topmost. Since this is not really funny, while currently trying to overtake one of your opponents in a difficult chicane, I strongly advice to install the connector extension, but this requires the *commercial* expert license for SimFeedback. You will find a copy of the *SFX-100-Streamdeck* plugin in the *Utilities\3rd Party* folder for your convenience. And don't forget to read the [installation & configuration instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback), since there are two steps necessary. |
 | [Microsoft Voice Languages](https://support.microsoft.com/en-us/office/how-to-download-text-to-speech-languages-for-windows-10-d5a6b612-b3ae-423f-afa5-4f6caf1ec5d3) | [Optional] Depending on your Windows version and your selected language, you might want to install additional *Text-to-Speech* languages from Microsoft for the speech generation capabilities of Simulator Controller, especially for Jona, the Virtual Race Engineer. |
 | [Microsoft Voice Recognition](https://www.microsoft.com/en-us/download/details.aspx?id=16789) | [Optional] Also depending on your Windows version and your selected language, you might want to install additional *Speech-to-Text* or voice recognition languages from Microsoft, especially for Jona, the Virtual Race Engineer. You will find a copy of the language runtime and some selected recognizer in the *Utilities\3rd Party* folder for your convenience. |
 | [rFactor 2 Telemetry Provider](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) | [Optional] If you are running the *rFactor 2* simulation game and want to use Jona, the Virtual Race Engineer during your races, you need to install this data aqcuisition plugin in your *rFactor 2* application directory. You will find a copy of the plugin (named *rf2_sm_tools_3.7.14.2.zip*) including a Readme file in the *Utilities\3rd Party* folder for your convenience. |
-
-### Documentation
-
-A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
-
-The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
-
-### Discord Community
-
-If you want to become a part of the small and very young Community for Simulator Controller on Discord, please use [this invitation](https://discord.gg/5N8JrNr48H)...
 
 ### Known issues
 

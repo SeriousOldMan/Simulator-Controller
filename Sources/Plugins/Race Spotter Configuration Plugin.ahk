@@ -25,7 +25,7 @@ global rearProximityDropDown
 global yellowFlagsDropDown
 global blueFlagsDropDown
 global startSummaryDropDown
-global performanceUpdatesDropDown
+global distanceInformationDropDown
 global finalLapsDropDown
 global pitWindowDropDown
 
@@ -100,7 +100,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 		
 		Gui %window%:Add, Text, x%x0% ys+24 w120 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit HWNDwidget13 Hidden
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit gvalidateRSPDampingFactor HWNDwidget13 Hidden
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
 		
 		Gui %window%:Font, Norm, Arial
@@ -114,7 +114,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w3 := width - (x3 - x + 16) + 10
 		
 		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Disabled Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
@@ -128,8 +128,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
 		
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Performance Updates all")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose3 vperformanceUpdatesDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), 1, 2, 3, 4)
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose3 vdistanceInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), 1, 2, 3, 4)
 		Gui %window%:Add, Text, x%x3% yp+4 w80 h20 HWNDwidget32 Hidden, % translate("Laps")
 		
 		Gui %window%:Add, Text, x%x0% yp+22 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
@@ -162,8 +162,10 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"]
 				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
-				
-			simulatorConfiguration["PerformanceUpdates"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
+			
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
+			
+			simulatorConfiguration["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
 			
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -179,7 +181,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 			
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "PerformanceUpdates", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "DistanceInformation", "FinalLaps", "PitWindow"]
 				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -188,12 +190,6 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		this.loadFromConfiguration(configuration)
 		
 		this.setSimulators(simulators)
-		
-		window := this.Editor.Window
-		
-		Gui %window%:Default
-		
-		GuiControl Disable, sideProximityDropDown
 	}
 	
 	loadSimulatorConfiguration(simulator := false) {
@@ -216,14 +212,16 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			
 			GuiControl Text, rspLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rspLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
-			GuiControl Text, rspDampingFactorEdit, % configuration["HistoryLapsDamping"]
+			
+			rspDampingFactorEdit := configuration["HistoryLapsDamping"]
+			GuiControl Text, rspDampingFactorEdit, %rspDampingFactorEdit%
 			
 			GuiControl Choose, sideProximityDropDown, % (configuration["SideProximity"] + 1)
 			GuiControl Choose, rearProximityDropDown, % (configuration["RearProximity"] + 1)
 			GuiControl Choose, yellowFlagsDropDown, % (configuration["YellowFlags"] + 1)
 			GuiControl Choose, blueFlagsDropDown, % (configuration["BlueFlags"] + 1)
 			GuiControl Choose, startSummaryDropDown, % (configuration["StartSummary"] + 1)
-			GuiControl Choose, performanceUpdatesDropDown, % (configuration["PerformanceUpdates"] + 1)
+			GuiControl Choose, distanceInformationDropDown, % (configuration["DistanceInformation"] + 1)
 			GuiControl Choose, finalLapsDropDown, % (configuration["FinalLaps"] + 1)
 			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
 		}
@@ -244,7 +242,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet yellowFlagsDropDown
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet startSummaryDropDown
-			GuiControlGet performanceUpdatesDropDown
+			GuiControlGet distanceInformationDropDown
 			GuiControlGet finalLapsDropDown
 			GuiControlGet pitWindowDropDown
 			
@@ -259,7 +257,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			configuration["YellowFlags"] := (yellowFlagsDropDown - 1)
 			configuration["BlueFlags"] := (blueFlagsDropDown - 1)
 			configuration["StartSummary"] := (startSummaryDropDown - 1)
-			configuration["PerformanceUpdates"] := (performanceUpdatesDropDown - 1)
+			configuration["DistanceInformation"] := (distanceInformationDropDown - 1)
 			configuration["FinalLaps"] := (finalLapsDropDown - 1)
 			configuration["PitWindow"] := (pitWindowDropDown - 1)
 		}
@@ -290,6 +288,19 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+validateRSPDampingFactor() {
+	oldValue := rspDampingFactorEdit
+	
+	GuiControlGet rspDampingFactorEdit
+	
+	if rspDampingFactorEdit is not Number
+	{
+		rspDampingFactorEdit := oldValue
+		
+		GuiControl, , rspDampingFactorEdit, %rspDampingFactorEdit%
+	}
+}
 
 chooseRaceSpotterSimulator() {
 	configurator := RaceSpotterConfigurator.Instance

@@ -46,39 +46,53 @@ global kMaxTemperatureDelta = 4
 ;;;-------------------------------------------------------------------------;;;
 
 class TyresDatabase extends SessionDatabase {
+	iDatabaseDirectory := kDatabaseDirectory
+	
 	iLastSimulator := false
 	iLastCar := false
 	iLastTrack := false
+	iLastScope := false
 	
 	iDatabase := false
 	
-	getTyresDatabase(simulator, car, track, type := "User") {
-		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
+	DatabaseDirectory[] {
+		Get {
+			return this.iDatabaseDirectory
+		}
 		
-		return new Database(kDatabaseDirectory . type . "\" . path, kTyresDataSchemas)
+		Set {
+			return (this.iDatabaseDirectory := value)
+		}
 	}
 	
-	requireDatabase(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		simulator := this.getSimulatorName(simulatorCode)
+	getTyresDatabase(simulator, car, track, scope := "User") {
+		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
 		
-		if (car == true)
-			MsgBox Here
+		FileCreateDir %directory%
 		
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
-		
-		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car) || (this.iLastTrack != track))) {
+		return new Database(directory . "\", kTyresDataSchemas)
+	}
+	
+	requireDatabase(simulator, car, track, scope := "User") {
+		simulator := this.getSimulatorName(simulator)
+
+		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
+							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
 			this.flush()
 			
 			this.iDatabase := false
 		}
 		
+		if ((simulator == true) || (car == true) || (track == true))
+			Throw "Unsupported database specification detected in TyresDatabase.requireDatabase..."
+		
 		if !this.iDatabase {
 			this.iLastSimulator := simulator
 			this.iLastCar := car
 			this.iLastTrack := track
+			this.iLastScope := scope
 			
-			this.iDatabase := this.getTyresDatabase(simulator, car, track, "User")
+			this.iDatabase := this.getTyresDatabase(simulator, car, track, scope)
 		}
 		
 		return this.iDatabase
@@ -206,12 +220,14 @@ class TyresDatabase extends SessionDatabase {
 			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
 		
-		database := this.getTyresDatabase(simulator, car, track, "Community")
-		
-		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
-																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
-			info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-					 , Compound: this.qualifiedCompound(row.Compound, row.CompoundColor), Count: row.Count})
+		if this.UseCommunity {
+			database := this.getTyresDatabase(simulator, car, track, "Community")
+			
+			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+				info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+						 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+		}
 		
 		return info
 	}
@@ -305,12 +321,12 @@ class TyresDatabase extends SessionDatabase {
 	}
 	
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true) {
+				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User") {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 		
 		if require
-			this.requireDatabase(simulator, car, track)
+			this.requireDatabase(simulator, car, track, scope)
 		
 		rows := this.iDatabase.query("Tyres.Pressures.Distribution"
 								   , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

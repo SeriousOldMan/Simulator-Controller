@@ -110,14 +110,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if (actions != "")
 					arguments .= ("; assistantCommands: " . actions)
 				
-				if wizard.isModuleSelected("Voice Control") {
-					arguments .= "; raceAssistantSpeaker: On"
-					
-					if ((assistant != "Race Spotter") && wizard.isSoftwareInstalled("MSSpeechRuntime"))
-						arguments .= "; raceAssistantListener: On"
-					else
-						arguments .= "; raceAssistantListener: Off"
-				}
+				if wizard.isModuleSelected("Voice Control")
+					arguments .= "; raceAssistantSpeaker: On; raceAssistantListener: On"
 				else
 					arguments .= "; raceAssistantSpeaker: Off"
 				
@@ -133,7 +127,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 								case "RaceAssistant":
 									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
 								case "TeamServer":
-									arguments .= ("; teamServer: On " . values2String(A_Space, function*))
+									arguments .= ("; teamServer: Off " . values2String(A_Space, function*))
 								case "SessionDatabaseOpen", "SetupDatabaseOpen":
 									arguments .= ("; openSessionDatabase: " . values2String(A_Space, function*))
 								case "RaceSettingsOpen":
@@ -156,7 +150,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			else
 				new Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
 		
-		new Plugin("Team Server", false, assistantActive, "", "teamServer: On").saveToConfiguration(configuration)
+		new Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration)
 	}
 	
 	createGui(wizard, x, y, width, height) {
@@ -208,7 +202,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			Gui %window%:Font, Norm, Arial
 			
-			Gui Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
+			Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
 			
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -414,7 +408,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		Gui ListView, % this.ActionsListView
 		
-		pluginLabels := readConfiguration(getFileName("Controller Action Labels." . getLanguage(), kUserTranslationsDirectory, kTranslationsDirectory))
+		pluginLabels := getControllerActionLabels()
 		
 		LV_Delete()
 		

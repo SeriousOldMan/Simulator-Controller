@@ -121,6 +121,9 @@ namespace SimulatorControllerPlugin
         {
             // Uncomment this line of code to allow for debugging
             // while (!System.Diagnostics.Debugger.IsAttached) { System.Threading.Thread.Sleep(100); }
+            // Logger.Instance.LogMessage(TracingLevel.ERROR, "Starting Simulator Controller Plugin with arguments:");
+            // foreach (string s in args)
+            //    Logger.Instance.LogMessage(TracingLevel.ERROR, "    " + s);
 
             new Thread(ServerThread).Start();
 

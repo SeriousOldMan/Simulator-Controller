@@ -111,8 +111,10 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
-		, service := false, speaker := false, vocalics := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Strategist", remoteHandler, name, language, service, speaker, vocalics, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		base.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
+		
+		this.updateConfigurationValues({Warnings: {WeatherUpdate: true}})
 	}
 	
 	updateConfigurationValues(values) {
@@ -160,14 +162,14 @@ class RaceStrategist extends RaceAssistant {
 	
 	handleVoiceCommand(grammar, words) {
 		switch grammar {
-			case "Time":
-				this.timeRecognized(words)
 			case "LapsRemaining":
 				this.lapsRemainingRecognized(words)
 			case "Weather":
 				this.weatherRecognized(words)
 			case "Position":
 				this.positionRecognized(words)
+			case "LapTimes":
+				this.lapTimesRecognized(words)
 			case "FuturePosition":
 				this.futurePositionRecognized(words)
 			case "GapToFront":
@@ -176,8 +178,6 @@ class RaceStrategist extends RaceAssistant {
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
-			case "LapTimes":
-				this.lapTimesRecognized(words)
 			case "StrategyOverview":
 				this.strategyOverviewRecognized(words)
 			case "CancelStrategy":
@@ -209,12 +209,6 @@ class RaceStrategist extends RaceAssistant {
 			default:
 				base.handleVoiceCommand(grammar, words)
 		}
-	}
-	
-	timeRecognized(words) {
-		FormatTime time, %A_Now%, Time
-		
-		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
 	
 	lapsRemainingRecognized(words) {
@@ -273,7 +267,7 @@ class RaceStrategist extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		lapPosition := inList(words, fragments["Laps"])
-				
+		
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 			
@@ -667,16 +661,12 @@ class RaceStrategist extends RaceAssistant {
 		
 		raceEngineer := (ErrorLevel > 0)
 		
-		/*
 		if raceEngineer
 			saveSettings := kNever
 		else {
 			deprecated := getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
 		}
-		*/
-		
-		saveSettings := kNever
 		
 		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 		
@@ -866,7 +856,18 @@ class RaceStrategist extends RaceAssistant {
 	}
 	
 	updateLap(lapNumber, data) {
-		; this.KnowledgeBase.addFact("Sector", true)
+		static lastSector := 1
+		
+		if !IsObject(data)
+			data := readConfiguration(data)
+		
+		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
+		
+		if (sector != lastSector) {
+			lastSector := sector
+			
+			this.KnowledgeBase.addFact("Sector", sector)
+		}
 		
 		return base.updateLap(lapNumber, data)
 	}
@@ -879,10 +880,10 @@ class RaceStrategist extends RaceAssistant {
 				this.lapsRemainingRecognized([])
 			case "Weather":
 				this.weatherRecognized([])
-			case "LapTimes":
-				this.lapTimesRecognized([])
 			case "Position":
 				this.positionRecognized([])
+			case "LapTimes":
+				this.lapTimesRecognized([])
 			case "GapToFrontStandings":
 				this.gapToFrontRecognized([])
 			case "GapToFrontTrack":
@@ -992,22 +993,30 @@ class RaceStrategist extends RaceAssistant {
 		local fact
 		
 		if strategy {
-			if !IsObject(strategy)
-				strategy := readConfiguration(strategy)
-		
-			this.clearStrategy()
+			if (this.Session == kSessionRace) {
+				if !IsObject(strategy)
+					strategy := readConfiguration(strategy)
 			
-			facts := {}
+				this.clearStrategy()
+				
+				facts := {}
+				
+				this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
+				
+				for fact, value in facts
+					knowledgeBase.setFact(fact, value)
 			
-			this.createStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
-			
-			for fact, value in facts
-				knowledgeBase.setFact(fact, value)
+				this.dumpKnowledge(knowledgeBase)
+				
+				this.updateSessionValues({Strategy: strategy})
+			}
 		}
-		else
+		else {
 			this.cancelStrategy(false)
 		
-		this.updateSessionValues({Strategy: strategy})
+			this.updateSessionValues({Strategy: false})
+		}
+		
 		this.updateDynamicValues({StrategyReported: false})
 	}
 	
@@ -1120,7 +1129,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if this.Speaker {
+		if (this.Speaker && (this.Session == kSessionRace) && this.Warnings["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 			
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1131,7 +1140,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if this.Speaker {
+			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 				

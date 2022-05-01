@@ -89,6 +89,7 @@ global vProgressCount = 0
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
 global installLocationPathEdit
 
 installOptions(options) {
@@ -100,8 +101,43 @@ installOptions(options) {
 	
 	static result := false
 	
-	if (options == kOk)
-		result := kOk
+	if (options == kOk) {
+		GuiControlGet installLocationPathEdit
+		
+		directory := installLocationPathEdit
+		
+		valid := true
+		empty := true
+		
+		if !FileExist(directory)
+			try {
+				FileCreateDir %directory%
+			}
+			catch exception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+				OnMessage(0x44, "")
+				
+				valid := false
+			}
+		else
+			Loop Files, %directory%\*.*, FD
+			{
+				empty := false
+				
+				break
+			}
+		
+		if (empty && valid)
+			result := kOk
+		else if !empty {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The installation folder must be empty.")
+			OnMessage(0x44, "")
+		}
+	}
 	else if (options == kCancel)
 		result := kCancel
 	else {
@@ -284,8 +320,39 @@ chooseInstallLocationPath() {
 	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
 	OnMessage(0x44, "")
 
-	if (directory != "")
-		GuiControl Text, installLocationPathEdit, %directory%
+	if (directory != "") {
+		valid := true
+		empty := true
+		
+		if !FileExist(directory)
+			try {
+				FileCreateDir %directory%
+			}
+			catch exception {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				title := translate("Error")
+				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+				OnMessage(0x44, "")
+				
+				valid := false
+			}
+		else
+			Loop Files, %directory%\*.*, FD
+			{
+				empty := false
+				
+				break
+			}
+		
+		if (empty && valid)
+			GuiControl Text, installLocationPathEdit, %directory%
+		else if !empty {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("The installation folder must be empty.")
+			OnMessage(0x44, "")
+		}
+	}
 }
 
 openInstallDocumentation() {
@@ -537,6 +604,8 @@ checkInstallation() {
 						Run %installLocation%\Binaries\Simulator Setup.exe
 				}
 				else {
+					Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes
+				
 					index := inList(A_Args, "-Start")
 				
 					if index
@@ -896,7 +965,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
-viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
+viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
 	static dismissed := false
 	
 	dismissed := false
@@ -914,7 +983,7 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	Gui FV:-Border -Caption
 	Gui FV:Color, D0D0D0, D8D8D8
 	Gui FV:Font, s10 Bold
-	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System - Compiler")
+	Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveBuildLogViewer, % translate("Modular Simulator Controller System - Compiler")
 	Gui FV:Font
 	Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
 	
@@ -946,7 +1015,7 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	
 	buttonX := Round(width / 2) - 40
 	
-	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Ok")
+	Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissBuildLogViewer, % translate("Ok")
 	
 	Gui FV:+AlwaysOnTop
 	Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
@@ -957,12 +1026,12 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 	Gui FV:Destroy
 }
 
-moveFileViewer() {
+moveBuildLogViewer() {
 	moveByMouse("FV")
 }
 
-dismissFileViewer() {
-	viewFile(false)
+dismissBuildLogViewer() {
+	viewBuildLog(false)
 }
 
 saveTargets() {
@@ -1249,6 +1318,7 @@ editTargets(command := "") {
 }
 
 updatePhraseGrammars() {
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, filePrefix in ["Race Engineer.grammars.", "Race Strategist.grammars.", "Race Spotter.grammars."]
@@ -1265,9 +1335,11 @@ updatePhraseGrammars() {
 						
 			writeConfiguration(grammarFileName, userGrammars)
 		}
+	*/
 }
 
 updateTranslations() {
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	
 	for ignore, translationFileName in getFileNames("Translations.*", kUserTranslationsDirectory, kUserConfigDirectory) {
@@ -1286,6 +1358,7 @@ updateTranslations() {
 				
 		writeTranslations(languageCode, languages[languageCode], translations)
 	}
+	*/
 }
 
 deleteActionLabels() {
@@ -1302,15 +1375,8 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 		}
 }
 
-updateActionLabels() {
-	updateActionDefinitions("Controller Action Labels")
-}
-
-updateActionIcons() {
-	updateActionDefinitions("Controller Action Icons")
-}
-
 updateActionDefinitions(fileName := "Controller Plugin Labels") {
+	/* Obsolete since 4.0.4...
 	languages := availableLanguages()
 	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
 	
@@ -1354,6 +1420,15 @@ updateActionDefinitions(fileName := "Controller Plugin Labels") {
 		if changed
 			writeConfiguration(userDefinitionsFile, userDefinitions)
 	}
+	*/
+}
+
+updateActionLabels() {
+	updateActionDefinitions("Controller Action Labels")
+}
+
+updateActionIcons() {
+	updateActionDefinitions("Controller Action Icons")
 }
 
 updateCustomCalls(startNumber, endNumber) {
@@ -1462,6 +1537,22 @@ updateInstallationForV354() {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 		
 		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+	}
+}
+
+updateConfigurationForV402() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+	}
+}
+
+updateConfigurationForV400() {
+	try {
+		FileDelete %kDatabaseDirectory%User\UPLOAD
+	}
+	catch exception {
+		; ignore
 	}
 }
 
@@ -1751,6 +1842,50 @@ updateConfigurationForV310() {
 		}
 }
 
+updatePluginsForV402() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		
+		if descriptor {
+			descriptor := StrReplace(descriptor, "raceAssistantListener: off", "raceAssistantListener: On")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updatePluginsForV400() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+	
+	if (userConfiguration.Count() > 0) {
+		for ignore, name in ["Race Engineer", "Race Strategist", "Race Spotter"] {
+			descriptor := getConfigurationValue(userConfiguration, "Plugins", name, false)
+			
+			if descriptor {
+				descriptor := StrReplace(descriptor, "raceAssistantService", "raceAssistantSynthesizer")
+				
+				setConfigurationValue(userConfiguration, "Plugins", name, descriptor)
+			}
+		}
+		
+		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		
+		if descriptor {
+			descriptor := StrReplace(descriptor, "raceAssistantListener: false", "raceAssistantListener: true")
+			
+			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+		}
+		
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV398() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1990,7 +2125,7 @@ runSpecialTargets(ByRef buildProgress) {
 				}
 				
 				if !success
-					viewFile(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+					viewBuildLog(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 					
 				if FileExist(kTempDirectory . "build.out")
 					FileDelete %kTempDirectory%build.out

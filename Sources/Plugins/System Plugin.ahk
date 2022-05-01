@@ -333,7 +333,7 @@ class SystemPlugin extends ControllerPlugin {
 			; Using a sempahore file instead...
 			
 			fileName := (kTempDirectory . "Startup.semaphore")
-						
+			
 			try {
 				FileDelete %fileName%
 			}

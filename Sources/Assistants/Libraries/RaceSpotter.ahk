@@ -454,7 +454,14 @@ class RaceSpotter extends RaceAssistant {
 																			   , gained: Round(positionInfo["Front"].DeltaDifference, 1)
 																			   , lapTime: Round(lapTimeDifference, 1)})
 				
-					if (delta >= 1)
+					if (delta < 1) {
+						if knowledgeBase.getValue("Car." . car . ".Incidents", false)
+							speaker.speakPhrase("UnsafeDriver")
+						else if ((knowledgeBase.getValue("Car." . car . ".ValidLaps", 0) + 1)
+							   < knowledgeBase.getValue("Car." . knowledgeBase.getValue("Driver.Car") . ".ValidLaps", 0))
+							speaker.speakPhrase("InconsistentDriver")
+					}
+					else
 						speaker.speakPhrase("CanDoIt")
 				}
 				else {
@@ -517,9 +524,9 @@ class RaceSpotter extends RaceAssistant {
 		if (this.Speaker && (this.Session = kSessionRace)) {
 			lastLap := knowledgeBase.getValue("Lap", 0)
 					
-			this.updatePositionInfo(lastLap)
-				
 			if !this.SpotterSpeaking {
+				this.updatePositionInfo(lastLap)
+				
 				this.SpotterSpeaking := true
 				
 				try {
@@ -880,9 +887,21 @@ class RaceSpotter extends RaceAssistant {
 	}
 	
 	addLap(lapNumber, data) {
+		local knowledgeBase
+		
 		result := base.addLap(lapNumber, data)
 	
-		lastPitstop := this.KnowledgeBase.getValue("Pitstop.Last", false)
+		knowledgeBase := this.KnowledgeBase
+		
+		Loop % knowledgeBase.getValue("Car.Count")
+		{
+			validLaps := knowledgeBase.getValue("Car." . A_Index . ".ValidLaps", 0)
+			
+			if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+				knowledgeBase.setFact("Car." . A_Index . ".ValidLaps", validLaps +  1)
+		}
+		
+		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
 			this.iPositionInfo := {}
@@ -902,7 +921,7 @@ class RaceSpotter extends RaceAssistant {
 		if (this.iDriverUpdate = 1) {
 			this.iDriverUpdate := 0
 			
-			this.KnowledgeBase.addFact("Sector", true)
+			this.KnowledgeBase.addFact("Standings", true)
 			
 			update := true
 		}

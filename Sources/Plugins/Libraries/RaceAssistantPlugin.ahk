@@ -1447,24 +1447,24 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			if silent
 				options .= " -Silent"
 			
-			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+			RunWait "%exePath%" %options%, %kBinariesDirectory%
 		}
 		else {
 			options := "-File """ . fileName . """ " . getSimulatorOptions(plugin)
 			
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
-		}
 		
-		if pid
-			for ignore, plugin in [kRaceEngineerPlugin, kRaceStrategistPlugin, kRaceSpotterPlugin] {
-				plugin := controller.findPlugin(plugin)
-			
-				if (plugin && controller.isActive(plugin)) {
-					callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
-					
-					SetTimer %callback%, -1000
+			if pid
+				for ignore, plugin in [kRaceEngineerPlugin, kRaceStrategistPlugin, kRaceSpotterPlugin] {
+					plugin := controller.findPlugin(plugin)
+				
+					if (plugin && controller.isActive(plugin)) {
+						callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
+						
+						SetTimer %callback%, -1000
+					}
 				}
-			}
+		}
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

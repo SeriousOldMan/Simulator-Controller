@@ -799,6 +799,7 @@ class RaceSpotter extends RaceAssistant {
 								, EnoughData: false})
 		
 		this.iFinalLapsAnnounced := false
+		this.iPositionInfo := {}
 		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
@@ -883,8 +884,10 @@ class RaceSpotter extends RaceAssistant {
 	
 		lastPitstop := this.KnowledgeBase.getValue("Pitstop.Last", false)
 		
-		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
+		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
 			this.iPositionInfo := {}
+			this.iLastDistanceInformationLap := false
+		}
 		
 		if result
 			this.iDriverUpdate := 4
@@ -918,6 +921,7 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		this.iPositionInfo := {}
+		this.iLastDistanceInformationLap := false
 	
 		this.startPitstop(lapNumber)
 		
@@ -933,7 +937,6 @@ class RaceSpotter extends RaceAssistant {
 		this.finishPitstop(lapNumber)
 		
 		return result
-	}
 	}
 	
 	requestInformation(category, arguments*) {

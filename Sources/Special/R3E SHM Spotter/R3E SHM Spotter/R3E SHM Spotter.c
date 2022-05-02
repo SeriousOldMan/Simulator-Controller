@@ -243,7 +243,7 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 			if (transY < 0)
 				carBehind = TRUE;
 
-			if (fabs(transY) < (longitudinalDistance + (longitudinalDistance / 2)))
+			if (fabs(transX) > (lateralDistance / 2))
 				if (transX > 0)
 					carBehindRight = TRUE;
 				else

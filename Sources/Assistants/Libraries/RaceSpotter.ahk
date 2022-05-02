@@ -515,8 +515,7 @@ class RaceSpotter extends RaceAssistant {
 						if (delta < 1) {
 							if knowledgeBase.getValue("Car." . car . ".Incidents", false)
 								speaker.speakPhrase("UnsafeDriver")
-							else if ((knowledgeBase.getValue("Car." . car . ".ValidLaps", 0) + 1)
-								   < knowledgeBase.getValue("Car." . knowledgeBase.getValue("Driver.Car") . ".ValidLaps", 0))
+							else if (knowledgeBase.getValue("Car." . car . ".ValidLaps", 0) < knowledgeBase.getValue("Lap", 0))
 								speaker.speakPhrase("InconsistentDriver")
 						}
 						else

@@ -118,6 +118,8 @@ int lastSituation = CLEAR;
 int situationCount = 0;
 
 BOOL carBehind = FALSE;
+BOOL carBehindLeft = FALSE;
+BOOL carBehindRight = FALSE;
 BOOL carBehindReported = FALSE;
 
 #define YELLOW_SECTOR_1 1
@@ -241,6 +243,12 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 			if (transY < 0)
 				carBehind = TRUE;
 
+			if (fabs(transY) < (longitudinalDistance + (longitudinalDistance / 2)))
+				if (transX > 0)
+					carBehindRight = TRUE;
+				else
+					carBehindLeft = FALSE;
+
 			return CLEAR;
 		}
 	}
@@ -271,6 +279,8 @@ BOOL checkPositions(int playerID) {
 		int newSituation = CLEAR;
 
 		carBehind = FALSE;
+		carBehindLeft = FALSE;
+		carBehindRight = FALSE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++) {
 			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID)
@@ -301,7 +311,8 @@ BOOL checkPositions(int playerID) {
 			if (!carBehindReported) {
 				carBehindReported = FALSE;
 
-				sendMessage("proximityAlert:Behind");
+				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return TRUE;
 			}
@@ -312,6 +323,8 @@ BOOL checkPositions(int playerID) {
 	else {
 		lastSituation = CLEAR;
 		carBehind = FALSE;
+		carBehindLeft = FALSE;
+		carBehindRight = FALSE;
 		carBehindReported = FALSE;
 	}
 
@@ -462,6 +475,8 @@ int main()
 			else {
 				lastSituation = CLEAR;
 				carBehind = FALSE;
+				carBehindLeft = FALSE;
+				carBehindRight = FALSE;
 				carBehindReported = FALSE;
 
 				lastFlagState = 0;

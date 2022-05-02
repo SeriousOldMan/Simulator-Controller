@@ -171,6 +171,8 @@ namespace RF2SHMSpotter {
 		int situationCount = 0;
 
 		bool carBehind = false;
+		bool carBehindLeft = false;
+		bool carBehindRight = false;
 		bool carBehindReported = false;
 
 		const int YELLOW_SECTOR_1 = 1;
@@ -305,6 +307,12 @@ namespace RF2SHMSpotter {
 					if (transY < 0)
 						carBehind = true;
 
+					if (Math.Abs(transY) < (longitudinalDistance + (longitudinalDistance / 2)))
+						if (transX > 0)
+							carBehindRight = true;
+						else
+							carBehindLeft = true;
+
 					return CLEAR;
 				}
 			}
@@ -339,6 +347,8 @@ namespace RF2SHMSpotter {
 				int newSituation = CLEAR;
 
 				carBehind = false;
+				carBehindLeft = false;
+				carBehindRight = false;
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
@@ -371,7 +381,8 @@ namespace RF2SHMSpotter {
 					{
 						carBehindReported = true;
 
-						SendMessage("proximityAlert:Behind");
+						SendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
 					}

@@ -76,6 +76,8 @@ int lastSituation = CLEAR;
 int situationCount = 0;
 
 bool carBehind = false;
+bool carBehindLeft = false;
+bool carBehindRight = false;
 bool carBehindReported = false;
 
 const int YELLOW = 1;
@@ -195,6 +197,12 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 			if (transY < 0)
 				carBehind = true;
 
+			if (fabs(transY) < (longitudinalDistance + (longitudinalDistance / 2)))
+				if (transX > 0)
+					carBehindRight = true;
+				else
+					carBehindLeft = true;
+
 			return CLEAR;
 		}
 	}
@@ -219,6 +227,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 		int newSituation = CLEAR;
 
 		carBehind = false;
+		carBehindLeft = false;
+		carBehindRight = false;
 
 		for (int id = 0; id < sharedData->mNumParticipants; id++) {
 			if (id != carID)
@@ -249,7 +259,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 			if (!carBehindReported) {
 				carBehindReported = true;
 
-				sendMessage("proximityAlert:Behind");
+				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return true;
 			}
@@ -260,6 +271,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 	else {
 		lastSituation = CLEAR;
 		carBehind = false;
+		carBehindLeft = false;
+		carBehindRight = false;
 		carBehindReported = false;
 	}
 
@@ -388,6 +401,8 @@ int main(int argc, char* argv[]) {
 				else {
 					lastSituation = CLEAR;
 					carBehind = false;
+					carBehindLeft = false;
+					carBehindRight = false;
 					carBehindReported = false;
 
 					lastFlagState = 0;

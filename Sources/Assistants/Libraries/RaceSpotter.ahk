@@ -617,7 +617,12 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	proximityAlert(type, variables := false) {
+	proximityAlert(message, variables := false) {
+		if (InStr(message, "Behind") == 1)
+			type := "Behind"
+		else
+			type := message
+		
 		if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
 			if (variables && !IsObject(variables)) {
 				values := {}
@@ -635,7 +640,7 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 				
 				try {
-					this.getSpeaker(true).speakPhrase(type, variables)
+					this.getSpeaker(true).speakPhrase(message, variables)
 				}
 				finally {
 					this.SpotterSpeaking := false
@@ -644,12 +649,12 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	yellowFlag(type, arguments*) {
+	yellowFlag(message, arguments*) {
 		if (this.Warnings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 			
 			try {
-				switch type {
+				switch message {
 					case "Full":
 						this.getSpeaker(true).speakPhrase("YellowFull")
 					case "Sector":

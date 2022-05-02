@@ -107,7 +107,8 @@ void sendMessage(string message) {
 
 int sessionDuration = 0;
 
-const float nearByDistance = 8.0;
+const float nearByXYDistance = 10.0;
+const float nearByZDistance = 6.0;
 const float longitudinalDistance = 4;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
@@ -224,9 +225,9 @@ float vectorAngle(float x, float y) {
 
 bool nearBy(float car1X, float car1Y, float car1Z,
 			float car2X, float car2Y, float car2Z) {
-	return (abs(car1X - car2X) < nearByDistance) &&
-		   (abs(car1Y - car2Y) < nearByDistance) &&
-		   (abs(car1Z - car2Z) < nearByDistance);
+	return (abs(car1X - car2X) < nearByXYDistance) &&
+		   (abs(car1Y - car2Y) < nearByXYDistance) &&
+		   (abs(car1Z - car2Z) < nearByZDistance);
 }
 
 void rotateBy(float* x, float* y, float angle) {
@@ -254,7 +255,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 			if (transY < 0) {
 				carBehind = true;
 
-				if (faster || abs(transX) > (lateralDistance / 2))
+				if ((faster && transY < longitudinalDistance * 1.5) ||
+					(transY < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
 					if (transX < 0)
 						carBehindRight = true;
 					else
@@ -314,7 +316,7 @@ bool checkPositions() {
 
 				if (hasLastCoordinates)
 					faster = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
-										  lastCoordinates[id][2] - gf->carCoordinates[id][2]) > speed * 1.01;
+										  lastCoordinates[id][2] - gf->carCoordinates[id][2]) > speed * 1.05;
 
 				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
 												 gf->carCoordinates[id][0], gf->carCoordinates[id][2], gf->carCoordinates[id][1]);

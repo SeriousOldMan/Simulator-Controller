@@ -100,7 +100,8 @@ void sendMessage(char* message) {
 
 #define PI 3.14159265
 
-#define nearByDistance 8.0
+#define nearByXYDistance 10.0
+#define nearByZDistance 6.0
 #define longitudinalDistance 4
 #define lateralDistance 6
 #define verticalDistance 2
@@ -217,9 +218,9 @@ r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 
 BOOL nearBy(r3e_float32 car1X, r3e_float32 car1Y, r3e_float32 car1Z,
 			r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
-	return (fabs(car1X - car2X) < nearByDistance) &&
-		   (fabs(car1Y - car2Y) < nearByDistance) &&
-		   (fabs(car1Z - car2Z) < nearByDistance);
+	return (fabs(car1X - car2X) < nearByXYDistance) &&
+		   (fabs(car1Y - car2Y) < nearByXYDistance) &&
+		   (fabs(car1Z - car2Z) < nearByZDistance);
 }
 
 void rotateBy(r3e_float32* x, r3e_float32* y, r3e_float64 angle) {
@@ -247,7 +248,8 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 			if (transY < 0) {
 				carBehind = TRUE;
 
-				if (faster || fabs(transX) > (lateralDistance / 2))
+				if ((faster && transY < longitudinalDistance * 1.5) ||
+					(transY < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = TRUE;
 					else

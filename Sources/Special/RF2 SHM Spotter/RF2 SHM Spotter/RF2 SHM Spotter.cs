@@ -153,7 +153,8 @@ namespace RF2SHMSpotter {
 
 		const double PI = 3.14159265;
 
-		const double nearByDistance = 8;
+		const double nearByXYDistance = 10.0;
+		const double nearByZDistance = 6.0;
 		const double longitudinalDistance = 4;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
@@ -278,9 +279,9 @@ namespace RF2SHMSpotter {
 		bool nearBy(double car1X, double car1Y, double car1Z,
 					double car2X, double car2Y, double car2Z)
 		{
-			return (Math.Abs(car1X - car2X) < nearByDistance) &&
-				   (Math.Abs(car1Y - car2Y) < nearByDistance) &&
-				   (Math.Abs(car1Z - car2Z) < nearByDistance);
+			return (Math.Abs(car1X - car2X) < nearByXYDistance) &&
+				   (Math.Abs(car1Y - car2Y) < nearByXYDistance) &&
+				   (Math.Abs(car1Z - car2Z) < nearByZDistance);
 		}
 
 		void rotateBy(ref double x, ref double y, double angle)
@@ -313,7 +314,8 @@ namespace RF2SHMSpotter {
 					{
 						carBehind = true;
 
-						if (faster || Math.Abs(transX) > (lateralDistance / 2))
+						if ((faster && transY < longitudinalDistance * 1.5) ||
+							(transY < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
 							if (transX > 0)
 								carBehindRight = true;
 							else

@@ -58,7 +58,8 @@ void sendMessage(char* message) {
 
 #define PI 3.14159265
 
-const float nearByDistance = 8.0;
+const float nearByXYDistance = 10.0;
+const float nearByZDistance = 6.0;
 const float longitudinalDistance = 4;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
@@ -171,9 +172,9 @@ float vectorAngle(float x, float y) {
 
 bool nearBy(float car1X, float car1Y, float car1Z,
 	float car2X, float car2Y, float car2Z) {
-	return (fabs(car1X - car2X) < nearByDistance) &&
-		(fabs(car1Y - car2Y) < nearByDistance) &&
-		(fabs(car1Z - car2Z) < nearByDistance);
+	return (fabs(car1X - car2X) < nearByXYDistance) &&
+		(fabs(car1Y - car2Y) < nearByXYDistance) &&
+		(fabs(car1Z - car2Z) < nearByZDistance);
 }
 
 void rotateBy(float* x, float* y, float angle) {
@@ -201,7 +202,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 			if (transY < 0) {
 				carBehind = true;
 
-				if (faster || fabs(transX) > (lateralDistance / 2))
+				if ((faster && transY < longitudinalDistance * 1.5) ||
+					(transY < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = true;
 					else

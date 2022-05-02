@@ -153,9 +153,13 @@ const char* computeAlert(int newSituation) {
 	return alert;
 }
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
 float vectorAngle(float x, float y) {
 	float scalar = (x * 0) + (y * 1);
-	float length = sqrt((x * x) + (y * y));
+	float length = vectorLength(x, y);
 
 	float angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
 
@@ -183,7 +187,7 @@ void rotateBy(float* x, float* y, float angle) {
 	*y = newY;
 }
 
-int checkCarPosition(float carX, float carY, float carZ, float angle,
+int checkCarPosition(float carX, float carY, float carZ, float angle, bool faster,
 					 float otherX, float otherY, float otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
 		float transX = (otherX - carX);
@@ -194,14 +198,15 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
-			if (transY < 0)
+			if (transY < 0) {
 				carBehind = true;
 
-			if (fabs(transX) > (lateralDistance / 2))
-				if (transX > 0)
-					carBehindRight = true;
-				else
-					carBehindLeft = true;
+				if (faster || fabs(transX) > (lateralDistance / 2))
+					if (transX > 0)
+						carBehindRight = true;
+					else
+						carBehindLeft = true;
+			}
 
 			return CLEAR;
 		}
@@ -209,6 +214,9 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 	else
 		return CLEAR;
 }
+
+float lastCoordinates[STORED_PARTICIPANTS_MAX][3];
+bool hasLastCoordinates = false;
 
 bool checkPositions(const SharedMemory* sharedData) {
 	float velocityX = sharedData->mWorldVelocity[VEC_X];
@@ -223,6 +231,10 @@ bool checkPositions(const SharedMemory* sharedData) {
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 		float coordinateZ = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Y];
+		float speed = 0.0;
+
+		if (hasLastCoordinates)
+			speed = vectorLength(lastCoordinates[carID][VEC_X] - coordinateX, lastCoordinates[carID][VEC_Z] - coordinateY);
 
 		int newSituation = CLEAR;
 
@@ -231,15 +243,32 @@ bool checkPositions(const SharedMemory* sharedData) {
 		carBehindRight = false;
 
 		for (int id = 0; id < sharedData->mNumParticipants; id++) {
-			if (id != carID)
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
-												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z],
-												 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y]);
+			if (id != carID) {
+				bool faster = false;
 
-			if ((newSituation == THREE) && carBehind)
-				break;
+				if (hasLastCoordinates)
+					faster = vectorLength(lastCoordinates[id][VEC_X] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+										  lastCoordinates[id][VEC_Z] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]) > speed * 1.01;
+
+				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
+					sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+					sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z],
+					sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y]);
+
+				if ((newSituation == THREE) && carBehind)
+					break;
+			}
 		}
+
+		for (int id = 0; id < sharedData->mNumParticipants; id++) {
+			ParticipantInfo participantInfo = sharedData->mParticipantInfo[id];
+
+			lastCoordinates[id][VEC_X] = participantInfo.mWorldPosition[VEC_X];
+			lastCoordinates[id][VEC_Y] = participantInfo.mWorldPosition[VEC_Y];
+			lastCoordinates[id][VEC_Z] = participantInfo.mWorldPosition[VEC_Z];
+		}
+
+		hasLastCoordinates = true;
 
 		const char* alert = computeAlert(newSituation);
 

@@ -206,10 +206,14 @@ string computeAlert(int newSituation) {
 	return alert;
 }
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
 float vectorAngle(float x, float y) {
 	float scalar = (x * 0) + (y * 1);
-	float length = sqrt((x * x) + (y * y));
-	
+	float length = vectorLength(x, y);
+
 	float angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
 
 	if (x < 0)
@@ -236,7 +240,7 @@ void rotateBy(float* x, float* y, float angle) {
 	*y = newY;
 }
 
-int checkCarPosition(float carX, float carY, float carZ, float angle,
+int checkCarPosition(float carX, float carY, float carZ, float angle, bool faster,
 					 float otherX, float otherY, float otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
 		float transX = (otherX - carX);
@@ -247,14 +251,15 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 		if ((abs(transY) < longitudinalDistance) && (abs(transX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
 			return (transX < 0) ? RIGHT : LEFT;
 		else {
-			if (transY < 0)
+			if (transY < 0) {
 				carBehind = true;
 
-			if (abs(transX) > (lateralDistance / 2))
-				if (transX < 0)
-					carBehindRight = true;
-				else
-					carBehindLeft = true;
+				if (faster || abs(transX) > (lateralDistance / 2))
+					if (transX < 0)
+						carBehindRight = true;
+					else
+						carBehindLeft = true;
+			}
 
 			return CLEAR;
 		}
@@ -262,6 +267,9 @@ int checkCarPosition(float carX, float carY, float carZ, float angle,
 	else
 		return CLEAR;
 }
+
+float lastCoordinates[60][3];
+bool hasLastCoordinates = false;
 
 bool checkPositions() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
@@ -282,12 +290,17 @@ bool checkPositions() {
 		for (int i = 0; i < gf->activeCars; i++)
 			if (gf->carID[i] == carID) {
 				carID = i;
+
 				break;
 			}
 
 		float coordinateX = gf->carCoordinates[carID][0];
 		float coordinateY = gf->carCoordinates[carID][2];
 		float coordinateZ = gf->carCoordinates[carID][1];
+		float speed = 0.0;
+
+		if (hasLastCoordinates)
+			speed = vectorLength(lastCoordinates[carID][0] - coordinateX, lastCoordinates[carID][2] - coordinateY);
 
 		int newSituation = CLEAR;
 
@@ -296,13 +309,28 @@ bool checkPositions() {
 		carBehindRight = false;
 
 		for (int id = 0; id < gf->activeCars; id++) {
-			if (id != carID)
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
+			if (id != carID) {
+				bool faster = false;
+
+				if (hasLastCoordinates)
+					faster = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
+										  lastCoordinates[id][2] - gf->carCoordinates[id][2]) > speed * 1.01;
+
+				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
 												 gf->carCoordinates[id][0], gf->carCoordinates[id][2], gf->carCoordinates[id][1]);
 
-			if ((newSituation == THREE) && carBehind)
-				break;
+				if ((newSituation == THREE) && carBehind)
+					break;
+			}
 		}
+
+		for (int id = 0; id < gf->activeCars; id++) {
+			lastCoordinates[id][0] = gf->carCoordinates[id][0];
+			lastCoordinates[id][1] = gf->carCoordinates[id][1];
+			lastCoordinates[id][2] = gf->carCoordinates[id][2];
+		}
+
+		hasLastCoordinates = true;
 
 		string alert = computeAlert(newSituation);
 

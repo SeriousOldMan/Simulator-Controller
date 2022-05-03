@@ -9,7 +9,7 @@
   7. Spotter informs that the car in front is to be lapped.
   8. More detailed rear car alert by Spotter incl. warning for possible dive bombs.
   9. Rule supoort has been to "Setup Advisor" for several additional cars.
-  10. Race Engineer no longer comlains about zero fuel when parking in the pitlane in ACC.
+  10. Race Engineer no longer complains about zero fuel when parking in the pitlane in ACC.
 
 ## 4.1.0-release 04/29/22
 

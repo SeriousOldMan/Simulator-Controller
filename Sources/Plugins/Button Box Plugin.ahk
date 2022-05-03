@@ -105,7 +105,7 @@ class GridButtonBox extends ButtonBox {
 	
 	Descriptor[] {
 		Get {
-			return this.iName
+			return this.Name
 		}
 	}
 	

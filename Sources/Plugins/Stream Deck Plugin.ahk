@@ -55,6 +55,12 @@ class StreamDeck extends FunctionController {
 	iRefreshActive := false
 	iPendingUpdates := []
 	
+	Descriptor[] {
+		Get {
+			return this.Name
+		}
+	}
+	
 	Type[] {
 		Get {
 			return "Stream Deck"

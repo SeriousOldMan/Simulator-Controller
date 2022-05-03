@@ -384,6 +384,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 	
+	updateSessionData(data) {
+		base.updateSessionData(data)
+		
+		if !getConfigurationValue(data, "Stint Data", "InPit", false)
+			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setConfigurationValue(data, "Session Data", "Paused", true)
+	}
+	
 	activateACCWindow() {
 		window := this.Simulator.WindowTitle
 		

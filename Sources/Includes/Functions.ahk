@@ -2112,14 +2112,27 @@ getControllerConfiguration(configuration := false) {
 			if configuration {
 				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
 				
-				options := " -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """"
+				options := (" -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """")
 			}
 			else
 				options := ""
 			
-			exePath := """" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options
+			exePath := ("""" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options)
 			
-			RunWait %exePath%, %kBinariesDirectory%
+			Run %exePath%, %kBinariesDirectory%, , pid
+			
+			Sleep 1000
+			
+			tries := 30
+		
+			while (tries > 0) {
+				Sleep 200
+			
+				Process Exist, %pid%
+				
+				if !ErrorLevel
+					break
+			}
 			
 			if configuration
 				FileDelete %kTempDirectory%Simulator Configuration.ini

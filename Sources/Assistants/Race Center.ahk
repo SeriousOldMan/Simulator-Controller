@@ -2087,7 +2087,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	planPitstop() {
-		if this.SessionActive() {
+		if this.SessionActive {
 			window := this.Window
 			
 			Gui %window%:Default

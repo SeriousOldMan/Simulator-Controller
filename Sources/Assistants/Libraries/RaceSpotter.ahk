@@ -107,12 +107,12 @@ class RaceSpotter extends RaceAssistant {
 	
 	updateSessionValues(values) {
 		base.updateSessionValues(values)
-		
-		if (this.Session == kSessionFinished) {
+	
+		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDistanceInformationLap := false
 			this.iPositionInfo := {}
 			this.iGridPosition := false
-	
+			
 			this.iRaceStartSummarized := false
 			this.iFinalLapsAnnounced := false
 		}

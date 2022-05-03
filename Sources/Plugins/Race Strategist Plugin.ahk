@@ -183,7 +183,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.cancelStrategy()
 	}
 	
-	sessionActive(sessionState) {
+	activeSession(sessionState) {
 		return ((sessionState == kSessionPractice) || (sessionState == kSessionRace))
 	}
 	

@@ -407,21 +407,30 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "UpdateState")
 			}
 			else if (arguments[1] = "UpdateAvailableMinutes") {
-				title := translate("Team Server")
-				prompt := translate("Please enter the amount of available minutes:")
-				
-				locale := ((getLanguage() = "en") ? "" : "Locale")
-				minutes := account.AvailableMinutes
-				
-				InputBox minutes, %title%, %prompt%, , 200, 150, , , %locale%, , %minutes%
-				
-				if !ErrorLevel
-				{
-					connector.SetAccountMinutes(account.Identifier, minutes)
+				if (account == true) {
+					title := translate("Error")
+		
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must save the account before you can change the number of available minutes.")
+					OnMessage(0x44, "")
+				}
+				else {
+					title := translate("Team Server")
+					prompt := translate("Please enter the amount of available minutes:")
 					
-					accounts := loadAccounts(connector, accountsListView)
-				
-					administrationEditor(kEvent, "AccountClear")
+					locale := ((getLanguage() = "en") ? "" : "Locale")
+					minutes := account.AvailableMinutes
+					
+					InputBox minutes, %title%, %prompt%, , 200, 150, , , %locale%, , %minutes%
+					
+					if !ErrorLevel
+					{
+						connector.SetAccountMinutes(account.Identifier, minutes)
+						
+						accounts := loadAccounts(connector, accountsListView)
+					
+						administrationEditor(kEvent, "AccountClear")
+					}
 				}
 			}
 			else if (arguments[1] = "UpdateState") {

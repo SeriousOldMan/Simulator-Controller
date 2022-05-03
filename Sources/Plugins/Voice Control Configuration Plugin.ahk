@@ -439,6 +439,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			}
 		}
 		
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		GuiControl Choose, voiceLanguageDropDown, %chosen%
 		
 		GuiControl Choose, voiceSynthesizerDropDown, %voiceSynthesizerDropDown%
@@ -488,6 +492,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	showWidgets() {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		GuiControlGet voiceSynthesizerDropDown
 		
 		if !voiceSynthesizerDropDown
@@ -514,6 +522,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	hideWidgets() {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		if (this.iSynthesizerMode = "Windows")
 			this.hideWindowsSynthesizerEditor()
 		else if (this.iSynthesizerMode = "dotNET")
@@ -677,6 +689,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	getCurrentLanguage() {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		GuiControlGet voiceLanguageDropDown
 		
 		languageCode := "en"
@@ -760,6 +776,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	loadWindowsVoices(configuration) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		if configuration
 			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows", getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
 		else {
@@ -772,6 +792,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	loadDotNETVoices(configuration)	{
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		if configuration
 			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		else {
@@ -784,6 +808,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	updateWindowsVoices(configuration := false) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		voices := this.loadWindowsVoices(configuration)
 		
 		chosen := inList(voices, windowsSpeakerDropDown)
@@ -796,6 +824,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	updateDotNETVoices(configuration := false) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		voices := this.loadDotNETVoices(configuration)
 		
 		chosen := inList(voices, windowsSpeakerDropDown)
@@ -808,6 +840,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 	
 	updateAzureVoices(configuration := false) {
+		window := this.Editor.Window
+		
+		Gui %window%:Default
+
 		voices := []
 		
 		GuiControlGet azureSubscriptionKeyEdit
@@ -904,7 +940,7 @@ chooseVoiceSynthesizer() {
 	else
 		configurator.showAzureSynthesizerEditor()
 	
-	if ((oldChoice <= 2) && (voiceSynthesizerDropDown <= 2))
+	if (voiceSynthesizerDropDown <= 2)
 		configurator.updateLanguage(false)
 }
 

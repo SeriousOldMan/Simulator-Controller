@@ -29,7 +29,7 @@ namespace TeamServer {
     public class Program {
         public static void Main(string[] args) {
             string json = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Settings.json"));
-            Settings settings= JsonSerializer.Deserialize<Settings>(json);
+            Settings settings = JsonSerializer.Deserialize<Settings>(json);
 
             SQLiteAsyncConnection connection;
 

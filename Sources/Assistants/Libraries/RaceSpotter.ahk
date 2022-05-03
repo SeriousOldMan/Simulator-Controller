@@ -367,7 +367,15 @@ class RaceSpotter extends RaceAssistant {
 		frontStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0)) / 1000, 1)
 		frontStandingsCar := knowledgeBase.getValue("Position.Standings.Front.Car", 0)
 		
-		if ((frontTrackCar != frontStandingsCar) && (frontTrackDelta <= 2)) {
+		special := false
+		
+		if ((frontTrackCar != frontStandingsCar) && (frontTrackDelta <= 2))
+			if (position < knowledgeBase.getValue("Car." . frontTrackCar . ".Position"))
+				special := "LapDown"
+			else if (position > knowledgeBase.getValue("Car." . frontTrackCar . ".Position"))
+				special := "LapUp"
+		
+		if special {
 			if (positionInfo.HasKey("Front") && (positionInfo["Front"].Car != frontTrackCar))
 				positionInfo.Delete("Front")
 			
@@ -384,7 +392,7 @@ class RaceSpotter extends RaceAssistant {
 			else
 				difference := false
 			
-			positionInfo["Front"] := {Car: frontTrackCar, Lapped: true, Reported: reported
+			positionInfo["Front"] := {Car: frontTrackCar, Type: special, Reported: reported
 									, Delta: frontTrackDelta, DeltaDifference: difference
 									, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
 		}
@@ -407,7 +415,7 @@ class RaceSpotter extends RaceAssistant {
 			else
 				difference := false
 			
-			positionInfo["Front"] := {Car: frontStandingsCar, Lapped: false, Reported: reported
+			positionInfo["Front"] := {Car: frontStandingsCar, Type: "Position", Reported: reported
 									, Delta: frontStandingsDelta, DeltaDifference: difference
 									, LapTimeDifference: Round(frontLapTime - driverLapTime, 1)}
 		}
@@ -497,11 +505,18 @@ class RaceSpotter extends RaceAssistant {
 			if positionInfo.HasKey("Front") {
 				delta := positionInfo["Front"].Delta
 				
-				if (positionInfo["Front"].Lapped && (delta <= 2)) {
+				if ((positionInfo["Front"].Type = "LapDown") && (delta <= 2)) {
 					if !positionInfo["Front"].Reported {
 						positionInfo["Front"].Reported := true
 						
-						speaker.speakPhrase("LappedDriver")
+						speaker.speakPhrase("LapDownDriver")
+					}
+				}
+				else if ((positionInfo["Front"].Type = "LapUp") && (delta <= 2)) {
+					if !positionInfo["Front"].Reported {
+						positionInfo["Front"].Reported := true
+						
+						speaker.speakPhrase("LapUpDriver")
 					}
 				}
 				else if ((delta < 1) || (positionInfo["Front"].DeltaDifference > 0)) {
@@ -529,6 +544,8 @@ class RaceSpotter extends RaceAssistant {
 						speaker.speakPhrase("CantDoIt")
 					}
 					
+					positionInfo["Front"].Reported := true
+
 					cheered := true
 				}
 			}

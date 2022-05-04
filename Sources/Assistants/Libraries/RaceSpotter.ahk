@@ -366,7 +366,15 @@ class RaceSpotter extends RaceAssistant {
 				reported := positionInfo[positionType].Reported
 				difference := Round(positionInfo[positionType].Delta - delta, 1)
 				
-				if (Abs(difference) < threshold)
+				positionInfo[positionType].LapTimeDifference := Round(lapTime - driverLapTime, 1)
+				
+				if (reported && (positionInfo[positionType].DeltaDifference = 0)) {
+					positionInfo[positionType].Delta := delta
+					positionInfo[positionType].Reported := false
+					
+					return
+				}
+				else if (Abs(difference) < threshold)
 					return
 				else if !reported {
 					positionInfo[positionType].Delta := delta
@@ -504,6 +512,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("LapUpDriver")
 				
 				positionInfo["TrackFront"].Reported := true
+				positionInfo["TrackFront"].DeltaDifference := 0
 			}
 			else {
 				deltaDifference := positionInfo["StandingsFront"].DeltaDifference
@@ -544,7 +553,8 @@ class RaceSpotter extends RaceAssistant {
 						}
 						
 						positionInfo["StandingsFront"].Reported := true
-
+						positionInfo["StandingsFront"].DeltaDifference := 0
+						
 						informed := true
 					}
 				}
@@ -564,6 +574,7 @@ class RaceSpotter extends RaceAssistant {
 						speaker.speakPhrase("Focus")
 					
 					positionInfo["StandingsBehind"].Reported := true
+					positionInfo["StandingsBehind"].DeltaDifference := 0
 				}
 			}
 		}

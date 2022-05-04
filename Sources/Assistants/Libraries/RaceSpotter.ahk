@@ -370,7 +370,7 @@ class RaceSpotter extends RaceAssistant {
 					return
 				else if !reported {
 					positionInfo[positionType].Delta := delta
-					positionInfo[positionType].DeltaDifference := (positionInfo[positionType].DeltaDifference + difference)
+					positionInfo[positionType].DeltaDifference := Max(0, positionInfo[positionType].DeltaDifference + difference)
 					
 					return
 				}
@@ -380,17 +380,23 @@ class RaceSpotter extends RaceAssistant {
 					
 					return
 				}
-				else if (opponentType = "Position")
-					reported := false
+				else if (opponentType = "Position") {
+					positionInfo[positionType].Reported := false
+				
+					positionInfo[positionType].Delta := delta
+					positionInfo[positionType].DeltaDifference := (positionInfo[positionType].DeltaDifference + difference)
+				}
 			}
-			else if (opponentType != "Position")
-				difference := true
-			else
-				difference := 0
+			else {
+				if (opponentType != "Position")
+					difference := true
+				else
+					difference := 0
 	
-			positionInfo[positionType] := {Car: car, Type: opponentType, Reported: reported
-										 , Delta: delta, DeltaDifference: difference
-										 , LapTimeDifference: Round(lapTime - driverLapTime, 1)}
+				positionInfo[positionType] := {Car: car, Type: opponentType, Reported: reported
+											 , Delta: delta, DeltaDifference: difference
+											 , LapTimeDifference: Round(lapTime - driverLapTime, 1)}
+			}
 		}
 	}
 	
@@ -422,7 +428,7 @@ class RaceSpotter extends RaceAssistant {
 			if ((frontStandingsDelta = 0) || (position = 1))
 				positionInfo.Delete("StandingsFront")
 			else
-				this.updateOpponentInfo(positionInfo, "StandingsFront", "Position", driverLapTime, frontStandingsCar, frontStandingsDelta, 0.5)
+				this.updateOpponentInfo(positionInfo, "StandingsFront", "Position", driverLapTime, frontStandingsCar, frontStandingsDelta, threshold)
 			
 			behindStandingsDelta := Round(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000, 1)
 			
@@ -504,22 +510,27 @@ class RaceSpotter extends RaceAssistant {
 			
 				if (positionInfo.HasKey("StandingsFront") && !positionInfo["StandingsFront"].Reported && (deltaDifference > 0)) {
 					delta := positionInfo["StandingsFront"].Delta
+					nearBy := (delta < 1)
 					
-					if ((delta < 1) || regular) {
+					if (nearBy || regular) {
 						lapTimeDifference := positionInfo["StandingsFront"].LapTimeDifference
 						
-						if ((delta < 1) || (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference))) {
+						if (nearBy || (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference))) {
 							speaker.speakPhrase((delta < 1) ? "GotHim" : "GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
 																					   , gained: Round(Abs(deltaDifference), 1)
 																					   , lapTime: Round(lapTimeDifference, 1)})
 						
-							if (delta < 1) {
-								car := positionInfo["StandingsFront"].Car
-								
-								if knowledgeBase.getValue("Car." . car . ".Incidents", false)
-									speaker.speakPhrase("UnsafeDriver")
-								else if ((knowledgeBase.getValue("Lap", 0) - knowledgeBase.getValue("Car." . car . ".ValidLaps", 0)) > 3)
-									speaker.speakPhrase("InconsistentDriver")
+							if nearBy {
+								if !positionInfo["StandingsFront"].HasKey("RatedDriver") {
+									car := positionInfo["StandingsFront"].Car
+									
+									if knowledgeBase.getValue("Car." . car . ".Incidents", false)
+										speaker.speakPhrase("UnsafeDriver")
+									else if ((knowledgeBase.getValue("Lap", 0) - knowledgeBase.getValue("Car." . car . ".ValidLaps", 0)) > 3)
+										speaker.speakPhrase("InconsistentDriver")
+									
+									positionInfo["StandingsFront"].RatedDriver := true
+								}
 							}
 							else
 								speaker.speakPhrase("CanDoIt")

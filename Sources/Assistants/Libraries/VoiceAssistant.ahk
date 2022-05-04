@@ -136,7 +136,8 @@ class VoiceAssistant {
 				this.iFocus := false
 				this.iIsTalking := false
 				
-				this.speak(text, focus)
+				if (StrLen(Trim(text)) > 0)
+					this.speak(text, focus)
 			}
 		}
 		
@@ -235,7 +236,8 @@ class VoiceAssistant {
 				this.iFocus := false
 				this.iIsTalking := false
 				
-				this.speak(text, focus)
+				if (StrLen(Trim(text)) > 0)
+					this.speak(text, focus)
 			}
 		}
 		

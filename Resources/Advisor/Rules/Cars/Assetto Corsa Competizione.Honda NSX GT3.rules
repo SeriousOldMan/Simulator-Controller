@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         Ferrari 488 GT3 Evo             ;;;
+;;;                                         Honda NSX GT3                   ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,4 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "Ferrari 488 GT3 Evo", Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "Honda NSX GT3", Aero.Splitter.Front))

@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         BMW M4 GT3                      ;;;
+;;;                                         Porsche 718 Cayman GT4 CS       ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,4 +11,11 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "BMW M4 GT3", Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 718 Cayman GT4 Clubsport",
+										[Aero.Splitter.Front, Brake.Balance,
+										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
+										 Differential.Preload, AntiRollBar.Front, AntiRollBar.Rear]))

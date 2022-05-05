@@ -100,7 +100,8 @@ void sendMessage(char* message) {
 
 #define PI 3.14159265
 
-#define nearByDistance 8.0
+#define nearByXYDistance 10.0
+#define nearByZDistance 6.0
 #define longitudinalDistance 4
 #define lateralDistance 6
 #define verticalDistance 2
@@ -118,6 +119,8 @@ int lastSituation = CLEAR;
 int situationCount = 0;
 
 BOOL carBehind = FALSE;
+BOOL carBehindLeft = FALSE;
+BOOL carBehindRight = FALSE;
 BOOL carBehindReported = FALSE;
 
 #define YELLOW_SECTOR_1 1
@@ -197,9 +200,13 @@ char* computeAlert(int newSituation) {
 	return alert;
 }
 
+inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
+	return sqrt((x * x) + (y * y));
+}
+
 r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 	r3e_float64 scalar = (x * 0) + (y * 1);
-	r3e_float64 length = sqrt((x * x) + (y * y));
+	r3e_float64 length = vectorLength(x, y);
 
 	r3e_float64 angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
 
@@ -211,9 +218,9 @@ r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
 
 BOOL nearBy(r3e_float32 car1X, r3e_float32 car1Y, r3e_float32 car1Z,
 			r3e_float32 car2X, r3e_float32 car2Y, r3e_float32 car2Z) {
-	return (fabs(car1X - car2X) < nearByDistance) &&
-		   (fabs(car1Y - car2Y) < nearByDistance) &&
-		   (fabs(car1Z - car2Z) < nearByDistance);
+	return (fabs(car1X - car2X) < nearByXYDistance) &&
+		   (fabs(car1Y - car2Y) < nearByXYDistance) &&
+		   (fabs(car1Z - car2Z) < nearByZDistance);
 }
 
 void rotateBy(r3e_float32* x, r3e_float32* y, r3e_float64 angle) {
@@ -227,7 +234,7 @@ void rotateBy(r3e_float32* x, r3e_float32* y, r3e_float64 angle) {
 	*y = newY;
 }
 
-int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_float32 angle,
+int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_float32 angle, BOOL faster,
 					 r3e_float32 otherX, r3e_float32 otherY, r3e_float32 otherZ) {
 	if (nearBy(carX, carY, carZ, otherX, otherY, otherZ)) {
 		r3e_float32 transX = (otherX - carX);
@@ -238,8 +245,16 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
-			if (transY < 0)
+			if (transY < 0) {
 				carBehind = TRUE;
+
+				if ((faster && transY < longitudinalDistance * 1.5) ||
+					(transY < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+					if (transX > 0)
+						carBehindRight = TRUE;
+					else
+						carBehindLeft = FALSE;
+			}
 
 			return CLEAR;
 		}
@@ -247,6 +262,9 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 	else
 		return CLEAR;
 }
+
+float lastCoordinates[R3E_NUM_DRIVERS_MAX][3];
+BOOL hasLastCoordinates = FALSE;
 
 BOOL checkPositions(int playerID) {
 	r3e_float64 velocityX = map_buffer->player.velocity.x;
@@ -267,21 +285,42 @@ BOOL checkPositions(int playerID) {
 		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
 		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
 		r3e_float32 coordinateZ = map_buffer->all_drivers_data_1[index].position.y;
+		r3e_float64 speed = 0.0;
+
+		if (hasLastCoordinates)
+			speed = vectorLength(lastCoordinates[index][0] - coordinateX, lastCoordinates[index][2] - coordinateY);
 
 		int newSituation = CLEAR;
 
 		carBehind = FALSE;
+		carBehindLeft = FALSE;
+		carBehindRight = FALSE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++) {
-			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID)
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle,
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) {
+				BOOL faster = FALSE;
+
+				if (hasLastCoordinates)
+					faster = vectorLength(lastCoordinates[id][0] - map_buffer->all_drivers_data_1[id].position.x,
+										  lastCoordinates[id][2] - map_buffer->all_drivers_data_1[id].position.z) > speed * 1.01;
+
+				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
 												 map_buffer->all_drivers_data_1[id].position.x,
 												 map_buffer->all_drivers_data_1[id].position.z,
 												 map_buffer->all_drivers_data_1[id].position.y);
 
-			if ((newSituation == THREE) && carBehind)
-				break;
+				if ((newSituation == THREE) && carBehind)
+					break;
+			}
 		}
+
+		for (int id = 0; id < map_buffer->num_cars; id++) {
+			lastCoordinates[id][0] = map_buffer->all_drivers_data_1[id].position.x;
+			lastCoordinates[id][1] = map_buffer->all_drivers_data_1[id].position.y;
+			lastCoordinates[id][2] = map_buffer->all_drivers_data_1[id].position.z;
+		}
+
+		hasLastCoordinates = TRUE;
 
 		char* alert = computeAlert(newSituation);
 
@@ -301,7 +340,8 @@ BOOL checkPositions(int playerID) {
 			if (!carBehindReported) {
 				carBehindReported = FALSE;
 
-				sendMessage("proximityAlert:Behind");
+				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return TRUE;
 			}
@@ -312,6 +352,8 @@ BOOL checkPositions(int playerID) {
 	else {
 		lastSituation = CLEAR;
 		carBehind = FALSE;
+		carBehindLeft = FALSE;
+		carBehindRight = FALSE;
 		carBehindReported = FALSE;
 	}
 
@@ -462,6 +504,8 @@ int main()
 			else {
 				lastSituation = CLEAR;
 				carBehind = FALSE;
+				carBehindLeft = FALSE;
+				carBehindRight = FALSE;
 				carBehindReported = FALSE;
 
 				lastFlagState = 0;

@@ -69,6 +69,10 @@ class VoiceAssistant {
 		
 		iSpeaker := false
 		iLanguage := false
+	
+		iIsTalking := false
+		iText := ""
+		iFocus := false
 		
 		Assistant[] {
 			Get {
@@ -83,6 +87,12 @@ class VoiceAssistant {
 			
 			Set {
 				return (this.Assistant.Speaking := value)
+			}
+		}
+	
+		Talking[] {
+			Get {
+				return this.iIsTalking
 			}
 		}
 		
@@ -113,11 +123,34 @@ class VoiceAssistant {
 			this.iLanguage := language
 		}
 		
-		speak(text, question := false) {
-			raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, question), this.Assistant.VoiceServer)
+		startTalk() {
+			this.iIsTalking := true
 		}
 		
-		speakPhrase(phrase, variables := false, question := false) {
+		finishTalk() {
+			if this.Talking {
+				text := this.iText
+				focus := this.iFocus
+				
+				this.iText := ""
+				this.iFocus := false
+				this.iIsTalking := false
+				
+				if (StrLen(Trim(text)) > 0)
+					this.speak(text, focus)
+			}
+		}
+		
+		speak(text, focus := false) {
+			if this.Talking {
+				this.iText .= (A_Space . text)
+				this.iFocus := (this.iFocus || focus)
+			}
+			else
+				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
+		}
+		
+		speakPhrase(phrase, variables := false, focus := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -129,7 +162,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase, question)
+				this.speak(phrase, focus)
 		}
 	}
 	
@@ -137,6 +170,10 @@ class VoiceAssistant {
 		iAssistant := false
 		iFragments := {}
 		iPhrases := {}
+		
+		iIsTalking := false
+		iText := ""
+		iFocus := false
 		
 		Assistant[] {
 			Get {
@@ -151,6 +188,12 @@ class VoiceAssistant {
 			
 			Set {
 				return (this.Assistant.Speaking := value)
+			}
+		}
+	
+		Talking[] {
+			Get {
+				return this.iIsTalking
 			}
 		}
 		
@@ -180,22 +223,46 @@ class VoiceAssistant {
 			base.__New(synthesizer, speaker, language)
 		}
 		
+		startTalk() {
+			this.iIsTalking := true
+		}
+		
+		finishTalk() {
+			if this.Talking {
+				text := this.iText
+				focus := this.iFocus
+				
+				this.iText := ""
+				this.iFocus := false
+				this.iIsTalking := false
+				
+				if (StrLen(Trim(text)) > 0)
+					this.speak(text, focus)
+			}
+		}
+		
 		speak(text, focus := false) {
-			stopped := this.Assistant.stopListening()
-			
-			try {
-				this.Speaking := true
+			if this.Talking {
+				this.iText .= (A_Space . text)
+				this.iFocus := (this.iFocus || focus)
+			}
+			else {
+				stopped := this.Assistant.stopListening()
 			
 				try {
-					base.speak(text, true)
+					this.Speaking := true
+				
+					try {
+						base.speak(text, true)
+					}
+					finally {
+						this.Speaking := false
+					}
 				}
 				finally {
-					this.Speaking := false
+					if (stopped && !this.Assistant.PushToTalk)
+						this.Assistant.startListening()
 				}
-			}
-			finally {
-				if (stopped && !this.Assistant.PushToTalk)
-					this.Assistant.startListening()
 			}
 		}
 		

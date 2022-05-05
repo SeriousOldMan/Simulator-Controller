@@ -861,25 +861,37 @@ class SetupWizard extends ConfigurationItem {
 	previousPage() {
 		vWorking := true
 		
-		step := false
-		page := false
-		
-		if this.getPreviousPage(step, page)
-			this.showPage(step, page)
-	
-		vWorking := false
+		try {
+			step := false
+			page := false
+			
+			if this.getPreviousPage(step, page)
+				this.showPage(step, page)
+		}
+		finally {
+			vWorking := false
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 	
 	nextPage() {
 		vWorking := true
 		
-		step := false
-		page := false
-		
-		if this.getNextPage(step, page)
-			this.showPage(step, page)
-		
-		vWorking := false
+		try {
+			step := false
+			page := false
+			
+			if this.getNextPage(step, page)
+				this.showPage(step, page)
+		}
+		finally {
+			vWorking := false
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	updateState() {
@@ -2193,14 +2205,10 @@ cancelSetup() {
 
 previousPage() {
 	SetupWizard.Instance.previousPage()
-	
-	vWorking := false
 }
 
 nextPage() {
 	SetupWizard.Instance.nextPage()
-	
-	vWorking := false
 }
 
 chooseLanguage() {

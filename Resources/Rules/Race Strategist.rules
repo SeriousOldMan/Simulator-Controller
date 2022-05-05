@@ -21,6 +21,20 @@
 
 ; [?Lap] => ...
 
+;;;-------------------------------------------------------------------------;;;
+;;; Each sector, after all the lap data has been copied to the knowledge    ;;;
+;;; base, all target data for race positions and lap times will             ;;;
+;;; be recomputed.                                                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Sector] => ...
+
+;;;-------------------------------------------------------------------------;;;
+;;; The race positions and lap times will be recomputed.                    ;;;
+;;;-------------------------------------------------------------------------;;;
+
+; [?Standings] => ...
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;; You can set this fact to a future lap number to request a standings     ;;;
@@ -367,8 +381,7 @@ bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestP
 ;;;-------------------------------------------------------------------------;;;
 ;;;                             Pitstop Performed                           ;;;
 ;;;                                                                         ;;;
-;;; After a pitstop has been performed, the pitstop plan is copied to the   ;;;
-;;; history memory as a reference for future calculations.                  ;;;
+;;; Records a performed pitstop.                                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 [?Pitstop.Lap] => (Prove: updatePitstopLap(?Pitstop.Lap))

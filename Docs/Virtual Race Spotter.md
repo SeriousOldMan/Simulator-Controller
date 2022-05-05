@@ -8,7 +8,7 @@ The Spotter will give you critical and in most cases real time information about
 
 1. Proximity Alerts
 
-   This real time information will highlight other cars on your side and directly behind you. Elisa will warn you about cars on your left and on your right (as well as three wide situations) and will also inform you, when the situation has cleared up. A warning will also be issued, when a car is very near to your back of your car, typically closing in for a pass maneuver. This may give you the opportunity to respond with countermeasures.
+   This real time information will highlight other cars on your side and directly behind you. Elisa will warn you about cars on your left and on your right (as well as three wide situations) and will also inform you, when the situation has cleared up. A warning will also be issued, when a car is very near to your back of your car, typically closing in for a pass maneuver. Elisa will use a path prediction algorithm, therefore sometimes you will get not only a warning that a car is at your rear, but also a hint, on which side the passing maneuver might take place. This may give you the opportunity to respond with countermeasures.
 
 2. Yellow Flag Warnings
 
@@ -29,6 +29,8 @@ The Spotter will give you critical and in most cases real time information about
 6. Distance Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you.
+   
+   When you approach a car in front of you, Elisa will gather all available information for the given car, for example, if it has been lapped, or whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
 7. Last Laps Announcement
 
@@ -55,7 +57,7 @@ As you might expect, the word "please" is optional. Available options for *annou
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
 | Capability                | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| --------------------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| ------------------------- | -------------------------- | --------------- | ------- | -------------------------- | --------- |
 | Side Alert                | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Behind Alert              | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
 | Yellow Flag               | Yes                        | Yes             | Yes     | Yes                        | Yes       |

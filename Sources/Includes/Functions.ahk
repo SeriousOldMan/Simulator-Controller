@@ -388,7 +388,7 @@ sendFileMessage(pid, event, data) {
 }
 
 receiveMessage() {
-	return (receivePipeMessage() || receiveFileMessage())
+	return (receiveFileMessage() || receivePipeMessage())
 }
 
 sendMessage() {
@@ -402,7 +402,7 @@ sendMessage() {
 
 messageDispatcher() {
 	try {
-		if (vIncomingMessages.Length() > 0) {
+		while (vIncomingMessages.Length() > 0) {
 			descriptor := vIncomingMessages.RemoveAt(1)
 		
 			withProtection(descriptor[1], descriptor[2], descriptor[3])
@@ -423,7 +423,7 @@ messageQueue() {
 	finally {
 		protectionOff()
 		
-		SetTimer messageQueue, -400
+		SetTimer messageQueue, -100
 	}
 }
 
@@ -524,8 +524,8 @@ startMessageManager() {
 	
 	OnExit("stopMessageManager")
 	
-	SetTimer messageQueue, -400
-	SetTimer messageDispatcher, -200
+	SetTimer messageQueue, -2000
+	SetTimer messageDispatcher, -4000
 }
 
 logError(exception) {
@@ -542,7 +542,7 @@ initializeLoggingSystem() {
 }
 
 startTrayMessageManager() {
-	SetTimer trayMessageQueue, -500
+	SetTimer trayMessageQueue, -1000
 }
 
 requestShareSessionDatabaseConsent() {
@@ -2112,14 +2112,27 @@ getControllerConfiguration(configuration := false) {
 			if configuration {
 				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
 				
-				options := " -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """"
+				options := (" -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """")
 			}
 			else
 				options := ""
 			
-			exePath := """" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options
+			exePath := ("""" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options)
 			
-			RunWait %exePath%, %kBinariesDirectory%
+			Run %exePath%, %kBinariesDirectory%, , pid
+			
+			Sleep 1000
+			
+			tries := 30
+		
+			while (tries > 0) {
+				Sleep 200
+			
+				Process Exist, %pid%
+				
+				if !ErrorLevel
+					break
+			}
 			
 			if configuration
 				FileDelete %kTempDirectory%Simulator Configuration.ini

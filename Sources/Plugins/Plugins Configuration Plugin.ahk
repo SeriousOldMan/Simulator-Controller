@@ -263,6 +263,8 @@ openPluginsModesDocumentation() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer
 		case "Race Strategist":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist
+		case "Race Spotter":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter
 		case "Team Server":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server
 		case "ACC":

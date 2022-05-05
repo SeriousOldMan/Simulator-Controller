@@ -254,22 +254,29 @@ class RaceEngineer extends RaceAssistant {
 		
 			return
 		}
+
+		speaker.startTalk()
 		
-		lap := knowledgeBase.getValue("Lap")
-		
-		speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
-		
-		speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1))
-									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
-		
-		speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1))
-									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
-		
-		speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1))
-									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
-		
-		speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1))
-									 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		try {
+			lap := knowledgeBase.getValue("Lap")
+			
+			speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
+			
+			speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1))
+										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+			
+			speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1))
+										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+			
+			speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1))
+										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+			
+			speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1))
+										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+		}
+		finally {
+			speaker.finishTalk()
+		}
 	}
 	
 	weatherRecognized(words) {
@@ -301,9 +308,16 @@ class RaceEngineer extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
+			speaker.startTalk()
 			
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			try {
+				speaker.speakPhrase("NotPossible")
+				
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -335,8 +349,15 @@ class RaceEngineer extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -376,8 +397,15 @@ class RaceEngineer extends RaceAssistant {
 		}
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -472,8 +500,15 @@ class RaceEngineer extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -491,8 +526,15 @@ class RaceEngineer extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -510,8 +552,15 @@ class RaceEngineer extends RaceAssistant {
 		fragments := speaker.Fragments
 		
 		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+			}
+			finally {
+				speaker.finishTalk()
+			}
 			
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
@@ -530,20 +579,27 @@ class RaceEngineer extends RaceAssistant {
 	updatePitstopFuel(litres) {
 		speaker := this.getSpeaker()
 		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+		speaker.startTalk()
+		
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+			else {
+				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
 
-			speaker.speakPhrase("ConfirmPlanUpdate")
-			speaker.speakPhrase("MoreChanges", false, true)
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges", false, true)
+			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
@@ -552,39 +608,46 @@ class RaceEngineer extends RaceAssistant {
 		
 		speaker := this.getSpeaker()
 		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			if (this.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != compound) {
-				speaker.speakPhrase("ConfirmPlanUpdate")
+		speaker.startTalk()
 		
-				knowledgeBase := this.KnowledgeBase
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
 				
-				knowledgeBase.setValue("Tyre.Compound.Target", compound)
-				knowledgeBase.setValue("Tyre.Compound.Color.Target", color)
-				
-				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound")
-				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound.Color")
-				
-				for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
-					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType)
-					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
-				}
-				
-				knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure.Correction")
-				
-				this.planPitstop({Update: true, Pressures: true, Confirm: false})
-				
-				speaker.speakPhrase("MoreChanges", false, true)
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
 			else {
-				speaker.speakPhrase("ConfirmPlanUpdate")
-				speaker.speakPhrase("MoreChanges", false, true)
+				if (this.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != compound) {
+					speaker.speakPhrase("ConfirmPlanUpdate")
+			
+					knowledgeBase := this.KnowledgeBase
+					
+					knowledgeBase.setValue("Tyre.Compound.Target", compound)
+					knowledgeBase.setValue("Tyre.Compound.Color.Target", color)
+					
+					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound")
+					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Compound.Color")
+					
+					for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
+						knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType)
+						knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
+					}
+					
+					knowledgeBase.clearFact("Pitstop.Planned.Tyre.Pressure.Correction")
+					
+					this.planPitstop({Update: true, Pressures: true, Confirm: false})
+					
+					speaker.speakPhrase("MoreChanges", false, true)
+				}
+				else {
+					speaker.speakPhrase("ConfirmPlanUpdate")
+					speaker.speakPhrase("MoreChanges", false, true)
+				}
 			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
@@ -592,25 +655,32 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		
 		speaker := this.getSpeaker()
-		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
-			targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
-			
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
 
-			speaker.speakPhrase("ConfirmPlanUpdate")
-			speaker.speakPhrase("MoreChanges", false, true)
+		speaker.startTalk()
+		
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+			else {
+				targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
+				targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
+				
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
+
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges", false, true)
+			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
@@ -618,39 +688,46 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase
 		
 		speaker := this.getSpeaker()
+
+		speaker.startTalk()
 		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			knowledgeBase := this.KnowledgeBase
-		
-			if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry") = "Dry") {
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FL", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FR", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.RL", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.RR", 26.1))
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
 			else {
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.FL", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.FR", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RL", 26.1))
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RR", 26.1))
-			}
+				knowledgeBase := this.KnowledgeBase
 			
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(knowledgeBase)
+				if (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry") = "Dry") {
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FL", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.FR", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.RL", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Session.Setup.Tyre.Dry.Pressure.RR", 26.1))
+				}
+				else {
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.FL", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.FR", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RL", 26.1))
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR", knowledgeBase.getValue("Session.Setup.Tyre.Wet.Pressure.RR", 26.1))
+				}
+				
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(knowledgeBase)
 
-			speaker.speakPhrase("ConfirmPlanUpdate")
-			speaker.speakPhrase("MoreChanges", false, true)
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges", false, true)
+			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
@@ -658,44 +735,58 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase
 		
 		speaker := this.getSpeaker()
-		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			knowledgeBase := this.KnowledgeBase
-		
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", false)
-			knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound.Color", false)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(knowledgeBase)
 
-			speaker.speakPhrase("ConfirmPlanUpdate")
-			speaker.speakPhrase("MoreChanges", false, true)
+		speaker.startTalk()
+		
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+			else {
+				knowledgeBase := this.KnowledgeBase
+			
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound", false)
+				knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound.Color", false)
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(knowledgeBase)
+
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges", false, true)
+			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
 	updatePitstopRepair(repairType, repair) {
 		speaker := this.getSpeaker()
-		
-		if !this.hasPlannedPitstop() {
-			speaker.speakPhrase("NotPossible")
-			speaker.speakPhrase("ConfirmPlan", false, true)
-			
-			this.setContinuation(ObjBindMethod(this, "planPitstop"))
-		}
-		else {
-			this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
-			
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
 
-			speaker.speakPhrase("ConfirmPlanUpdate")
-			speaker.speakPhrase("MoreChanges", false, true)
+		speaker.startTalk()
+		
+		try {
+			if !this.hasPlannedPitstop() {
+				speaker.speakPhrase("NotPossible")
+				speaker.speakPhrase("ConfirmPlan", false, true)
+				
+				this.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+			else {
+				this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
+				
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledge(this.KnowledgeBase)
+
+				speaker.speakPhrase("ConfirmPlanUpdate")
+				speaker.speakPhrase("MoreChanges", false, true)
+			}
+		}
+		finally {
+			speaker.finishTalk()
 		}
 	}
 	
@@ -820,24 +911,31 @@ class RaceEngineer extends RaceAssistant {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase("GreetingEngineer")
-				
-			Process Exist, Race Strategist.exe
+			speaker.startTalk()
 			
-			if ErrorLevel {
-				strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
-				strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
+			try {
+				speaker.speakPhrase("GreetingEngineer")
+					
+				Process Exist, Race Strategist.exe
 				
-				if strategistName {
-					speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
-				
-					speaker.speakPhrase("CallUs")
+				if ErrorLevel {
+					strategistPlugin := new Plugin("Race Strategist", kSimulatorConfiguration)
+					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
+					
+					if strategistName {
+						speaker.speakPhrase("GreetingStrategist", {strategist: strategistName})
+					
+						speaker.speakPhrase("CallUs")
+					}
+					else
+						speaker.speakPhrase("CallMe")
 				}
 				else
 					speaker.speakPhrase("CallMe")
 			}
-			else
-				speaker.speakPhrase("CallMe")
+			finally {
+				speaker.finishTalk()
+			}
 		}
 		
 		if this.Debug[kDebugKnowledgeBase]
@@ -1239,100 +1337,107 @@ class RaceEngineer extends RaceAssistant {
 		if this.Speaker {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
-			
-			if ((options == true) || options.Intro)
-				speaker.speakPhrase("Pitstop", {number: pitstopNumber})
-			
-			if ((options == true) || options.Fuel) {
-				fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
-				
-				if (fuel == 0)
-					speaker.speakPhrase("NoRefuel")
-				else
-					speaker.speakPhrase("Refuel", {litres: fuel})
-			}
-			
-			compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
-			
-			if ((options == true) || options.Compound) {
-				if compound {
-					color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
-					
-					if (compound = "Dry")
-						speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
-					else
-						speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
-				}
-				else {
-					if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
-						speaker.speakPhrase("NoTyreChange")
-					else
-						speaker.speakPhrase("NoTyreChangeLap")
-				}
-			}
-			
-			debug := this.Debug[kDebugPhrases]
-			
-			if (compound && ((options == true) || options.Pressures)) {
-				incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
-				incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
-				incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
-				incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
-			
-				if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
-					speaker.speakPhrase("NewPressures")
-				
-				if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
-					speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
-												 , unit: fragments["PSI"]})
-				
-				if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
-					speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
-												 , unit: fragments["PSI"]})
-				
-				if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
-					speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
-												 , unit: fragments["PSI"]})
-				
-				if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
-					speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
-												 , unit: fragments["PSI"]})
-		
-				pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
-				
-				if (Abs(pressureCorrection) > 0.05) {
-					temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
-					
-					if (temperatureDelta = 0)
-						temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
-					
-					speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-									  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
-									   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
-									   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
-				}
-			}
 
-			if ((options == true) || options.Repairs || (repairBodywork != kUndefined) || (repairSuspension != kUndefined)) {
-				if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
-					speaker.speakPhrase("RepairSuspension")
-				else if debug
-					speaker.speakPhrase("NoRepairSuspension")
-
-				if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
-					speaker.speakPhrase("RepairBodywork")
-				else if debug
-					speaker.speakPhrase("NoRepairBodywork")
-			}
+			speaker.startTalk()
 			
-			if confirm
-				if plannedLap
-					speaker.speakPhrase("PitstopLap", {lap: plannedLap})
-				else {
-					speaker.speakPhrase("ConfirmPrepare", false, true)
+			try {
+				if ((options == true) || options.Intro)
+					speaker.speakPhrase("Pitstop", {number: pitstopNumber})
+				
+				if ((options == true) || options.Fuel) {
+					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 					
-					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+					if (fuel == 0)
+						speaker.speakPhrase("NoRefuel")
+					else
+						speaker.speakPhrase("Refuel", {litres: fuel})
 				}
+				
+				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+				
+				if ((options == true) || options.Compound) {
+					if compound {
+						color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
+						
+						if (compound = "Dry")
+							speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+						else
+							speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+					}
+					else {
+						if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
+							speaker.speakPhrase("NoTyreChange")
+						else
+							speaker.speakPhrase("NoTyreChangeLap")
+					}
+				}
+				
+				debug := this.Debug[kDebugPhrases]
+				
+				if (compound && ((options == true) || options.Pressures)) {
+					incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
+					incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
+					incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
+					incrementRR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0), 1)
+				
+					if (debug || (incrementFL != 0) || (incrementFR != 0) || (incrementRL != 0) || (incrementRR != 0) || (tyrePressures != kUndefined))
+						speaker.speakPhrase("NewPressures")
+					
+					if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
+						speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
+													 , unit: fragments["PSI"]})
+					
+					if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
+						speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
+													 , unit: fragments["PSI"]})
+					
+					if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
+						speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
+													 , unit: fragments["PSI"]})
+					
+					if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
+						speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
+													 , unit: fragments["PSI"]})
+			
+					pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
+					
+					if (Abs(pressureCorrection) > 0.05) {
+						temperatureDelta := knowledgeBase.getValue("Weather.Temperature.Air.Delta", 0)
+						
+						if (temperatureDelta = 0)
+							temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
+						
+						speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
+										  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
+										   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
+										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+					}
+				}
+
+				if ((options == true) || options.Repairs || (repairBodywork != kUndefined) || (repairSuspension != kUndefined)) {
+					if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
+						speaker.speakPhrase("RepairSuspension")
+					else if debug
+						speaker.speakPhrase("NoRepairSuspension")
+
+					if knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork", false)
+						speaker.speakPhrase("RepairBodywork")
+					else if debug
+						speaker.speakPhrase("NoRepairBodywork")
+				}
+				
+				if confirm
+					if plannedLap
+						speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+					else {
+						speaker.speakPhrase("ConfirmPrepare", false, true)
+						
+						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+					}
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 		
 		if (result && this.RemoteHandler)
@@ -1497,21 +1602,28 @@ class RaceEngineer extends RaceAssistant {
 		if (this.Speaker && this.Warnings["FuelWarning"]) {
 			speaker := this.getSpeaker()
 			
-			speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
+							
+				if this.supportsPitstop() {
+					if this.hasPreparedPitstop()
+						speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+					else if !this.hasPlannedPitstop() {
+						speaker.speakPhrase("ConfirmPlan", false, true)
 						
-			if this.supportsPitstop() {
-				if this.hasPreparedPitstop()
-					speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-				else if !this.hasPlannedPitstop() {
-					speaker.speakPhrase("ConfirmPlan", false, true)
-					
-					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					}
+					else {
+						speaker.speakPhrase("ConfirmPrepare", false, true)
+						
+						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+					}
 				}
-				else {
-					speaker.speakPhrase("ConfirmPrepare", false, true)
-					
-					this.setContinuation(ObjBindMethod(this, "preparePitstop"))
-				}
+			}
+			finally {
+				speaker.finishTalk()
 			}
 		}
 	}
@@ -1530,12 +1642,19 @@ class RaceEngineer extends RaceAssistant {
 			else if newBodyworkDamage
 				phrase := "BodyworkDamage"
 			
-			speaker.speakPhrase(phrase)
-	
-			if (knowledgeBase.getValue("Lap.Remaining") > 4)
-				speaker.speakPhrase("DamageAnalysis")
-			else
-				speaker.speakPhrase("NoDamageAnalysis")
+			speaker.startTalk()
+			
+			try {
+				speaker.speakPhrase(phrase)
+		
+				if (knowledgeBase.getValue("Lap.Remaining") > 4)
+					speaker.speakPhrase("DamageAnalysis")
+				else
+					speaker.speakPhrase("NoDamageAnalysis")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 	
@@ -1550,12 +1669,19 @@ class RaceEngineer extends RaceAssistant {
 				delta := Format("{:.1f}", Round(delta, 2))
 				
 				if repair {
-					speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
-			
-					if this.supportsPitstop() {
-						speaker.speakPhrase("ConfirmPlan", false, true)
+					speaker.startTalk()
 					
-						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					try {
+						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+				
+						if this.supportsPitstop() {
+							speaker.speakPhrase("ConfirmPlan", false, true)
+						
+							this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						}
+					}
+					finally {
+						speaker.finishTalk()
 					}
 				}
 				else if (repair == false)
@@ -1585,14 +1711,21 @@ class RaceEngineer extends RaceAssistant {
 			if (this.Speaker && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
+
+				speaker.startTalk()
 				
-				speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
-								  , {minutes: minutes, compound: fragments[recommendedCompound]})
-				
-				if this.supportsPitstop() {
-					speaker.speakPhrase("ConfirmPlan", false, true)
-				
-					this.setContinuation(ObjBindMethod(this, "planPitstop"))
+				try {
+					speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+									  , {minutes: minutes, compound: fragments[recommendedCompound]})
+					
+					if this.supportsPitstop() {
+						speaker.speakPhrase("ConfirmPlan", false, true)
+					
+						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					}
+				}
+				finally {
+					speaker.finishTalk()
 				}
 			}
 	}

@@ -153,7 +153,8 @@ namespace RF2SHMSpotter {
 
 		const double PI = 3.14159265;
 
-		const double nearByDistance = 8;
+		const double nearByXYDistance = 10.0;
+		const double nearByZDistance = 6.0;
 		const double longitudinalDistance = 4;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
@@ -171,6 +172,8 @@ namespace RF2SHMSpotter {
 		int situationCount = 0;
 
 		bool carBehind = false;
+		bool carBehindLeft = false;
+		bool carBehindRight = false;
 		bool carBehindReported = false;
 
 		const int YELLOW_SECTOR_1 = 1;
@@ -255,10 +258,15 @@ namespace RF2SHMSpotter {
 			return alert;
 		}
 
+		double vectorLength(double x, double y)
+		{
+			return Math.Sqrt((x * x) + (y * y));
+		}
+
 		double vectorAngle(double x, double y)
 		{
 			double scalar = (x * 0) + (y * 1);
-			double length = Math.Sqrt((x * x) + (y * y));
+			double length = vectorLength(x, y);
 
 			double angle = (length > 0) ? Math.Acos(scalar / length) * 180 / PI : 0;
 
@@ -271,9 +279,9 @@ namespace RF2SHMSpotter {
 		bool nearBy(double car1X, double car1Y, double car1Z,
 					double car2X, double car2Y, double car2Z)
 		{
-			return (Math.Abs(car1X - car2X) < nearByDistance) &&
-				   (Math.Abs(car1Y - car2Y) < nearByDistance) &&
-				   (Math.Abs(car1Z - car2Z) < nearByDistance);
+			return (Math.Abs(car1X - car2X) < nearByXYDistance) &&
+				   (Math.Abs(car1Y - car2Y) < nearByXYDistance) &&
+				   (Math.Abs(car1Z - car2Z) < nearByZDistance);
 		}
 
 		void rotateBy(ref double x, ref double y, double angle)
@@ -288,7 +296,7 @@ namespace RF2SHMSpotter {
 			y = newY;
 		}
 
-		int checkCarPosition(double carX, double carY, double carZ, double angle,
+		int checkCarPosition(double carX, double carY, double carZ, double angle, bool faster,
 							 double otherX, double otherY, double otherZ)
 		{
 			if (nearBy(carX, carY, carZ, otherX, otherY, otherZ))
@@ -303,7 +311,16 @@ namespace RF2SHMSpotter {
 				else
 				{
 					if (transY < 0)
+					{
 						carBehind = true;
+
+						if ((faster && transY < longitudinalDistance * 1.5) ||
+							(transY < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+							if (transX > 0)
+								carBehindRight = true;
+							else
+								carBehindLeft = true;
+					}
 
 					return CLEAR;
 				}
@@ -312,11 +329,27 @@ namespace RF2SHMSpotter {
 				return CLEAR;
 		}
 
+		double[,] lastCoordinates;
+		bool hasLastCoordinates = false;
+
 		bool checkPositions(ref rF2VehicleScoring playerScoring)
 		{
+			if (!hasLastCoordinates)
+				lastCoordinates = new double[scoring.mScoringInfo.mNumVehicles, 3];
+
 			double lVelocityX = playerScoring.mLocalVel.x;
 			double lVelocityY = playerScoring.mLocalVel.y;
 			double lVelocityZ = playerScoring.mLocalVel.z;
+
+			int carID = 0;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (scoring.mVehicles[i].mIsPlayer != 0)
+				{
+					carID = i;
+
+					break;
+				}
 
 			var ori = playerScoring.mOri;
 
@@ -335,25 +368,50 @@ namespace RF2SHMSpotter {
 				double coordinateX = playerScoring.mPos.x;
 				double coordinateY = playerScoring.mPos.y;
 				double coordinateZ = playerScoring.mPos.z;
+				double speed = 0.0;
+
+				if (hasLastCoordinates)
+					speed = vectorLength(lastCoordinates[carID, 0] - coordinateX, lastCoordinates[carID, 2] - coordinateZ);
 
 				int newSituation = CLEAR;
 
 				carBehind = false;
+				carBehindLeft = false;
+				carBehindRight = false;
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 				{
 					var vehicle = scoring.mVehicles[i];
 
-					// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
-					// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
-
 					if (vehicle.mIsPlayer == 0)
-						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle,
+					{
+						// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
+						// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
+
+						bool faster = false;
+
+						if (hasLastCoordinates)
+							faster = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
+												  lastCoordinates[i, 2] - vehicle.mPos.z) > speed * 1.01;
+
+						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
 														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
 
-					if ((newSituation == THREE) && carBehind)
-						break;
+						if ((newSituation == THREE) && carBehind)
+							break;
+					}
 				}
+
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				{
+					var position = scoring.mVehicles[i].mPos;
+
+					lastCoordinates[i, 0] = position.x;
+					lastCoordinates[i, 1] = position.y;
+					lastCoordinates[i, 2] = position.z;
+				}
+
+				hasLastCoordinates = true;
 
 				string alert = computeAlert(newSituation);
 
@@ -371,7 +429,8 @@ namespace RF2SHMSpotter {
 					{
 						carBehindReported = true;
 
-						SendMessage("proximityAlert:Behind");
+						SendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
 					}

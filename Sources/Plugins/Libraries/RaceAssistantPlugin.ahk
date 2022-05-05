@@ -36,6 +36,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iTeamSessionActive := false
 	
 	iSimulator := false
+	iSessionActive := false
 	
 	iLastLap := 0
 	iLastLapCounter := 0
@@ -295,6 +296,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	Simulator[] {
 		Get {
 			return this.iSimulator
+		}
+	}
+	
+	SessionActive[] {
+		Get {
+			return this.iSessionActive
 		}
 	}
 	
@@ -798,20 +805,23 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			Loop Files, %kTempDirectory%%code% Data\%assistant%*.*
 				if (A_LoopFilePath != dataFile)
 					FileDelete %A_LoopFilePath%
-		}
 		
-		if this.RaceAssistant
-			this.finishSession(false, !teamSession)
-		else
-			this.startupRaceAssistant()
-	
-		if this.RaceAssistant
-			this.RaceAssistant.startSession(settingsFile, dataFile)
+			if this.RaceAssistant
+				this.finishSession(false, !teamSession)
+			else
+				this.startupRaceAssistant()
+		
+			this.iSessionActive := true
+			
+			if this.RaceAssistant
+				this.RaceAssistant.startSession(settingsFile, dataFile)
+		}
 	}
 	
 	finishSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession(shutdownAssistant)
+			if this.SessionActive
+				this.RaceAssistant.finishSession(shutdownAssistant)
 			
 			if (shutdownTeamSession && this.TeamSessionActive) {
 				this.TeamServer.leaveSession()
@@ -822,6 +832,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if shutdownAssistant
 				this.shutdownRaceAssistant()
 		}
+		
+		this.iSessionActive := false
 	}
 	
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
@@ -896,7 +908,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.updatePositionsData(data)
 	}
 	
-	sessionActive(sessionState) {
+	activeSession(sessionState) {
 		return (sessionState >= kSessionPractice)
 	}
 	
@@ -1084,7 +1096,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					
 					return
 				}
-				else if !this.sessionActive(sessionState) {
+				else if !this.activeSession(sessionState) {
 					; Not in a supported session
 				
 					this.iLastLap := 0

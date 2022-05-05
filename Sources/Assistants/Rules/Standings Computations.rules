@@ -17,19 +17,16 @@
 ;;;                            Public Rules Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Lap], [?Sector]} => (Clear: Position.Standings.Front.Car),
-										 (Clear: Position.Standings.Front.Distance), (Clear: Position.Standings.Front.Delta),
-										 (Clear: Position.Standings.Behind.Car),
-										 (Clear: Position.Standings.Behind.Distance), (Clear: Position.Standings.Behind.Delta),
-										 (Clear: Position.Standings.Leader.Car),
-										 (Clear: Position.Standings.Leader.Distance), (Clear: Position.Standings.Leader.Delta),
-										 (Clear: Position.Track.Front.Car),
-										 (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),
-										 (Clear: Position.Track.Behind.Car),
-										 (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
+priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
+		(Clear: Position.Standings.Front.Car), (Clear: Position.Standings.Front.Distance), (Clear: Position.Standings.Front.Delta),
+		(Clear: Position.Standings.Behind.Car), (Clear: Position.Standings.Behind.Distance), (Clear: Position.Standings.Behind.Delta),
+		(Clear: Position.Standings.Leader.Car), (Clear: Position.Standings.Leader.Distance), (Clear: Position.Standings.Leader.Delta),
+		(Clear: Position.Track.Front.Car), (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),
+		(Clear: Position.Track.Behind.Car), (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
 [?Lap] => (Prove: updateGrid(?Lap))
 {Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
+priority: -5, [?Standings] => (Clear: Standings)
 							  
 updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
 					Call(builtin0, getTime, ?time), Set(Standings.Lap, ?lap, Time, ?time),

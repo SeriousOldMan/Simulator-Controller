@@ -176,8 +176,11 @@ class SessionDatabase extends ConfigurationItem {
 	getTracks(simulator, car) {
 		code := this.getSimulatorCode(simulator)
 		
-		if code
-			return this.getEntries(code . "\" . car . "\*.*")
+		if code {
+			tracks := this.getEntries(code . "\" . car . "\*.*")
+			
+			return ((tracks.Length() > 0) ? tracks : this.getEntries(code . "\" . this.getCarName(simulator, car) . "\*.*"))
+		}
 		else
 			return []
 	}

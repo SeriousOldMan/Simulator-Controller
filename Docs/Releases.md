@@ -1,3 +1,18 @@
+## 4.1.2-release 05/06/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support track choice for ACC cars in "Setup Advisor".
+  4. Improved responsiveness of voice generation and recognition. Reaction time is now twice as fast in many cases.
+  5. Improved handling of formation lap and post race lap in strategy devlopment.
+  6. Spotter might give tactical advises before overtaking a car.
+  7. Spotter informs that the car in front is to be lapped.
+  8. More detailed rear car alert by Spotter incl. warning for possible dive bombs.
+  9. Rule supoort has been to "Setup Advisor" for several additional cars.
+  10. Race Engineer no longer complains about zero fuel when parking in the pitlane in ACC.
+  12. Fixed the Spotter greeting erroneously with a strategy comment.
+  13. Spotter tells you whether car in front is for position or lap down or lap up.
+
 ## 4.1.1-release 05/01/22
 
   1. Fixed a critical bug, when cold tyre pressures are not initialized correctly.

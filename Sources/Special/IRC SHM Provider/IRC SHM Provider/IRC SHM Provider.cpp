@@ -568,6 +568,10 @@ void writeStandings(const irsdk_header *header, const char* data)
 				
 				printf("Car.%s.Time=%ld\n", carIdx1, (long)(normalize(atof(result)) * 1000));
 
+				getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}Incidents:", sessionID, carIdx);
+
+				printf("Car.%s.Incidents=%s\n", carIdx1, result);
+
 				char* trackPositions;
 				
 				if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))

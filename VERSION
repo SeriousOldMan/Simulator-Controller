@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.1-release
-Target=4.1.1-release
-Date=05/01/2022
-Download=https://cntr.click/dM0RKgY
-Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
+Version=4.1.2-beta
+Target=4.1.2-release
+Date=05/05/2022
+Download=https://www.dropbox.com/s/2wv9qx8b4hybqto/Simulator%20Controller%204.1.2-beta.zip?dl=1
+Changes=Support track choices in "Setup Advisor", Improved responsiveness for voice generation and recognition, Improved handling of formation lap and post race lap in strategy devlopment, Spotter notifies about opponent performance before overtake, Spotter informs that the car in front is to be lapped, More detailed rear car alert for Spotter, New rule support for several additional cars in "Setup Advisor"
 [Release]
 Version=4.1.1-release
 Date=05/01/2022
 Download=https://cntr.click/dM0RKgY
 Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Support for multiple hotkeys in "Simulator Setup", Stability improvements in "Race Center", New Stream Deck icons for Chat messages, Support editing of validation rules directly from "Strategy Workbench", Setup Generator in "Setup Advisor", Track names are now displayed in non-internal format for ACC tracks
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.1.1-release
-Development=4.1.1-release
+Development=4.1.2-beta

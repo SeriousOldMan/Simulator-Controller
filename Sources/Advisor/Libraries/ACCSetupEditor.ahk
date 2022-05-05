@@ -143,9 +143,13 @@ class ACCSetupEditor extends SetupEditor {
 		
 		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		car := this.Advisor.SelectedCar
+		track := this.Advisor.SelectedTrack[false]
 		
 		if (car && (car != true))
 			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
+		
+		if (track && (track != true))
+			directory .= ("\" . track)
 					
 		title := translate("Load ACC Setup File...")
 	

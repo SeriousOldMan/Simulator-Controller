@@ -73,7 +73,7 @@ class PositionInfo {
 	
 	LapTimeDifference[] {
 		Get {
-			return this.DriverLapTime - this.CarLapTime
+			return Abs(this.DriverLapTime - this.CarLapTime)
 		}
 	}
 	
@@ -93,12 +93,12 @@ class PositionInfo {
 		this.iOriginalDelta := Abs(delta)
 	}
 	
-	hasGained(threshold := 0.5) {
+	hasDifference(threshold := 0.5) {
 		return ((this.OriginalDelta - this.CurrentDelta) >= threshold)
 	}
 	
 	hasNotification(gainThreshold := 0.5, deltaThreshold := 1.0) {
-		return (this.hasGained(gainThreshold) || (this.CurrentDelta <= deltaThreshold))
+		return (this.hasDifference(gainThreshold) || (this.CurrentDelta <= deltaThreshold))
 	}
 	
 	hasReport(gainThreshold := 0.5, deltaThreshold := 1.0) {
@@ -117,21 +117,24 @@ class PositionInfo {
 		this.iDriverLapTime := driverLapTime
 		this.iCarLapTime := carLapTime
 	}
+	
+	checkReset(delta := -2.5) {
+		if (this.DeltaDifference < delta)
+			this.recalibrate(true)
+	}
 }
 
 class FrontPositionInfo extends PositionInfo {
 	LapTimeDifference[] {
 		Get {
-			return (this.CarLapTime - this.DriverLapTime)
+			return Abs(this.CarLapTime - this.DriverLapTime)
 		}
 	}
 }
 
 class BehindPositionInfo extends PositionInfo {
-	LapTimeDifference[] {
-		Get {
-			return (this.DriverLapTime - this.CarLapTime)
-		}
+	checkReset(delta := -1.5) {
+		base.checkReset(delta)
 	}
 }
 
@@ -506,9 +509,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 						
 			positionInfos[positionType].checkpoint(delta, driverLapTime, lapTime)
-			
-			if (positionInfos[positionType].DeltaDifference < -4)
-				positionInfos[positionType].recalibrate(true)
+			positionInfos[positionType].checkReset()
 		}
 	}
 	
@@ -608,7 +609,7 @@ class RaceSpotter extends RaceAssistant {
 		
 		try {
 			if (positionInfos.HasKey("TrackFront") && positionInfos["TrackFront"].hasReport(0.5, 2)) {
-				if positionInfos["TrackFront"].hasGained(0.5) {
+				if (positionInfos["TrackFront"].hasDifference(0.5) && (positionInfos["TrackFront"].CurrentDelta <= 2)) {
 					if (positionInfos["TrackFront"].OpponentType = "LapDown")
 						speaker.speakPhrase("LapDownDriver")
 					else if (positionInfos["TrackFront"].OpponentType = "LapUp")
@@ -617,13 +618,13 @@ class RaceSpotter extends RaceAssistant {
 					positionInfos["TrackFront"].Reported := true
 				}
 			}
-			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasNotification(0.5, 1)) {
+			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasDifference(0.3)) {
 				delta := positionInfos["StandingsFront"].CurrentDelta
 				deltaDifference := positionInfos["StandingsFront"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsFront"].LapTimeDifference
 			
 				if (delta < 1) {
-					if (!positionInfos["StandingsFront"].Reported && positionInfos["StandingsFront"].hasGained(0.5)) {
+					if !positionInfos["StandingsFront"].Reported {
 						speaker.speakPhrase("GotHim", {delta: Round(delta, 1)
 													 , gained: Round(Abs(deltaDifference), 1)
 													 , lapTime: Round(lapTimeDifference, 1)})
@@ -646,7 +647,7 @@ class RaceSpotter extends RaceAssistant {
 						positionInfos["StandingsFront"].recalibrate()
 					}
 				}
-				else if regular {
+				else if (regular && positionInfos["StandingsBehind"].hasDifference(0.5)) {
 					if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {
 						speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
 														  , gained: Round(Abs(deltaDifference), 1)
@@ -668,12 +669,12 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			
-			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasNotification(0.5, 0.8)) {
+			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasDifference(0.3)) {
 				delta := positionInfos["StandingsBehind"].CurrentDelta
 				deltaDifference := positionInfos["StandingsBehind"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsBehind"].LapTimeDifference
 				
-				if ((delta < 0.8) && positionInfos["StandingsFront"].hasGained(0.5)) {
+				if (delta < 0.8) {
 					if !positionInfos["StandingsBehind"].Reported {
 						speaker.speakPhrase("ClosingIn", {delta: Round(delta, 1)
 														, lost: Round(Abs(deltaDifference), 1)
@@ -684,7 +685,7 @@ class RaceSpotter extends RaceAssistant {
 				
 					positionInfos["StandingsBehind"].recalibrate()
 				}
-				else if regular {
+				else if (regular && positionInfos["StandingsBehind"].hasDifference(0.5)) {
 					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
 													 , lost: Round(Abs(deltaDifference), 1)
 													 , lapTime: Round(positionInfos["StandingsBehind"].LapTimeDifference, 1)})

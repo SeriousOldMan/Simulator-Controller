@@ -872,7 +872,7 @@ class SetupWizard extends ConfigurationItem {
 			vWorking := false
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 	
@@ -890,7 +890,7 @@ class SetupWizard extends ConfigurationItem {
 			vWorking := false
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 

@@ -93,8 +93,16 @@ class PositionInfo {
 		this.iOriginalDelta := Abs(delta)
 	}
 	
-	hasGained(threshold := 0.0) {
+	hasGained(threshold := 0.5) {
 		return ((this.OriginalDelta - this.CurrentDelta) >= threshold)
+	}
+	
+	hasNotification(gainThreshold := 0.5, deltaThreshold := 1.0) {
+		return (this.hasGained(gainThreshold) || (this.CurrentDelta <= deltaThreshold))
+	}
+	
+	hasReport(gainThreshold := 0.5, deltaThreshold := 1.0) {
+		return (!this.Reported && this.hasNotification(gainThreshold, deltaThreshold))
 	}
 	
 	recalibrate(full := false) {
@@ -599,21 +607,23 @@ class RaceSpotter extends RaceAssistant {
 		speaker.startTalk()
 		
 		try {
-			if (positionInfos.HasKey("TrackFront") && !positionInfos["TrackFront"].Reported && (positionInfos["TrackFront"].hasGained(0.5))) {
-				if (positionInfos["TrackFront"].OpponentType = "LapDown")
-					speaker.speakPhrase("LapDownDriver")
-				else if (positionInfos["TrackFront"].OpponentType = "LapUp")
-					speaker.speakPhrase("LapUpDriver")
-				
-				positionInfos["TrackFront"].Reported := true
+			if (positionInfos.HasKey("TrackFront") && positionInfos["TrackFront"].hasReport(0.5, 2)) {
+				if positionInfos["TrackFront"].hasGained(0.5) {
+					if (positionInfos["TrackFront"].OpponentType = "LapDown")
+						speaker.speakPhrase("LapDownDriver")
+					else if (positionInfos["TrackFront"].OpponentType = "LapUp")
+						speaker.speakPhrase("LapUpDriver")
+					
+					positionInfos["TrackFront"].Reported := true
+				}
 			}
-			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasGained(0.5)) {
+			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasNotification(0.5, 1)) {
 				delta := positionInfos["StandingsFront"].CurrentDelta
 				deltaDifference := positionInfos["StandingsFront"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsFront"].LapTimeDifference
 			
 				if (delta < 1) {
-					if !positionInfos["StandingsFront"].Reported {
+					if (!positionInfos["StandingsFront"].Reported && positionInfos["StandingsFront"].hasGained(0.5)) {
 						speaker.speakPhrase("GotHim", {delta: Round(delta, 1)
 													 , gained: Round(Abs(deltaDifference), 1)
 													 , lapTime: Round(lapTimeDifference, 1)})
@@ -632,6 +642,8 @@ class RaceSpotter extends RaceAssistant {
 						positionInfos["StandingsFront"].Reported := true
 						
 						informed := true
+				
+						positionInfos["StandingsFront"].recalibrate()
 					}
 				}
 				else if regular {
@@ -651,17 +663,17 @@ class RaceSpotter extends RaceAssistant {
 					}
 					
 					informed := true
-				}
 				
-				positionInfos["StandingsFront"].recalibrate()
+					positionInfos["StandingsFront"].recalibrate()
+				}
 			}
 			
-			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasGained(0.5)) {
+			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasNotification(0.5, 0.8)) {
 				delta := positionInfos["StandingsBehind"].CurrentDelta
 				deltaDifference := positionInfos["StandingsBehind"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsBehind"].LapTimeDifference
 				
-				if (delta < 0.7) {
+				if ((delta < 0.8) && positionInfos["StandingsFront"].hasGained(0.5)) {
 					if !positionInfos["StandingsBehind"].Reported {
 						speaker.speakPhrase("ClosingIn", {delta: Round(delta, 1)
 														, lost: Round(Abs(deltaDifference), 1)
@@ -669,6 +681,8 @@ class RaceSpotter extends RaceAssistant {
 						
 						positionInfos["StandingsBehind"].Reported := true
 					}
+				
+					positionInfos["StandingsBehind"].recalibrate()
 				}
 				else if regular {
 					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
@@ -677,9 +691,9 @@ class RaceSpotter extends RaceAssistant {
 					
 					if !informed
 						speaker.speakPhrase("Focus")
-				}
 				
-				positionInfos["StandingsBehind"].recalibrate()
+					positionInfos["StandingsBehind"].recalibrate()
+				}
 			}
 		}
 		finally {

@@ -74,7 +74,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 									  , "Race Strategist Startup", "Race Strategist Shutdown"
-									  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
+									  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
+									  , "Race Spotter Analysis", "Race Spotter Announcements"] {
 					subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 					
 					if subConfiguration
@@ -286,7 +287,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 							  , "Race Strategist Startup", "Race Strategist Shutdown"
-							  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
+							  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
+							  , "Race Spotter Analysis", "Race Spotter Announcements"] {
 			subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
 			
 			if subConfiguration
@@ -310,7 +312,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	
 			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 								  , "Race Strategist Startup", "Race Strategist Shutdown"
-								  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports", "Race Spotter Analysis"] {
+								  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
+								  , "Race Spotter Analysis", "Race Spotter Announcements"] {
 				subConfiguration := getConfigurationSectionValues(configuration, section, false)
 				
 				if subConfiguration

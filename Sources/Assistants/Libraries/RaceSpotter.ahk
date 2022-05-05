@@ -53,6 +53,12 @@ class PositionInfo {
 		}
 	}
 	
+	Delta[] {
+		Get {
+			return this.CurrentDelta
+		}
+	}
+	
 	DeltaDifference[] {
 		Get {
 			return (this.OriginalDelta - this.CurrentDelta)
@@ -73,7 +79,7 @@ class PositionInfo {
 	
 	LapTimeDifference[] {
 		Get {
-			return Abs(this.DriverLapTime - this.CarLapTime)
+			Throw "Virtual property PositionInfo.LapTimeDifference must be implemented in a subclass..."
 		}
 	}
 	
@@ -94,7 +100,7 @@ class PositionInfo {
 	}
 	
 	hasDifference(threshold := 0.5) {
-		return ((this.OriginalDelta - this.CurrentDelta) >= threshold)
+		return (this.DeltaDifference >= threshold)
 	}
 	
 	hasNotification(gainThreshold := 0.5, deltaThreshold := 1.0) {
@@ -116,23 +122,34 @@ class PositionInfo {
 		this.iCurrentDelta := Abs(delta)
 		this.iDriverLapTime := driverLapTime
 		this.iCarLapTime := carLapTime
+		
+		; logMessage(kLogCritical, this.base.__Class . ": " . this.car . " " . this.CurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
 	}
 	
 	checkReset(delta := -2.5) {
-		if (this.DeltaDifference < delta)
+		if (this.DeltaDifference < delta) {
+			; logMessage(kLogCritical, "RESET: " . this.base.__Class . ": " . this.car . " " . this.CurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
+			
 			this.recalibrate(true)
+		}
 	}
 }
 
 class FrontPositionInfo extends PositionInfo {
 	LapTimeDifference[] {
 		Get {
-			return Abs(this.CarLapTime - this.DriverLapTime)
+			return (this.CarLapTime - this.DriverLapTime)
 		}
 	}
 }
 
 class BehindPositionInfo extends PositionInfo {
+	LapTimeDifference[] {
+		Get {
+			return (this.DriverLapTime - this.CarLapTime)
+		}
+	}
+	
 	checkReset(delta := -1.5) {
 		base.checkReset(delta)
 	}
@@ -170,7 +187,7 @@ class RaceSpotter extends RaceAssistant {
 	iLastDistanceInformationLap := false
 	iPositionInfos := {}
 	
-	iRaceStartSummarized := true
+	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
 	
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {		
@@ -507,7 +524,7 @@ class RaceSpotter extends RaceAssistant {
 					default:
 						Throw "Unknown position type detected in RaceSpotter.updateOpponentInfo..."
 				}
-						
+			
 			positionInfos[positionType].checkpoint(delta, driverLapTime, lapTime)
 			positionInfos[positionType].checkReset()
 		}
@@ -529,7 +546,8 @@ class RaceSpotter extends RaceAssistant {
 			frontStandingsDelta := Round(Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0)) / 1000, 1)
 			frontStandingsCar := knowledgeBase.getValue("Position.Standings.Front.Car", 0)
 			
-			if ((frontTrackCar != frontStandingsCar) && (frontTrackDelta <= 2)) {
+			if ((frontTrackCar != frontStandingsCar)
+			 || (knowledgeBase.getValue("Car." . frontTrackCar . ".Lap") != knowledgeBase.getValue("Car." . driver . ".Lap"))) {
 				if (position < knowledgeBase.getValue("Car." . frontTrackCar . ".Position"))
 					opponentType := "LapDown"
 				else
@@ -537,6 +555,8 @@ class RaceSpotter extends RaceAssistant {
 			
 				this.updateOpponentInfo(positionInfos, "TrackFront", opponentType, driverLapTime, frontTrackCar, frontTrackDelta)
 			}
+			else
+				positionInfos.Delete("TrackFront")
 			
 			if ((frontStandingsDelta = 0) || (position = 1))
 				positionInfos.Delete("StandingsFront")
@@ -609,7 +629,7 @@ class RaceSpotter extends RaceAssistant {
 		
 		try {
 			if (positionInfos.HasKey("TrackFront") && positionInfos["TrackFront"].hasReport(0.5, 2)) {
-				if (positionInfos["TrackFront"].hasDifference(0.5) && (positionInfos["TrackFront"].CurrentDelta <= 2)) {
+				if (positionInfos["TrackFront"].hasDifference(0.5) && (positionInfos["TrackFront"].Delta <= 2)) {
 					if (positionInfos["TrackFront"].OpponentType = "LapDown")
 						speaker.speakPhrase("LapDownDriver")
 					else if (positionInfos["TrackFront"].OpponentType = "LapUp")
@@ -619,7 +639,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasDifference(0.3)) {
-				delta := positionInfos["StandingsFront"].CurrentDelta
+				delta := positionInfos["StandingsFront"].Delta
 				deltaDifference := positionInfos["StandingsFront"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsFront"].LapTimeDifference
 			
@@ -647,7 +667,7 @@ class RaceSpotter extends RaceAssistant {
 						positionInfos["StandingsFront"].recalibrate()
 					}
 				}
-				else if (regular && positionInfos["StandingsBehind"].hasDifference(0.5)) {
+				else if (regular && positionInfos["StandingsFront"].hasDifference(0.5)) {
 					if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {
 						speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
 														  , gained: Round(Abs(deltaDifference), 1)
@@ -670,7 +690,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 			
 			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasDifference(0.3)) {
-				delta := positionInfos["StandingsBehind"].CurrentDelta
+				delta := positionInfos["StandingsBehind"].Delta
 				deltaDifference := positionInfos["StandingsBehind"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsBehind"].LapTimeDifference
 				
@@ -746,7 +766,7 @@ class RaceSpotter extends RaceAssistant {
 						
 						this.announceFinalLaps(lastLap)
 					}
-					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap >= 2)) {
+					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap == 2)) {
 						if this.summarizeRaceStart(lastLap)
 							this.iRaceStartSummarized := true
 					}
@@ -1189,13 +1209,13 @@ class RaceSpotter extends RaceAssistant {
 			case "GapToFrontStandings":
 				this.gapToFrontRecognized([])
 			case "GapToFrontTrack":
-				this.gapToFrontRecognized(["Car"])
+				this.gapToFrontRecognized(Array(this.getSpeaker().Fragments["Car"]))
 			case "GapToFront":
 				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToBehindStandings":
 				this.gapToBehindRecognized([])
 			case "GapToBehindTrack":
-				this.gapToBehindRecognized(["Car"])
+				this.gapToBehindRecognized(Array(this.getSpeaker().Fragments["Car"]))
 			case "GapToBehind":
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":

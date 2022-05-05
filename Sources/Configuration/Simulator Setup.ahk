@@ -859,17 +859,19 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	previousPage() {
-		vWorking := true
-		
 		try {
-			step := false
-			page := false
+			vWorking := true
 			
-			if this.getPreviousPage(step, page)
-				this.showPage(step, page)
-		}
-		finally {
-			vWorking := false
+			try {
+				step := false
+				page := false
+				
+				if this.getPreviousPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				vWorking := false
+			}
 		}
 		catch exception {
 			logError(exception)
@@ -877,17 +879,19 @@ class SetupWizard extends ConfigurationItem {
 	}
 	
 	nextPage() {
-		vWorking := true
-		
 		try {
-			step := false
-			page := false
+			vWorking := true
 			
-			if this.getNextPage(step, page)
-				this.showPage(step, page)
-		}
-		finally {
-			vWorking := false
+			try {
+				step := false
+				page := false
+				
+				if this.getNextPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				vWorking := false
+			}
 		}
 		catch exception {
 			logError(exception)

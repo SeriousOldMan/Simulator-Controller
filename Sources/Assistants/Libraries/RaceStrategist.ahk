@@ -829,7 +829,7 @@ class RaceStrategist extends RaceAssistant {
 			if (!ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 			
-			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 				
 				if this.Listener {
@@ -924,13 +924,13 @@ class RaceStrategist extends RaceAssistant {
 			case "GapToFrontStandings":
 				this.gapToFrontRecognized([])
 			case "GapToFrontTrack":
-				this.gapToFrontRecognized(["Car"])
+				this.gapToFrontRecognized(Array(this.getSpeaker().Fragments["Car"]))
 			case "GapToFront":
 				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToBehindStandings":
 				this.gapToBehindRecognized([])
 			case "GapToBehindTrack":
-				this.gapToBehindRecognized(["Car"])
+				this.gapToBehindRecognized(Array(this.getSpeaker().Fragments["Car"]))
 			case "GapToBehind":
 				this.gapToBehindRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToLeader":

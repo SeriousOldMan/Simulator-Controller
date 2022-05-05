@@ -151,7 +151,7 @@ class InstallationStepWizard extends StepWizard {
 			if !this.iPages.HasKey(page)
 				this.iPages[page] := {}
 			
-			this.iPages[page][software] := [installButtonHandle, locateButtonHandle]
+			this.iPages[page][software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
 			
 			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
 				y := startY

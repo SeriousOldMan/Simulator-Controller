@@ -24,6 +24,131 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class PositionInfo {
+	iCar := false
+	
+	iOriginalDelta := false
+	iCurrentDelta := false
+	
+	iCarLapTime := false
+	iDriverLapTime := false
+	
+	iReported := false
+	
+	Car[] {
+		Get {
+			return this.iCar
+		}
+	}
+	
+	OriginalDelta[] {
+		Get {
+			return this.iOriginalDelta
+		}
+	}
+	
+	CurrentDelta[] {
+		Get {
+			return this.iCurrentDelta
+		}
+	}
+	
+	DeltaDifference[] {
+		Get {
+			return (this.OriginalDelta - this.CurrentDelta)
+		}
+	}
+	
+	DriverLapTime[] {
+		Get {
+			return this.iDriverLapTime
+		}
+	}
+	
+	CarLapTime[] {
+		Get {
+			return this.iCarLapTime
+		}
+	}
+	
+	LapTimeDifference[] {
+		Get {
+			return this.DriverLapTime - this.CarLapTime
+		}
+	}
+	
+	Reported[] {
+		Get {
+			return this.iReported
+		}
+		
+		Set {
+			return (this.iReported := value)
+		}
+	}
+	
+	__New(car, delta) {
+		this.iCar := car
+		
+		this.iOriginalDelta := Abs(delta)
+	}
+	
+	hasGained(threshold := 0.0) {
+		return ((this.OriginalDelta - this.CurrentDelta) >= threshold)
+	}
+	
+	recalibrate(full := false) {
+		this.iOriginalDelta := this.iCurrentDelta
+		
+		if full
+			this.iReported := false
+	}
+	
+	checkpoint(delta, driverLapTime, carLapTime) {
+		this.iCurrentDelta := Abs(delta)
+		this.iDriverLapTime := driverLapTime
+		this.iCarLapTime := carLapTime
+	}
+}
+
+class FrontPositionInfo extends PositionInfo {
+	LapTimeDifference[] {
+		Get {
+			return (this.CarLapTime - this.DriverLapTime)
+		}
+	}
+}
+
+class BehindPositionInfo extends PositionInfo {
+	LapTimeDifference[] {
+		Get {
+			return (this.DriverLapTime - this.CarLapTime)
+		}
+	}
+}
+
+class StandingsFrontInfo extends FrontPositionInfo {
+}
+
+class StandingsBehindInfo extends BehindPositionInfo {
+}
+
+class TrackFrontInfo extends FrontPositionInfo {
+	iOpponentType := false
+	
+	OpponentType[] {
+		Get {
+			return this.iOpponentType
+		}
+	}
+	
+	__New(car, delta, opponentType) {
+		this.iOpponentType := opponentType
+		
+		base.__New(car, delta)
+	}
+}
+
 class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
 	
@@ -32,7 +157,7 @@ class RaceSpotter extends RaceAssistant {
 	iGridPosition := false
 	
 	iLastDistanceInformationLap := false
-	iPositionInfo := {}
+	iPositionInfos := {}
 	
 	iRaceStartSummarized := true
 	iFinalLapsAnnounced := false
@@ -86,9 +211,9 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	PositionInfo {
+	PositionInfos {
 		Get {
-			return this.iPositionInfo
+			return this.iPositionInfos
 		}
 	}
 	
@@ -108,7 +233,7 @@ class RaceSpotter extends RaceAssistant {
 	
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDistanceInformationLap := false
-			this.iPositionInfo := {}
+			this.iPositionInfos := {}
 			this.iGridPosition := false
 			
 			this.iRaceStartSummarized := false
@@ -351,67 +476,38 @@ class RaceSpotter extends RaceAssistant {
 		return this.VoiceAssistant.getSpeaker(fast)
 	}
 	
-	updateOpponentInfo(positionInfo, positionType, opponentType, driverLapTime, car, delta, threshold) {
+	updateOpponentInfo(positionInfos, positionType, opponentType, driverLapTime, car, delta) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if (positionInfo.HasKey(positionType) && (positionInfo[positionType].Car != car))
-			positionInfo.Delete(positionType)
+		if (positionInfos.HasKey(positionType) && (positionInfos[positionType].Car != car))
+			positionInfos.Delete(positionType)
 			
 		lapTime := Round(knowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
 		
 		if lapTime {
-			reported := false
+			if !positionInfos.HasKey(positionType)
+				switch positionType {
+					case "StandingsFront":
+						positionInfos[positionType] := new StandingsFrontInfo(car, delta)
+					case "StandingsBehind":
+						positionInfos[positionType] := new StandingsBehindInfo(car, delta)
+					case "TrackFront":
+						positionInfos[positionType] := new TrackFrontInfo(car, delta, opponentType)
+					default:
+						Throw "Unknown position type detected in RaceSpotter.updateOpponentInfo..."
+				}
+						
+			positionInfos[positionType].checkpoint(delta, driverLapTime, lapTime)
 			
-			if positionInfo.HasKey(positionType) {
-				reported := positionInfo[positionType].Reported
-				difference := Round(positionInfo[positionType].Delta - delta, 1)
-				
-				positionInfo[positionType].LapTimeDifference := Round(lapTime - driverLapTime, 1)
-				
-				if (reported && (positionInfo[positionType].DeltaDifference = 0)) {
-					positionInfo[positionType].Delta := delta
-					positionInfo[positionType].Reported := false
-					
-					return
-				}
-				else if (Abs(difference) < threshold)
-					return
-				else if !reported {
-					positionInfo[positionType].Delta := delta
-					positionInfo[positionType].DeltaDifference := Max(0, positionInfo[positionType].DeltaDifference + difference)
-					
-					return
-				}
-				else if (reported && (difference < 0)) {
-					positionInfo[positionType].Delta := delta
-					positionInfo[positionType].DeltaDifference := Max(0, positionInfo[positionType].DeltaDifference + difference)
-					
-					return
-				}
-				else if (opponentType = "Position") { ; && reported && (difference > 0)
-					positionInfo[positionType].Reported := false
-				
-					positionInfo[positionType].Delta := delta
-					positionInfo[positionType].DeltaDifference := (positionInfo[positionType].DeltaDifference + difference)
-				}
-			}
-			else {
-				if (opponentType != "Position")
-					difference := true
-				else
-					difference := 0
-	
-				positionInfo[positionType] := {Car: car, Type: opponentType, Reported: reported
-											 , Delta: delta, DeltaDifference: difference
-											 , LapTimeDifference: Round(lapTime - driverLapTime, 1)}
-			}
+			if (positionInfos[positionType].DeltaDifference < -4)
+				positionInfos[positionType].recalibrate(true)
 		}
 	}
 	
-	updatePositionInfo(lastLap) {
+	updatePositionInfos(lastLap) {
 		local knowledgeBase = this.KnowledgeBase
 		
-		positionInfo := this.PositionInfo
+		positionInfos := this.PositionInfos
 		
 		driver := knowledgeBase.getValue("Driver.Car")
 		driverLapTime := Round(knowledgeBase.getValue("Car." . driver . ".Time") / 1000, 1)
@@ -430,23 +526,21 @@ class RaceSpotter extends RaceAssistant {
 				else
 					opponentType := "LapUp"
 			
-				this.updateOpponentInfo(positionInfo, "TrackFront", opponentType, driverLapTime, frontTrackCar, frontTrackDelta, 0.5)
+				this.updateOpponentInfo(positionInfos, "TrackFront", opponentType, driverLapTime, frontTrackCar, frontTrackDelta)
 			}
 			
 			if ((frontStandingsDelta = 0) || (position = 1))
-				positionInfo.Delete("StandingsFront")
+				positionInfos.Delete("StandingsFront")
 			else
-				this.updateOpponentInfo(positionInfo, "StandingsFront", "Position", driverLapTime, frontStandingsCar, frontStandingsDelta, 0.5)
+				this.updateOpponentInfo(positionInfos, "StandingsFront", "Position", driverLapTime, frontStandingsCar, frontStandingsDelta)
 			
 			behindStandingsDelta := Round(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000, 1)
 			
 			if ((behindStandingsDelta = 0) || (position = Round(knowledgeBase.getValue("Car.Count", 0))))
-				positionInfo.Delete("StandingsBehind")
-			else {
-				behindStandingsCar := knowledgeBase.getValue("Position.Standings.Behind.Car")
-				
-				this.updateOpponentInfo(positionInfo, "StandingsBehind", "Position", driverLapTime, behindStandingsCar, behindStandingsDelta, 1)
-			}
+				positionInfos.Delete("StandingsBehind")
+			else
+				this.updateOpponentInfo(positionInfos, "StandingsBehind", "Position", driverLapTime
+									  , knowledgeBase.getValue("Position.Standings.Behind.Car"), behindStandingsDelta)
 		}
 	}
 
@@ -497,85 +591,95 @@ class RaceSpotter extends RaceAssistant {
 	summarizeOpponents(lastLap, regular) {
 		local knowledgeBase := this.KnowledgeBase
 		
+		positionInfos := this.PositionInfos
 		speaker := this.getSpeaker(true)
-		positionInfo := this.PositionInfo
 		
 		informed := false
 		
 		speaker.startTalk()
 		
 		try {
-			if (positionInfo.HasKey("TrackFront") && !positionInfo["TrackFront"].Reported && (positionInfo["TrackFront"].DeltaDifference > 0)) {
-				if (positionInfo["TrackFront"].Type = "LapDown")
+			if (positionInfos.HasKey("TrackFront") && !positionInfos["TrackFront"].Reported && (positionInfos["TrackFront"].hasGained(0.5))) {
+				if (positionInfos["TrackFront"].OpponentType = "LapDown")
 					speaker.speakPhrase("LapDownDriver")
-				else if (positionInfo["TrackFront"].Type = "LapUp")
+				else if (positionInfos["TrackFront"].OpponentType = "LapUp")
 					speaker.speakPhrase("LapUpDriver")
 				
-				positionInfo["TrackFront"].Reported := true
-				positionInfo["TrackFront"].DeltaDifference := 0
+				positionInfos["TrackFront"].Reported := true
 			}
-			else {
-				deltaDifference := positionInfo["StandingsFront"].DeltaDifference
+			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasGained(0.5)) {
+				delta := positionInfos["StandingsFront"].CurrentDelta
+				deltaDifference := positionInfos["StandingsFront"].DeltaDifference
+				lapTimeDifference := positionInfos["StandingsFront"].LapTimeDifference
 			
-				if (positionInfo.HasKey("StandingsFront") && !positionInfo["StandingsFront"].Reported && (deltaDifference > 0)) {
-					delta := positionInfo["StandingsFront"].Delta
-					nearBy := (delta < 1)
-					
-					if (nearBy || regular) {
-						lapTimeDifference := positionInfo["StandingsFront"].LapTimeDifference
+				if (delta < 1) {
+					if !positionInfos["StandingsFront"].Reported {
+						speaker.speakPhrase("GotHim", {delta: Round(delta, 1)
+													 , gained: Round(Abs(deltaDifference), 1)
+													 , lapTime: Round(lapTimeDifference, 1)})
 						
-						if (nearBy || (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference))) {
-							speaker.speakPhrase((delta < 1) ? "GotHim" : "GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
-																					   , gained: Round(Abs(deltaDifference), 1)
-																					   , lapTime: Round(lapTimeDifference, 1)})
-						
-							if nearBy {
-								if !positionInfo["StandingsFront"].HasKey("RatedDriver") {
-									car := positionInfo["StandingsFront"].Car
-									
-									if knowledgeBase.getValue("Car." . car . ".Incidents", false)
-										speaker.speakPhrase("UnsafeDriver")
-									else if ((knowledgeBase.getValue("Lap", 0) - knowledgeBase.getValue("Car." . car . ".ValidLaps", 0)) > 3)
-										speaker.speakPhrase("InconsistentDriver")
-									
-									positionInfo["StandingsFront"].RatedDriver := true
-								}
-							}
-							else
-								speaker.speakPhrase("CanDoIt")
-						}
-						else {
-							speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
-															  , gained: Round(Abs(deltaDifference), 1)
-															  , lapTime: Round(lapTimeDifference, 1)})
-						
-							speaker.speakPhrase("CantDoIt")
+						if !positionInfos["StandingsFront"].HasKey("RatedDriver") {
+							car := positionInfos["StandingsFront"].Car
+							
+							if knowledgeBase.getValue("Car." . car . ".Incidents", false)
+								speaker.speakPhrase("UnsafeDriver")
+							else if ((knowledgeBase.getValue("Lap", 0) - knowledgeBase.getValue("Car." . car . ".ValidLaps", 0)) > 3)
+								speaker.speakPhrase("InconsistentDriver")
+							
+							positionInfos["StandingsFront"].RatedDriver := true
 						}
 						
-						positionInfo["StandingsFront"].Reported := true
-						positionInfo["StandingsFront"].DeltaDifference := 0
+						positionInfos["StandingsFront"].Reported := true
 						
 						informed := true
 					}
 				}
+				else if regular {
+					if (knowledgeBase.getValue("Session.Lap.Remaining") > (delta / lapTimeDifference)) {
+						speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
+														  , gained: Round(Abs(deltaDifference), 1)
+														  , lapTime: Round(lapTimeDifference, 1)})
+					
+						speaker.speakPhrase("CanDoIt")
+					}
+					else {
+						speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
+														  , gained: Round(Abs(deltaDifference), 1)
+														  , lapTime: Round(lapTimeDifference, 1)})
+					
+						speaker.speakPhrase("CantDoIt")
+					}
+					
+					informed := true
+				}
+				
+				positionInfos["StandingsFront"].recalibrate()
 			}
 			
-			deltaDifference := positionInfo["StandingsBehind"].DeltaDifference
-			
-			if (positionInfo.HasKey("StandingsBehind") && !positionInfo["StandingsBehind"].Reported && (deltaDifference > 0)) {
-				delta := positionInfo["StandingsBehind"].Delta
-			
-				if ((delta < 0.7) || regular) {
-					speaker.speakPhrase((delta < 1) ? "ClosingIn" : "LostBehind", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
-																				  , lost: Round(Abs(deltaDifference), 1)
-																				  , lapTime: Round(positionInfo["StandingsBehind"].LapTimeDifference, 1)})
-					
-					if (!informed && (delta >= 0.7))
-						speaker.speakPhrase("Focus")
-					
-					positionInfo["StandingsBehind"].Reported := true
-					positionInfo["StandingsBehind"].DeltaDifference := 0
+			if (positionInfos.HasKey("StandingsBehind") && positionInfos["StandingsBehind"].hasGained(0.5)) {
+				delta := positionInfos["StandingsBehind"].CurrentDelta
+				deltaDifference := positionInfos["StandingsBehind"].DeltaDifference
+				lapTimeDifference := positionInfos["StandingsBehind"].LapTimeDifference
+				
+				if (delta < 0.7) {
+					if !positionInfos["StandingsBehind"].Reported {
+						speaker.speakPhrase("ClosingIn", {delta: Round(delta, 1)
+														, lost: Round(Abs(deltaDifference), 1)
+														, lapTime: Round(positionInfos["StandingsBehind"].LapTimeDifference, 1)})
+						
+						positionInfos["StandingsBehind"].Reported := true
+					}
 				}
+				else if regular {
+					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : Round(delta, 1)
+													 , lost: Round(Abs(deltaDifference), 1)
+													 , lapTime: Round(positionInfos["StandingsBehind"].LapTimeDifference, 1)})
+					
+					if !informed
+						speaker.speakPhrase("Focus")
+				}
+				
+				positionInfos["StandingsBehind"].recalibrate()
 			}
 		}
 		finally {
@@ -616,7 +720,7 @@ class RaceSpotter extends RaceAssistant {
 		if (this.Speaker && (this.Session = kSessionRace)) {
 			lastLap := knowledgeBase.getValue("Lap", 0)
 				
-			this.updatePositionInfo(lastLap)
+			this.updatePositionInfos(lastLap)
 			
 			if !this.SpotterSpeaking {
 				this.SpotterSpeaking := true
@@ -905,7 +1009,7 @@ class RaceSpotter extends RaceAssistant {
 								, EnoughData: false})
 		
 		this.iFinalLapsAnnounced := false
-		this.iPositionInfo := {}
+		this.iPositionInfos := {}
 		this.iLastDistanceInformationLap := false
 		this.iRaceStartSummarized := false
 		
@@ -1006,7 +1110,7 @@ class RaceSpotter extends RaceAssistant {
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
-			this.iPositionInfo := {}
+			this.iPositionInfos := {}
 			this.iLastDistanceInformationLap := false
 		}
 		
@@ -1040,7 +1144,7 @@ class RaceSpotter extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		this.iPositionInfo := {}
+		this.iPositionInfos := {}
 		this.iLastDistanceInformationLap := false
 	
 		this.startPitstop(lapNumber)

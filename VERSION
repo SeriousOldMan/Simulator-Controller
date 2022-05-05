@@ -1,8 +1,8 @@
 [Development]
-Version=4.1.2-dev
+Version=4.1.2-beta
 Target=4.1.2-release
-Date=05/04/2022
-Download=
+Date=05/05/2022
+Download=https://www.dropbox.com/s/2wv9qx8b4hybqto/Simulator%20Controller%204.1.2-beta.zip?dl=1
 Changes=Support track choices in "Setup Advisor", Improved responsiveness for voice generation and recognition, Improved handling of formation lap and post race lap in strategy devlopment, Spotter notifies about opponent performance before overtake, Spotter informs that the car in front is to be lapped, More detailed rear car alert for Spotter, New rule support for several additional cars in "Setup Advisor"
 [Release]
 Version=4.1.0-release
@@ -13,4 +13,4 @@ Changes=Support "No Tyre Change" for post-preparing pitstop option changes, Supp
 Type=Development
 [Version]
 Release=4.1.0-release
-Development=4.1.2-dev
+Development=4.1.2-beta

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.1.2-beta](https://www.dropbox.com/s/2wv9qx8b4hybqto/Simulator%20Controller%204.1.2-beta.zip?dl=1) (Test version for 4.1.2. New features: Support track choices in "Setup Advisor", Improved responsiveness for voice generation and recognition, Improved handling of formation lap and post race lap in strategy devlopment, Spotter notifies about opponent performance before overtake, Spotter informs that the car in front is to be lapped, More detailed rear car alert for Spotter, New rule support for several additional cars in "Setup Advisor". Stable, incl. documentation and update procedure.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-412) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

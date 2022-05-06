@@ -1192,6 +1192,8 @@ class RaceSpotter extends RaceAssistant {
 	updateLap(lapNumber, data) {
 		static lastSector := 1
 		
+		update := false
+		
 		if !IsObject(data)
 			data := readConfiguration(data)
 		
@@ -1199,13 +1201,16 @@ class RaceSpotter extends RaceAssistant {
 		
 		if (sector != lastSector) {
 			lastSector := sector
+		
+			update := true
 			
 			this.KnowledgeBase.addFact("Sector", sector)
 		}
 		
 		result := base.updateLap(lapNumber, data)
 		
-		this.updateDriver()
+		if update
+			this.updateDriver()
 		
 		return result
 	}

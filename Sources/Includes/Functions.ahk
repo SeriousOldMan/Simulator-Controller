@@ -871,6 +871,16 @@ loadSimulatorConfiguration() {
 	if (kSimulatorConfiguration.Count() == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
 	
+	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Database Path")
+	if path {
+		kDatabaseDirectory := path . "\"
+		
+		FileCreateDir %kDatabaseDirectory%Community
+		FileCreateDir %kDatabaseDirectory%User
+		
+		logMessage(kLogInfo, translate("Database path set to ") . path)
+	}
+	
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
 	if path {
 		kHomeDirectory := path . "\"

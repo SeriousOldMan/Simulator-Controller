@@ -366,7 +366,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Add, Picture, x280 ys w30 h30 Section, %kIconsDirectory%Report.ico
 		Gui %window%:Add, Text, xp+34 yp+5 w120 h26, % translate("Notes")
-		
+
+		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gchooseDatabasePath
+		setButtonIcon(generalSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
+				
 		Gui %window%:Font, s8 Norm, Arial
 		
 		Gui %window%:Add, Edit, x280 yp+32 w390 h94 -Background gupdateNotes vnotesEdit
@@ -376,7 +379,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
 			
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section vsettingsImg1 gchooseTab1, %kIconsDirectory%Report Settings.ico
+		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section vsettingsImg1 gchooseTab1, %kIconsDirectory%General Settings.ico
 		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab1 gchooseTab1, % translate("Race Settings")
 		
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
@@ -588,12 +591,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
-			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings.ico
+			GuiControl, , settingsImg1, %kIconsDirectory%General Settings.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg1
-			GuiControl, , settingsImg1, %kIconsDirectory%Report Settings Gray.ico
+			GuiControl, , settingsImg1, %kIconsDirectory%General Settings Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 		
@@ -1463,6 +1466,116 @@ closeSessionDatabaseEditor() {
 
 openSessionDatabaseEditorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
+}
+
+normalizePath(path) {
+	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
+}
+
+chooseDatabasePath() {
+	protectionOn()
+	
+	try {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
+		OnMessage(0x44, "")
+		
+		if ((directory != "") && (normalizePath(directory) != normalizePath(kDatabaseDirectory))) {
+			SoundPlay *32
+		
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
+			title := translate("Session Database")
+			MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+			OnMessage(0x44, "")
+			
+			IfMsgBox Cancel
+				return
+			
+			IfMsgBox Yes
+			{
+				if !FileExist(directory)
+					try {
+						FileCreateDir %directory%
+					}
+					catch exception {
+						title := translate("Error")
+						
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+						OnMessage(0x44, "")
+						
+						return
+					}
+				else {
+					empty := true
+				
+					Loop Files, %directory%\*.*, FD
+					{
+						empty := false
+						
+						break
+					}
+				
+					if !empty {
+						title := translate("Error")
+					
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262160, %title%, % translate("The new database folder must be empty.")
+						OnMessage(0x44, "")
+						
+						return
+					}
+				}
+				
+				original := normalizePath(kDatabaseDirectory)
+				
+				x := Round((A_ScreenWidth - 300) / 2)
+				y := A_ScreenHeight - 150
+				
+				showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("Copying Files")})
+
+				updateProgress := Func("updateProgress").Bind(100)
+				
+				SetTimer %updateProgress%, 500
+			
+				FileCopyDir %original%, %directory%, 1
+	
+				SetTimer %updateProgress%, Off
+				
+				showProgress({progress: 100})
+				
+				Sleep 200
+				
+				hideProgress()
+			}
+			
+			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			
+			setConfigurationValue(configuration, "Database", "Path", directory)
+			
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			
+			title := translate("Information")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262192, %title%, % translate("The session database location has been updated and the application will exit now. Make sure to restart all other applications as well.")
+			OnMessage(0x44, "")
+			
+			ExitApp 0
+		}
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+
+updateProgress(max) {
+	static counter := 0
+	
+	counter := Min(counter + 1, max)
+	
+	showProgress({progress: counter})
 }
 
 chooseSimulator() {

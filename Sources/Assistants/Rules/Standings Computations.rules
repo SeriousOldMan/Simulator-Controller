@@ -24,7 +24,7 @@ priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
 		(Clear: Position.Track.Front.Car), (Clear: Position.Track.Front.Distance), (Clear: Position.Track.Front.Delta),
 		(Clear: Position.Track.Behind.Car), (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
 [?Lap] => (Prove: updateGrid(?Lap))
-{Any: [?Lap], [?Sector]} => (Prove: updatePositions(!Lap))
+{Any: [?Lap], [?Sector], [?Standings]} => (Prove: updatePositions(!Lap))
 priority: -5, [?Sector] => (Clear: Sector)
 priority: -5, [?Standings] => (Clear: Standings)
 							  

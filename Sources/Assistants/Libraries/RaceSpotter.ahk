@@ -260,9 +260,16 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	PositionInfos {
+	PositionInfos[sector := false] {
 		Get {
-			return this.iPositionInfos
+			if sector {
+				if !this.iPositionInfos.HasKey(sector)
+					this.iPositionInfos[sector] := {}
+				
+				return this.iPositionInfos[sector]
+			}
+			else
+				return this.iPositionInfos
 		}
 	}
 	
@@ -554,10 +561,10 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	updatePositionInfos(lastLap) {
+	updatePositionInfos(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
 		
-		positionInfos := this.PositionInfos
+		positionInfos := this.PositionInfos[sector]
 		
 		driver := knowledgeBase.getValue("Driver.Car")
 		driverLapTime := Round(knowledgeBase.getValue("Car." . driver . ".Time") / 1000, 1)
@@ -650,11 +657,11 @@ class RaceSpotter extends RaceAssistant {
 			return false
 	}
 	
-	summarizeOpponents(lastLap, regular) {
+	summarizeOpponents(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		positionInfos := this.PositionInfos
 		speaker := this.getSpeaker(true)
+		positionInfos := this.PositionInfos[sector]
 		
 		informed := false
 		
@@ -783,13 +790,11 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 	
-	updateDriver() {
+	updateDriver(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
 		
 		if (this.Speaker && (this.Session = kSessionRace)) {
-			lastLap := knowledgeBase.getValue("Lap", 0)
-				
-			this.updatePositionInfos(lastLap)
+			this.updatePositionInfos(lastLap, sector)
 			
 			if !this.SpotterSpeaking {
 				this.SpotterSpeaking := true
@@ -813,7 +818,7 @@ class RaceSpotter extends RaceAssistant {
 							if regular
 								this.iLastDistanceInformationLap := lastLap
 							
-							this.summarizeOpponents(lastLap, regular)
+							this.summarizeOpponents(lastLap, sector, regular)
 						}
 					}
 				}
@@ -1203,14 +1208,14 @@ class RaceSpotter extends RaceAssistant {
 			lastSector := sector
 		
 			update := true
-			
+				
 			this.KnowledgeBase.addFact("Sector", sector)
 		}
 		
 		result := base.updateLap(lapNumber, data)
 		
 		if update
-			this.updateDriver()
+			this.updateDriver(lapNumber, sector)
 		
 		return result
 	}

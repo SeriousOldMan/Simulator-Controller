@@ -141,7 +141,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		speak(text, focus := false) {
+		speak(text, focus := false, cache := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -150,7 +150,7 @@ class VoiceAssistant {
 				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
 		}
 		
-		speakPhrase(phrase, variables := false, focus := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -162,7 +162,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase, focus)
+				this.speak(phrase, focus, cache)
 		}
 	}
 	
@@ -241,7 +241,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		speak(text, focus := false) {
+		speak(text, focus := false, cache := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -253,7 +253,7 @@ class VoiceAssistant {
 					this.Speaking := true
 				
 					try {
-						base.speak(text, true)
+						base.speak(text, true, cache)
 					}
 					finally {
 						this.Speaking := false
@@ -266,7 +266,7 @@ class VoiceAssistant {
 			}
 		}
 		
-		speakPhrase(phrase, variables := false, focus := false) {
+		speakPhrase(phrase, variables := false, focus := false, cache := false) {
 			phrases := this.Phrases
 			
 			if phrases.HasKey(phrase) {
@@ -278,7 +278,7 @@ class VoiceAssistant {
 			}
 			
 			if phrase
-				this.speak(phrase, focus)
+				this.speak(phrase, focus, cache)
 		}
 	}
 	

@@ -3,7 +3,7 @@ Version=4.1.4-dev
 Target=4.1.4-release
 Date=05/06/2022
 Download=
-Changes=
+Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster ddue to caching of the generated sound files
 [Release]
 Version=4.1.2-release
 Date=05/06/2022

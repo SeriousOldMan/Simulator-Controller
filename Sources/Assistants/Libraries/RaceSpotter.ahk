@@ -852,7 +852,10 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 				
 				try {
-					this.getSpeaker(true).speakPhrase(message, variables)
+					if variables
+						this.getSpeaker(true).speakPhrase(message, variables)
+					else
+						this.getSpeaker(true).speakPhrase(message, false, false, message)
 				}
 				finally {
 					this.SpotterSpeaking := false
@@ -964,6 +967,8 @@ class RaceSpotter extends RaceAssistant {
 		}
 		
 		this.iSpotterPID := false
+		
+		return false
 	}
 				
 	createSession(settings, data) {

@@ -56,6 +56,9 @@ class SpeechSynthesizer {
 	iPitch := 0
 	iVolume := 100
 	
+	iCache := {}
+	iCacheDirectory := false
+	
 	Synthesizer[] {
 		Get {
 			return this.iSynthesizer
@@ -194,10 +197,73 @@ class SpeechSynthesizer {
 		}
 		else
 			Throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
+		
+		OnExit(ObjBindMethod(this, "clearCache"))
 	}
-
-	speak(text, wait := true) {
+	
+	clearCache() {
+		cache := this.iCacheDirectory
+		
+		if cache {
+			try {
+				FileRemoveDir %cache%, 1
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		
+		return false
+	}
+	
+	cacheFile(cacheKey) {
+		if this.iCache.HasKey(cacheKey)
+			return this.iCache[cacheKey]
+		else {
+			if !this.iCacheDirectory {
+				Random postfix, 1, 1000000
+			
+				postfix := Round(postfix)
+				
+				dirName := ("PhraseCache" . postfix)
+				
+				FileCreateDir %kTempDirectory%%dirName%
+				
+				this.iCacheDirectory := (kTempDirectory . dirName)
+			}
+			
+			Random postfix, 1, 1000000
+			
+			postfix := Round(postfix)
+			
+			fileName := (this.iCacheDirectory . "\" . cacheKey . postfix . ".wav")
+			
+			this.iCache[cacheKey] := fileName
+			
+			return fileName
+		}
+	}
+	
+	speak(text, wait := true, cache := false) {
 		this.stop()
+		
+		if (cache && (cache == true))
+			cache := text
+		
+		if cache {
+			cacheFileName := this.cacheFile(cache)
+			
+			if FileExist(cacheFileName) {
+				if (wait || !cache)
+					SoundPlay %cacheFileName%, Wait
+				else
+					SoundPlay %cacheFileName%
+				
+				return
+			}
+		}
+		else
+			cacheFileName := false
 
 		if kSoX {
 			Random postfix, 1, 1000000
@@ -205,23 +271,30 @@ class SpeechSynthesizer {
 			postfix := Round(postfix)
 	
 			temp1Name := kTempDirectory . "temp1_" . postfix . ".wav"
-			temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
+		
+			if cacheFileName
+				temp2Name := cacheFileName
+			else
+				temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
 			
 			this.speakToFile(temp1Name, text)
-			
+		
 			if !FileExist(temp1Name) {
 				if (this.Synthesizer = "Windows")
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 				
 				return
 			}
-				
+			
 			try {
 				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
 				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
 				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
-				
-				SoundPlay %temp2Name%, Wait
+			
+				if (wait || !cache)
+					SoundPlay %temp2Name%, Wait
+				else
+					SoundPlay %temp2Name%
 			}
 			catch exception {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
@@ -231,11 +304,16 @@ class SpeechSynthesizer {
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
-				if FileExist(temp1Name)
-					FileDelete %temp1Name%
-				
-				if FileExist(temp2Name)
-					FileDelete %temp2Name%
+				try {
+					if FileExist(temp1Name)
+						FileDelete %temp1Name%
+							
+					if (!cache && FileExist(temp2Name))
+						FileDelete %temp2Name%
+				}
+				catch exception {
+					; ignore
+				}
 			}
 		}
 		else {
@@ -246,20 +324,25 @@ class SpeechSynthesizer {
 				
 				postfix := Round(postfix)
 		
-				tempName := kTempDirectory . "temp_" . postfix . ".wav"
+				tempName := (cache ? cacheFileName : (kTempDirectory . "temp_" . postfix . ".wav"))
 
 				this.SpeakToFile(tempName, text)
 				
 				if !FileExist(tempName)
 					return
 				
-				if wait {
-					SoundPlay %tempName%, WAIT
-					
-					FileDelete %tempName%
-				}
+				if (wait || !cache)
+					SoundPlay %tempName%, Wait
 				else
 					SoundPlay %tempName%
+				
+				if !cache
+					try {
+						FileDelete %tempName%
+					}
+					catch exception {
+						; ignore
+					}
 			}
 		}
 	}

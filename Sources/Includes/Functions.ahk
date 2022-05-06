@@ -46,6 +46,7 @@ global vProgressMessage
 global vEventHandlers = Object()
 global vIncomingMessages = []
 global vOutgoingMessages = []
+global vDispatching = false
 
 global vPendingTrayMessages = []
 global vTrayMessageDuration = 1500
@@ -401,15 +402,23 @@ sendMessage() {
 }
 
 messageDispatcher() {
-	try {
-		while (vIncomingMessages.Length() > 0) {
-			descriptor := vIncomingMessages.RemoveAt(1)
-		
-			withProtection(descriptor[1], descriptor[2], descriptor[3])
+	if vDispatching
+		return
+	else {
+		vDispatching := true
+	
+		try {
+			while (vIncomingMessages.Length() > 0) {
+				descriptor := vIncomingMessages.RemoveAt(1)
+			
+				withProtection(descriptor[1], descriptor[2], descriptor[3])
+			}
 		}
-	}
-	finally {
-		SetTimer messageDispatcher, -200
+		finally {
+			vDispatching := false
+			
+			SetTimer messageDispatcher, -200
+		}
 	}
 }
 
@@ -424,6 +433,8 @@ messageQueue() {
 		protectionOff()
 		
 		SetTimer messageQueue, -100
+		
+		messageDispatcher()
 	}
 }
 
@@ -506,6 +517,8 @@ stopMessageManager() {
 	
 	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
 		FileDelete %kTempDirectory%Messages\%pid%.msg
+		
+	return false
 }
 
 startMessageManager() {

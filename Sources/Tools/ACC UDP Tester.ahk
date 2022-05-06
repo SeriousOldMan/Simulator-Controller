@@ -158,6 +158,8 @@ stopUDPClient() {
 		
 		vUDPClient := false
 	}
+	
+	return false
 }
 
 readUDPData() {

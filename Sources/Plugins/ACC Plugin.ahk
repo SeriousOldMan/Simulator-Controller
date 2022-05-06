@@ -252,6 +252,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			this.iUDPClient := false
 		}
+		
+		return false
 	}
 	
 	requireUDPClient() {

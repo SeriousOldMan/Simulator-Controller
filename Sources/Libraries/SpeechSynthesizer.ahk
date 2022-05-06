@@ -216,7 +216,7 @@ class SpeechSynthesizer {
 		return false
 	}
 	
-	cacheFile(cacheKey) {
+	cacheFileName(cacheKey) {
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
@@ -232,11 +232,7 @@ class SpeechSynthesizer {
 				this.iCacheDirectory := (kTempDirectory . dirName)
 			}
 			
-			Random postfix, 1, 1000000
-			
-			postfix := Round(postfix)
-			
-			fileName := (this.iCacheDirectory . "\" . cacheKey . postfix . ".wav")
+			fileName := (this.iCacheDirectory . "\" . cacheKey . ".wav")
 			
 			this.iCache[cacheKey] := fileName
 			
@@ -251,7 +247,7 @@ class SpeechSynthesizer {
 			cache := text
 		
 		if cache {
-			cacheFileName := this.cacheFile(cache)
+			cacheFileName := this.cacheFileName(cache)
 			
 			if FileExist(cacheFileName) {
 				if (wait || !cache)

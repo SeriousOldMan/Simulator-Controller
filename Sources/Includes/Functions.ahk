@@ -1633,11 +1633,11 @@ getLanguage() {
 }
 
 protectionOn() {
-	changeProtection(true)
+	; changeProtection(true)
 }
 
 protectionOff() {
-	changeProtection(false)
+	; changeProtection(false)
 }
 
 withProtection(function, params*) {

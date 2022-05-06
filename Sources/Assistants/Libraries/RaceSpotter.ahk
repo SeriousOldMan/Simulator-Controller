@@ -684,7 +684,7 @@ class RaceSpotter extends RaceAssistant {
 				deltaDifference := positionInfos["StandingsFront"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsFront"].LapTimeDifference
 			
-				if (delta < 1) {
+				if (delta <= 0.8) {
 					if !positionInfos["StandingsFront"].Reported {
 						speaker.speakPhrase("GotHim", {delta: Round(delta, 1)
 													 , gained: Round(Abs(deltaDifference), 1)
@@ -735,7 +735,7 @@ class RaceSpotter extends RaceAssistant {
 				deltaDifference := positionInfos["StandingsBehind"].DeltaDifference
 				lapTimeDifference := positionInfos["StandingsBehind"].LapTimeDifference
 				
-				if (delta < 0.8) {
+				if (delta <= 0.8) {
 					if !positionInfos["StandingsBehind"].Reported {
 						speaker.speakPhrase("ClosingIn", {delta: Round(delta, 1)
 														, lost: Round(Abs(deltaDifference), 1)

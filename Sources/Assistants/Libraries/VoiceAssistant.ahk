@@ -158,6 +158,9 @@ class VoiceAssistant {
 				
 				Random index, 1, % phrases.Length()
 				
+				if cache
+					cache .= ("." . index)
+				
 				phrase := substituteVariables(phrases[Round(index)], this.Assistant.getPhraseVariables(variables))
 			}
 			
@@ -273,6 +276,9 @@ class VoiceAssistant {
 				phrases := phrases[phrase]
 				
 				Random index, 1, % phrases.Length()
+				
+				if cache
+					cache .= ("." . index)
 				
 				phrase := substituteVariables(phrases[Round(index)], this.Assistant.getPhraseVariables(variables))
 			}

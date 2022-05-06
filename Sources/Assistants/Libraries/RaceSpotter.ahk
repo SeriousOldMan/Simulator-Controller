@@ -28,12 +28,19 @@ class PositionInfo {
 	iCar := false
 	
 	iOriginalDelta := false
-	iCurrentDelta := false
 	
 	iCarLapTime := false
 	iDriverLapTime := false
 	
+	iCurrentDelta := false
+	
 	iReported := false
+	
+	Type[] {
+		Get {
+			Throw "Virtual property PositionInfo.Type must be implemented in a subclass..."
+		}
+	}
 	
 	Car[] {
 		Get {
@@ -44,6 +51,18 @@ class PositionInfo {
 	OriginalDelta[] {
 		Get {
 			return this.iOriginalDelta
+		}
+	}
+	
+	DriverLapTime[] {
+		Get {
+			return this.iDriverLapTime
+		}
+	}
+	
+	CarLapTime[] {
+		Get {
+			return this.iCarLapTime
 		}
 	}
 	
@@ -62,18 +81,6 @@ class PositionInfo {
 	DeltaDifference[] {
 		Get {
 			return (this.OriginalDelta - this.CurrentDelta)
-		}
-	}
-	
-	DriverLapTime[] {
-		Get {
-			return this.iDriverLapTime
-		}
-	}
-	
-	CarLapTime[] {
-		Get {
-			return this.iCarLapTime
 		}
 	}
 	
@@ -108,7 +115,9 @@ class PositionInfo {
 	}
 	
 	recalibrate(full := false) {
-		this.iOriginalDelta := this.iCurrentDelta
+		; logMessage(kLogCritical, this.Type . " Recalibrate")
+		
+		this.iOriginalDelta := this.CurrentDelta
 		
 		if full
 			this.iReported := false
@@ -119,12 +128,12 @@ class PositionInfo {
 		this.iDriverLapTime := driverLapTime
 		this.iCarLapTime := carLapTime
 		
-		; logMessage(kLogCritical, this.base.__Class . ": " . this.car . " " . this.CurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
+		; logMessage(kLogCritical, this.Type . " Checkpoint: " . this.Car . " " . this.iOriginalDelta . " " . this.iCurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
 	}
 	
 	checkReset(delta := -2.5) {
 		if (this.DeltaDifference < delta) {
-			; logMessage(kLogCritical, "RESET: " . this.base.__Class . ": " . this.car . " " . this.CurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
+			; logMessage(kLogCritical, "Reset: " . this.Type . ": " . this.car . " " . this.CurrentDelta . " " . this.DeltaDifference . " " . this.LapTimeDifference)
 			
 			this.recalibrate(true)
 		}
@@ -152,13 +161,29 @@ class BehindPositionInfo extends PositionInfo {
 }
 
 class StandingsFrontInfo extends FrontPositionInfo {
+	Type[] {
+		Get {
+			return "StandingsFront"
+		}
+	}
 }
 
 class StandingsBehindInfo extends BehindPositionInfo {
+	Type[] {
+		Get {
+			return "StandingsBehind"
+		}
+	}
 }
 
 class TrackFrontInfo extends FrontPositionInfo {
 	iOpponentType := false
+	
+	Type[] {
+		Get {
+			return "TrackFront"
+		}
+	}
 	
 	OpponentType[] {
 		Get {
@@ -509,7 +534,9 @@ class RaceSpotter extends RaceAssistant {
 		carLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time", false) / 1000, 1)
 		
 		if carLapTime {
-			if !positionInfos.HasKey(positionType)
+			if !positionInfos.HasKey(positionType) {
+				; logMessage(kLogCritical, "Creating " . positionType)
+						
 				switch positionType {
 					case "StandingsFront":
 						positionInfos[positionType] := new StandingsFrontInfo(car, delta)
@@ -520,6 +547,7 @@ class RaceSpotter extends RaceAssistant {
 					default:
 						Throw "Unknown position type detected in RaceSpotter.updateOpponentInfo..."
 				}
+			}
 			
 			positionInfos[positionType].checkpoint(delta, driverLapTime, carLapTime)
 			positionInfos[positionType].checkReset()
@@ -551,19 +579,28 @@ class RaceSpotter extends RaceAssistant {
 			
 				this.updateOpponentInfo(positionInfos, "TrackFront", opponentType, driverLapTime, frontTrackCar, frontTrackDelta)
 			}
-			else
+			else {
 				positionInfos.Delete("TrackFront")
+				
+				; logMessage(kLogCritical, "Cleared TrackFront")
+			}
 			
-			if (!frontStandingsCar || (frontStandingsDelta = 0) || (position = 1))
+			if (!frontStandingsCar || (frontStandingsDelta = 0) || (position = 1)) {
+				; logMessage(kLogCritical, "Clearing StandingsFront")
+			
 				positionInfos.Delete("StandingsFront")
+			}
 			else
 				this.updateOpponentInfo(positionInfos, "StandingsFront", "Position", driverLapTime, frontStandingsCar, frontStandingsDelta)
 			
 			behindStandingsDelta := Round(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000, 1)
 			behindStandingsCar := knowledgeBase.getValue("Position.Standings.Behind.Car", false)
 			
-			if (!behindStandingsCar || (behindStandingsDelta = 0) || (position = Round(knowledgeBase.getValue("Car.Count", 0))))
+			if (!behindStandingsCar || (behindStandingsDelta = 0) || (position = Round(knowledgeBase.getValue("Car.Count", 0)))) {
+				; logMessage(kLogCritical, "Clearing StandingsBehind")
+			
 				positionInfos.Delete("StandingsBehind")
+			}
 			else
 				this.updateOpponentInfo(positionInfos, "StandingsBehind", "Position", driverLapTime, behindStandingsCar, behindStandingsDelta)
 		}
@@ -771,7 +808,7 @@ class RaceSpotter extends RaceAssistant {
 						distanceInformation := this.Warnings["DistanceInformation"]
 						
 						if distanceInformation {
-							regular := lastLap >= (this.iLastDistanceInformationLap + distanceInformation)
+							regular := (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))
 							
 							if regular
 								this.iLastDistanceInformationLap := lastLap

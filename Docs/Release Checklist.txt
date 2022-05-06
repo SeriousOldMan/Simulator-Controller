@@ -17,6 +17,18 @@ General Release Actions
 13. Update #releases and #anouncements in Discord
 14. Set a Git Tag after final commit
 
+Release 4.1.4 Checklist
+=======================
+
+0. Search for new links (*)
+1. Update Procedure
+   a. Translations
+   b. Phrase Grammars
+2. Relocatable Session Database
+   a. Translations
+   b. Image and Documentation
+   
+
 Release 4.1.2 Checklist
 =======================
 

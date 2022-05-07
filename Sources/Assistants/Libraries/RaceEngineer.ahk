@@ -240,9 +240,6 @@ class RaceEngineer extends RaceAssistant {
 	fuelInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		
-		if !this.hasEnoughData()
-			return
-		
 		lap := knowledgeBase.getValue("Lap", 0)
 		
 		if (laps == 0)

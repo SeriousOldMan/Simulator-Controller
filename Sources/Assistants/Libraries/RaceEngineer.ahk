@@ -137,6 +137,8 @@ class RaceEngineer extends RaceAssistant {
 		switch grammar {
 			case "LapsRemaining":
 				this.lapInfoRecognized(words)
+			case "FuelRemaining":
+				this.fuelInfoRecognized(words)
 			case "TyreTemperatures":
 				this.tyreInfoRecognized(words)
 			case "TyrePressures":
@@ -233,6 +235,26 @@ class RaceEngineer extends RaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 		else
 			this.getSpeaker().speakPhrase("Laps", {laps: laps})
+	}
+	
+	fuelInfoRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
+		
+		if !this.hasEnoughData()
+			return
+		
+		lap := knowledgeBase.getValue("Lap", 0)
+		
+		if (laps == 0)
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			fuel := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0)
+		
+			if (fuel == 0)
+				this.getSpeaker().speakPhrase("Later")
+			else
+				this.getSpeaker().speakPhrase("Fuel", {fuel: Floor(fuel)})
+		}
 	}
 	
 	tyreInfoRecognized(words) {
@@ -1249,6 +1271,8 @@ class RaceEngineer extends RaceAssistant {
 				this.timeRecognized([])
 			case "LapsRemaining":
 				this.lapInfoRecognized([])
+			case "FuelRemaining":
+				this.fuelInfoRecognized([])
 			case "Weather":
 				this.weatherRecognized([])
 			case "TyrePressures":

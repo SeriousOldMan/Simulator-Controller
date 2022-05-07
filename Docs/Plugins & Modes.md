@@ -255,6 +255,7 @@ Please see the following table for available information commands.
 | ------ | ------ |
 | Time | You will be told the current time of your local computer. |
 | LapsRemaining | Jona will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
+| FuelRemaining | Jona will give you the amount of remaining fuel in the tank. |
 | Weather | You will get information about the current and upcoming weather. |
 | TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
 | TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |

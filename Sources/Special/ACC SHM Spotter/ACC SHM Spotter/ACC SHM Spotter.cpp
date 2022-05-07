@@ -470,10 +470,26 @@ int main(int argc, char* argv[])
 
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+
+	int countdown = 4000;
+	int safety = 200;
 
 	while (true) {
 		if (!running)
-			running = (gf->flag == AC_GREEN_FLAG);
+			running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
+
+		if (running) {
+			if (pf->speedKmh > 120)
+				safety = 200;
+
+			if (safety-- <= 0)
+				running = false;
+		}
+		else if ((safety <= 0) && (pf->speedKmh > 120)) {
+			running = true;
+			safety = 200;
+		}
 
 		if (running) {
 			if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))

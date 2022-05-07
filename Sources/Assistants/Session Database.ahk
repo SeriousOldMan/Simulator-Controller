@@ -1531,6 +1531,20 @@ chooseDatabasePath() {
 		OnMessage(0x44, "")
 		
 		if ((directory != "") && (normalizePath(directory) != normalizePath(kDatabaseDirectory))) {
+			if !FileExist(directory)
+				try {
+					FileCreateDir %directory%
+				}
+				catch exception {
+					title := translate("Error")
+					
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+					OnMessage(0x44, "")
+					
+					return
+				}
+					
 			SoundPlay *32
 		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
@@ -1543,38 +1557,23 @@ chooseDatabasePath() {
 			
 			IfMsgBox Yes
 			{
-				if !FileExist(directory)
-					try {
-						FileCreateDir %directory%
-					}
-					catch exception {
-						title := translate("Error")
-						
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-						OnMessage(0x44, "")
-						
-						return
-					}
-				else {
-					empty := true
-				
-					Loop Files, %directory%\*.*, FD
-					{
-						empty := false
-						
-						break
-					}
-				
-					if !empty {
-						title := translate("Error")
+				empty := true
+			
+				Loop Files, %directory%\*.*, FD
+				{
+					empty := false
 					
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262160, %title%, % translate("The new database folder must be empty.")
-						OnMessage(0x44, "")
-						
-						return
-					}
+					break
+				}
+			
+				if !empty {
+					title := translate("Error")
+				
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("The new database folder must be empty.")
+					OnMessage(0x44, "")
+					
+					return
 				}
 				
 				original := normalizePath(kDatabaseDirectory)

@@ -628,30 +628,36 @@ shareSessionDatabase() {
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
 		
-		FileReadLine id, %idFileName%, 1
+		FileReadLine ID, %idFileName%, 1
 		
-		consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+		dbIDFileName := kDatabaseDirectory . "ID"
 		
-		shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-		shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+		FileReadLine dbID, %dbIDFileName%, 1
 		
-		if (shareTyrePressures || shareCarSetups) {
-			options := ("-ID " . id)
+		if (ID = dbID) {
+			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 			
-			if shareTyrePressures
-				options .= " -Pressures"
+			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 			
-			if shareCarSetups
-				options .= " -Setups"
-			
-			try {
-				Run %kBinariesDirectory%Database Synchronizer.exe %options%
-			}
-			catch exception {
-				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
-			
-				showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			if (shareTyrePressures || shareCarSetups) {
+				options := ("-ID " . ID)
+				
+				if shareTyrePressures
+					options .= " -Pressures"
+				
+				if shareCarSetups
+					options .= " -Setups"
+				
+				try {
+					Run %kBinariesDirectory%Database Synchronizer.exe %options%
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+				
+					showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 	}
@@ -1040,6 +1046,9 @@ initializeEnvironment() {
 		
 		FileAppend %id%, % kUserConfigDirectory . "ID"
 	}
+	
+	if !FileExist(kDatabaseDirectory . "ID")
+		FileCopy %kUserConfigDirectory%ID, %kDatabaseDirectory%ID
 	
 	if (!FileExist(kUserConfigDirectory . "UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%

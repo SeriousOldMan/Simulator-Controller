@@ -395,7 +395,7 @@ Whenever you have to setup your car for a given track and specific environmental
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%203.jpg)
 
-This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the Virtual Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) using track and car specific default values.
+This tool gives you access to the database where you have access to the tyre pressures of all your past sessions, where you can store your track specific car setups and where you can provide default values for various settings for the Virtual Race Asssistants. These values can be used to initialize the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) using track and car specific default values. Telemetry information of all past sessions is also stored in the database. Use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) to browse this data.
 
 You have to use the menus in the upper left area to specify the simulation, car, track, current weather and so on. After you have done that, you can select one of the database topics using the choice tabs.
 
@@ -472,6 +472,10 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
 Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+  
+#### Choosing the Database location
+
+Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a gear in the upper right corner of the *Session Database* window. A file chooser will open up and allow you to select a different folder as the new database location. You will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that once you have changed the database location, you have to restart all applications.
 
 ## Technical information
 

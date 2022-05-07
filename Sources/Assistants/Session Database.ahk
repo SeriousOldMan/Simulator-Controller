@@ -2071,7 +2071,9 @@ deleteSetup() {
 }
 
 loadPressures() {
-	SessionDatabaseEditor.Instance.loadPressures()
+	callback := ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures")
+	
+	SetTimer %callback%, -100
 }
 
 noSelect() {

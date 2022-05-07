@@ -871,16 +871,16 @@ class RaceSpotter extends RaceAssistant {
 			try {
 				switch message {
 					case "Full":
-						this.getSpeaker(true).speakPhrase("YellowFull")
+						this.getSpeaker(true).speakPhrase("YellowFull", false, false, "YellowFull")
 					case "Sector":
 						if (arguments.Length() > 1)
 							this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
 						else
 							this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
 					case "Clear":
-						this.getSpeaker(true).speakPhrase("YellowClear")
+						this.getSpeaker(true).speakPhrase("YellowClear", false, false, "YellowClear")
 					case "Ahead":
-						this.getSpeaker(true).speakPhrase("YellowAhead")
+						this.getSpeaker(true).speakPhrase("YellowAhead", false, false, "YellowAhead")
 				}
 			}
 			finally {
@@ -900,9 +900,9 @@ class RaceSpotter extends RaceAssistant {
 				delta := knowledgeBase.getValue("Position.Standings.Behind.Delta", false)
 				
 				if (knowledgeBase.getValue("Position.Standings.Behind.Car", false) && delta && (delta < 2000))
-					this.getSpeaker(true).speakPhrase("BlueForPosition")
+					this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
 				else
-					this.getSpeaker(true).speakPhrase("Blue")
+					this.getSpeaker(true).speakPhrase("Blue", false, false, "Blue")
 			}
 			finally {
 				this.SpotterSpeaking := false
@@ -916,9 +916,9 @@ class RaceSpotter extends RaceAssistant {
 			
 			try {
 				if (state = "Open")
-					this.getSpeaker(true).speakPhrase("PitWindowOpen")
+					this.getSpeaker(true).speakPhrase("PitWindowOpen", false, false, "PitWindowOpen")
 				else if (state = "Closed")
-					this.getSpeaker(true).speakPhrase("PitWindowClosed")
+					this.getSpeaker(true).speakPhrase("PitWindowClosed", false, false, "PitWindowClosed")
 			}
 			finally {
 				this.SpotterSpeaking := false

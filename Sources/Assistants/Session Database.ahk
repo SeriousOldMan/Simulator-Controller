@@ -1472,6 +1472,56 @@ normalizePath(path) {
 	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
 }
 
+copyDirectory(source, destination, progressStep, ByRef count) {
+	FileCreateDir %destination%
+	
+	files := []
+	
+	Loop Files, %source%\*.*, DF
+		files.Push(A_LoopFilePath)
+	
+	for ignore, fileName in files {
+		SplitPath fileName, file
+	
+		count += 1
+		
+		showProgress({progress: Round(50 + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
+		
+		if InStr(FileExist(fileName), "D") {
+			SplitPath fileName, subDirectory
+			
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, count)
+		}
+		else
+			FileCopy %fileName%, %destination%, 1
+	}
+}
+
+copyFiles(source, destination) {
+	count := 0
+	progress := 0
+	
+	showProgress({color: "Blue"})
+	
+	Loop Files, %source%\*, DFR
+	{
+		if (Mod(count, 20) == 0)
+			progress += 1
+		
+		showProgress({progress: Min(progress, 50), message: translate("Validating ") . A_LoopFileName . translate("...")})
+		
+		Sleep 1
+		
+		count += 1
+	}
+	
+	showProgress({progress: 50, color: "Green"})
+	
+	step := 0
+	
+	copyDirectory(source, destination, 50 / count, step)
+}
+
 chooseDatabasePath() {
 	protectionOn()
 	
@@ -1532,17 +1582,11 @@ chooseDatabasePath() {
 				x := Round((A_ScreenWidth - 300) / 2)
 				y := A_ScreenHeight - 150
 				
-				showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("Copying Files")})
+				showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
 
-				updateProgress := Func("updateProgress").Bind(100)
+				copyFiles(original, directory)
 				
-				SetTimer %updateProgress%, 500
-			
-				FileCopyDir %original%, %directory%, 1
-	
-				SetTimer %updateProgress%, Off
-				
-				showProgress({progress: 100})
+				showProgress({progress: 100, message: translate("Finished...")})
 				
 				Sleep 200
 				
@@ -1567,15 +1611,6 @@ chooseDatabasePath() {
 	finally {
 		protectionOff()
 	}
-}
-
-
-updateProgress(max) {
-	static counter := 0
-	
-	counter := Min(counter + 1, max)
-	
-	showProgress({progress: counter})
 }
 
 chooseSimulator() {

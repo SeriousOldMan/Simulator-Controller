@@ -202,11 +202,11 @@ class SpeechSynthesizer {
 	}
 	
 	clearCache() {
-		cache := this.iCacheDirectory
+		directory := this.iCacheDirectory
 		
-		if cache {
+		if directory {
 			try {
-				FileRemoveDir %cache%, 1
+				FileRemoveDir %directory%, 1
 			}
 			catch exception {
 				; ignore
@@ -216,7 +216,7 @@ class SpeechSynthesizer {
 		return false
 	}
 	
-	cacheFileName(cacheKey) {
+	cacheFileName(cacheKey, fileName := false) {
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
@@ -232,7 +232,7 @@ class SpeechSynthesizer {
 				this.iCacheDirectory := (kTempDirectory . dirName)
 			}
 			
-			fileName := (this.iCacheDirectory . "\" . cacheKey . ".wav")
+			fileName := (this.iCacheDirectory . "\" . (fileName ? fileName : cacheKey) . ".wav")
 			
 			this.iCache[cacheKey] := fileName
 			
@@ -241,13 +241,18 @@ class SpeechSynthesizer {
 	}
 	
 	speak(text, wait := true, cache := false) {
+		static counter := 1
+		
 		this.stop()
 		
 		if (cache && (cache == true))
 			cache := text
 		
 		if cache {
-			cacheFileName := this.cacheFileName(cache)
+			if (cache == true)
+				cacheFileName := this.cacheFileName(text, "Unnamed_" . counter++)
+			else
+				cacheFileName := this.cacheFileName(cache)
 			
 			if FileExist(cacheFileName) {
 				if (wait || !cache)

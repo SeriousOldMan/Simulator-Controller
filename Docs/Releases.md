@@ -1,3 +1,16 @@
+## 4.1.4-release 05/13/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Delta time calculation by the Spotter is much more precise now.
+  4. Spotter warnings come much faster due to caching of the generated sound files.
+  5. Session Database location is now configurable. See the [documentation](*) for more information.
+  6. The Virtual Race Engineer can be asked about the amount of remaining fuel.
+  7. New *InformationRequest* action *FuelRemaining* for all simulator plugins and the "Race Engineer" plugin. See the [documentation](*) for more information.
+  8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-414) and check whether any manual updates to your local configuration might be necessary.
+
 ## 4.1.2-release 05/06/22
 
   1. Bugfixes, as always

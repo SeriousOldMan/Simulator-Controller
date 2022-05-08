@@ -82,7 +82,9 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance"]
 							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]
 							 , "Plan.Data": ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
-										   , "Fuel.Amount", "Tyre.Change"]}
+										   , "Fuel.Amount", "Tyre.Change"]
+							 , "Driver.Data": ["Driver", "Tyre.Pressure.Delta.FL", "Tyre.Pressure.Delta.FR"
+											 , "Tyre.Pressure.Delta.RL", "Tyre.Pressure.Delta.RR"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -128,9 +130,18 @@ global strategyMenuDropDown
 global planMenuDropDown
 global pitstopMenuDropDown
 
+global driverDropDownMenu
+global driverDeltaFLEdit
+global driverDeltaFrEdit
+global driverDeltaRLEdit
+global driverDeltaRREdit
+
+global addDriverButton
+global deleteDriverButton
+
 global sessionDateCal
 global sessionTimeEdit
-global driverDropDownMenu
+global planDriverDropDownMenu
 global planTimeEdit
 global actTimeEdit
 global planLapEdit
@@ -219,11 +230,13 @@ class RaceCenter extends ConfigurationItem {
 	iCurrentStint := false
 	iLastLap := false
 
+	iDriverListView := false
 	iPlanListView := false
 	iStintsListView := false
 	iLapsListView := false
 	iPitstopsListView := false
 	
+	iSelectedDriver := false
 	iSelectedPlanStint := false
 	
 	iSessionDatabase := false
@@ -786,6 +799,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	DriverListView[] {
+		Get {
+			return this.iDriverListView
+		}
+	}
+	
 	PlanListView[] {
 		Get {
 			return this.iPlanListView
@@ -807,6 +826,12 @@ class RaceCenter extends ConfigurationItem {
 	PitstopsListView[] {
 		Get {
 			return this.iPitstopsListView
+		}
+	}
+	
+	SelectedDriver[] {
+		Get {
+			return this.iSelectedDriver
 		}
 	}
 	
@@ -1052,9 +1077,41 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y827 w554 vmessageField
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Driver", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
+		
+		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseDriver, % values2String("|", map(["Driver", "Delta Prs. FL", "Delta Prs. FR", "Delta Prs. RL", "Delta Prs. RR"], "translate")*)
+		
+		this.iDriverListView := listHandle
+		
+		Gui %window%:Add, Text, x378 ys+38 w90 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vdriverDropDownMenu gupdateDriver
+		
+		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Delta Pressure FL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaFLEdit gupdateDriver
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure FR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaFREdit gupdateDriver
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure RL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaRLEdit gupdateDriver
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure RR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaRREdit gupdateDriver
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton vaddDriverButton gaddDriver
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteDriverButton gdeleteDriver
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		
+		Gui %window%:Add, Button, x408 ys+279 w160 greleaseDrivers, % translate("Release Driver List")
+		
+		Gui Tab, 2
 		
 		Gui %window%:Add, Text, x24 ys+33 w90 h23 +0x200, % translate("Session")
 		Gui %window%:Add, DateTime, x106 yp w80 h23 vsessionDateCal gupdateDate
@@ -1065,7 +1122,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPlanListView := listHandle
 		
 		Gui %window%:Add, Text, x378 ys+68 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vdriverDropDownMenu gupdatePlan
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanDriverDropDownMenu gupdatePlan
 		
 		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (est. / act.)")
 		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit gupdatePlan 1, HH:mm
@@ -1093,19 +1150,19 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Button, x408 ys+279 w160 greleasePlan, % translate("Release Plan")
 
-		Gui Tab, 2
+		Gui Tab, 3
 		
 		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
-		Gui Tab, 3
+		Gui Tab, 4
 		
 		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
-		Gui Tab, 4
+		Gui Tab, 5
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -1178,7 +1235,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %trafficConsideredEdit%
 		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length")
 		
-		Gui Tab, 5
+		Gui Tab, 6
 	
 		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
@@ -1370,7 +1427,8 @@ class RaceCenter extends ConfigurationItem {
 		names := getKeys(drivers)
 		identifiers := getValues(drivers)
 		
-		GuiControl, , driverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
+		GuiControl, , driverDropDownMenu, % ("|" . values2String("|", names*))
+		GuiControl, , planDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
 	}
 	
 	selectSession(identifier) {
@@ -1401,7 +1459,7 @@ class RaceCenter extends ConfigurationItem {
 		syncSession()
 	}
 	
-	addDriver(driver) {
+	createDriver(driver) {
 		for ignore, candidate in this.Drivers
 			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
 				return candidate
@@ -1502,6 +1560,44 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.updateStrategyMenu()
 		
+		Gui ListView, % this.DriverListView
+		
+		selected := LV_GetNext(0)
+		
+		if (selected != this.SelectedDriver) {
+			this.iSelectedDriver := false
+			selected := false
+			
+			LV_Modify(selected, "-Select")
+		}
+		
+		if selected {
+			GuiControl Enable, driverDropDownMenu
+			GuiControl Enable, driverDeltaFLEdit
+			GuiControl Enable, driverDeltaFREdit
+			GuiControl Enable, driverDeltaRLEdit
+			GuiControl Enable, driverDeltaRREdit
+			
+			GuiControl Enable, deleteDriverButton
+			
+			LV_GetText(stint, selected)
+		}
+		else {
+			GuiControl Disable, driverDropDownMenu
+			GuiControl Disable, driverDeltaFLEdit
+			GuiControl Disable, driverDeltaFREdit
+			GuiControl Disable, driverDeltaRLEdit
+			GuiControl Disable, driverDeltaRREdit
+			
+			GuiControl Disable, deleteDriverButton
+			
+			GuiControl Choose, driverDropDownMenu, 0
+			GuiControl, , driverDeltaFLEdit, % ""
+			GuiControl, , driverDeltaFREdit, % ""
+			GuiControl, , driverDeltaRLEdit, % ""
+			GuiControl, , driverDeltaRREdit, % ""
+		}
+		
 		Gui ListView, % this.PlanListView
 		
 		selected := LV_GetNext(0)
@@ -1514,7 +1610,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 		
 		if selected {
-			GuiControl Enable, driverDropDownMenu
+			GuiControl Enable, planDriverDropDownMenu
 			GuiControl Enable, planTimeEdit
 			GuiControl Enable, actTimeEdit
 			GuiControl Enable, deletePlanButton
@@ -1540,7 +1636,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			GuiControl Disable, driverDropDownMenu
+			GuiControl Disable, planDriverDropDownMenu
 			GuiControl Disable, planTimeEdit
 			GuiControl Disable, actTimeEdit
 			GuiControl Disable, planLapEdit
@@ -1549,7 +1645,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Disable, planTyreCompoundDropDown
 			GuiControl Disable, deletePlanButton
 			
-			GuiControl Choose, driverDropDownMenu, 0
+			GuiControl Choose, planDriverDropDownMenu, 0
 			GuiControl, , planTimeEdit, 20200101000000
 			GuiControl, , actTimeEdit, 20200101000000
 			GuiControl, , planLapEdit, % ""
@@ -1598,6 +1694,61 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Choose, useTelemetryDataDropDown, % (this.UseTelemetryDatabase ? 1 : 2)
 		GuiControl Choose, keepMapDropDown, % (this.UseCurrentMap ? 1 : 2)
 		GuiControl Choose, considerTrafficDropDown, % (this.UseTraffic ? 1 : 2)
+	}
+	
+	addDriver() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.DriverListView
+		
+		selected := LV_GetNext(0)
+		
+		if (selected != this.SelectedDriver) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedDriver := false
+			selected := false
+		}
+			
+		if (selected && (this.Drivers.Length() > 0)) {
+			LV_Add("Select Vis", this.Drivers[1], "0.0", "0.0", "0.0", "0.0")
+		
+			this.iSelectedDriver := LV_GetCount()
+		
+			GuiControl Choose, driverDropDownMenu, 1
+			GuiControl, , driverDeltaFLEdit, 0.0
+			GuiControl, , driverDeltaFREdit, 0.0
+			GuiControl, , driverDeltaRLEdit, 0.0
+			GuiControl, , driverDeltaRREdit, 0.0
+		}
+		
+		this.updateState()
+	}
+	
+	deleteDriver() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.DriverListView
+		
+		selected := LV_GetNext(0)
+		
+		if (selected != this.SelectedDriver) {
+			Loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+			
+			this.iSelectedDriver := false
+			selected := false
+		}
+		
+		if selected
+			LV_Delete(selected)
+		
+		this.updateState()
 	}
 	
 	loadPlanFromStrategy() {
@@ -1837,7 +1988,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iSelectedPlanStint := LV_GetCount()
 		}
 		
-		GuiControl Choose, driverDropDownMenu, 1
+		GuiControl Choose, planDriverDropDownMenu, 1
 		GuiControl, , planTimeEdit, 20200101000000
 		GuiControl, , actTimeEdit, 20200101000000
 		GuiControl, , planLapEdit, % ""
@@ -2914,8 +3065,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		if this.SessionActive
 			this.loadSessionDrivers()
-		else
+		else {
 			GuiControl, , driverDropDownMenu, % "|"
+			GuiControl, , planDriverDropDownMenu, % "|"
+		}
 		
 		this.iDrivers := []
 		this.iStints := {}
@@ -2986,7 +3139,7 @@ class RaceCenter extends ConfigurationItem {
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
 				
-				driver := this.addDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
+				driver := this.createDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
 
 				message := (translate("Load stint (Stint: ") . stint.Nr . translate(", Driver: ") . driver.FullName . translate(")"))
 				
@@ -4400,7 +4553,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
 			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 		
-			this.addDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name})
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name})
 		}
 	}
 			
@@ -4451,7 +4604,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iStints := []
 		
 		for ignore, stint in this.SessionDatabase.Tables["Stint.Data"] {
-			driver := this.addDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"]})
+			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"]})
 			
 			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
 					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
@@ -7299,6 +7452,135 @@ updateTime() {
 	rCenter.updateState()
 }
 
+addDriver() {
+	rCenter := RaceCenter.Instance
+	
+	if rCenter.SessionActive
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addDriver"))
+	else {
+		title := translate("Information")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+		OnMessage(0x44, "")
+	}
+}
+
+deleteDriver() {
+	rCenter := RaceCenter.Instance
+	
+	window := rCenter.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % rCenter.DriverListView
+	
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedDriver) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedDriver := false
+	}
+	
+	if LV_GetNext(0) {
+		title := translate("Delete")
+					
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the current driver data?")
+		OnMessage(0x44, "")
+		
+		IfMsgBox Yes
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "deleteDriver"))
+	}
+}
+
+chooseDriver() {
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		rCenter := RaceCenter.Instance
+	
+		window := rCenter.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % rCenter.DriverListView
+		
+		rCenter.iSelectedDriver := A_EventInfo
+		
+		LV_GetText(driver, A_EventInfo, 1)
+		LV_GetText(deltaFL, A_EventInfo, 2)
+		LV_GetText(deltaFR, A_EventInfo, 3)
+		LV_GetText(deltaRL, A_EventInfo, 4)
+		LV_GetText(deltaRR, A_EventInfo, 5)
+
+		GuiControl Choose, driverDropDownMenu, % inList(getKeys(rCenter.SessionDrivers), driver)
+		GuiControl, , driverDeltaFLEdit, %deltaFL%
+		GuiControl, , driverDeltaFREdit, %deltaFR%
+		GuiControl, , driverDeltaRLEdit, %deltaRL%
+		GuiControl, , driverDeltaRREdit, %deltaRR%
+		
+		rCenter.updateState()
+	}
+}
+
+releaseDrivers() {
+	rCenter := RaceCenter.Instance
+	
+	if rCenter.SessionActive
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "releaseDrivers"))
+	else {
+		title := translate("Information")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+		MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+		OnMessage(0x44, "")
+	}
+}
+
+updateDriver() {
+	RaceCenter.Instance.pushTask("updateDriverAsync")
+}
+
+updateDriverAsync() {
+	rCenter := RaceCenter.Instance
+
+	window := rCenter.Window
+	
+	Gui %window%:Default
+	
+	Gui ListView, % rCenter.DriverListView
+	
+	row := LV_GetNext(0)
+	
+	if (row != rCenter.SelectedDriver) {
+		LV_Modify(row, "-Select")
+	
+		row := false
+		rCenter.iSelectedDriver := false
+	}
+	
+	if (row > 0) {
+		GuiControlGet driverDropDownMenu
+		GuiControlGet driverDeltaFLEdit
+		GuiControlGet driverDeltaFREdit
+		GuiControlGet driverDeltaRLEdit
+		GuiControlGet driverDeltaRREdit
+		
+		validateNumber("driverDeltaFLEdit")
+		validateNumber("driverDeltaFREdit")
+		validateNumber("driverDeltaRLEdit")
+		validateNumber("driverDeltaRREdit")
+		
+		LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[driverDropDownMenu])
+		
+		LV_Modify(row, "Col3", driverDeltaFLEdit)
+		LV_Modify(row, "Col4", driverDeltaFREdit)
+		LV_Modify(row, "Col5", driverDeltaRLEdit)
+		LV_Modify(row, "Col6", driverDeltaRREdit)
+	}
+}
+
 choosePlan() {
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		rCenter := RaceCenter.Instance
@@ -7342,7 +7624,7 @@ choosePlan() {
 		
 		timeActual := currentTime
 		
-		GuiControl Choose, driverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
+		GuiControl Choose, planDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
 		GuiControl, , planTimeEdit, %timePlanned%
 		GuiControl, , actTimeEdit, %timeActual%
 		GuiControl, , planLapEdit, %lapPlanned%
@@ -7377,7 +7659,7 @@ updatePlanAsync() {
 	}
 	
 	if (row > 0) {
-		GuiControlGet driverDropDownMenu
+		GuiControlGet planDriverDropDownMenu
 		GuiControlGet planTimeEdit
 		GuiControlGet actTimeEdit
 		GuiControlGet planLapEdit
@@ -7385,10 +7667,10 @@ updatePlanAsync() {
 		GuiControlGet planRefuelEdit
 		GuiControlGet planTyreCompoundDropDown
 		
-		if (driverDropDownMenu = 1)
+		if (planDriverDropDownMenu = 1)
 			LV_Modify(row, "Col2", "")
 		else
-			LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[driverDropDownMenu - 1])
+			LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planDriverDropDownMenu - 1])
 
 		FormatTime time, %planTimeEdit%, HH:mm
 		

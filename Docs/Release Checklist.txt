@@ -27,6 +27,8 @@ Release 4.1.4 Checklist
 2. Relocatable Session Database
    a. Translations
    b. Image and Documentation
+3. New command "Fuel Remaining"
+   a. Update command list in Discord
    
 
 Release 4.1.2 Checklist

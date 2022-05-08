@@ -5,7 +5,7 @@
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings come much faster due to caching of the generated sound files.
   5. Session Database location is now configurable. See the [documentation](*) for more information.
-  6. The Virtual Race Engineer can be asked about the amount of remaining fuel.
+  6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is rmemaining?".
   7. New *InformationRequest* action *FuelRemaining* for all simulator plugins and the "Race Engineer" plugin. See the [documentation](*) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
   9. New preset for "Simulator Setup" to always enable Team Server.

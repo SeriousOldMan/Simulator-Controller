@@ -1083,7 +1083,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y827 w554 vmessageField
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Setup", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Setups", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
 		
@@ -1135,7 +1135,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteDriverButton gdeleteDriver
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 		
-		Gui %window%:Add, Button, x408 ys+279 w160 greleaseDrivers, % translate("Release Team")
+		Gui %window%:Add, Button, x408 ys+279 w160 greleaseDrivers, % translate("Release Setups")
 		
 		Gui Tab, 2
 		

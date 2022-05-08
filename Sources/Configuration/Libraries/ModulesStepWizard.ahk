@@ -319,6 +319,19 @@ class PitstopImages extends NamedPreset {
 	}
 }
 
+class TeamServerAlwaysOn extends NamedPreset {
+	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		if (wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
+			if (getConfigurationValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
+				thePlugin := new Plugin("Team Server", simulatorConfiguration)
+				
+				thePlugin.setArgumentValue("teamServer", "On")
+				
+				thePlugin.saveToConfiguration(simulatorConfiguration)
+			}
+	}
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

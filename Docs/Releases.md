@@ -8,6 +8,7 @@
   6. The Virtual Race Engineer can be asked about the amount of remaining fuel.
   7. New *InformationRequest* action *FuelRemaining* for all simulator plugins and the "Race Engineer" plugin. See the [documentation](*) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
+  9. New preset for "Simulator Setup" to always enable Team Server.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-414) and check whether any manual updates to your local configuration might be necessary.
 

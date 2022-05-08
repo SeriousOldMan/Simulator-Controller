@@ -83,8 +83,10 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]
 							 , "Plan.Data": ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
 										   , "Fuel.Amount", "Tyre.Change"]
-							 , "Driver.Data": ["Driver", "Tyre.Pressure.Delta.FL", "Tyre.Pressure.Delta.FR"
-											 , "Tyre.Pressure.Delta.RL", "Tyre.Pressure.Delta.RR"]}
+							 , "Team.Data": ["Driver", "Weather", "Temperature.Air", "Temperature.Track"
+										   , "Tyre.Compound", "Tyre.Compound.Color"
+										   , "Tyre.Pressure.FL", "Tyre.Pressure.FR"
+										   , "Tyre.Pressure.RL", "Tyre.Pressure.RR"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -131,10 +133,14 @@ global planMenuDropDown
 global pitstopMenuDropDown
 
 global driverDropDownMenu
-global driverDeltaFLEdit
-global driverDeltaFrEdit
-global driverDeltaRLEdit
-global driverDeltaRREdit
+global driverWeatherDropDownMenu
+global driverAirTemperatureEdit
+global driverTrackTemperatureEdit
+global driverCompoundDropDownMenu
+global driverBasePressureFLEdit
+global driverBasePressureFrEdit
+global driverBasePressureRLEdit
+global driverBasePressureRREdit
 
 global addDriverButton
 global deleteDriverButton
@@ -230,7 +236,7 @@ class RaceCenter extends ConfigurationItem {
 	iCurrentStint := false
 	iLastLap := false
 
-	iDriverListView := false
+	iTeamListView := false
 	iPlanListView := false
 	iStintsListView := false
 	iLapsListView := false
@@ -799,9 +805,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
-	DriverListView[] {
+	TeamListView[] {
 		Get {
-			return this.iDriverListView
+			return this.iTeamListView
 		}
 	}
 	
@@ -1077,39 +1083,59 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y827 w554 vmessageField
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Driver", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Setup", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
 		
-		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseDriver, % values2String("|", map(["Driver", "Delta Prs. FL", "Delta Prs. FR", "Delta Prs. RL", "Delta Prs. RR"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseDriver, % values2String("|", map(["Driver", "Conditions", "Compound", "PSI FL", "PSI FR", "PSI RL", "PSI RR"], "translate")*)
 		
-		this.iDriverListView := listHandle
+		this.iTeamListView := listHandle
 		
 		Gui %window%:Add, Text, x378 ys+38 w90 h23 +0x200, % translate("Driver")
 		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vdriverDropDownMenu gupdateDriver
 		
-		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Delta Pressure FL")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaFLEdit gupdateDriver
+		Gui %window%:Add, Text, x378 yp+30 w70 h23 +0x200, % translate("Weather")
+		
+		choices := map(kWeatherOptions, "translate")
+		
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose0 vdriverWeatherDropDownMenu gupdateDriver, % values2String("|", choices*) ; gchooseDriverWeather vweatherDropDown
+		
+		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatues")
+		
+		Gui %window%:Add, Edit, x474 yp w40 vdriverAirTemperatureEdit gupdateDriver, % ""
+		Gui %window%:Add, UpDown, x476 yp w18 h20
+		
+		Gui %window%:Add, Edit, x521 yp w40 vdriverTrackTemperatureEdit gupdateDriver, % ""
+		Gui %window%:Add, UpDown, x523 yp w18 h20
+		Gui %window%:Add, Text, x563 yp w90 h23 +0x200, % translate("A / T")
+		
+		choices := map(kQualifiedTyreCompounds, "translate")
+		
+		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vdriverCompoundDropDownMenu gupdateDriver, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure FL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverBasePressureFLEdit gupdateDriver
 		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
 		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure FR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaFREdit gupdateDriver
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure FR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverBasePressureFREdit gupdateDriver
 		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
 		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure RL")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaRLEdit gupdateDriver
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverBasePressureRLEdit gupdateDriver
 		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
 		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Delta Pressure RR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverDeltaRREdit gupdateDriver
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vdriverBasePressureRREdit gupdateDriver
 		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
 		
-		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton vaddDriverButton gaddDriver
+		Gui %window%:Add, Button, x550 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddDriverButton gaddDriver
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteDriverButton gdeleteDriver
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 		
-		Gui %window%:Add, Button, x408 ys+279 w160 greleaseDrivers, % translate("Release Driver List")
+		Gui %window%:Add, Button, x408 ys+279 w160 greleaseDrivers, % translate("Release Team")
 		
 		Gui Tab, 2
 		
@@ -1143,7 +1169,7 @@ class RaceCenter extends ConfigurationItem {
 		choices := map(["Yes", "No"], "translate")
 		Gui %window%:Add, DropDownList, x474 yp w50 AltSubmit Choose1 vplanTyreCompoundDropDown gupdatePlan, % values2String("|", choices*)
 		
-		Gui %window%:Add, Button, x550 yp+35 w23 h23 Center +0x200 HWNDplusButton vaddPlanButton gaddPlan
+		Gui %window%:Add, Button, x550 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddPlanButton gaddPlan
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeletePlanButton gdeletePlan
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
@@ -1560,7 +1586,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		this.updateStrategyMenu()
 		
-		Gui ListView, % this.DriverListView
+		Gui ListView, % this.TeamListView
 		
 		selected := LV_GetNext(0)
 		
@@ -1573,10 +1599,14 @@ class RaceCenter extends ConfigurationItem {
 		
 		if selected {
 			GuiControl Enable, driverDropDownMenu
-			GuiControl Enable, driverDeltaFLEdit
-			GuiControl Enable, driverDeltaFREdit
-			GuiControl Enable, driverDeltaRLEdit
-			GuiControl Enable, driverDeltaRREdit
+			GuiControl Enable, driverWeatherDropDownMenu
+			GuiControl Enable, driverAirTemperatureEdit
+			GuiControl Enable, driverTrackTemperatureEdit
+			GuiControl Enable, driverCompoundDropDownMenu
+			GuiControl Enable, driverBasePressureFLEdit
+			GuiControl Enable, driverBasePressureFREdit
+			GuiControl Enable, driverBasePressureRLEdit
+			GuiControl Enable, driverBasePressureRREdit
 			
 			GuiControl Enable, deleteDriverButton
 			
@@ -1584,18 +1614,26 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			GuiControl Disable, driverDropDownMenu
-			GuiControl Disable, driverDeltaFLEdit
-			GuiControl Disable, driverDeltaFREdit
-			GuiControl Disable, driverDeltaRLEdit
-			GuiControl Disable, driverDeltaRREdit
+			GuiControl Disable, driverWeatherDropDownMenu
+			GuiControl Disable, driverAirTemperatureEdit
+			GuiControl Disable, driverTrackTemperatureEdit
+			GuiControl Disable, driverCompoundDropDownMenu
+			GuiControl Disable, driverBasePressureFLEdit
+			GuiControl Disable, driverBasePressureFREdit
+			GuiControl Disable, driverBasePressureRLEdit
+			GuiControl Disable, driverBasePressureRREdit
 			
 			GuiControl Disable, deleteDriverButton
 			
 			GuiControl Choose, driverDropDownMenu, 0
-			GuiControl, , driverDeltaFLEdit, % ""
-			GuiControl, , driverDeltaFREdit, % ""
-			GuiControl, , driverDeltaRLEdit, % ""
-			GuiControl, , driverDeltaRREdit, % ""
+			GuiControl Choose, driverWeatherDropDownMenu, 0
+			GuiControl Choose, driverCompoundDropDownMenu, 0
+			GuiControl, , driverAirTemperatureEdit, % ""
+			GuiControl, , driverTrackTemperatureEdit, % ""
+			GuiControl, , driverBasePressureFLEdit, % ""
+			GuiControl, , driverBasePressureFREdit, % ""
+			GuiControl, , driverBasePressureRLEdit, % ""
+			GuiControl, , driverBasePressureRREdit, % ""
 		}
 		
 		Gui ListView, % this.PlanListView
@@ -1701,28 +1739,40 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		Gui ListView, % this.DriverListView
-		
-		selected := LV_GetNext(0)
-		
-		if (selected != this.SelectedDriver) {
-			Loop % LV_GetCount()
-				LV_Modify(A_Index, "-Select")
+		Gui ListView, % this.TeamListView
 			
-			this.iSelectedDriver := false
-			selected := false
-		}
+		if (this.Drivers.Length() > 0) {
+			GuiControl Choose, driverDropDownMenu, 1
+
+			driverAirTemperatureEdit := 23
+			driverTrackTemperatureEdit := 27
 			
-		if (selected && (this.Drivers.Length() > 0)) {
-			LV_Add("Select Vis", this.Drivers[1], "0.0", "0.0", "0.0", "0.0")
+			driverBasePressureFLEdit := 25.5
+			driverBasePressureFREdit := 25.5
+			driverBasePressureRLEdit := 25.5
+			driverBasePressureRREdit := 25.5
+			
+			GuiControl Choose, driverWeatherDropDownMenu, % inList(kWeatherOptions, "Dry")
+			GuiControl, , driverAirTemperatureEdit, %driverAirTemperatureEdit%
+			GuiControl, , driverTrackTemperatureEdit, %driverTrackTemperatureEdit%
+			GuiControl Choose, driverCompoundDropDownMenu, % inList(kQualifiedTyreCompounds, "Dry")
+			
+			GuiControl, , driverBasePressureFLEdit, %driverBasePressureFLEdit%
+			GuiControl, , driverBasePressureFREdit, %driverBasePressureFREdit%
+			GuiControl, , driverBasePressureRLEdit, %driverBasePressureRLEdit%
+			GuiControl, , driverBasePressureRREdit, %driverBasePressureRREdit%
+			
+			LV_Add("Select Vis", this.Drivers[1]
+							   , translate("Dry") . A_Space . translate("(") . driverAirTemperatureEdit . translate(", ") . driverTrackTemperatureEdit . translate(")")
+							   , translate("Dry")
+							   , driverBasePressureFLEdit, driverBasePressureFREdit, driverBasePressureRLEdit, driverBasePressureRREdit)
 		
 			this.iSelectedDriver := LV_GetCount()
-		
-			GuiControl Choose, driverDropDownMenu, 1
-			GuiControl, , driverDeltaFLEdit, 0.0
-			GuiControl, , driverDeltaFREdit, 0.0
-			GuiControl, , driverDeltaRLEdit, 0.0
-			GuiControl, , driverDeltaRREdit, 0.0
+			
+			LV_ModifyCol()
+			
+			Loop % LV_GetCount("Col")
+				LV_ModifyCol(A_Index, "AutoHdr")
 		}
 		
 		this.updateState()
@@ -1733,7 +1783,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		Gui ListView, % this.DriverListView
+		Gui ListView, % this.TeamListView
 		
 		selected := LV_GetNext(0)
 		
@@ -3044,6 +3094,12 @@ class RaceCenter extends ConfigurationItem {
 			
 			this.ReportViewer.setReport(reportDirectory)
 		}
+		
+		Gui ListView, % this.TeamListView
+		
+		LV_Delete()
+		
+		this.iSelectedDriver := false
 		
 		Gui ListView, % this.PlanListView
 		
@@ -7190,7 +7246,7 @@ validateNumber(field) {
 	
 	if %field% is not Number
 	{
-		%field%:= oldValue
+		%field% := oldValue
 		
 		GuiControl, , %field%, %oldValue%
 	}
@@ -7455,13 +7511,13 @@ updateTime() {
 addDriver() {
 	rCenter := RaceCenter.Instance
 	
-	if rCenter.SessionActive
+	if (rCenter.Drivers.Length() > 0)
 		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addDriver"))
 	else {
 		title := translate("Information")
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+		MsgBox 262192, %title%, % translate("There are no drivers available. Please select a valid session first.")
 		OnMessage(0x44, "")
 	}
 }
@@ -7473,7 +7529,7 @@ deleteDriver() {
 	
 	Gui %window%:Default
 	
-	Gui ListView, % rCenter.DriverListView
+	Gui ListView, % rCenter.TeamListView
 	
 	row := LV_GetNext(0)
 	
@@ -7504,21 +7560,36 @@ chooseDriver() {
 		
 		Gui %window%:Default
 		
-		Gui ListView, % rCenter.DriverListView
+		Gui ListView, % rCenter.TeamListView
 		
 		rCenter.iSelectedDriver := A_EventInfo
 		
 		LV_GetText(driver, A_EventInfo, 1)
-		LV_GetText(deltaFL, A_EventInfo, 2)
-		LV_GetText(deltaFR, A_EventInfo, 3)
-		LV_GetText(deltaRL, A_EventInfo, 4)
-		LV_GetText(deltaRR, A_EventInfo, 5)
+		LV_GetText(conditions, A_EventInfo, 2)
+		LV_GetText(compound, A_EventInfo, 3)
+		LV_GetText(driverBasePressureFLEdit, A_EventInfo, 4)
+		LV_GetText(driverBasePressureFREdit, A_EventInfo, 5)
+		LV_GetText(driverBasePressureRLEdit, A_EventInfo, 6)
+		LV_GetText(driverBasePressureRLEdit, A_EventInfo, 7)
 
 		GuiControl Choose, driverDropDownMenu, % inList(getKeys(rCenter.SessionDrivers), driver)
-		GuiControl, , driverDeltaFLEdit, %deltaFL%
-		GuiControl, , driverDeltaFREdit, %deltaFR%
-		GuiControl, , driverDeltaRLEdit, %deltaRL%
-		GuiControl, , driverDeltaRREdit, %deltaRR%
+		
+		conditions := string2Values(translate("("), conditions)
+		temperatures := string2Values(translate(", "), StrReplace(conditions[2], translate(")"), ""))
+		
+		driverAirTemperatureEdit := temperatures[1]
+		driverTrackTemperatureEdit := temperatures[2]
+		
+		GuiControl Choose, driverWeatherDropDownMenu, % inList(map(kWeatherOptions, "translate"), conditions[1])
+		GuiControl Choose, driverCompoundDropDownMenu, % inList(map(kQualifiedTyreCompounds, "translate"), compound)
+		
+		GuiControl, , driverAirTemperatureEdit, %driverAirTemperatureEdit%
+		GuiControl, , driverTrackTemperatureEdit, %driverTrackTemperatureEdit%
+		
+		GuiControl, , driverBasePressureFLEdit, %driverBasePressureFLEdit%
+		GuiControl, , driverBasePressureFREdit, %driverBasePressureFREdit%
+		GuiControl, , driverBasePressureRLEdit, %driverBasePressureRLEdit%
+		GuiControl, , driverBasePressureRREdit, %driverBasePressureRREdit%
 		
 		rCenter.updateState()
 	}
@@ -7549,7 +7620,7 @@ updateDriverAsync() {
 	
 	Gui %window%:Default
 	
-	Gui ListView, % rCenter.DriverListView
+	Gui ListView, % rCenter.TeamListView
 	
 	row := LV_GetNext(0)
 	
@@ -7562,22 +7633,26 @@ updateDriverAsync() {
 	
 	if (row > 0) {
 		GuiControlGet driverDropDownMenu
-		GuiControlGet driverDeltaFLEdit
-		GuiControlGet driverDeltaFREdit
-		GuiControlGet driverDeltaRLEdit
-		GuiControlGet driverDeltaRREdit
 		
-		validateNumber("driverDeltaFLEdit")
-		validateNumber("driverDeltaFREdit")
-		validateNumber("driverDeltaRLEdit")
-		validateNumber("driverDeltaRREdit")
+		validateNumber("driverBasePressureFLEdit")
+		validateNumber("driverBasePressureFREdit")
+		validateNumber("driverBasePressureRLEdit")
+		validateNumber("driverBasePressureRREdit")
 		
-		LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[driverDropDownMenu])
+		GuiControlGet driverBasePressureFLEdit
+		GuiControlGet driverBasePressureFREdit
+		GuiControlGet driverBasePressureRLEdit
+		GuiControlGet driverBasePressureRREdit
 		
-		LV_Modify(row, "Col3", driverDeltaFLEdit)
-		LV_Modify(row, "Col4", driverDeltaFREdit)
-		LV_Modify(row, "Col5", driverDeltaRLEdit)
-		LV_Modify(row, "Col6", driverDeltaRREdit)
+		GuiControlGet driverWeatherDropDownMenu
+		GuiControlGet driverAirTemperatureEdit
+		GuiControlGet driverTrackTemperatureEdit
+		GuiControlGet driverCompoundDropDownMenu
+		
+		LV_Modify(row, "", getKeys(rCenter.SessionDrivers)[driverDropDownMenu]
+						 , translate(kWeatherOptions[driverWeatherDropDownMenu]) . A_Space . translate("(") . driverAirTemperatureEdit . translate(", ") . driverTrackTemperatureEdit . translate(")")
+					     , translate(kQualifiedTyreCompounds[driverCompoundDropDownMenu])
+					     , driverBasePressureFLEdit, driverBasePressureFREdit, driverBasePressureRLEdit, driverBasePressureRREdit)
 	}
 }
 

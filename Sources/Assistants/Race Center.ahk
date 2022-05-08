@@ -930,14 +930,14 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s10 Bold, Arial
 
-		Gui %window%:Add, Text, w1184 Center gmoveRaceCenter, % translate("Modular Simulator Controller System") 
+		Gui %window%:Add, Text, w1334 Center gmoveRaceCenter, % translate("Modular Simulator Controller System") 
 		
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
+		Gui %window%:Add, Text, YP+20 w1334 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
 		
-		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+30 w1350 0x10
 			
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -975,8 +975,11 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, ListView, x16 yp+10 w115 h176 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
 		
-		for ignore, report in map(kSessionReports, "translate")
-			LV_Add("", report)
+		for ignore, report in kSessionReports
+			if (report = "Driver")
+				LV_Add("", translate("Driver (Start)"))
+			else
+				LV_Add("", translate(report))
 		
 		LV_ModifyCol(1, "AutoHdr")
 		
@@ -996,21 +999,21 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x400 ys w40 h23 +0x200, % translate("Plot")
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
-		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
+		Gui %window%:Add, Button, x1327 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
 		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
 		
-		Gui %window%:Add, ActiveX, x400 yp+24 w800 h278 Border vchartViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x400 yp+24 w950 h343 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
-		Gui %window%:Add, Text, x8 yp+286 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+351 w1350 0x10
 
 		Gui %window%:Font, s10 Bold, Arial
 			
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 Section, %kIconsDirectory%Tools BW.ico
 		Gui %window%:Add, Text, x50 yp+5 w80 h26, % translate("Session")
 		
-		Gui %window%:Add, ActiveX, x1173 yp w30 h30 vwaitViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x1323 yp w30 h30 vwaitViewer, shell.explorer
 		
 		waitViewer.Navigate("about:blank")
 		
@@ -1031,9 +1034,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w582 h9, % translate("Output")
+		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w732 h9, % translate("Output")
 		
-		Gui %window%:Add, ActiveX, x619 yp+21 w582 h293 Border vdetailsViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w732 h293 Border vdetailsViewer, shell.explorer
 		
 		detailsViewer.Navigate("about:blank")
 		
@@ -1044,10 +1047,10 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y750 w1200 0x10
+		Gui %window%:Add, Text, x8 y815 w1350 0x10
 		
-		Gui %window%:Add, Text, x16 y762 w554 vmessageField
-		Gui %window%:Add, Button, x574 y759 w80 h23 GcloseRaceCenter, % translate("Close")
+		Gui %window%:Add, Text, x16 y827 w554 vmessageField
+		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
 		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
 		
@@ -4804,6 +4807,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 		
 		chartViewer.Document.Open()
+
+		width := (chartViewer.Width - 5)
+		height := (chartViewer.Height - 5)
 		
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before =
@@ -4826,7 +4832,7 @@ class RaceCenter extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: 798px; height: 248px"></div>
+					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
 			)
@@ -5728,16 +5734,18 @@ class RaceCenter extends ConfigurationItem {
 			temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
 		}
 			
-		chart1 := this.createLapDetailsChart(1, 555, 248, laps, positions, lapTimes, fuelConsumptions, temperatures)
+		width := (detailsViewer.Width - 20)
 		
-		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
+		chart1 := this.createLapDetailsChart(1, width, 248, laps, positions, lapTimes, fuelConsumptions, temperatures)
+		
+		html .= ("<br><br><div id=""chart_1" . """ style=""width: " . width . "px; height: 248px""></div>")
 			
 		html .= ("<br><br><div id=""header""><i>" . translate("Driver") . "</i></div>")
 		
-		chart2 := this.createStintPerformanceChart(2, 555, 248, stint)
+		chart2 := this.createStintPerformanceChart(2, width, 248, stint)
 		
-		html .= ("<br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
-			
+		html .= ("<br><div id=""chart_2" . """ style=""width: " . width . "px; height: 248px""></div>")
+		
 		this.showDetails("Stint", html, [1, chart1], [2, chart2])
 	}
 	
@@ -6126,16 +6134,18 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<br>" . this.createDriverDetails(this.Drivers))
 		
 		html .= ("<br><br><div id=""header""><i>" . translate("Pace") . "</i></div>")
-			
-		chart1 := this.createDriverPaceChart(1, 555, 248, this.Drivers)
 		
-		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
+		width := (detailsViewer.Width - 20)
+		
+		chart1 := this.createDriverPaceChart(1, width, 248, this.Drivers)
+		
+		html .= ("<br><br><div id=""chart_1" . """ style=""width: " . width . "px; height: 248px""></div>")
 			
 		html .= ("<br><br><div id=""header""><i>" . translate("Performance") . "</i></div>")
 			
-		chart2 := this.createDriverPerformanceChart(2, 555, 248, this.Drivers)
+		chart2 := this.createDriverPerformanceChart(2, width, 248, this.Drivers)
 		
-		html .= ("<br><br><div id=""chart_2" . """ style=""width: 555px; height: 248px""></div>")
+		html .= ("<br><br><div id=""chart_2" . """ style=""width: " . width . "px; height: 248px""></div>")
 		
 		this.showDetails("Driver", html, [1, chart1], [2, chart2])
 	}
@@ -6240,9 +6250,11 @@ class RaceCenter extends ConfigurationItem {
 				tyreLaps.Push(lapDataTable[A_Index]["Tyre.Laps"])
 			}
 		
-		chart1 := this.createRaceSummaryChart(1, 555, 248, laps, positions, remainingFuels, tyreLaps)
+		width := (detailsViewer.Width - 20)
 		
-		html .= ("<br><br><div id=""chart_1" . """ style=""width: 555px; height: 248px""></div>")
+		chart1 := this.createRaceSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
+		
+		html .= ("<br><br><div id=""chart_1" . """ style=""width: " . width . "px; height: 248px""></div>")
 		
 		this.showDetails("Session", html, [1, chart1])
 	}

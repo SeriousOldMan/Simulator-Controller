@@ -267,7 +267,12 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 			
-			chartArea := this.createConsumablesChart(strategy, 555, 248, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
+			width := 555
+			
+			if this.StrategyViewer
+				width := (this.StrategyViewer.Width - 10)
+			
+			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
 			
 			before =
 			(

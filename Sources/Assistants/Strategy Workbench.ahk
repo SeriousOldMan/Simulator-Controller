@@ -328,14 +328,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Font, s10 Bold, Arial
 
-		Gui %window%:Add, Text, w1184 Center gmoveWorkbench, % translate("Modular Simulator Controller System") 
+		Gui %window%:Add, Text, w1334 Center gmoveWorkbench, % translate("Modular Simulator Controller System") 
 		
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenWorkbenchDocumentation, % translate("Strategy Workbench")
+		Gui %window%:Add, Text, YP+20 w1334 cBlue Center gopenWorkbenchDocumentation, % translate("Strategy Workbench")
 		
-		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+30 w1350 0x10
 			
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold, Arial
@@ -441,11 +441,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x444 yp w80 AltSubmit Choose1 +0x200 vchartSourceDropDown gchooseChartSource, % values2String("|", map(["Telemetry", "Comparison"], "translate")*)
 		Gui %window%:Add, DropDownList, x529 yp w80 AltSubmit Choose1 vchartTypeDropDown gchooseChartType, % values2String("|", map(["Scatter", "Bar", "Bubble", "Line"], "translate")*)
 		
-		Gui %window%:Add, ActiveX, x400 yp+24 w800 h302 Border vchartViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x400 yp+24 w950 h442 Border vchartViewer, shell.explorer
 		
 		chartViewer.Navigate("about:blank")
 		
-		Gui %window%:Add, Text, x8 yp+310 w1200 0x10
+		Gui %window%:Add, Text, x8 yp+450 w1350 0x10
 
 		Gui %window%:Font, s10 Bold, Arial
 			
@@ -465,9 +465,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w577 h9, % translate("Strategy")
+		Gui %window%:Add, GroupBox, -Theme x619 ys+39 w727 h9, % translate("Strategy")
 		
-		Gui %window%:Add, ActiveX, x619 yp+21 w577 h193 Border vstratViewer, shell.explorer
+		Gui %window%:Add, ActiveX, x619 yp+21 w727 h193 Border vstratViewer, shell.explorer
 		
 		stratViewer.Navigate("about:blank")
 		
@@ -477,9 +477,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		Gui %window%:Font, Norm, Arial
 		
-		Gui %window%:Add, Text, x8 y676 w1200 0x10
+		Gui %window%:Add, Text, x8 y816 w1350 0x10
 		
-		Gui %window%:Add, Button, x574 y684 w80 h23 GcloseWorkbench, % translate("Close")
+		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseWorkbench, % translate("Close")
 
 		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
 		
@@ -854,6 +854,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		
 		chartViewer.Document.Open()
 		
+		width := (chartViewer.Width - 5)
+		height := (chartViewer.Height - 5)
+		
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before =
 			(
@@ -875,7 +878,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: 798px; height: 285px"></div>
+					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
 			)
@@ -2036,11 +2039,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			html .= ("<br>" . this.createStintsInfo(strategy, timeSeries, lapSeries, fuelSeries, tyreSeries))
 		}
 		
+		width := (chartViewer.Width - 5)
+		
 		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 				
 		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id" . vChartID . "')); chart.draw(data, options); }")
 		
-		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id" . vChartID . """ style=""width: 778px; height: 348px"">")
+		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id" . vChartID . """ style=""width: " . width . "px; height: 348px"">")
 
 		tableCSS := getTableCSS()
 		

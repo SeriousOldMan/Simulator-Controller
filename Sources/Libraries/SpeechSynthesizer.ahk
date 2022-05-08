@@ -58,6 +58,8 @@ class SpeechSynthesizer {
 	
 	iCache := {}
 	iCacheDirectory := false
+
+	iPlaysCacheFile := false
 	
 	Synthesizer[] {
 		Get {
@@ -257,8 +259,11 @@ class SpeechSynthesizer {
 			if FileExist(cacheFileName) {
 				if (wait || !cache)
 					SoundPlay %cacheFileName%, Wait
-				else
+				else {
 					SoundPlay %cacheFileName%
+				
+					this.iPlaysCacheFile := true
+				}
 				
 				return
 			}
@@ -294,8 +299,11 @@ class SpeechSynthesizer {
 			
 				if (wait || !cache)
 					SoundPlay %temp2Name%, Wait
-				else
+				else {
 					SoundPlay %temp2Name%
+				
+					this.iPlaysCacheFile := true
+				}
 			}
 			catch exception {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
@@ -409,21 +417,23 @@ class SpeechSynthesizer {
 	}
 	
 	stop() {
-		if (this.Synthesizer = "Windows") {
-			status := this.iSpeechSynthesizer.Status.RunningState
-			
-			if (status = 0)
-				this.iSpeechSynthesizer.Resume
-			
-			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
-		}
-		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
 			}
 			catch exception {
 				; Ignore
 			}
+			
+			this.iPlaysCacheFile := false
+		}
+		else if (this.Synthesizer = "Windows") {
+			status := this.iSpeechSynthesizer.Status.RunningState
+			
+			if (status = 0)
+				this.iSpeechSynthesizer.Resume
+			
+			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
 	}
 	

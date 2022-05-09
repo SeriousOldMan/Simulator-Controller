@@ -2349,8 +2349,8 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 	
-	driverRelativePressure(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
-						 , ByRef deltaFL, ByRef deltaFR, ByRef deltaRL, ByRef deltaRR) {
+	driverPressureDelta(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+					  , ByRef deltaFL, ByRef deltaFR, ByRef deltaRL, ByRef deltaRR) {
 		if (currentDriver = nextDriver) {
 			deltaFL := 0
 			deltaFR := 0
@@ -2418,8 +2418,8 @@ class RaceCenter extends ConfigurationItem {
 				deltaRL := false
 				deltaRR := false
 				
-				if this.driverRelativePressure(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
-											 , deltaFL, deltaFR, deltaRL, deltaRR) {
+				if this.driverPressureDelta(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+										  , deltaFL, deltaFR, deltaRL, deltaRR) {
 					flPressure += deltaFL
 					frPressure += deltaFR
 					rlPressure += deltaRL

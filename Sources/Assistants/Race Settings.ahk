@@ -212,17 +212,21 @@ openSettingsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings
 }
 
-isFloat(numbers*) {
+isPositiveFloat(numbers*) {
 	for ignore, value in numbers
 		if value is not float
+			return false
+		else if (value < 0)
 			return false
 		
 	return true
 }
 
-isNumber(numbers*) {
+isPositiveNumber(numbers*) {
 	for ignore, value in numbers
 		if value is not number
+			return false
+		else if (value < 0)
 			return false
 		
 	return true
@@ -616,12 +620,12 @@ restart:
 		
 		newSettings := newConfiguration()
 		
-		if (!isFloat(tyrePressureDeviationEdit, fuelConsumptionEdit, pitstopRefuelServiceEdit
-				   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
-				   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
-				   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
-				   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
-		 || !isNumber(repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
+		if (!isPositiveFloat(tyrePressureDeviationEdit, pitstopRefuelServiceEdit
+						   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
+						   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
+						   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
+						   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
+		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
 		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")

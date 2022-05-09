@@ -67,8 +67,8 @@ global vTrack := false
 global vWeather := "Dry"
 global vAirTemperature := 23
 global vTrackTemperature := 27
-global vCompound := "Dry"
-global vCompoundColor := "Black"
+global vCompound := false
+global vCompoundColor := false
 	
 global repairSuspensionDropDown
 global repairSuspensionThresholdEdit
@@ -1494,8 +1494,8 @@ showRaceSettingsEditor() {
 	vWeather := "Dry"
 	vAirTemperature := 23
 	vTrackTemperature:= 27
-	vCompound := "Dry"
-	vCompoundColor := "Black"
+	vCompound := false
+	vCompoundColor := false
 	
 	index := 1
 	

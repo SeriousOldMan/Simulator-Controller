@@ -18,6 +18,7 @@
 
 #Include ..\Libraries\Database.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -195,7 +196,7 @@ class TyresDatabase extends SessionDatabase {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
 				
-				thePressures.Push(pressureInfo["Pressure"] + (deltaAir * (- correctionAir)) + (deltaTrack * (- correctionTrack)))
+				thePressures.Push(pressureInfo["Pressure"] + Round((deltaAir * (- correctionAir)) + (deltaTrack * (- correctionTrack)), 1))
 				
 				theCertainty := Min(theCertainty, 1.0 - (Abs(deltaAir + deltaTrack) / (kMaxTemperatureDelta + 1)))
 			}

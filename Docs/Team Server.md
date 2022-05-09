@@ -238,6 +238,14 @@ Before creating the plan, please enter the date and time of the event into the f
 
 I recommend that only one person from the team is responsible for the strategy and stint plan, otherwise it will get chaotic quite fast. Therefore, if you choose "Release Plan" from the "Plan" menu, your current plan will be updated automatically in all "Race Center"s of your team mates.
 
+### Managing driver specific tyre pressures
+
+A typical problem in team races is the different driving styles of the team members. In most cases, the race rules does not allow changing the suspension and aerodynamics setup during a pitstop, but handling driver specific tyre pressures due to a more or less aggressive driving style is fortunately allowed and easily doable. Using the "Setups" tab, you can write down one or more reference tyre pressures for your team mates, which can then be used to adjust tyre pressures during a driver swap.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2015.JPG)
+
+You can enter as many setups here as you like for different weather conditions, temperatures and used tyre compounds. The more you have at your finger tips, the better are the chances that you can't be catched off guard by a sudden weather change. See the next section, how this data can be used to automatically adjust the tyre pressures, when planning an upcoming pitstop.
+
 ### Planning a Pitstop
 
 Using the elements on the "Pitstops" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of the Virtual Race Assistants in an endurance race, where currently passive team members or even a dedicated race engineer are part of the crew supporting the active driver.
@@ -245,6 +253,18 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
 Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan, or from the stratetgy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information there from previous sessions in comparable conditions.
+
+Below these two commands you can choose between two strategies to adjust tyre pressures, when swapping drivers, as described in the previous section:
+
+  1. Reference
+  
+     When you choose this strategy and there are tyre pressure setups are available for the next driver in the Stint Plan, these reference pressures will be used (possibly temperature corrected) and the pressure values derived by the Virtual Race Engineer will be ignored.
+
+  2. Relative
+  
+     Using this strategy will use the target pressures derived by the Virtual Race Engineer, but these values will corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the Stint Plan. This will work best, when the reference pressures are for very similar conditions.
+
+Important: The correction factor to be applied for temperature corrections can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) independently for each simulator / car / track / weather combination, when necessary. If you don't supply this individual factors, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.033 PSI for each increase in track temperature.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
   

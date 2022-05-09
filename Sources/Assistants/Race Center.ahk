@@ -1100,61 +1100,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y827 w554 vmessageField
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Setups", "Plan", "Stints", "Laps", "Strategy", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], "translate")*)
 		
 		Gui Tab, 1
-		
-		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures"], "translate")*)
-		
-		this.iSetupsListView := listHandle
-		
-		Gui %window%:Add, Text, x378 ys+38 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vsetupDriverDropDownMenu gupdateSetup
-		
-		Gui %window%:Add, Text, x378 yp+30 w70 h23 +0x200, % translate("Weather")
-		
-		choices := map(kWeatherOptions, "translate")
-		
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose0 vsetupWeatherDropDownMenu gupdateSetup, % values2String("|", choices*)
-		
-		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatures")
-		
-		Gui %window%:Add, Edit, x474 yp w40 vsetupAirTemperatureEdit gupdateSetup, % ""
-		Gui %window%:Add, UpDown, x476 yp w18 h20
-		
-		Gui %window%:Add, Edit, x521 yp w40 vsetupTrackTemperatureEdit gupdateSetup, % ""
-		Gui %window%:Add, UpDown, x523 yp w18 h20
-		Gui %window%:Add, Text, x563 yp w90 h23 +0x200, % translate("A / T")
-		
-		choices := map(kQualifiedTyreCompounds, "translate")
-		
-		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
-		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu gupdateSetup, % values2String("|", choices*)
-		
-		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure FL")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFLEdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
-		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure FR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFREdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
-		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RL")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRLEdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
-		
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRREdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
-		
-		Gui %window%:Add, Button, x550 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
-		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSetupButton gdeleteSetup
-		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-		
-		Gui %window%:Add, Button, x408 ys+279 w160 greleaseSetups, % translate("Release Setups")
-		
-		Gui Tab, 2
 		
 		Gui %window%:Add, Text, x24 ys+33 w90 h23 +0x200, % translate("Session")
 		Gui %window%:Add, DateTime, x106 yp w80 h23 vsessionDateCal gupdateDate
@@ -1193,19 +1141,19 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Button, x408 ys+279 w160 greleasePlan, % translate("Release Plan")
 
-		Gui Tab, 3
+		Gui Tab, 2
 		
 		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseStint, % values2String("|", map(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], "translate")*)
 		
 		this.iStintsListView := listHandle
 		
-		Gui Tab, 4
+		Gui Tab, 3
 		
 		Gui %window%:Add, ListView, x24 ys+33 w577 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseLap, % values2String("|", map(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident"], "translate")*)
 		
 		this.iLapsListView := listHandle
 		
-		Gui Tab, 5
+		Gui Tab, 4
 		
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -1277,6 +1225,58 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number VtrafficConsideredEdit, %trafficConsideredEdit%
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %trafficConsideredEdit%
 		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length")
+		
+		Gui Tab, 5
+		
+		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures"], "translate")*)
+		
+		this.iSetupsListView := listHandle
+		
+		Gui %window%:Add, Text, x378 ys+38 w90 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vsetupDriverDropDownMenu gupdateSetup
+		
+		Gui %window%:Add, Text, x378 yp+30 w70 h23 +0x200, % translate("Weather")
+		
+		choices := map(kWeatherOptions, "translate")
+		
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose0 vsetupWeatherDropDownMenu gupdateSetup, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatures")
+		
+		Gui %window%:Add, Edit, x474 yp w40 vsetupAirTemperatureEdit gupdateSetup, % ""
+		Gui %window%:Add, UpDown, x476 yp w18 h20
+		
+		Gui %window%:Add, Edit, x521 yp w40 vsetupTrackTemperatureEdit gupdateSetup, % ""
+		Gui %window%:Add, UpDown, x523 yp w18 h20
+		Gui %window%:Add, Text, x563 yp w90 h23 +0x200, % translate("A / T")
+		
+		choices := map(kQualifiedTyreCompounds, "translate")
+		
+		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu gupdateSetup, % values2String("|", choices*)
+		
+		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure FL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFLEdit gupdateSetup
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure FR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFREdit gupdateSetup
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RL")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRLEdit gupdateSetup
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RR")
+		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRREdit gupdateSetup
+		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		
+		Gui %window%:Add, Button, x550 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSetupButton gdeleteSetup
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		
+		Gui %window%:Add, Button, x408 ys+279 w160 greleaseSetups, % translate("Release Setups")
 		
 		Gui Tab, 6
 	

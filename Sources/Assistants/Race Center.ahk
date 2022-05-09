@@ -40,6 +40,7 @@ ListLines Off					; Disable execution history
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
 #Include Libraries\SessionDatabase.ahk
+#Include Libraries\SettingsDatabase.ahk
 #Include Libraries\TyresDatabase.ahk
 #Include Libraries\TelemetryDatabase.ahk
 #Include Libraries\RaceReportViewer.ahk
@@ -2333,10 +2334,15 @@ class RaceCenter extends ConfigurationItem {
 	
 	driverReferencePressure(driver, weather, airTemperature, trackTemperature, compound, compoundColor
 						  , ByRef pressureFL, ByRef pressureFR, ByRef pressureRL, ByRef pressureRR) {
+		settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+		
+		correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+		correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
+					
 		setup := this.driverSetup(driver, weather, airTemperature, trackTemperature, compound, compoundColor)
 		
 		if setup {
-			delta := (((setup["Temperature.Air"] - airTemperature) * 0.1) + ((setup["Temperature.Track"] - trackTemperature) * 0.33))
+			delta := (((airTemperature - setup["Temperature.Air"]) * correctionAir) + ((trackTemperature - setup["Temperature.Track"]) * correctionTrack))
 			
 			pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
 			pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
@@ -2360,20 +2366,25 @@ class RaceCenter extends ConfigurationItem {
 			return true
 		}
 		else {
+			settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+		
+			correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+			correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
+		
 			currentDriverSetup := this.driverSetup(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 			nextDriverSetup := this.driverSetup(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 		
 			if (currentDriverSetup && nextDriverSetup) {
-				currentDelta := (((currentDriverSetup["Temperature.Air"] - airTemperature) * 0.1)
-							   + ((currentDriverSetup["Temperature.Track"] - trackTemperature) * 0.33))
+				currentDelta := (((airTemperature - currentDriverSetup["Temperature.Air"]) * correctionAir)
+							   + ((trackTemperature - currentDriverSetup["Temperature.Track"]) * correctionTrack))
 			
 				currentBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + currentDelta)
 				currentBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + currentDelta)
 				currentBasePressureRL := (setup["Tyre.Pressure.Rear.Left"] + currentDelta)
 				currentBasePressureRR := (setup["Tyre.Pressure.Rear.Right"] + currentDelta)
 				
-				nextDelta := (((nextDriverSetup["Temperature.Air"] - airTemperature) * 0.1)
-							+ ((nextDriverSetup["Temperature.Track"] - trackTemperature) * 0.33))
+				nextDelta := (((airTemperature - nextDriverSetup["Temperature.Air"]) * correctionAir)
+							+ ((trackTemperature - nextDriverSetup["Temperature.Track"]) * correctionTrack))
 			
 				nextBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + nextDelta)
 				nextBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + nextDelta)

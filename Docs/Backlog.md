@@ -2,8 +2,7 @@
   1. [Target: V4.x] Overhaul (shortening) of assistant phrases
   2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
-  4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
-  5. [Target: V4.2][Race Spotter Plugin] Supply in-depth performance and safety analysis for the car in front before overtaking.
+  4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button.
 
 #### Strategy Development
   1. [Target: V4.x] Enhancements for Race Strategist

@@ -179,6 +179,11 @@ class TyresDatabase extends SessionDatabase {
 		else
 			compounds := [Array(compound, compoundColor)]
 		
+		settings := new SettingsDatabase().loadSettings(simulator, car, track, weather)
+		
+		correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+		correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
+		
 		thePressures := []
 		theCertainty := 1.0
 		
@@ -190,7 +195,7 @@ class TyresDatabase extends SessionDatabase {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
 				
-				thePressures.Push(pressureInfo["Pressure"] + ((deltaAir + Round(deltaTrack * 0.33)) * 0.1))
+				thePressures.Push(pressureInfo["Pressure"] + (deltaAir * (- correctionAir)) + (deltaTrack * (- correctionTrack)))
 				
 				theCertainty := Min(theCertainty, 1.0 - (Abs(deltaAir + deltaTrack) / (kMaxTemperatureDelta + 1)))
 			}

@@ -544,8 +544,9 @@ updateTyrePressureCorrection(?lap) <=
 		sequence(?firstlap, ?lap, ?indices), lapAirTemperatures(?firstLap, ?lap, ?temperatures), linRegression(?indices, ?temperatures, ?a, ?b),
 		nextStintLaps(?nextStintLaps), ?halfStintLaps = ?nextStintLaps / 2,
 		average(?temperatures, ?averagetemperature), ?middleStintLap = ?lap + ?halfStintLaps, ?temp = ?b * ?middleStintLap,
-		?projectedtemperature = ?a + ?temp, ?temperatureFactor = ?averagetemperature - ?projectedtemperature,
-		?pressureCorrection = ?temperatureFactor * 0.1,	Set(Tyre.Pressure.Target.Correction, ?pressureCorrection)
+		?projectedTemperature = ?a + ?temp, ?temperatureDelta = ?projectedTemperature - ?averageTemperature,
+		?pressureCorrection = ?temperatureDelta * !Session.Settings.Tyre.Pressure.Correction.Temperature.Air,
+		Set(Tyre.Pressure.Target.Correction, ?pressureCorrection)
 
 
 ;;;-------------------------------------------------------------------------;;;

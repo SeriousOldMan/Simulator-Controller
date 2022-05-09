@@ -190,7 +190,7 @@ class TyresDatabase extends SessionDatabase {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
 				
-				thePressures.Push(pressureInfo["Pressure"] + ((deltaAir + Round(deltaTrack * 0.49)) * 0.1))
+				thePressures.Push(pressureInfo["Pressure"] + ((deltaAir + Round(deltaTrack * 0.33)) * 0.1))
 				
 				theCertainty := Min(theCertainty, 1.0 - (Abs(deltaAir + deltaTrack) / (kMaxTemperatureDelta + 1)))
 			}

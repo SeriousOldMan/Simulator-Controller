@@ -1114,9 +1114,9 @@ class RaceCenter extends ConfigurationItem {
 		
 		choices := map(kWeatherOptions, "translate")
 		
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose0 vsetupWeatherDropDownMenu gupdateSetup, % values2String("|", choices*) ; gchooseDriverWeather vweatherDropDown
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit Choose0 vsetupWeatherDropDownMenu gupdateSetup, % values2String("|", choices*)
 		
-		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatues")
+		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatures")
 		
 		Gui %window%:Add, Edit, x474 yp w40 vsetupAirTemperatureEdit gupdateSetup, % ""
 		Gui %window%:Add, UpDown, x476 yp w18 h20
@@ -1755,7 +1755,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Default
 		
-		correct1 := ((this.TyrePressureMode = "Base") ? "(x) Adjust Pressures (Setup)" : "      Adjust Pressures (Setup)")
+		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 		
 		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
@@ -2288,22 +2288,180 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
+	getStintDriver(stintNr) {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		Loop % LV_GetCount()
+		{
+			LV_GetText(stint, A_Index, 1)
+			
+			if (stint = stintNr) {
+				LV_GetText(driver, A_Index, 2)
+				
+				for ignore, candidate in this.Drivers
+					if (driver = candidate.FullName)
+						return candidate
+			}
+		}
+		
+		return false
+	}
+	
+	driverSetup(driver, weather, airTemperature, trackTemperature, compound, compoundColor) {
+		this.saveSetups()
+		
+		setup := false
+		
+		for ignore, candidate in this.SessionDatabase.query("Setups.Data", {Where: {Driver: driver.FullName
+																				  , Weather: weather
+																				  , "Tyre.Compound": compound
+																				  , "Tyre.Compound.Color": compoundColor}})
+			if setup {
+				if ((Abs(candidate["Temperature.Air"] - airTemperature) < Abs(setup["Temperature.Air"] - airTemperature))
+				 || (Abs(candidate["Temperature.Track"] - trackTemperature) < Abs(setup["Temperature.Track"] - trackTemperature)))
+					setup := candidate
+			}
+			else
+				setup := candidate
+		
+		return setup
+	}
+	
+	driverReferencePressure(driver, weather, airTemperature, trackTemperature, compound, compoundColor
+						  , ByRef pressureFL, ByRef pressureFR, ByRef pressureRL, ByRef pressureRR) {
+		setup := this.driverSetup(driver, weather, airTemperature, trackTemperature, compound, compoundColor)
+		
+		if setup {
+			delta := (((setup["Temperature.Air"] - airTemperature) * 0.1) + ((setup["Temperature.Track"] - trackTemperature) * 0.33))
+			
+			pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
+			pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
+			pressureRL := (setup["Tyre.Pressure.Rear.Left"] + delta)
+			pressureRR := (setup["Tyre.Pressure.Rear.Right"] + delta)
+			
+			return true
+		}
+		else
+			return false
+	}
+	
+	driverRelativePressure(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+						 , ByRef deltaFL, ByRef deltaFR, ByRef deltaRL, ByRef deltaRR) {
+		if (currentDriver = nextDriver) {
+			deltaFL := 0
+			deltaFR := 0
+			deltaRL := 0
+			deltaRR := 0
+			
+			return true
+		}
+		else {
+			currentDriverSetup := this.driverSetup(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
+			nextDriverSetup := this.driverSetup(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
+		
+			if (currentDriverSetup && nextDriverSetup) {
+				currentDelta := (((currentDriverSetup["Temperature.Air"] - airTemperature) * 0.1)
+							   + ((currentDriverSetup["Temperature.Track"] - trackTemperature) * 0.33))
+			
+				currentBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + currentDelta)
+				currentBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + currentDelta)
+				currentBasePressureRL := (setup["Tyre.Pressure.Rear.Left"] + currentDelta)
+				currentBasePressureRR := (setup["Tyre.Pressure.Rear.Right"] + currentDelta)
+				
+				nextDelta := (((nextDriverSetup["Temperature.Air"] - airTemperature) * 0.1)
+							+ ((nextDriverSetup["Temperature.Track"] - trackTemperature) * 0.33))
+			
+				nextBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + nextDelta)
+				nextBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + nextDelta)
+				nextBasePressureRL := (setup["Tyre.Pressure.Rear.Left"] + nextDelta)
+				nextBasePressureRR := (setup["Tyre.Pressure.Rear.Right"] + nextDelta)
+			
+				deltaFL := (nextBasePressureFL - currentBasePressureFL)
+				deltaFR := (nextBasePressureFR - currentBasePressureFR)
+				deltaRL := (nextBasePressureRL - currentBasePressureRL)
+				deltaRR := (nextBasePressureRR - currentBasePressureRR)
+				
+				return true
+			}
+			else
+				return false
+		}
+	}
+	
+	adjustPitstopTyrePressures(tyrePressureMode, weather, airTemperature, trackTemperature, compound, compoundColor
+							 , ByRef flPressure, ByRef frPressure, ByRef rlPressure, ByRef rrPressure) {
+		currentDriver := (this.CurrentStint ? this.CurrentStint.Driver : false)
+		nextDriver := (this.CurrentStint ? this.getStintDriver(this.CurrentStint.Nr + 1) : false)
+		
+		if (currentDriver && nextDriver) {
+			if (tyrePressureMode = "Reference") {
+				pressureFL := false
+				pressureFR := false
+				pressureRL := false
+				pressureRR := false
+				
+				if this.driverReferencePressure(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+											  , pressureFL, pressureFR, pressureRL, pressureRR) {
+					flPressure := pressureFL
+					frPressure := pressureFR
+					rlPressure := pressureRL
+					rrPressure := pressureRR
+				}
+			}
+			else if (tyrePressureMode = "Relative") {
+				deltaFL := false
+				deltaFR := false
+				deltaRL := false
+				deltaRR := false
+				
+				if this.driverRelativePressure(currentDriver, nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+											 , deltaFL, deltaFR, deltaRL, deltaRR) {
+					flPressure += deltaFL
+					frPressure += deltaFR
+					rlPressure += deltaRL
+					rrPressure += deltaRR
+				}
+			}
+			else
+				Throw "Unknown tyre pressure mode detected in RaceCenter.adjustPitstopTyrePressures..."
+		}
+	}
+	
 	initializePitstopTyreSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 		window := this.Window
 		
 		Gui %window%:Default
 		
-		if (compoundColor != "Black")
-			compound := (compound . " (" . compoundColor . ")")
-		
-		chosen := inList(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), compound)
-		
-		GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
-		
-		GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
-		GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
-		GuiControl, , pitstopPressureRLEdit, % Round(rlPressure, 1)
-		GuiControl, , pitstopPressureRREdit, % Round(rrPressure, 1)
+		if compound {
+			if (compoundColor != "Black")
+				compound := (compound . " (" . compoundColor . ")")
+			
+			if this.TyrePressureMode
+				this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
+											  , compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
+				
+			chosen := inList(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), compound)
+			
+			GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
+			
+			GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
+			GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
+			GuiControl, , pitstopPressureRLEdit, % Round(rlPressure, 1)
+			GuiControl, , pitstopPressureRREdit, % Round(rrPressure, 1)
+		}
+		else {
+			GuiControl Choose, pitstopTyreCompoundDropDown, 1
+			
+			GuiControl, , pitstopPressureFLEdit, % ""
+			GuiControl, , pitstopPressureFREdit, % ""
+			GuiControl, , pitstopPressureRLEdit, % ""
+			GuiControl, , pitstopPressureRREdit, % ""
+		}
+			
 		
 		this.updateState()
 	}
@@ -2749,7 +2907,7 @@ class RaceCenter extends ConfigurationItem {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			case 6:
-				this.iTyrePressureMode := ((this.TyrePressureMode = "Base") ? false : "Base")
+				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 				
 				this.updateState()
 			case 7:
@@ -4990,7 +5148,7 @@ class RaceCenter extends ConfigurationItem {
 		
 			condition := (translate(setup.Weather) . A_Space
 						. translate("(") . translate(setup["Temperature.Air"]) . ", " . translate(setup["Temperature.Track"]) . translate(")"))
-						
+			
 			LV_Add("", setup.Driver, condition
 					 , translateQualifiedCompound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"])
 					 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
@@ -6593,7 +6751,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Remaining") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Laps") . "');")
 		drawChartFunction .= "`ndata.addRows(["
 		
@@ -7773,7 +7931,7 @@ deleteSetup() {
 		title := translate("Delete")
 					
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		MsgBox 262436, %title%, % translate("Do you really want to delete the current driver data?")
+		MsgBox 262436, %title%, % translate("Do you really want to delete the current driver specific setup?")
 		OnMessage(0x44, "")
 		
 		IfMsgBox Yes

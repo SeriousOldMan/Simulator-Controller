@@ -429,6 +429,7 @@ int main(int argc, char* argv[])
 	timeBeginPeriod(1);
 
 	bool running = false;
+	int countdown = 4000;
 
 	while (true) {
 		g_data = NULL;
@@ -456,7 +457,7 @@ int main(int argc, char* argv[])
 
 						int flags = atoi(result);
 
-						running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0));
+						running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown-- <= 0));
 					}
 
 					if (running) {

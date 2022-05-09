@@ -541,6 +541,7 @@ namespace RF2SHMSpotter {
 
 		public void Run() {
 			bool running = false;
+			int countdown = 4000;
 
 			while (true) {
 				if (!connected)
@@ -560,7 +561,7 @@ namespace RF2SHMSpotter {
 
 					if (connected) {
 						if (!running)
-							if (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)
+							if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
 								running = true;
 
 						if (running)

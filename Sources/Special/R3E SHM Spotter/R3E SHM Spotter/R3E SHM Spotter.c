@@ -484,6 +484,7 @@ int main()
     BOOL mapped_r3e = FALSE;
 	int playerID = 0;
 	BOOL running = FALSE;
+	int countdown = 4000;
 
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
@@ -494,7 +495,7 @@ int main()
 			}
 
 		if (mapped_r3e && !running)
-			running = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
+			running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));
 
 		if (running) {
 			if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {

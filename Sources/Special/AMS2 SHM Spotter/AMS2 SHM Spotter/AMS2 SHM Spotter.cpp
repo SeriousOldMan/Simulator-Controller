@@ -401,6 +401,8 @@ int main(int argc, char* argv[]) {
 
 		bool running = false;
 
+		int countdown = 4000;
+
 		while (true)
 		{
 			if (sharedData->mSequenceNumber % 2)
@@ -422,7 +424,7 @@ int main(int argc, char* argv[]) {
 			}
 			
 			if (!running)
-				running = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
+				running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
 
 			if (running) {
 				if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {

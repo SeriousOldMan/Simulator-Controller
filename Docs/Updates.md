@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.1.4
 
-A new information request action "FuelRemaining" has been added to the "Race Engineer" plugin and all simulator plugins. You may bind this to a button on your hardware controller.
+A new information request action "FuelRemaining" has been added to the "Race Engineer" plugin and all simulator plugins. You might want to configure this to a button on your hardware controller. All other changes will be handled automatically.
 
 ***
 

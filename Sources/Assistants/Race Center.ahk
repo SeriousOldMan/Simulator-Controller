@@ -1248,7 +1248,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui %window%:Add, Edit, x521 yp w40 vsetupTrackTemperatureEdit gupdateSetup, % ""
 		Gui %window%:Add, UpDown, x523 yp w18 h20
-		Gui %window%:Add, Text, x563 yp w90 h23 +0x200, % translate("A / T")
+		Gui %window%:Add, Text, x563 yp w35 h23 +0x200, % translate("A / T")
 		
 		choices := map(kQualifiedTyreCompounds, "translate")
 		

@@ -822,6 +822,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			userSetups := userSetups[setupType]
 			
+			Gui ListView, % this.SetupListView
+			
 			for ignore, name in userSetups
 				LV_Add("", translate("Local"), name)
 			
@@ -863,6 +865,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				value := setting.Value
 			
 			this.iSettings.Push(Array(setting.Section, setting.Key))
+		
+			Gui ListView, % this.SettingsListView
 			
 			LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
 		}
@@ -876,6 +880,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	selectSettings(load := true) {
+		window := this.Window
+	
+		Gui %window%:Default
+		
 		Gui ListView, % this.DataListView
 			
 		LV_Delete()
@@ -923,6 +931,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case "Weather":
 						reference := (translate("Weather: ") . translate(this.SelectedWeather))
 				}
+		
+				Gui ListView, % this.DataListView
 				
 				LV_Add("", reference, count)
 			}
@@ -937,6 +947,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	selectSetups() {
+		window := this.Window
+	
+		Gui %window%:Default
+		
 		Gui ListView, % this.DataListView
 			
 		LV_Delete()
@@ -967,6 +981,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 	
 	selectPressures() {
+		window := this.Window
+	
+		Gui %window%:Default
+		
 		Gui ListView, % this.DataListView
 			
 		LV_Delete()
@@ -1059,7 +1077,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			Gui %window%:Default
 			
-			Gui ListView, % this.SettingListView
+			Gui ListView, % this.SettingsListView
 			
 			selected := LV_GetNext(0)
 			
@@ -1076,7 +1094,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			Gui %window%:Default
 			
-			Gui ListView, % this.SettingListView
+			Gui ListView, % this.SettingsListView
 			
 			selected := LV_GetNext(0)
 			

@@ -19,7 +19,7 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Update", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter"]
+global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Update", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -748,8 +748,6 @@ checkForUpdates() {
 			if version {
 				version := StrSplit(version, "-", , 2)
 				current := StrSplit(kVersion, "-", , 2)
-				
-				dottedVersion := version[1]
 				
 				versionPostfix := version[2]
 				currentPostfix := current[2]

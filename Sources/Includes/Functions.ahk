@@ -19,7 +19,9 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Update", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
+global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
+
+global kForegroundApps = ["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -667,7 +669,7 @@ checkForNews() {
 	if vDetachedInstallation
 		return
 	
-	if !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1]) {
+	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
 		
 		if !check {
@@ -718,7 +720,7 @@ checkForUpdates() {
 	if vDetachedInstallation
 		return
 	
-	if !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1]) {
+	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kUserConfigDirectory . "VERSION")
 		
 		if !check {
@@ -797,7 +799,7 @@ checkForUpdates() {
 		writeConfiguration(userToolTargetsFile, userToolTargets)
 	}
 	
-	if (!inList(A_Args, "-NoUpdate") && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
+	if (!inList(A_Args, "-NoUpdate") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
 		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:		
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())

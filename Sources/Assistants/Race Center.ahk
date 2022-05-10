@@ -1502,6 +1502,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 	
 	createDriver(driver) {
+		if !driver.HasKey("Identifier")
+			driver["Identifier"] := false
+		
 		for ignore, candidate in this.Drivers
 			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
 				return candidate
@@ -1771,7 +1774,7 @@ class RaceCenter extends ConfigurationItem {
 		
 		Gui ListView, % this.SetupsListView
 			
-		if (this.Drivers.Length() > 0) {
+		if (this.SessionDrivers.Count() > 0) {
 			GuiControl Choose, setupDriverDropDownMenu, 1
 
 			setupAirTemperatureEdit := 23
@@ -1792,7 +1795,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl, , setupBasePressureRLEdit, %setupBasePressureRLEdit%
 			GuiControl, , setupBasePressureRREdit, %setupBasePressureRREdit%
 			
-			LV_Add("Select Vis", this.Drivers[1]
+			LV_Add("Select Vis", getKeys(this.SessionDrivers)[1]
 							   , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit . ", " . setupTrackTemperatureEdit . translate(")")
 							   , translate("Dry")
 							   , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
@@ -2303,9 +2306,16 @@ class RaceCenter extends ConfigurationItem {
 			if (stint = stintNr) {
 				LV_GetText(driver, A_Index, 2)
 				
-				for ignore, candidate in this.Drivers
-					if (driver = candidate.FullName)
-						return candidate
+				for ignore, candidate in getKeys(this.SessionDrivers)
+					if (driver = candidate) {
+						forName := ""
+						surName := ""
+						nickName := ""
+						
+						parseDriverName(candidate, forName, surName, nickName)
+						
+						return this.createDriver({Forname: forName, Surname: surName, Nickname: nickName, Identifier: this.SessionDrivers[candidate]})
+					}
 			}
 		}
 		
@@ -2378,18 +2388,18 @@ class RaceCenter extends ConfigurationItem {
 				currentDelta := (((airTemperature - currentDriverSetup["Temperature.Air"]) * correctionAir)
 							   + ((trackTemperature - currentDriverSetup["Temperature.Track"]) * correctionTrack))
 			
-				currentBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + currentDelta)
-				currentBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + currentDelta)
-				currentBasePressureRL := (setup["Tyre.Pressure.Rear.Left"] + currentDelta)
-				currentBasePressureRR := (setup["Tyre.Pressure.Rear.Right"] + currentDelta)
+				currentBasePressureFL := (currentDriverSetup["Tyre.Pressure.Front.Left"] + currentDelta)
+				currentBasePressureFR := (currentDriverSetup["Tyre.Pressure.Front.Right"] + currentDelta)
+				currentBasePressureRL := (currentDriverSetup["Tyre.Pressure.Rear.Left"] + currentDelta)
+				currentBasePressureRR := (currentDriverSetup["Tyre.Pressure.Rear.Right"] + currentDelta)
 				
 				nextDelta := (((airTemperature - nextDriverSetup["Temperature.Air"]) * correctionAir)
 							+ ((trackTemperature - nextDriverSetup["Temperature.Track"]) * correctionTrack))
 			
-				nextBasePressureFL := (setup["Tyre.Pressure.Front.Left"] + nextDelta)
-				nextBasePressureFR := (setup["Tyre.Pressure.Front.Right"] + nextDelta)
-				nextBasePressureRL := (setup["Tyre.Pressure.Rear.Left"] + nextDelta)
-				nextBasePressureRR := (setup["Tyre.Pressure.Rear.Right"] + nextDelta)
+				nextBasePressureFL := (nextDriverSetup["Tyre.Pressure.Front.Left"] + nextDelta)
+				nextBasePressureFR := (nextDriverSetup["Tyre.Pressure.Front.Right"] + nextDelta)
+				nextBasePressureRL := (nextDriverSetup["Tyre.Pressure.Rear.Left"] + nextDelta)
+				nextBasePressureRR := (nextDriverSetup["Tyre.Pressure.Rear.Right"] + nextDelta)
 			
 				deltaFL := (nextBasePressureFL - currentBasePressureFL)
 				deltaFR := (nextBasePressureFR - currentBasePressureFR)
@@ -7705,6 +7715,22 @@ parseObject(properties) {
 	return result
 }
 
+parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
+	if InStr(fullName, "(") {
+		fullName := StrSplit(fullName, "(", " `t", 2)
+		
+		nickName := Trim(StrReplace(fullName[2], ")", ""))
+		fullName := fullName[1]
+	}
+	else
+		nickName := ""
+	
+	fullName := StrSplit(fullName, A_Space, " `t", 2)
+	
+	forName := fullName[1]
+	surName := fullName[2]
+}
+
 computeDriverName(forName, surName, nickName) {
 	name := ""
 	
@@ -7909,7 +7935,7 @@ updateTime() {
 addSetup() {
 	rCenter := RaceCenter.Instance
 	
-	if (rCenter.Drivers.Length() > 0)
+	if (rCenter.SessionDrivers.Count() > 0)
 		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addSetup"))
 	else {
 		title := translate("Information")

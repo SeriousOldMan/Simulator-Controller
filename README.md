@@ -63,7 +63,7 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 ### Discord Community
 
-If you want to become a part of the small and very young Community for Simulator Controller on Discord, please use [this invitation](https://discord.gg/5N8JrNr48H)...
+If you want to become a part of the small and very young Community for Simulator Controller on Discord. Here you will also find a growing collection of video tutorials for different parts of the software suite. Please use [this invitation](https://discord.gg/5N8JrNr48H) to join the Discord Server.
 
 ### Main features
 

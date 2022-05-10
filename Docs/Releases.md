@@ -10,7 +10,7 @@
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
   9. New preset for "Simulator Setup" to always enable Team Server.
   10. Fixed Spotter not starting in AMS2 after the formation lap.
-  11. Base setups can be configured for each participating driver in "Race Center". This information is used to adjust tyre pressures, when the driver changes for the next stint. See the [new documentation](*) for more information.
+  11. Base setups can be configured for each participating driver in "Race Center". This information is used to adjust tyre pressures, when the driver changes for the next stint. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures) for more information.
   12. New settings in "Session Database" to specifiy tyre pressure correction values for changes in ambient and track temperatures.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-414) and check whether any manual updates to your local configuration might be necessary.

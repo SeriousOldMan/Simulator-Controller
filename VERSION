@@ -1,9 +1,9 @@
 [Development]
-Version=4.1.4-dev
+Version=4.1.4-alpha
 Target=4.1.4-release
-Date=05/10/2022
-Download=https://www.dropbox.com/s/jxa0yp5b3eoo6j7/Simulator%20Controller%204.1.4-dev.zip?dl=1
-Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster due to caching of the generated sound files, Session Database location is now configurable, Jona can be asked about the amount of fuel remaining, New *InformationRequest* action *FuelRemaining* for all simulators and the "Race Engineer" plugin, Larger window sizes for "Strategy Workbench" and "Race Center", Handling of driver specific car setups in "Race Center", Fixed Spotter not starting in AMS2 after the formation lap, Settings for temperature based tyre pressure correction
+Date=05/11/2022
+Download=https://www.dropbox.com/s/tl4cuxyrl4zc51m/Simulator%20Controller%204.1.4-alpha.zip?dl=1
+Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster due to caching of the generated sound files, Session Database location is now configurable, Jona can be asked about the amount of fuel remaining, New *InformationRequest* action *FuelRemaining* for all simulators and the "Race Engineer" plugin, Larger window sizes for "Strategy Workbench" and "Race Center", Handling of driver specific car setups in "Race Center", Fixed Spotter not starting in AMS2 after the formation lap, Settings for temperature based tyre pressure correction, New special rules for additional cars in "Setup Advisor"
 [Release]
 Version=4.1.2-release
 Date=05/06/2022
@@ -13,4 +13,4 @@ Changes=Support track choices in "Setup Advisor", Improved responsiveness for vo
 Type=Development
 [Version]
 Release=4.1.2-release
-Development=4.1.4-dev
+Development=4.1.4-alpha

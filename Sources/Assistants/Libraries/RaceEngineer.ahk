@@ -1260,7 +1260,19 @@ class RaceEngineer extends RaceAssistant {
 	}
 	
 	supportsPitstop() {
-		return ((this.Session == kSessionRace) && this.RemoteHandler)
+		if this.RemoteHandler
+			switch this.Session {
+				case kSessionPractice:
+					return getConfigurationValue(this.Settings, "Session Settings", "Pitstop.Practice", false)
+				case kSessionQualification:
+					return getConfigurationValue(this.Settings, "Session Settings", "Pitstop.Qualification", false)
+				case kSessionRace:
+					return getConfigurationValue(this.Settings, "Session Settings", "Pitstop.Race", true)
+				default:
+					return false
+			}
+		else
+			return false
 	}
 	
 	requestInformation(category, arguments*) {

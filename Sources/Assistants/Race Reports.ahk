@@ -414,6 +414,20 @@ class RaceReports extends ConfigurationItem {
 		return result
 	}
 	
+	getReports(simulator, car, track) {
+		reports := []
+		
+		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+		{
+			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+			
+			if ((getConfigurationValue(raceData, "Session", "Car") = car) && (getConfigurationValue(raceData, "Session", "Track") = track))
+				reports.Push(A_LoopFilePath)
+		}
+		
+		return reports
+	}
+	
 	loadSimulator(simulator, force := false) {
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -481,15 +495,16 @@ class RaceReports extends ConfigurationItem {
 			LV_Delete()
 				
 			if track {
-				Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
-				{
-					FormatTime date, %A_LoopFileName%, ShortDate
-					FormatTime time, %A_LoopFileName%, HH:mm
+				for ignore, report in this.getReports(simulator, this.SelectedCar, track) {
+					SplitPath report, fileName
+				
+					FormatTime date, %fileName%, ShortDate
+					FormatTime time, %fileName%, HH:mm
 					
-					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+					raceData := readConfiguration(report . "\Race.data")
 					
 					if ((getConfigurationValue(raceData, "Session", "Car") = this.SelectedCar) && (getConfigurationValue(raceData, "Session", "Track") = track)) {
-						this.AvailableRaces.Push(A_LoopFileName)
+						this.AvailableRaces.Push(fileName)
 						
 						LV_Add("", date, time, Round(getConfigurationValue(raceData, "Session", "Duration") / 60), getConfigurationValue(raceData, "Cars", "Count"))
 					}
@@ -543,7 +558,12 @@ class RaceReports extends ConfigurationItem {
 			
 			FileRemoveDir %raceDirectory%, true
 		
-			this.loadTrack(this.SelectedTrack, true)
+			if (this.getReports(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).Length() > 0)
+				this.loadTrack(this.SelectedTrack, true)
+			else if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
+				this.loadCar(this.SelectedCar, true)
+			else
+				this.loadSimulator(this.SelectedSimulator, true)
 		}
 	}
 	

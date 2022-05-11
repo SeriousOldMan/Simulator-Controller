@@ -855,7 +855,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
 																 , this.SelectedTrack["*"], this.SelectedWeather["*"]
 																 , false, false) {
-			type := this.getSettingType(setting.Section, setting.Key)
+			type := this.getSettingType(setting.Section, setting.Key, ignore)
 			
 			if IsObject(type)
 				value := translate(setting.Value)
@@ -1088,7 +1088,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return getConfigurationValue(vSettingDescriptors, section . ".Labels", key, "")
 	}
 	
-	getSettingType(section := false, key := false) {
+	getSettingType(section := false, key := false, ByRef default := false) {
 		if !section {
 			window := this.Window
 			
@@ -1104,8 +1104,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		type := getConfigurationValue(vSettingDescriptors, section . ".Types", key, "Text")
 		
+		type := string2Values(";", type)
+		
+		default := type[2]
+		type := type[1]
+		
 		if InStr(type, "Choices:")
 			type := string2Values(",", string2Values(":", type)[2])
+		
+		if (default = kTrue)
+			default := true
+		else if (default = kFalse)
+			default := false
 		
 		return type
 	}
@@ -1158,7 +1168,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		this.iSettings.Push(Array(section, key))
 		
-		LV_Add("Select Vis", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key)) ? translate(value) : value)
+		LV_Add("Select Vis", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
 		
 		LV_ModifyCol()
 		
@@ -1208,7 +1218,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		selected := LV_GetNext(0)
 		
-		type := this.getSettingType(section, key)
+		type := this.getSettingType(section, key, ignore)
 	
 		if IsObject(type)
 			display := translate(value)
@@ -1741,7 +1751,7 @@ chooseSetting() {
 	GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 	GuiControl Choose, settingDropDown, % inList(labels, setting)
 	
-	type := editor.getSettingType(section, key)
+	type := editor.getSettingType(section, key, ignore)
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
@@ -1802,7 +1812,7 @@ addSetting() {
 	GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 	GuiControl Choose, settingDropDown, 1
 	
-	type := editor.getSettingType(settings[1][1], settings[1][2])
+	type := editor.getSettingType(settings[1][1], settings[1][2], default)
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
@@ -1813,9 +1823,9 @@ addSetting() {
 		labels := map(type, "translate")
 		
 		GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingValueDropDown, 1
+		GuiControl Choose, settingValueDropDown, % inList(type, default)
 		
-		value := type[1]
+		value := default
 	}
 	else if (type = "Boolean") {
 		GuiControl Hide, settingValueDropDown
@@ -1823,7 +1833,9 @@ addSetting() {
 		GuiControl Show, settingValueCheck
 		GuiControl Enable, settingValueCheck
 		
-		GuiControl, , settingValueCheck, 1
+		GuiControl, , settingValueCheck, %default%
+		
+		value := default
 	}
 	else {
 		GuiControl Hide, settingValueDropDown
@@ -1831,12 +1843,16 @@ addSetting() {
 		GuiControl Show, settingValueEdit
 		GuiControl Enable, settingValueEdit
 		
+		/*
 		if (type = "Float")
 			value := 0.0
 		else if (type = "Integer")
 			value := 0
 		else if (type = "Text")
 			value := ""
+		*/
+		
+		value := default
 		
 		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
@@ -1904,7 +1920,7 @@ selectSetting() {
 			break
 		}
 	
-	type := editor.getSettingType(section, key)
+	type := editor.getSettingType(section, key, default)
 	
 	if IsObject(type) {
 		GuiControl Hide, settingValueEdit
@@ -1915,9 +1931,9 @@ selectSetting() {
 		labels := map(type, "translate")
 		
 		GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingValueDropDown, 1
+		GuiControl Choose, settingValueDropDown, % inList(type, default)
 		
-		value := type[1]
+		value := default
 	}
 	else if (type = "Boolean") {
 		GuiControl Hide, settingValueDropDown
@@ -1925,9 +1941,9 @@ selectSetting() {
 		GuiControl Show, settingValueCheck
 		GuiControl Enable, settingValueCheck
 		
-		GuiControl, , settingValueCheck, % true
+		GuiControl, , settingValueCheck, %default%
 		
-		value := true
+		value := default
 	}
 	else {
 		GuiControl Hide, settingValueDropDown
@@ -1935,12 +1951,16 @@ selectSetting() {
 		GuiControl Show, settingValueEdit
 		GuiControl Enable, settingValueEdit
 		
+		/*
 		if (type = "Float")
 			value := 0.0
 		else if (type = "Integer")
 			value := 0
 		else if (type = "Text")
 			value := ""
+		*/
+		
+		value := default
 		
 		settingValueEdit := value
 		GuiControl, , settingValueEdit, %value%
@@ -1977,7 +1997,7 @@ changeSetting() {
 			break
 		}
 	
-	type := editor.getSettingType(section, key)
+	type := editor.getSettingType(section, key, ignore)
 	
 	if IsObject(type) {
 		GuiControlGet settingValueDropDown

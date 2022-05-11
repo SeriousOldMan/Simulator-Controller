@@ -5,13 +5,15 @@
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings are much faster now due to caching of the generated sound files.
   5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location) for more information.
-  6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is rmemaining?".
-  7. New *InformationRequest* action *FuelRemaining* for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
+  6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
+  7. The same can be achieved using the new *InformationRequest* action *FuelRemaining*, which is available for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).
   9. New preset for "Simulator Setup" to always enable Team Server.
   10. Fixed Spotter not starting in AMS2 after the formation lap.
   11. Base setups can be configured for each participating driver in "Race Center". This information is used to adjust tyre pressures, when the driver changes for the next stint. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures) for more information.
   12. New settings in "Session Database" to specifiy tyre pressure correction values for changes in ambient and track temperatures.
+  13. Track specific fuel capacity will be saved to the session database by the Race Engineer at the end of the session, when saving settings is configured.
+  14. Additional car specific rules in "Setup Advisor".
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-414) and check whether any manual updates to your local configuration might be necessary.
 

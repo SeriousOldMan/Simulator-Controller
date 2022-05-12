@@ -605,7 +605,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (((sessionState == kSessionRace) || (theAction.Action = "InformationRequest")) && (this.RaceAssistant != false)) {
+				if (this.RaceAssistant != false) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}

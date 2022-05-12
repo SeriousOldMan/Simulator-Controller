@@ -27,7 +27,8 @@ global kAssistantMode = "Assistant"
 global kSessionStates = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
 global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
 
-global kAssistantRaceActions = ["PitstopRecommend", "PitstopPlan", "PitstopPrepare", "StrategyCancel", "Accept", "Reject"]
+global kAssistantAnswerActions = ["Accept", "Reject"]
+global kAssistantRaceActions = ["PitstopPlan", "PitstopPrepare", "PitstopRecommend", "StrategyCancel"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -65,25 +66,17 @@ class AssistantMode extends ControllerMode {
 		
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantAction)
-				if inList(kAssistantRaceActions, theAction.Action) {
-					if (sessionState == kSessionRace) {
-						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label)
-					}
-					else {
-						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label, "Gray")
-					}
+				if inList(kAssistantAnswerActions, theAction.Action) {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setLabel(theAction.Label)
 				}
-				else if (theAction.Action = "InformationRequest") {
-					if inList([kSessionPractice, kSessionRace], sessionState) {
-						theAction.Function.enable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label)
-					}
-					else {
-						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(theAction.Label, "Gray")
-					}
+				else if inList([kSessionPractice, kSessionRace], sessionState) {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setLabel(theAction.Label)
+				}
+				else {
+					theAction.Function.disable(kAllTrigger, theAction)
+					theAction.Function.setLabel(theAction.Label, "Gray")
 				}
 	}
 }
@@ -249,7 +242,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		
 			theAction := arguments[1]
 			
-			if (inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
+			if (inList(kAssistantAnswerActions, theAction) || inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
 				this.createRaceAssistantAction(controller, arguments*)
 			else
 				this.createPitstopAction(controller, arguments*)
@@ -649,6 +642,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceEngineer.accept()
 		else if this.RaceStrategist
 			this.RaceStrategist.accept()
+		else if this.RaceSpotter
+			this.RaceSpotter.accept()
 	}
 	
 	reject() {
@@ -656,6 +651,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceEngineer.reject()
 		else if this.RaceStrategist
 			this.RaceStrategist.reject()
+		else if this.RaceSpotter
+			this.RaceSpotter.reject()
 	}
 	
 	recommendPitstop() {

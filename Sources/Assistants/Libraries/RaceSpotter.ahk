@@ -532,6 +532,12 @@ class RaceSpotter extends RaceAssistant {
 		return this.VoiceAssistant.getSpeaker(fast)
 	}
 	
+	updateOpponentReported(positionType, car, reported) {
+		for ignore, positionInfos in this.PositionInfos
+			if (positionInfos.HasKey(positionType) && (positionInfos[positionType].Car = car))
+				positionInfos[positionType].Reported := reported
+	}
+	
 	updateOpponentInfo(positionInfos, positionType, opponentType, driverLapTime, car, delta) {
 		local knowledgeBase := this.KnowledgeBase
 		
@@ -675,8 +681,8 @@ class RaceSpotter extends RaceAssistant {
 						speaker.speakPhrase("LapDownDriver")
 					else if (positionInfos["TrackFront"].OpponentType = "LapUp")
 						speaker.speakPhrase("LapUpDriver")
-					
-					positionInfos["TrackFront"].Reported := true
+	
+					this.updateOpponentReported("TrackFront", positionInfos["TrackFront"].Car, true)
 				}
 			}
 			else if (positionInfos.HasKey("StandingsFront") && positionInfos["StandingsFront"].hasGained(0.3)) {
@@ -690,9 +696,9 @@ class RaceSpotter extends RaceAssistant {
 													 , gained: Round(Abs(deltaDifference), 1)
 													 , lapTime: Round(lapTimeDifference, 1)})
 						
-						if !positionInfos["StandingsFront"].HasKey("RatedDriver") {
-							car := positionInfos["StandingsFront"].Car
+						car := positionInfos["StandingsFront"].Car
 							
+						if !positionInfos["StandingsFront"].HasKey("RatedDriver") {
 							if knowledgeBase.getValue("Car." . car . ".Incidents", false)
 								speaker.speakPhrase("UnsafeDriver")
 							else if ((knowledgeBase.getValue("Lap", 0) - knowledgeBase.getValue("Car." . car . ".ValidLaps", 0)) > 3)
@@ -701,7 +707,7 @@ class RaceSpotter extends RaceAssistant {
 							positionInfos["StandingsFront"].RatedDriver := true
 						}
 						
-						positionInfos["StandingsFront"].Reported := true
+						this.updateOpponentReported("StandingsFront", car, true)
 						
 						informed := true
 				
@@ -741,7 +747,7 @@ class RaceSpotter extends RaceAssistant {
 														, lost: Round(Abs(deltaDifference), 1)
 														, lapTime: Round(lapTimeDifference, 1)})
 						
-						positionInfos["StandingsBehind"].Reported := true
+						this.updateOpponentReported("StandingsBehind", positionInfos["StandingsBehind"].Car, true)
 					}
 				
 					positionInfos["StandingsBehind"].recalibrate()

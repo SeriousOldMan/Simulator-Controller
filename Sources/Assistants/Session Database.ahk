@@ -641,63 +641,70 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Font, settingsTab3
 				GuiControl Choose, settingsTab, 3
 		}
+
+		defaultListView := A_DefaultListView
 		
-		Gui ListView, % this.SetupListView
-		
-		selected := LV_GetNext(0)
-		
-		if selected {
-			LV_GetText(type, selected, 1)
+		try {
+			Gui ListView, % this.SetupListView
 			
-			GuiControl Enable, downloadSetupButton
+			selected := LV_GetNext(0)
 			
-			if (type = translate("Local")) {
-				GuiControl Enable, deleteSetupButton
-				GuiControl Enable, renameSetupButton
+			if selected {
+				LV_GetText(type, selected, 1)
+				
+				GuiControl Enable, downloadSetupButton
+				
+				if (type = translate("Local")) {
+					GuiControl Enable, deleteSetupButton
+					GuiControl Enable, renameSetupButton
+				}
+				else {
+					GuiControl Disable, deleteSetupButton
+					GuiControl Disable, renameSetupButton
+				}
 			}
 			else {
+				GuiControl Disable, downloadSetupButton
 				GuiControl Disable, deleteSetupButton
 				GuiControl Disable, renameSetupButton
 			}
-		}
-		else {
-			GuiControl Disable, downloadSetupButton
-			GuiControl Disable, deleteSetupButton
-			GuiControl Disable, renameSetupButton
-		}
-		
-		Gui ListView, % this.SettingsListView
-		
-		selected := LV_GetNext(0)
-		
-		if selected {
-			GuiControl Enable, deleteSettingButton
-			GuiControl Enable, settingDropDown
-			GuiControl Enable, settingValueDropDown
-			GuiControl Enable, settingValueEdit
-			GuiControl Enable, settingValueCheck
-		}
-		else {
-			GuiControl Disable, deleteSettingButton
-			GuiControl Disable, settingDropDown
-			GuiControl Hide, settingValueDropDown
-			GuiControl Disable, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Disable, settingValueCheck
-			GuiControl Show, settingValueEdit
-			GuiControl Disable, settingValueEdit
 			
-			GuiControl Choose, settingDropDown, 0
-			GuiControl Choose, settingValueDropDown, 0
+			Gui ListView, % this.SettingsListView
 			
-			settingValueEdit := ""
-			GuiControl, , settingValueEdit, %settingValueEdit%
+			selected := LV_GetNext(0)
+			
+			if selected {
+				GuiControl Enable, deleteSettingButton
+				GuiControl Enable, settingDropDown
+				GuiControl Enable, settingValueDropDown
+				GuiControl Enable, settingValueEdit
+				GuiControl Enable, settingValueCheck
+			}
+			else {
+				GuiControl Disable, deleteSettingButton
+				GuiControl Disable, settingDropDown
+				GuiControl Hide, settingValueDropDown
+				GuiControl Disable, settingValueDropDown
+				GuiControl Hide, settingValueCheck
+				GuiControl Disable, settingValueCheck
+				GuiControl Show, settingValueEdit
+				GuiControl Disable, settingValueEdit
+				
+				GuiControl Choose, settingDropDown, 0
+				GuiControl Choose, settingValueDropDown, 0
+				
+				settingValueEdit := ""
+				GuiControl, , settingValueEdit, %settingValueEdit%
+			}
+			
+			if (this.getAvailableSettings().Length() == 0)
+				GuiControl Disable, addSettingButton
+			else
+				GuiControl Enable, addSettingButton
 		}
-		
-		if (this.getAvailableSettings().Length() == 0)
-			GuiControl Disable, addSettingButton
-		else
-			GuiControl Enable, addSettingButton
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	loadSimulator(simulator, force := false) {
@@ -807,37 +814,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 			Gui %window%:Default
 			
-			Gui ListView, % this.SetupListView
-			
-			LV_Delete()
-
-			this.SelectedSetupType := setupType
-			
-			GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
-
-			userSetups := true
-			communitySetups := this.UseCommunity
-			
-			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
-			
-			userSetups := userSetups[setupType]
-			
-			Gui ListView, % this.SetupListView
-			
-			for ignore, name in userSetups
-				LV_Add("", translate("Local"), name)
-			
-			if communitySetups
-				for ignore, name in communitySetups[setupType]
-					if !inList(userSetups, name)
-						LV_Add("", translate("Community"), name)
-			
-			LV_ModifyCol()
-			
-			Loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
+			defaultListView := A_DefaultListView
 		
-			this.updateState()
+			try {
+				Gui ListView, % this.SetupListView
+				
+				LV_Delete()
+
+				this.SelectedSetupType := setupType
+				
+				GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
+
+				userSetups := true
+				communitySetups := this.UseCommunity
+				
+				this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
+				
+				userSetups := userSetups[setupType]
+				
+				Gui ListView, % this.SetupListView
+				
+				for ignore, name in userSetups
+					LV_Add("", translate("Local"), name)
+				
+				if communitySetups
+					for ignore, name in communitySetups[setupType]
+						if !inList(userSetups, name)
+							LV_Add("", translate("Community"), name)
+				
+				LV_ModifyCol()
+				
+				Loop 2
+					LV_ModifyCol(A_Index, "AutoHdr")
+			
+				this.updateState()
+			}
+			finally {
+				Gui ListView, %defaultListView%
+			}
 		}
 	}
 	
@@ -845,38 +859,45 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window := this.Window
 	
 		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
 		
-		Gui ListView, % this.SettingsListView
-		
-		LV_Delete()
-		
-		this.iSettings := []
-		
-		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																 , this.SelectedTrack["*"], this.SelectedWeather["*"]
-																 , false, false) {
-			type := this.getSettingType(setting.Section, setting.Key, ignore)
-			
-			if IsObject(type)
-				value := translate(setting.Value)
-			else if (type = "Boolean")
-				value := (setting.Value ? "x" : "")
-			else
-				value := setting.Value
-			
-			this.iSettings.Push(Array(setting.Section, setting.Key))
-		
+		try {
 			Gui ListView, % this.SettingsListView
 			
-			LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
+			LV_Delete()
+			
+			this.iSettings := []
+			
+			for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
+																	 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+																	 , false, false) {
+				type := this.getSettingType(setting.Section, setting.Key, ignore)
+				
+				if IsObject(type)
+					value := translate(setting.Value)
+				else if (type = "Boolean")
+					value := (setting.Value ? "x" : "")
+				else
+					value := setting.Value
+				
+				this.iSettings.Push(Array(setting.Section, setting.Key))
+			
+				Gui ListView, % this.SettingsListView
+				
+				LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
+			}
+			
+			LV_ModifyCol()
+			
+			Loop 3
+				LV_ModifyCol(A_Index, "AutoHdr")
+		
+			this.updateState()
 		}
-		
-		LV_ModifyCol()
-		
-		Loop 3
-			LV_ModifyCol(A_Index, "AutoHdr")
-	
-		this.updateState()
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	selectSettings(load := true) {
@@ -884,69 +905,76 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
-		Gui ListView, % this.DataListView
-			
-		LV_Delete()
+		defaultListView := A_DefaultListView
 		
-		while LV_DeleteCol(1)
-			ignore := 1
-		
-		for ignore, column in map(["Reference", "#"], "translate") {
+		try {
 			Gui ListView, % this.DataListView
+				
+			LV_Delete()
 			
-			LV_InsertCol(A_Index, "", column)
-		}
-		
-		references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
-							  
-		for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																 , this.SelectedTrack["*"], this.SelectedWeather["*"]
-																 , true, false) {
-			if (setting.Car != "*")
-				references.Car += 1
-			else
-				references.AllCar += 1
+			while LV_DeleteCol(1)
+				ignore := 1
 			
-			if (setting.Track != "*")
-				references.Track += 1
-			else
-				references.AllTrack += 1
-			
-			if (setting.Weather != "*")
-				references.Weather += 1
-			else
-				references.AllWeather += 1
-		}
-		
-		for reference, count in references
-			if (count > 0) {
-				switch reference {
-					case "AllCar":
-						reference := (translate("Car: ") . translate("All"))
-					case "AllTrack":
-						reference := (translate("Track: ") . translate("All"))
-					case "AllWeather":
-						reference := (translate("Weather: ") . translate("All"))
-					case "Car":
-						reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
-					case "Track":
-						reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
-					case "Weather":
-						reference := (translate("Weather: ") . translate(this.SelectedWeather))
-				}
-		
+			for ignore, column in map(["Reference", "#"], "translate") {
 				Gui ListView, % this.DataListView
 				
-				LV_Add("", reference, count)
+				LV_InsertCol(A_Index, "", column)
 			}
-		
-		LV_ModifyCol()
-		
-		Loop 2
-			LV_ModifyCol(A_Index, "AutoHdr")
-		
-		if load
-			this.loadSettings()
+			
+			references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
+								  
+			for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
+																	 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+																	 , true, false) {
+				if (setting.Car != "*")
+					references.Car += 1
+				else
+					references.AllCar += 1
+				
+				if (setting.Track != "*")
+					references.Track += 1
+				else
+					references.AllTrack += 1
+				
+				if (setting.Weather != "*")
+					references.Weather += 1
+				else
+					references.AllWeather += 1
+			}
+			
+			for reference, count in references
+				if (count > 0) {
+					switch reference {
+						case "AllCar":
+							reference := (translate("Car: ") . translate("All"))
+						case "AllTrack":
+							reference := (translate("Track: ") . translate("All"))
+						case "AllWeather":
+							reference := (translate("Weather: ") . translate("All"))
+						case "Car":
+							reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
+						case "Track":
+							reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
+						case "Weather":
+							reference := (translate("Weather: ") . translate(this.SelectedWeather))
+					}
+			
+					Gui ListView, % this.DataListView
+					
+					LV_Add("", reference, count)
+				}
+			
+			LV_ModifyCol()
+			
+			Loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+			
+			if load
+				this.loadSettings()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	selectSetups() {
@@ -954,33 +982,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
-		Gui ListView, % this.DataListView
+		defaultListView := A_DefaultListView
+		
+		try {
+			Gui ListView, % this.DataListView
 			
-		LV_Delete()
+			LV_Delete()
+			
+			while LV_DeleteCol(1)
+				ignore := 1
+			
+			for ignore, column in map(["Source", "Type", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
+			
+			userSetups := true
+			communitySetups := true
+			
+			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
+			
+			for type, setups in userSetups
+				LV_Add("", translate("Local"), translate(kSetupNames[type]), setups.Length())
+			
+			for type, setups in communitySetups
+				LV_Add("", translate("Community"), translate(kSetupNames[type]), setups.Length())
 		
-		while LV_DeleteCol(1)
-			ignore := 1
-		
-		for ignore, column in map(["Source", "Type", "#"], "translate")
-			LV_InsertCol(A_Index, "", column)
-		
-		userSetups := true
-		communitySetups := true
-		
-		this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
-		
-		for type, setups in userSetups
-			LV_Add("", translate("Local"), translate(kSetupNames[type]), setups.Length())
-		
-		for type, setups in communitySetups
-			LV_Add("", translate("Community"), translate(kSetupNames[type]), setups.Length())
-	
-		LV_ModifyCol()
-		
-		Loop 3
-			LV_ModifyCol(A_Index, "AutoHdr")
-		
-		this.loadSetups(this.SelectedSetupType, true)
+			LV_ModifyCol()
+			
+			Loop 3
+				LV_ModifyCol(A_Index, "AutoHdr")
+			
+			this.loadSetups(this.SelectedSetupType, true)
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	selectPressures() {
@@ -988,27 +1023,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	
 		Gui %window%:Default
 		
-		Gui ListView, % this.DataListView
+		defaultListView := A_DefaultListView
+		
+		try {
+			Gui ListView, % this.DataListView
 			
-		LV_Delete()
+			LV_Delete()
+			
+			while LV_DeleteCol(1)
+				ignore := 1
+			
+			for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
+			
+			for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
+																			 , this.SelectedTrack, this.SelectedWeather)
+				LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
+						 , translate(info.Compound), info.Count)
 		
-		while LV_DeleteCol(1)
-			ignore := 1
-		
-		for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
-			LV_InsertCol(A_Index, "", column)
-		
-		for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
-																		 , this.SelectedTrack, this.SelectedWeather)
-			LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
-					 , translate(info.Compound), info.Count)
-	
-		LV_ModifyCol()
-		
-		Loop 6
-			LV_ModifyCol(A_Index, "AutoHdr")
-		
-		this.loadPressures()
+			LV_ModifyCol()
+			
+			Loop 6
+				LV_ModifyCol(A_Index, "AutoHdr")
+			
+			this.loadPressures()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	moduleAvailable(module) {
@@ -1080,12 +1122,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			Gui %window%:Default
 			
-			Gui ListView, % this.SettingsListView
+			defaultListView := A_DefaultListView
+		
+			try {
+				Gui ListView, % this.SettingsListView
 			
-			selected := LV_GetNext(0)
-			
-			section := this.iSettings[selected][1]
-			key := this.iSettings[selected][2]
+				selected := LV_GetNext(0)
+				
+				section := this.iSettings[selected][1]
+				key := this.iSettings[selected][2]
+			}
+			finally {
+				Gui ListView, %defaultListView%
+			}
 		}
 		
 		return getConfigurationValue(vSettingDescriptors, section . ".Labels", key, "")
@@ -1097,12 +1146,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			
 			Gui %window%:Default
 			
-			Gui ListView, % this.SettingsListView
+			defaultListView := A_DefaultListView
+		
+			try {
+				Gui ListView, % this.SettingsListView
 			
-			selected := LV_GetNext(0)
-			
-			section := this.iSettings[selected][1]
-			key := this.iSettings[selected][2]
+				selected := LV_GetNext(0)
+				
+				section := this.iSettings[selected][1]
+				key := this.iSettings[selected][2]
+			}
+			finally {
+				Gui ListView, %defaultListView%
+			}
 		}
 		
 		type := getConfigurationValue(vSettingDescriptors, section . ".Types", key, "Text")
@@ -1167,23 +1223,30 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 			
-		Gui ListView, % this.SettingsListView
+		defaultListView := A_DefaultListView
 		
-		this.iSettings.Push(Array(section, key))
+		try {
+			Gui ListView, % this.SettingsListView
 		
-		LV_Add("Select Vis", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
-		
-		LV_ModifyCol()
-		
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		
-		new SettingsDatabase().setSettingValue(this.SelectedSimulator
-											 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-											 , section, key, value)
-		
-		this.selectSettings(false)
-		this.updateState()
+			this.iSettings.Push(Array(section, key))
+			
+			LV_Add("Select Vis", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
+			
+			LV_ModifyCol()
+			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			
+			new SettingsDatabase().setSettingValue(this.SelectedSimulator
+												 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+												 , section, key, value)
+			
+			this.selectSettings(false)
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	deleteSetting(section, key) {
@@ -1191,25 +1254,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 			
-		Gui ListView, % this.SettingsListView
+		defaultListView := A_DefaultListView
 		
-		selected := LV_GetNext(0)
+		try {
+			Gui ListView, % this.SettingsListView
 		
-		LV_Delete(selected)
-		
-		LV_ModifyCol()
-		
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		
-		new SettingsDatabase().removeSettingValue(this.SelectedSimulator
-												, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-												, section, key)
-												
-		this.iSettings.RemoveAt(selected)
-		
-		this.selectSettings(false)
-		this.updateState()
+			selected := LV_GetNext(0)
+			
+			LV_Delete(selected)
+			
+			LV_ModifyCol()
+			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			
+			new SettingsDatabase().removeSettingValue(this.SelectedSimulator
+													, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+													, section, key)
+													
+			this.iSettings.RemoveAt(selected)
+			
+			this.selectSettings(false)
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 	
 	updateSetting(section, key, value) {
@@ -1217,41 +1287,48 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		
 		Gui %window%:Default
 			
-		Gui ListView, % this.SettingsListView
+		defaultListView := A_DefaultListView
 		
-		selected := LV_GetNext(0)
+		try {
+			Gui ListView, % this.SettingsListView
 		
-		type := this.getSettingType(section, key, ignore)
-	
-		if IsObject(type)
-			display := translate(value)
-		else if (type = "Boolean")
-			display := (value ? "x" : "")
-		else
-			display := value
+			selected := LV_GetNext(0)
+			
+			type := this.getSettingType(section, key, ignore)
 		
-		LV_Modify(selected, "", this.getSettingLabel(section, key), display)
-		
-		LV_ModifyCol()
-		
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		
-		settingsDB := new SettingsDatabase()
-		
-		settingsDB.removeSettingValue(this.SelectedSimulator
-								    , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-								    , this.iSettings[selected][1], this.iSettings[selected][2])
-		
-		this.iSettings[selected][1] := section
-		this.iSettings[selected][2] := key
-		
-		settingsDB.setSettingValue(this.SelectedSimulator
-								 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-								 , section, key, value)
-		
-		this.selectSettings(false)
-		this.updateState()
+			if IsObject(type)
+				display := translate(value)
+			else if (type = "Boolean")
+				display := (value ? "x" : "")
+			else
+				display := value
+			
+			LV_Modify(selected, "", this.getSettingLabel(section, key), display)
+			
+			LV_ModifyCol()
+			
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+			
+			settingsDB := new SettingsDatabase()
+			
+			settingsDB.removeSettingValue(this.SelectedSimulator
+										, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+										, this.iSettings[selected][1], this.iSettings[selected][2])
+			
+			this.iSettings[selected][1] := section
+			this.iSettings[selected][2] := key
+			
+			settingsDB.setSettingValue(this.SelectedSimulator
+									 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+									 , section, key, value)
+			
+			this.selectSettings(false)
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 
 	loadPressures() {
@@ -1724,38 +1801,110 @@ chooseSetting() {
 		
 		Gui %window%:Default
 		
-		Gui ListView, % editor.SettingsListView
+		defaultListView := A_DefaultListView
 		
-		selected := LV_GetNext(0)
+		try {
+			Gui ListView, % editor.SettingsListView
 		
-		if !selected
-			return
-		
-		LV_GetText(setting, selected, 1)
-		LV_GetText(value, selected, 2)
-		
-		settings := editor.getAvailableSettings(selected)
-		
-		section := false
-		key := false
-		
-		for ignore, candidate in settings
-			if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
-				section := candidate[1]
-				key := candidate[2]
+			selected := LV_GetNext(0)
+			
+			if !selected
+				return
+			
+			LV_GetText(setting, selected, 1)
+			LV_GetText(value, selected, 2)
+			
+			settings := editor.getAvailableSettings(selected)
+			
+			section := false
+			key := false
+			
+			for ignore, candidate in settings
+				if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
+					section := candidate[1]
+					key := candidate[2]
+					
+					break
+				}
+			
+			labels := []
+			
+			for ignore, descriptor in settings
+				labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
+			
+			GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
+			GuiControl Choose, settingDropDown, % inList(labels, setting)
+			
+			type := editor.getSettingType(section, key, ignore)
+			
+			if IsObject(type) {
+				GuiControl Hide, settingValueEdit
+				GuiControl Hide, settingValueCheck
+				GuiControl Show, settingValueDropDown
+				GuiControl Enable, settingValueDropDown
 				
-				break
+				labels := map(type, "translate")
+				
+				GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
+				GuiControl Choose, settingValueDropDown, % inList(labels, value)
 			}
+			else if (type = "Boolean") {
+				GuiControl Hide, settingValueDropDown
+				GuiControl Hide, settingValueEdit
+				GuiControl Show, settingValueCheck
+				GuiControl Enable, settingValueCheck
+				
+				GuiControlGet settingValueCheck
+				
+				if (settingValueCheck != value)
+					GuiControl, , settingValueCheck, % (value = "x") ? true : false
+			}
+			else {
+				GuiControl Hide, settingValueDropDown
+				GuiControl Hide, settingValueCheck
+				GuiControl Show, settingValueEdit
+				GuiControl Enable, settingValueEdit
+				
+				GuiControlGet settingValueEdit
+				
+				if (settingValueEdit != value) {
+					settingValueEdit := value
+				
+					GuiControl, , settingValueEdit, %value%
+				}
+			}
+			
+			editor.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+}
+
+addSetting() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+	
+	Gui %window%:Default
+	
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SettingsListView
+	
+		settings := editor.getAvailableSettings(false)
 		
 		labels := []
 		
-		for ignore, descriptor in settings
-			labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
+		for ignore, setting in settings
+			labels.Push(editor.getSettingLabel(setting[1], setting[2]))
 		
+		GuiControl Enable, settingDropDown
 		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingDropDown, % inList(labels, setting)
+		GuiControl Choose, settingDropDown, 1
 		
-		type := editor.getSettingType(section, key, ignore)
+		type := editor.getSettingType(settings[1][1], settings[1][2], default)
 		
 		if IsObject(type) {
 			GuiControl Hide, settingValueEdit
@@ -1766,7 +1915,9 @@ chooseSetting() {
 			labels := map(type, "translate")
 			
 			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-			GuiControl Choose, settingValueDropDown, % inList(labels, value)
+			GuiControl Choose, settingValueDropDown, % inList(type, default)
+			
+			value := default
 		}
 		else if (type = "Boolean") {
 			GuiControl Hide, settingValueDropDown
@@ -1774,10 +1925,9 @@ chooseSetting() {
 			GuiControl Show, settingValueCheck
 			GuiControl Enable, settingValueCheck
 			
-			GuiControlGet settingValueCheck
+			GuiControl, , settingValueCheck, %default%
 			
-			if (settingValueCheck != value)
-				GuiControl, , settingValueCheck, % (value = "x") ? true : false
+			value := default
 		}
 		else {
 			GuiControl Hide, settingValueDropDown
@@ -1785,85 +1935,26 @@ chooseSetting() {
 			GuiControl Show, settingValueEdit
 			GuiControl Enable, settingValueEdit
 			
-			GuiControlGet settingValueEdit
+			/*
+			if (type = "Float")
+				value := 0.0
+			else if (type = "Integer")
+				value := 0
+			else if (type = "Text")
+				value := ""
+			*/
 			
-			if (settingValueEdit != value) {
-				settingValueEdit := value
+			value := default
 			
-				GuiControl, , settingValueEdit, %value%
-			}
+			settingValueEdit := value
+			GuiControl, , settingValueEdit, %value%
 		}
 		
-		editor.updateState()
+		editor.addSetting(settings[1][1], settings[1][2], value)
 	}
-}
-
-addSetting() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
-	
-	Gui %window%:Default
-	
-	Gui ListView, % editor.SettingsListView
-	
-	settings := editor.getAvailableSettings(false)
-	
-	labels := []
-	
-	for ignore, setting in settings
-		labels.Push(editor.getSettingLabel(setting[1], setting[2]))
-	
-	GuiControl Enable, settingDropDown
-	GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
-	GuiControl Choose, settingDropDown, 1
-	
-	type := editor.getSettingType(settings[1][1], settings[1][2], default)
-	
-	if IsObject(type) {
-		GuiControl Hide, settingValueEdit
-		GuiControl Hide, settingValueCheck
-		GuiControl Show, settingValueDropDown
-		GuiControl Enable, settingValueDropDown
-		
-		labels := map(type, "translate")
-		
-		GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingValueDropDown, % inList(type, default)
-		
-		value := default
+	finally {
+		Gui ListView, %defaultListView%
 	}
-	else if (type = "Boolean") {
-		GuiControl Hide, settingValueDropDown
-		GuiControl Hide, settingValueEdit
-		GuiControl Show, settingValueCheck
-		GuiControl Enable, settingValueCheck
-		
-		GuiControl, , settingValueCheck, %default%
-		
-		value := default
-	}
-	else {
-		GuiControl Hide, settingValueDropDown
-		GuiControl Hide, settingValueCheck
-		GuiControl Show, settingValueEdit
-		GuiControl Enable, settingValueEdit
-		
-		/*
-		if (type = "Float")
-			value := 0.0
-		else if (type = "Integer")
-			value := 0
-		else if (type = "Text")
-			value := ""
-		*/
-		
-		value := default
-		
-		settingValueEdit := value
-		GuiControl, , settingValueEdit, %value%
-	}
-	
-	editor.addSetting(settings[1][1], settings[1][2], value)
 }
 
 deleteSetting() {
@@ -1872,29 +1963,36 @@ deleteSetting() {
 	
 	Gui %window%:Default
 	
-	Gui ListView, % editor.SettingsListView
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SettingsListView
 	
-	selected := LV_GetNext(0)
-	
-	if !selected
-		return
-	
-	GuiControlGet settingDropDown
-	
-	settings := editor.getAvailableSettings(selected)
-	
-	section := false
-	key := false
-	
-	for ignore, setting in settings
-		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-			section := setting[1]
-			key := setting[2]
-			
-			break
-		}
-	
-	SessionDatabaseEditor.Instance.deleteSetting(section, key)
+		selected := LV_GetNext(0)
+		
+		if !selected
+			return
+		
+		GuiControlGet settingDropDown
+		
+		settings := editor.getAvailableSettings(selected)
+		
+		section := false
+		key := false
+		
+		for ignore, setting in settings
+			if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+				section := setting[1]
+				key := setting[2]
+				
+				break
+			}
+		
+		SessionDatabaseEditor.Instance.deleteSetting(section, key)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
 }
 
 selectSetting() {
@@ -1903,143 +2001,160 @@ selectSetting() {
 	
 	Gui %window%:Default
 	
-	Gui ListView, % editor.SettingsListView
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SettingsListView
 	
-	selected := LV_GetNext(0)
-	
-	if !selected
-		return
-	
-	GuiControlGet settingDropDown
-	
-	settings := editor.getAvailableSettings(selected)
-	
-	section := false
-	key := false
-	
-	for ignore, setting in settings
-		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-			section := setting[1]
-			key := setting[2]
+		selected := LV_GetNext(0)
+		
+		if !selected
+			return
+		
+		GuiControlGet settingDropDown
+		
+		settings := editor.getAvailableSettings(selected)
+		
+		section := false
+		key := false
+		
+		for ignore, setting in settings
+			if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+				section := setting[1]
+				key := setting[2]
+				
+				break
+			}
+		
+		type := editor.getSettingType(section, key, default)
+		
+		if IsObject(type) {
+			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueCheck
+			GuiControl Show, settingValueDropDown
+			GuiControl Enable, settingValueDropDown
 			
-			break
+			labels := map(type, "translate")
+			
+			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
+			GuiControl Choose, settingValueDropDown, % inList(type, default)
+			
+			value := default
 		}
-	
-	type := editor.getSettingType(section, key, default)
-	
-	if IsObject(type) {
-		GuiControl Hide, settingValueEdit
-		GuiControl Hide, settingValueCheck
-		GuiControl Show, settingValueDropDown
-		GuiControl Enable, settingValueDropDown
+		else if (type = "Boolean") {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueEdit
+			GuiControl Show, settingValueCheck
+			GuiControl Enable, settingValueCheck
+			
+			GuiControl, , settingValueCheck, %default%
+			
+			value := default
+		}
+		else {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueCheck
+			GuiControl Show, settingValueEdit
+			GuiControl Enable, settingValueEdit
+			
+			/*
+			if (type = "Float")
+				value := 0.0
+			else if (type = "Integer")
+				value := 0
+			else if (type = "Text")
+				value := ""
+			*/
+			
+			value := default
+			
+			settingValueEdit := value
+			GuiControl, , settingValueEdit, %value%
+		}
 		
-		labels := map(type, "translate")
-		
-		GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingValueDropDown, % inList(type, default)
-		
-		value := default
+		editor.updateSetting(section, key, value)
 	}
-	else if (type = "Boolean") {
-		GuiControl Hide, settingValueDropDown
-		GuiControl Hide, settingValueEdit
-		GuiControl Show, settingValueCheck
-		GuiControl Enable, settingValueCheck
-		
-		GuiControl, , settingValueCheck, %default%
-		
-		value := default
+	finally {
+		Gui ListView, %defaultListView%
 	}
-	else {
-		GuiControl Hide, settingValueDropDown
-		GuiControl Hide, settingValueCheck
-		GuiControl Show, settingValueEdit
-		GuiControl Enable, settingValueEdit
-		
-		/*
-		if (type = "Float")
-			value := 0.0
-		else if (type = "Integer")
-			value := 0
-		else if (type = "Text")
-			value := ""
-		*/
-		
-		value := default
-		
-		settingValueEdit := value
-		GuiControl, , settingValueEdit, %value%
-	}
-	
-	editor.updateSetting(section, key, value)
 }
 
 changeSetting() {
 	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
 	
-	Gui %window%:Default
-	
-	Gui ListView, % editor.SettingsListView
-	
-	selected := LV_GetNext(0)
-	
-	if !selected
-		return
-	
-	GuiControlGet settingDropDown
-	
-	settings := editor.getAvailableSettings(selected)
-	
-	section := false
-	key := false
-	
-	for ignore, setting in settings
-		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-			section := setting[1]
-			key := setting[2]
+	if (editor.SelectedModule = "Settings") {
+		window := editor.Window
+		
+		Gui %window%:Default
+		
+		defaultListView := A_DefaultListView
+		
+		try {
+			Gui ListView, % editor.SettingsListView
+		
+			selected := LV_GetNext(0)
 			
-			break
-		}
-	
-	type := editor.getSettingType(section, key, ignore)
-	
-	if IsObject(type) {
-		GuiControlGet settingValueDropDown
-		
-		value := type[inList(map(type, "translate"), settingValueDropDown)]
-	}
-	else if (type = "Boolean") {
-		GuiControlGet settingValueCheck
-	
-		value := settingValueCheck
-	}
-	else {
-		oldValue := settingValueEdit
-	
-		GuiControlGet settingValueEdit
-	
-		if (type = "Integer") {
-			if settingValueEdit is not Integer
-			{
-				settingValueEdit := oldValue
+			if !selected
+				return
+			
+			GuiControlGet settingDropDown
+			
+			settings := editor.getAvailableSettings(selected)
+			
+			section := false
+			key := false
+			
+			for ignore, setting in settings
+				if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+					section := setting[1]
+					key := setting[2]
+					
+					break
+				}
+			
+			type := editor.getSettingType(section, key, ignore)
+			
+			if IsObject(type) {
+				GuiControlGet settingValueDropDown
 				
-				GuiControl, , settingValueEdit, %settingValueEdit%
+				value := type[inList(map(type, "translate"), settingValueDropDown)]
 			}
-		}
-		else if (type = "Float") {
-			if settingValueEdit is not Number
-			{
-				settingValueEdit := oldValue
+			else if (type = "Boolean") {
+				GuiControlGet settingValueCheck
+			
+				value := settingValueCheck
+			}
+			else {
+				oldValue := settingValueEdit
+			
+				GuiControlGet settingValueEdit
+			
+				if (type = "Integer") {
+					if settingValueEdit is not Integer
+					{
+						settingValueEdit := oldValue
+						
+						GuiControl, , settingValueEdit, %settingValueEdit%
+					}
+				}
+				else if (type = "Float") {
+					if settingValueEdit is not Number
+					{
+						settingValueEdit := oldValue
+						
+						GuiControl, , settingValueEdit, %settingValueEdit%
+					}
+				}
 				
-				GuiControl, , settingValueEdit, %settingValueEdit%
+				value := settingValueEdit
 			}
+			
+			editor.updateSetting(section, key, value)
 		}
-		
-		value := settingValueEdit
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
-	
-	editor.updateSetting(section, key, value)
 }
 
 chooseSetupType() {
@@ -2077,11 +2192,18 @@ downloadSetup() {
 	
 	GuiControlGet setupTypeDropDown
 	
-	Gui ListView, % editor.SetupListView
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SetupListView
 	
-	LV_GetText(name, LV_GetNext(0), 2)
-	
-	SessionDatabaseEditor.Instance.downloadSetup(kSetupTypes[setupTypeDropDown], name)
+		LV_GetText(name, LV_GetNext(0), 2)
+		
+		SessionDatabaseEditor.Instance.downloadSetup(kSetupTypes[setupTypeDropDown], name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
 }
 
 renameSetup() {
@@ -2092,11 +2214,18 @@ renameSetup() {
 	
 	GuiControlGet setupTypeDropDown
 	
-	Gui ListView, % editor.SetupListView
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SetupListView
 	
-	LV_GetText(name, LV_GetNext(0), 2)
-	
-	SessionDatabaseEditor.Instance.renameSetup(kSetupTypes[setupTypeDropDown], name)
+		LV_GetText(name, LV_GetNext(0), 2)
+		
+		SessionDatabaseEditor.Instance.renameSetup(kSetupTypes[setupTypeDropDown], name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
 }
 
 deleteSetup() {
@@ -2107,17 +2236,28 @@ deleteSetup() {
 	
 	GuiControlGet setupTypeDropDown
 	
-	Gui ListView, % editor.SetupListView
+	defaultListView := A_DefaultListView
+		
+	try {
+		Gui ListView, % editor.SetupListView
 	
-	LV_GetText(name, LV_GetNext(0), 2)
-	
-	SessionDatabaseEditor.Instance.deleteSetup(kSetupTypes[setupTypeDropDown], name)
+		LV_GetText(name, LV_GetNext(0), 2)
+		
+		SessionDatabaseEditor.Instance.deleteSetup(kSetupTypes[setupTypeDropDown], name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
 }
 
 loadPressures() {
-	callback := ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures")
+	editor := SessionDatabaseEditor.Instance
 	
-	SetTimer %callback%, -100
+	if (editor.SelectedModule = "Pressures") {
+		callback := ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures")
+		
+		SetTimer %callback%, -100
+	}
 }
 
 noSelect() {
@@ -2127,9 +2267,16 @@ noSelect() {
 		
 		Gui %window%:Default
 		
-		Gui ListView, % editor.DataListView
+		defaultListView := A_DefaultListView
 		
-		LV_Modify(A_EventInfo, "-Select")
+		try {
+			Gui ListView, % editor.DataListView
+		
+			LV_Modify(A_EventInfo, "-Select")
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 }
 

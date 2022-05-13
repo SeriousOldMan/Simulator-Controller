@@ -1308,7 +1308,7 @@ showProgress(options) {
 		color := options.HasKey("color") ? options.color : "Green"
 	
 		Gui Progress:Default
-		Gui Progress:-Border -Caption
+		Gui Progress:-Border ; -Caption
 		Gui Progress:Color, D0D0D0, D8D8D8
 
 		Gui Progress:Font, s10 Bold, Arial

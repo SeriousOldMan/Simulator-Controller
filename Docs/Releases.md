@@ -1,4 +1,4 @@
-## 4.1.4-release 05/13/22 (planned)
+## 4.1.4-release 05/13/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -17,9 +17,9 @@
   15. Additional car specific rules in "Setup Advisor" for
   
       - Bentley Continental GT3 (2018)
-	  - Lamborghini Huracan GT3 EVO
-	  - Porsche 991 II GT3 R
-	  - BMW M2 CS
+      - Lamborghini Huracan GT3 EVO
+      - Porsche 991 II GT3 R
+      - BMW M2 CS
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-414) and check whether any manual updates to your local configuration might be necessary.
 

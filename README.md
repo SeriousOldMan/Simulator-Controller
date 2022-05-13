@@ -53,12 +53,6 @@ A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Cont
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
-### Documentation
-
-A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
-
-The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
-
 ### Discord Community
 
 If you want to become a part of the small and very young Community for Simulator Controller on Discord. Here you will also find a growing collection of video tutorials for different parts of the software suite. Please use [this invitation](https://discord.gg/5N8JrNr48H) to join the Discord Server.

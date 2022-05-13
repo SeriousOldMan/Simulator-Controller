@@ -1762,7 +1762,7 @@ class RaceCenter extends ConfigurationItem {
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 		
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 		
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -1834,7 +1834,44 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 	
-	deleteSetups() {
+	clearSetups(verbose := true) {
+		window := this.Window
+				
+		Gui %window%:Default
+		
+		Gui ListView, % this.SetupsListView
+		
+		if (LV_GetCount() > 0) {
+			delete := false
+			
+			if verbose {
+				title := translate("Delete")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				MsgBox 262436, %title%, % translate("Do you really want to delete all driver specific setups?")
+				OnMessage(0x44, "")
+				
+				IfMsgBox Yes
+					delete := true
+			}
+			else
+				delete := true
+			
+			if delete {
+				this.iSetupsVersion := (A_Now . "")
+				
+				LV_Delete()
+				
+				this.iSelectedSetup := false
+			
+				this.updateState()
+			}
+		}
+		
+		
+		
+		
+		
 		window := this.Window
 		
 		Gui %window%:Default
@@ -1996,7 +2033,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 	
-	clearPlan() {
+	clearPlan(verbose := true) {
 		window := this.Window
 				
 		Gui %window%:Default
@@ -2004,14 +2041,22 @@ class RaceCenter extends ConfigurationItem {
 		Gui ListView, % this.PlanListView
 		
 		if (LV_GetCount() > 0) {
-			title := translate("Delete")
+			delete := false
 			
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			MsgBox 262436, %title%, % translate("Do you really want to delete the current plan?")
-			OnMessage(0x44, "")
+			if verbose {
+				title := translate("Delete")
+				
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				MsgBox 262436, %title%, % translate("Do you really want to delete the current plan?")
+				OnMessage(0x44, "")
+				
+				IfMsgBox Yes
+					delete := true
+			}
+			else
+				delete := true
 			
-			IfMsgBox Yes
-			{
+			if delete {
 				this.iPlanVersion := (A_Now . "")
 				
 				LV_Delete()
@@ -2169,20 +2214,6 @@ class RaceCenter extends ConfigurationItem {
 					LV_Modify(A_Index, "", stintNr++)
 			}
 		}
-		
-		this.updateState()
-	}
-	
-	deletePlans() {
-		window := this.Window
-		
-		Gui %window%:Default
-		
-		Gui ListView, % this.PlanListView
-		
-		LV_Delete()
-			
-		this.iSelectedPlanStint := false
 		
 		this.updateState()
 	}
@@ -2955,15 +2986,17 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-			case 6:
+			case 5:
+				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
+			case 7:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 				
 				this.updateState()
-			case 7:
+			case 8:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 				
 				this.updateState()
-			case 9:
+			case 10:
 				this.planPitstop()
 		}
 	}
@@ -2974,6 +3007,10 @@ class RaceCenter extends ConfigurationItem {
 	
 	clearPlanAsync() {
 		this.clearPlan()
+	}
+	
+	clearSetupsAsync() {
+		this.clearSetups()
 	}
 	
 	withExceptionHandler(function, arguments*) {
@@ -5316,10 +5353,10 @@ class RaceCenter extends ConfigurationItem {
 			}
 			
 			/*
-			this.deletePlans()
+			this.clearPlan()
 			this.releasePlan(false)
 			
-			this.deleteSetups()
+			this.clearSetups()
 			this.releaseSetups(false)
 			*/
 			

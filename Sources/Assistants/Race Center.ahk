@@ -1834,6 +1834,20 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 	
+	deleteSetups() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.SetupsListView
+		
+		LV_Delete()
+		
+		this.iSelectedSetup := false
+		
+		this.updateState()
+	}
+	
 	releaseSetups(verbose := true) {
 		if this.SessionActive
 			try {
@@ -2155,6 +2169,20 @@ class RaceCenter extends ConfigurationItem {
 					LV_Modify(A_Index, "", stintNr++)
 			}
 		}
+		
+		this.updateState()
+	}
+	
+	deletePlans() {
+		window := this.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % this.PlanListView
+		
+		LV_Delete()
+			
+		this.iSelectedPlanStint := false
 		
 		this.updateState()
 	}
@@ -5287,8 +5315,13 @@ class RaceCenter extends ConfigurationItem {
 				; ignore
 			}
 			
-			this.deletePlan()
+			/*
+			this.deletePlans()
 			this.releasePlan(false)
+			
+			this.deleteSetups()
+			this.releaseSetups(false)
+			*/
 			
 			this.initializeSession()
 		}

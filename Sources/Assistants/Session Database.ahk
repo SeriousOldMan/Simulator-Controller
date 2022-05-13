@@ -2121,14 +2121,16 @@ loadPressures() {
 }
 
 noSelect() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
-	
-	Gui %window%:Default
-	
-	Gui ListView, % editor.DataListView
-	
-	LV_Modify(A_EventInfo, "-Select")
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		editor := SessionDatabaseEditor.Instance
+		window := editor.Window
+		
+		Gui %window%:Default
+		
+		Gui ListView, % editor.DataListView
+		
+		LV_Modify(A_EventInfo, "-Select")
+	}
 }
 
 chooseTab1() {

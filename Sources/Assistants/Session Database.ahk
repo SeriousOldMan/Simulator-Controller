@@ -150,8 +150,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := true
 	
-	iLastTracks := []
-	iLastTrackNames := []
+	iAllTracks := []
 	
 	iAirTemperature := 23
 	iTrackTemperature := 27
@@ -560,8 +559,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return this.SessionDatabase.getCars(simulator)
 	}
 	
-	getTracks(simulator, car) {
-		return this.SessionDatabase.getTracks(simulator, car)
+	getTracks(simulator, car := false) {
+		if !car
+			return []
+		else if ((car == true) || (car = "*")) {
+			if (this.iAllTracks.Length() > 0)
+				return this.iAllTracks
+			else {
+				tracks := []
+			
+				for ignore, car in this.getCars(simulator)
+					for ignore, track in this.getTracks(simulator, car)
+						if !inList(tracks, track)
+							tracks.Push(track)
+				
+				this.iAllTracks := tracks
+				
+				return tracks
+			}
+		}
+		else
+			return this.SessionDatabase.getTracks(simulator, car)
 	}
 	
 	getCarName(simulator, car) {
@@ -714,8 +732,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %window%:Default
 			
 			this.iSelectedSimulator := simulator
-			this.iLastTracks := []
-			this.iLastTrackNames := []
+			this.iAllTracks := []
 			
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
 			
@@ -745,27 +762,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car) + 1
 			
-			if (car && (car != true)) {
-				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
-				trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
-				
-				tracks.InsertAt(1, true)
-				trackNames.InsertAt(1, translate("All"))
-				
-				this.iLastTracks := tracks
-				this.iLastTrackNames := trackNames
-				
-				GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
-				
-				this.loadTrack(true, true)
-			}
-			else if (this.iLastTrackNames.Length() > 0)
-				this.updateModules()
-			else {
-				GuiControl, , trackDropDown, % "|" . translate("All")
+			tracks := this.getTracks(this.SelectedSimulator, car).Clone()
+			trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 			
-				this.loadTrack(true, true)
-			}
+			tracks.InsertAt(1, true)
+			trackNames.InsertAt(1, translate("All"))
+			
+			GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
+			
+			this.loadTrack(true, true)
 		}
 	}
 	
@@ -782,8 +787,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				
 				GuiControl Choose, trackDropDown, 1
 			}
-			else if (this.iLastTracks.Length() > 0)
-				GuiControl Choose, trackDropDown, % inList(this.iLastTracks, track)
 			else
 				GuiControl Choose, trackDropDown, % (inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
 			
@@ -1761,8 +1764,6 @@ chooseTrack() {
 	
 	if (trackDropDown = translate("All"))
 		editor.loadTrack(true)
-	else if (editor.iLastTrackNames.Length() > 0)
-		editor.loadTrack(editor.iLastTracks[inList(editor.iLastTrackNames, trackDropDown)])
 	else {
 		simulator := editor.SelectedSimulator
 		tracks := editor.getTracks(simulator, editor.SelectedCar)

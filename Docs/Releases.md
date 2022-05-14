@@ -1,3 +1,7 @@
+## 4.1.5-release 05/14/22
+
+  1. Fixed a timing and redrawing problem in the "Session Database" tool.
+
 ## 4.1.4-release 05/13/22
 
   1. Bugfixes, as always

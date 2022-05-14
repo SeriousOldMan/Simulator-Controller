@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.6-dev
-Target=4.1.6-release
-Date=05/13/2022
-Download=
-Changes=
+Version=4.1.5-release
+Target=4.1.5-release
+Date=05/14/2022
+Download=https://cntr.click/X1paFsz
+Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster due to caching of the generated sound files, Session Database location is now configurable, Jona can be asked about the amount of fuel remaining, New *InformationRequest* action *FuelRemaining* for all simulators and the "Race Engineer" plugin, Larger window sizes for "Strategy Workbench" and "Race Center", Handling of driver specific car setups in "Race Center", Fixed Spotter not starting in AMS2 after the formation lap, Settings for temperature based tyre pressure correction, New special rules for additional cars in "Setup Advisor", New icons for Stream Deck
 [Release]
-Version=4.1.4-release
-Date=05/13/2022
-Download=https://cntr.click/w3FgXd1
+Version=4.1.5-release
+Date=05/14/2022
+Download=https://cntr.click/X1paFsz
 Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster due to caching of the generated sound files, Session Database location is now configurable, Jona can be asked about the amount of fuel remaining, New *InformationRequest* action *FuelRemaining* for all simulators and the "Race Engineer" plugin, Larger window sizes for "Strategy Workbench" and "Race Center", Handling of driver specific car setups in "Race Center", Fixed Spotter not starting in AMS2 after the formation lap, Settings for temperature based tyre pressure correction, New special rules for additional cars in "Setup Advisor", New icons for Stream Deck
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.1.4-release
-Development=4.1.6-dev
+Release=4.1.5-release
+Development=4.1.5-release

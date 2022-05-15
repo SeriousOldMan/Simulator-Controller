@@ -62,6 +62,9 @@ global kTraceOff = 4
 global vActiveChoicePoints = 0
 global vActiveResultSets = 0
 
+global vMaxChoicePoints = 0
+global vMaxResultSets = 0
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -358,7 +361,7 @@ class Variable extends Primary {
 	
 	RootVariable[] {
 		Get {
-			return this.iRootVariable
+			return (this.iRootVariable ? this.iRootVariable : this)
 		}
 	}
 	
@@ -381,7 +384,7 @@ class Variable extends Primary {
 	__New(name, property := false, rootVariable := false) {
 		this.iVariable := name
 		this.iProperty := ((property && (property != "")) ? string2Values(".", property) : false)
-		this.iRootVariable := (rootVariable ? rootVariable : this)
+		this.iRootVariable := rootVariable
 		
 		if ((!property && rootVariable) || (property && !rootVariable))
 			Throw "Inconsistent argument combination detected in Variable.__New..."
@@ -394,7 +397,7 @@ class Variable extends Primary {
 		if (variablesFactsOrResultSet == kNotInitialized)
 			return this
 		else {
-			value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet.base == Facts) || ((variablesFactsOrResultSet.base == ProductionRule.Variables))) ? this : this.iRootVariable)
+			value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet.base == Facts) || ((variablesFactsOrResultSet.base == ProductionRule.Variables))) ? this : this.RootVariable)
 	
 			if (IsObject(value) && ((value.base == Variable) || (value.base == Literal) || (value.base == Fact)))
 				value := value.getValue(variablesFactsOrResultSet, value)
@@ -1447,8 +1450,6 @@ class ReductionRule extends Rule {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ResultSet {
-	iDisposed := false
-	
 	iKnowledgeBase := false
 	iChoicePoint := false
 	iExhausted := false
@@ -1496,16 +1497,28 @@ class ResultSet {
 		
 		this.iChoicePoint := this.createChoicePoint(goal)
 		
-		if isDebug() {
-			vActiveResultSets += 1
+		/*
+		vActiveResultSets += 1
+		
+		vMaxResultSets := Max(vMaxResultSets, vActiveResultSets)
+		
+		if (Mod(vActiveResultSets, 100) = 0)
+			showMessage("(+) # Active Result Sets: " . vActiveResultSets)
 			
-			if (Mod(vActiveResultSets, 100) = 0)
-				showMessage("# Active Result Sets: " . vActiveResultSets)
-		}
+		*/
 	}
 	
+	/*
+	__Delete() {
+		vActiveResultSets -= 1
+		
+		if (vActiveResultSets > 0)
+			if (Mod(vActiveResultSets, 1000) = 0)
+				showMessage("(-) # Active Result Sets: " . vActiveResultSets)
+	}
+	*/
+	
 	dispose() {
-		this.iKnowledgeBase := false
 		this.iBindings := false
 		
 		cp := this.iChoicePoint
@@ -1523,16 +1536,6 @@ class ResultSet {
 		}
 		
 		this.iChoicePoint := false
-		
-		if (isDebug() && !this.iDisposed)  {
-			this.iDisposed := true
-			
-			vActiveResultSets -= 1
-		
-			if (vActiveResultSets > 0)
-				if (Mod(vActiveResultSets, 1000) = 0)
-					showMessage("# Active Result Sets: " . vActiveResultSets)
-		}
 	}
 		
 	resetChoicePoint(choicePoint) {
@@ -1771,29 +1774,31 @@ class ChoicePoint {
 		this.iGoal := goal
 		this.iEnvironment := environment
 		
-		if isDebug() {
-			vActiveChoicePoints += 1
-			
-			if (Mod(vActiveChoicePoints, 1000) = 0)
-				showMessage("# Active Choice Points: " . vActiveChoicePoints)
-		}
+		/*
+		vActiveChoicePoints += 1
+		
+		vMaxChoicePoints := Max(vMaxChoicePoints, vActiveChoicePoints)
+		
+		if (Mod(vActiveChoicePoints, 1000) = 0)
+			showMessage("(+) # Active Choice Points: " . vActiveChoicePoints)
+		*/
 	}
+	
+	/*
+	__Delete() {
+		vActiveChoicePoints -= 1
+		
+		if (vActiveChoicePoints > 0)
+			if (Mod(vActiveChoicePoints, 1000) = 0)
+				showMessage("(-) # Active Choice Points: " . vActiveChoicePoints)
+	}
+	*/
 	
 	dispose() {
 		this.iResultSet := false
 		this.iGoal := false
 		this.iEnvironment := false
 		this.iSavedVariables := false
-		
-		if (isDebug() && !this.iDisposed)  {
-			this.iDisposed := true
-			
-			vActiveChoicePoints -= 1
-		
-			if (vActiveChoicePoints > 0)
-				if (Mod(vActiveChoicePoints, 1000) = 0)
-					showMessage("# Active Choice Points: " . vActiveChoicePoints)
-		}
 	}
 	
 	nextChoice() {

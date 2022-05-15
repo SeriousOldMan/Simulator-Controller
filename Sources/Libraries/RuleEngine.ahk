@@ -56,6 +56,14 @@ global kTraceOff = 4
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variables Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vActiveChoicePoints = 0
+global vActiveResultSets = 0
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1439,6 +1447,8 @@ class ReductionRule extends Rule {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ResultSet {
+	iDisposed := false
+	
 	iKnowledgeBase := false
 	iChoicePoint := false
 	iExhausted := false
@@ -1485,9 +1495,19 @@ class ResultSet {
 		this.iKnowledgeBase := knowledgeBase
 		
 		this.iChoicePoint := this.createChoicePoint(goal)
+		
+		if isDebug() {
+			vActiveResultSets += 1
+			
+			if (Mod(vActiveResultSets, 100) = 0)
+				showMessage("# Active Result Sets: " . vActiveResultSets)
+		}
 	}
 	
 	dispose() {
+		this.iKnowledgeBase := false
+		this.iBindings := false
+		
 		cp := this.iChoicePoint
 		
 		if cp {
@@ -1503,6 +1523,16 @@ class ResultSet {
 		}
 		
 		this.iChoicePoint := false
+		
+		if (isDebug() && !this.iDisposed)  {
+			this.iDisposed := true
+			
+			vActiveResultSets -= 1
+		
+			if (vActiveResultSets > 0)
+				if (Mod(vActiveResultSets, 1000) = 0)
+					showMessage("# Active Result Sets: " . vActiveResultSets)
+		}
 	}
 		
 	resetChoicePoint(choicePoint) {
@@ -1685,6 +1715,8 @@ class ResultSet {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ChoicePoint {
+	iDisposed := false
+	
 	iPreviousChoicePoint := false
 	iNextChoicePoint := false
 	
@@ -1738,11 +1770,30 @@ class ChoicePoint {
 		this.iResultSet := resultSet
 		this.iGoal := goal
 		this.iEnvironment := environment
+		
+		if isDebug() {
+			vActiveChoicePoints += 1
+			
+			if (Mod(vActiveChoicePoints, 1000) = 0)
+				showMessage("# Active Choice Points: " . vActiveChoicePoints)
+		}
 	}
 	
 	dispose() {
 		this.iResultSet := false
 		this.iGoal := false
+		this.iEnvironment := false
+		this.iSavedVariables := false
+		
+		if (isDebug() && !this.iDisposed)  {
+			this.iDisposed := true
+			
+			vActiveChoicePoints -= 1
+		
+			if (vActiveChoicePoints > 0)
+				if (Mod(vActiveChoicePoints, 1000) = 0)
+					showMessage("# Active Choice Points: " . vActiveChoicePoints)
+		}
 	}
 	
 	nextChoice() {
@@ -1778,9 +1829,6 @@ class ChoicePoint {
 	}
 	
 	unlink() {
-		this.iResultSet := false
-		this.iGoal := false
-		
 		next := this.iNextChoicePoint
 		previous := this.iPreviousChoicePoint
 		
@@ -1792,6 +1840,8 @@ class ChoicePoint {
 		
 		this.iNextChoicePoint := false
 		this.iPreviousChoicePoint := false
+		
+		this.dispose()
 	}
 	
 	remove(removeables := false) {
@@ -1895,6 +1945,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 	
 	dispose() {
+		this.iReductions := []
 		this.iSubstitutedReductions := {}
 		
 		base.dispose()

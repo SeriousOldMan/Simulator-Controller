@@ -305,7 +305,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 	
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms; Garbage: [RS: " . vActiveResultSets . ", CP: " . vActiveChoicePoints . "]"
 }
 else {
 	raceNr := 17

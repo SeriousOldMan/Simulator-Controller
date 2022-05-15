@@ -976,13 +976,34 @@ class RaceReportViewer {
 			laps := this.getReportLaps(raceData)
 			lapTimes := []
 			
+			driverTimes := {}
+			length := 20000
+			
 			for ignore, car in selectedCars {
-				carTimes := Array("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
-				
-				for ignore, time in this.getDriverTimes(raceData, times, car)
-					carTimes.Push(time)
-				
-				lapTimes.Push("[" . values2String(", ", carTimes*) . "]")
+				carTimes := this.getDriverTimes(raceData, times, car)
+			
+				if (carTimes.Length() > 0) {
+					length := Min(length, carTimes.Length())
+					
+					driverTimes[car] := carTimes
+				}
+			}
+			
+			if (length == 20000)
+				length := false
+			
+			for index, car in selectedCars {
+				if driverTimes.HasKey(car) {
+					carTimes := Array("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
+					
+					for dIndex, time in driverTimes[index]
+						if (dIndex > length)
+							break
+						else
+							carTimes.Push(time)
+					
+					lapTimes.Push("[" . values2String(", ", carTimes*) . "]")
+				}
 			}
 			
 			drawChartFunction .= (values2String("`n, ", lapTimes*) . "];")
@@ -990,9 +1011,9 @@ class RaceReportViewer {
 			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			
-			Loop % laps.Length()
-				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . laps[A_Index] . "');"
-			
+			Loop % Min(length, laps.Length())
+					drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . laps[A_Index] . "');"
+				
 			text =
 			(
 			data.addColumn({id:'max', type:'number', role:'interval'});
@@ -1004,7 +1025,7 @@ class RaceReportViewer {
 			
 			drawChartFunction .= ("`n" . text)
 			
-			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (laps.Length() + 1) . "));")
+			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (Min(length, laps.Length()) + 1) . "));")
 			
 			drawChartFunction .= ("`n" . getPaceJSFunctions())
 			

@@ -1605,6 +1605,8 @@ class ResultSet {
 					
 					this.iExhausted := true
 					
+					this.dispose()
+					
 					return false
 				}
 			}

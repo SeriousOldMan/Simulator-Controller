@@ -177,6 +177,56 @@ class StrategySimulation {
 		local rule
 		local resultSet
 		
+		reqPitstops := strategy.PitstopRule
+				
+		if IsObject(reqPitstops)
+			reqPitstops := 1
+		
+		if (strategy.Pitstops.Length() < reqPitstops)
+			return false
+		
+		refuelRule := strategy.RefuelRule
+		
+		if (refuelRule = "Disallowed") {
+			for ignore, pitstop in strategy.Pitstops
+				if (pitstop.RefuelAmount > 0)
+					return false
+		}
+		else if (refuelRule = "Required") {
+			valid := false
+		
+			for ignore, pitstop in strategy.Pitstops
+				if (pitstop.RefuelAmount > 0) {
+					valid := true
+				
+					break
+				}
+			
+			if !valid
+				return false
+		}
+		
+		tyreChangeRule := strategy.TyreChangeRule
+		
+		if (tyreChangeRule = "Disallowed") {
+			for ignore, pitstop in strategy.Pitstops
+				if pitstop.TyreChange
+					return false
+		}
+		else if (tyreChangeRule = "Required") {
+			valid := false
+		
+			for ignore, pitstop in strategy.Pitstops
+				if pitstop.TyreChange {
+					valid := true
+				
+					break
+				}
+			
+			if !valid
+				return false
+		}
+		
 		if validator {
 			static compiler := false
 			static goal := false
@@ -2004,9 +2054,9 @@ class Strategy extends ConfigurationItem {
 				else
 					this.iStintLaps := Min(stintLaps, canonicalStintLaps)
 			}
-			else
-				numPitstops := false
 		}
+		else if IsObject(numPitstops)
+			numPitstops := 1
 		else
 			numPitstops := false
 			

@@ -543,7 +543,7 @@ class Literal extends Primary {
 	}
 	
 	getValue(factsOrResultSet := "__NotInitialized__") {
-		if (factsOrResultSet.base == Facts)
+		if (factsOrResultSet && (factsOrResultSet != kNotInitialized) && (factsOrResultSet.base == Facts))
 			return this.Literal
 		else
 			return this

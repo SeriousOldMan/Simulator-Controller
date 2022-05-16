@@ -470,7 +470,8 @@ class StrategySimulation {
 			if (scenario1.getSessionDuration() < scenario2.getSessionDuration())
 				return scenario1
 			else if ((scenario1.getSessionDuration() = scenario2.getSessionDuration())
-				  && (scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true] ))
+				  && ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true])
+				   || (scenario2.RemainingFuel[true] > scenario1.RemainingFuel[true])))
 				return scenario1
 			else
 				return scenario2

@@ -2628,14 +2628,15 @@ class RaceCenter extends ConfigurationItem {
 				strategy := printConfiguration(strategy)
 
 				session := this.SelectedSession[true]
-				lap := this.Connector.GetSessionLastLap(session)
-
-				this.Connector.SetLapValue(lap, "Strategy Update", strategy)
-				this.Connector.SetSessionValue(session, "Strategy Update", lap)
 
 				this.Connector.SetSessionValue(session, "Race Strategy", strategy)
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
+
+				lap := this.Connector.GetSessionLastLap(session)
+
 				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
+				this.Connector.SetLapValue(lap, "Strategy Update", strategy)
+				this.Connector.SetSessionValue(session, "Strategy Update", lap)
 
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}

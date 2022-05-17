@@ -47,39 +47,39 @@ global kAzureVoices = {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-Jo
 class SpeechSynthesizer {
 	iSynthesizer := "Windows"
 	iVoices := []
-	
+
 	iLanguage := ""
 	iLocale := ""
 	iVoice := ""
-	
+
 	iRate := 0
 	iPitch := 0
 	iVolume := 100
-	
+
 	iCache := {}
 	iCacheDirectory := false
 
 	iPlaysCacheFile := false
-	
+
 	Synthesizer[] {
 		Get {
 			return this.iSynthesizer
 		}
 	}
-	
+
 	Voices[language := false] {
 		Get {
 			if !language
 				return this.iVoices
 			else {
 				voices := []
-			
+
 				if (this.Synthesizer = "Windows") {
 					Loop % this.iSpeechSynthesizer.GetVoices.Count
 					{
 						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
 						lcid := voice.GetAttribute("Language")
-						
+
 						if (getLanguageFromLCID(lcid) = language)
 							voices.Push(voice.GetAttribute("Name"))
 					}
@@ -87,55 +87,55 @@ class SpeechSynthesizer {
 				else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 					for ignore, candidate in this.iVoices {
 						name := string2Values("(", candidate)
-					
+
 						if (InStr(name[2], language) == 1)
 							voices.Push(candidate)
 					}
 				}
-				
+
 				return voices
-			}	
+			}
 		}
 	}
-	
+
 	Language[] {
 		Get {
 			return this.iLanguage
 		}
 	}
-	
+
 	Locale[] {
 		Get {
 			return this.iLocale
 		}
 	}
-	
+
 	Voice[] {
 		Get {
 			return this.iVoice
 		}
 	}
-	
+
 	__New(synthesizer, voice := false, language := false) {
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
-			
+
 			Loop % this.iSpeechSynthesizer.GetVoices.Count
 				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
-			
+
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else if (synthesizer = "dotNET") {
 			this.iSynthesizer := "dotNET"
-			
+
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
-			
+
 			try {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
-					
+
 					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
@@ -143,49 +143,49 @@ class SpeechSynthesizer {
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
-				
+
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-			
+
 			voices := this.iSpeechSynthesizer.GetVoices()
 			this.iVoices := string2Values("|", voices)
-			
+
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else if (InStr(synthesizer, "Azure|") == 1) {
 			this.iSynthesizer := "Azure"
-			
+
 			dllName := "Speech.Synthesizer.dll"
 			dllFile := kBinariesDirectory . dllName
-			
+
 			try {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
-					
+
 					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
-				
+
 				synthesizer := string2Values("|", synthesizer)
-				
+
 				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
-				
+
 					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
-				
+
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-			
+
 			voices := this.iSpeechSynthesizer.GetVoices()
-			
+
 			if (voices = "") {
 				for languageCode, voiceInfos in kAzureVoices
 					for ignore, voiceInfo in voiceInfos
@@ -194,18 +194,18 @@ class SpeechSynthesizer {
 			else {
 				this.iVoices := string2Values("|", voices)
 			}
-			
+
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else
 			Throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
-		
+
 		OnExit(ObjBindMethod(this, "clearCache"))
 	}
-	
+
 	clearCache() {
 		directory := this.iCacheDirectory
-		
+
 		if directory {
 			try {
 				FileRemoveDir %directory%, 1
@@ -214,57 +214,57 @@ class SpeechSynthesizer {
 				; ignore
 			}
 		}
-		
+
 		return false
 	}
-	
+
 	cacheFileName(cacheKey, fileName := false) {
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
 			if !this.iCacheDirectory {
 				Random postfix, 1, 1000000
-			
+
 				postfix := Round(postfix)
-				
+
 				dirName := ("PhraseCache" . postfix)
-				
+
 				FileCreateDir %kTempDirectory%%dirName%
-				
+
 				this.iCacheDirectory := (kTempDirectory . dirName)
 			}
-			
+
 			fileName := (this.iCacheDirectory . "\" . (fileName ? fileName : cacheKey) . ".wav")
-			
+
 			this.iCache[cacheKey] := fileName
-			
+
 			return fileName
 		}
 	}
-	
+
 	speak(text, wait := true, cache := false) {
 		static counter := 1
-		
+
 		this.stop()
-		
+
 		if (cache && (cache == true))
 			cache := text
-		
+
 		if cache {
 			if (cache == true)
 				cacheFileName := this.cacheFileName(text, "Unnamed_" . counter++)
 			else
 				cacheFileName := this.cacheFileName(cache)
-			
+
 			if FileExist(cacheFileName) {
 				if (wait || !cache)
 					SoundPlay %cacheFileName%, Wait
 				else {
 					SoundPlay %cacheFileName%
-				
+
 					this.iPlaysCacheFile := true
 				}
-				
+
 				return
 			}
 		}
@@ -273,42 +273,42 @@ class SpeechSynthesizer {
 
 		if kSoX {
 			Random postfix, 1, 1000000
-			
+
 			postfix := Round(postfix)
-	
+
 			temp1Name := kTempDirectory . "temp1_" . postfix . ".wav"
-		
+
 			if cacheFileName
 				temp2Name := cacheFileName
 			else
 				temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
-			
+
 			this.speakToFile(temp1Name, text)
-		
+
 			if !FileExist(temp1Name) {
 				if (this.Synthesizer = "Windows")
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-				
+
 				return
 			}
-			
+
 			try {
 				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
 				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
 				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
-			
+
 				if (wait || !cache)
 					SoundPlay %temp2Name%, Wait
 				else {
 					SoundPlay %temp2Name%
-				
+
 					this.iPlaysCacheFile := true
 				}
 			}
 			catch exception {
 				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				
+
 				if (this.Synthesizer = "Windows")
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
@@ -316,7 +316,7 @@ class SpeechSynthesizer {
 				try {
 					if FileExist(temp1Name)
 						FileDelete %temp1Name%
-							
+
 					if (!cache && FileExist(temp2Name))
 						FileDelete %temp2Name%
 				}
@@ -330,21 +330,21 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 				Random postfix, 1, 1000000
-				
+
 				postfix := Round(postfix)
-		
+
 				tempName := (cache ? cacheFileName : (kTempDirectory . "temp_" . postfix . ".wav"))
 
 				this.SpeakToFile(tempName, text)
-				
+
 				if !FileExist(tempName)
 					return
-				
+
 				if (wait || !cache)
 					SoundPlay %tempName%, Wait
 				else
 					SoundPlay %tempName%
-				
+
 				if !cache
 					try {
 						FileDelete %tempName%
@@ -358,42 +358,42 @@ class SpeechSynthesizer {
 
 	speakToFile(fileName, text) {
 		this.stop()
-		
+
 		if (this.Synthesizer = "Windows") {
 			oldStream := this.iSpeechSynthesizer.AudioOutputStream
-			
+
 			stream := ComObjCreate("Sapi.SpFileStream")
-			
+
 			try {
 				stream.Open(fileName, 0x3, 0)
-			
+
 				this.iSpeechSynthesizer.AudioOutputStream := stream
-			
+
 				this.iSpeechSynthesizer.Speak(text, 0x0)
 			}
 			finally {
 				stream.Close()
-				
+
 				this.iSpeechSynthesizer.AudioOutputStream := oldStream
 			}
 		}
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
 		    ssml .= " <voice name=""%voice%"">"
-			
+
 			if (this.Synthesizer = "Azure")
 				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
 			else
 				ssml .= "  <prosody pitch=""%pitch%"">"
-			
+
 			ssml .= "  %text%"
 			ssml .= "  </prosody>"
 			ssml .= " </voice>"
 			ssml .= "</speak>"
-			
+
 			ssml := substituteVariables(ssml, {volume: this.iVolume, pitch: ((this.iPitch > 0) ? "+" : "-") . Abs(this.iPitch) . "st", rate: 1 + (0.05 * this.iRate)
 									  , language: this.Locale, voice: this.Voice, text: text})
-			
+
 			try {
 				if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
 					Throw "Error while speech synthesizing..."
@@ -404,18 +404,18 @@ class SpeechSynthesizer {
 			}
 		}
 	}
-	
+
 	pause() {
 		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
-			
+
 			if (status = 0)
 				this.iSpeechSynthesizer.Resume
 			else if (status = 2)
 				this.iSpeechSynthesizer.Pause
 		}
 	}
-	
+
 	stop() {
 		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
@@ -424,58 +424,58 @@ class SpeechSynthesizer {
 			catch exception {
 				; Ignore
 			}
-			
+
 			this.iPlaysCacheFile := false
 		}
 		else if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
-			
+
 			if (status = 0)
 				this.iSpeechSynthesizer.Resume
-			
+
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
 	}
-	
+
 	setRate(rate) {
 		this.iRate := rate
-		
+
 		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Rate := rate
 		else if (this.Synthesizer = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(rate, this.iVolume)
 	}
-	
+
 	setVolume(volume) {
 		this.iVolume := volume
-		
+
 		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Volume := volume
 		else if (this.Synthesizer = "dotNET")
 			this.iSpeechSynthesizer.SetProsody(this.iRate, volume)
 	}
-	
+
 	setPitch(pitch) {
 		this.iPitch := pitch
-		
+
 		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak("<pitch absmiddle = '" pitch "'/>", 0x20)
 	}
 
 	computeVoice(voice, language, randomize := true) {
 		voices := this.Voices
-	
+
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {
 				availableVoices := this.Voices[language]
-				
+
 				count := availableVoices.Length()
-				
+
 				if (count == 0)
 					voice := false
 				else if randomize {
 					Random index, 1, count
-				
+
 					voice := availableVoices[Round(index)]
 				}
 				else
@@ -487,58 +487,58 @@ class SpeechSynthesizer {
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			if ((voice == true) && language) {
 				availableVoices := []
-				
+
 				for ignore, candidate in voices {
 					voice := string2Values("(", candidate)
 					locale := StrReplace(voice[2], ")", "")
-					
+
 					if (InStr(locale, language) == 1)
 						availableVoices.Push(candidate)
 				}
-				
+
 				count := availableVoices.Length()
-				
+
 				if (count == 0)
 					voice := false
 				else if randomize {
 					Random index, 1, count
-				
+
 					voice := availableVoices[Round(index)]
 				}
 				else
 					voice := availableVoices[1]
 			}
 		}
-			
+
 		if (voice && (voice != true))
 			voice := inList(voices, voice)
-		
+
 		if !voice
 			voice := 1
-			
+
 		return voices[voice]
 	}
-	
+
 	setVoice(language, name) {
 		if (this.Synthesizer = "Windows") {
 			if !inList(this.Voices, name)
 				return false
-			
+
 			while !(this.iSpeechSynthesizer.Status.RunningState = 1)
 				Sleep 200
-			
+
 			this.iSpeechSynthesizer.Voice := this.iSpeechSynthesizer.GetVoices("Name=" . name).Item(0)
 			this.iLanguage := language
 			this.iVoice := name
 		}
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			name := string2Values("(", name)
-		
+
 			this.iLanguage := language
 			this.iVoice := name[1]
 			this.iLocale := StrReplace(name[2], ")", "")
 		}
-			
+
 		return true
 	}
 }

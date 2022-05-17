@@ -198,6 +198,8 @@ class TrackFrontInfo extends FrontPositionInfo {
 	}
 }
 
+setDebug(true)
+
 class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
 
@@ -215,18 +217,8 @@ class RaceSpotter extends RaceAssistant {
 		iFastSpeechSynthesizer := false
 
 		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
-			iLastSpeech := 0
-
 			speak(text, focus := false, cache := false, wait := true) {
-				if ((A_Now - this.iLastSpeech) < 2000) {
-					SoundPlay NonExistent.avi
-
-					Sleep 200
-				}
-
-				this.iLastSpeech := A_Now
-
-				base.speak(text, focus, cache, false)
+				base.speak(text, focus, cache, true)
 			}
 		}
 
@@ -881,10 +873,12 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 
 				try {
+					speaker := this.getSpeaker(true)
+
 					if variables
-						this.getSpeaker(true).speakPhrase(message, variables)
+						speaker.speakPhrase(message, variables)
 					else
-						this.getSpeaker(true).speakPhrase(message, false, false, message)
+						speaker.speakPhrase(message, false, false, message)
 				}
 				finally {
 					this.SpotterSpeaking := false

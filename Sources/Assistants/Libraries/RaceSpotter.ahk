@@ -214,11 +214,27 @@ class RaceSpotter extends RaceAssistant {
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {
 		iFastSpeechSynthesizer := false
 
+		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
+			iLastSpeech := 0
+
+			speak(text, focus := false, cache := false, wait := true) {
+				if ((A_Now - this.iLastSpeech) < 2000) {
+					SoundPlay NonExistent.avi
+
+					Sleep 200
+				}
+
+				this.iLastSpeech := A_Now
+
+				base.speak(text, focus, cache, false)
+			}
+		}
+
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+					this.iFastSpeechSynthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
 					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -229,6 +245,13 @@ class RaceSpotter extends RaceAssistant {
 			}
 			else
 				return base.getSpeaker()
+		}
+
+		buildPhrases(language, fast := false) {
+			if fast
+				return base.buildPhrases(language, "Spotter Phrases")
+			else
+				return base.buildPhrases(language)
 		}
 	}
 

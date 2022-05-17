@@ -198,8 +198,6 @@ class TrackFrontInfo extends FrontPositionInfo {
 	}
 }
 
-setDebug(true)
-
 class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
 

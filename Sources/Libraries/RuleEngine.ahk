@@ -4501,7 +4501,8 @@ unequal(choicePoint, operand1, operand2) {
 builtin0(choicePoint, function, operand1) {
 	local resultSet := choicePoint.ResultSet
 
-	function := function.toString(resultSet)
+	if isInstance(function, Term)
+		function := function.toString(resultSet)
 
 	return resultSet.unify(choicePoint, new Literal(%function%()), operand1.getValue(resultSet, operand1))
 }

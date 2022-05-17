@@ -315,10 +315,10 @@ class StrategySimulation {
 													 , initialMap, initialFuelConsumption, initialAvgLapTime)
 	}
 
-	getSimulationSettings(ByRef useStartConditions, ByRef useTelemetryData, ByRef consumptionWeight, ByRef initialFuelWeight
-						, ByRef tyreUsageWeight, ByRef tyreCompoundVariationWeight) {
-		return this.StrategyManager.getSimulationSettings(useStartConditions, useTelemetryData, consumptionWeight, initialFuelWeight
-														, tyreUsageWeight, tyreCompoundVariationWeight)
+	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData, ByRef consumptionVariation, ByRef initialFuelVariation
+						, ByRef tyreUsageVariation, ByRef tyreCompoundVariationVariation) {
+		return this.StrategyManager.getSimulationSettings(useInitialConditions, useTelemetryData, consumptionVariation, initialFuelVariation
+														, tyreUsageVariation, tyreCompoundVariationVariation)
 	}
 
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
@@ -645,16 +645,16 @@ class VariationSimulation extends StrategySimulation {
 		if initialLap
 			formationLap := false
 
-		useStartConditions := false
+		useInitialConditions := false
 		useTelemetryData := false
 		consumption := 0
 		tyreUsage := 0
 		tyreCompoundVariation := 0
 		initialFuel := 0
 
-		this.getSimulationSettings(useStartConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
+		this.getSimulationSettings(useInitialConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 
-		consumptionSteps := consumption / 10
+		consumptionSteps := 1
 		tyreUsageSteps := tyreUsage
 		tyreCompoundVariationSteps := tyreCompoundVariation / 4
 		initialFuelSteps := initialFuel / 10
@@ -663,7 +663,7 @@ class VariationSimulation extends StrategySimulation {
 		variation := 1
 
 		if (tyreCompoundVariation > 0) {
-			if (useStartConditions && useTelemetryData) {
+			if (useInitialConditions && useTelemetryData) {
 				tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
 
 				if !inList(tyreCompoundColors, tyreCompoundColor)
@@ -694,7 +694,7 @@ class VariationSimulation extends StrategySimulation {
 			Loop { ; initialFuel
 				Loop { ; tyreUsage
 					Loop { ; tyreCompoundVariation
-						if useStartConditions {
+						if useInitialConditions {
 							if map is number
 							{
 								message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate(":") . variation++ . translate("..."))
@@ -710,7 +710,7 @@ class VariationSimulation extends StrategySimulation {
 								try {
 									strategy := this.createStrategy(name)
 
-									currentConsumption := (fuelConsumption - (fuelConsumption / 100 * consumption))
+									currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
 									Random rnd, 0, 1
 
@@ -758,7 +758,7 @@ class VariationSimulation extends StrategySimulation {
 
 									strategy := this.createStrategy(name)
 
-									currentConsumption := (scenarioFuelConsumption - (scenarioFuelConsumption / 100 * consumption))
+									currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 
 									Random rnd, 0, 1
 
@@ -870,6 +870,14 @@ class Strategy extends ConfigurationItem {
 	iAvgLapTime := 0
 	iFuelConsumption := 0
 	iTyreLaps := 0
+
+	iUseInitialConditions := false
+	iUseTelemetryData := false
+
+	iConsumptionVariation := 0
+	iInitialFuelVariation := 0
+	iTyreUsageVariation := 0
+	iTyreCompoundVariation := 0
 
 	iPitstops := []
 
@@ -1517,6 +1525,42 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	UseInitialConditions[] {
+		Get {
+			return this.iUseInitialConditions
+		}
+	}
+
+	UseTelemetryData[] {
+		Get {
+			return this.iUseTelemetryData
+		}
+	}
+
+	ConsumptionVariation[] {
+		Get {
+			return this.iConsumptionVariation
+		}
+	}
+
+	InitialFuelVariation[] {
+		Get {
+			return this.iInitialFuelVariation
+		}
+	}
+
+	TyreUsageVariation[] {
+		Get {
+			return this.iTyreUsageVariation
+		}
+	}
+
+	TyreCompoundVariation[] {
+		Get {
+			return this.iTyreCompoundVariation
+		}
+	}
+
 	__New(strategyManager, configuration := false) {
 		this.iStrategyManager := strategyManager
 
@@ -1596,6 +1640,24 @@ class Strategy extends ConfigurationItem {
 			this.iRefuelRule := refuelRule
 			this.iTyreChangeRule := tyreChangeRule
 			this.iTyreSets := tyreSets
+
+			useInitialConditions := false
+			useTelemetryData := false
+			consumptionVariation := false
+			initialFuelVariation := false
+			tyreUsageVariation := false
+			tyreCompoundVariation := false
+
+			this.StrategyManager.getSimulationSettings(useInitialConditions, useTelemetryData
+													 , consumptionVariation, initialFuelVariation, tyreUsageVariation, tyreCompoundVariation)
+
+			iUseInitialConditions := useInitialConditions
+			iUseTelemetryData := useTelemetryData
+
+			iConsumptionVariation := consumptionVariation
+			iInitialFuelVariation := initialFuelVariation
+			iTyreUsageVariation := tyreUsageVariation
+			iTyreCompoundVariation := tyreCompoundVariation
 		}
 	}
 
@@ -1695,6 +1757,14 @@ class Strategy extends ConfigurationItem {
 
 		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
 			this.Pitstops.Push(this.createPitstop(A_Index, lap, this.TyreCompound, this.TyreCompoundColor, configuration))
+
+		this.iUseInitialConditions := getConfigurationValue(configuration, "Simulation", "UseInitialConditions", true)
+		this.iUseTelemetryData := getConfigurationValue(configuration, "Simulation", "UseTelemetryData", true)
+
+		this.iConsumptionVariation := getConfigurationValue(configuration, "Simulation", "ConsumptionVariation", 0)
+		this.iInitialFuelVariation := getConfigurationValue(configuration, "Simulation", "InitialFuelVariation", 0)
+		this.iTyreUsageVariation := getConfigurationValue(configuration, "Simulation", "TyreUsageVariation", 0)
+		this.iTyreCompoundVariation := getConfigurationValue(configuration, "Simulation", "TyreCompoundVariation", 0)
 	}
 
 	saveToConfiguration(configuration) {
@@ -1765,7 +1835,7 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Strategy", "MaxTyreLaps", this.MaxTyreLaps)
 
 		setConfigurationValue(configuration, "Strategy", "AvgLapTime", this.AvgLapTime)
-		setConfigurationValue(configuration, "Strategy", "FuelConsumption", this.FUelConsumption)
+		setConfigurationValue(configuration, "Strategy", "FuelConsumption", this.FuelConsumption)
 
 		pitstops := []
 
@@ -1776,6 +1846,14 @@ class Strategy extends ConfigurationItem {
 		}
 
 		setConfigurationValue(configuration, "Strategy", "Pitstops", values2String(", ", pitstops*))
+
+		setConfigurationValue(configuration, "Simulation", "UseInitialConditions", this.UseInitialConditions)
+		setConfigurationValue(configuration, "Simulation", "UseTelemetryData", this.UseTelemetryData)
+
+		setConfigurationValue(configuration, "Simulation", "ConsumptionVariation", this.ConsumptionVariation)
+		setConfigurationValue(configuration, "Simulation", "InitialFuelVariation", this.InitialFuelVariation)
+		setConfigurationValue(configuration, "Simulation", "TyreUsageVariation", this.TyreUsageVariation)
+		setConfigurationValue(configuration, "Simulation", "TyreCompoundVariation", this.TyreCompoundVariation)
 	}
 
 	initializeAvailableTyreSets() {

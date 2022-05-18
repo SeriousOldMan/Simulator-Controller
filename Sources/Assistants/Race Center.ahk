@@ -2454,13 +2454,19 @@ class RaceCenter extends ConfigurationItem {
 
 		setup := false
 
+		weatherIndex := inList(kWeatherOptions, weather)
+
 		for ignore, candidate in this.SessionDatabase.query("Setups.Data", {Where: {Driver: driver.FullName
-																				  , Weather: weather
 																				  , "Tyre.Compound": compound
 																				  , "Tyre.Compound.Color": compoundColor}})
 			if setup {
-				if ((Abs(candidate["Temperature.Air"] - airTemperature) < Abs(setup["Temperature.Air"] - airTemperature))
-				 || (Abs(candidate["Temperature.Track"] - trackTemperature) < Abs(setup["Temperature.Track"] - trackTemperature)))
+				sWeatherIndex := inList(kWeatherOptions, setup.Weather)
+				cWeatherIndex := inList(kWeatherOptions, candidate.Weather)
+
+				if (Abs(weatherIndex - cWeatherIndex) < Abs(weatherIndex - sWeatherIndex))
+					setup := candidate
+				else if ((Abs(candidate["Temperature.Air"] - airTemperature) < Abs(setup["Temperature.Air"] - airTemperature))
+					  || (Abs(candidate["Temperature.Track"] - trackTemperature) < Abs(setup["Temperature.Track"] - trackTemperature)))
 					setup := candidate
 			}
 			else
@@ -3827,6 +3833,8 @@ class RaceCenter extends ConfigurationItem {
 		numLaps := laps.Length()
 
 		lapTimes := []
+		airTemperatures := []
+		trackTemperatures := []
 
 		for ignore, lap in laps {
 			if (lap.Nr > 1) {
@@ -3840,6 +3848,8 @@ class RaceCenter extends ConfigurationItem {
 				stint.Accidents += 1
 
 			lapTimes.Push(lap.Laptime)
+			airTemperatures.Push(lap.AirTemperature)
+			trackTemperatures.Push(lap.TrackTemperature)
 
 			if (A_Index == 1) {
 				stint.Compound := lap.Compound
@@ -3859,6 +3869,8 @@ class RaceCenter extends ConfigurationItem {
 		stint.AvgLaptime := Round(average(laptimes), 1)
 		stint.BestLaptime := Round(minimum(laptimes), 1)
 		stint.FuelConsumption := Round(stint.FuelConsumption, 1)
+		stint.AirTemperature := Round(average(airTemperatures), 1)
+		stint.TrackTemperature := Round(average(trackTemperatures), 1)
 
 		currentListView := A_DefaultListView
 
@@ -4497,58 +4509,62 @@ class RaceCenter extends ConfigurationItem {
 
 				state := parseConfiguration(state)
 
-				lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
+				Loop {
+					lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 
-				if lap {
-					fuel := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
-					compound := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
-					compoundColor := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color")
-					tyreSet := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
-					pressureFL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
-					pressureFR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
-					pressureRL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
-					pressureRR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
-					repairBodywork := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
-					repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
+					if lap {
+						fuel := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
+						compound := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
+						compoundColor := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color")
+						tyreSet := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
+						pressureFL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
+						pressureFR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
+						pressureRL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
+						pressureRR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
+						repairBodywork := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
+						repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
 
-					if (compound && (compound != "-"))
-						pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
-					else {
-						compound := "-"
-						compoundColor := false
+						if (compound && (compound != "-"))
+							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+						else {
+							compound := "-"
+							compoundColor := false
 
-						tyreSet := "-"
-						pressures := "-, -, -, -"
+							tyreSet := "-"
+							pressures := "-, -, -, -"
+						}
+
+						if (repairBodywork && repairSuspension)
+							repairs := (translate("Bodywork") . ", " . translate("Suspension"))
+						else if repairBodywork
+							repairs := translate("Bodywork")
+						else if repairSuspension
+							repairs := translate("Suspension")
+						else
+							repairs := "-"
+
+						Gui ListView, % this.PitstopsListView
+
+						LV_Add("", nextStop, lap + 1, fuel, translate(compound(compound, compoundColor)), tyreSet, pressures, repairs)
+
+						if (nextStop = 1) {
+							LV_ModifyCol()
+
+							Loop % LV_GetCount("Col")
+								LV_ModifyCol(A_Index, "AutoHdr")
+						}
+
+						pressures := string2Values(",", pressures)
+
+						sessionDB.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
+													 , "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
+													 , "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
+													 , "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension})
+
+						nextStop += 1
 					}
-
-					if (repairBodywork && repairSuspension)
-						repairs := (translate("Bodywork") . ", " . translate("Suspension"))
-					else if repairBodywork
-						repairs := translate("Bodywork")
-					else if repairSuspension
-						repairs := translate("Suspension")
 					else
-						repairs := "-"
-
-					Gui ListView, % this.PitstopsListView
-
-					LV_Add("", nextStop, lap + 1, fuel, translate(compound(compound, compoundColor)), tyreSet, pressures, repairs)
-
-					if (nextStop = 1) {
-						LV_ModifyCol()
-
-						Loop % LV_GetCount("Col")
-							LV_ModifyCol(A_Index, "AutoHdr")
-					}
-
-					pressures := string2Values(",", pressures)
-
-					sessionDB.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
-												 , "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
-												 , "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
-												 , "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension})
-
-					this.syncPitstop(state)
+						break
 				}
 			}
 		}
@@ -5269,11 +5285,17 @@ class RaceCenter extends ConfigurationItem {
 			stintNr := newStint.Nr
 			stintLap := newStint.Lap
 
+			airTemperatures := []
+			trackTemperatures := []
+
 			Loop {
 				if !this.Laps.HasKey(stintLap)
 					break
 
 				lap := this.Laps[stintLap]
+
+				airTemperatures.Push(lap.AirTemperature)
+				trackTemperatures.Push(lap.TrackTemperature)
 
 				if IsObject(lap.Stint)
 					newStint.Lap := (stintLap + 1)
@@ -5289,6 +5311,9 @@ class RaceCenter extends ConfigurationItem {
 
 				stintLap += 1
 			}
+
+			newStint.AirTemperature := Round(average(airTemperatures), 1)
+			newStint.TrackTemperature := Round(average(trackTemperatures), 1)
 
 			newStint.Potential := "-"
 			newStint.RaceCraft := "-"
@@ -6498,6 +6523,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . stint.AirTemperature . ", " . stint.TrackTemperature . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . stint.FuelConsumption . A_Space . translate("Liter") . "</td></tr>")
 		html .= "</table>"
 

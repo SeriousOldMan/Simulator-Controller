@@ -239,7 +239,7 @@ const int LEFT = 2;
 const int RIGHT = 3;
 const int THREE = 4;
 
-const int situationRepeat = 5;
+const int situationRepeat = 50;
 
 const char* noAlert = "NoAlert";
 
@@ -340,7 +340,8 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 	const char* alert = computeAlert(newSituation);
 
 	if (alert != noAlert) {
-		carBehindReported = FALSE;
+		if (strcmp(alert, "Hold") == 0)
+			carBehindReported = FALSE;
 
 		char buffer2[128];
 		int offset = 0;

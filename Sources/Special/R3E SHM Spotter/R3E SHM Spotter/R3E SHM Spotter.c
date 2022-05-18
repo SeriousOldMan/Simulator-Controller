@@ -111,7 +111,7 @@ void sendMessage(char* message) {
 #define RIGHT 2
 #define THREE 3
 
-#define situationRepeat 5
+#define situationRepeat 50
 
 char* noAlert = "NoAlert";
 
@@ -325,7 +325,8 @@ BOOL checkPositions(int playerID) {
 		char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			carBehindReported = FALSE;
+			if (strcmp(alert, "Hold") == 0)
+				carBehindReported = FALSE;
 
 			char buffer[128];
 

@@ -164,7 +164,7 @@ namespace RF2SHMSpotter {
 		const int RIGHT = 2;
 		const int THREE = 3;
 
-		const int situationRepeat = 5;
+		const int situationRepeat = 50;
 
 		const string noAlert = "NoAlert";
 
@@ -417,7 +417,8 @@ namespace RF2SHMSpotter {
 
 				if (alert != noAlert)
 				{
-					carBehindReported = false;
+					if (alert != "Hold")
+						carBehindReported = false;
 
 					SendMessage("proximityAlert:" + alert);
 

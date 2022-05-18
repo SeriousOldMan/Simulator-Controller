@@ -117,6 +117,12 @@ class SpeechSynthesizer {
 		}
 	}
 
+	Speaking[] {
+		Get {
+			return this.isSpeaking()
+		}
+	}
+
 	__New(synthesizer, voice := false, language := false) {
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
@@ -443,6 +449,22 @@ class SpeechSynthesizer {
 		}
 	}
 
+	isSpeaking() {
+		if this.iSoundPlayer {
+			Process Exist, % this.iSoundPlayer
+
+			if ErrorLevel
+				return true
+			else {
+				this.iSoundPlayer := false
+
+				return false
+			}
+		}
+		else
+			return false
+	}
+
 	pause() {
 		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
@@ -456,17 +478,8 @@ class SpeechSynthesizer {
 
 	wait() {
 		if this.iSoundPlayer
-			Loop {
-				Process Exist, % this.iSoundPlayer
-
-				if ErrorLevel
-					Sleep 50
-				else {
-					this.iSoundPlayer := false
-
-					break
-				}
-			}
+			while this.isSpeaking()
+				Sleep 50
 		else
 			this.stop()
 	}

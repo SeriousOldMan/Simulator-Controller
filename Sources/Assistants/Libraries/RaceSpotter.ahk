@@ -216,6 +216,8 @@ class RaceSpotter extends RaceAssistant {
 
 		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
 			speak(text, focus := false, cache := false, wait := true) {
+				this.wait()
+
 				base.speak(text, focus, cache, false)
 			}
 		}
@@ -867,26 +869,28 @@ class RaceSpotter extends RaceAssistant {
 				variables := values
 			}
 
-			if (this.Speaker && !this.SpotterSpeaking) {
-				this.SpotterSpeaking := true
+			if this.Speaker { ; if (this.Speaker && !this.SpotterSpeaking) {
+				if (!this.SpotterSpeaking || (type != "Hold")) {
+					this.SpotterSpeaking := true
 
-				try {
-					speaker := this.getSpeaker(true)
+					try {
+						speaker := this.getSpeaker(true)
 
-					if variables
-						speaker.speakPhrase(message, variables)
-					else
-						speaker.speakPhrase(message, false, false, message)
-				}
-				finally {
-					this.SpotterSpeaking := false
+						if variables
+							speaker.speakPhrase(message, variables)
+						else
+							speaker.speakPhrase(message, false, false, message)
+					}
+					finally {
+						this.SpotterSpeaking := false
+					}
 				}
 			}
 		}
 	}
 
 	yellowFlag(message, arguments*) {
-		if (this.Warnings["YellowFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -913,7 +917,7 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Warnings["BlueFlags"] && this.Speaker && !this.SpotterSpeaking) {
+		if (this.Warnings["BlueFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -932,7 +936,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pitWindow(state) {
-		if (this.Warnings["PitWindow"] && this.Speaker && !this.SpotterSpeaking && (this.Session = kSessionRace)) {
+		if (this.Warnings["PitWindow"] && this.Speaker && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
 			this.SpotterSpeaking := true
 
 			try {

@@ -186,7 +186,7 @@ class VoiceAssistant {
 
 		Speaking[] {
 			Get {
-				return this.Assistant.Speaking
+				return (this.Assistant.Speaking || base.Speaking)
 			}
 
 			Set {

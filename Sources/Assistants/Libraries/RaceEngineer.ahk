@@ -1297,7 +1297,7 @@ class RaceEngineer extends RaceAssistant {
 			  , tyrePressures := "__Undefined__", repairBodywork := "__Undefined__", repairSuspension := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
-			  
+		
 		confirm := true
 		
 		options := optionsOrLap

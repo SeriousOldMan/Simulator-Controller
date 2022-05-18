@@ -587,6 +587,14 @@ namespace Speech
                 percentileChoices.Add(i.ToString());
 
             _choicesDictionary.Add("Percent", percentileChoices);
+            _choicesDictionary.Add("Number", percentileChoices);
+
+            var digitChoices = new System.Speech.Recognition.Choices();
+
+            for (var i = 0; i <= 10; i++)
+                digitChoices.Add(i.ToString());
+
+            _choicesDictionary.Add("Digit", digitChoices);
         }
 
         /// <summary>

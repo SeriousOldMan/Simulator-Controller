@@ -357,9 +357,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				
 					if !driverCar {
 						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)
-						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Nickname") = driverNickname))
+						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
+						
+							lastDriverCar := driverCar
+						}
 						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 							driverCar := A_index
 					}
@@ -368,8 +370,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			
 			if !driverCar
 				driverCar := lastDriverCar
-			else
-				lastDriverCar := driverCar
 			
 			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
 			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
@@ -1397,11 +1397,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		if compound {
 			changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
-			
-			tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
-			
-			if (compound = "Dry")
-				changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+
+			if set {
+				tyreSetIncrement := Round(set - this.getPitstopOptionValues("Tyre Set")[1])
+				
+				if (compound = "Dry")
+					changePitstopTyreSet((tyreSetIncrement > 0) ? "Next" : "Previous", Abs(tyreSetIncrement))
+			}
 		}
 		else if this.iPSChangeTyres
 			this.toggleActivity("Change Tyres")

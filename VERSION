@@ -1,9 +1,9 @@
 [Development]
-Version=4.1.5-release
-Target=4.1.5-release
-Date=05/14/2022
-Download=https://cntr.click/X1paFsz
-Changes=Delta calculation by the Spotter is much more precise, Spotter warnings are now much faster due to caching of the generated sound files, Session Database location is now configurable, Jona can be asked about the amount of fuel remaining, New *InformationRequest* action *FuelRemaining* for all simulators and the "Race Engineer" plugin, Larger window sizes for "Strategy Workbench" and "Race Center", Handling of driver specific car setups in "Race Center", Fixed Spotter not starting in AMS2 after the formation lap, Settings for temperature based tyre pressure correction, New special rules for additional cars in "Setup Advisor", New icons for Stream Deck
+Version=4.1.6-dev
+Target=4.1.6-release
+Date=05/18/2022
+Download=https://www.dropbox.com/s/ih7jf0w9nes5etb/Simulator%20Controller%204.1.6-dev.zip?dl=1
+Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive
 [Release]
 Version=4.1.5-release
 Date=05/14/2022
@@ -13,4 +13,4 @@ Changes=Delta calculation by the Spotter is much more precise, Spotter warnings 
 Type=Release
 [Version]
 Release=4.1.5-release
-Development=4.1.5-release
+Development=4.1.6-dev

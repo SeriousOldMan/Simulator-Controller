@@ -69,7 +69,7 @@ const int LEFT = 1;
 const int RIGHT = 2;
 const int THREE = 3;
 
-const int situationRepeat = 5;
+const int situationRepeat = 50;
 
 const char* noAlert = "NoAlert";
 
@@ -275,7 +275,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 		const char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			carBehindReported = false;
+			if (strcmp(alert, "Hold") == 0)
+				carBehindReported = false;
 
 			char buffer[128];
 

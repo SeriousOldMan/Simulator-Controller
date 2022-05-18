@@ -59,6 +59,7 @@ class SpeechSynthesizer {
 	iCache := {}
 	iCacheDirectory := false
 
+	iSoundPlayer := false
 	iPlaysCacheFile := false
 
 	Synthesizer[] {
@@ -203,6 +204,27 @@ class SpeechSynthesizer {
 		OnExit(ObjBindMethod(this, "clearCache"))
 	}
 
+	playSound(soundFile, wait := true) {
+		if kSox {
+			if wait {
+				RunWait "%kSox%" "%soundFile%" -t waveaudio -d, , HIDE
+
+				return false
+			}
+			else {
+				Run "%kSox%" "%soundFile%" -t waveaudio -d, , HIDE, pid
+
+				return pid
+			}
+		}
+		else {
+			if wait
+				SoundPlay %soundFile%, Wait
+			else
+				SoundPlay %soundFile%
+		}
+	}
+
 	clearCache() {
 		directory := this.iCacheDirectory
 
@@ -245,7 +267,7 @@ class SpeechSynthesizer {
 	speak(text, wait := true, cache := false) {
 		static counter := 1
 
-		this.stop()
+		this.wait()
 
 		if (cache && (cache == true))
 			cache := text
@@ -257,10 +279,15 @@ class SpeechSynthesizer {
 				cacheFileName := this.cacheFileName(cache)
 
 			if FileExist(cacheFileName) {
-				if (wait || !cache)
-					SoundPlay %cacheFileName%, Wait
+				if (wait || !cache) {
+					; SoundPlay %cacheFileName%, Wait
+
+					this.playSound(cacheFileName, true)
+				}
 				else {
-					SoundPlay %cacheFileName%
+					; SoundPlay %cacheFileName%
+
+					this.iSoundPlayer := this.playSound(cacheFileName, false)
 
 					this.iPlaysCacheFile := true
 				}
@@ -297,10 +324,15 @@ class SpeechSynthesizer {
 				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
 				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
 
-				if (wait || !cache)
-					SoundPlay %temp2Name%, Wait
+				if (wait || !cache) {
+					; SoundPlay %temp2Name%, Wait
+
+					this.playSound(temp2Name, true)
+				}
 				else {
-					SoundPlay %temp2Name%
+					; SoundPlay %temp2Name%
+
+					this.iSoundPlayer := this.playSound(temp2Name, false)
 
 					this.iPlaysCacheFile := true
 				}
@@ -340,10 +372,16 @@ class SpeechSynthesizer {
 				if !FileExist(tempName)
 					return
 
-				if (wait || !cache)
-					SoundPlay %tempName%, Wait
-				else
-					SoundPlay %tempName%
+				if (wait || !cache) {
+					; SoundPlay %tempName%, Wait
+
+					this.playSound(tempName, true)
+				}
+				else {
+					; SoundPlay %tempName%
+
+					this.iSoundPlayer := this.playSound(tempName, false)
+				}
 
 				if !cache
 					try {
@@ -416,10 +454,29 @@ class SpeechSynthesizer {
 		}
 	}
 
+	wait() {
+		if this.iSoundPlayer
+			Loop {
+				Process Exist, % this.iSoundPlayer
+
+				if ErrorLevel
+					Sleep 50
+				else {
+					this.iSoundPlayer := false
+
+					break
+				}
+			}
+		else
+			this.stop()
+	}
+
 	stop() {
 		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
+
+				this.iSoundPlayer := false
 			}
 			catch exception {
 				; Ignore

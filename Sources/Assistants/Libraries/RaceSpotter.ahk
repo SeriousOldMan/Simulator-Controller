@@ -216,7 +216,7 @@ class RaceSpotter extends RaceAssistant {
 
 		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
 			speak(text, focus := false, cache := false, wait := true) {
-				base.speak(text, focus, cache, true)
+				base.speak(text, focus, cache, false)
 			}
 		}
 

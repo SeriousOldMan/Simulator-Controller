@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.6-dev
 Target=4.1.6-release
-Date=05/16/2022
+Date=05/18/2022
 Download=
-Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition
+Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive
 [Release]
 Version=4.1.4-release
 Date=05/13/2022

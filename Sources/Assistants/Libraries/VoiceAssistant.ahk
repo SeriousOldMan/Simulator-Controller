@@ -244,7 +244,7 @@ class VoiceAssistant {
 			}
 		}
 
-		speak(text, focus := false, cache := false, wait := true) {
+		speak(text, focus := false, cache := false) {
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -256,7 +256,7 @@ class VoiceAssistant {
 					this.Speaking := true
 
 					try {
-						base.speak(text, wait, cache)
+						base.speak(text, !this.Awaitable, cache)
 					}
 					finally {
 						this.Speaking := false

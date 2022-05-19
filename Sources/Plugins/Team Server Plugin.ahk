@@ -267,7 +267,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.createTeamServerAction(controller, "TeamServer", arguments[2])
 		}
 		else
-			this.iTeamServerEnabled := true
+			this.iTeamServerEnabled := false
 
 		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 
@@ -283,7 +283,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			controller.registerPlugin(this)
 
 		if this.TeamServerEnabled
-			this.updateTrayLabel(true)
+			this.enableTeamServer()
 
 		this.keepAlive()
 	}
@@ -350,6 +350,10 @@ class TeamServerPlugin extends ControllerPlugin {
 	enableTeamServer() {
 		this.iTeamServerEnabled := true
 
+		callback := ObjBindMethod(this, "tryConnect")
+
+		SetTimer %callback%, -5000
+
 		this.updateActions(kSessionFinished)
 
 		this.updateTrayLabel(true)
@@ -390,7 +394,21 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iDriverNickName := false
 	}
 
-	connect(serverURL, accessToken, team, driver, session) {
+	tryConnect() {
+		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+
+		serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
+		accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+		teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
+		driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
+		sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
+
+		this.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+
+		this.disconnect()
+	}
+
+	connect(serverURL, accessToken, team, driver, session, verbose := false) {
 		this.disconnect()
 
 		this.iServerURL := ((serverURL && (serverURL != "")) ? serverURL : false)
@@ -402,12 +420,21 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if this.Connected {
 			try {
-				this.Connector.GetTeam(team)
-				this.Connector.GetDriver(driver)
-				this.Connector.GetSession(session)
+				driverObject := this.parseObject(this.Connector.GetDriver(driver))
+
+				teamName := this.parseObject(this.Connector.GetTeam(team)).Name
+				driverName := (driverObject.ForName . A_Space . driverObject.SurName)
+				sessionName := this.parseObject(this.Connector.GetSession(session)).Name
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
+
+				if verbose
+					showMessage(translate("Successfully connected to the team server.") . "`n`n"
+										. translate("Team: ") . teamName . "`n"
+										. translate("Driver: ") . driverName . "`n"
+										. translate("Session: ") . sessionName
+							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 			}
 			catch exception {
 				this.iConnected := false
@@ -486,8 +513,6 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.Connector.SetSessionValue(this.Session, "Time", A_Now)
 
 				this.iSessionActive := true
-
-				; sessionName := this.parseObject(this.Connector.GetSession(this.Session).Name
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Starting session (Session: ") . this.Session . translate(", Car: ") . car . translate(", Track: ") . track . translate(")"))

@@ -1283,7 +1283,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSetupButton gdeleteSetup
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Button, x408 ys+279 w160 greleaseSetups, % translate("Release Setups")
+		Gui %window%:Add, Button, x408 ys+279 w160 greleaseSetups, % translate("Save Setups")
 
 		Gui Tab, 6
 
@@ -1940,7 +1940,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.setSessionValue(session, "Setups Version", version)
 
 				if verbose
-					showMessage(translate("Setups will be updated for this Session."))
+					showMessage(translate("Setups has been saved for this Session."))
 			}
 			catch exception {
 				; ignore
@@ -2319,7 +2319,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.setSessionValue(session, "Stint Plan Version", version)
 
 				if verbose
-					showMessage(translate("Plan will be updated for this Session."))
+					showMessage(translate("Plan has been saved for this Session."))
 			}
 			catch exception {
 				; ignore

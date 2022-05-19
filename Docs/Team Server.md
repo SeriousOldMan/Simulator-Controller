@@ -240,7 +240,7 @@ I recommend that only one person from the team is responsible for the strategy a
 
 ### Managing driver specific tyre pressures
 
-A typical problem in team races is the different driving styles of the team members. In most cases, the race rules does not allow changing the suspension and aerodynamics setup during a pitstop, but handling driver specific tyre pressures due to a more or less aggressive driving style is fortunately allowed and easily doable. Using the "Setups" tab, you can write down one or more reference tyre pressures for your team mates, which can then be used to adjust tyre pressures during a driver swap.
+A typical problem in team races is the different driving styles of the team members. In most cases, the race rules does not allow changing the suspension and aerodynamics setup during a pitstop, but handling driver specific tyre pressures due to a more or less aggressive driving style is fortunately allowed and easily doable. Using the "Setups" tab, you can enter one or more reference tyre pressures for your team mates, which can then be used to adjust tyre pressures during a driver swap.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2015.JPG)
 

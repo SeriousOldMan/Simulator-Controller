@@ -7,7 +7,7 @@
   5. Extended strategy validation in "Strategy Workbench".
   6. Extended strategy optimization in "Strategy Workbench" and "Race Center".
   7. Fixed the handling in "Desktop" voice recognition for the predefined (Number) and (Digit) variables - no longer "Cannot register voice command ..." errors shown on startup.
-  8. Made Spotter warnings much more faster and responsive.
+  8. Made Spotter warnings much faster and more responsive.
   9. Added three more car rules to "Setup Advisor".
   10. A new report "Setups Summary" is available in "Race Center".
 

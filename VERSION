@@ -1,9 +1,9 @@
 [Development]
-Version=4.1.6-alpha
+Version=4.1.6-beta
 Target=4.1.6-release
 Date=05/18/2022
-Download=https://www.dropbox.com/s/sjpfn9jp8xmyd82/Simulator%20Controller%204.1.6-alpha.zip?dl=1
-Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive
+Download=https://www.dropbox.com/s/sb7g54eh28bimg3/Simulator%20Controller%204.1.6-beta.zip?dl=1
+Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive, More special rules for additional cars in "Setup Advisor", New Setups summary report in "Race Center"
 [Release]
 Version=4.1.5-release
 Date=05/14/2022
@@ -13,4 +13,4 @@ Changes=Delta calculation by the Spotter is much more precise, Spotter warnings 
 Type=Development
 [Version]
 Release=4.1.5-release
-Development=4.1.6-alpha
+Development=4.1.6-beta

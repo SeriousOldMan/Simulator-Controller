@@ -1,4 +1,4 @@
-## 4.1.6-release 05/20/22
+## 4.1.6-release 05/20/22 (planned)
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -8,6 +8,8 @@
   6. Extended strategy optimization in "Strategy Workbench" and "Race Center".
   7. Fixed the handling in "Desktop" voice recognition for the predefined (Number) and (Digit) variables - no longer "Cannot register voice command ..." errors shown on startup.
   8. Made Spotter warnings much more faster and responsive.
+  9. Added three more car rules to "Setup Advisor".
+  10. A new report "Setups Summary" is available in "Race Center".
 
 ## 4.1.5-release 05/14/22
 

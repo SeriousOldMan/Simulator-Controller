@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.1.6-alpha](https://www.dropbox.com/s/sjpfn9jp8xmyd82/Simulator%20Controller%204.1.6-alpha.zip?dl=1) (Test build for 4.1.6. New features: Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive. Stable, incl. update procedure and documentation.)
+[4.1.6-beta](https://www.dropbox.com/s/sb7g54eh28bimg3/Simulator%20Controller%204.1.6-beta.zip?dl=1) (Test build for 4.1.6. New features: Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive, More special rules for additional cars in "Setup Advisor", New Setups summary report in "Race Center". Stable, incl. update procedure and documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-416) of this version and all the versions you might have skipped, before installing and using this version.
 

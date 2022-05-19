@@ -1776,7 +1776,7 @@ class RaceCenter extends ConfigurationItem {
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -1823,6 +1823,9 @@ class RaceCenter extends ConfigurationItem {
 
 				Loop % LV_GetCount("Col")
 					LV_ModifyCol(A_Index, "AutoHdr")
+
+				if (this.SelectedDetailReport = "Setups")
+					this.showSetupsDetails()
 			}
 
 			this.updateState()
@@ -1854,6 +1857,9 @@ class RaceCenter extends ConfigurationItem {
 
 			if selected
 				LV_Delete(selected)
+
+			if (this.SelectedDetailReport = "Setups")
+				this.showSetupsDetails()
 
 			this.updateState()
 		}
@@ -1894,6 +1900,9 @@ class RaceCenter extends ConfigurationItem {
 					LV_Delete()
 
 					this.iSelectedSetup := false
+
+					if (this.SelectedDetailReport = "Setups")
+						this.showSetupsDetails()
 
 					this.updateState()
 				}
@@ -2092,6 +2101,9 @@ class RaceCenter extends ConfigurationItem {
 
 					this.iSelectedPlanStint := false
 
+					if (this.SelectedDetailReport = "Plan")
+						this.showPlanDetails()
+
 					this.updateState()
 				}
 			}
@@ -2227,6 +2239,9 @@ class RaceCenter extends ConfigurationItem {
 			Loop % LV_GetCount()
 				LV_Modify(A_Index, "", stintNr++)
 
+			if (this.SelectedDetailReport = "Plan")
+				this.showPlanDetails()
+
 			this.updateState()
 		}
 		finally {
@@ -2264,6 +2279,9 @@ class RaceCenter extends ConfigurationItem {
 						LV_Modify(A_Index, "", stintNr++)
 				}
 			}
+
+			if (this.SelectedDetailReport = "Plan")
+				this.showPlanDetails()
 
 			this.updateState()
 		}
@@ -3064,14 +3082,18 @@ class RaceCenter extends ConfigurationItem {
 			case 5:
 				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
 			case 7:
+				this.showSetupsDetails()
+
+				this.iSelectedDetailReport := "Setups"
+			case 9:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				this.updateState()
-			case 8:
+			case 11:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 10:
+			case 12:
 				this.planPitstop()
 		}
 	}
@@ -5451,6 +5473,9 @@ class RaceCenter extends ConfigurationItem {
 
 			Loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
+
+			if (this.SelectedDetailReport = "Setups")
+				this.showSetupsDetails()
 		}
 		finally {
 			Gui ListView, %currentListView%
@@ -7256,6 +7281,49 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails("Plan", html)
 	}
 
+	showSetupsDetails() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.SetupsListView
+
+			html := ("<div id=""header""><b>" . translate("Setups Summary") . "</b></div>")
+
+			html .= "<br><br><table class=""table-std"">"
+
+			html .= ("<th class=""th-std"">" . translate("Driver") . "</th>"
+				   . "<th class=""th-std"">" . translate("Conditions") . "</th>"
+				   . "<th class=""th-std"">" . translate("Compound") . "</th>"
+				   . "<th class=""th-std"">" . translate("Pressures") . "</th>"
+				   . "</tr>")
+
+			Loop % LV_GetCount()
+			{
+				LV_GetText(driver, A_Index, 1)
+				LV_GetText(condition, A_Index, 2)
+				LV_GetText(compound, A_Index, 3)
+				LV_GetText(pressures, A_Index, 4)
+
+				html .= ("<td class=""td-std"">" . driver . "</td>"
+					   . "<td class=""td-std"">" . condition . "</td>"
+					   . "<td class=""td-std"">" . compound . "</td>"
+					   . "<td class=""td-std"">" . pressures . "</td>"
+					   . "</tr>")
+			}
+
+			html .= "</table>"
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
+
+		this.showDetails("Setups", html)
+	}
+
 	computeCarStatistics(car, laps, ByRef lapTime, ByRef potential, ByRef raceCraft, ByRef speed, ByRef consistency, ByRef carControl) {
 		raceData := true
 		drivers := false
@@ -8438,6 +8506,9 @@ updateSetupAsync() {
 							 , translate(kQualifiedTyreCompounds[setupCompoundDropDownMenu])
 							 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
 		}
+
+		if (rCenter.SelectedDetailReport = "Setups")
+			rCenter.showSetupsDetails()
 	}
 	finally {
 		Gui ListView, %currentListView%

@@ -281,16 +281,16 @@ class RaceEngineer extends RaceAssistant {
 
 			speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
 
-			speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1))
+			speaker.speakPhrase("TyreFL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
 										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 
-			speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1))
+			speaker.speakPhrase("TyreFR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
 										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 
-			speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1))
+			speaker.speakPhrase("TyreRL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
 										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 
-			speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1))
+			speaker.speakPhrase("TyreRR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
 										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
 		}
 		finally {
@@ -500,7 +500,7 @@ class RaceEngineer extends RaceAssistant {
 
 					delta := Round(psiValue + (tenthPsiValue / 10), 1)
 
-					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: Format("{:.1f}", delta)}, true)
+					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: printNumber(delta, 1)}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
 
@@ -1418,19 +1418,19 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("NewPressures")
 
 					if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1))
+						speaker.speakPhrase("TyreFL", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1)
 													 , unit: fragments["PSI"]})
 
 					if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1))
+						speaker.speakPhrase("TyreFR", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1)
 													 , unit: fragments["PSI"]})
 
 					if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRL", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1))
+						speaker.speakPhrase("TyreRL", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1)
 													 , unit: fragments["PSI"]})
 
 					if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRR", {value: Format("{:.1f}", Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1))
+						speaker.speakPhrase("TyreRR", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1)
 													 , unit: fragments["PSI"]})
 
 					pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
@@ -1442,7 +1442,7 @@ class RaceEngineer extends RaceAssistant {
 							temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 
 						speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-										  , {value: Format("{:.1f}", Abs(pressureCorrection)), unit: fragments["PSI"]
+										  , {value: printNumber(Abs(pressureCorrection), 1), unit: fragments["PSI"]
 										   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
 										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 					}
@@ -1700,7 +1700,7 @@ class RaceEngineer extends RaceAssistant {
 				speaker := this.getSpeaker()
 
 				stintLaps := Round(stintLaps)
-				delta := Format("{:.1f}", Round(delta, 2))
+				delta := printNumber(delta, 1)
 
 				if repair {
 					speaker.startTalk()

@@ -372,7 +372,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(Abs(delta / 1000), 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -395,9 +395,9 @@ class RaceSpotter extends RaceAssistant {
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
-			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Front.Delta", 0) / 1000, 1))
+			delta := Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: Format("{:.1f}", delta)})
+			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -423,7 +423,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: Format("{:.1f}", Abs(Round(delta / 1000, 1)))})
+				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(Abs(delta / 1000), 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -446,9 +446,9 @@ class RaceSpotter extends RaceAssistant {
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")
 		else {
-			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000, 1))
+			delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("StandingsGapToBehind", {delta: Format("{:.1f}", delta)})
+			this.getSpeaker().speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -461,9 +461,9 @@ class RaceSpotter extends RaceAssistant {
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
-			delta := Abs(Round(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000, 1))
+			delta := Abs(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("GapToLeader", {delta: Format("{:.1f}", delta)})
+			this.getSpeaker().speakPhrase("GapToLeader", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -471,17 +471,17 @@ class RaceSpotter extends RaceAssistant {
 		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
 
 		if lapTime {
-			lapTime := Round(lapTime / 1000, 1)
+			lapTime /= 1000
 
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 
-			speaker.speakPhrase(phrase, {time: Format("{:.1f}", lapTime)})
+			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1)})
 
 			delta := (driverLapTime - lapTime)
 
 			if (Abs(delta) > 0.5)
-				speaker.speakPhrase("LapTimeDelta", {delta: Format("{:.1f}", Abs(delta))
+				speaker.speakPhrase("LapTimeDelta", {delta: printNumber(Abs(delta), 1)
 												   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
 		}
 	}
@@ -497,7 +497,7 @@ class RaceSpotter extends RaceAssistant {
 		position := Round(knowledgeBase.getValue("Position"))
 		cars := Round(knowledgeBase.getValue("Car.Count"))
 
-		driverLapTime := Round(knowledgeBase.getValue("Car." . car . ".Time") / 1000, 1)
+		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
 		speaker := this.getSpeaker()
 
 		if (lap == 0)
@@ -506,7 +506,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("LapTime", {time: Format("{:.1f}", driverLapTime)})
+				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))

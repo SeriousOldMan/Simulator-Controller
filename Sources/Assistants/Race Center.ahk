@@ -7298,7 +7298,10 @@ class RaceCenter extends ConfigurationItem {
 			html .= ("<th class=""th-std"">" . translate("Driver") . "</th>"
 				   . "<th class=""th-std"">" . translate("Conditions") . "</th>"
 				   . "<th class=""th-std"">" . translate("Compound") . "</th>"
-				   . "<th class=""th-std"">" . translate("Pressures") . "</th>"
+				   . "<th class=""th-std"">" . translate("Prs. FL") . "</th>"
+				   . "<th class=""th-std"">" . translate("Prs. FR") . "</th>"
+				   . "<th class=""th-std"">" . translate("Prs. RL") . "</th>"
+				   . "<th class=""th-std"">" . translate("Prs. RR") . "</th>"
 				   . "</tr>")
 
 			Loop % LV_GetCount()
@@ -7308,10 +7311,15 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(compound, A_Index, 3)
 				LV_GetText(pressures, A_Index, 4)
 
+				pressures := string2Values(",", pressures)
+
 				html .= ("<td class=""td-std"">" . driver . "</td>"
 					   . "<td class=""td-std"">" . condition . "</td>"
 					   . "<td class=""td-std"">" . compound . "</td>"
-					   . "<td class=""td-std"">" . pressures . "</td>"
+					   . "<td class=""td-std"">" . pressures[1] . "</td>"
+					   . "<td class=""td-std"">" . pressures[2] . "</td>"
+					   . "<td class=""td-std"">" . pressures[3] . "</td>"
+					   . "<td class=""td-std"">" . pressures[4] . "</td>"
 					   . "</tr>")
 			}
 

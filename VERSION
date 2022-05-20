@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.6-release
-Target=4.1.6-release
+Version=4.1.7.0-dev
+Target=4.1.7.0-release
 Date=05/20/2022
-Download=https://cntr.click/jHXvp59
-Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive, More special rules for additional cars in "Setup Advisor", New Setups summary report in "Race Center", Driver specific tyre pressures can now be cloned in "Race Center", New info window when a valid team session configuration is activated
+Download=
+Changes=Fixed unexpected translation of Grip status in ACC shared memory
 [Release]
 Version=4.1.6-release
 Date=05/20/2022
 Download=https://cntr.click/jHXvp59
 Changes=Several bug fixes in "Race Center", Show air and track temeperature in lap report in "Race Center", Extended strategy validation in "Strategy Workbench", Extended strategy optimization in "Strategy Workbench" and "Race Center", Fixed Number and Digit handling in "Desktop" voice recognition, Made Spotter warnings much more responsive, More special rules for additional cars in "Setup Advisor", New Setups summary report in "Race Center", Driver specific tyre pressures can now be cloned in "Race Center", New info window when a valid team session configuration is activated
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.1.6-release
-Development=4.1.6-release
+Development=4.1.7.0-development

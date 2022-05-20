@@ -2536,24 +2536,61 @@ class RaceCenter extends ConfigurationItem {
 		return setup
 	}
 
+	driverSetups(driver, weather, compound, compoundColor) {
+		this.saveSetups()
+
+		return this.SessionDatabase.query("Setups.Data", {Where: {Driver: driver.FullName, Weather: weather
+																, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+	}
+
+	setupsPressureCurve(driver, setups, tyreType, ByRef a, ByRef b) {
+		xValues := []
+		yValues := []
+
+		for ignore, setup in setups {
+			xValues := setup["Temperature.Air"]
+			yValues := setup["Tyre.Pressure." . tyreType]
+		}
+
+		linRegression(xValues, yValues, a, b)
+	}
+
 	driverReferencePressure(driver, weather, airTemperature, trackTemperature, compound, compoundColor
 						  , ByRef pressureFL, ByRef pressureFR, ByRef pressureRL, ByRef pressureRR) {
-		settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
-
-		correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
-		correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
+		local variable
 
 		setup := this.driverSetup(driver, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 		if setup {
-			delta := (((airTemperature - setup["Temperature.Air"]) * correctionAir) + ((trackTemperature - setup["Temperature.Track"]) * correctionTrack))
+			setups := this.driverSetups(driver, setup.Weather, setup["Tyre.Compound"], setup["Tyre.Compound.Color"])
 
-			pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
-			pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
-			pressureRL := (setup["Tyre.Pressure.Rear.Left"] + delta)
-			pressureRR := (setup["Tyre.Pressure.Rear.Right"] + delta)
+			if (setups.Length() > 1) {
+				for index, tyreType in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+					a := false
+					b := false
 
-			return true
+					this.driverPressureCurve(driver, setups, tyreType, a, b)
+
+					variable := ["pressureFL", "pressureFR", "pressureRL", "pressureRR"][index]
+
+					%variable% := ((a * airTemperature) + b)
+				}
+			}
+			else {
+				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+
+				correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+				correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
+
+				delta := (((airTemperature - setup["Temperature.Air"]) * correctionAir) + ((trackTemperature - setup["Temperature.Track"]) * correctionTrack))
+
+				pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
+				pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
+				pressureRL := (setup["Tyre.Pressure.Rear.Left"] + delta)
+				pressureRR := (setup["Tyre.Pressure.Rear.Right"] + delta)
+
+				return true
+			}
 		}
 		else
 			return false
@@ -2570,15 +2607,34 @@ class RaceCenter extends ConfigurationItem {
 			return true
 		}
 		else {
-			settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
-
-			correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
-			correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
-
 			currentDriverSetup := this.driverSetup(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 			nextDriverSetup := this.driverSetup(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 			if (currentDriverSetup && nextDriverSetup) {
+				currentBasePressureFL := false
+				currentBasePressureFR := false
+				currentBasePressureRL := false
+				currentBasePressureRR := false
+
+				nextBasePressureFL := false
+				nextBasePressureFR := false
+				nextBasePressureRL := false
+				nextBasePressureRR := false
+
+				this.driverReferencePressure(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+										   , ByRef currentPressureFL, ByRef currentPressureFR
+										   , ByRef currentPressureRL, ByRef currentPressureRR)
+
+				this.driverReferencePressure(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+										   , ByRef nextPressureFL, ByRef nextPressureFR
+										   , ByRef nextPressureRL, ByRef nextPressureRR)
+
+				/*
+				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+
+				correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+				correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
+
 				currentDelta := (((airTemperature - currentDriverSetup["Temperature.Air"]) * correctionAir)
 							   + ((trackTemperature - currentDriverSetup["Temperature.Track"]) * correctionTrack))
 
@@ -2594,6 +2650,7 @@ class RaceCenter extends ConfigurationItem {
 				nextBasePressureFR := (nextDriverSetup["Tyre.Pressure.Front.Right"] + nextDelta)
 				nextBasePressureRL := (nextDriverSetup["Tyre.Pressure.Rear.Left"] + nextDelta)
 				nextBasePressureRR := (nextDriverSetup["Tyre.Pressure.Rear.Right"] + nextDelta)
+				*/
 
 				deltaFL := (nextBasePressureFL - currentBasePressureFL)
 				deltaFR := (nextBasePressureFR - currentBasePressureFR)

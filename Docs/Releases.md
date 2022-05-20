@@ -3,11 +3,21 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Several bug fixes in "Race Center".
-  4. Air and track temeperature are now shown in lap report in "Race Center".
+  4. Air and track temperature are now shown in lap report in "Race Center".
   5. Extended strategy validation in "Strategy Workbench".
   6. Extended strategy optimization in "Strategy Workbench" and "Race Center".
   7. Fixed the handling in "Desktop" voice recognition for the predefined (Number) and (Digit) variables - no longer "Cannot register voice command ..." errors shown on startup.
-  8. Made Spotter warnings much more faster and responsive.
+  8. Made Spotter warnings much faster and more responsive.
+  9. Added three more car rules to "Setup Advisor".
+  10. A new report "Setups Summary" is available in "Race Center".
+  11. Driver specific tyre pressures can now be cloned in "Race Center".
+  12. Simulator Controller now opens an info window when a valid team session configuration is found and activated.
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-416) and check whether any manual updates to your local configuration might be necessary.
+
+## 4.1.5-release 05/14/22
+
+  1. Fixed a timing and redrawing problem in the "Session Database" tool.
 
 ## 4.1.4-release 05/13/22
 

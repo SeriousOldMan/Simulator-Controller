@@ -105,6 +105,12 @@ class SpeechSynthesizer {
 		}
 	}
 
+	Awaitable[] {
+		Get {
+			return (kSox != false)
+		}
+	}
+
 	Locale[] {
 		Get {
 			return this.iLocale

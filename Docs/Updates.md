@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.1.6
 
-Configuration & database updates ae handled automatically, but the file structure of the Race Spotter grammars changed. If you have modified or extended the grammars, you have to check and potentially merge your changes.
+Configuration and database updates ae handled automatically, but the file structure of the Race Spotter grammars changed. If you have modified or extended the grammars, you have to check and potentially merge your changes.
 
 ***
 

@@ -1369,9 +1369,12 @@ getAllThemes(configuration := false) {
 	return themes
 }
 
-showMessage(message, title := false, icon := "Information.png", duration := 1000
+showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
 	innerWidth := width - 16
+
+	if (icon = kUndefined)
+		icon := "Information.png"
 
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")

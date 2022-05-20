@@ -3,7 +3,7 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Several bug fixes in "Race Center".
-  4. Air and track temeperature are now shown in lap report in "Race Center".
+  4. Air and track temperature are now shown in lap report in "Race Center".
   5. Extended strategy validation in "Strategy Workbench".
   6. Extended strategy optimization in "Strategy Workbench" and "Race Center".
   7. Fixed the handling in "Desktop" voice recognition for the predefined (Number) and (Digit) variables - no longer "Cannot register voice command ..." errors shown on startup.

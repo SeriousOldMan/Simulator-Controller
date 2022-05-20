@@ -1,4 +1,4 @@
-## 4.1.6-release 05/20/22 (planned)
+## 4.1.6-release 05/20/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -10,6 +10,10 @@
   8. Made Spotter warnings much faster and more responsive.
   9. Added three more car rules to "Setup Advisor".
   10. A new report "Setups Summary" is available in "Race Center".
+  11. Driver specific tyre pressures can now be cloned in "Race Center".
+  12. Simulator Controller now opens an info window when a valid team session configuration is found and activated.
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-416) and check whether any manual updates to your local configuration might be necessary.
 
 ## 4.1.5-release 05/14/22
 

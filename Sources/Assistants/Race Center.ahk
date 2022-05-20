@@ -144,6 +144,7 @@ global setupBasePressureRLEdit
 global setupBasePressureRREdit
 
 global addSetupButton
+global copySetupButton
 global deleteSetupButton
 
 global sessionDateCal
@@ -1278,8 +1279,10 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRREdit gupdateSetup
 		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
 
-		Gui %window%:Add, Button, x550 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
+		Gui %window%:Add, Button, x525 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x550 yp w23 h23 Center +0x200 HWNDcopyButton vcopySetupButton gcopySetup
+		setButtonIcon(copyButton, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSetupButton gdeleteSetup
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
@@ -1638,6 +1641,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, setupBasePressureRLEdit
 				GuiControl Enable, setupBasePressureRREdit
 
+				GuiControl Enable, copySetupButton
 				GuiControl Enable, deleteSetupButton
 
 				LV_GetText(stint, selected)
@@ -1653,6 +1657,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, setupBasePressureRLEdit
 				GuiControl Disable, setupBasePressureRREdit
 
+				GuiControl Disable, copySetupButton
 				GuiControl Disable, deleteSetupButton
 
 				GuiControl Choose, setupDriverDropDownMenu, 0
@@ -1816,6 +1821,44 @@ class RaceCenter extends ConfigurationItem {
 								   , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit . ", " . setupTrackTemperatureEdit . translate(")")
 								   , translate("Dry")
 								   , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
+
+				this.iSelectedSetup := LV_GetCount()
+
+				LV_ModifyCol()
+
+				Loop % LV_GetCount("Col")
+					LV_ModifyCol(A_Index, "AutoHdr")
+
+				if (this.SelectedDetailReport = "Setups")
+					this.showSetupsDetails()
+			}
+
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
+	}
+
+	copySetup() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.SetupsListView
+
+			row := LV_GetNext(0)
+
+			if row {
+				LV_GetText(driver, row, 1)
+				LV_GetText(conditions, row, 2)
+				LV_GetText(compound, row, 3)
+				LV_GetText(pressures, row, 4)
+
+				LV_Add("Select Vis", driver, conditions, compound, pressures)
 
 				this.iSelectedSetup := LV_GetCount()
 
@@ -5421,8 +5464,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	loadSetups(info := false, setups := false) {
-		local condition
-
 		window := this.Window
 
 		Gui %window%:Default
@@ -5460,10 +5501,10 @@ class RaceCenter extends ConfigurationItem {
 			for ignore, setup in this.SessionDatabase.Tables["Setups.Data"] {
 				Gui ListView, % this.SetupsListView
 
-				condition := (translate(setup.Weather) . A_Space
-							. translate("(") . translate(setup["Temperature.Air"]) . ", " . translate(setup["Temperature.Track"]) . translate(")"))
+				conditions := (translate(setup.Weather) . A_Space
+							 . translate("(") . translate(setup["Temperature.Air"]) . ", " . translate(setup["Temperature.Track"]) . translate(")"))
 
-				LV_Add("", setup.Driver, condition
+				LV_Add("", setup.Driver, conditions
 						 , translateQualifiedCompound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"])
 						 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
 											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"]))
@@ -7307,14 +7348,14 @@ class RaceCenter extends ConfigurationItem {
 			Loop % LV_GetCount()
 			{
 				LV_GetText(driver, A_Index, 1)
-				LV_GetText(condition, A_Index, 2)
+				LV_GetText(conditions, A_Index, 2)
 				LV_GetText(compound, A_Index, 3)
 				LV_GetText(pressures, A_Index, 4)
 
 				pressures := string2Values(",", pressures)
 
 				html .= ("<td class=""td-std"">" . driver . "</td>"
-					   . "<td class=""td-std"">" . condition . "</td>"
+					   . "<td class=""td-std"">" . conditions . "</td>"
 					   . "<td class=""td-std"">" . compound . "</td>"
 					   . "<td class=""td-std"">" . pressures[1] . "</td>"
 					   . "<td class=""td-std"">" . pressures[2] . "</td>"
@@ -8358,6 +8399,35 @@ addSetup() {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		MsgBox 262192, %title%, % translate("There are no drivers available. Please select a valid session first.")
 		OnMessage(0x44, "")
+	}
+}
+
+copySetup() {
+	rCenter := RaceCenter.Instance
+
+	window := rCenter.Window
+
+	Gui %window%:Default
+
+	currentListView := A_DefaultListView
+
+	try {
+		Gui ListView, % rCenter.SetupsListView
+
+		row := LV_GetNext(0)
+
+		if (row != rCenter.SelectedSetup) {
+			LV_Modify(row, "-Select")
+
+			row := false
+			rCenter.iSelectedSetup := false
+		}
+
+		if LV_GetNext(0)
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "copySetup"))
+	}
+	finally {
+		Gui ListView, %currentListView%
 	}
 }
 

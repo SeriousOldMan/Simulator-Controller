@@ -322,6 +322,13 @@ BOOL checkPositions(int playerID) {
 
 		hasLastCoordinates = TRUE;
 
+		if (newSituation != CLEAR) {
+			carBehind = FALSE;
+			carBehindLeft = FALSE;
+			carBehindRight = FALSE;
+			carBehindReported = FALSE;
+		}
+
 		char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {

@@ -820,8 +820,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	finishSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		if this.RaceAssistant {
-			if this.SessionActive
-				this.RaceAssistant.finishSession(shutdownAssistant)
+			this.RaceAssistant.finishSession(shutdownAssistant)
 
 			if (shutdownTeamSession && this.TeamSessionActive) {
 				this.TeamServer.leaveSession()

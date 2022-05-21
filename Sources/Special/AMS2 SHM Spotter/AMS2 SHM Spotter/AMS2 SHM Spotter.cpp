@@ -272,6 +272,13 @@ bool checkPositions(const SharedMemory* sharedData) {
 
 		hasLastCoordinates = true;
 
+		if (newSituation != CLEAR) {
+			carBehind = false;
+			carBehindLeft = false;
+			carBehindRight = false;
+			carBehindReported = false;
+		}
+
 		const char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {

@@ -413,6 +413,14 @@ namespace RF2SHMSpotter {
 
 				hasLastCoordinates = true;
 
+				if (newSituation != CLEAR)
+				{
+					carBehind = false;
+					carBehindLeft = false;
+					carBehindRight = false;
+					carBehindReported = false;
+				}
+
 				string alert = computeAlert(newSituation);
 
 				if (alert != noAlert)

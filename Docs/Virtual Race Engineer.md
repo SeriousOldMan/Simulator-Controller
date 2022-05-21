@@ -471,7 +471,11 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
-Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+Notes:
+
+  1. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+
+  2. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
   
 #### Choosing the Database location
 

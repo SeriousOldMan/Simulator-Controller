@@ -84,11 +84,13 @@ As you might expect, the word "please" is optional. Only one option for *warning
 
 ## Racing with Cato
 
-Cato will be active during practice and race sessions, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. Using Cato during a race is easy. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own like Jona does, but Cato will also collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
+Cato will be active during practice and race sessions by default, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1). 
+
+Cato will always be active during a race, even if you have disabled data collection for races. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own as often as Jona does, but Cato will collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
 
 ### Race Settings
 
-Cato shares a lot of settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool.
+Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
 
 #### Tab *Strategy*
 

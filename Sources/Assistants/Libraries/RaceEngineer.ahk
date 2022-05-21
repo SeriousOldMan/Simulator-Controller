@@ -809,6 +809,24 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	collectTyrePessures() {
+		session := "Other"
+		default := false
+
+		switch this.Session {
+			case kSessionPractice:
+				session := "Practice"
+				default := true
+			case kSessionQualification:
+				session := "Qualification"
+			case kSessionRace:
+				session := "Race"
+				default := true
+		}
+
+		return getConfigurationValue(this.Settings, "Session Settings", "Pressures." . session, default)
+	}
+
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 
@@ -967,10 +985,11 @@ class RaceEngineer extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false) && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
+			if (shutdown && this.hasEnoughData(false)) {
 				this.shutdownSession("Before")
 
-				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.HasPressureData) || (this.SaveSettings == kAsk))) {
+				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData)
+								   || (this.SaveSettings == kAsk))) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
@@ -1000,6 +1019,30 @@ class RaceEngineer extends RaceAssistant {
 			callback := ObjBindMethod(this, "forceFinishSession")
 
 			SetTimer %callback%, -5000
+		}
+	}
+
+	shutdownSession(phase) {
+		this.iSessionDataActive := true
+
+		try {
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
+				this.saveSessionSettings()
+
+			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData && this.collectTyrePressures())
+				this.updateTyresDatabase()
+		}
+		finally {
+			this.iSessionDataActive := false
+		}
+
+		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("DataUpdated")
+
+			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
+
+			this.finishSession()
 		}
 	}
 
@@ -1208,7 +1251,7 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
-			if this.RemoteHandler {
+			if (this.RemoteHandler && this.collectTyrePressures()) {
 				this.updateDynamicValues({HasPressureData: true})
 
 				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
@@ -1220,32 +1263,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	shutdownSession(phase) {
-		this.iSessionDataActive := true
-
-		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
-
-			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData)
-				this.updateTyresDatabase()
-		}
-		finally {
-			this.iSessionDataActive := false
-		}
-
-		if (phase = "After") {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("DataUpdated")
-
-			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
-
-			this.finishSession()
-		}
-	}
-
 	updateTyresDatabase() {
-		if this.RemoteHandler
+		if (this.RemoteHandler && this.collectTyrePressures())
 			this.RemoteHandler.updateTyresDatabase()
 
 		this.updateDynamicValues({HasPressureData: false})

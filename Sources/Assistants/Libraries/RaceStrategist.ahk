@@ -124,7 +124,7 @@ class RaceStrategist extends RaceAssistant {
 			this.iSessionReportsDatabase := values["SessionReportsDatabase"]
 
 		if values.HasKey("SaveTelemetry")
-			this.iSaveTyrePressures := values["SaveTelemetry"]
+			this.iSaveTelemetry := values["SaveTelemetry"]
 
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
@@ -535,6 +535,24 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
+	collectTelemetry() {
+		session := "Other"
+		default := false
+
+		switch this.Session {
+			case kSessionPractice:
+				session := "Practice"
+				default := true
+			case kSessionQualification:
+				session := "Qualification"
+			case kSessionRace:
+				session := "Race"
+				default := true
+		}
+
+		return getConfigurationValue(this.Settings, "Session Settings", "Telemetry." . session, default)
+	}
+
 	createStrategy(facts, strategy, lap := false) {
 		facts["Strategy.Name"] := getConfigurationValue(strategy, "General", "Name")
 
@@ -724,6 +742,107 @@ class RaceStrategist extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 	}
 
+	finishSession(shutdown := true) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if knowledgeBase {
+			Process Exist, Race Engineer.exe
+
+			if (!ErrorLevel && this.Speaker)
+				this.getSpeaker().speakPhrase("Bye")
+
+			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+				this.shutdownSession("Before")
+
+				if this.Listener {
+					asked := true
+
+					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+					  || (this.collectTelemetry() && (this.SaveTelemetry == kAsk)))
+					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
+						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+						  || (this.collectTelemetry() && (this.SaveTelemetry == kAsk)))
+						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
+					else
+						asked := false
+				}
+				else
+					asked := false
+
+				if asked {
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
+
+					callback := ObjBindMethod(this, "forceFinishSession")
+
+					SetTimer %callback%, -120000
+
+					return
+				}
+			}
+
+			this.updateDynamicValues({KnowledgeBase: false})
+		}
+
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, StrategyReported: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
+	}
+
+	forceFinishSession() {
+		if !this.SessionDataActive {
+			this.updateDynamicValues({KnowledgeBase: false})
+
+			this.finishSession()
+		}
+		else {
+			callback := ObjBindMethod(this, "forceFinishSession")
+
+			SetTimer %callback%, -5000
+		}
+	}
+
+	shutdownSession(phase) {
+		this.iSessionDataActive := true
+
+		try {
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
+				this.saveSessionSettings()
+
+			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
+				this.createRaceReport()
+
+			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
+				this.updateTelemetryDatabase()
+		}
+		finally {
+			this.iSessionDataActive := false
+		}
+
+		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("RaceReportSaved")
+
+			this.updateDynamicValues({KnowledgeBase: false})
+
+			this.finishSession()
+		}
+	}
+
+	prepareData(lapNumber, data) {
+		local knowledgeBase
+
+		data := base.prepareData(lapNumber, data)
+
+		knowledgeBase := this.KnowledgeBase
+
+		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			knowledgeBase.setFact(key, value)
+
+		return data
+	}
+
 	addLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
@@ -775,7 +894,7 @@ class RaceStrategist extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (this.hasEnoughData(false) && (this.SaveTelemetry != kNever)) {
+		if (this.hasEnoughData(false) && this.collectTelemetry() && (this.SaveTelemetry != kNever)) {
 			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
 			if pitstop
@@ -818,78 +937,6 @@ class RaceStrategist extends RaceAssistant {
 		this.saveStandingsData(lapNumber, simulator, car, track)
 
 		return result
-	}
-
-	finishSession(shutdown := true) {
-		local knowledgeBase := this.KnowledgeBase
-
-		if knowledgeBase {
-			Process Exist, Race Engineer.exe
-
-			if (!ErrorLevel && this.Speaker)
-				this.getSpeaker().speakPhrase("Bye")
-
-			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
-				this.shutdownSession("Before")
-
-				if this.Listener {
-					asked := true
-
-					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveTelemetry == kAsk))
-					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
-						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) || (this.SaveTelemetry == kAsk))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-					else
-						asked := false
-				}
-				else
-					asked := false
-
-				if asked {
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
-
-					callback := ObjBindMethod(this, "forceFinishSession")
-
-					SetTimer %callback%, -120000
-
-					return
-				}
-			}
-
-			this.updateDynamicValues({KnowledgeBase: false})
-		}
-
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, StrategyReported: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
-	}
-
-	forceFinishSession() {
-		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false})
-
-			this.finishSession()
-		}
-		else {
-			callback := ObjBindMethod(this, "forceFinishSession")
-
-			SetTimer %callback%, -5000
-		}
-	}
-
-	prepareData(lapNumber, data) {
-		local knowledgeBase
-
-		data := base.prepareData(lapNumber, data)
-
-		knowledgeBase := this.KnowledgeBase
-
-		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			knowledgeBase.setFact(key, value)
-
-		return data
 	}
 
 	updateLap(lapNumber, data) {
@@ -1259,33 +1306,6 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	shutdownSession(phase) {
-		this.iSessionDataActive := true
-
-		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
-
-			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
-				this.createRaceReport()
-
-			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
-				this.updateTelemetryDatabase()
-		}
-		finally {
-			this.iSessionDataActive := false
-		}
-
-		if (phase = "After") {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("RaceReportSaved")
-
-			this.updateDynamicValues({KnowledgeBase: false})
-
-			this.finishSession()
-		}
-	}
-
 	saveLapStandings(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 
@@ -1497,14 +1517,14 @@ class RaceStrategist extends RaceAssistant {
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures) {
-		if this.RemoteHandler
+		if (this.RemoteHandler && this.collectTelemetry())
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
 											   , compound, compoundColor, pressures, temperatures)
 	}
 
 	updateTelemetryDatabase() {
-		if this.RemoteHandler
+		if (this.RemoteHandler && this.collectTelemetry())
 			this.RemoteHandler.updateTelemetryDatabase()
 	}
 }

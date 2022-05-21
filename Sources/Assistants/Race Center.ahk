@@ -2543,7 +2543,7 @@ class RaceCenter extends ConfigurationItem {
 																, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 	}
 
-	setupsPressureCurve(driver, setups, tyreType, ByRef a, ByRef b) {
+	driverPressureCurve(driver, setups, tyreType, ByRef a, ByRef b) {
 		xValues := []
 		yValues := []
 

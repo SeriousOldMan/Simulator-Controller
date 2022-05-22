@@ -623,6 +623,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	disableRaceAssistant() {
 		this.iRaceAssistantEnabled := false
 
+		this.iLastSession := kSessionFinished
+		this.iLastLap := 0
+		this.iLastLapCounter := 0
+		this.iFinished := false
+		this.iInPit := false
+
 		if this.RaceAssistant
 			this.finishSession()
 	}
@@ -779,7 +785,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			this.iTeamSession := false
 
-		return this.iTeamSessionActive
+		return this.TeamSessionActive
 	}
 
 	disconnectTeamSession() {
@@ -1096,7 +1102,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					return
 				}
-				else if !this.activeSession(data) {
+
+				if !this.activeSession(data) {
 					; Not in a supported session
 
 					this.iLastSession := kSessionFinished
@@ -1112,7 +1119,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 				if ((dataLastLap < this.iLastLap) || (this.iLastSession != sessionState)) {
-					; Start of new race without finishing previous race first
+					; Start of new session without finishing previous session first
 
 					this.iLastSession := sessionState
 					this.iLastLap := 0
@@ -1120,8 +1127,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					this.iFinished := false
 					this.iInPit := false
 
-					if (this.RaceAssistant && !this.TeamSessionActive)
+					if this.RaceAssistant {
 						this.finishSession()
+
+						return
+					}
 				}
 
 				if this.RaceAssistantEnabled {
@@ -1197,13 +1207,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						firstLap := ((dataLastLap == 1) && newLap)
 
 						if this.iInPit {
+							this.iInPit := false
+
 							; Was in the pits, check if same driver for next stint...
 
-							if this.driverActive(data)
+							if (this.TeamSessionActive && this.driverActive(data))
 								this.TeamServer.addStint(dataLastLap)
 						}
-
-						this.iInPit := false
 
 						if newLap {
 							if this.iFinished {

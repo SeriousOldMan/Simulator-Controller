@@ -809,7 +809,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	collectTyrePessures() {
+	collectTyrePressures() {
 		session := "Other"
 		default := false
 

@@ -214,11 +214,18 @@ class RaceSpotter extends RaceAssistant {
 	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {
 		iFastSpeechSynthesizer := false
 
+		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
+			speak(arguments*) {
+				if (this.Assistant.RaceAssistant.Session >= kSessionPractice)
+					base.speak(arguments*)
+			}
+		}
+
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
+					this.iFastSpeechSynthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
 					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)

@@ -38,9 +38,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iSimulator := false
 	iSessionActive := false
 
+	iLastSession := kSessionFinished
 	iLastLap := 0
 	iLastLapCounter := 0
-	iWaitPeriod := 0
+	iWaitForShutdown := 0
 	iInPit := false
 	iFinished := false
 
@@ -708,7 +709,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.iRaceAssistant := false
 
 		if raceAssistant {
-			this.iWaitPeriod := (A_TickCount + (90 * 1000))
+			this.iWaitForShutdown := (A_TickCount + (90 * 1000))
 
 			raceAssistant.shutdown()
 		}
@@ -908,7 +909,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	activeSession(data) {
-		return (this.getDataSessionState(data) >= kSessionPractice)
+		return (getDataSessionState(data) >= kSessionPractice)
 	}
 
 	saveSessionState(settingsFile, stateFile) {
@@ -1047,7 +1048,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	collectSessionData() {
-		if (A_TickCount <= this.iWaitPeriod)
+		if (A_TickCount <= this.iWaitForShutdown)
 			return
 
 		if this.Simulator {
@@ -1098,6 +1099,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				else if !this.activeSession(data) {
 					; Not in a supported session
 
+					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
 					this.iLastLapCounter := 0
 					this.iFinished := false
@@ -1109,15 +1111,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					return
 				}
 
-				if ((dataLastLap <= 1) && (dataLastLap < this.iLastLap)) {
+				if ((dataLastLap < this.iLastLap) || (this.iLastSession != sessionState)) {
 					; Start of new race without finishing previous race first
 
+					this.iLastSession := sessionState
 					this.iLastLap := 0
 					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
-					if this.RaceAssistant
+					if (this.RaceAssistant && !this.TeamSessionActive)
 						this.finishSession()
 				}
 
@@ -1204,6 +1207,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 						if newLap {
 							if this.iFinished {
+								this.iLastSession := kSessionFinished
 								this.iLastLap := 0
 								this.iLastLapCounter := 0
 								this.iFinished := false
@@ -1277,6 +1281,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 				}
 				else {
+					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
 					this.iLastLapCounter := 0
 					this.iFinished := false
@@ -1296,6 +1301,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					Sleep 500
 				}
 
+			this.iLastSession := kSessionFinished
 			this.iLastLap := 0
 			this.iLastLapCounter := 0
 			this.iFinished := false

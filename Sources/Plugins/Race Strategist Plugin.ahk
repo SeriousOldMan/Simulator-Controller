@@ -184,7 +184,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	activeSession(data) {
-		sessionState := this.getDataSessionState(data)
+		sessionState := getDataSessionState(data)
 
 		if (sessionState == kSessionRace)
 			return true

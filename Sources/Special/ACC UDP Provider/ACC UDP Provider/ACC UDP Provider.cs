@@ -214,11 +214,10 @@ namespace ACCUDPProvider {
     }
 
     public class UDPProvider {
-        public ObservableCollection<CarData> Cars { get; } = new ObservableCollection<CarData>();
-        public ObservableCollection<DriverData> Drivers { get; } = new ObservableCollection<DriverData>();
-        public ObservableCollection<LapData> Laps { get; } = new ObservableCollection<LapData>();
+        public ObservableCollection<CarData> Cars { get; set; } = new ObservableCollection<CarData>();
+        public ObservableCollection<DriverData> Drivers { get; set; } = new ObservableCollection<DriverData>();
+        public ObservableCollection<LapData> Laps { get; set; } = new ObservableCollection<LapData>();
 
-        private bool finished = false;
         private float trackMeters = 0;
         private string cmdFileName;
         private string outFileName;
@@ -227,6 +226,14 @@ namespace ACCUDPProvider {
             this.cmdFileName = cmdFileName;
             this.outFileName = outFileName;
         }
+		
+		public void Reset() {
+			Cars = new ObservableCollection<CarData>();
+			Drivers = new ObservableCollection<DriverData>();
+			Laps = new ObservableCollection<LapData>();
+			
+			trackMeters = 0;
+		}
 
 		public void ReadStandings(string ip, int port, string displayName, string connectionPassword, string commandPassword) {
             TextWriterTraceListener listener = new TextWriterTraceListener(this.outFileName + ".Trace");
@@ -234,120 +241,131 @@ namespace ACCUDPProvider {
 
             Debug.WriteLine("Starting UDP Client...");
 
-            ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
+			bool finished = false;
+        
+			while (!finished) {
+				ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
 
-            client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
-            client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;
-            client.MessageHandler.OnEntrylistUpdate += OnEntryListUpdate;
-            client.MessageHandler.OnRealtimeCarUpdate += OnRealtimeCarUpdate;
-            client.MessageHandler.OnBroadcastingEvent += OnBroadcastingEvent;
+				client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
+				client.MessageHandler.OnTrackDataUpdate += OnTrackDataUpdate;
+				client.MessageHandler.OnEntrylistUpdate += OnEntryListUpdate;
+				client.MessageHandler.OnRealtimeCarUpdate += OnRealtimeCarUpdate;
+				client.MessageHandler.OnBroadcastingEvent += OnBroadcastingEvent;
 
-            int retries = 3;
+				int retries = 3;
 
-            while (!finished) {
-                int count = Cars.Count;
+				while (!finished) {
+					int count = Cars.Count;
 
-                Thread.Sleep(500);
+					Thread.Sleep(500);
 
-                if (Cars.Count == count) {
-                    if (retries-- == 0)
-                        finished = true;
-                }
-                else
-                    retries = 1;
-            }
+					if (Cars.Count == count) {
+						if (retries-- == 0)
+							finished = true;
+					}
+					else
+						retries = 1;
+				}
 
-            bool done = false;
+				int runs = 5;
+				bool done = false;
 
-            while (!done) {
-                try {
-                    Debug.Flush();
-                    listener.Flush();
+				while (!done || (runs-- < 0)) {
+					try {
+						Debug.Flush();
+						listener.Flush();
 
-                    if (File.Exists(cmdFileName)) {
-                        StreamReader cmdStream = new StreamReader(cmdFileName);
+						if (File.Exists(cmdFileName)) {
+							StreamReader cmdStream = new StreamReader(cmdFileName);
 
-                        string command = cmdStream.ReadLine();
+							string command = cmdStream.ReadLine();
 
-                        if (command == "Exit")
-                            done = true;
-                        else if (command == "Read") {
-                            StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
+							if (command == "Exit")
+								done = true;
+							else if (command == "Read") {
+								StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
 
-                            outStream.WriteLine("[Position Data]");
+								outStream.WriteLine("[Position Data]");
 
-                            outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
+								outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
-                            int index = 1;
+								int index = 1;
 
-                            foreach (CarData car in Cars) {
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
+								foreach (CarData car in Cars) {
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-                                LapData lastLap = car.LastLap;
+									LapData lastLap = car.LastLap;
 
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
 
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
-                                outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
+									outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
-                                outStream.Write("Car."); outStream.Write(index);
-                                if (lastLap != null) {
-                                    string split1MS = lastLap.Split1MS + "";
-                                    string split2MS = lastLap.Split2MS + "";
-                                    string split3MS = lastLap.Split3MS + "";
+									outStream.Write("Car."); outStream.Write(index);
+									if (lastLap != null) {
+										string split1MS = lastLap.Split1MS + "";
+										string split2MS = lastLap.Split2MS + "";
+										string split3MS = lastLap.Split3MS + "";
 
-                                    if (split1MS.Length == 0)
-                                        split1MS = "0";
+										if (split1MS.Length == 0)
+											split1MS = "0";
 
-                                    if (split2MS.Length == 0)
-                                        split2MS = "0";
+										if (split2MS.Length == 0)
+											split2MS = "0";
 
-                                    if (split3MS.Length == 0)
-                                        split3MS = "0";
+										if (split3MS.Length == 0)
+											split3MS = "0";
 
-                                    outStream.Write(".Time.Sectors="); outStream.WriteLine(split1MS + "," + split2MS + "," + split3MS);
-                                }
-                                else
-                                    outStream.WriteLine(".Time.Sectors=0,0,0");
-                                
-                                outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+										outStream.Write(".Time.Sectors="); outStream.WriteLine(split1MS + "," + split2MS + "," + split3MS);
+									}
+									else
+										outStream.WriteLine(".Time.Sectors=0,0,0");
+									
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
-                                DriverData currentDriver = car.CurrentDriver;
+									DriverData currentDriver = car.CurrentDriver;
 
-                                if (currentDriver != null) {
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
-                                }
+									if (currentDriver != null) {
+										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
+										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
+										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+									}
 
-                                index += 1;
-                            }
+									index += 1;
+								}
 
-                            outStream.Close();
-                        }
+								outStream.Close();
+							}
 
-                        cmdStream.Close();
+							cmdStream.Close();
 
-                        File.Delete(cmdFileName);
-                    }
-                    else
-                        Thread.Sleep(100);
-                }
-                catch (Exception ex) {
-                    Debug.WriteLine(ex.Message);
-                }
-            }
+							File.Delete(cmdFileName);
+						}
+						else
+							Thread.Sleep(100);
+					}
+					catch (Exception ex) {
+						Debug.WriteLine(ex.Message);
+					}
+					
+					if (done)
+						finished = true;
+				}
 
-            client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
-            client.MessageHandler.OnTrackDataUpdate -= OnTrackDataUpdate;
-            client.MessageHandler.OnEntrylistUpdate -= OnEntryListUpdate;
-            client.MessageHandler.OnRealtimeCarUpdate -= OnRealtimeCarUpdate;
-            client.MessageHandler.OnBroadcastingEvent -= OnBroadcastingEvent;
+				client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
+				client.MessageHandler.OnTrackDataUpdate -= OnTrackDataUpdate;
+				client.MessageHandler.OnEntrylistUpdate -= OnEntryListUpdate;
+				client.MessageHandler.OnRealtimeCarUpdate -= OnRealtimeCarUpdate;
+				client.MessageHandler.OnBroadcastingEvent -= OnBroadcastingEvent;
 
-            client.Shutdown();
+				client.Shutdown();
+				
+				if (!finished)
+					Reset();
+			}
         }
 
         private void OnBroadcastingEvent(string sender, BroadcastingEvent evt) {

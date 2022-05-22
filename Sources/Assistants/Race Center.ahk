@@ -1335,7 +1335,7 @@ class RaceCenter extends ConfigurationItem {
 
 	showMessage(message, prefix := false) {
 		if !prefix
-			prefix := translate("Step: ")
+			prefix := translate("Task: ")
 
 		window := this.Window
 
@@ -2548,8 +2548,8 @@ class RaceCenter extends ConfigurationItem {
 		yValues := []
 
 		for ignore, setup in setups {
-			xValues := setup["Temperature.Air"]
-			yValues := setup["Tyre.Pressure." . tyreType]
+			xValues.Push(setup["Temperature.Air"])
+			yValues.Push(setup["Tyre.Pressure." . tyreType])
 		}
 
 		linRegression(xValues, yValues, a, b)
@@ -2571,10 +2571,17 @@ class RaceCenter extends ConfigurationItem {
 
 					this.driverPressureCurve(driver, setups, tyreType, a, b)
 
-					variable := ["pressureFL", "pressureFR", "pressureRL", "pressureRR"][index]
+					variable := ["tempFL", "tempFR", "tempRL", "tempRR"][index]
 
-					%variable% := ((a * airTemperature) + b)
+					%variable% := (a + (b * airTemperature))
 				}
+
+				pressureFL := tempFL
+				pressureFR := tempFR
+				pressureRL := tempRL
+				pressureRR := tempRR
+
+				return true
 			}
 			else {
 				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
@@ -2622,12 +2629,10 @@ class RaceCenter extends ConfigurationItem {
 				nextBasePressureRR := false
 
 				this.driverReferencePressure(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor
-										   , ByRef currentPressureFL, ByRef currentPressureFR
-										   , ByRef currentPressureRL, ByRef currentPressureRR)
+										   , currentBasePressureFL, currentBasePressureFR, currentBasePressureRL, currentBasePressureRR)
 
 				this.driverReferencePressure(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
-										   , ByRef nextPressureFL, ByRef nextPressureFR
-										   , ByRef nextPressureRL, ByRef nextPressureRR)
+										   , nextBasePressureFL, nextBasePressureFR, nextBasePressureRL, nextBasePressureRR)
 
 				/*
 				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
@@ -3189,7 +3194,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				this.updateState()
-			case 11:
+			case 10:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()

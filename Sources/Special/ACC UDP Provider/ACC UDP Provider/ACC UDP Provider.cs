@@ -241,9 +241,10 @@ namespace ACCUDPProvider {
 
             Debug.WriteLine("Starting UDP Client...");
 
-			bool finished = false;
+			bool done = false;
+			bool firstRun = true;
         
-			while (!finished) {
+			while (!done) {
 				ACCUdpRemoteClient client = new ACCUdpRemoteClient(ip, port, displayName, connectionPassword, commandPassword, 100);
 
 				client.MessageHandler.OnRealtimeUpdate += OnRealtimeUpdate;
@@ -252,25 +253,26 @@ namespace ACCUDPProvider {
 				client.MessageHandler.OnRealtimeCarUpdate += OnRealtimeCarUpdate;
 				client.MessageHandler.OnBroadcastingEvent += OnBroadcastingEvent;
 
-				int retries = 3;
+				if (firstRun) {
+					firstRun = false;
+					
+					int retries = 3;
 
-				while (!finished) {
-					int count = Cars.Count;
+					while (retries > 0) {
+						int count = Cars.Count;
 
-					Thread.Sleep(500);
+						Thread.Sleep(500);
 
-					if (Cars.Count == count) {
-						if (retries-- == 0)
-							finished = true;
+						if (Cars.Count == count)
+							retries -= 1;
+						else
+							retries = 1;
 					}
-					else
-						retries = 1;
 				}
 
 				int runs = 5;
-				bool done = false;
-
-				while (!done || (runs-- < 0)) {
+				
+				while (!done && (runs-- > 0)) {
 					try {
 						Debug.Flush();
 						listener.Flush();
@@ -350,9 +352,6 @@ namespace ACCUDPProvider {
 					catch (Exception ex) {
 						Debug.WriteLine(ex.Message);
 					}
-					
-					if (done)
-						finished = true;
 				}
 
 				client.MessageHandler.OnRealtimeUpdate -= OnRealtimeUpdate;
@@ -362,9 +361,6 @@ namespace ACCUDPProvider {
 				client.MessageHandler.OnBroadcastingEvent -= OnBroadcastingEvent;
 
 				client.Shutdown();
-				
-				if (!finished)
-					Reset();
 			}
         }
 

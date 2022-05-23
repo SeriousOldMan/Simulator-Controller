@@ -278,7 +278,7 @@ namespace ACCUDPProvider {
 						listener.Flush();
 
 						if (File.Exists(cmdFileName)) {
-							requests += 1;
+							// requests += 1;
 							
 							StreamReader cmdStream = new StreamReader(cmdFileName);
 

@@ -224,18 +224,29 @@ class RaceSpotter extends RaceAssistant {
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
+					synthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+													  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
-					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iFastSpeechSynthesizer.setRate(this.SpeakerSpeed)
+					this.iFastSpeechSynthesizer := synthesizer
+
+					synthesizer.setVolume(this.SpeakerVolume)
+					synthesizer.setPitch(this.SpeakerPitch)
+					synthesizer.setRate(this.SpeakerSpeed)
+
+					synthesizer.SpeechStatusCallback := ObjBindMethod(this, "updateSpeechStatus")
 				}
 
 				return this.iFastSpeechSynthesizer
 			}
 			else
 				return base.getSpeaker()
+		}
+
+		updateSpeechStatus(status) {
+			if (status = "Start")
+				this.muteAssistants()
+			else if (status = "Stop")
+				this.unmuteAssistants()
 		}
 
 		buildPhrases(language, fast := false) {

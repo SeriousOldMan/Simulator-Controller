@@ -642,6 +642,26 @@ class VoiceAssistant {
 			}
 	}
 
+	muteAssistants() {
+		if this.VoiceServer
+			try {
+				FileAppend TRUE, %kTempDirectory%Voice.mute
+			}
+			catch exception {
+				; ignore
+			}
+	}
+
+	unmuteAssistants() {
+		if this.VoiceServer
+			try {
+				FileDelete %kTempDirectory%Voice.mute
+			}
+			catch exception {
+				; ignore
+			}
+	}
+
 	getGrammars(language) {
 		Throw "Virtual method VoiceAssistant.getGrammars must be implemented in a subclass..."
 	}

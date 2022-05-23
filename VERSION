@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.7.0-dev
 Target=4.1.7.0-release
-Date=05/21/2022
+Date=05/23/2022
 Download=
-Changes=Fixed unexpected translation of Grip status in ACC shared memory, Added new linear regression for tyre pressure correction between drivers in "Race Center", New settings to enable/disable telemetry and tyre pressure data collection during Practice, Qualifaction and Race sessions
+Changes=Fixed unexpected translation of Grip status in ACC shared memory, Added new linear regression for tyre pressure correction between drivers in "Race Center", New settings to enable/disable telemetry and tyre pressure data collection during Practice, Qualifaction and Race sessions, Improved UDP connection stability (for position data), Spotter warnings mute other voice output
 [Release]
 Version=4.1.6-release
 Date=05/20/2022

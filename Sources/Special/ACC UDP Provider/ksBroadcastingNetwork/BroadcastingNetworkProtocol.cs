@@ -384,12 +384,25 @@ namespace ksBroadcastingNetwork
             }
         }
 
+		/*
         internal void Disconnect()
         {
             using (var ms = new MemoryStream())
             using (var br = new BinaryWriter(ms))
             {
                 br.Write((byte)OutboundMessageTypes.UNREGISTER_COMMAND_APPLICATION); // First byte is always the command type
+                Send(ms.ToArray());
+            }
+        }
+		*/
+		
+		internal void Disconnect()
+        {
+            using (var ms = new MemoryStream())
+            using (var br = new BinaryWriter(ms))
+            {
+                br.Write((byte)OutboundMessageTypes.UNREGISTER_COMMAND_APPLICATION); // First byte is always the command type
+                br.Write((int)ConnectionId);
                 Send(ms.ToArray());
             }
         }

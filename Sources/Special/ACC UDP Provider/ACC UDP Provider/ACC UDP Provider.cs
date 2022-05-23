@@ -270,14 +270,16 @@ namespace ACCUDPProvider {
 					}
 				}
 
-				int runs = 5;
+				int requests = 0;
 				
-				while (!done && (runs-- > 0)) {
+				while (!done && (requests < 5)) {
 					try {
 						Debug.Flush();
 						listener.Flush();
 
 						if (File.Exists(cmdFileName)) {
+							requests += 1;
+							
 							StreamReader cmdStream = new StreamReader(cmdFileName);
 
 							string command = cmdStream.ReadLine();

@@ -523,7 +523,7 @@ class VoiceServer extends ConfigurationItem {
 			; ignore
 		}
 
-		timer := ObjBindMethod(this, "checkMute")
+		timer := ObjBindMethod(this, "muteVoiceClients")
 
 		SetTimer %timer%, 50
 	}
@@ -694,7 +694,7 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : false)
 	}
 
-	checkMute() {
+	muteVoiceClients() {
 		if FileExist(kTempDirectory . "Voice.mute")
 			for ignore, client in this.VoiceClients
 				client.mute()

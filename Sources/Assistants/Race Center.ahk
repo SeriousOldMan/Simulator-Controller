@@ -1351,6 +1351,32 @@ class RaceCenter extends ConfigurationItem {
 	connectAsync(silent) {
 		window := this.Window
 
+		if (!silent && GetKeyState("Ctrl", "P")) {
+			Gui TSL:+Owner%window%
+			Gui %window%:+Disabled
+
+			try {
+				token := loginDialog(this.Connector, this.ServerURL)
+
+				if token {
+					serverTokenEdit := token
+
+					Gui %window%:Default
+
+					this.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
+
+					GuiControl Text, serverTokenEdit, %serverTokenEdit%
+				}
+				else
+					return
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
+
+		window := this.Window
+
 		Gui %window%:Default
 
 		SetTimer syncSession, Off
@@ -8156,6 +8182,77 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 
 	return previousValue
+}
+
+loginDialog(connectorOrCommand := false, teamServerURL := false) {
+	static result := false
+
+	static nameEdit := ""
+	static passwordEdit := ""
+
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+		window := "TSL"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
+
+		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, x110 yp+1 w160 VnameEdit, %nameEdit%
+		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
+
+		Gui %window%:Show, AutoSize Center
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk) {
+			try {
+				connectorOrCommand.Connect(teamServerURL)
+
+				return connectorOrCommand.Login(nameEdit, passwordEdit)
+			}
+			catch exception {
+				title := translate("Error")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+				OnMessage(0x44, "")
+
+				return false
+			}
+		}
+	}
+}
+
+acceptLogin() {
+	loginDialog(kOk)
+}
+
+cancelLogin() {
+	loginDialog(kCancel)
 }
 
 validateNumber(field) {

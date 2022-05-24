@@ -74,7 +74,7 @@ First of all, it is absolutely important to note that a team session can only fu
 
 Select the tab named "Team", and enter the server URI as well as the access token, which has been provided by the team manager as described above in the chapter about [team administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams). Please note, that the tab "Team" is not available in the "Session Database", since the settings that are stored there will be independent of a given team.
 
-Once you have entered the server credentials, you can click on the small button with the key and the available teams, drivers and sessions associated with the access token will be loaded. Select the team, your driver and the session, and you are done - almost.
+Once you have entered the server credentials, you can click on the small button with the key and the available teams, drivers and sessions associated with the access token will be loaded. As an alternative, you can hold down the Control key, while pressing on the "Key" button which will open a login dialog where you can enter the login credentials of the team manager. Select the team, your driver and the session, and you are done - almost.
 
 ## Running a team session
 
@@ -108,7 +108,7 @@ Please note, that all the data and graphs shown in the window will be updated dy
 
 ### Connecting to a Session
 
-To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the access token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu.
+To use the "Race Center", you must have a valid connection to a team session. This is normally handled by entering the corresponding server URL and access token into the ["Race Settings" application](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session), but you can even connect to a team session without being an active driver in the session by entering the access token supplied by your team manager directly into the field at the top of the "Race Center" window. Then either click on the small button with the key on the left of the token field or choose "Connect" from the "Session" menu. As an alternative, you can hold down the Control key, while pressing on the "Key" button or choosing the menu command, which will open a login dialog where you can enter the login credentials of the team manager.
 
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 

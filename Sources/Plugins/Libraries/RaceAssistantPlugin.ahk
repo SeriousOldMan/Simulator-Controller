@@ -907,6 +907,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateSessionData(data) {
+		static sessionDB := new SessionDatabase()
+
+		maxFuel := sessionDB.getSettingValue(getConfigurationValue(data, "Session Data", "Simulator")
+										   , getConfigurationValue(data, "Session Data", "Car")
+										   , getConfigurationValue(data, "Session Data", "Track")
+										   , "*", "Session Settings", "Fuel.Amount", kUndefined)
+
+		if (maxFuel != kUndefined)
+			setConfigurationValue(data, "Session Data", "FuelAmount", maxFuel)
+
 		this.Simulator.updateSessionData(data)
 	}
 
@@ -1400,11 +1410,11 @@ prepareSessionDatabase(data) {
 		plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
-		sessionDB := new SessionDatabase()
+		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
+		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
-		sessionDB.prepareDatabase(sessionDB.getSimulatorCode(plugin.Simulator.runningSimulator())
-								, getConfigurationValue(data, "Session Data", "Car", "Unknown")
-								, getConfigurationValue(data, "Session Data", "Track", "Unknown"))
+		if ((car != kUndefined) && (track && kUndefined))
+			new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
 	}
 }
 

@@ -211,12 +211,12 @@ class RaceSpotter extends RaceAssistant {
 	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
 
-	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {
+	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
 
-		class FastSpeaker extends VoiceAssistant.LocalSpeaker {
+		class FastSpeaker extends VoiceManager.LocalSpeaker {
 			speak(arguments*) {
-				if (this.Assistant.RaceAssistant.Session >= kSessionPractice)
+				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
 					base.speak(arguments*)
 			}
 		}
@@ -244,9 +244,9 @@ class RaceSpotter extends RaceAssistant {
 
 		updateSpeechStatus(status) {
 			if (status = "Start")
-				this.muteAssistants()
+				this.mute()
 			else if (status = "Stop")
-				this.unmuteAssistants()
+				this.unmute()
 		}
 
 		buildPhrases(language, fast := false) {
@@ -305,8 +305,8 @@ class RaceSpotter extends RaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
 
-	createVoiceAssistant(name, options) {
-		return new this.SpotterVoiceAssistant(this, name, options)
+	createVoiceManager(name, options) {
+		return new this.SpotterVoiceManager(this, name, options)
 	}
 
 	updateSessionValues(values) {
@@ -554,7 +554,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	getSpeaker(fast := false) {
-		return this.VoiceAssistant.getSpeaker(fast)
+		return this.VoiceManager.getSpeaker(fast)
 	}
 
 	updateOpponentReported(positionType, car, reported) {

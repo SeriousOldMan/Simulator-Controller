@@ -312,7 +312,7 @@ else {
 	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
 									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
-	strategist.VoiceAssistant.setDebug(kDebugGrammars, false)
+	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 	
 	if (raceNr == 15) {
 		done := false

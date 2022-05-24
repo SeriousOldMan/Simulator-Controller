@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Voice Chat Assistant            ;;;
+;;;   Modular Simulator Controller System - Voice Chat Manager              ;;;
+;;;                                         Client for Voice Server         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -34,7 +35,7 @@ global kDebugRecognitions := 4
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class VoiceAssistant {
+class VoiceManager {
 	iDebug := kDebugOff
 
 	iLanguage := "en"
@@ -63,7 +64,7 @@ class VoiceAssistant {
 	iContinuation := false
 
 	class RemoteSpeaker {
-		iAssistant := false
+		iVoiceManager := false
 		iFragments := {}
 		iPhrases := {}
 
@@ -74,19 +75,19 @@ class VoiceAssistant {
 		iText := ""
 		iFocus := false
 
-		Assistant[] {
+		VoiceManager[] {
 			Get {
-				return this.iAssistant
+				return this.iVoiceManager
 			}
 		}
 
 		Speaking[] {
 			Get {
-				return this.Assistant.Speaking
+				return this.VoiceManager.Speaking
 			}
 
 			Set {
-				return (this.Assistant.Speaking := value)
+				return (this.VoiceManager.Speaking := value)
 			}
 		}
 
@@ -114,8 +115,8 @@ class VoiceAssistant {
 			}
 		}
 
-		__New(assistant, synthesizer, speaker, language, fragments, phrases) {
-			this.iAssistant := assistant
+		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+			this.iVoiceManager := voiceManager
 			this.iFragments := fragments
 			this.iPhrases := phrases
 
@@ -147,7 +148,7 @@ class VoiceAssistant {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.Assistant.Name, text, focus), this.Assistant.VoiceServer)
+				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
@@ -161,7 +162,7 @@ class VoiceAssistant {
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.Assistant.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -170,7 +171,7 @@ class VoiceAssistant {
 	}
 
 	class LocalSpeaker extends SpeechSynthesizer {
-		iAssistant := false
+		iVoiceManager := false
 		iFragments := {}
 		iPhrases := {}
 
@@ -178,19 +179,19 @@ class VoiceAssistant {
 		iText := ""
 		iFocus := false
 
-		Assistant[] {
+		VoiceManager[] {
 			Get {
-				return this.iAssistant
+				return this.iVoiceManager
 			}
 		}
 
 		Speaking[] {
 			Get {
-				return (this.Assistant.Speaking || base.Speaking)
+				return (this.VoiceManager.Speaking || base.Speaking)
 			}
 
 			Set {
-				return (this.Assistant.Speaking := value)
+				return (this.VoiceManager.Speaking := value)
 			}
 		}
 
@@ -218,8 +219,8 @@ class VoiceAssistant {
 			}
 		}
 
-		__New(assistant, synthesizer, speaker, language, fragments, phrases) {
-			this.iAssistant := assistant
+		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+			this.iVoiceManager := voiceManager
 			this.iFragments := fragments
 			this.iPhrases := phrases
 
@@ -250,7 +251,7 @@ class VoiceAssistant {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else {
-				stopped := this.Assistant.stopListening()
+				stopped := this.VoiceManager.stopListening()
 
 				try {
 					this.Speaking := true
@@ -263,8 +264,8 @@ class VoiceAssistant {
 					}
 				}
 				finally {
-					if (stopped && !this.Assistant.PushToTalk)
-						this.Assistant.startListening()
+					if (stopped && !this.VoiceManager.PushToTalk)
+						this.VoiceManager.startListening()
 				}
 			}
 		}
@@ -280,7 +281,7 @@ class VoiceAssistant {
 				if cache
 					cache .= ("." . index)
 
-				phrase := substituteVariables(phrases[Round(index)], this.Assistant.getPhraseVariables(variables))
+				phrase := substituteVariables(phrases[Round(index)], this.VoiceManager.getPhraseVariables(variables))
 			}
 
 			if phrase
@@ -289,13 +290,13 @@ class VoiceAssistant {
 	}
 
 	class VoiceContinuation {
-		iAssistant := false
+		iVoiceManager := false
 		iContinuation := false
 		iReply := false
 
-		Assistant[] {
+		VoiceManager[] {
 			Get {
-				return this.iAssistant
+				return this.iVoiceManager
 			}
 		}
 
@@ -311,15 +312,15 @@ class VoiceAssistant {
 			}
 		}
 
-		__New(assistant, continuation, reply := false) {
-			this.iAssistant := assistant
+		__New(voiceManager, continuation, reply := false) {
+			this.iVoiceManager := voiceManager
 			this.iContinuation := continuation
 			this.iReply := reply
 		}
 
 		continue() {
-			if (this.Assistant.Speaker && this.Reply)
-				this.Assistant.getSpeaker().speakPhrase(this.Reply)
+			if (this.VoiceManager.Speaker && this.Reply)
+				this.VoiceManager.getSpeaker().speakPhrase(this.Reply)
 
 			continuation := this.Continuation
 
@@ -426,7 +427,7 @@ class VoiceAssistant {
 
 	User[] {
 		Get {
-			Throw "Virtual property VoiceAssistant.User must be implemented in a subclass..."
+			Throw "Virtual property VoiceManager.User must be implemented in a subclass..."
 		}
 	}
 
@@ -455,10 +456,10 @@ class VoiceAssistant {
 		}
 
 		if this.VoiceServer
-			OnExit(ObjBindMethod(this, "shutdownVoiceAssistant"))
+			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
 	}
 
-	shutdownVoiceAssistant() {
+	shutdownVoiceManager() {
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 
@@ -642,7 +643,7 @@ class VoiceAssistant {
 			}
 	}
 
-	muteAssistants() {
+	mute() {
 		if this.VoiceServer
 			try {
 				FileAppend TRUE, %kTempDirectory%Voice.mute
@@ -652,7 +653,7 @@ class VoiceAssistant {
 			}
 	}
 
-	unmuteAssistants() {
+	unmute() {
 		if this.VoiceServer
 			try {
 				FileDelete %kTempDirectory%Voice.mute
@@ -663,7 +664,7 @@ class VoiceAssistant {
 	}
 
 	getGrammars(language) {
-		Throw "Virtual method VoiceAssistant.getGrammars must be implemented in a subclass..."
+		Throw "Virtual method VoiceManager.getGrammars must be implemented in a subclass..."
 	}
 
 	buildFragments(language) {
@@ -800,6 +801,6 @@ class VoiceAssistant {
 	}
 
 	handleVoiceCommand(grammar, words) {
-		Throw "Virtual method VoiceAssistant.handleVoiceCommand must be implemented in a subclass..."
+		Throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
 	}
 }

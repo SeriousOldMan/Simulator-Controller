@@ -17,7 +17,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports = ["Overview", "Car", "Driver", "Position", "Pace"]
+global kRaceReports = ["Overview", "Car", "Driver", "Positions", "Lap Times", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -122,6 +122,7 @@ class RaceReportViewer {
 					<head>
 						<style>
 							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+							.cellStyle { text-align: right; }
 							.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
 							.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
 						</style>
@@ -846,7 +847,7 @@ class RaceReportViewer {
 		return this.editReportSettings("Laps", "Drivers")
 	}
 
-	showPositionReport() {
+	showPositionsReport() {
 		report := this.Report
 
 		if report {
@@ -953,8 +954,73 @@ class RaceReportViewer {
 		}
 	}
 
-	editPositionReportSettings() {
+	editPositionsReportSettings() {
 		return this.editReportSettings("Laps")
+	}
+
+	showLapTimesReport() {
+		report := this.Report
+
+		if report {
+			raceData := true
+			drivers := true
+			positions := false
+			times := true
+
+			this.loadReportData(false, raceData, drivers, positions, times)
+
+			selectedCars := this.getReportDrivers(raceData)
+
+			laps := this.getReportLaps(raceData)
+			driverTimes := {}
+
+			for ignore, lap in laps {
+				lapTimes := []
+
+				for ignore, car in selectedCars
+					if times.hasKey(lap) {
+						time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+						time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+
+						if (time > 0)
+							lapTimes.Push("'" . this.lapTimeDisplayValue(time) . "'")
+						else
+							lapTimes.Push(kNull)
+					}
+					else
+						lapTimes.Push(kNull)
+
+				driverTimes[lap] := lapTimes
+			}
+
+			rows := []
+
+			for ignore, lap in laps
+				rows.Push("[" . values2String(", ", lap, driverTimes[lap]*) . "]")
+
+			drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . "');"
+
+			for ignore, car in selectedCars
+				drawChartFunction .= "`ndata.addColumn('string', '#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "');"
+
+			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
+
+			drawChartFunction .= "`nvar cssClassNames = { headerCell: 'headerStyle', tableCell: 'cellStyle', tableRow: 'rowStyle', oddTableRow: 'oddRowStyle' };"
+			drawChartFunction := drawChartFunction . "`nvar options = { cssClassNames: cssClassNames, width: '100%' };"
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.Table(document.getElementById('chart_id')); chart.draw(data, options); }"
+
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+
+	editLapTimesReportSettings() {
+		return this.editReportSettings("Laps", "Drivers")
 	}
 
 	showPaceReport() {

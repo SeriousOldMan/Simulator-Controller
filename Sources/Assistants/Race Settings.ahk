@@ -184,7 +184,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
 
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x110 yp+1 w160 VnameEdit, %nameEdit%
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
 		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
 		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
 

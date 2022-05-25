@@ -239,7 +239,8 @@ class SpeechSynthesizer {
 					Run "%kNirCmd%" setappvolume /%pid% %level%
 				}
 				catch exception {
-					; ignore
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 		}
@@ -303,7 +304,13 @@ class SpeechSynthesizer {
 			Sleep 500
 
 			if kNirCmd
-				Run "%kNirCmd%" setappvolume /%pid% 1.0
+				try {
+					Run "%kNirCmd%" setappvolume /%pid% 1.0
+				}
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 
 			this.iSoundPlayer := pid
 
@@ -446,9 +453,18 @@ class SpeechSynthesizer {
 			}
 
 			try {
-				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
-				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
-				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+				try {
+					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
+					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+				}
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+					if (this.Synthesizer = "Windows")
+						this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
+				}
 
 				if (wait || !cache)
 					this.playSound(temp2Name, true)
@@ -457,13 +473,6 @@ class SpeechSynthesizer {
 
 					this.iPlaysCacheFile := true
 				}
-			}
-			catch exception {
-				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-				if (this.Synthesizer = "Windows")
-					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
 				try {

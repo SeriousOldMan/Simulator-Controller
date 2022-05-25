@@ -150,6 +150,11 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
+				else if this.hasPlannedPitstop() {
+					this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
+				}
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 
@@ -165,16 +170,8 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
-				else {
-					this.getSpeaker().speakPhrase("Confirm")
-
-					sendMessage()
-
-					Loop 10
-						Sleep 500
-
+				else
 					this.preparePitstopRecognized(words)
-				}
 			case "PitstopAdjustFuel":
 				this.clearContinuation()
 
@@ -317,6 +314,13 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	preparePitstopRecognized(words) {
+		this.getSpeaker().speakPhrase("Confirm")
+
+		sendMessage()
+
+		Loop 10
+			Sleep 500
+
 		this.preparePitstop()
 	}
 
@@ -463,9 +467,9 @@ class RaceEngineer extends RaceAssistant {
 					{
 						psiValue := numberFragmentsLookup[psiValue]
 						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
-
-						found := true
 					}
+
+					found := true
 				}
 				else
 					for ignore, word in words {
@@ -1485,7 +1489,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 			}
 			finally {
@@ -1615,20 +1619,32 @@ class RaceEngineer extends RaceAssistant {
 
 		if !this.supportsPitstop()
 			this.getSpeaker().speakPhrase("NoPitstop")
-		else {
-			if (lap == kUndefined) {
+		else if this.hasPlannedPitstop() {
+			this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+			this.setContinuation(ObjBindMethod(this, "invokePlanPitstop", false, lap, arguments*))
+		}
+		else
+			this.invokePlanPitstop(true, lap, arguments*)
+	}
+
+	invokePlanPitstop(confirm, lap := "__Undefined__", arguments*) {
+		this.clearContinuation()
+
+		if (lap == kUndefined) {
+			if confirm {
 				this.getSpeaker().speakPhrase("Confirm")
 
 				sendMessage()
 
 				Loop 10
 					Sleep 500
-
-				this.planPitstop()
 			}
-			else
-				this.planPitstop(lap, arguments*)
+
+			this.planPitstop()
 		}
+		else
+			this.planPitstop(lap, arguments*)
 	}
 
 	callPreparePitstop(lap := false) {
@@ -1671,7 +1687,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 				}
 			}

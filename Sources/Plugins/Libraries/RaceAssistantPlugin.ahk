@@ -907,7 +907,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateSessionData(data) {
-		static sessionDB := new SessionDatabase()
+		static sessionDB := false
+		
+		if !sessionDB
+			sessionDB := new SessionDatabase()
 
 		maxFuel := sessionDB.getSettingValue(getConfigurationValue(data, "Session Data", "Simulator")
 										   , getConfigurationValue(data, "Session Data", "Car")

@@ -228,6 +228,10 @@ class RaceReportViewer {
 		}
 	}
 
+	getReportCars(raceData) {
+		return this.getReportDrivers(raceData)
+	}
+
 	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
 		local raceData := true
 		local drivers := true
@@ -1020,7 +1024,7 @@ class RaceReportViewer {
 	}
 
 	editLapTimesReportSettings() {
-		return this.editReportSettings("Laps", "Drivers")
+		return this.editReportSettings("Laps", "Cars")
 	}
 
 	showPaceReport() {
@@ -1130,7 +1134,7 @@ class RaceReportViewer {
 	}
 
 	editPaceReportSettings() {
-		return this.editReportSettings("Laps", "Drivers")
+		return this.editReportSettings("Laps", "Cars")
 	}
 }
 
@@ -1351,12 +1355,14 @@ editReportSettings(raceReport, report := false, options := false) {
 			}
 		}
 
-		if inList(options, "Drivers") {
+		if (inList(options, "Drivers") || inList(options, "Cars")) {
 			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10") + 2
 
-			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate("Drivers")
+			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate(inList(options, "Cars") ? "Cars" : "Drivers")
 
-			Gui RRS:Add, ListView, x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr gselectDriver, % values2String("|", map(["     Driver (Start)", "Car"], "translate")*)
+			headers := (inList(options, "Drivers") ? ["     Driver (Start)", "Car"] : ["     #", "Car"])
+
+			Gui RRS:Add, ListView, x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr gselectDriver, % values2String("|", map(headers, "translate")*)
 
 			Gui RRS:Add, CheckBox, Check3 x72 yp+2 w15 h23 vdriverSelectCheck gselectDrivers
 
@@ -1372,9 +1378,16 @@ editReportSettings(raceReport, report := false, options := false) {
 			sessionDB := new SessionDatabase()
 			simulator := getConfigurationValue(raceData, "Session", "Simulator")
 
-			for ignore, driver in allDrivers
-				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", driver
-					 , sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car")))
+			for ignore, driver in allDrivers {
+				if inList(options, "Cars")
+					column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+				else
+					column1 := driver
+
+				column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+
+				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
+			}
 
 			if (!selectedDrivers || (selectedDrivers.Length() == allDrivers.Length()))
 				GuiControl, , driverSelectCheck, 1
@@ -1389,7 +1402,7 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Font, s8 Norm, Arial
 
-		yOption := (inList(options, "Drivers") ? "yp+306" : "yp+30")
+		yOption := ((inList(options, "Drivers") || inList(options, "Cars")) ? "yp+306" : "yp+30")
 
 		Gui RRS:Add, Text, x8 %yOption% w360 0x10
 
@@ -1441,7 +1454,7 @@ editReportSettings(raceReport, report := false, options := false) {
 				}
 			}
 
-			if inList(options, "Drivers") {
+			if (inList(options, "Drivers") || inList(options, "Cars")) {
 				newDrivers := []
 
 				rowNumber := 0
@@ -1456,6 +1469,7 @@ editReportSettings(raceReport, report := false, options := false) {
 				}
 
 				result["Drivers"] := newDrivers
+				result["Cars"] := newDrivers
 			}
 		}
 		else

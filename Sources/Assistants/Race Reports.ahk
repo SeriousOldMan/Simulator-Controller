@@ -342,7 +342,7 @@ class RaceReports extends ConfigurationItem {
 	editLapTimesReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	showPaceReport(reportDirectory) {
@@ -365,7 +365,7 @@ class RaceReports extends ConfigurationItem {
 	editPaceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	getSimulators() {

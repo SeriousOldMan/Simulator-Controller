@@ -6139,7 +6139,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editLapTimesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	showPaceReport() {
@@ -6151,7 +6151,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	showRaceReport(report) {

@@ -2807,13 +2807,13 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				session := this.SelectedSession[true]
 
+				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
+				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
+
 				lap := this.Connector.GetSessionLastLap(session)
 
 				this.Connector.SetLapValue(lap, "Strategy Update", "CANCEL")
 				this.Connector.SetSessionValue(session, "Strategy Update", lap)
-
-				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
-				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
 
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
@@ -2877,7 +2877,7 @@ class RaceCenter extends ConfigurationItem {
 				showMessage(translate("Race Engineer will be instructed as fast as possible."))
 			}
 			catch exception {
-				title := translate("Information")
+				title := translate("Error")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
@@ -2885,7 +2885,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			title := translate("Information")
+			title := translate("Error")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")

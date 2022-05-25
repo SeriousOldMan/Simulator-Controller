@@ -1029,7 +1029,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 yp+30 w356 0x10
 
-		Gui %window%:Add, ListView, x16 yp+10 w115 h176 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
+		Gui %window%:Add, ListView, x16 yp+10 w115 h200 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
 
 		for ignore, report in kSessionReports
 			if (report = "Driver")

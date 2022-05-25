@@ -10,6 +10,7 @@
   8. Spotter warnings now mute other voice output when *NirCmd* is installed.
   9. Alternative login dialog for name and password when connecting to Team Server (hold the Ctrk key while clicking on the "Key" button).
   10. Engineer now asks, before he replans an already planned pitstop.
+  11. New report in "Race Reports" and "Race Center" with lap times for all laps and cars. See the 8Lap Times Report Part [extended documentation](*) for more information.
 
 ## 4.1.6-release 05/20/22
 

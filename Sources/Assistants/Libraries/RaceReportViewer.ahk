@@ -17,7 +17,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports = ["Overview", "Car", "Driver", "Positions", "Lap Times", "Pace"]
+global kRaceReports = ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -57,7 +57,7 @@ global kConnect = "Connect"
 global kEvent = "Event"
 
 global kSessionReports = concatenate(kRaceReports, ["Pressures", "Temperatures", "Free"])
-global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Driver", "Strategy"]
+global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
@@ -1032,7 +1032,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, ListView, x16 yp+10 w115 h200 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
 
 		for ignore, report in kSessionReports
-			if (report = "Driver")
+			if (report = "Drivers")
 				LV_Add("", translate("Driver (Start)"))
 			else
 				LV_Add("", translate(report))
@@ -1588,7 +1588,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Driver", "Positions", "Lap Times", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Drivers", "Positions", "Lap Times", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -6107,7 +6107,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showDriverReport() {
-		this.selectReport("Driver")
+		this.selectReport("Drivers")
 
 		this.ReportViewer.showDriverReport()
 
@@ -6160,7 +6160,7 @@ class RaceCenter extends ConfigurationItem {
 				this.showOverviewReport()
 			case "Car":
 				this.showCarReport()
-			case "Driver":
+			case "Drivers":
 				raceData := true
 
 				this.ReportViewer.loadReportData(false, raceData, false, false, false)
@@ -6616,7 +6616,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if (this.Drivers.Length() != sessionDB.Tables["Driver.Data"].Length()) {
-				sessionDB.clear("Driver")
+				sessionDB.clear("Driver.Data")
 
 				for ignore, driver in this.Drivers
 					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
@@ -6628,7 +6628,7 @@ class RaceCenter extends ConfigurationItem {
 
 	reportSettings(report) {
 		switch report {
-			case "Driver":
+			case "Drivers":
 				if this.editDriverReportSettings()
 					this.showDriverReport()
 			case "Positions":

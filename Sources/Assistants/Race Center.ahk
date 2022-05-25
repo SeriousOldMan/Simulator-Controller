@@ -1588,7 +1588,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Driver", "Position", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Driver", "Positions", "Lap Times", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -6118,16 +6118,28 @@ class RaceCenter extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Drivers")
 	}
 
-	showPositionReport() {
-		this.selectReport("Position")
+	showPositionsReport() {
+		this.selectReport("Positions")
 
-		this.ReportViewer.showPositionReport()
+		this.ReportViewer.showPositionsReport()
 
 		this.updateState()
 	}
 
-	editPositionReportSettings() {
+	editPositionsReportSettings() {
 		return this.ReportViewer.editReportSettings("Laps")
+	}
+
+	showLapTimesReport() {
+		this.selectReport("Lap Times")
+
+		this.ReportViewer.showLapTimesReport()
+
+		this.updateState()
+	}
+
+	editLapTimesReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	showPaceReport() {
@@ -6139,7 +6151,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
 	showRaceReport(report) {
@@ -6162,8 +6174,10 @@ class RaceCenter extends ConfigurationItem {
 					this.ReportViewer.Settings["Drivers"] := drivers
 
 				this.showDriverReport()
-			case "Position":
-				this.showPositionReport()
+			case "Positions":
+				this.showPositionsReport()
+			case "Lap Times":
+				this.showLapTimesReport()
 			case "Pace":
 				this.showPaceReport()
 		}
@@ -6617,9 +6631,12 @@ class RaceCenter extends ConfigurationItem {
 			case "Driver":
 				if this.editDriverReportSettings()
 					this.showDriverReport()
-			case "Position":
-				if this.editPositionReportSettings()
-					this.showPositionReport()
+			case "Positions":
+				if this.editPositionsReportSettings()
+					this.showPositionsReport()
+			case "Lap Times":
+				if this.editLapTimesReportSettings()
+					this.showLapTimesReport()
 			case "Pace":
 				if this.editPaceReportSettings()
 					this.showPaceReport()
@@ -8211,7 +8228,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
 
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x110 yp+1 w160 VnameEdit, %nameEdit%
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
 		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
 		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
 

@@ -1417,7 +1417,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 				y := "Center"
 		}
 
-	; Gui SM:+AlwaysOnTop
+	Gui SM:+AlwaysOnTop
 	Gui SM:Show, X%x% Y%y% W%width% H%height% NoActivate
 
 	Sleep %duration%

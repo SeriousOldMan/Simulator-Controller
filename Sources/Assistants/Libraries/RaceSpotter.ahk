@@ -211,24 +211,42 @@ class RaceSpotter extends RaceAssistant {
 	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
 
-	class SpotterVoiceAssistant extends RaceAssistant.RaceVoiceAssistant {
+	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
+
+		class FastSpeaker extends VoiceManager.LocalSpeaker {
+			speak(arguments*) {
+				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
+					base.speak(arguments*)
+			}
+		}
 
 		getSpeaker(fast := false) {
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					this.iFastSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	   , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
+					synthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+													  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
-					this.iFastSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iFastSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iFastSpeechSynthesizer.setRate(this.SpeakerSpeed)
+					this.iFastSpeechSynthesizer := synthesizer
+
+					synthesizer.setVolume(this.SpeakerVolume)
+					synthesizer.setPitch(this.SpeakerPitch)
+					synthesizer.setRate(this.SpeakerSpeed)
+
+					synthesizer.SpeechStatusCallback := ObjBindMethod(this, "updateSpeechStatus")
 				}
 
 				return this.iFastSpeechSynthesizer
 			}
 			else
 				return base.getSpeaker()
+		}
+
+		updateSpeechStatus(status) {
+			if (status = "Start")
+				this.mute()
+			else if (status = "Stop")
+				this.unmute()
 		}
 
 		buildPhrases(language, fast := false) {
@@ -287,8 +305,8 @@ class RaceSpotter extends RaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
 
-	createVoiceAssistant(name, options) {
-		return new this.SpotterVoiceAssistant(this, name, options)
+	createVoiceManager(name, options) {
+		return new this.SpotterVoiceManager(this, name, options)
 	}
 
 	updateSessionValues(values) {
@@ -536,7 +554,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	getSpeaker(fast := false) {
-		return this.VoiceAssistant.getSpeaker(fast)
+		return this.VoiceManager.getSpeaker(fast)
 	}
 
 	updateOpponentReported(positionType, car, reported) {

@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\VoiceAssistant.ahk
+#Include ..\Assistants\Libraries\VoiceManager.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
@@ -50,7 +50,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	iAssistantType := ""
 	iSettings := false
-	iVoiceAssistant := false
+	iVoiceManager := false
 
 	iWarnings := false
 
@@ -112,7 +112,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	class RaceVoiceAssistant extends VoiceAssistant {
+	class RaceVoiceManager extends VoiceManager {
 		iRaceAssistant := false
 
 		RaceAssistant[] {
@@ -202,21 +202,21 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	VoiceAssistant[] {
+	VoiceManager[] {
 		Get {
-			return this.iVoiceAssistant
+			return this.iVoiceManager
 		}
 	}
 
 	Speaker[] {
 		Get {
-			return this.VoiceAssistant.Speaker
+			return this.VoiceManager.Speaker
 		}
 	}
 
 	Listener[] {
 		Get {
-			return this.VoiceAssistant.Listener
+			return this.VoiceManager.Listener
 		}
 	}
 
@@ -232,7 +232,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Continuation[] {
 		Get {
-			return this.VoiceAssistant.Continuation
+			return this.VoiceManager.Continuation
 		}
 	}
 
@@ -366,7 +366,7 @@ class RaceAssistant extends ConfigurationItem {
 			options["VoiceServer"] := voiceServer
 		}
 
-		this.iVoiceAssistant := this.createVoiceAssistant(name, options)
+		this.iVoiceManager := this.createVoiceManager(name, options)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -385,8 +385,8 @@ class RaceAssistant extends ConfigurationItem {
 		options["PushToTalk"] := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 	}
 
-	createVoiceAssistant(name, options) {
-		return new this.RaceVoiceAssistant(this, name, options)
+	createVoiceManager(name, options) {
+		return new this.RaceVoiceManager(this, name, options)
 	}
 
 	updateConfigurationValues(values) {
@@ -456,7 +456,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.clearContinuation()
 
-				if isInstance(continuation, VoiceAssistant.VoiceContinuation)
+				if isInstance(continuation, VoiceManager.VoiceContinuation)
 					continuation.continue()
 				else if continuation {
 					this.getSpeaker().speakPhrase("Confirm")
@@ -515,7 +515,7 @@ class RaceAssistant extends ConfigurationItem {
 		if announcement {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
-			this.setContinuation(new VoiceAssistant.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
+			this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
 		}
 		else
 			speaker.speakPhrase("Repeat")
@@ -526,32 +526,32 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	call() {
-		local voiceAssistant := this.VoiceAssistant
+		local voiceManager := this.VoiceManager
 
-		if voiceAssistant
-			voiceAssistant.recognizeActivation("Call", ["Hey", this.VoiceAssistant.Name])
+		if voiceManager
+			voiceManager.recognizeActivation("Call", ["Hey", this.VoiceManager.Name])
 	}
 
 	accept() {
 		if this.Continuation {
-			if this.VoiceAssistant
-				this.VoiceAssistant.phraseRecognized("Yes", ["Yes"])
+			if this.VoiceManager
+				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
 			else
 				this.handleVoiceCommand("Yes", ["Yes"])
 		}
-		else if this.VoiceAssistant
-			this.VoiceAssistant.recognizeCommand("Yes", ["Yes"])
+		else if this.VoiceManager
+			this.VoiceManager.recognizeCommand("Yes", ["Yes"])
 	}
 
 	reject() {
 		if this.Continuation {
-			if this.VoiceAssistant
-				this.VoiceAssistant.phraseRecognized("No", ["No"])
+			if this.VoiceManager
+				this.VoiceManager.phraseRecognized("No", ["No"])
 			else
 				this.handleVoiceCommand("No", ["No"])
 		}
-		else if this.VoiceAssistant
-			this.VoiceAssistant.recognizeCommand("No", ["No"])
+		else if this.VoiceManager
+			this.VoiceManager.recognizeCommand("No", ["No"])
 	}
 
 	nameRecognized(words) {
@@ -559,14 +559,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	setContinuation(continuation) {
-		if isInstance(continuation, VoiceAssistant.VoiceContinuation)
-			this.VoiceAssistant.setContinuation(continuation)
+		if isInstance(continuation, VoiceManager.VoiceContinuation)
+			this.VoiceManager.setContinuation(continuation)
 		else
-			this.VoiceAssistant.setContinuation(new VoiceAssistant.VoiceContinuation(this, continuation, "Confirm"))
+			this.VoiceManager.setContinuation(new VoiceManager.VoiceContinuation(this, continuation, "Confirm"))
 	}
 
 	clearContinuation() {
-		this.VoiceAssistant.clearContinuation()
+		this.VoiceManager.clearContinuation()
 	}
 
 	createKnowledgeBase(facts) {
@@ -592,7 +592,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	getSpeaker() {
-		return this.VoiceAssistant.getSpeaker()
+		return this.VoiceManager.getSpeaker()
 	}
 
 	hasEnoughData(inform := true) {
@@ -1011,7 +1011,9 @@ class RaceAssistant extends ConfigurationItem {
 
 			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
 				settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
-				settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+
+				if (settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
+					settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
 
 				if (lapTime > 10)
 					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))

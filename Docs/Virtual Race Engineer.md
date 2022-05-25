@@ -286,7 +286,7 @@ Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Contro
 
 #### Tab *Team*
 
-This tab gives you all you need to become a driver in a team session. Whenever you want to participate in a team session, you must connect to the corresponding *Team Server* beforehand using the URI and the access token provided by your team manager. After you have established a valid connection, you can choose the team, your driver name and the sesison you want to join. Please note, that you still might have to activate a team session, before you head out onto the track (see the actions of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server), if you want to control this using your Button Box, for example).
+This tab gives you all you need to become a driver in a team session. Whenever you want to participate in a team session, you must connect to the corresponding *Team Server* beforehand using the URI and the access token provided by your team manager and clicking on the "Key" button (if you hold down the Control key, while pressing on the "Key" button, you can use login credentials of the team manager as well). After you have established a valid connection, you can choose the team, your driver name and the sesison you want to join. Please note, that you still might have to activate a team session, before you head out onto the track (see the actions of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server), if you want to control this using your Button Box, for example).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%204.JPG)
 
@@ -471,7 +471,11 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
-Note: If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+Notes:
+
+  1. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+
+  2. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
   
 #### Choosing the Database location
 

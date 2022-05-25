@@ -135,6 +135,26 @@ inline void printData2(const string name, const T(&v)[S][S2])
 
 }
 
+inline const string getGrip(ACC_TRACK_GRIP_STATUS gripStatus) {
+
+	switch (gripStatus) {
+	case ACC_GREEN:
+		return "Green";
+	case ACC_FAST:
+		return "Fast";
+	case ACC_OPTIMUM:
+		return "Optimum";
+	case ACC_DAMP:
+		return "Damp";
+	case ACC_GREASY:
+		return "Greasy";
+	case ACC_WET:
+		return "Wet";
+	case ACC_FLOODED:
+		return "Flooded";
+	}
+}
+
 inline const string getWeather(ACC_RAIN_INTENSITY weather) {
 	switch (weather) {
 	case ACC_NO_RAIN:
@@ -244,15 +264,7 @@ int main(int argc, char* argv[])
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 		printData("Temperature", pf->roadTemp);
-
-		_bstr_t ts(gf->trackStatus);
-		char* trackStatus = ts;
-		
-		trackStatus[0] = toupper(trackStatus[0]);
-		for (int i = 1; trackStatus[i] != '\0'; ++i)
-			trackStatus[i] = tolower(trackStatus[i]);
-
-		printData("Grip", trackStatus);
+		printData("Grip", getGrip(gf->trackGripStatus));
 	}
 	
 	if ((argc == 1) || (argv[1][0] == 'W'))

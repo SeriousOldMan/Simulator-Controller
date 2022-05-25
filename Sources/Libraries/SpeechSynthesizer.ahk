@@ -62,6 +62,8 @@ class SpeechSynthesizer {
 	iSoundPlayer := false
 	iPlaysCacheFile := false
 
+	iSpeechStatusCallback := false
+
 	Synthesizer[] {
 		Get {
 			return this.iSynthesizer
@@ -126,6 +128,16 @@ class SpeechSynthesizer {
 	Speaking[] {
 		Get {
 			return this.isSpeaking()
+		}
+	}
+
+	SpeechStatusCallback[] {
+		Get {
+			return this.iSpeechStatusCallback
+		}
+
+		Set {
+			return (this.iSpeechStatusCallback := value)
 		}
 	}
 
@@ -216,24 +228,129 @@ class SpeechSynthesizer {
 		OnExit(ObjBindMethod(this, "clearCache"))
 	}
 
-	playSound(soundFile, wait := true) {
-		if kSox {
-			if wait {
-				RunWait "%kSox%" "%soundFile%" -t waveaudio -d, , HIDE
+	setPlayerLevel(level) {
+		pid := this.iSoundPlayer
 
-				return false
+		if (kNirCmd && pid) {
+			Process Exist, %pid%
+
+			if ErrorLevel {
+				try {
+					Run "%kNirCmd%" setappvolume /%pid% %level%
+				}
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+		}
+	}
+
+	mute() {
+		this.setPlayerLevel(0.4)
+	}
+
+	unmute() {
+		this.setPlayerLevel(1.0)
+	}
+
+	updateSpeechStatus(pid) {
+		Process Exist, %pid%
+
+		if ErrorLevel {
+			callback := ObjBindMethod(this, "updateSpeechStatus", pid)
+
+			SetTimer, %callback%, -50
+		}
+		else {
+			this.iSoundPlayer := false
+
+			callback := this.SpeechStatusCallback
+
+			%callback%("Stop")
+		}
+	}
+
+	playSound(soundFile, wait := true) {
+		local callback
+		local player
+
+		callback := this.SpeechStatusCallback
+
+		if kSox {
+			player := (wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe")
+
+			if !FileExist(kTempDirectory . player) {
+				copied := false
+
+				while (!copied)
+					try {
+						FileCopy %kSox%, %kTempDirectory%%player%, 1
+
+						copied := true
+					}
+					catch exception {
+						; ignore
+					}
+			}
+
+			if callback
+				%callback%("Start")
+
+			SplitPath kSox, , workingDirectory
+
+			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
+
+			Sleep 500
+
+			if kNirCmd
+				try {
+					Run "%kNirCmd%" setappvolume /%pid% 1.0
+				}
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+			this.iSoundPlayer := pid
+
+			if wait {
+				Loop {
+					Process Exist, %pid%
+
+					if ErrorLevel
+						Sleep 50
+					else
+						break
+				}
+
+				this.iSoundPlayer := false
+
+				if callback
+					%callback%("Stop")
 			}
 			else {
-				Run "%kSox%" "%soundFile%" -t waveaudio -d, , HIDE, pid
+				callback := ObjBindMethod(this, "updateSpeechStatus", pid)
 
-				return pid
+				Settimer %callback%, -500
 			}
 		}
 		else {
-			if wait
+			if wait {
+				if callback
+					%callback%("Start")
+
 				SoundPlay %soundFile%, Wait
-			else
+
+				if callback
+					%callback%("Stop")
+			}
+			else {
+				if callback
+					%callback%("Play")
+
 				SoundPlay %soundFile%
+			}
 		}
 	}
 
@@ -291,15 +408,10 @@ class SpeechSynthesizer {
 				cacheFileName := this.cacheFileName(cache)
 
 			if FileExist(cacheFileName) {
-				if (wait || !cache) {
-					; SoundPlay %cacheFileName%, Wait
-
+				if (wait || !cache)
 					this.playSound(cacheFileName, true)
-				}
 				else {
-					; SoundPlay %cacheFileName%
-
-					this.iSoundPlayer := this.playSound(cacheFileName, false)
+					this.playSound(cacheFileName, false)
 
 					this.iPlaysCacheFile := true
 				}
@@ -325,36 +437,42 @@ class SpeechSynthesizer {
 			this.speakToFile(temp1Name, text)
 
 			if !FileExist(temp1Name) {
-				if (this.Synthesizer = "Windows")
+				callback := this.SpeechStatusCallback
+
+				if (this.Synthesizer = "Windows") {
+					if callback
+						%callback%(wait ? "Start" : "Play")
+
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
+
+					if (callback && wait)
+						%callback%("Stop")
+				}
 
 				return
 			}
 
 			try {
-				RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
-				RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
-				RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
-
-				if (wait || !cache) {
-					; SoundPlay %temp2Name%, Wait
-
-					this.playSound(temp2Name, true)
+				try {
+					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
+					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					RunWait "%kSoX%" "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
 				}
-				else {
-					; SoundPlay %temp2Name%
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-					this.iSoundPlayer := this.playSound(temp2Name, false)
+					if (this.Synthesizer = "Windows")
+						this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
+				}
+
+				if (wait || !cache)
+					this.playSound(temp2Name, true)
+				else {
+					this.playSound(temp2Name, false)
 
 					this.iPlaysCacheFile := true
 				}
-			}
-			catch exception {
-				showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-				if (this.Synthesizer = "Windows")
-					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			}
 			finally {
 				try {
@@ -384,16 +502,7 @@ class SpeechSynthesizer {
 				if !FileExist(tempName)
 					return
 
-				if (wait || !cache) {
-					; SoundPlay %tempName%, Wait
-
-					this.playSound(tempName, true)
-				}
-				else {
-					; SoundPlay %tempName%
-
-					this.iSoundPlayer := this.playSound(tempName, false)
-				}
+				this.playSound(tempName, wait || !cache)
 
 				if !cache
 					try {

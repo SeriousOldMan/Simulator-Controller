@@ -212,7 +212,7 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechSynthesizer[create := false] {
 			Get {
-				if (create && this.Speaker && !this.iSpeechSynthesizer) {
+				if (!this.iSpeechSynthesizer && create && this.Speaker) {
 					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Synthesizer, this.Speaker, this.Language)
 
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
@@ -226,7 +226,7 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechRecognizer[create := false] {
 			Get {
-				if (create && this.Listener && !this.iSpeechRecognizer)
+				if (!this.iSpeechRecognizer && create && this.Listener)
 					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 
 				return this.iSpeechRecognizer
@@ -310,6 +310,20 @@ class VoiceServer extends ConfigurationItem {
 
 					return true
 				}
+		}
+
+		mute() {
+			synthesizer := this.SpeechSynthesizer
+
+			if synthesizer
+				synthesizer.mute()
+		}
+
+		unmute() {
+			synthesizer := this.SpeechSynthesizer
+
+			if synthesizer
+				synthesizer.unmute()
 		}
 
 		registerChoices(name, choices*) {
@@ -501,6 +515,17 @@ class VoiceServer extends ConfigurationItem {
 		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
 
 		SetTimer %timer%, 5000
+
+		try {
+			FileDelete %kTempDirectory%Voice.mute
+		}
+		catch exception {
+			; ignore
+		}
+
+		timer := ObjBindMethod(this, "muteVoiceClients")
+
+		SetTimer %timer%, 50
 	}
 
 	loadFromConfiguration(configuration) {
@@ -667,6 +692,15 @@ class VoiceServer extends ConfigurationItem {
 		activeClient := this.getVoiceClient()
 
 		return (activeClient ? activeClient.stopListening(retry) : false)
+	}
+
+	muteVoiceClients() {
+		if FileExist(kTempDirectory . "Voice.mute")
+			for ignore, client in this.VoiceClients
+				client.mute()
+		else
+			for ignore, client in this.VoiceClients
+				client.unmute()
 	}
 
 	speak(descriptor, text, activate := false) {

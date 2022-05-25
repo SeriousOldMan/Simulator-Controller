@@ -150,6 +150,11 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
+				else if this.hasPlannedPitstop() {
+					this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+					this.setContinuation(ObjBindMethod(this, "planPitstopRecognized", words))
+				}
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 
@@ -165,16 +170,8 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
-				else {
-					this.getSpeaker().speakPhrase("Confirm")
-
-					sendMessage()
-
-					Loop 10
-						Sleep 500
-
+				else
 					this.preparePitstopRecognized(words)
-				}
 			case "PitstopAdjustFuel":
 				this.clearContinuation()
 
@@ -317,6 +314,13 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	preparePitstopRecognized(words) {
+		this.getSpeaker().speakPhrase("Confirm")
+
+		sendMessage()
+
+		Loop 10
+			Sleep 500
+
 		this.preparePitstop()
 	}
 
@@ -463,9 +467,9 @@ class RaceEngineer extends RaceAssistant {
 					{
 						psiValue := numberFragmentsLookup[psiValue]
 						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
-
-						found := true
 					}
+
+					found := true
 				}
 				else
 					for ignore, word in words {
@@ -809,6 +813,24 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	collectTyrePressures() {
+		session := "Other"
+		default := false
+
+		switch this.Session {
+			case kSessionPractice:
+				session := "Practice"
+				default := true
+			case kSessionQualification:
+				session := "Qualification"
+			case kSessionRace:
+				session := "Race"
+				default := true
+		}
+
+		return getConfigurationValue(this.Settings, "Session Settings", "Pressures." . session, default)
+	}
+
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 
@@ -967,10 +989,11 @@ class RaceEngineer extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false) && ((this.Session == kSessionPractice) || (this.Session == kSessionRace))) {
+			if (shutdown && this.hasEnoughData(false)) {
 				this.shutdownSession("Before")
 
-				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.HasPressureData) || (this.SaveSettings == kAsk))) {
+				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData)
+								   || (this.SaveSettings == kAsk))) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
@@ -1000,6 +1023,30 @@ class RaceEngineer extends RaceAssistant {
 			callback := ObjBindMethod(this, "forceFinishSession")
 
 			SetTimer %callback%, -5000
+		}
+	}
+
+	shutdownSession(phase) {
+		this.iSessionDataActive := true
+
+		try {
+			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
+				this.saveSessionSettings()
+
+			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData && this.collectTyrePressures())
+				this.updateTyresDatabase()
+		}
+		finally {
+			this.iSessionDataActive := false
+		}
+
+		if (phase = "After") {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("DataUpdated")
+
+			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
+
+			this.finishSession()
 		}
 	}
 
@@ -1208,7 +1255,7 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
-			if this.RemoteHandler {
+			if (this.RemoteHandler && this.collectTyrePressures()) {
 				this.updateDynamicValues({HasPressureData: true})
 
 				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
@@ -1220,32 +1267,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	shutdownSession(phase) {
-		this.iSessionDataActive := true
-
-		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
-
-			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData)
-				this.updateTyresDatabase()
-		}
-		finally {
-			this.iSessionDataActive := false
-		}
-
-		if (phase = "After") {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("DataUpdated")
-
-			this.updateDynamicValues({KnowledgeBase: false, HasPressureData: false})
-
-			this.finishSession()
-		}
-	}
-
 	updateTyresDatabase() {
-		if this.RemoteHandler
+		if (this.RemoteHandler && this.collectTyrePressures())
 			this.RemoteHandler.updateTyresDatabase()
 
 		this.updateDynamicValues({HasPressureData: false})
@@ -1466,7 +1489,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 			}
 			finally {
@@ -1596,20 +1619,32 @@ class RaceEngineer extends RaceAssistant {
 
 		if !this.supportsPitstop()
 			this.getSpeaker().speakPhrase("NoPitstop")
-		else {
-			if (lap == kUndefined) {
+		else if this.hasPlannedPitstop() {
+			this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+			this.setContinuation(ObjBindMethod(this, "invokePlanPitstop", false, lap, arguments*))
+		}
+		else
+			this.invokePlanPitstop(true, lap, arguments*)
+	}
+
+	invokePlanPitstop(confirm, lap := "__Undefined__", arguments*) {
+		this.clearContinuation()
+
+		if (lap == kUndefined) {
+			if confirm {
 				this.getSpeaker().speakPhrase("Confirm")
 
 				sendMessage()
 
 				Loop 10
 					Sleep 500
-
-				this.planPitstop()
 			}
-			else
-				this.planPitstop(lap, arguments*)
+
+			this.planPitstop()
 		}
+		else
+			this.planPitstop(lap, arguments*)
 	}
 
 	callPreparePitstop(lap := false) {
@@ -1652,7 +1687,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "preparePitstop"))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 				}
 			}

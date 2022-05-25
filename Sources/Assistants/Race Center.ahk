@@ -1335,7 +1335,7 @@ class RaceCenter extends ConfigurationItem {
 
 	showMessage(message, prefix := false) {
 		if !prefix
-			prefix := translate("Step: ")
+			prefix := translate("Task: ")
 
 		window := this.Window
 
@@ -1349,6 +1349,32 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	connectAsync(silent) {
+		window := this.Window
+
+		if (!silent && GetKeyState("Ctrl", "P")) {
+			Gui TSL:+Owner%window%
+			Gui %window%:+Disabled
+
+			try {
+				token := loginDialog(this.Connector, this.ServerURL)
+
+				if token {
+					serverTokenEdit := token
+
+					Gui %window%:Default
+
+					this.iServerToken := ((serverTokenEdit = "") ? "__INVALID__" : serverTokenEdit)
+
+					GuiControl Text, serverTokenEdit, %serverTokenEdit%
+				}
+				else
+					return
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
+
 		window := this.Window
 
 		Gui %window%:Default
@@ -2536,24 +2562,68 @@ class RaceCenter extends ConfigurationItem {
 		return setup
 	}
 
+	driverSetups(driver, weather, compound, compoundColor) {
+		this.saveSetups()
+
+		return this.SessionDatabase.query("Setups.Data", {Where: {Driver: driver.FullName, Weather: weather
+																, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+	}
+
+	driverPressureCurve(driver, setups, tyreType, ByRef a, ByRef b) {
+		xValues := []
+		yValues := []
+
+		for ignore, setup in setups {
+			xValues.Push(setup["Temperature.Air"])
+			yValues.Push(setup["Tyre.Pressure." . tyreType])
+		}
+
+		linRegression(xValues, yValues, a, b)
+	}
+
 	driverReferencePressure(driver, weather, airTemperature, trackTemperature, compound, compoundColor
 						  , ByRef pressureFL, ByRef pressureFR, ByRef pressureRL, ByRef pressureRR) {
-		settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
-
-		correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
-		correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
+		local variable
 
 		setup := this.driverSetup(driver, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 		if setup {
-			delta := (((airTemperature - setup["Temperature.Air"]) * correctionAir) + ((trackTemperature - setup["Temperature.Track"]) * correctionTrack))
+			setups := this.driverSetups(driver, setup.Weather, setup["Tyre.Compound"], setup["Tyre.Compound.Color"])
 
-			pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
-			pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
-			pressureRL := (setup["Tyre.Pressure.Rear.Left"] + delta)
-			pressureRR := (setup["Tyre.Pressure.Rear.Right"] + delta)
+			if (setups.Length() > 1) {
+				for index, tyreType in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+					a := false
+					b := false
 
-			return true
+					this.driverPressureCurve(driver, setups, tyreType, a, b)
+
+					variable := ["tempFL", "tempFR", "tempRL", "tempRR"][index]
+
+					%variable% := (a + (b * airTemperature))
+				}
+
+				pressureFL := tempFL
+				pressureFR := tempFR
+				pressureRL := tempRL
+				pressureRR := tempRR
+
+				return true
+			}
+			else {
+				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+
+				correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+				correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
+
+				delta := (((airTemperature - setup["Temperature.Air"]) * correctionAir) + ((trackTemperature - setup["Temperature.Track"]) * correctionTrack))
+
+				pressureFL := (setup["Tyre.Pressure.Front.Left"] + delta)
+				pressureFR := (setup["Tyre.Pressure.Front.Right"] + delta)
+				pressureRL := (setup["Tyre.Pressure.Rear.Left"] + delta)
+				pressureRR := (setup["Tyre.Pressure.Rear.Right"] + delta)
+
+				return true
+			}
 		}
 		else
 			return false
@@ -2570,15 +2640,32 @@ class RaceCenter extends ConfigurationItem {
 			return true
 		}
 		else {
-			settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
-
-			correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
-			correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.033)
-
 			currentDriverSetup := this.driverSetup(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 			nextDriverSetup := this.driverSetup(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 			if (currentDriverSetup && nextDriverSetup) {
+				currentBasePressureFL := false
+				currentBasePressureFR := false
+				currentBasePressureRL := false
+				currentBasePressureRR := false
+
+				nextBasePressureFL := false
+				nextBasePressureFR := false
+				nextBasePressureRL := false
+				nextBasePressureRR := false
+
+				this.driverReferencePressure(currentDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+										   , currentBasePressureFL, currentBasePressureFR, currentBasePressureRL, currentBasePressureRR)
+
+				this.driverReferencePressure(nextDriver, weather, airTemperature, trackTemperature, compound, compoundColor
+										   , nextBasePressureFL, nextBasePressureFR, nextBasePressureRL, nextBasePressureRR)
+
+				/*
+				settings := new SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+
+				correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+				correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
+
 				currentDelta := (((airTemperature - currentDriverSetup["Temperature.Air"]) * correctionAir)
 							   + ((trackTemperature - currentDriverSetup["Temperature.Track"]) * correctionTrack))
 
@@ -2594,6 +2681,7 @@ class RaceCenter extends ConfigurationItem {
 				nextBasePressureFR := (nextDriverSetup["Tyre.Pressure.Front.Right"] + nextDelta)
 				nextBasePressureRL := (nextDriverSetup["Tyre.Pressure.Rear.Left"] + nextDelta)
 				nextBasePressureRR := (nextDriverSetup["Tyre.Pressure.Rear.Right"] + nextDelta)
+				*/
 
 				deltaFL := (nextBasePressureFL - currentBasePressureFL)
 				deltaFR := (nextBasePressureFR - currentBasePressureFR)
@@ -2719,13 +2807,13 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				session := this.SelectedSession[true]
 
+				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
+				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
+
 				lap := this.Connector.GetSessionLastLap(session)
 
 				this.Connector.SetLapValue(lap, "Strategy Update", "CANCEL")
 				this.Connector.SetSessionValue(session, "Strategy Update", lap)
-
-				this.Connector.SetSessionValue(session, "Race Strategy", "CANCEL")
-				this.Connector.SetSessionValue(session, "Race Strategy Version", A_Now . "")
 
 				showMessage(translate("Race Strategist will be instructed as fast as possible."))
 			}
@@ -2789,7 +2877,7 @@ class RaceCenter extends ConfigurationItem {
 				showMessage(translate("Race Engineer will be instructed as fast as possible."))
 			}
 			catch exception {
-				title := translate("Information")
+				title := translate("Error")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
@@ -2797,7 +2885,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			title := translate("Information")
+			title := translate("Error")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
@@ -3132,7 +3220,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				this.updateState()
-			case 11:
+			case 10:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
@@ -8094,6 +8182,77 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 
 	return previousValue
+}
+
+loginDialog(connectorOrCommand := false, teamServerURL := false) {
+	static result := false
+
+	static nameEdit := ""
+	static passwordEdit := ""
+
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+		window := "TSL"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
+
+		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, x110 yp+1 w160 VnameEdit, %nameEdit%
+		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
+
+		Gui %window%:Show, AutoSize Center
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk) {
+			try {
+				connectorOrCommand.Connect(teamServerURL)
+
+				return connectorOrCommand.Login(nameEdit, passwordEdit)
+			}
+			catch exception {
+				title := translate("Error")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+				OnMessage(0x44, "")
+
+				return false
+			}
+		}
+	}
+}
+
+acceptLogin() {
+	loginDialog(kOk)
+}
+
+cancelLogin() {
+	loginDialog(kCancel)
 }
 
 validateNumber(field) {

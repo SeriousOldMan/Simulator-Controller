@@ -919,7 +919,7 @@ else {
 	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 								   , new TestPitStopHandler(), "Jona", "en", "Windows", true, true, true)
 
-	engineer.VoiceAssistant.setDebug(kDebugGrammars, false)
+	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 	
 	if (raceNr == 1) {
 		Loop {

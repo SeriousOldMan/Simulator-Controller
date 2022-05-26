@@ -395,7 +395,7 @@ class ControllerStepWizard extends StepWizard {
 
 		Gui ListView, % this.iFunctionsListView
 
-		if load
+		if (load || !this.iFunctionTriggers)
 			this.iFunctionTriggers := {}
 
 		LV_Delete()

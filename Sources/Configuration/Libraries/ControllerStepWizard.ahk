@@ -42,6 +42,8 @@ class ControllerStepWizard extends StepWizard {
 			oldGui := A_DefaultGui
 
 			try {
+				SetupWizard.Instance.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
+
 				SetupWizard.Instance.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
 			}
 			finally {
@@ -194,9 +196,12 @@ class ControllerStepWizard extends StepWizard {
 		}
 	}
 
-	saveControllerFunctions() {
-		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+	saveFunctions(buttonBoxConfiguration := false, streamDeckConfiguration := false) {
+		if !buttonBoxConfiguration
+			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+
+		if !streamDeckConfiguration
+			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 		this.SetupWizard.setControllerFunctions(this.controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration))
 	}
@@ -268,7 +273,7 @@ class ControllerStepWizard extends StepWizard {
 
 			this.iControllerEditor := false
 
-			this.saveControllerFunctions()
+			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
 			return true
 		}
@@ -513,8 +518,6 @@ class ControllerStepWizard extends StepWizard {
 			wizard.toggleTriggerDetector(callback)
 
 			SetTimer stopTriggerDetector, 100
-
-			this.saveControllerFunctions()
 		}
 	}
 
@@ -590,8 +593,11 @@ class ControllerStepWizard extends StepWizard {
 			else
 				this.iFunctionTriggers[function] := [key1]
 
-			this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-							 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"))
+			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+
+			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+			this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
 			window := this.Window
 
@@ -599,8 +605,6 @@ class ControllerStepWizard extends StepWizard {
 			Gui ListView, % this.iFunctionsListView
 
 			LV_Modify(row, "Vis")
-
-			this.saveControllerFunctions()
 		}
 	}
 
@@ -641,7 +645,7 @@ class ControllerStepWizard extends StepWizard {
 
 			LV_Modify(row, "Col5", "")
 
-			this.saveControllerFunctions()
+			this.saveFunctions()
 		}
 	}
 
@@ -676,8 +680,11 @@ class ControllerStepWizard extends StepWizard {
 
 		wizard.toggleTriggerDetector()
 
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-						 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"))
+		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+
+		this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+		this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
 		window := this.Window
 
@@ -685,8 +692,6 @@ class ControllerStepWizard extends StepWizard {
 		Gui ListView, % this.iFunctionsListView
 
 		LV_Modify(row, "Vis")
-
-		this.saveControllerFunctions()
 	}
 }
 
@@ -1090,7 +1095,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		this.iFunctions[mode][action] := functionDescriptor
 
-		this.saveControllerFunctions()
+		this.saveFunctions()
 	}
 
 	getActionFunction(mode, action) {

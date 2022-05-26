@@ -1396,7 +1396,11 @@ editReportSettings(raceReport, report := false, options := false) {
 			else
 				GuiControl, , driverSelectCheck, 0
 
-			LV_ModifyCol(1, "AutoHdr")
+			if inList(options, "Cars")
+				LV_ModifyCol(1, "AutoHdr Right")
+			else
+				LV_ModifyCol(1, "AutoHdr")
+
 			LV_ModifyCol(2, "AutoHdr")
 		}
 

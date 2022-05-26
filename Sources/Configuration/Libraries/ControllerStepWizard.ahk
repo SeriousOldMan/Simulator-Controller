@@ -25,7 +25,7 @@ class ControllerStepWizard extends StepWizard {
 
 	iFunctionsListView := false
 
-	iFunctionTriggers := {}
+	iFunctionTriggers := false
 
 	class StepControllerEditor extends ControllerEditor {
 		configurationChanged(type, name) {
@@ -187,7 +187,7 @@ class ControllerStepWizard extends StepWizard {
 		base.reset()
 
 		this.iFunctionsListView := false
-		this.iFunctionTriggers := {}
+		this.iFunctionTriggers := false
 
 		if this.iControllerEditor {
 			this.iControllerEditor.close(true)
@@ -197,13 +197,15 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	saveFunctions(buttonBoxConfiguration := false, streamDeckConfiguration := false) {
-		if !buttonBoxConfiguration
-			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		if this.iFunctionTriggers {
+			if !buttonBoxConfiguration
+				buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 
-		if !streamDeckConfiguration
-			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			if !streamDeckConfiguration
+				streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
-		this.SetupWizard.setControllerFunctions(this.controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration))
+			this.SetupWizard.setControllerFunctions(this.controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration))
+		}
 	}
 
 	showPage(page) {
@@ -274,6 +276,8 @@ class ControllerStepWizard extends StepWizard {
 			this.iControllerEditor := false
 
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
+
+			this.iFunctionTriggers := false
 
 			return true
 		}

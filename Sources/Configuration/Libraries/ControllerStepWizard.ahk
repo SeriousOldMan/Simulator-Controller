@@ -1372,13 +1372,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
 			function := [function]
+		else if (((functionType == k1WayToggleType) || (functionType == kButtonType)) && (actionDescriptor[2] == "Toggle") && !actionDescriptor[3])
+			function := [function]
 		else if (actionDescriptor[2] == "Activate")
 			function := [function]
 		else {
-			if (actionDescriptor[2] == "Toggle")
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["On", "Off", "Cancel"]))
-			else
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
 
 			title := translate("Trigger")
 			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")

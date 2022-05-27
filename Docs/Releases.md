@@ -8,7 +8,7 @@
   6. New settings in "Session Database" to enable/disable pitstop automation support during Practice, Qualifaction and Race sessions.
   7. Improved UDP connection stability (for position data) after restart of ACC.
   8. Spotter warnings now mute other voice output **when** *NirCmd* is installed.
-  9. Alternative login dialog for name and password when connecting to Team Server (hold the Ctrk key while clicking on the "Key" button).
+  9. Alternative login dialog for name and password when connecting to Team Server (hold the Ctrl key while clicking on the "Key" button).
   10. Engineer now asks, before he replans an already planned pitstop.
   11. New report in "Race Reports" and "Race Center" with lap times for all cars and laps. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports) for more information.
 

@@ -211,7 +211,7 @@ class RaceSpotter extends RaceAssistant {
 	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
 
-	iNextAlert := false
+	iPendingAlerts := []
 
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
@@ -873,65 +873,105 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	skipAlert(alert) {
-		nextAlert := this.iNextAlert
+	pendingAlert(alert, match := false) {
+		if match {
+			for ignore, candidate in this.iPendingAlerts
+				if InStr(candidate, alert)
+					return true
 
-		this.iNextAlert := false
-
-		if ((alert = "Hold") && InStr(nextAlert, "Clear"))
-			return true
-		else if ((alert = "Left") && ((nextAlert = "ClearAll") || (nextAlert = "ClearLeft")))
-			return true
-		else if ((alert = "Right") && ((nextAlert = "ClearAll") || (nextAlert = "ClearRight")))
-			return true
-		else if (InStr(alert, "Clear") && ((nextAlert = "Left") || (nextAlert = "Right") || (nextAlert = "Three")))
-			return true
-		else if (InStr(alert, "Behind") && (nextAlert = "Behind"))
-			return true
-		else if (InStr(alert, "BehindLeft") && (nextAlert = "BehindLeft"))
-			return true
-		else if (InStr(alert, "BehindRight") && (nextAlert = "BehindRight"))
-			return true
-		else
 			return false
+		}
+		else
+			return inList(this.iPendingAlerts, alert)
+	}
+
+	pendingAlerts(alerts, match := false) {
+		for ignore, alert in alerts
+			if match {
+				for ignore, candidate in this.iPendingAlerts
+					if InStr(candidate, alert)
+						return true
+			}
+			else
+				if inList(this.iPendingAlerts, alert)
+					return true
+
+		return false
+	}
+
+	skipAlert(alert) {
+		result := false
+
+		if ((alert = "Hold") && this.pendingAlerts(["ClearAll", "ClearLeft", "ClearRight"]))
+			result := true
+		else if ((alert = "Left") && this.pendingAlerts(["ClearAll", "ClearLeft"]))
+			result := true
+		else if ((alert = "Right") && this.pendingAlerts(["ClearAll", "ClearRight"]))
+			result := true
+		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three"]))
+			result := true
+		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"])))
+			result := true
+
+		return result
 	}
 
 	proximityAlert(alert) {
-		Loop {
-			if (InStr(alert, "Behind") == 1)
-				type := "Behind"
-			else
-				type := alert
+		static alerting := false
 
-			if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
-				if this.Speaker { ; if (this.Speaker && !this.SpotterSpeaking) {
-					if (!this.SpotterSpeaking || (type != "Hold")) {
-						speaker := this.getSpeaker(true)
+		if this.Speaker {
+			speaker := this.getSpeaker(true)
 
-						if speaker.isSpeaking() {
-							this.iNextAlert := alert
+			if alert {
+				this.iPendingAlerts.Push(alert)
 
-							return
-						}
-						else
-							this.iNextAlert := false
+				if (alerting || speaker.isSpeaking()) {
+					callback := ObjBindMethod(this, "proximityAlert", false)
 
-						this.SpotterSpeaking := true
+					SetTimer %callback%, -1000
 
-						try {
-							speaker.speakPhrase(alert, false, false, alert)
-						}
-						finally {
-							this.SpotterSpeaking := false
+					return
+				}
+			}
+			else if (alerting || speaker.isSpeaking()) {
+				callback := ObjBindMethod(this, "proximityAlert", false)
+
+				SetTimer %callback%, -100
+
+				return
+			}
+
+			alerting := true
+
+			try {
+				Loop {
+					if (this.iPendingAlerts.Length() > 0)
+						alert := this.iPendingAlerts.RemoveAt(1)
+					else
+						break
+
+					if (InStr(alert, "Behind") == 1)
+						type := "Behind"
+					else
+						type := alert
+
+					if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
+						if (!this.SpotterSpeaking || (type != "Hold")) {
+							this.SpotterSpeaking := true
+
+							try {
+								speaker.speakPhrase(alert, false, false, alert)
+							}
+							finally {
+								this.SpotterSpeaking := false
+							}
 						}
 					}
 				}
 			}
-
-			if this.iNextAlert
-				alert := this.iNextAlert
-			else
-				break
+			finally {
+				alerting := false
+			}
 		}
 	}
 

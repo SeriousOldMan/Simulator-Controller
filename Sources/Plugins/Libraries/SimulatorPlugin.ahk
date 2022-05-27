@@ -540,7 +540,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
-			else if (inList(kAssistantRaceActions, action) && inList(kAssistantAnswerActions, action)) {
+			else if (inList(kAssistantRaceActions, action) || inList(kAssistantAnswerActions, action)) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
 				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))

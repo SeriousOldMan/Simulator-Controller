@@ -873,78 +873,74 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	skipAlert(phrase) {
+	skipAlert(alert) {
 		nextAlert := this.iNextAlert
 
 		this.iNextAlert := false
 
-		if ((phrase = "Hold") && InStr(nextAlert, "Clear"))
+		if ((alert = "Hold") && InStr(nextAlert, "Clear"))
 			return true
-		else if ((phrase = "Left") && ((nextAlert = "ClearAll") || (nextAlert = "ClearLeft")))
+		else if ((alert = "Left") && ((nextAlert = "ClearAll") || (nextAlert = "ClearLeft")))
 			return true
-		else if ((phrase = "Right") && ((nextAlert = "ClearAll") || (nextAlert = "ClearRight")))
+		else if ((alert = "Right") && ((nextAlert = "ClearAll") || (nextAlert = "ClearRight")))
 			return true
-		else if (InStr(phrase, "Clear") && ((nextAlert = "Left") || (nextAlert = "Right") || (nextAlert = "Three")))
+		else if (InStr(alert, "Clear") && ((nextAlert = "Left") || (nextAlert = "Right") || (nextAlert = "Three")))
 			return true
-		else if (InStr(phrase, "Behind") && (nextAlert = "Behind"))
+		else if (InStr(alert, "Behind") && (nextAlert = "Behind"))
 			return true
-		else if (InStr(phrase, "BehindLeft") && (nextAlert = "BehindLeft"))
+		else if (InStr(alert, "BehindLeft") && (nextAlert = "BehindLeft"))
 			return true
-		else if (InStr(phrase, "BehindRight") && (nextAlert = "BehindRight"))
+		else if (InStr(alert, "BehindRight") && (nextAlert = "BehindRight"))
 			return true
 		else
 			return false
 	}
 
-	announceAlert(message) {
-		this.iNextAlert := message
-	}
+	proximityAlert(alert) {
+		Loop {
+			if (InStr(alert, "Behind") == 1)
+				type := "Behind"
+			else
+				type := alert
 
-	proximityAlert(message, variables := false) {
-		if (InStr(message, "Behind") == 1)
-			type := "Behind"
-		else
-			type := message
-
-		if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
-			if (variables && !IsObject(variables)) {
-				values := {}
-
-				for ignore, value in string2Values(",", variables) {
-					value := string2Values(":", value)
-
-					values[value[1]] := value[2]
-				}
-
-				variables := values
-			}
-
-			if this.Speaker { ; if (this.Speaker && !this.SpotterSpeaking) {
-				if (!this.SpotterSpeaking || (type != "Hold")) {
-					this.SpotterSpeaking := true
-
-					try {
+			if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
+				if this.Speaker { ; if (this.Speaker && !this.SpotterSpeaking) {
+					if (!this.SpotterSpeaking || (type != "Hold")) {
 						speaker := this.getSpeaker(true)
 
-						if variables
-							speaker.speakPhrase(message, variables)
+						if speaker.isSpeaking() {
+							this.iNextAlert := alert
+
+							return
+						}
 						else
-							speaker.speakPhrase(message, false, false, message)
-					}
-					finally {
-						this.SpotterSpeaking := false
+							this.iNextAlert := false
+
+						this.SpotterSpeaking := true
+
+						try {
+							speaker.speakPhrase(alert, false, false, alert)
+						}
+						finally {
+							this.SpotterSpeaking := false
+						}
 					}
 				}
 			}
+
+			if this.iNextAlert
+				alert := this.iNextAlert
+			else
+				break
 		}
 	}
 
-	yellowFlag(message, arguments*) {
+	yellowFlag(alert, arguments*) {
 		if (this.Warnings["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
-				switch message {
+				switch alert {
 					case "Full":
 						this.getSpeaker(true).speakPhrase("YellowFull", false, false, "YellowFull")
 					case "Sector":

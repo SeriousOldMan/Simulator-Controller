@@ -211,6 +211,8 @@ class RaceSpotter extends RaceAssistant {
 	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
 
+	iNextAlert := false
+
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
 
@@ -218,6 +220,17 @@ class RaceSpotter extends RaceAssistant {
 			speak(arguments*) {
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
 					base.speak(arguments*)
+			}
+
+			speakPhrase(phrase, arguments*) {
+				if this.Awaitable {
+					this.wait()
+
+					if this.VoiceManager.RaceAssistant.skipAlert(phrase)
+						return
+				}
+
+				base.speakPhrase(phrase, arguments*)
 			}
 		}
 
@@ -858,6 +871,33 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 		}
+	}
+
+	skipAlert(phrase) {
+		nextAlert := this.iNextAlert
+
+		this.iNextAlert := false
+
+		if ((phrase = "Hold") && InStr(nextAlert, "Clear"))
+			return true
+		else if ((phrase = "Left") && ((nextAlert = "ClearAll") || (nextAlert = "ClearLeft")))
+			return true
+		else if ((phrase = "Right") && ((nextAlert = "ClearAll") || (nextAlert = "ClearRight")))
+			return true
+		else if (InStr(phrase, "Clear") && ((nextAlert = "Left") || (nextAlert = "Right") || (nextAlert = "Three")))
+			return true
+		else if (InStr(phrase, "Behind") && (nextAlert = "Behind"))
+			return true
+		else if (InStr(phrase, "BehindLeft") && (nextAlert = "BehindLeft"))
+			return true
+		else if (InStr(phrase, "BehindRight") && (nextAlert = "BehindRight"))
+			return true
+		else
+			return false
+	}
+
+	announceAlert(message) {
+		this.iNextAlert := message
 	}
 
 	proximityAlert(message, variables := false) {

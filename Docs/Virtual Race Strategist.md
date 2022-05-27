@@ -163,6 +163,14 @@ Cato allows you to save most of the data that is acquired during a race to an ex
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%201.JPG)
 
+  4. Lap Times Report
+  
+     This Report will give you access to all lap times of all your opponents. These lap times will also be used to create the *Pace* chart (see next report), which supplies a much more intuitive way to judge the performance of a given car / driver, but sometimes looking at the numbers may reveal more detailed information.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%206.JPG)
+	 
+	 Impotant: The laps will be always the last lap of you and your car. The report does not perform any lap up or lap down correction, take the lap number for your opponents with a grain of salt.
+
   5. Pace Report
   
      If you want to analyze lap times and consistency of the different drivers, this report is for you. The small rectangle marks the range of typical lap times of the different drivers. The smaller and further down the small rectangle, the faster and the more consistent the corresponding driver is. If there are small blue lines above or below the rectangle, these marks lap times, which are outside of the standard deviation, for example a slow lap time after a crash.

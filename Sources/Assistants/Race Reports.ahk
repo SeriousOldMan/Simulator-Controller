@@ -279,9 +279,9 @@ class RaceReports extends ConfigurationItem {
 	showDriverReport(reportDirectory) {
 		if reportDirectory {
 			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Driver")
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Drivers")
 
-			this.iSelectedReport := "Driver"
+			this.iSelectedReport := "Drivers"
 		}
 		else {
 			GuiControl Choose, reportsDropDown, 0
@@ -607,18 +607,19 @@ class RaceReports extends ConfigurationItem {
 						this.showOverviewReport(reportDirectory)
 					case "Car":
 						this.showCarReport(reportDirectory)
-					case "Driver":
-						raceData := true
+					case "Drivers":
+						if !this.ReportViewer.Settings.HasKey("Drivers") {
+							raceData := true
 
-						this.ReportViewer.loadReportData(false, raceData, false, false, false)
+							this.ReportViewer.loadReportData(false, raceData, false, false, false)
 
-						drivers := []
+							drivers := []
 
-						Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
-							drivers.Push(A_Index)
+							Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+								drivers.Push(A_Index)
 
-						if !this.ReportViewer.Settings.HasKey("Drivers")
 							this.ReportViewer.Settings["Drivers"] := drivers
+						}
 
 						this.showDriverReport(reportDirectory)
 					case "Positions":
@@ -644,7 +645,7 @@ class RaceReports extends ConfigurationItem {
 		reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 
 		switch report {
-			case "Driver":
+			case "Drivers":
 				if this.editDriverReportSettings(reportDirectory)
 					this.showDriverReport(reportDirectory)
 			case "Positions":

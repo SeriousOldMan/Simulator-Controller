@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.7.0-release
-Target=4.1.7.0-release
+Version=4.1.7.1-release
+Target=4.1.7.1-release
 Date=05/27/2022
-Download=https://cntr.click/5HadKVW
+Download=https://cntr.click/1tAwMv4
 Changes=Fixed unexpected translation of Grip status in ACC shared memory, Added new linear regression for tyre pressure correction between drivers in "Race Center", New settings to enable/disable telemetry and tyre pressure data collection during Practice, Qualifaction and Race sessions, Improved UDP connection stability (for position data), Spotter warnings mute other voice output, Alternative login dialog for name and password when connecting to Team Server, Engineer now asks, before he replans an already planned pitstop, New laptime report in "Race Reports" and "Race Center"
 [Release]
-Version=4.1.7.0-release
+Version=4.1.7.1-release
 Date=05/27/2022
-Download=https://cntr.click/5HadKVW
+Download=https://cntr.click/1tAwMv4
 Changes=Fixed unexpected translation of Grip status in ACC shared memory, Added new linear regression for tyre pressure correction between drivers in "Race Center", New settings to enable/disable telemetry and tyre pressure data collection during Practice, Qualifaction and Race sessions, Improved UDP connection stability (for position data), Spotter warnings mute other voice output, Alternative login dialog for name and password when connecting to Team Server, Engineer now asks, before he replans an already planned pitstop, New laptime report in "Race Reports" and "Race Center"
 [Current]
 Type=Release
 [Version]
-Release=4.1.7.0-release
-Development=4.1.7.0-release
+Release=4.1.7.1-release
+Development=4.1.7.1-release

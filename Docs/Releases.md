@@ -1,4 +1,4 @@
-## 4.1.7,0-release 05/27/22
+## 4.1.7.0-release 05/27/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

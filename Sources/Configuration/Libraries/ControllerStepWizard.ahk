@@ -42,9 +42,13 @@ class ControllerStepWizard extends StepWizard {
 			oldGui := A_DefaultGui
 
 			try {
-				SetupWizard.Instance.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
+				controllerWizard := SetupWizard.Instance.StepWizards["Controller"]
 
-				SetupWizard.Instance.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
+				if controllerWizard.iFunctionTriggers {
+					SetupWizard.Instance.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
+
+					SetupWizard.Instance.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
+				}
 			}
 			finally {
 				Gui %oldGui%:Default

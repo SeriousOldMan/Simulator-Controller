@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.8.0-dev
 Target=4.1.8.0-release
-Date=05/27/2022
+Date=05/29/2022
 Download=
-Changes=Skip outdated Spotter anouncements
+Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises
 [Release]
 Version=4.1.7.1-release
 Date=05/27/2022

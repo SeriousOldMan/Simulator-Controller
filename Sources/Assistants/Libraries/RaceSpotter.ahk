@@ -178,15 +178,15 @@ class CarInfo {
 		this.iDriver := driver
 		this.iPosition := position
 
-		if (lastLap > this.LastLap) {
-			this.LapTimes[lastLap] := lapTime
+		if ((lastLap > this.LastLap) && (lapTime > 0)) {
+			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 20)
 				this.LapTimes.RemoveAt(1)
 
 			this.iLastLap := lastLap
 
-			if !valid
+			if (!valid && !inList(this.InvalidLaps, lastLap))
 				this.InvalidLaps.Push(lastLap)
 		}
 
@@ -300,7 +300,9 @@ class PositionInfo {
 
 	LapTimeDifference[average := false] {
 		Get {
-			return (Round(this.Spotter.KnowledgeBase.getValue("Lap." . lastLap . "Time") / 1000, 1) - this.Car.LapTime[average])
+			local knowledgeBase := this.Spotter.KnowledgeBase
+
+			return (Round(knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Time") / 1000, 1) - this.Car.LapTime[average])
 		}
 	}
 
@@ -318,25 +320,7 @@ class PositionInfo {
 		this.iSpotter := spotter
 		this.iCar := car
 
-		this.iStartingDelta := car.LastDelta
-	}
-
-	closingIn(threshold := 0.5) {
-		difference := this.DeltaDifference[true]
-
-		if this.isFront()
-			return ((difference < 0) && (Abs(difference) > threshold))
-		else
-			return ((difference > 0) && (difference > threshold))
-	}
-
-	runningAway(threshold := 2) {
-		difference := this.DeltaDifference[true]
-
-		if this.isFront()
-			return ((difference > 0) && (difference > threshold))
-		else
-			return ((difference < 0) && (Abs(difference) > threshold))
+		this.iStartingDelta := car.Delta[true]
 	}
 
 	inDelta(threshold := 2) {
@@ -345,6 +329,24 @@ class PositionInfo {
 
 	isFaster() {
 		return this.Car.isFaster()
+	}
+
+	closingIn(threshold := 0.5) {
+		difference := this.DeltaDifference[true]
+
+		if this.inFront()
+			return ((difference < 0) && (Abs(difference) > threshold))
+		else
+			return ((difference > 0) && (difference > threshold))
+	}
+
+	runningAway(threshold := 2) {
+		difference := this.DeltaDifference[true]
+
+		if this.inFront()
+			return ((difference > 0) && (difference > threshold))
+		else
+			return ((difference < 0) && (Abs(difference) > threshold))
 	}
 
 	inFront(standings := true) {
@@ -393,7 +395,7 @@ class PositionInfo {
 
 	reset() {
 		this.Reported := false
-		this.iStartingDelta := this.Car.LastDelta
+		this.iStartingDelta := this.Car.Delta[true]
 	}
 
 	checkpoint() {
@@ -506,7 +508,7 @@ class RaceSpotter extends RaceAssistant {
 
 	CarInfos[key := false] {
 		Get {
-			return (key ? this.iCarInfos[key] : this.iCars)
+			return (key ? this.iCarInfos[key] : this.iCarInfos)
 		}
 
 		Set {
@@ -791,7 +793,6 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateCarInfos(lastLap, sector) {
-		local carInfo
 		local knowledgeBase = this.KnowledgeBase
 
 		lastLap := knowledgeBase.getValue("Lap", 0)
@@ -809,18 +810,18 @@ class RaceSpotter extends RaceAssistant {
 												  , knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
 
 					if this.CarInfos.HasKey(carNr)
-						carInfo := this.CarInfos[carNr]
+						info := this.CarInfos[carNr]
 					else {
-						carInfo := new CarInfo(carNr, knowledgeBase.getValue("Car." . A_Index . ".Car", "Unknown"), driverName)
+						info := new CarInfo(carNr, knowledgeBase.getValue("Car." . A_Index . ".Car", "Unknown"), driverName)
 
-						this.CarInfos[carNr] := carInfo
+						this.CarInfos[carNr] := info
 					}
 
-					carInfo.update(driverName, knowledgeBase.getValue("Car." . A_Index . ".Position")
-								 , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0), carLapTime
-								 , knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-								 , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
-								 , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
+					info.update(driverName, knowledgeBase.getValue("Car." . A_Index . ".Position")
+							  , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0), carLapTime
+							  , knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+							  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
+							  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
 				}
 		}
 	}
@@ -834,11 +835,20 @@ class RaceSpotter extends RaceAssistant {
 			else {
 				position := new PositionInfo(this, car)
 
+				FileAppend New: %nr%`n, C:\Users\Simulator\Desktop\Debug.out
+
 				this.PositionInfos[nr] := position
 			}
 
+			info := this.PositionInfos[nr]
+			info := values2String(", ", info.Car.Nr, info.Car.Car, info.Car.Driver, info.Car.Position, values2String("|", info.Car.LapTimes*), info.Car.LapTime[true], values2String("|", info.Car.Deltas*), info.Delta[true], info.inFront(), info.atBehind(), info.inFront(false), info.atBehind(false), info.forPosition(), info.DeltaDifference[true], info.LapTimeDifference[true], this.Car.isFaster(), this.closingIn(0.2), this.runningAway(0.3))
+
+			FileAppend %info%`n, C:\Users\Simulator\Desktop\Debug.out
+
 			position.checkpoint()
 		}
+
+		FileAppend `n---------------------------------`n`n, C:\Users\Simulator\Desktop\Debug.out
 	}
 
 	summarizeRaceStart(lastLap) {

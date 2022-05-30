@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.8.0-dev
 Target=4.1.8.0-release
-Date=05/29/2022
+Date=05/30/2022
 Download=
-Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises
+Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector
 [Release]
 Version=4.1.7.1-release
 Date=05/27/2022

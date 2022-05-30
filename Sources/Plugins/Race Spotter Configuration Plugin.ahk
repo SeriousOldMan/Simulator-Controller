@@ -114,33 +114,32 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w3 := width - (x3 - x + 16) + 10
 
 		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget20 Hidden, % translate("Yellow Flags")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vyellowFlagsDropDown HWNDwidget21 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vyellowFlagsDropDown HWNDwidget21 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget22 Hidden, % translate("Blue Flags")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose3 vdistanceInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), "S", 1, 2, 3, 4)
-		Gui %window%:Add, Text, x%x3% yp+4 w80 h20 HWNDwidget32 Hidden, % translate("Laps")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdistanceInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
 
-		Gui %window%:Add, Text, x%x0% yp+22 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget30 Hidden, % translate("Pit Window")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w50 AltSubmit Choose1 vpitWindowDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vpitWindowDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Font, Norm, Arial
 
-		Loop 32
+		Loop 31
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()

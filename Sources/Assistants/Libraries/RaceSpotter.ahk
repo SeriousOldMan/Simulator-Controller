@@ -398,7 +398,6 @@ class PositionInfo {
 	forPosition() {
 		local knowledgeBase := this.Spotter.KnowledgeBase
 
-		lastLap := knowledgeBase.getValue("Lap")
 		position := knowledgeBase.getValue("Position")
 
 		if ((position - this.Car.Position) == 1)
@@ -989,7 +988,7 @@ class RaceSpotter extends RaceAssistant {
 
 		try {
 			if (trackFront && (trackFront != standingsFront) && trackFront.inDelta(2) && !trackFront.isFaster(sector)) {
-				if !trackFront.Reported {
+				if (!trackFront.Reported && (sector > 1)) {
 					if (trackFront.OpponentType = "LapDown")
 						speaker.speakPhrase("LapDownDriver")
 					else if (trackFront.OpponentType = "LapUp")

@@ -22,6 +22,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constant Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kDebugPositions = 2
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -244,7 +251,7 @@ class PositionInfo {
 	iSpotter := false
 	iCar := false
 
-	iActive := false
+	iObserved := false
 	iStartingDeltas := {}
 
 	iReported := false
@@ -283,9 +290,9 @@ class PositionInfo {
 		}
 	}
 
-	Active[] {
+	Observed[] {
 		Get {
-			return this.iActive
+			return this.iObserved
 		}
 	}
 
@@ -412,7 +419,15 @@ class PositionInfo {
 		if full
 			this.Reported := false
 
+		sectors := []
+
 		for sector, ignore in this.Car.Deltas
+			if !inList(sectors, sector)
+				sectors.Push(sector)
+
+		this.iStartingDeltas := {}
+
+		for ignore, sector in sectors
 			this.iStartingDeltas[sector] := this.Car.Delta[sector]
 	}
 
@@ -422,16 +437,19 @@ class PositionInfo {
 		position := this.forPosition()
 
 		if (trackFront || trackBehind || position) {
-			type := ((trackFront != false) . (trackBehind != false) . position)
-			active := this.Active
+			type := ((trackFront != false) . (trackBehind != false) . (position = "Front") . (position = "Behind"))
+			observed := this.Observed
 
-			if (!active || (active != type))
+			if (!observed || (observed != type))
 				this.reset(true)
 
-			this.iActive := type
+			this.iObserved := type
 		}
-		else
-			this.iActive := false
+		else {
+			this.iObserved := false
+
+			this.reset(true)
+		}
 	}
 }
 
@@ -567,6 +585,8 @@ class RaceSpotter extends RaceAssistant {
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
+
+		this.iDebug := (true || isDebug() ? (kDebugKnowledgeBase + kDebugPositions) : kDebugOff)
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
@@ -876,6 +896,9 @@ class RaceSpotter extends RaceAssistant {
 
 		positionInfos := this.PositionInfos
 
+		if this.Debug[kDebugPositions]
+			FileAppend ---------------------------------`n`n, %kTempDirectory%Race Spotter.positions
+
 		for nr, car in this.OtherCars {
 			if positionInfos.HasKey(nr)
 				position := positionInfos[nr]
@@ -885,7 +908,7 @@ class RaceSpotter extends RaceAssistant {
 				positionInfos[nr] := position
 			}
 
-			if isDebug() {
+			if this.Debug[kDebugPositions] {
 				info := values2String(", ", position.Car.Nr, position.Car.Car, position.Car.Driver, position.Car.Position
 										  , values2String("|", position.Car.LapTimes*), position.Car.LapTime[true]
 										  , values2String("|", position.Car.Deltas[sector]*), position.Delta[sector]
@@ -893,14 +916,14 @@ class RaceSpotter extends RaceAssistant {
 										  , position.DeltaDifference[sector], position.LapTimeDifference[true]
 										  , position.isFaster(sector), position.closingIn(sector, 0.2), position.runningAway(sector, 0.3))
 
-				FileAppend %info%`n, %kTempDirectory%Spotter.debug.out
+				FileAppend %info%`n, %kTempDirectory%Race Spotter.positions
 			}
 
 			position.checkpoint(sector)
 		}
 
-		if isDebug()
-			FileAppend `n---------------------------------`n`n, %kTempDirectory%Spotter.debug.out
+		if this.Debug[kDebugPositions]
+			FileAppend `n---------------------------------`n`n, %kTempDirectory%Race Spotter.positions
 	}
 
 	summarizeRaceStart(lastLap) {
@@ -1002,14 +1025,14 @@ class RaceSpotter extends RaceAssistant {
 				deltaDifference := Abs(standingsFront.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsFront.LapTimeDifference)
 
-				if isDebug() {
+				if this.Debug[kDebugPositions] {
 					info := values2String(", ", standingsFront.Car.Nr, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
 											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[sector, true]
 											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
 											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, 0.2), standingsFront.runningAway(sector, 0.3))
 
-					FileAppend `n=====`n%info%`n=====`n, %kTempDirectory%Spotter.debug.out
+					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
 				}
 
 				if ((delta <= 0.8) && !standingsFront.isFaster(sector) && !standingsFront.Reported) {
@@ -1036,7 +1059,7 @@ class RaceSpotter extends RaceAssistant {
 					remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
 					if ((remaining > 0) && (lapTimeDifference > 0))
-						if ((remaining / 1000) > (delta / lapTimeDifference))
+						if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
 							speaker.speakPhrase("CanDoIt")
 						else
 							speaker.speakPhrase("CantDoIt")
@@ -1058,6 +1081,16 @@ class RaceSpotter extends RaceAssistant {
 				delta := Abs(standingsBehind.Delta[sector])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
+
+				if this.Debug[kDebugPositions] {
+					info := values2String(", ", standingsBehind.Car.Nr, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
+											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[sector, true]
+											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
+											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
+											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, 0.2), standingsBehind.runningAway(sector, 0.3))
+
+					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
+				}
 
 				if ((delta <= 0.8) && standingsBehind.isFaster(sector) && !standingsBehind.Reported) {
 					speaker.speakPhrase("ClosingIn", {delta: printNumber(delta, 1)
@@ -1201,15 +1234,21 @@ class RaceSpotter extends RaceAssistant {
 
 		if ((alert = "Hold") && this.pendingAlerts(["ClearAll", "ClearLeft", "ClearRight"]))
 			result := true
-		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlert("Three")))
+		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlerts(["Left", "Three"])))
 			result := true
-		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight"]) || this.pendingAlert("Three")))
+		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight"]) || this.pendingAlerts(["Right", "Three"])))
 			result := true
-		else if ((alert = "Side") && this.pendingAlert("ClearAll"))
+		else if ((alert = "Three") && this.pendingAlert("Clear", true))
 			result := true
-		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side"]))
+		else if ((alert = "Side") && this.pendingAlert("Clear", true))
+			result := true
+		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 			result := true
 		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"]) || this.pendingAlert("Clear", true)))
+			result := true
+		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
+			result := true
+		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
 			result := true
 
 		return result

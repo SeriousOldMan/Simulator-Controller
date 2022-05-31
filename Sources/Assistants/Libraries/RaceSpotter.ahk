@@ -994,6 +994,22 @@ class RaceSpotter extends RaceAssistant {
 	summarizeOpponents(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 
+		static frontAttackThreshold := false
+		static frontGainThreshold := false
+		static frontLostThreshold := false
+		static behindAttackThreshold := false
+		static behindGainThreshold := false
+		static behindLostThreshold := false
+
+		if !frontAttackThreshold {
+			frontAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Attack.Threshold", 0.8)
+			frontGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Gain.Threshold", 0.3)
+			frontLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Lost.Threshold", 1.0)
+			behindAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Attack.Threshold", 0.8)
+			behindLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Lost.Threshold", 0.3)
+			behindGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+		}
+
 		standingsFront := false
 		standingsBehind := false
 		trackFront := false
@@ -1028,12 +1044,12 @@ class RaceSpotter extends RaceAssistant {
 											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[sector, true]
 											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
-											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, 0.2), standingsFront.runningAway(sector, 0.3))
+											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, 0.2), standingsFront.runningAway(sector, 0.2))
 
 					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
 				}
 
-				if ((delta <= 0.8) && !standingsFront.isFaster(sector) && !standingsFront.Reported) {
+				if ((delta <= frontAttackThreshold) && !standingsFront.isFaster(sector) && !standingsFront.Reported) {
 					speaker.speakPhrase("GotHim", {delta: printNumber(delta, 1)
 												 , gained: printNumber(deltaDifference, 1)
 												 , lapTime: printNumber(lapTimeDifference, 1)})
@@ -1049,7 +1065,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsFront.reset()
 				}
-				else if (regular && standingsFront.closingIn(sector, 0.3) && !standingsFront.Reported) {
+				else if (regular && standingsFront.closingIn(sector, frontGainThreshold) && !standingsFront.Reported) {
 					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													  , gained: printNumber(deltaDifference, 1)
 													  , lapTime: printNumber(lapTimeDifference, 1)})
@@ -1066,7 +1082,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsFront.reset()
 				}
-				else if (regular && standingsFront.runningAway(sector, 1.0)) {
+				else if (regular && standingsFront.runningAway(sector, frontLostThreshold)) {
 					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
@@ -1085,12 +1101,12 @@ class RaceSpotter extends RaceAssistant {
 											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[sector, true]
 											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
-											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, 0.2), standingsBehind.runningAway(sector, 0.3))
+											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, 0.2), standingsBehind.runningAway(sector, 0.2))
 
 					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
 				}
 
-				if ((delta <= 0.8) && standingsBehind.isFaster(sector) && !standingsBehind.Reported) {
+				if ((delta <= behindAttackThreshold) && standingsBehind.isFaster(sector) && !standingsBehind.Reported) {
 					speaker.speakPhrase("ClosingIn", {delta: printNumber(delta, 1)
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
@@ -1106,7 +1122,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsBehind.reset()
 				}
-				else if (regular && standingsBehind.closingIn(sector, 0.3) && !standingsBehind.Reported) {
+				else if (regular && standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													 , lost: printNumber(deltaDifference, 1)
 													 , lapTime: printNumber(lapTimeDifference, 1)})
@@ -1116,7 +1132,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsBehind.reset()
 				}
-				else if (regular && standingsBehind.runningAway(sector, 1.0)) {
+				else if (regular && standingsBehind.runningAway(sector, behindGainThreshold)) {
 					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													   , gained: printNumber(deltaDifference, 1)
 													   , lapTime: printNumber(lapTimeDifference, 1)})

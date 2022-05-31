@@ -1735,13 +1735,12 @@ class RaceEngineer extends RaceAssistant {
 				speaker := this.getSpeaker()
 
 				stintLaps := Round(stintLaps)
-				delta := printNumber(delta, 1)
 
 				if repair {
 					speaker.startTalk()
 
 					try {
-						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 
 						if this.supportsPitstop() {
 							speaker.speakPhrase("ConfirmPlan", false, true)
@@ -1754,7 +1753,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 				else if (repair == false)
-					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: delta})
+					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 			}
 	}
 

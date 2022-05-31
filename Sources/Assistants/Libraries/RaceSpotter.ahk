@@ -586,7 +586,7 @@ class RaceSpotter extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		this.iDebug := (true || isDebug() ? (kDebugKnowledgeBase + kDebugPositions) : kDebugOff)
+		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugPositions) : kDebugOff)
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}

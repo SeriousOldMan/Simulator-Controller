@@ -1,3 +1,7 @@
+## 4.1.7.2-release 05/31/22
+
+  1. Fixed a critical bug where under special conditions the Race Engineer was unable to calculate refuel amount.
+
 ## 4.1.7.1-release 05/27/22
 
   1. Fixed a critical bug in "Simulator Setup", where configured function triggers were "forgotten".

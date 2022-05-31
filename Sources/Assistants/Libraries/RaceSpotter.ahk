@@ -600,10 +600,10 @@ class RaceSpotter extends RaceAssistant {
 
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDistanceInformationLap := false
+
 			this.iDriverCar := false
 			this.OtherCars := {}
 			this.PositionInfos := {}
-			this.iGridPosition := false
 
 			this.iRaceStartSummarized := false
 			this.iFinalLapsAnnounced := false

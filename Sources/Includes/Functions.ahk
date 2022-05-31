@@ -783,6 +783,8 @@ checkForUpdates() {
 
 						ExitApp 0
 					}
+					else if FileExist(kUserConfigDirectory . "VERSION")
+						FileSetTime A_Now, %kUserConfigDirectory%VERSION
 				}
 			}
 		}

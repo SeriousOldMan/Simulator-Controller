@@ -252,7 +252,7 @@ class PositionInfo {
 	iCar := false
 
 	iObserved := false
-	iStartingDeltas := {}
+	iStartDeltas := {}
 
 	iReported := false
 
@@ -296,9 +296,17 @@ class PositionInfo {
 		}
 	}
 
-	StartingDelta[sector] {
+	StartDelta[sector] {
 		Get {
-			return (this.iStartingDeltas.HasKey(sector) ? this.iStartingDeltas[sector] : false)
+			if this.iStartDeltas.HasKey(sector)
+				return this.iStartDeltas[sector]
+			else {
+				delta := this.Delta[sector]
+
+				this.iStartDeltas[sector] := delta
+
+				return delta
+			}
 		}
 	}
 
@@ -316,7 +324,7 @@ class PositionInfo {
 
 	DeltaDifference[sector] {
 		Get {
-			return (this.StartingDelta[sector] - this.Delta[sector])
+			return (this.StartDelta[sector] - this.Delta[sector])
 		}
 	}
 
@@ -342,8 +350,7 @@ class PositionInfo {
 		this.iSpotter := spotter
 		this.iCar := car
 
-		for sector, ignore in car.Deltas
-			this.iStartingDeltas[sector] := car.Delta[sector]
+		this.reset(true)
 	}
 
 	inDelta(sector, threshold := 2) {
@@ -351,7 +358,7 @@ class PositionInfo {
 	}
 
 	isFaster(sector) {
-		return ((this.StartingDelta[sector] - this.Delta[Sector]) > 0)
+		return ((this.StartDelta[sector] - this.Delta[Sector]) > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -419,16 +426,7 @@ class PositionInfo {
 		if full
 			this.Reported := false
 
-		sectors := []
-
-		for sector, ignore in this.Car.Deltas
-			if !inList(sectors, sector)
-				sectors.Push(sector)
-
-		this.iStartingDeltas := {}
-
-		for ignore, sector in sectors
-			this.iStartingDeltas[sector] := this.Car.Delta[sector]
+		this.iStartDeltas := {}
 	}
 
 	checkpoint(sector) {

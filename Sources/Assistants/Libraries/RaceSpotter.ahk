@@ -50,7 +50,7 @@ class CarInfo {
 	iDeltas := {}
 	iLastDeltas := {}
 
-	iInvalidLaps := []
+	iInvalidLaps := false
 	iIncidents := false
 
 	Nr[] {
@@ -186,7 +186,7 @@ class CarInfo {
 		this.iCar := car
 	}
 
-	update(driver, position, lastLap, sector, lapTime, valid, incidents, delta, pitstop := false) {
+	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, pitstop := false) {
 		this.iDriver := driver
 		this.iPosition := position
 
@@ -197,11 +197,9 @@ class CarInfo {
 				this.LapTimes.RemoveAt(1)
 
 			this.iLastLap := lastLap
-
-			if (!valid && !inList(this.InvalidLaps, lastLap))
-				this.InvalidLaps.Push(lastLap)
 		}
 
+		this.iInvalidLaps := invalidLaps
 		this.iIncidents := incidents
 
 		if (sector != this.iLastSector) {
@@ -877,13 +875,14 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 
+				lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+
 				info.update(computeDriverName(knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
-						  , knowledgeBase.getValue("Car." . A_Index . ".Position")
-						  , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0), sector
+						  , knowledgeBase.getValue("Car." . A_Index . ".Position"), lap, sector
 						  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
-						  , knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+						  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 						  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
 						  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
 			}
@@ -995,6 +994,8 @@ class RaceSpotter extends RaceAssistant {
 	summarizeOpponents(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 
+		static lapUpRangeThreshold := kUndefined
+		static lapDownRangeThreshold := false
 		static frontAttackThreshold := false
 		static frontGainThreshold := false
 		static frontLostThreshold := false
@@ -1002,7 +1003,9 @@ class RaceSpotter extends RaceAssistant {
 		static behindGainThreshold := false
 		static behindLostThreshold := false
 
-		if !frontAttackThreshold {
+		if (lapUpRangeThreshold == kUndefined) {
+			lapUpRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapUp.Range.Threshold", 0.8)
+			lapDownRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapDown.Range.Threshold", 0.8)
 			frontAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Attack.Threshold", 0.8)
 			frontGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Gain.Threshold", 0.3)
 			frontLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Lost.Threshold", 1.0)
@@ -1025,11 +1028,14 @@ class RaceSpotter extends RaceAssistant {
 		speaker.startTalk()
 
 		try {
-			if (trackFront && (trackFront != standingsFront) && trackFront.inDelta(2) && !trackFront.isFaster(sector)) {
+			opponentType := trackFront.OpponentType
+
+			if (trackFront && (trackFront != standingsFront)
+			 && trackFront.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold) && !trackFront.isFaster(sector)) {
 				if (!trackFront.Reported && (sector > 1)) {
-					if (trackFront.OpponentType = "LapDown")
+					if (opponentType = "LapDown")
 						speaker.speakPhrase("LapDownDriver")
-					else if (trackFront.OpponentType = "LapUp")
+					else if (opponentType = "LapUp")
 						speaker.speakPhrase("LapUpDriver")
 
 					trackFront.Reported := true
@@ -1059,7 +1065,7 @@ class RaceSpotter extends RaceAssistant {
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriverFront")
-					else if (car.InvalidLaps.Length() > 3)
+					else if (car.InvalidLaps > 3)
 						speaker.speakPhrase("InconsistentDriverFront")
 
 					standingsFront.Reported := true
@@ -1116,7 +1122,7 @@ class RaceSpotter extends RaceAssistant {
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriveBehind")
-					else if (car.InvalidLaps.Length() > 3)
+					else if (car.InvalidLaps > 3)
 						speaker.speakPhrase("InconsistentDriverBehind")
 
 					standingsBehind.Reported := true
@@ -1647,10 +1653,15 @@ class RaceSpotter extends RaceAssistant {
 
 		Loop % knowledgeBase.getValue("Car.Count")
 		{
-			validLaps := knowledgeBase.getValue("Car." . A_Index . ".ValidLaps", 0)
+			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
+			lastLap := knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)
 
-			if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-				knowledgeBase.setFact("Car." . A_Index . ".ValidLaps", validLaps +  1)
+			if (lap != lastLap) {
+				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
+
+				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", validLaps +  1)
+			}
 		}
 
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)

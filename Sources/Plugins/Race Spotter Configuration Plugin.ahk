@@ -25,7 +25,7 @@ global rearProximityDropDown
 global yellowFlagsDropDown
 global blueFlagsDropDown
 global startSummaryDropDown
-global distanceInformationDropDown
+global deltaInformationDropDown
 global finalLapsDropDown
 global pitWindowDropDown
 
@@ -129,7 +129,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdistanceInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdeltaInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
@@ -163,8 +163,9 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", 2)
 
-			simulatorConfiguration["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
+			simulatorConfiguration["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DeltaInformation", default)
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -180,7 +181,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "DistanceInformation", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "DeltaInformation", "FinalLaps", "PitWindow"]
 				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -221,12 +222,12 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControl Choose, blueFlagsDropDown, % (configuration["BlueFlags"] + 1)
 			GuiControl Choose, startSummaryDropDown, % (configuration["StartSummary"] + 1)
 
-			if (!configuration["DistanceInformation"])
-				GuiControl Choose, distanceInformationDropDown, 1
-			else if (configuration["DistanceInformation"] = "S")
-				GuiControl Choose, distanceInformationDropDown, 2
+			if (!configuration["DeltaInformation"])
+				GuiControl Choose, deltaInformationDropDown, 1
+			else if (configuration["DeltaInformation"] = "S")
+				GuiControl Choose, deltaInformationDropDown, 2
 			else
-				GuiControl Choose, distanceInformationDropDown, % (configuration["DistanceInformation"] + 2)
+				GuiControl Choose, deltaInformationDropDown, % (configuration["DeltaInformation"] + 2)
 
 			GuiControl Choose, finalLapsDropDown, % (configuration["FinalLaps"] + 1)
 			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
@@ -248,7 +249,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet yellowFlagsDropDown
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet startSummaryDropDown
-			GuiControlGet distanceInformationDropDown
+			GuiControlGet deltaInformationDropDown
 			GuiControlGet finalLapsDropDown
 			GuiControlGet pitWindowDropDown
 
@@ -264,12 +265,12 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			configuration["BlueFlags"] := (blueFlagsDropDown - 1)
 			configuration["StartSummary"] := (startSummaryDropDown - 1)
 
-			if (distanceInformationDropDown == 1)
-				configuration["DistanceInformation"] := false
-			else if (distanceInformationDropDown == 2)
-				configuration["DistanceInformation"] := "S"
+			if (deltaInformationDropDown == 1)
+				configuration["DeltaInformation"] := false
+			else if (deltaInformationDropDown == 2)
+				configuration["DeltaInformation"] := "S"
 			else
-				configuration["DistanceInformation"] := (distanceInformationDropDown - 2)
+				configuration["DeltaInformation"] := (deltaInformationDropDown - 2)
 
 			configuration["FinalLaps"] := (finalLapsDropDown - 1)
 			configuration["PitWindow"] := (pitWindowDropDown - 1)

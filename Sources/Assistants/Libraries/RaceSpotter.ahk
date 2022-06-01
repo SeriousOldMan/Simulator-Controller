@@ -458,7 +458,7 @@ class RaceSpotter extends RaceAssistant {
 
 	iGridPosition := false
 
-	iLastDistanceInformationLap := false
+	iLastDeltaInformationLap := false
 	iPositionInfos := {}
 
 	iDriverCar := false
@@ -597,7 +597,7 @@ class RaceSpotter extends RaceAssistant {
 		base.updateSessionValues(values)
 
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
-			this.iLastDistanceInformationLap := false
+			this.iLastDeltaInformationLap := false
 
 			this.iDriverCar := false
 			this.OtherCars := {}
@@ -828,9 +828,10 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateAnnouncement(announcement, value) {
-		if (value && (announcement = "DistanceInformation")) {
+		if (value && (announcement = "DeltaInformation")) {
 			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", value)
+			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DeltaInformation", value)
 
 			if !value
 				value := 2
@@ -1194,16 +1195,16 @@ class RaceSpotter extends RaceAssistant {
 							this.iRaceStartSummarized := true
 					}
 					else if this.hasEnoughData(false) {
-						distanceInformation := this.Announcements["DistanceInformation"]
+						deltaInformation := this.Announcements["DeltaInformation"]
 
-						if distanceInformation {
-							if (distanceInformation = "S")
+						if deltaInformation {
+							if (deltaInformation = "S")
 								regular := true
 							else {
-								regular := (lastLap >= (this.iLastDistanceInformationLap + distanceInformation))
+								regular := (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
 
 								if regular
-									this.iLastDistanceInformationLap := lastLap
+									this.iLastDeltaInformationLap := lastLap
 							}
 
 							this.summarizeOpponents(lastLap, sector, regular)
@@ -1479,8 +1480,9 @@ class RaceSpotter extends RaceAssistant {
 				announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".DeltaInformation", default)
 
-			announcements["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+			announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
 
 			this.updateConfigurationValues({Announcements: announcements})
 		}
@@ -1554,7 +1556,7 @@ class RaceSpotter extends RaceAssistant {
 		this.iDriverCar := false
 		this.OtherCars := {}
 		this.PositionInfos := {}
-		this.iLastDistanceInformationLap := false
+		this.iLastDeltaInformationLap := false
 		this.iRaceStartSummarized := false
 
 		if !this.GridPosition
@@ -1655,7 +1657,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
 			this.PositionInfos := {}
-			this.iLastDistanceInformationLap := false
+			this.iLastDeltaInformationLap := false
 		}
 
 		if !this.GridPosition
@@ -1694,7 +1696,7 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		this.PositionInfos := {}
-		this.iLastDistanceInformationLap := false
+		this.iLastDeltaInformationLap := false
 
 		this.startPitstop(lapNumber)
 

@@ -26,11 +26,13 @@ The Spotter will give you critical and in most cases real time information about
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-6. Distance Information
+6. Opponent Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you.
    
    When you approach a car in front of you, Elisa will gather all available information for the given car, for example, if it has been lapped, or whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
+   
+   Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
 
 7. Last Laps Announcement
 
@@ -42,13 +44,36 @@ All these alerts and announcements can be individually configured or disabled wi
 
 Please note, that not every simulation will support all these capabilities and that the behaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
 
+### Opponent and Delta Information
+
+Elisa tracks the positions, lap times and the deltas to your own car for four different other cars, the cars directly in front and behind you as well as the car one race position before and one race position behind you:
+
+  - Relevant changes in the deltas to these cars will be updated each sector and the Spotter might inform you about any changes each sector, each lap, each second lap, and so on, according to your choices in the ["Race Spotter" tab in configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter). It will take one lap for Elisa to collect all sector timings for each of these four cars, before Elisa will inform you, whether you have gained or lost to the given car. This will be reset, once you have been overtaken or you overtook the car in front of you.
+
+  - A special case is a situation where you are in attack position to the car in front of you or when the car behind is in attack range. This information will be issued as soon as possible, as long you are faster than the car in front of you or the car behind is faster than you.
+  
+  - Another special case occurs, when you are approaching a car in front of you which is a lap up or a lap down. Elisa will give you the corresponding information annd additional tactical information about these cars.
+
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). See the table below for the thresholds and their default values.
+
+| Threshold                | Default Value (Seconds) |
+| ------------------------ | ----------------------- |
+| Lap up car in range      | 1.0                     |
+| Lap down car in range    | 2.0                     |
+| Attack car in front      | 0.8                     |
+| Gained on car in front   | 0.3                     |
+| Lost on car in front     | 1.0                     |
+| Attack car behind        | 0.8                     |
+| Lost on car behind       | 0.3                     |
+| Gained on car behind     | 1.5                     |
+
 ### Enabling and disabling specific warnings and announcements
 
 As you have seen above, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:
 
 	[Please] No more *announcement* [please]
 
-As you might expect, the word "please" is optional. Available options for *announcement* are: "distance information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to the settings described above), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to the settings described above), you can reenable it with the following command:
 
 	[Please] Give me *announcement* [please]
 
@@ -67,8 +92,9 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Blue Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Pit Window                | Yes (by time) (2)          | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
 | Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Distance Information      | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
 (2) It has been reported, that the pit window times in the shared memory data of *Assetto Corsa Competizione* are somewhat spooky. It looks like they are offset from the start of a whole race weekend and therefore may be way off. At least for a quick race, it looks like they are almost correct.
+(3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.

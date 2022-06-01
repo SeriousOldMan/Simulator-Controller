@@ -84,7 +84,7 @@ As you might expect, the word "please" is optional. Only one option for *warning
 
 ## Racing with Cato
 
-Cato will be active during practice and race sessions by default, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1). 
+Cato will be active during practice and race sessions by default, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). 
 
 Cato will always be active during a race, even if you have disabled data collection for races. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own as often as Jona does, but Cato will collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
 
@@ -253,7 +253,7 @@ Loading of settings is supported for:
   
   3. Session Database
      
-     All preconfigured setting values for the selected simulator / car / track / weather combination are [loaded from the Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1). Available values are used to initialize the same fields as with the contents of the *Race.settings* file.
+     All preconfigured setting values for the selected simulator / car / track / weather combination are [loaded from the Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Available values are used to initialize the same fields as with the contents of the *Race.settings* file.
 
   4. Telemetry Data
   

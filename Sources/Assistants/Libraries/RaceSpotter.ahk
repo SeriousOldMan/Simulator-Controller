@@ -249,8 +249,8 @@ class PositionInfo {
 	iSpotter := false
 	iCar := false
 
-	iObserved := false
-	iStartDeltas := {}
+	iObserved := "________"
+	iInitialDeltas := {}
 
 	iReported := false
 
@@ -294,23 +294,17 @@ class PositionInfo {
 		}
 	}
 
-	StartDelta[sector] {
+	InitialDelta[sector] {
 		Get {
-			if this.iStartDeltas.HasKey(sector)
-				return this.iStartDeltas[sector]
+			if this.iInitialDeltas.HasKey(sector)
+				return this.iInitialDeltas[sector]
 			else {
 				delta := this.Delta[sector]
 
-				this.iStartDeltas[sector] := delta
+				this.iInitialDeltas[sector] := delta
 
 				return delta
 			}
-		}
-	}
-
-	LastDelta[sector] {
-		Get {
-			return this.Car.LastDelta[sector]
 		}
 	}
 
@@ -322,7 +316,7 @@ class PositionInfo {
 
 	DeltaDifference[sector] {
 		Get {
-			return (this.StartDelta[sector] - this.Delta[sector])
+			return (this.InitialDelta[sector] - this.Delta[sector])
 		}
 	}
 
@@ -347,8 +341,6 @@ class PositionInfo {
 	__New(spotter, car) {
 		this.iSpotter := spotter
 		this.iCar := car
-
-		this.reset(true)
 	}
 
 	inDelta(sector, threshold := 2) {
@@ -356,7 +348,7 @@ class PositionInfo {
 	}
 
 	isFaster(sector) {
-		return ((this.StartDelta[sector] - this.Delta[Sector]) > 0)
+		return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -424,27 +416,17 @@ class PositionInfo {
 		if full
 			this.Reported := false
 
-		this.iStartDeltas := {}
+		this.iInitialDeltas := {}
 	}
 
 	checkpoint(sector) {
-		trackFront := this.inFront(false)
-		trackBehind := this.atBehind(false)
 		position := this.forPosition()
+		observed := ((this.inFront(false) ? "TF" : "__") . (this.atBehind(false) ? "TB" : "__") . ((position = "Front") ? "SF" : "__") . ((position = "Behind") ? "SB" : "__"))
 
-		if (trackFront || trackBehind || position) {
-			type := ((trackFront != false) . (trackBehind != false) . (position = "Front") . (position = "Behind"))
-			observed := this.Observed
-
-			if (!observed || (observed != type))
-				this.reset(true)
-
-			this.iObserved := type
-		}
-		else {
-			this.iObserved := false
-
+		if (observed != this.Observed) {
 			this.reset(true)
+
+			this.iObserved := observed
 		}
 	}
 }
@@ -969,24 +951,22 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	getPositionInfos(ByRef standingsFront, ByRef standingsBehind, ByRef trackFront, ByRef trackBehind) {
-		local knowledgeBase := this.KnowledgeBase
-
 		standingsFront := false
 		standingsBehind := false
 		trackFront := false
 		trackBehind := false
 
 		for nr, candidate in this.PositionInfos {
-			if candidate.inFront(false)
+			observed := candidate.Observed
+
+			if InStr(observed, "TF")
 				trackFront := candidate
-			else if candidate.atBehind(false)
+			else if InStr(observed, "TB")
 				trackBehind := candidate
 
-			type := candidate.forPosition()
-
-			if (type = "Front")
+			if InStr(observed, "SF")
 				standingsFront := candidate
-			else if (type = "Behind")
+			else if InStr(observed, "SB")
 				standingsBehind := candidate
 		}
 	}

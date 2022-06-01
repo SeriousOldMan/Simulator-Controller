@@ -53,7 +53,7 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceManager := false
 
-	iWarnings := false
+	iAnnouncements := false
 
 	iRemoteHandler := false
 
@@ -221,13 +221,13 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Warnings[key := false] {
+	Announcements[key := false] {
 		Get {
-			return (key ? this.iWarnings[key] : this.iWarnings)
+			return (key ? this.iAnnouncements[key] : this.iAnnouncements)
 		}
 
 		Set {
-			return (key ? (this.iWarnings[key] := value) : (this.iWarnings := value))
+			return (key ? (this.iAnnouncements[key] := value) : (this.iAnnouncements := value))
 		}
 	}
 
@@ -400,8 +400,8 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("LearningLaps")
 			this.iLearningLaps := values["LearningLaps"]
 
-		if values.HasKey("Warnings")
-			this.iWarnings := values["Warnings"]
+		if values.HasKey("Announcements")
+			this.iAnnouncements := values["Announcements"]
 	}
 
 	updateSessionValues(values) {
@@ -500,7 +500,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		announcements := []
 
-		for key, value in this.Warnings
+		for key, value in this.Announcements
 			announcements.Push(key)
 
 		announcement := false
@@ -523,7 +523,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateAnnouncement(announcement, value) {
-		this.Warnings[announcement] := value
+		this.Announcements[announcement] := value
 	}
 
 	call() {

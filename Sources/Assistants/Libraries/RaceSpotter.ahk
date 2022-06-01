@@ -1184,17 +1184,17 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 
 				try {
-					if ((lastLap > 5) && this.Warnings["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
+					if ((lastLap > 5) && this.Announcements["FinalLaps"] && !this.iFinalLapsAnnounced && (knowledgeBase.getValue("Session.Lap.Remaining") <= 3)) {
 						this.iFinalLapsAnnounced := true
 
 						this.announceFinalLaps(lastLap)
 					}
-					else if (this.Warnings["StartSummary"] && !this.iRaceStartSummarized && (lastLap == 2)) {
+					else if (this.Announcements["StartSummary"] && !this.iRaceStartSummarized && (lastLap == 2)) {
 						if this.summarizeRaceStart(lastLap)
 							this.iRaceStartSummarized := true
 					}
 					else if this.hasEnoughData(false) {
-						distanceInformation := this.Warnings["DistanceInformation"]
+						distanceInformation := this.Announcements["DistanceInformation"]
 
 						if distanceInformation {
 							if (distanceInformation = "S")
@@ -1307,7 +1307,7 @@ class RaceSpotter extends RaceAssistant {
 					else
 						type := alert
 
-					if (((type != "Behind") && this.Warnings["SideProximity"]) || ((type = "Behind") && this.Warnings["RearProximity"])) {
+					if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"])) {
 						if (!this.SpotterSpeaking || (type != "Hold")) {
 							this.SpotterSpeaking := true
 
@@ -1328,7 +1328,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	yellowFlag(alert, arguments*) {
-		if (this.Warnings["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1355,7 +1355,7 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Warnings["BlueFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["BlueFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1374,7 +1374,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pitWindow(state) {
-		if (this.Warnings["PitWindow"] && this.Speaker && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
+		if (this.Announcements["PitWindow"] && this.Speaker && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1465,24 +1465,24 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	initializeWarnings(data) {
+	initializeAnnouncements(data) {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		if (!this.Warnings || (this.Warnings.Count() = 0)) {
+		if (!this.Announcements || (this.Announcements.Count() = 0)) {
 			configuration := this.Configuration
 
-			warnings := {}
+			announcements := {}
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"]
-				warnings[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+				announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
 
-			warnings["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+			announcements["DistanceInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 
-			this.updateConfigurationValues({Warnings: warnings})
+			this.updateConfigurationValues({Announcements: announcements})
 		}
 	}
 
@@ -1496,7 +1496,7 @@ class RaceSpotter extends RaceAssistant {
 	prepareSession(settings, data) {
 		base.prepareSession(settings, data)
 
-		this.initializeWarnings(data)
+		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data)
 
 		if this.Speaker
@@ -1510,7 +1510,7 @@ class RaceSpotter extends RaceAssistant {
 	startSession(settings, data) {
 		local facts
 
-		joined := (!this.Warnings || (this.Warnings.Count() = 0))
+		joined := (!this.Announcements || (this.Announcements.Count() = 0))
 
 		if !IsObject(settings)
 			settings := readConfiguration(settings)
@@ -1519,7 +1519,7 @@ class RaceSpotter extends RaceAssistant {
 			data := readConfiguration(data)
 
 		if joined {
-			this.initializeWarnings(data)
+			this.initializeAnnouncements(data)
 
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Greeting")

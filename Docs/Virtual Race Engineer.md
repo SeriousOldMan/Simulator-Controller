@@ -180,7 +180,7 @@ As you might expect, the word "please" is optional. Available options for *warni
 
 ## Racing with Jona
 
-Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions.
+Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions, unless you enable them for other session types in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
 
 The Virtual Race Engineer is handled by the "Race Engineer" plugin, which may be integrated by the different simulation game plugins, if they want to support Jona. This plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 

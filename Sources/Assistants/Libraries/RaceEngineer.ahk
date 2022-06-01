@@ -109,7 +109,7 @@ class RaceEngineer extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		this.updateConfigurationValues({Warnings: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, WeatherUpdate: true}})
 	}
 
 	updateConfigurationValues(values) {
@@ -1668,7 +1668,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	lowFuelWarning(remainingLaps) {
-		if (this.Speaker && this.Warnings["FuelWarning"]) {
+		if (this.Speaker && this.Announcements["FuelWarning"]) {
 			speaker := this.getSpeaker()
 
 			speaker.startTalk()
@@ -1700,7 +1700,7 @@ class RaceEngineer extends RaceAssistant {
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && this.Warnings["DamageReporting"]) {
+		if (this.Speaker && this.Announcements["DamageReporting"]) {
 			speaker := this.getSpeaker()
 			phrase := false
 
@@ -1731,17 +1731,16 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if (this.Speaker && this.Warnings["DamageAnalysis"]) {
+			if (this.Speaker && this.Announcements["DamageAnalysis"]) {
 				speaker := this.getSpeaker()
 
 				stintLaps := Round(stintLaps)
-				delta := printNumber(delta, 1)
 
 				if repair {
 					speaker.startTalk()
 
 					try {
-						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: delta})
+						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 
 						if this.supportsPitstop() {
 							speaker.speakPhrase("ConfirmPlan", false, true)
@@ -1754,7 +1753,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 				else if (repair == false)
-					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: delta})
+					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 			}
 	}
 
@@ -1764,7 +1763,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 
 		if !ErrorLevel
-			if (this.Speaker && (this.Session == kSessionRace) && this.Warnings["WeatherUpdate"]) {
+			if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})

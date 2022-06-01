@@ -1,3 +1,17 @@
+## 4.1.8.0-release 06/03/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Increased precision of Spotter opponent delta information.
+  4. Added new Spotter advises and extended information about opponent performance.  
+     - Thresholds for delta information can be defined in the "Session Database" settings.
+	 - Update frequency can be configured for each sector, beside each one, two, three or four laps.
+  5. Spotter alert responsiveness has been increased even further by eliminating outdated warnings waiting in the queue.
+  6. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
+  7. Additional car specific rules in "Setup Advisor" for:
+	 - BMW M6 GT3
+	 - Ginetta 955 GT4
+
 ## 4.1.7.2-release 05/31/22
 
   1. Fixed a critical bug where under special conditions the Race Engineer was unable to calculate refuel amount.

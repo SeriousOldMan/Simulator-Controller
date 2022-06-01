@@ -114,7 +114,7 @@ class RaceStrategist extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		this.updateConfigurationValues({Warnings: {WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {WeatherUpdate: true}})
 	}
 
 	updateConfigurationValues(values) {
@@ -1225,7 +1225,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (this.Session == kSessionRace) && this.Warnings["WeatherUpdate"]) {
+		if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})

@@ -55,9 +55,27 @@ A very [extensive documentation](https://github.com/SeriousOldMan/Simulator-Cont
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
+### Video Tutorials
+
+Beside the quite extensive documentation (I know, nobody reads documentation these days), we also have a list of video tutorial, which are recordings of live coaching session in our Discord community.
+
+1. [Setup and Configuration](https://youtu.be/1XFvWhg2cPw)
+   You will learn a lot about the general setup and configuration of the Simulator Controller suite. The Setup Wizard "Simulator Setup" is introduced, but we will also take a look at the low level configuration tool "Simulator Configuration".
+
+2. [Pitstop Automation using Race Engineer](https://youtu.be/V35v0Be2nUE)
+   We will take a look at pitstop automation using the Race Engineer. You will learn everything about the necessary configuration and see and hear the Race Engineer in action on the track.
+
+3. [Managing Settings](https://youtu.be/Pdwpbfadd5g)
+   This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
+
+4. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM)
+   In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
+
+This list will be extended with one new video per week.
+
 ### Discord Community
 
-If you want to become a part of the small and very young Community for Simulator Controller on Discord. Here you will also find a growing collection of video tutorials for different parts of the software suite. Please use [this invitation](https://discord.gg/5N8JrNr48H) to join the Discord Server.
+If you want to become a part of the small and very young Community for Simulator Controller on Discord. Here you will also find a large collection of FAQs and you will be able to attend live coaching sessions each Monday. Please use [this invitation](https://discord.gg/5N8JrNr48H) to join the Discord Server.
 
 ### Main features
 

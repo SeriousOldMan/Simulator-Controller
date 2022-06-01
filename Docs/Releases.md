@@ -10,7 +10,7 @@
   6. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
   7. Additional car specific rules in "Setup Advisor" for:
 	 - BMW M6 GT3
-	 - Ginetta 955 GT4
+	 - Ginetta G55 GT4
 
 ## 4.1.7.2-release 05/31/22
 

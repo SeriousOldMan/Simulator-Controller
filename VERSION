@@ -2,7 +2,7 @@
 Version=4.1.8.0-dev
 Target=4.1.8.0-release
 Date=06/01/2022
-Download=
+Download=https://www.dropbox.com/s/azxr3is881su4ag/Simulator%20Controller%204.1.8.0-dev.zip?dl=1
 Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector, Added Spotter distance thresholds to "Session Database" settings, Additional car rules for "Setup Advisor"
 [Release]
 Version=4.1.7.1-release

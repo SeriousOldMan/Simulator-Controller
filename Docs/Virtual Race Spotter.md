@@ -95,6 +95,10 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
+Notes:
+
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
+
 (2) It has been reported, that the pit window times in the shared memory data of *Assetto Corsa Competizione* are somewhat spooky. It looks like they are offset from the start of a whole race weekend and therefore may be way off. At least for a quick race, it looks like they are almost correct.
+
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.

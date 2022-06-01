@@ -11,6 +11,8 @@
   6. Additional car specific rules in "Setup Advisor" for:
      
 	 - BMW M6 GT3
+	 - Aston Martin Vantage AMR GT3
+	 - Ginetta G55 GT4
   7. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
 
 ## 4.1.7.1-release 05/27/22

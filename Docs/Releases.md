@@ -13,6 +13,7 @@
 	 - BMW M6 GT3
 	 - Aston Martin Vantage AMR GT3
 	 - Ginetta G55 GT4
+	 - Aston Martin V8 Vantage GT4
 
 ## 4.1.7.2-release 05/31/22
 

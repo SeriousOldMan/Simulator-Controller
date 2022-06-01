@@ -28,11 +28,7 @@ The Spotter will give you critical and in most cases real time information about
 
 6. Opponent Information
 
-   Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you.
-   
-   When you approach a car in front of you, Elisa will gather all available information for the given car, for example, if it has been lapped, or whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
-   
-   Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
+   Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
 
 7. Last Laps Announcement
 
@@ -48,11 +44,13 @@ Please note, that not every simulation will support all these capabilities and t
 
 Elisa tracks the positions, lap times and the deltas to your own car for four different other cars, the cars directly in front and behind you as well as the car one race position before and one race position behind you:
 
-  - Relevant changes in the deltas to these cars will be updated each sector and the Spotter might inform you about any changes each sector, each lap, each second lap, and so on, according to your choices in the ["Race Spotter" tab in configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter). It will take one lap for Elisa to collect all sector timings for each of these four cars, before Elisa will inform you, whether you have gained or lost to the given car. This will be reset, once you have been overtaken or you overtook the car in front of you.
+  - Relevant changes in the deltas to these cars will be updated each sector and the Spotter might inform you about any changes each sector, each lap, each second lap, and so on, according to your choices in the ["Race Spotter" tab in configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter). It will take one lap for Elisa to collect all sector timings for each of these four cars, before Elisa will inform you, whether you have gained or lost to the given car. This will be reset, once you have been overtaken or when you overtook the car in front of you.
 
   - A special case is a situation where you are in attack position to the car in front of you or when the car behind is in attack range. This information will be issued as soon as possible, as long you are faster than the car in front of you or the car behind is faster than you.
   
   - Another special case occurs, when you are approaching a car in front of you which is a lap up or a lap down. Elisa will give you the corresponding information annd additional tactical information about these cars.
+
+When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
 Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the "Race Settings" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). See the table below for the thresholds and their default values.
 

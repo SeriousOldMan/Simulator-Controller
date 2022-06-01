@@ -994,7 +994,7 @@ class RaceSpotter extends RaceAssistant {
 	summarizeOpponents(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 
-		static lapUpRangeThreshold := kUndefined
+		static lapUpRangeThreshold := "__Undefined__"
 		static lapDownRangeThreshold := false
 		static frontAttackThreshold := false
 		static frontGainThreshold := false
@@ -1003,9 +1003,9 @@ class RaceSpotter extends RaceAssistant {
 		static behindGainThreshold := false
 		static behindLostThreshold := false
 
-		if (lapUpRangeThreshold == kUndefined) {
-			lapUpRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapUp.Range.Threshold", 0.8)
-			lapDownRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapDown.Range.Threshold", 0.8)
+		if (lapUpRangeThreshold = kUndefined) {
+			lapUpRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapUp.Range.Threshold", 1.0)
+			lapDownRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapDown.Range.Threshold", 2.0)
 			frontAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Attack.Threshold", 0.8)
 			frontGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Gain.Threshold", 0.3)
 			frontLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Lost.Threshold", 1.0)
@@ -1051,7 +1051,7 @@ class RaceSpotter extends RaceAssistant {
 											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[sector, true]
 											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
-											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, 0.2), standingsFront.runningAway(sector, 0.2))
+											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, frontGainThreshold), standingsFront.runningAway(sector, frontLostThreshold))
 
 					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
 				}
@@ -1108,7 +1108,7 @@ class RaceSpotter extends RaceAssistant {
 											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[sector, true]
 											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
-											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, 0.2), standingsBehind.runningAway(sector, 0.2))
+											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, behindLostThreshold), standingsBehind.runningAway(sector, behindGainThreshold))
 
 					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
 				}
@@ -1654,9 +1654,9 @@ class RaceSpotter extends RaceAssistant {
 		Loop % knowledgeBase.getValue("Car.Count")
 		{
 			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
-			lastLap := knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)
+			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 
-			if (lap != lastLap) {
+			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
 
 				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)

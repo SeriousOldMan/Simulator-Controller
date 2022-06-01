@@ -4,10 +4,13 @@
   2. Documentation updates, as always
   3. Increased precision of Spotter opponent delta information.
   4. Added new Spotter advises and extended information about opponent performance.
+     
      - Thresholds for delta information can be defined in the "Session Database" settings.
 	 - Update frequency can be configured for each sector, beside each one, two, three or four laps.
   5. Spotter alert responsiveness has been increased even further by eliminating outdated warnings waiting in the queue.
-  6. Additional car specific rules in "Setup Advisor".
+  6. Additional car specific rules in "Setup Advisor" for:
+     
+	 - BMW M6 GT3
   7. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
 
 ## 4.1.7.1-release 05/27/22

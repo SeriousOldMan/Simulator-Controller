@@ -249,7 +249,8 @@ class PositionInfo {
 	iSpotter := false
 	iCar := false
 
-	iObserved := "________"
+	iBaseLap := false
+	iObserved := ""
 	iInitialDeltas := {}
 
 	iReported := false
@@ -412,22 +413,36 @@ class PositionInfo {
 			return false
 	}
 
-	reset(full := false) {
-		if full
+	reset(sector, full := false) {
+		if full {
 			this.Reported := false
+			this.iBaseLap := this.Car.LastLap
+		}
 
 		this.iInitialDeltas := {}
+		this.iInitialDeltas[sector] := this.Delta[sector]
+	}
+
+	calibrate(sector) {
+		if (this.Car.LastLap >= (this.iBaseLap + 3))
+			this.reset(sector, true)
+		else if !this.iInitialDeltas.HasKey(sector)
+			this.iInitialDeltas[sector] := this.Delta[sector]
 	}
 
 	checkpoint(sector) {
 		position := this.forPosition()
-		observed := ((this.inFront(false) ? "TF" : "__") . (this.atBehind(false) ? "TB" : "__") . ((position = "Front") ? "SF" : "__") . ((position = "Behind") ? "SB" : "__"))
+		observed := ((this.inFront(false) ? "TF" : "") . (this.atBehind(false) ? "TB" : "")
+				   . ((position = "Front") ? "SF" : "") . ((position = "Behind") ? "SB" : ""))
 
 		if (observed != this.Observed) {
-			this.reset(true)
+			if (this.Observed != "")
+				this.reset(sector, true)
 
 			this.iObserved := observed
 		}
+		else if (observed = "")
+			this.calibrate()
 	}
 }
 
@@ -1050,7 +1065,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsFront.Reported := true
 
-					standingsFront.reset()
+					standingsFront.reset(sector)
 				}
 				else if (regular && standingsFront.closingIn(sector, frontGainThreshold) && !standingsFront.Reported) {
 					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
@@ -1067,14 +1082,14 @@ class RaceSpotter extends RaceAssistant {
 
 					informed := true
 
-					standingsFront.reset()
+					standingsFront.reset(sector)
 				}
 				else if (regular && standingsFront.runningAway(sector, frontLostThreshold)) {
 					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
 
-					standingsFront.reset(true)
+					standingsFront.reset(sector, true)
 				}
 			}
 
@@ -1107,7 +1122,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsBehind.Reported := true
 
-					standingsBehind.reset()
+					standingsBehind.reset(sector)
 				}
 				else if (regular && standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
@@ -1117,14 +1132,14 @@ class RaceSpotter extends RaceAssistant {
 					if !informed
 						speaker.speakPhrase("Focus")
 
-					standingsBehind.reset()
+					standingsBehind.reset(sector)
 				}
 				else if (regular && standingsBehind.runningAway(sector, behindGainThreshold)) {
 					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													   , gained: printNumber(deltaDifference, 1)
 													   , lapTime: printNumber(lapTimeDifference, 1)})
 
-					standingsBehind.reset(true)
+					standingsBehind.reset(sector, true)
 				}
 			}
 		}

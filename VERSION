@@ -1,8 +1,8 @@
 [Development]
-Version=4.1.8.0-dev
+Version=4.1.8.0-beta
 Target=4.1.8.0-release
-Date=06/01/2022
-Download=https://www.dropbox.com/s/azxr3is881su4ag/Simulator%20Controller%204.1.8.0-dev.zip?dl=1
+Date=06/02/2022
+Download=https://www.dropbox.com/s/4wl55lcsa7c0529/Simulator%20Controller%204.1.8-beta.zip?dl=1
 Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector, Added Spotter distance thresholds to "Session Database" settings, Additional car rules for "Setup Advisor"
 [Release]
 Version=4.1.7.2-release
@@ -13,4 +13,4 @@ Changes=Fixed unexpected translation of Grip status in ACC shared memory, Added 
 Type=Development
 [Version]
 Release=4.1.7.2-release
-Development=4.1.8.0-dev
+Development=4.1.8.0-beta

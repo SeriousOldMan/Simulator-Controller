@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.1.8.0-dev](https://www.dropbox.com/s/azxr3is881su4ag/Simulator%20Controller%204.1.8.0-dev.zip?dl=1) (Early build for 4.1.8. New features: Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector, Added Spotter distance thresholds to "Session Database" settings, Additional car rules for "Setup Advisor". Stable, incl. documentation.)
+[4.1.8.0-beta](https://www.dropbox.com/s/4wl55lcsa7c0529/Simulator%20Controller%204.1.8-beta.zip?dl=1) (Test build for 4.1.8. New features: Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector, Added Spotter distance thresholds to "Session Database" settings, Additional car rules for "Setup Advisor". Stable, incl. documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-418) of this version and all the versions you might have skipped, before installing and using this version.
 

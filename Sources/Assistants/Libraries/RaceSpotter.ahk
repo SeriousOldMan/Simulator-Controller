@@ -438,11 +438,13 @@ class PositionInfo {
 		if (observed != this.Observed) {
 			if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
 				this.reset(sector, true)
+			else
+				this.Reported := false
 
 			this.iObserved := observed
 		}
 		else if (observed = "")
-			this.calibrate()
+			this.calibrate(sector)
 	}
 }
 
@@ -1017,7 +1019,7 @@ class RaceSpotter extends RaceAssistant {
 		this.getPositionInfos(standingsFront, standingsBehind, trackFront, trackBehind)
 
 		if this.Debug[kDebugPositions] {
-			info := ("=================================`n" . (standingsFront != false) . (standingsBehind != false) . (trackFront != false) . (trackBehind != false) . "`n=================================`n`n")
+			info := ("=================================`n" . regular . (standingsFront != false) . (standingsBehind != false) . (trackFront != false) . (trackBehind != false) . "`n=================================`n`n")
 
 			FileAppend %info%, %kTempDirectory%Race Spotter.positions
 		}
@@ -1048,7 +1050,7 @@ class RaceSpotter extends RaceAssistant {
 				lapTimeDifference := Abs(standingsFront.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
-					info := values2String(", ", standingsFront.Car.Nr, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
+					info := values2String(", ", standingsFront.Car.Nr, standingsFront.Reported, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
 											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[sector, true]
 											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
@@ -1107,7 +1109,7 @@ class RaceSpotter extends RaceAssistant {
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
-					info := values2String(", ", standingsBehind.Car.Nr, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
+					info := values2String(", ", standingsBehind.Car.Nr, standingsBehind.Reported, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
 											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[sector, true]
 											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
@@ -1491,7 +1493,7 @@ class RaceSpotter extends RaceAssistant {
 				announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".DeltaInformation", default)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", default)
 
 			announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
 

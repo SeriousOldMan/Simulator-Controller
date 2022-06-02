@@ -436,7 +436,7 @@ class PositionInfo {
 				   . ((position = "Front") ? "SF" : "") . ((position = "Behind") ? "SB" : ""))
 
 		if (observed != this.Observed) {
-			if (this.Observed != "")
+			if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
 				this.reset(sector, true)
 
 			this.iObserved := observed

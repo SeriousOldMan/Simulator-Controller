@@ -4,8 +4,8 @@
   2. Documentation updates, as always
   3. Increased precision of Spotter opponent delta information. See the extended [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) for more information.
   4. Added new Spotter advises and extended information about opponent performance.  
-     - Thresholds for delta information can be defined in the "Session Database" settings.
-	 - Update frequency can be configured for each sector, beside each one, two, three or four laps.
+     - [Thresholds for delta information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) can be defined in the "Session Database" settings.
+	 - [Update frequency](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) can be configured for each sector, beside each one, two, three or four laps.
   5. Spotter alert responsiveness has been increased even further by eliminating outdated warnings waiting in the queue.
   6. Number input dialog will be opened instead of the context menu, when clicking on a control with the Control key pressed in the [Controller Layout Editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts).
   7. The term "distance information" for the Spotter has ben renamed to "delta information" to better reflect the actual meaning. Keep this in mind, when you enable or enable this type of announcement using a voice command.

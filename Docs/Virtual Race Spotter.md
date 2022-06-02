@@ -93,7 +93,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
-Notes:
+##### Notes
 
 (1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
 

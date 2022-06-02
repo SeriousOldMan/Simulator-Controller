@@ -579,7 +579,7 @@ class RaceSpotter extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugPositions) : kDebugOff)
+		this.iDebug := (isDebug() ? (this.iDebug + kDebugPositions) : kDebugOff)
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
@@ -904,7 +904,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if this.Debug[kDebugPositions] {
-				info := values2String(", ", position.Car.Nr, position.Car.Car, position.Car.Driver, position.Car.Position
+				info := values2String(", ", position.Car.Nr, position.Car.Car, position.Car.Driver, position.Car.Position, position.Observed
 										  , values2String("|", position.Car.LapTimes*), position.Car.LapTime[true]
 										  , values2String("|", position.Car.Deltas[sector]*), position.Delta[sector]
 										  , position.inFront(), position.atBehind(), position.inFront(false), position.atBehind(false), position.forPosition()
@@ -1016,6 +1016,12 @@ class RaceSpotter extends RaceAssistant {
 
 		this.getPositionInfos(standingsFront, standingsBehind, trackFront, trackBehind)
 
+		if this.Debug[kDebugPositions] {
+			info := ("=================================`n" . (standingsFront != false) . (standingsBehind != false) . (trackFront != false) . (trackBehind != false) . "`n=================================`n`n")
+
+			FileAppend %info%, %kTempDirectory%Race Spotter.positions
+		}
+
 		speaker := this.getSpeaker(true)
 
 		informed := false
@@ -1048,7 +1054,9 @@ class RaceSpotter extends RaceAssistant {
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
 											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, frontGainThreshold), standingsFront.runningAway(sector, frontLostThreshold))
 
-					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
+					info := ("=================================`n" . info . "`n=================================`n`n")
+
+					FileAppend %info%, %kTempDirectory%Race Spotter.positions
 				}
 
 				if ((delta <= frontAttackThreshold) && !standingsFront.isFaster(sector) && !standingsFront.Reported) {
@@ -1105,7 +1113,9 @@ class RaceSpotter extends RaceAssistant {
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
 											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, behindLostThreshold), standingsBehind.runningAway(sector, behindGainThreshold))
 
-					FileAppend =================================`n%info%`n=================================`n`n, %kTempDirectory%Race Spotter.positions
+					info := ("=================================`n" . info . "`n=================================`n`n")
+
+					FileAppend %info%, %kTempDirectory%Race Spotter.positions
 				}
 
 				if ((delta <= behindAttackThreshold) && standingsBehind.isFaster(sector) && !standingsBehind.Reported) {
@@ -1512,6 +1522,14 @@ class RaceSpotter extends RaceAssistant {
 
 	startSession(settings, data) {
 		local facts
+
+		if this.Debug[kDebugPositions]
+			try {
+				FileDelete %kTempDirectory%Race Spotter.positions
+			}
+			catch exception {
+				; ignore
+			}
 
 		joined := (!this.Announcements || (this.Announcements.Count() = 0))
 

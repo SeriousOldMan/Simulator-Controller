@@ -1034,14 +1034,19 @@ class RaceSpotter extends RaceAssistant {
 			opponentType := trackFront.OpponentType
 
 			if (trackFront && (trackFront != standingsFront)
-			 && trackFront.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold) && !trackFront.isFaster(sector)) {
+			 && trackFront.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && !trackFront.isFaster(sector)) {
 				if (!trackFront.Reported && (sector > 1)) {
-					if (opponentType = "LapDown")
+					if (opponentType = "LapDown") {
 						speaker.speakPhrase("LapDownDriver")
-					else if (opponentType = "LapUp")
+
+						trackFront.Reported := true
+					}
+					else if (opponentType = "LapUp") {
 						speaker.speakPhrase("LapUpDriver")
 
-					trackFront.Reported := true
+						trackFront.Reported := true
+					}
 				}
 			}
 			else if standingsFront {

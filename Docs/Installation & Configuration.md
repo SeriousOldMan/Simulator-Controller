@@ -163,7 +163,7 @@ The following rules apply:
     Example:
   
     [Replace: Plugins]
-	Race Spotter=raceAssistantName: Elisa->raceAssistantName: Tom|raceAssistantListener: On->raceAssistantListener: Micsrosoft Stefan (de-DE)
+	Race Spotter=raceAssistantName: Elisa->raceAssistantName: Tom|raceAssistantListener: On->raceAssistantListener: Microsoft Stefan (de-DE)
 	Race Engineer=raceAssistantName: Jona->raceAssistantName: Frank
 	Race Strategist=raceAssistantName: Khato->raceAssistantName: Mary
 

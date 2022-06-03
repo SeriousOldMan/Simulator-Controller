@@ -1,4 +1,4 @@
-## 4.1.8.0-release 06/03/22 (planned)
+## 4.1.8.0-release 06/03/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

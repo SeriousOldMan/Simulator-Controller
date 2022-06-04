@@ -1828,7 +1828,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x85 ys+14 w193 vfileNameViewer
 		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 
-		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
 
 		this.iSettingsListView := settingsListView
 
@@ -2083,9 +2083,24 @@ class SetupEditor extends ConfigurationItem {
 ;;; SetupComparator                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+global decreaseABSettingButton
+global increaseABSettingButton
+
+global fileNameAViewer
+global fileNameBViewer
+
+global applyMixSlider = 0
+
 class SetupComparator extends ConfigurationItem {
 	iEditor := false
+
+	iSetupA := false
 	iSetupB := false
+	iSetupAB := false
+
+	iSettingsListView := false
+
+	iSettings := []
 
 	iClosed := false
 
@@ -2103,7 +2118,11 @@ class SetupComparator extends ConfigurationItem {
 
 	SetupA[] {
 		Get {
-			return this.Editor.Setup
+			return this.iSetupA
+		}
+
+		Set {
+			return (this.iSetupA := value)
 		}
 	}
 
@@ -2117,6 +2136,32 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
+	SetupAB[] {
+		Get {
+			return this.iSetupAB
+		}
+
+		Set {
+			return (this.iSetupAB := value)
+		}
+	}
+
+	Setings[key := false] {
+		Get {
+			return (key ? this.iSettings[key] : this.iSettings)
+		}
+
+		Set {
+			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
+		}
+	}
+
+	SettingsListView[] {
+		Get {
+			return this.iSettingsListView
+		}
+	}
+
 	Window[] {
 		Get {
 			return "Comparator"
@@ -2124,7 +2169,8 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
-		this.iEditor := Editor
+		this.iEditor := editor
+		this.iSetupA := editor.Setup
 
 		if !configuration {
 			advisor := this.Advisor
@@ -2171,9 +2217,26 @@ class SetupComparator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 
+		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupAFile, % translate("Setup A:")
+		Gui %window%:Add, Text, x85 ys+14 w193 vfileNameAViewer
+		Gui %window%:Add, Button, x16 ys+34 w60 gchooseSetupBFile, % translate("Setup B:")
+		Gui %window%:Add, Text, x85 ys+38 w193 vfileNameBViewer
+
+		Gui %window%:Add, ListView, x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectABSetting, % values2String("|", map(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], "translate")*)
+
+		Gui %window%:Add, Button, x16 yp+354 w80 Disabled vdecreaseABSettingButton gdecreaseABSetting, % translate("Decrease")
+		Gui %window%:Add, Button, x720 yp w80 Disabled vincreaseABSettingButton gincreaseABSetting, % translate("Increase")
+
+		Gui %window%:Add, Slider, x316 yp w200 0x10 Range-100-100 ToolTip vapplyMixSlider gmixSetups, 0
+		Gui %window%:Add, Text, x251 yp+3 w50, % translate("Setup A")
+		Gui %window%:Add, Text, x529 yp w50, % translate("Setup B")
+
+		this.iSettingsListView := settingsListView
+
 		Gui %window%:Add, Text, x8 y506 w800 0x10
 
-		Gui %window%:Add, Button, x374 y514 w80 h23 GcloseComparator, % translate("Close")
+		Gui %window%:Add, Button, x322 y514 w80 h23 GapplyComparator, % translate("&Apply")
+		Gui %window%:Add, Button, x426 y514 w80 h23 Default GcloseComparator, % translate("Close")
 	}
 
 	show() {
@@ -2184,8 +2247,8 @@ class SetupComparator extends ConfigurationItem {
 		this.loadSetups()
 	}
 
-	close() {
-		this.iClosed := true
+	close(apply := false) {
+		this.iClosed := (apply ? "Apply" : "Close")
 	}
 
 	destroy() {
@@ -2194,15 +2257,44 @@ class SetupComparator extends ConfigurationItem {
 		Gui %window%:Destroy
 	}
 
-	loadSetup(ByRef setup := false) {
-		if !setup
-			setup := this.SetupB
+	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
+		if !setupA
+			setupA := this.SetupA
 		else
-			this.SetupB := setup
+			this.SetupA := setupA
+
+		if !setupB
+			setupB := this.SetupB
+		else
+			this.SetupB := setupB
 
 		window := this.Window
 
 		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		LV_Delete()
+
+		this.Settings := []
+
+		fileNameA := ""
+		fileNameB := ""
+
+		if setupA {
+			fileNameA := setupA.FileName[true]
+
+			SplitPath fileNameA, , , , fileNameA
+		}
+
+		if setupB {
+			fileNameB := setupB.FileName[true]
+
+			SplitPath fileNameB, , , , fileNameB
+		}
+
+		GuiControl Text, fileNameAViewer, %fileNameA%
+		GuiControl Text, fileNameBViewer, %fileNameB%
 
 		this.updateState()
 	}
@@ -2220,13 +2312,72 @@ class SetupComparator extends ConfigurationItem {
 			this.destroy()
 		}
 
-		return this.SetupB
+		return ((this.iClosed = "Apply") ? this.SetupAB : false)
+	}
+
+	updateSetting(setting, newValue) {
+		Throw "Virtual method SetupComparator.updateSetting must be implemented in a subclass..."
+	}
+
+	increaseSetting(setting := false) {
+		window := this.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		if setting
+			row := inList(this.Settings, setting)
+		else
+			row := LV_GetNext(0)
+
+		if row {
+			setting := this.Settings[row]
+			handler := this.Editor.createSettingHandler(setting)
+
+			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.SetupAB.getValue(setting)))))
+		}
+
+		this.updateState()
+	}
+
+	decreaseSetting(setting := false) {
+		window := this.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		if setting
+			row := inList(this.Settings, setting)
+		else
+			row := LV_GetNext(0)
+
+		if row {
+			setting := this.Settings[row]
+			handler := this.Editor.createSettingHandler(setting)
+
+			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.SetupAB.getValue(setting)))))
+		}
+
+		this.updateState()
 	}
 
 	updateState() {
 		window := this.Window
 
 		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		if LV_GetNext(0) {
+			GuiControl Enable, increaseABSettingButton
+			GuiControl Enable, decreaseABSettingButton
+		}
+		else {
+			GuiControl Disable, increaseABSettingButton
+			GuiControl Disable, decreaseABSettingButton
+		}
 	}
 }
 
@@ -2402,6 +2553,10 @@ openEditorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups
 }
 
+applyComparator() {
+	SetupAdvisor.Instance.Editor.Comparator.close(true)
+}
+
 closeComparator() {
 	SetupAdvisor.Instance.Editor.Comparator.close()
 }
@@ -2412,6 +2567,32 @@ moveComparator() {
 
 openComparatorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#compare-car-setups
+}
+
+chooseSetupAFile() {
+	SetupAdvisor.Instance.Editor.Comparator.chooseSetup("A")
+}
+
+chooseSetupBFile() {
+	SetupAdvisor.Instance.Editor.Comparator.chooseSetup("B")
+}
+
+selectABSetting() {
+	SetupAdvisor.Instance.Editor.Comparator.updateState()
+}
+
+increaseABSetting() {
+	SetupAdvisor.Instance.Editor.Comparator.increaseSetting()
+}
+
+decreaseABSetting() {
+	SetupAdvisor.Instance.Editor.Comparator.decreaseSetting()
+}
+
+mixSetups() {
+	GuiControlGet applyMixSlider
+
+	SetupAdvisor.Instance.Editor.Comparator.loadSetups(false, false, applyMixSlider)
 }
 
 chooseSetupFile() {

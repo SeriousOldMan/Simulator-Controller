@@ -172,6 +172,13 @@ class ACCSetupEditor extends SetupEditor {
 	loadSetup(setup := false) {
 		base.loadSetup(setup)
 
+		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
+
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+
+		if (categoriesLabels.Count() == 0)
+			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
+
 		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
 
 		if (settingsLabels.Count() == 0)
@@ -206,7 +213,21 @@ class ACCSetupEditor extends SetupEditor {
 				else
 					value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 
-				LV_Add("", settingsLabels[setting], value, settingsUnits[setting])
+				category := ""
+
+				for candidate, settings in categories {
+					for ignore, cSetting in string2Values(";", settings)
+						if (InStr(setting, cSetting) == 1) {
+							category := candidate
+
+							break
+						}
+
+					if (category != "")
+						break
+				}
+
+				LV_Add("", categoriesLabels[category], settingsLabels[setting], value, settingsUnits[setting])
 
 				this.Settings.Push(setting)
 			}
@@ -214,9 +235,22 @@ class ACCSetupEditor extends SetupEditor {
 
 		LV_ModifyCol()
 
-		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(1, "AutoHdr Sort")
 		LV_ModifyCol(2, "AutoHdr")
 		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
+
+		lastCategory := ""
+
+		Loop % LV_getCount()
+		{
+			LV_GetText(category, A_Index)
+
+			if (category = lastCategory)
+				LV_Modify(A_Index, "", "")
+
+			lastCategory := category
+		}
 	}
 
 	saveSetup() {
@@ -276,8 +310,8 @@ class ACCSetupEditor extends SetupEditor {
 		else
 			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 
-		LV_Modify(row, "+Vis Col2", value)
-		LV_ModifyCol(2, "AutoHdr")
+		LV_Modify(row, "+Vis Col3", value)
+		LV_ModifyCol(3, "AutoHdr")
 	}
 }
 
@@ -288,7 +322,7 @@ class ACCSetupEditor extends SetupEditor {
 class ACCSetupComparator extends SetupComparator {
 	compareSetup(theSetup := false) {
 		if !theSetup
-			theSetup := this.chooseSetup(false)
+			theSetup := this.chooseSetup("B", false)
 
 		if theSetup
 			return base.compareSetup(theSetup)
@@ -299,7 +333,7 @@ class ACCSetupComparator extends SetupComparator {
 		}
 	}
 
-	chooseSetup(load := true) {
+	chooseSetup(type, load := true) {
 		static carNames := false
 
 		if !carNames
@@ -315,7 +349,7 @@ class ACCSetupComparator extends SetupComparator {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		title := translate("Load ACC Setup File...")
+		title := (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File..."))
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
@@ -324,8 +358,12 @@ class ACCSetupComparator extends SetupComparator {
 		if fileName {
 			theSetup := new ACCSetup(this, fileName)
 
-			if load
-				this.loadSetup(theSetup)
+			if load {
+				if (type = "A")
+					this.loadSetups(theSetup)
+				else
+					this.loadSetups(false, theSetup)
+			}
 			else
 				return theSetup
 		}
@@ -333,8 +371,25 @@ class ACCSetupComparator extends SetupComparator {
 			return false
 	}
 
-	loadSetup(setup := false) {
-		base.loadSetup(setup)
+	loadABSetup() {
+	}
+
+	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
+		base.loadSetups(setupA, setupB)
+
+		setupAB := new ACCSetup(this.Editor, setupA.FileName[true])
+
+		setupAB.FileName[false] := setupA.FileName[false]
+		setupAB.Setup[false] := setupA.Setup[false]
+
+		this.SetupAB := setupAB
+
+		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
+
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+
+		if (categoriesLabels.Count() == 0)
+			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
 
 		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
 
@@ -346,8 +401,120 @@ class ACCSetupComparator extends SetupComparator {
 		if (settingsUnits.Count() == 0)
 			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN", Object())
 
+		LV_Delete()
+
+		this.Settings := []
+
+		for ignore, setting in this.Advisor.Settings {
+			handler := this.Editor.createSettingHandler(setting)
+
+			if handler {
+				valueA := handler.convertToDisplayValue(setupA.getValue(setting, false))
+				valueB := handler.convertToDisplayValue(setupB.getValue(setting, true))
+
+				category := ""
+
+				for candidate, settings in categories {
+					for ignore, cSetting in string2Values(";", settings)
+						if (InStr(setting, cSetting) == 1) {
+							category := candidate
+
+							break
+						}
+
+					if (category != "")
+						break
+				}
+
+				targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
+				valueAB := ((valueA < valueB) ? valueA : valueB)
+				lastValueAB := kUndefined
+
+				Loop {
+					if (valueAB >= targetAB) {
+						if (lastValueAB != kUndefined) {
+							delta := (valueAB - lastValueAB)
+
+							if ((lastValueAB + (delta / 2)) > targetAB)
+								valueAB := lastValueAB
+						}
+						break
+					}
+					else {
+						lastValueAB := valueAB
+
+						valueAB := handler.increaseValue(valueAB)
+					}
+				}
+
+				setupAB.setValue(setting, handler.convertToRawValue(valueAB))
+
+				valueAB := handler.formatValue(valueAB)
+
+				if (valueB > valueA)
+					valueB := (valueB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+				else if (valueB < valueA)
+					valueB := (valueB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+
+				originalAB := handler.convertToDisplayValue(setupAB.getValue(setting, true))
+
+				if (valueAB > originalAB)
+					valueAB := (valueAB . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalAB - valueAB)) . translate(")"))
+				else if (valueAB < originalAB)
+					valueAB := (valueAB . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalAB - valueAB)) . translate(")"))
+
+				LV_Add("", categoriesLabels[category], settingsLabels[setting], valueA, valueB, valueAB, settingsUnits[setting])
+
+				this.Settings.Push(setting)
+			}
+		}
+
+		LV_ModifyCol()
+
+		LV_ModifyCol(1, "AutoHdr Sort")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
+		LV_ModifyCol(5, "AutoHdr")
+
+		lastCategory := ""
+
+		Loop % LV_getCount()
+		{
+			LV_GetText(category, A_Index)
+
+			if (category = lastCategory)
+				LV_Modify(A_Index, "", "")
+
+			lastCategory := category
+		}
+	}
+
+	updateSetting(setting, newValue) {
+		local setup := this.SetupAB
+
+		setup.setValue(setting, newValue)
+
+		row := inList(this.Settings, setting)
+
 		window := this.Window
 
 		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		handler := this.Editor.createSettingHandler(setting)
+		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+		if (originalValue = modifiedValue)
+			value := originalValue
+		else if (modifiedValue > originalValue)
+			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+		else
+			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+
+		LV_Modify(row, "+Vis Col5", value)
+		LV_ModifyCol(5, "AutoHdr")
 	}
 }

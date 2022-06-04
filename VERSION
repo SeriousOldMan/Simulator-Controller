@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.9.0-dev
 Target=4.1.9.0-release
-Date=06/05/2022
+Date=06/06/2022
 Download=
-Changes=
+Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups
 [Release]
 Version=4.1.8.0-release
 Date=06/05/2022

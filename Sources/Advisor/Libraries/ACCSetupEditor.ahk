@@ -197,7 +197,7 @@ class ACCSetupEditor extends SetupEditor {
 
 		LV_Delete()
 
-		this.Settings := []
+		this.Settings := {}
 
 		for ignore, setting in this.Advisor.Settings {
 			handler := this.createSettingHandler(setting)
@@ -227,9 +227,12 @@ class ACCSetupEditor extends SetupEditor {
 						break
 				}
 
-				LV_Add("", categoriesLabels[category], settingsLabels[setting], value, settingsUnits[setting])
+				label := settingsLabels[setting]
 
-				this.Settings.Push(setting)
+				LV_Add("", categoriesLabels[category], label, value, settingsUnits[setting])
+
+				this.Settings[setting] := label
+				this.Settings[label] := setting
 			}
 		}
 
@@ -291,7 +294,18 @@ class ACCSetupEditor extends SetupEditor {
 
 		setup.setValue(setting, newValue)
 
-		row := inList(this.Settings, setting)
+		label := this.Settings[setting]
+		row := false
+
+		Loop {
+			LV_GetText(candidate, A_Index, 2)
+
+			if (label = candidate) {
+				row := A_Index
+
+				break
+			}
+		}
 
 		window := this.Window
 
@@ -403,7 +417,7 @@ class ACCSetupComparator extends SetupComparator {
 
 		LV_Delete()
 
-		this.Settings := []
+		this.Settings := {}
 
 		for ignore, setting in this.Advisor.Settings {
 			handler := this.Editor.createSettingHandler(setting)
@@ -456,16 +470,17 @@ class ACCSetupComparator extends SetupComparator {
 				else if (valueB < valueA)
 					valueB := (valueB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
 
-				originalAB := handler.convertToDisplayValue(setupAB.getValue(setting, true))
+				if (valueAB > valueA)
+					valueAB := (valueAB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
+				else if (valueAB < valueA)
+					valueAB := (valueAB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
 
-				if (valueAB > originalAB)
-					valueAB := (valueAB . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalAB - valueAB)) . translate(")"))
-				else if (valueAB < originalAB)
-					valueAB := (valueAB . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalAB - valueAB)) . translate(")"))
+				label := settingsLabels[setting]
 
 				LV_Add("", categoriesLabels[category], settingsLabels[setting], valueA, valueB, valueAB, settingsUnits[setting])
 
-				this.Settings.Push(setting)
+				this.Settings[setting] := label
+				this.Settings[label] := setting
 			}
 		}
 
@@ -495,7 +510,18 @@ class ACCSetupComparator extends SetupComparator {
 
 		setup.setValue(setting, newValue)
 
-		row := inList(this.Settings, setting)
+		label := this.Settings[setting]
+		row := false
+
+		Loop {
+			LV_GetText(candidate, A_Index, 2)
+
+			if (label = candidate) {
+				row := A_Index
+
+				break
+			}
+		}
 
 		window := this.Window
 
@@ -504,7 +530,7 @@ class ACCSetupComparator extends SetupComparator {
 		Gui ListView, % this.SettingsListView
 
 		handler := this.Editor.createSettingHandler(setting)
-		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+		originalValue := handler.convertToDisplayValue(this.SetupA.getValue(setting, false))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (originalValue = modifiedValue)

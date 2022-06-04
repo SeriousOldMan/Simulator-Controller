@@ -1729,7 +1729,7 @@ class SetupEditor extends ConfigurationItem {
 
 	iComparator := false
 
-	iSettings := []
+	iSettings := {}
 	iSettingsListView := false
 
 	iClosed := false
@@ -1933,7 +1933,7 @@ class SetupEditor extends ConfigurationItem {
 
 		LV_Delete()
 
-		this.Settings := []
+		this.Settings := {}
 
 		fileName := ""
 
@@ -1960,13 +1960,27 @@ class SetupEditor extends ConfigurationItem {
 
 		Gui ListView, % this.SettingsListView
 
-		if setting
-			row := inList(this.Settings, setting)
+		if setting {
+			label := this.Settings[setting]
+			row := false
+
+			Loop {
+				LV_GetText(candidate, A_Index, 2)
+
+				if (label = candidate) {
+					row := A_Index
+
+					break
+				}
+			}
+		}
 		else
 			row := LV_GetNext(0)
 
 		if row {
-			setting := this.Settings[row]
+			LV_GetText(label, row, 2)
+
+			setting := this.Settings[label]
 			handler := this.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
@@ -1984,13 +1998,27 @@ class SetupEditor extends ConfigurationItem {
 
 		Gui ListView, % this.SettingsListView
 
-		if setting
-			row := inList(this.Settings, setting)
+		if setting {
+			label := this.Settings[setting]
+			row := false
+
+			Loop {
+				LV_GetText(candidate, A_Index, 2)
+
+				if (label = candidate) {
+					row := A_Index
+
+					break
+				}
+			}
+		}
 		else
 			row := LV_GetNext(0)
 
 		if row {
-			setting := this.Settings[row]
+			LV_GetText(label, row, 2)
+
+			setting := this.Settings[label]
 			handler := this.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
@@ -2100,7 +2128,7 @@ class SetupComparator extends ConfigurationItem {
 
 	iSettingsListView := false
 
-	iSettings := []
+	iSettings := {}
 
 	iClosed := false
 
@@ -2276,7 +2304,7 @@ class SetupComparator extends ConfigurationItem {
 
 		LV_Delete()
 
-		this.Settings := []
+		this.Settings := {}
 
 		fileNameA := ""
 		fileNameB := ""
@@ -2326,13 +2354,27 @@ class SetupComparator extends ConfigurationItem {
 
 		Gui ListView, % this.SettingsListView
 
-		if setting
-			row := inList(this.Settings, setting)
+		if setting {
+			label := this.Settings[setting]
+			row := false
+
+			Loop {
+				LV_GetText(candidate, A_Index, 2)
+
+				if (label = candidate) {
+					row := A_Index
+
+					break
+				}
+			}
+		}
 		else
 			row := LV_GetNext(0)
 
 		if row {
-			setting := this.Settings[row]
+			LV_GetText(label, row, 2)
+
+			setting := this.Settings[label]
 			handler := this.Editor.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.SetupAB.getValue(setting)))))
@@ -2348,13 +2390,27 @@ class SetupComparator extends ConfigurationItem {
 
 		Gui ListView, % this.SettingsListView
 
-		if setting
-			row := inList(this.Settings, setting)
+		if setting {
+			label := this.Settings[setting]
+			row := false
+
+			Loop {
+				LV_GetText(candidate, A_Index, 2)
+
+				if (label = candidate) {
+					row := A_Index
+
+					break
+				}
+			}
+		}
 		else
 			row := LV_GetNext(0)
 
 		if row {
-			setting := this.Settings[row]
+			LV_GetText(label, row, 2)
+
+			setting := this.Settings[label]
 			handler := this.Editor.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.SetupAB.getValue(setting)))))

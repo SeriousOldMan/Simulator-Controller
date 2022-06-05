@@ -1052,7 +1052,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			else if standingsFront {
-				delta := Abs(standingsFront.Delta[sector])
+				delta := Abs(standingsFront.Delta[sector, true])
 				deltaDifference := Abs(standingsFront.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsFront.LapTimeDifference)
 
@@ -1111,7 +1111,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if standingsBehind {
-				delta := Abs(standingsBehind.Delta[sector])
+				delta := Abs(standingsBehind.Delta[sector, true])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
 

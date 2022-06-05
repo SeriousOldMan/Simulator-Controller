@@ -297,6 +297,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		static carIDs := false
 		static lastDriverCar := false
+		static lastRead := false
+		static standings := false
 
 		if (this.SessionState == kSessionRace)
 			this.requireUDPClient()
@@ -306,31 +308,49 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !carIDs
 			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
 
-		fileName := kTempDirectory . "ACCUDP.cmd"
+		if ((A_Now + 5000) > lastRead) {
+			lastRead := (A_Now + 0)
 
-		FileAppend Read, %fileName%
+			fileName := kTempDirectory . "ACCUDP.cmd"
 
-		tries := 10
+			FileAppend Read, %fileName%
 
-		while FileExist(fileName) {
-			Sleep 200
+			tries := 10
 
-			if (--tries <= 0)
-				break
+			while FileExist(fileName) {
+				Sleep 200
+
+				if (--tries <= 0)
+					break
+			}
+
+			if (tries > 0) {
+				fileName := kTempDirectory . "ACCUDP.out"
+
+				standings := readConfiguration(fileName)
+
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+			}
+			else {
+				standings := false
+
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+
+				this.iUDPClient := false
+			}
 		}
 
-		if (tries > 0) {
-			fileName := kTempDirectory . "ACCUDP.out"
-
-			standings := readConfiguration(fileName)
-
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
-
+		if standings {
 			if (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)
 				lastDriverCar := false
 
@@ -373,16 +393,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
 			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
-		}
-		else {
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
-
-			this.iUDPClient := false
 		}
 	}
 

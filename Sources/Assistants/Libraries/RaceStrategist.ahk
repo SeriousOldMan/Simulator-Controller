@@ -340,13 +340,13 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
-		delta := knowledgeBase.getValue("Position.Track.Front.Delta", 0)
+		delta := Abs(knowledgeBase.getValue("Position.Track.Front.Delta", 0))
 
 		if (delta != 0) {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(Abs(delta / 1000), 1)})
+				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -391,13 +391,13 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
-		delta := knowledgeBase.getValue("Position.Track.Behind.Delta", 0)
+		delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 
 		if (delta != 0) {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(Abs(delta / 1000), 1)})
+				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))

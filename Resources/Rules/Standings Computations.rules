@@ -53,30 +53,30 @@ updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
 		carLapTime(?car, ?carLapTime), lapTime(?lap, ?lapTime), carPosition(?car, ?position),
 		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),  
-		?standingsDistance = ?driverLaps - ?carLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
+		?standingsDistance = ?carLaps - ?driverLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
 		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
 		Set(?prefix, Time, ?carLapTime), Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
 		updateStandingsFront(?lap, ?car, ?standingsDistance, ?standingsDelta),
 		updateStandingsBehind(?lap, ?car, ?standingsDistance, ?standingsDelta),
 		updateStandingsLeader(?lap, ?car, ?standingsDistance, ?standingsDelta),
-		?trackDistance = ?driverRunning - ?carRunning, ?trackDelta = ?lapTime * ?trackDistance,
+		?trackDistance = ?driverRunning - ?carRunning, ?temp = ?lapTime * ?trackDistance, ?trackDelta = ?temp * -1,
 		updateTrackFront(?lap, ?car, ?trackDistance, ?trackDelta), updateTrackBehind(?lap, ?car, ?trackDistance, ?trackDelta),	
 		?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <= ?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
 
-updateStandingsFront(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Standings.Front.Car), !,
+updateStandingsFront(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Standings.Front.Car), !,
 													Set(Position.Standings.Front.Car, ?car), Set(Position.Standings.Front.Distance, ?distance),
 													Set(Position.Standings.Front.Delta, ?delta)
-updateStandingsFront(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Standings.Front.Delta, ?curDelta), ?delta > ?curDelta,
+updateStandingsFront(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Standings.Front.Delta, ?curDelta), ?delta < ?curDelta,
 													Set(Position.Standings.Front.Car, ?car), Set(Position.Standings.Front.Distance, ?distance),
 													Set(Position.Standings.Front.Delta, ?delta)
 updateStandingsFront(?, ?, ?, ?)
 
-updateStandingsBehind(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Standings.Behind.Car), !,
+updateStandingsBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Standings.Behind.Car), !,
 													 Set(Position.Standings.Behind.Car, ?car),
 													 Set(Position.Standings.Behind.Distance, ?distance),
 													 Set(Position.Standings.Behind.Delta, ?delta)
-updateStandingsBehind(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Standings.Behind.Delta, ?curDelta), ?delta < ?curDelta,
+updateStandingsBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Standings.Behind.Delta, ?curDelta), ?delta > ?curDelta,
 													 Set(Position.Standings.Behind.Car, ?car),
 													 Set(Position.Standings.Behind.Distance, ?distance),
 													 Set(Position.Standings.Behind.Delta, ?delta)
@@ -101,15 +101,15 @@ updateTrackFront(?lap) <= carLaps(!Driver.Car, RUNNING, ?temp), ?running = 1 - ?
 updateTrackFront(?, ?, ?car) <= =<(?car, 0), !
 updateTrackFront(?lap, ?running, !Driver.Car) <= ?nextCar = !Driver.Car - 1, updateTrackFront(?lap, ?running, ?nextCar), !
 updateTrackFront(?lap, ?running, ?car) <= unbound?(!Position.Track.Front.Car), carLaps(?car, RUNNING, ?carRunning), lapTime(?lap, ?lapTime),
-										  ?temp = ?carRunning + ?running, ?distance = ?temp * -1, ?delta = ?lapTime * ?distance,
+										  ?temp = ?carRunning + ?running, ?delta = ?lapTime * ?temp, ?distance = ?temp * -1,
 										  Set(Position.Track.Front.Car, ?car), Set(Position.Track.Front.Distance, ?distance),
 										  Set(Position.Track.Front.Delta, ?delta),
 										  ?nextCar = ?car - 1, updateTrackFront(?lap, ?running, ?nextCar), !
 updateTrackFront(?lap, ?running, ?car) <= carLaps(?car, RUNNING, ?carRunning), lapTime(?lap, ?lapTime),
-										  ?temp = ?carRunning + ?running, ?distance = ?temp * -1,
+										  ?temp = ?carRunning + ?running, ?delta = ?lapTime * ?temp, ?distance = ?temp * -1,
 										  Get(Position.Track.Front.Distance, ?curDistance), ?distance > ?curDistance,
 										  Set(Position.Track.Front.Car, ?car), Set(Position.Track.Front.Distance, ?distance),
-										  ?delta = ?lapTime * ?distance, Set(Position.Track.Front.Delta, ?delta),
+										  Set(Position.Track.Front.Delta, ?delta),
 										  ?nextCar = ?car - 1, updateTrackFront(?lap, ?running, ?nextCar)
 
 updateTrackBehind(?, ?car, ?distance, ?delta) <= ?distance > 0, unbound?(!Position.Track.Behind.Car), !, Set(Position.Track.Behind.Car, ?car),
@@ -126,12 +126,12 @@ updateTrackBehind(?, ?, ?car) <= =<(?car, 0), !
 updateTrackBehind(?lap, ?running, !Driver.Car) <= ?nextCar = !Driver.Car - 1, updateTrackBehind(?lap, ?running, ?nextCar), !
 updateTrackBehind(?lap, ?running, ?car) <= unbound?(!Position.Track.Behind.Car), carLaps(?car, RUNNING, ?carRunning),
 										   lapTime(?lap, ?lapTime), ?temp = 1 - ?carRunning, ?distance = ?temp + ?running,
-										   ?delta = ?lapTime * ?distance, Set(Position.Track.Behind.Car, ?car),
+										   ?temp2 = ?distance * -1, ?delta = ?lapTime * ?temp2, Set(Position.Track.Behind.Car, ?car),
 										   Set(Position.Track.Behind.Distance, ?distance), Set(Position.Track.Behind.Delta, ?delta),
 										   ?nextCar = ?car - 1, updateTrackBehind(?lap, ?running, ?nextCar), !
 updateTrackBehind(?lap, ?running, ?car) <= carLaps(?car, RUNNING, ?carRunning), lapTime(?lap, ?lapTime),
 										   ?temp = 1 - ?carRunning, ?distance = ?temp + ?running,
 										   Get(Position.Track.Behind.Distance, ?curDistance), ?distance < ?curDistance,
 										   Set(Position.Track.Behind.Car, ?car), Set(Position.Track.Behind.Distance, ?distance),
-										   ?delta = ?lapTime * ?distance, Set(Position.Track.Behind.Delta, ?delta),
+										   ?temp2 = ?distance * -1, ?delta = ?lapTime * ?temp2, Set(Position.Track.Behind.Delta, ?delta),
 										   ?nextCar = ?car - 1, updateTrackBehind(?lap, ?running, ?nextCar)

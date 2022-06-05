@@ -241,7 +241,7 @@ class CarInfo {
 
 		linRegression(xValues, yValues, a, b)
 
-		return (b < 0)
+		return (b > 0)
 	}
 }
 
@@ -317,7 +317,7 @@ class PositionInfo {
 
 	DeltaDifference[sector] {
 		Get {
-			return (this.InitialDelta[sector] - this.Delta[sector])
+			return (this.Delta[sector] - this.InitialDelta[sector])
 		}
 	}
 
@@ -349,7 +349,9 @@ class PositionInfo {
 	}
 
 	isFaster(sector) {
-		return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
+		; return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
+
+		return this.Car.isFaster(sector)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -667,13 +669,13 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
-		delta := knowledgeBase.getValue("Position.Track.Front.Delta", 0)
+		delta := Abs(knowledgeBase.getValue("Position.Track.Front.Delta", 0))
 
 		if (delta != 0) {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(Abs(delta / 1000), 1)})
+				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -718,13 +720,13 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
-		delta := knowledgeBase.getValue("Position.Track.Behind.Delta", 0)
+		delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 
 		if (delta != 0) {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(Abs(delta / 1000), 1)})
+				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -1379,7 +1381,7 @@ class RaceSpotter extends RaceAssistant {
 
 			try {
 				position := knowledgeBase.getValue("Position", false)
-				delta := knowledgeBase.getValue("Position.Standings.Behind.Delta", false)
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", false))
 
 				if (knowledgeBase.getValue("Position.Standings.Behind.Car", false) && delta && (delta < 2000))
 					this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")

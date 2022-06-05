@@ -87,7 +87,17 @@ On the right side, you will see the simulator specific content of the setup file
 
 The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The Setup Editor is currently only available for *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
+
+## Comparing Car Setups
+
+Beside applying selected recommendations for handling problems to a given setup, "Setup Advisor" is also able to compare two given setups and can also *merge* setups, for example a setup for dry conditions with a setup for wet conditions to create some kind of hybrid setup for endurance races. To do this, first load one setup into the *Setup Editor* as described above, and then click the "Compare..." button. You will be asked to load a second setup, which then will be compared to the first one. The differences will be shown in the following window.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%203.JPG)
+
+The orginal setup will be named "Setup A" and the second will be named "Setup B" here. Beside only investigating the differences betweeen the two setups, you can also create a *merged* setup, name "Setup A/B". Use the slider in the lower middle of the window, to balance the weight of the two orginal setups for the settings in the merged setup. You can also use the two "Decrease" and "Increase" buttons, to change individual settings in the "Setup A/B".
+
+When you want the merged setup to be taken over to the *Setup Editor*, when you are finished, click on the "Apply" button, otherwise close the window using the "Close" button.
 
 ## Extending and cutomizing "Setup Advisor"
 
@@ -202,6 +212,7 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Simulator=Assetto Corsa Competizione
 	[Setup]
 	Editor=ACCSetupEditor
+	Comparator=ACCSetupComparator
 	Type=JSON
 	[Setup.Settings]
 	Electronics.TC=basicSetup.electronics.tC1
@@ -216,6 +227,6 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic in other simulators.
+  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementation for *Assetto Corsa Competizione* provides a generic car model and a couple of very detailed car specifications at the moment. More will be added in the future. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
   3. Last but not least, specifications for specific car models are missing as well at the moment for all other simulators, only a generic car is supported here. But only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 

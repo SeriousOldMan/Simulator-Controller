@@ -2622,7 +2622,7 @@ moveComparator() {
 }
 
 openComparatorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#compare-car-setups
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups
 }
 
 chooseSetupAFile() {

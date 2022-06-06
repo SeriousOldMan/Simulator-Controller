@@ -23,9 +23,13 @@ Release 4.1.8.0 Checklist
 0. Search for new links (*)
 1. Update Procedure
    a. Translations
+   b. Phrase Grammars
 2. Setup Comparison
    a. Translations
    b. Documentation & Image Update
+3. New Post Race Review by Race Strategist
+   a. Documentation & Image Update
+   b. Phrase Grammars
 
 Release 4.1.8.0 Checklist
 =======================

@@ -32,6 +32,7 @@ class RaceStrategist extends RaceAssistant {
 
 	iSaveTelemetry := kAlways
 	iSaveRaceReport := false
+	iRaceReview := false
 
 	iFirstStandingsLap := true
 
@@ -68,6 +69,34 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
+	class RaceReviewContinuation {
+		iRaceStrategist := false
+		iContinuation := false
+
+		RaceStrategist[] {
+			Get {
+				return this.iRaceStrategist
+			}
+		}
+
+		Continuation[] {
+			Get {
+				return this.iContinuation
+			}
+		}
+
+		__New(raceStrategist, continuation) {
+			this.iRaceStrategist := raceStrategist
+			this.iContinuation := continuation
+		}
+
+		continue() {
+			continuation := this.Continuation
+
+			%continuation%()
+		}
+	}
+
 	RaceInfo[] {
 		Get {
 			return this.iRaceInfo
@@ -95,6 +124,12 @@ class RaceStrategist extends RaceAssistant {
 	SaveRaceReport[] {
 		Get {
 			return ((this.iSessionReportsDatabase != false) ? this.iSaveRaceReport : kNever)
+		}
+	}
+
+	RaceReview[] {
+		Get {
+			return this.iRaceReview
 		}
 	}
 
@@ -128,6 +163,9 @@ class RaceStrategist extends RaceAssistant {
 
 		if values.HasKey("SaveRaceReport")
 			this.iSaveRaceReport := values["SaveRaceReport"]
+
+		if values.HasKey("RaceReview")
+			this.iRaceReview := values["RaceReview"]
 	}
 
 	updateSessionValues(values) {
@@ -535,6 +573,75 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
+	reviewRace(cars, laps, position
+			 , leaderAvgLapTime, driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+
+		speaker.startTalk()
+
+		try {
+			if (position <= (cars / 5))
+				speaker.speakPhrase("GreatRace", {position: position})
+			else if (position <= ((cars / 5) * 3))
+				speaker.speakPhrase("MediocreRace", {position: position})
+			else
+				speaker.speakPhrase("CatastrophicRace", {position: position})
+
+			if (position > 1) {
+				only := ""
+
+				if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
+					only := speaker.Fragments["Only"]
+
+				speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(avgLapTime - leaderAvgLapTime), 1)})
+
+				driver := knowledgeBase.getValue("Driver.Car")
+
+				if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.04))
+				 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.04)))
+					speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
+
+				if (position <= (cars / 3))
+					speaker.speakPhrase("PositiveSummary")
+
+				goodPace := false
+
+				if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
+					speaker.speakPhrase("GoodPace")
+
+					goodPace := true
+				}
+				else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
+					speaker.speakPhrase("MediocrePace")
+				else
+					speaker.speakPhrase("BadPace")
+
+				if (driverLapTimeStdDev < (driverMinLapTime * 1.005))
+					speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
+				else (driverLapTimeStdDev < (driverMinLapTime * 1.01))
+					speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
+				else
+					speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})
+			}
+		}
+		finally {
+			speaker.finishTalk()
+		}
+
+		continuation := this.Continuation
+
+		if isInstance(continuation, this.RaceReviewContinuation) {
+			this.clearContinuation()
+
+			continuation.continue()
+		}
+	}
+
 	collectTelemetry() {
 		session := "Other"
 		default := false
@@ -729,6 +836,7 @@ class RaceStrategist extends RaceAssistant {
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
+									  , RaceReview: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", true)
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
@@ -742,13 +850,21 @@ class RaceStrategist extends RaceAssistant {
 			this.dumpKnowledge(this.KnowledgeBase)
 	}
 
-	finishSession(shutdown := true) {
+	finishSession(shutdown := true, review := true) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
+			if (review && (this.Session = kSessionRace) && this.RaceReview && this.hasEnoughData(false)) {
+				this.finishSessionWithReview(shutdown)
+
+				return
+			}
+			else
+				review := false
+
 			Process Exist, Race Engineer.exe
 
-			if (!ErrorLevel && this.Speaker)
+			if (!review && !ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
 			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
@@ -801,6 +917,16 @@ class RaceStrategist extends RaceAssistant {
 
 			SetTimer %callback%, -5000
 		}
+	}
+
+	finishSessionWithReview(shutdown) {
+		if this.RemoteHandler {
+			this.RemoteHandler.reviewRace()
+
+			this.setContinuation(new this.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
+		}
+		else
+			this.finishSession(shutdown, false)
 	}
 
 	shutdownSession(phase) {
@@ -888,6 +1014,19 @@ class RaceStrategist extends RaceAssistant {
 			}
 
 			this.updateDynamicValues({StrategyReported: lapNumber})
+		}
+
+		Loop % knowledgeBase.getValue("Car.Count")
+		{
+			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
+			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
+
+			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
+				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
+
+				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", validLaps +  1)
+			}
 		}
 
 		simulator := knowledgeBase.getValue("Session.Simulator")

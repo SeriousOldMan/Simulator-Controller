@@ -11,6 +11,7 @@
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Assistants\Libraries\RaceReportReader.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,6 +54,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		restoreRaceInfo(arguments*) {
 			this.callRemote("restoreRaceInfo", arguments*)
+		}
+
+		reviewRace(arguments*) {
+			this.callRemote("reviewRace", arguments*)
 		}
 	}
 
@@ -424,10 +429,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		base.restoreSessionState()
 	}
 
-	createRaceReport() {
+	createRaceReport(targetDirectory := false) {
 		reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 
-		if reportsDirectory {
+		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
 			session := this.TeamSession
 
@@ -514,9 +519,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 
-				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				if !targetDirectory
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 
-				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+				FileCopyDir %kTempDirectory%Race Report, %targetDirectory%, 1
 			}
 			else {
 				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
@@ -581,9 +587,72 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 
-				directory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				if !targetDirectory
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 
-				FileCopyDir %kTempDirectory%Race Report, %directory%, 1
+				FileCopyDir %kTempDirectory%Race Report, %targetDirectory%, 1
+			}
+		}
+	}
+
+	reviewRace() {
+		Random postfix, 1, 1000000
+
+		report := (kTempDirectory . this.Plugin . " Race Report" . postfix)
+
+		this.createRaceReport(report)
+
+		try {
+			reader := new RaceReportReader(report)
+
+			raceData := true
+			drivers := true
+			positions := true
+			times := true
+
+			reader.loadData(false, raceData, drivers, positions, times)
+
+			cars := getConfigurationValue(raceData, "Cars", "Count", 0)
+			driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
+			laps := getConfigurationValue(raceData, "Laps", "Count", 0)
+
+			if laps
+				position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
+			else
+				position := cars
+
+			leader := 0
+
+			for car, candidate in positions[laps]
+				if (candidate = 1) {
+					leader := car
+
+					break
+				}
+
+			min := false
+			max := false
+			leaderAvgLapTime := false
+			stdDev := false
+
+			reader.getDriverPace(raceData, times, leader, min, max, leaderAvgLapTime, stdDev)
+
+			driverMinLapTime := false
+			driverMaxLapTime := false
+			driverAvgLapTime := false
+			driverLapTimeStdDev := false
+
+			reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
+
+			this.RaceAssistant.reviewRace(cars, laps, position, leaderAvgLapTime
+										, driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+		}
+		finally {
+			try {
+				FileRemoveDir %report%, 1
+			}
+			catch exception {
+				; ignore
 			}
 		}
 	}

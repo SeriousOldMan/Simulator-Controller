@@ -1,3 +1,9 @@
+## 4.1.9.0-release 06/10/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. [Comparing and merging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups) setups is now supported in "Setup Advisor".
+
 ## 4.1.8.0-release 06/03/22
 
   1. Bugfixes, as always

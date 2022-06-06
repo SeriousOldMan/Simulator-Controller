@@ -606,8 +606,8 @@ class RaceStrategist extends RaceAssistant {
 
 				driver := knowledgeBase.getValue("Driver.Car")
 
-				if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.04))
-				 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.04)))
+				if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
+				 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
 					speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
 
 				if (position <= (cars / 3))

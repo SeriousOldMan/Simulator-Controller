@@ -67,6 +67,10 @@ class RaceStrategist extends RaceAssistant {
 		createRaceReport(arguments*) {
 			this.callRemote("createRaceReport", arguments*)
 		}
+
+		reviewRace(arguments*) {
+			this.callRemote("reviewRace", arguments*)
+		}
 	}
 
 	class RaceReviewContinuation {
@@ -573,8 +577,8 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
-	reviewRace(cars, laps, position
-			 , leaderAvgLapTime, driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
+	reviewRace(cars, laps, position, leaderAvgLapTime
+			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if !this.hasEnoughData()
@@ -598,7 +602,7 @@ class RaceStrategist extends RaceAssistant {
 				if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
 					only := speaker.Fragments["Only"]
 
-				speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(avgLapTime - leaderAvgLapTime), 1)})
+				speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 
 				driver := knowledgeBase.getValue("Driver.Car")
 
@@ -623,7 +627,7 @@ class RaceStrategist extends RaceAssistant {
 
 				if (driverLapTimeStdDev < (driverMinLapTime * 1.005))
 					speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-				else (driverLapTimeStdDev < (driverMinLapTime * 1.01))
+				else if (driverLapTimeStdDev < (driverMinLapTime * 1.01))
 					speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				else
 					speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})
@@ -921,7 +925,9 @@ class RaceStrategist extends RaceAssistant {
 
 	finishSessionWithReview(shutdown) {
 		if this.RemoteHandler {
-			this.RemoteHandler.reviewRace()
+			Process Exist
+
+			this.RemoteHandler.reviewRace(ErrorLevel)
 
 			this.setContinuation(new this.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
 		}

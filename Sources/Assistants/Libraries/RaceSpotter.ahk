@@ -596,7 +596,7 @@ class RaceSpotter extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		if (true || isDebug()) {
+		if isDebug() {
 			this.setDebug(kDebugKnowledgeBase, true)
 			this.setDebug(kDebugPositions, true)
 		}

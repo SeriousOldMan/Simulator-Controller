@@ -534,6 +534,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
+		showMessage("RA")
 		if this.VoiceManager
 			this.VoiceManager.phraseRecognized("Yes", ["Yes"])
 		else if this.Continuation
@@ -541,6 +542,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	reject() {
+		showMessage("RA")
 		if this.VoiceManager
 			this.VoiceManager.phraseRecognized("No", ["No"])
 		else if this.Continuation

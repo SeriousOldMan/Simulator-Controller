@@ -588,24 +588,26 @@ class RaceStrategist extends RaceAssistant {
 				if (position <= (cars / 3))
 					speaker.speakPhrase("PositiveSummary")
 
-				goodPace := false
+				if (driverMinLapTime && driverLapTimeStdDev) {
+					goodPace := false
 
-				if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
-					speaker.speakPhrase("GoodPace")
+					if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
+						speaker.speakPhrase("GoodPace")
 
-					goodPace := true
+						goodPace := true
+					}
+					else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
+						speaker.speakPhrase("MediocrePace")
+					else
+						speaker.speakPhrase("BadPace")
+
+					if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
+						speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
+					else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
+						speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
+					else
+						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})
 				}
-				else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
-					speaker.speakPhrase("MediocrePace")
-				else
-					speaker.speakPhrase("BadPace")
-
-				if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
-					speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-				else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
-					speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
-				else
-					speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})
 			}
 		}
 		finally {

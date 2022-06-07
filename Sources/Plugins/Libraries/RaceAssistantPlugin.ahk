@@ -175,8 +175,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					case "Call":
 						this.Plugin.call()
 					case "Accept":
+						showMessage("PA")
 						this.Plugin.accept()
 					case "Reject":
+						showMessage("PR")
 						this.Plugin.reject()
 					default:
 						Throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
@@ -889,13 +891,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	accept() {
-		if this.RaceAssistant[true]
+		showMessage("A")
+		if this.RaceAssistant[true] {
+			showMessage("1")
 			this.RaceAssistant[true].accept()
+		}
 	}
 
 	reject() {
-		if this.RaceAssistant[true]
+		showMessage("R")
+		if this.RaceAssistant[true] {
+			showMessage("1")
 			this.RaceAssistant[true].reject()
+		}
 	}
 
 	getSessionState(data := false) {

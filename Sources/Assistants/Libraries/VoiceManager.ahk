@@ -769,7 +769,7 @@ class VoiceManager {
 	}
 
 	remoteDeactivationRecognized(words*) {
-		this.clearContinuation()
+		; this.clearContinuation()
 	}
 
 	remoteCommandRecognized(grammar, command, words*) {

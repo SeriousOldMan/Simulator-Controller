@@ -534,25 +534,17 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		if this.Continuation {
-			if this.VoiceManager
-				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
-			else
-				this.handleVoiceCommand("Yes", ["Yes"])
-		}
-		else if this.VoiceManager
-			this.VoiceManager.recognizeCommand("Yes", ["Yes"])
+		if this.VoiceManager
+			this.VoiceManager.phraseRecognized("Yes", ["Yes"])
+		else if this.Continuation
+			this.handleVoiceCommand("Yes", ["Yes"])
 	}
 
 	reject() {
-		if this.Continuation {
-			if this.VoiceManager
-				this.VoiceManager.phraseRecognized("No", ["No"])
-			else
-				this.handleVoiceCommand("No", ["No"])
-		}
-		else if this.VoiceManager
-			this.VoiceManager.recognizeCommand("No", ["No"])
+		if this.VoiceManager
+			this.VoiceManager.phraseRecognized("No", ["No"])
+		else if this.Continuation
+			this.handleVoiceCommand("No", ["No"])
 	}
 
 	nameRecognized(words) {

@@ -26,6 +26,7 @@ global yellowFlagsDropDown
 global blueFlagsDropDown
 global startSummaryDropDown
 global deltaInformationDropDown
+global tacticalAdvisesDropDown
 global finalLapsDropDown
 global pitWindowDropDown
 
@@ -106,24 +107,31 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h202 HWNDwidget15 Hidden, % translate("Announcements")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h178 HWNDwidget15 Hidden, % translate("Announcements")
 
 		Gui %window%:Font, Norm, Arial
 
 		x3 := x + 186
 		w3 := width - (x3 - x + 16) + 10
+		x5 := x1 + 72
 
-		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side Proximity")
+		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side / Rear Proximity")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget18 := widget19
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget20 Hidden, % translate("Yellow Flags")
+		; Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget18 Hidden, % translate("Rear Proximity")
+		; Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vrearProximityDropDown HWNDwidget19 Hidden, % values2String("|", translate("Off"), translate("On"))
+
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget20 Hidden, % translate("Yellow / Blue Flags")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vyellowFlagsDropDown HWNDwidget21 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget22 Hidden, % translate("Blue Flags")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget22 := widget23
+
+		; Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget22 Hidden, % translate("Blue Flags")
+		; Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("Start Summary")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vstartSummaryDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
@@ -131,15 +139,18 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdeltaInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Final Laps")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Tactical Advises")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vtacticalAdvisesDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget30 Hidden, % translate("Pit Window")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vpitWindowDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget30 Hidden, % translate("Final Laps")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
+
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget32 Hidden, % translate("Pit Window")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vpitWindowDropDown HWNDwidget33 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Font, Norm, Arial
 
-		Loop 31
+		Loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -159,7 +170,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulator . ".HistoryLapsDamping", 0.2)
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "TacticalAdvises", "FinalLaps", "PitWindow"]
 				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
@@ -181,7 +192,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "DeltaInformation", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "DeltaInformation", "TacticalAdvises", "FinalLaps", "PitWindow"]
 				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -229,6 +240,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			else
 				GuiControl Choose, deltaInformationDropDown, % (configuration["DeltaInformation"] + 2)
 
+			GuiControl Choose, tacticalAdvisesDropDown, % (configuration["TacticalAdvises"] + 1)
 			GuiControl Choose, finalLapsDropDown, % (configuration["FinalLaps"] + 1)
 			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
 		}
@@ -250,6 +262,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet startSummaryDropDown
 			GuiControlGet deltaInformationDropDown
+			GuiControlGet tacticalAdvisesDropDown
 			GuiControlGet finalLapsDropDown
 			GuiControlGet pitWindowDropDown
 
@@ -272,6 +285,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			else
 				configuration["DeltaInformation"] := (deltaInformationDropDown - 2)
 
+			configuration["TacticalAdvises"] := (tacticalAdvisesDropDown - 1)
 			configuration["FinalLaps"] := (finalLapsDropDown - 1)
 			configuration["PitWindow"] := (pitWindowDropDown - 1)
 		}

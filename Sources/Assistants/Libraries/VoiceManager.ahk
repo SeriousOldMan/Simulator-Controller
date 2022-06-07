@@ -290,13 +290,12 @@ class VoiceManager {
 	}
 
 	class VoiceContinuation {
-		iVoiceManager := false
+		iManager := false
 		iContinuation := false
-		iReply := false
 
-		VoiceManager[] {
+		Manager[] {
 			Get {
-				return this.iVoiceManager
+				return this.iManager
 			}
 		}
 
@@ -306,28 +305,41 @@ class VoiceManager {
 			}
 		}
 
-		Reply[] {
-			Get {
-				return this.iReply
-			}
-		}
-
-		__New(voiceManager, continuation, reply := false) {
-			this.iVoiceManager := voiceManager
+		__New(manager, continuation := false) {
+			this.iManager := manager
 			this.iContinuation := continuation
-			this.iReply := reply
 		}
 
 		continue() {
-			if (this.VoiceManager.Speaker && this.Reply)
-				this.VoiceManager.getSpeaker().speakPhrase(this.Reply)
-
 			continuation := this.Continuation
 
 			if isInstance(continuation, this.VoiceContinuation)
 				continuation.continue()
 			else if continuation
 				%continuation%()
+		}
+	}
+
+	class ReplyContinuation extends VoiceManager.VoiceContinuation {
+		iReply := false
+
+		Reply[] {
+			Get {
+				return this.iReply
+			}
+		}
+
+		__New(manager, continuation := false, reply := false) {
+			this.iReply := reply
+
+			base.__New(manager, continuation)
+		}
+
+		continue() {
+			if (this.Manager.Speaker && this.Reply)
+				this.Manager.getSpeaker().speakPhrase(this.Reply)
+
+			base.continue()
 		}
 	}
 

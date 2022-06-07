@@ -73,32 +73,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	class RaceReviewContinuation {
-		iRaceStrategist := false
-		iContinuation := false
-
-		RaceStrategist[] {
-			Get {
-				return this.iRaceStrategist
-			}
-		}
-
-		Continuation[] {
-			Get {
-				return this.iContinuation
-			}
-		}
-
-		__New(raceStrategist, continuation) {
-			this.iRaceStrategist := raceStrategist
-			this.iContinuation := continuation
-		}
-
-		continue() {
-			continuation := this.Continuation
-
-			%continuation%()
-		}
+	class RaceReviewContinuation extends VoiceManager.VoiceContinuation {
 	}
 
 	RaceInfo[] {
@@ -625,9 +600,9 @@ class RaceStrategist extends RaceAssistant {
 				else
 					speaker.speakPhrase("BadPace")
 
-				if (driverLapTimeStdDev < (driverMinLapTime * 1.005))
+				if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
 					speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-				else if (driverLapTimeStdDev < (driverMinLapTime * 1.01))
+				else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
 					speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				else
 					speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})

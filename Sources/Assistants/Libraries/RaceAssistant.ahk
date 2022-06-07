@@ -516,7 +516,7 @@ class RaceAssistant extends ConfigurationItem {
 		if announcement {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
-			this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
+			this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
 		}
 		else
 			speaker.speakPhrase("Repeat")

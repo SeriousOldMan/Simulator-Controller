@@ -390,8 +390,23 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				; ignore
 			}
 		}
-		else
-			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%
+		else {
+			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%, 1
+
+			Loop {
+				lapNumber += 1
+
+				if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
+					try {
+						FileDelete %kTempDirectory%Race Report\Lap.%lapNumber%
+					}
+					catch exception {
+						; ignore
+					}
+				else
+					break
+			}
+		}
 	}
 
 	restoreRaceInfo() {
@@ -530,6 +545,16 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				count := 0
 				pitstops := false
 
+				try {
+					if FileExist(kTempDirectory . "Race Report\Output")
+						FileRemoveDir %kTempDirectory%Race Report\Output, 1
+
+					FileCreateDir %kTempDirectory%Race Report\Output
+				}
+				catch exception {
+					; ignore
+				}
+
 				Loop {
 					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
 
@@ -539,13 +564,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						lapData := readConfiguration(fileName)
 
 						count += 1
-
-						try {
-							FileDelete %fileName%
-						}
-						catch exception {
-							; ignore
-						}
 
 						for key, value in getConfigurationSectionValues(lapData, "Lap")
 							setConfigurationValue(data, "Laps", key, value)
@@ -561,18 +579,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 						line := (newLine . times)
 
-						FileAppend %line%, % kTempDirectory . "Race Report\Times.CSV"
+						FileAppend %line%, % kTempDirectory . "Race Report\Output\Times.CSV"
 
 						line := (newLine . positions)
 
-						FileAppend %line%, % kTempDirectory . "Race Report\Positions.CSV"
+						FileAppend %line%, % kTempDirectory . "Race Report\Output\Positions.CSV"
 
 						line := (newLine . laps)
 
-						FileAppend %line%, % kTempDirectory . "Race Report\Laps.CSV"
+						FileAppend %line%, % kTempDirectory . "Race Report\Output\Laps.CSV"
 
 						line := (newLine . drivers)
-						fileName := (kTempDirectory . "Race Report\Drivers.CSV")
+						fileName := (kTempDirectory . "Race Report\Output\Drivers.CSV")
 
 						FileAppend %line%, %fileName%, UTF-16
 					}
@@ -583,14 +601,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				setConfigurationValue(data, "Laps", "Pitstops", pitstops)
 
-				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				writeConfiguration(kTempDirectory . "Race Report\Output\Race.data", data)
 
 				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
 
 				if !targetDirectory
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
 
-				FileCopyDir %kTempDirectory%Race Report, %targetDirectory%, 1
+				FileCopyDir %kTempDirectory%Race Report\Output, %targetDirectory%, 1
 			}
 		}
 	}

@@ -71,7 +71,7 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 
 ### Tactical Advises
 
-The Virtual Race Spotter has been trained to detect several typical race situations and will give according advises how you will best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of the faster car. Other adivises willl help you to handle lapped cars, and so on.
+The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
 ### Enabling and disabling specific warnings and announcements
 

@@ -168,8 +168,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		fireAction(function, trigger) {
-			if this.Plugin.RaceAssistant
-				switch this.Action {
+			local action := this.Action
+
+			if (((action = "Accept") || (action = "Reject")) ? this.Plugin.RaceAssistant[true] : this.Plugin.RaceAssistant)
+				switch action {
 					case "InformationRequest":
 						this.Plugin.requestInformation(this.Arguments*)
 					case "Call":

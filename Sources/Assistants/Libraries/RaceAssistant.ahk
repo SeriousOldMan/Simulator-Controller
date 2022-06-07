@@ -534,7 +534,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		showMessage("RA")
+		showMessage("RAA")
 		if this.VoiceManager
 			this.VoiceManager.phraseRecognized("Yes", ["Yes"])
 		else if this.Continuation
@@ -542,7 +542,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	reject() {
-		showMessage("RA")
+		showMessage("RAR")
 		if this.VoiceManager
 			this.VoiceManager.phraseRecognized("No", ["No"])
 		else if this.Continuation
@@ -1096,9 +1096,19 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 ;;;-------------------------------------------------------------------------;;;
 
 matchFragment(words, fragment) {
-	for ignore, word in string2Values(A_Space, fragment)
-		if !inList(words, word)
+	for ignore, word in string2Values(A_Space, fragment) {
+		found := false
+
+		for ignore, candidate in words
+			if ((InStr(candidate, word) == 1) || (InStr(word, candidate) == 1)) {
+				found := true
+
+				break
+			}
+
+		if !found
 			return false
+	}
 
 	return true
 }

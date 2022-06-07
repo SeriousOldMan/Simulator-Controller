@@ -1,9 +1,9 @@
 [Development]
 Version=4.1.9.0-dev
 Target=4.1.9.0-release
-Date=06/06/2022
+Date=06/07/2022
 Download=
-Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps
+Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor"
 [Release]
 Version=4.1.8.0-release
 Date=06/05/2022

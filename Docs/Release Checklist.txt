@@ -30,6 +30,8 @@ Release 4.1.8.0 Checklist
 3. New Post Race Review by Race Strategist
    a. Documentation & Image Update
    b. Phrase Grammars
+4. More tactical advises by the Spotter
+   a. Phrase Grammars
 
 Release 4.1.8.0 Checklist
 =======================

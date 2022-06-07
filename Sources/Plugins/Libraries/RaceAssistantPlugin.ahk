@@ -30,6 +30,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantListener := false
 
 	iRaceAssistant := false
+	iRaceAssistantZombie := false
 
 	iTeamServer := false
 	iTeamSession := false
@@ -306,9 +307,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	RaceAssistant[] {
+	RaceAssistant[zombie := false] {
 		Get {
-			return this.iRaceAssistant
+			if (!this.iRaceAssistant && zombie)
+				return this.iRaceAssistantZombie
+			else
+				return this.iRaceAssistant
+		}
+
+		Set {
+			if value
+				this.iRaceAssistantZombie := value
+
+			return (this.iRaceAssistant := value)
 		}
 	}
 
@@ -606,7 +617,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (this.RaceAssistant != false) {
+				if (((theAction.Action = "Accept") || (theAction.Action = "Reject")) && (this.RaceAssistant[true] != false)) {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setLabel(theAction.Label)
+				}
+				else if (this.RaceAssistant != false) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -705,14 +720,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				return false
 			}
 
-			this.iRaceAssistant := this.createRaceAssistant(raceAssistantPID)
+			this.RaceAssistant := this.createRaceAssistant(raceAssistantPID)
 		}
 	}
 
 	shutdownRaceAssistant() {
 		local raceAssistant := this.RaceAssistant
 
-		this.iRaceAssistant := false
+		this.RaceAssistant := false
 
 		if raceAssistant {
 			this.iWaitForShutdown := (A_TickCount + (90 * 1000))
@@ -874,13 +889,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	accept() {
-		if this.RaceAssistant
-			this.RaceAssistant.accept()
+		if this.RaceAssistant[true]
+			this.RaceAssistant[true].accept()
 	}
 
 	reject() {
-		if this.RaceAssistant
-			this.RaceAssistant.reject()
+		if this.RaceAssistant[true]
+			this.RaceAssistant[true].reject()
 	}
 
 	getSessionState(data := false) {

@@ -165,15 +165,18 @@ class SpeechSynthesizer {
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
+
+				voices := this.iSpeechSynthesizer.GetVoices()
 			}
-			catch exception {
+			catch exceptions {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
 
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+				voices := ""
 			}
 
-			voices := this.iSpeechSynthesizer.GetVoices()
 			this.iVoices := string2Values("|", voices)
 
 			this.setVoice(language, this.computeVoice(voice, language))
@@ -201,15 +204,17 @@ class SpeechSynthesizer {
 
 					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
+
+				voices := this.iSpeechSynthesizer.GetVoices()
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
 
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
 
-			voices := this.iSpeechSynthesizer.GetVoices()
+				voices := ""
+			}
 
 			if (voices = "") {
 				for languageCode, voiceInfos in kAzureVoices

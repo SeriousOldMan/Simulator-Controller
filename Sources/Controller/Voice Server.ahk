@@ -96,6 +96,8 @@ class VoiceServer extends ConfigurationItem {
 
 		iSpeechSynthesizer := false
 
+		iMuted := false
+
 		iSpeechRecognizer := false
 		iIsSpeaking := false
 		iIsListening := false
@@ -224,6 +226,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		Muted[] {
+			Get {
+				return this.iMuted
+			}
+		}
+
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
@@ -250,6 +258,9 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text) {
+			while this.Muted
+				Sleep 100
+
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
 
@@ -313,6 +324,8 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		mute() {
+			this.iMuted := true
+
 			synthesizer := this.SpeechSynthesizer
 
 			if synthesizer
@@ -320,6 +333,8 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		unmute() {
+			this.iMuted := false
+
 			synthesizer := this.SpeechSynthesizer
 
 			if synthesizer

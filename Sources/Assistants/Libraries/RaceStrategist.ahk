@@ -925,9 +925,7 @@ class RaceStrategist extends RaceAssistant {
 
 	finishSessionWithReview(shutdown) {
 		if this.RemoteHandler {
-			Process Exist
-
-			this.RemoteHandler.reviewRace(ErrorLevel)
+			this.RemoteHandler.reviewRace()
 
 			this.setContinuation(new this.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
 		}

@@ -595,7 +595,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	reviewRace(pid) {
+	reviewRace() {
 		Random postfix, 1, 1000000
 
 		report := (kTempDirectory . this.Plugin . " Race Report" . postfix)
@@ -644,8 +644,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 			reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-			this.createRaceAssistant(pid).reviewRace(cars, laps, position, leaderAvgLapTime
-												   , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+			this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
+											  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 		}
 		finally {
 			try {

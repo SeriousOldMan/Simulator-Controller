@@ -986,6 +986,13 @@ class RaceEngineer extends RaceAssistant {
 
 	finishSession(shutdown := true) {
 		if this.KnowledgeBase {
+			if (this.Session == kSessionRace) {
+				Process Exist, Race Strategist.exe
+
+				if ErrorLevel
+					Sleep 5000
+			}
+
 			if this.Speaker
 				this.getSpeaker().speakPhrase("Bye")
 

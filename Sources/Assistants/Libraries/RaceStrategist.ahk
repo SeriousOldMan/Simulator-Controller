@@ -835,7 +835,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
-			if (review && (this.Session = kSessionRace) && this.RaceReview && this.hasEnoughData(false)) {
+			if (shutdown && review && (this.Session = kSessionRace) && this.RaceReview && this.hasEnoughData(false)) {
 				this.finishSessionWithReview(shutdown)
 
 				return
@@ -845,7 +845,7 @@ class RaceStrategist extends RaceAssistant {
 
 			Process Exist, Race Engineer.exe
 
-			if (!review && !ErrorLevel && this.Speaker)
+			if (shutdown && !review && !ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
 			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {

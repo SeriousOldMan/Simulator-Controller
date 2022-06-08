@@ -993,7 +993,7 @@ class RaceEngineer extends RaceAssistant {
 					Sleep 5000
 			}
 
-			if this.Speaker
+			if (shutdown && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
 			if (shutdown && this.hasEnoughData(false)) {

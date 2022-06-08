@@ -6,7 +6,8 @@
   4. The Virtual Race Strategist will give you now a post race summary. It will be very honest, so if you feel offended, you can disable it in the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). But an AI doesn't lie, does it?
   5. Reversed sign of laptime delta in all apps. Faster cars will have a positive delta, slower cars a negative one.
   6. The Spotter-AI has been trained to detect several typical race situations and can advise you how to best react there. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
-  7. More car specific rules in "Setup Advisor" for:
+  7. New "Consistency" report in "Race Reports" and "Race Center". See the [revised documentation](*) for more information.
+  8. More car specific rules in "Setup Advisor" for:
      - Nissan GT-R Nismo GT3 (2018)
      - Audi R8 LMS GT4
 	 - Maserati Granturismo MC GT4

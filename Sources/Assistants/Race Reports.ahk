@@ -345,6 +345,29 @@ class RaceReports extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
+	showConsistencyReport(reportDirectory) {
+		if reportDirectory {
+			GuiControl Enable, reportSettingsButton
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Consistency")
+
+			this.iSelectedReport := "Consistency"
+		}
+		else {
+			GuiControl Choose, reportsDropDown, 0
+
+			this.iSelectedReport := false
+		}
+
+		this.ReportViewer.setReport(reportDirectory)
+		this.ReportViewer.showConsistencyReport()
+	}
+
+	editConsistencyReportSettings(reportDirectory) {
+		this.ReportViewer.setReport(reportDirectory)
+
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
+	}
+
 	showPaceReport(reportDirectory) {
 		if reportDirectory {
 			GuiControl Enable, reportSettingsButton
@@ -626,6 +649,21 @@ class RaceReports extends ConfigurationItem {
 						this.showPositionsReport(reportDirectory)
 					case "Lap Times":
 						this.showLapTimesReport(reportDirectory)
+					case "Consistency":
+						if !this.ReportViewer.Settings.HasKey("Drivers") {
+							raceData := true
+
+							this.ReportViewer.loadReportData(false, raceData, false, false, false)
+
+							drivers := []
+
+							Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+								drivers.Push(A_Index)
+
+							this.ReportViewer.Settings["Drivers"] := drivers
+						}
+
+						this.showConsistencyReport(reportDirectory)
 					case "Pace":
 						this.showPaceReport(reportDirectory)
 				}
@@ -654,6 +692,9 @@ class RaceReports extends ConfigurationItem {
 			case "Lap Times":
 				if this.editLapTimesReportSettings(reportDirectory)
 					this.showLapTimesReport(reportDirectory)
+			case "Consistency":
+				if this.editConsistencyReportSettings(reportDirectory)
+					this.showConsistencyReport(reportDirectory)
 			case "Pace":
 				if this.editPaceReportSettings(reportDirectory)
 					this.showPaceReport(reportDirectory)
@@ -818,7 +859,7 @@ runRaceReports() {
 		ExitApp 0
 	}
 
-	current := fixIE(11)
+	current := fixIE(13)
 
 	try {
 		reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)

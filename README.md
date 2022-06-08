@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.1.9.0-dev](https://www.dropbox.com/s/bckc8aeten9t0qx/Simulator%20Controller%204.1.9.0-dev.zip?dl=1) (New features: Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor". Stable, incl. updated documentation.)
+[4.1.9.0-dev](https://www.dropbox.com/s/bckc8aeten9t0qx/Simulator%20Controller%204.1.9.0-dev.zip?dl=1) (New features: Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center". Stable, incl. updated documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-419) of this version and all the versions you might have skipped, before installing and using this version.
 

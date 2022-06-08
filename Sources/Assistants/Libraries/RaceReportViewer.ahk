@@ -18,7 +18,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports = ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Pace"]
+global kRaceReports = ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -124,7 +124,7 @@ class RaceReportViewer extends RaceReportReader {
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 				)
 
 				width := this.ChartViewer.Width
@@ -140,7 +140,12 @@ class RaceReportViewer extends RaceReportReader {
 				</html>
 				)
 
-				this.ChartViewer.Document.write(before . drawChartFunction . after)
+				html := (before . drawChartFunction . after)
+
+				this.ChartViewer.Document.write(html)
+
+				; FileDelete %kTempDirectory%chart.html
+				; FileAppend %html%, %kTempDirectory%chart.html
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
@@ -680,6 +685,133 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editLapTimesReportSettings() {
+		return this.editReportSettings("Laps", "Cars")
+	}
+
+	showConsistencyReport() {
+		report := this.Report
+
+		if report {
+			raceData := true
+			drivers := true
+			positions := false
+			times := true
+
+			this.loadReportData(false, raceData, drivers, positions, times)
+
+			selectedCars := this.getReportDrivers(raceData)
+
+			laps := this.getReportLaps(raceData)
+			driverTimes := {}
+
+			allTimes := []
+
+			for ignore, lap in laps {
+				lapTimes := []
+
+				for ignore, car in selectedCars
+					if times.hasKey(lap) {
+						time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+						time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+
+						if (time > 0) {
+							allTimes.Push(time)
+							lapTimes.Push(time)
+						}
+						else
+							lapTimes.Push(kNull)
+					}
+					else
+						lapTimes.Push(kNull)
+
+				driverTimes[lap] := lapTimes
+			}
+
+			drawChartFunction := "function drawChart() {"
+
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+
+			cars := []
+
+			for ignore, car in selectedCars
+				cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+
+			singleChar := (selectedCars.Length() = 1)
+
+			if singleChar {
+				cars.Push(translate("Max"))
+				cars.Push(translate("Avg"))
+				cars.Push(translate("Min"))
+
+				carTimes := []
+
+				for ignore, lap in laps {
+					time := driverTimes[lap][1]
+
+					if time is number
+						carTimes.Push(time)
+				}
+
+				min := minimum(carTimes)
+				avg := average(carTimes)
+				max := maximum(carTimes)
+
+				for ignore, lap in laps {
+					driverTimes[lap].Push(max)
+					driverTimes[lap].Push(avg)
+					driverTimes[lap].Push(min)
+				}
+			}
+
+			drawChartFunction .= "`n['" . values2String("', '", translate("Lap"), cars*) . "']"
+
+			for ignore, lap in laps
+				drawChartFunction .= ",`n[" . lap . ", " . values2String(", ", driverTimes[lap]*) . "]"
+
+			drawChartFunction .= ("`n]);")
+
+			minValue := Round(Min(allTimes*) / 2)
+
+			series := ""
+			window := ""
+			title := ""
+
+			if singleChar {
+				consistency := 0
+
+				for ignore, time in allTimes
+					consistency += (100 - Abs(avg - time))
+
+				consistency := Round(consistency / allTimes.Length(), 2)
+
+				series := ", series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}"
+
+				delta := (max - min)
+
+				min := Max(avg - (3 * delta), 0)
+				max := Min(avg + (2 * delta), max)
+
+				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
+
+				window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
+			}
+			else
+				window := "baseline: 0, viewWindow: {min: 0}, "
+
+			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#D8D8D8', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
+
+			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+
+	editConsistencyReportSettings() {
 		return this.editReportSettings("Laps", "Cars")
 	}
 

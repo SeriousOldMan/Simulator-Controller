@@ -1029,7 +1029,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 yp+30 w356 0x10
 
-		Gui %window%:Add, ListView, x16 yp+10 w115 h200 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
+		Gui %window%:Add, ListView, x16 yp+10 w115 h210 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
 
 		for ignore, report in kSessionReports
 			if (report = "Drivers")
@@ -1588,7 +1588,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Drivers", "Positions", "Lap Times", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -6142,6 +6142,18 @@ class RaceCenter extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
+	showConsistencyReport() {
+		this.selectReport("Consistency")
+
+		this.ReportViewer.showConsistencyReport()
+
+		this.updateState()
+	}
+
+	editConsistencyReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
+	}
+
 	showPaceReport() {
 		this.selectReport("Pace")
 
@@ -6161,23 +6173,41 @@ class RaceCenter extends ConfigurationItem {
 			case "Car":
 				this.showCarReport()
 			case "Drivers":
-				raceData := true
+				if !this.ReportViewer.Settings.HasKey("Drivers") {
+					raceData := true
 
-				this.ReportViewer.loadReportData(false, raceData, false, false, false)
+					this.ReportViewer.loadReportData(false, raceData, false, false, false)
 
-				drivers := []
+					drivers := []
 
-				Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
-					drivers.Push(A_Index)
+					Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+						drivers.Push(A_Index)
 
-				if !this.ReportViewer.Settings.HasKey("Drivers")
-					this.ReportViewer.Settings["Drivers"] := drivers
+					if !this.ReportViewer.Settings.HasKey("Drivers")
+						this.ReportViewer.Settings["Drivers"] := drivers
+				}
 
 				this.showDriverReport()
 			case "Positions":
 				this.showPositionsReport()
 			case "Lap Times":
 				this.showLapTimesReport()
+			case "Consistency":
+				if !this.ReportViewer.Settings.HasKey("Drivers") {
+					raceData := true
+
+					this.ReportViewer.loadReportData(false, raceData, false, false, false)
+
+					drivers := []
+
+					Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+						drivers.Push(A_Index)
+
+					if !this.ReportViewer.Settings.HasKey("Drivers")
+						this.ReportViewer.Settings["Drivers"] := drivers
+				}
+
+				this.showConsistencyReport()
 			case "Pace":
 				this.showPaceReport()
 		}
@@ -6637,6 +6667,9 @@ class RaceCenter extends ConfigurationItem {
 			case "Lap Times":
 				if this.editLapTimesReportSettings()
 					this.showLapTimesReport()
+			case "Consistency":
+				if this.editConsistencyReportSettings()
+					this.showConsistencyReport()
 			case "Pace":
 				if this.editPaceReportSettings()
 					this.showPaceReport()

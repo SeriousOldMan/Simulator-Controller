@@ -30,7 +30,7 @@ The Spotter will give you critical and in most cases real time information about
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
 
-7. Tactical Advises
+7. Tactical Advices
 
    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
@@ -75,7 +75,7 @@ As you have seen above, Elisa will give you a lot of warnings and announcements 
 
 	[Please] No more *announcement* [please]
 
-As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advises", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to the settings described above), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advices", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to the settings described above), you can reenable it with the following command:
 
 	[Please] Give me *announcement* [please]
 
@@ -96,7 +96,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Tactical Advises          | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Tactical Advices          | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 ##### Notes
 

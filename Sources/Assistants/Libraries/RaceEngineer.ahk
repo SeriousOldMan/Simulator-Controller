@@ -1605,7 +1605,7 @@ class RaceEngineer extends RaceAssistant {
 
 		result := knowledgeBase.produce()
 
-		if (true || this.Debug[kDebugKnowledgeBase])
+		if (this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledge(knowledgeBase)
 
 		if result

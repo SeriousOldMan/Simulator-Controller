@@ -313,7 +313,7 @@ class VoiceManager {
 		continue() {
 			continuation := this.Continuation
 
-			if isInstance(continuation, this.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.VoiceContinuation)
 				continuation.continue()
 			else if continuation
 				%continuation%()

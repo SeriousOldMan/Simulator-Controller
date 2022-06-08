@@ -472,7 +472,7 @@ class RaceSpotter extends RaceAssistant {
 
 	iLastDeltaInformationLap := false
 	iPositionInfos := {}
-	iAdvises := {}
+	iAdvices := {}
 
 	iDriverCar := false
 	iOtherCars := {}
@@ -593,13 +593,13 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	Advises[key := false] {
+	Advices[key := false] {
 		Get {
-			return (key ? this.iAdvises[key] : this.iAdvises)
+			return (key ? this.iAdvices[key] : this.iAdvices)
 		}
 
 		Set {
-			return (key ? (this.iAdvises[key] := value) : (this.iAdvises := value))
+			return (key ? (this.iAdvices[key] := value) : (this.iAdvices := value))
 		}
 	}
 
@@ -628,7 +628,7 @@ class RaceSpotter extends RaceAssistant {
 			this.iDriverCar := false
 			this.OtherCars := {}
 			this.PositionInfos := {}
-			this.Advises := {}
+			this.Advices := {}
 
 			this.iRaceStartSummarized := false
 			this.iFinalLapsAnnounced := false
@@ -1018,7 +1018,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	tacticalAdvise(sector, regular) {
+	tacticalAdvice(sector, regular) {
 		speaker := this.getSpeaker(true)
 
 		standingsFront := false
@@ -1033,8 +1033,8 @@ class RaceSpotter extends RaceAssistant {
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
 			situation := ("ProtectSlower " . trackFront . A_Space . trackBehind)
 
-			if !this.Advises.HasKey(situation) {
-				this.Advises[situation] := true
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
 
 				speaker.speakPhrase("ProtectSlower")
 
@@ -1047,8 +1047,8 @@ class RaceSpotter extends RaceAssistant {
 			  && (trackBehind.OpponentType = "LapDown")) {
 			situation := ("ProtectFaster " . trackBehind . A_Space . opponent)
 
-			if !this.Advises.HasKey(situation) {
-				this.Advises[situation] := true
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
 
 				speaker.speakPhrase("ProtectFaster")
 
@@ -1059,8 +1059,8 @@ class RaceSpotter extends RaceAssistant {
 			  && (trackBehind.OpponentType = "LapDown")) {
 			situation := ("LapDownFaster " . trackBehind)
 
-			if !this.Advises.HasKey(situation) {
-				this.Advises[situation] := true
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
 
 				speaker.startTalk()
 
@@ -1081,8 +1081,8 @@ class RaceSpotter extends RaceAssistant {
 			  && (Abs(trackBehind.LapTimeDifference[true]) < (this.DriverCar.LapTime[true] * 0.005))) {
 			situation := ("LapUpFaster " . trackBehind)
 
-			if !this.Advises.HasKey(situation) {
-				this.Advises[situation] := true
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
 
 				speaker.startTalk()
 
@@ -1328,9 +1328,9 @@ class RaceSpotter extends RaceAssistant {
 					}
 					else if this.hasEnoughData(false) {
 						deltaInformation := this.Announcements["DeltaInformation"]
-						tacticalAdvises := this.Announcements["TacticalAdvises"]
+						tacticalAdvices := this.Announcements["TacticalAdvices"]
 
-						if (tacticalAdvises && this.tacticalAdvise(sector, true))
+						if (tacticalAdvices && this.tacticalAdvice(sector, true))
 							deltaInformation := false
 
 						if deltaInformation {
@@ -1611,7 +1611,7 @@ class RaceSpotter extends RaceAssistant {
 
 			announcements := {}
 
-			for ignore, key in ["TacticalAdvises", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
+			for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "StartSummary", "FinalLaps", "PitWindow"]
 				announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
@@ -1700,7 +1700,7 @@ class RaceSpotter extends RaceAssistant {
 		this.iDriverCar := false
 		this.OtherCars := {}
 		this.PositionInfos := {}
-		this.Advises := {}
+		this.Advices := {}
 		this.iLastDeltaInformationLap := false
 		this.iRaceStartSummarized := false
 
@@ -1807,7 +1807,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2)) {
 			this.PositionInfos := {}
-			this.Advises := {}
+			this.Advices := {}
 			this.iLastDeltaInformationLap := false
 		}
 
@@ -1847,7 +1847,7 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		this.PositionInfos := {}
-		this.Advises := {}
+		this.Advices := {}
 		this.iLastDeltaInformationLap := false
 
 		this.startPitstop(lapNumber)

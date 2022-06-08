@@ -1496,7 +1496,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(new VoiceManager.VoiceContinuation(ObjBindMethod(this, "preparePitstop")))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 			}
 			finally {
@@ -1694,7 +1694,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(new VoiceManager.VoiceContinuation(ObjBindMethod(this, "preparePitstop")))
+						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
 					}
 				}
 			}

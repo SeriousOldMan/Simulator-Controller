@@ -26,7 +26,7 @@ global yellowFlagsDropDown
 global blueFlagsDropDown
 global startSummaryDropDown
 global deltaInformationDropDown
-global tacticalAdvisesDropDown
+global tacticalAdvicesDropDown
 global finalLapsDropDown
 global pitWindowDropDown
 
@@ -139,8 +139,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos all")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdeltaInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Tactical Advises")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vtacticalAdvisesDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
+		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Tactical Advices")
+		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vtacticalAdvicesDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget30 Hidden, % translate("Final Laps")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vfinalLapsDropDown HWNDwidget31 Hidden, % values2String("|", translate("Off"), translate("On"))
@@ -170,7 +170,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulator . ".HistoryLapsDamping", 0.2)
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "TacticalAdvises", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "TacticalAdvices", "FinalLaps", "PitWindow"]
 				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
@@ -192,7 +192,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "DeltaInformation", "TacticalAdvises", "FinalLaps", "PitWindow"]
+							  , "StartSummary", "DeltaInformation", "TacticalAdvices", "FinalLaps", "PitWindow"]
 				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -240,7 +240,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			else
 				GuiControl Choose, deltaInformationDropDown, % (configuration["DeltaInformation"] + 2)
 
-			GuiControl Choose, tacticalAdvisesDropDown, % (configuration["TacticalAdvises"] + 1)
+			GuiControl Choose, tacticalAdvicesDropDown, % (configuration["TacticalAdvices"] + 1)
 			GuiControl Choose, finalLapsDropDown, % (configuration["FinalLaps"] + 1)
 			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
 		}
@@ -262,7 +262,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet startSummaryDropDown
 			GuiControlGet deltaInformationDropDown
-			GuiControlGet tacticalAdvisesDropDown
+			GuiControlGet tacticalAdvicesDropDown
 			GuiControlGet finalLapsDropDown
 			GuiControlGet pitWindowDropDown
 
@@ -285,7 +285,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			else
 				configuration["DeltaInformation"] := (deltaInformationDropDown - 2)
 
-			configuration["TacticalAdvises"] := (tacticalAdvisesDropDown - 1)
+			configuration["TacticalAdvices"] := (tacticalAdvicesDropDown - 1)
 			configuration["FinalLaps"] := (finalLapsDropDown - 1)
 			configuration["PitWindow"] := (pitWindowDropDown - 1)
 		}

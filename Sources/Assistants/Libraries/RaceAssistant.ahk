@@ -534,19 +534,25 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		showMessage("RAA")
-		if this.VoiceManager
-			this.VoiceManager.phraseRecognized("Yes", ["Yes"])
-		else if this.Continuation
-			this.handleVoiceCommand("Yes", ["Yes"])
+		if this.Continuation {
+			if this.VoiceManager
+				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
+			else
+				this.handleVoiceCommand("Yes", ["Yes"])
+		}
+		else if this.VoiceManager
+			this.VoiceManager.recognizeCommand("Yes", ["Yes"])
 	}
 
 	reject() {
-		showMessage("RAR")
-		if this.VoiceManager
-			this.VoiceManager.phraseRecognized("No", ["No"])
-		else if this.Continuation
-			this.handleVoiceCommand("No", ["No"])
+		if this.Continuation {
+			if this.VoiceManager
+				this.VoiceManager.phraseRecognized("No", ["No"])
+			else
+				this.handleVoiceCommand("No", ["No"])
+		}
+		else if this.VoiceManager
+			this.VoiceManager.recognizeCommand("No", ["No"])
 	}
 
 	nameRecognized(words) {
@@ -557,7 +563,7 @@ class RaceAssistant extends ConfigurationItem {
 		if isInstance(continuation, VoiceManager.VoiceContinuation)
 			this.VoiceManager.setContinuation(continuation)
 		else
-			this.VoiceManager.setContinuation(new VoiceManager.VoiceContinuation(this, continuation, "Confirm"))
+			this.VoiceManager.setContinuation(new VoiceManager.ReplyContinuation(this, continuation, "Confirm"))
 	}
 
 	clearContinuation() {

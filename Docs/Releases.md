@@ -9,6 +9,7 @@
   7. More car specific rules in "Setup Advisor" for:
      - Nissan GT-R Nismo GT3 (2018)
      - Audi R8 LMS GT4
+	 - Maserati Granturismo MC GT4
 
 ## 4.1.8.0-release 06/03/22
 

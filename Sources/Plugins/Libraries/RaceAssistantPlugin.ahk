@@ -313,8 +313,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	RaceAssistant[zombie := false] {
 		Get {
-			if (!this.iRaceAssistant && zombie)
+			if (!this.iRaceAssistant && zombie) {
+				if !this.iWaitForShutdown {
+					wasZombie := (this.iRaceAssistantZombie != false)
+
+					this.iRaceAssistantZombie := false
+
+					if wasZombie
+						this.updateActions(kSessionFinished)
+				}
+
 				return this.iRaceAssistantZombie
+			}
 			else
 				return this.iRaceAssistant
 		}
@@ -1094,6 +1104,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	collectSessionData() {
 		if (A_TickCount <= this.iWaitForShutdown)
 			return
+		else {
+			this.iWaitForShutdown := false
+
+			this.RaceAssistant[true]
+		}
 
 		if this.Simulator {
 			code := this.Simulator.Code

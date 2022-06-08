@@ -3,6 +3,10 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. [Comparing and merging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups) setups is now supported in "Setup Advisor".
+  4. The Virtual Race Strategist will give you now a post race summary. It will be very honest, so if you fell attacked, you can disable it in the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist).
+  5. Reversed sign of laptime delta in all apps. Faster cars will have a positive delta, slower cars a negative one.
+  6. The Spotter-AI has been trained to detect several typical race situations and can advise you how to best react there. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  7. More car specific rules in "Setup Advisor" for:
 
 ## 4.1.8.0-release 06/03/22
 

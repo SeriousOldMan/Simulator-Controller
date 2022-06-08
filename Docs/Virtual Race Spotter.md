@@ -32,7 +32,7 @@ The Spotter will give you critical and in most cases real time information about
 
 7. Tactical Advises
 
-   Elisa has quite a good understandig of race tacticts and might give you situation specific hints, how to handle this situations. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#tactical-advises) down below for more detailed information.
+   The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
 8. Last Laps Announcement
 
@@ -52,7 +52,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
   - A special case is a situation where you are in attack position to the car in front of you or when the car behind is in attack range. This information will be issued as soon as possible, as long you are faster than the car in front of you or the car behind is faster than you.
   
-  - Another special case occurs, when you are approaching a car in front of you which is a lap up or a lap down. Elisa will give you the corresponding information annd additional tactical information about these cars.
+  - Another special case occurs, when you are approaching a car in front of you which is a lap up or a lap down. Elisa will give you the corresponding information annd additional tactical information about these cars (see above).
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
@@ -68,10 +68,6 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 | Attack car behind        | 0.8                     |
 | Lost on car behind       | 0.3                     |
 | Gained on car behind     | 1.5                     |
-
-### Tactical Advises
-
-The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
 ### Enabling and disabling specific warnings and announcements
 

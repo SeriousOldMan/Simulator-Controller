@@ -875,7 +875,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Characteristics.Push(characteristic)
 
 							if (!fast && !isDebug())
-								Sleep 50
+								Sleep 25
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -897,7 +897,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Characteristics.Push(characteristic)
 
 						if (!fast && !isDebug())
-							Sleep 50
+							Sleep 25
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -936,7 +936,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Settings.Push(setting)
 
 							if (!fast && !isDebug())
-								Sleep 50
+								Sleep 25
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -958,7 +958,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Settings.Push(setting)
 
 						if (!fast && !isDebug())
-							Sleep 50
+							Sleep 25
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -2772,10 +2772,6 @@ runSetupAdvisor() {
 	}
 
 	current := fixIE()
-
-	simulator := "Assetto Corsa Competizione"
-	car := "honda_nsx_gt3_evo"
-	track := "Hungaroring"
 
 	try {
 		if car

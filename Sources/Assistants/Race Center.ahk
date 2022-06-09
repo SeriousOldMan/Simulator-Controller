@@ -6787,6 +6787,60 @@ class RaceCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
+	createStintConsistencyChart(chartID, width, height, stint, laps, lapTimes) {
+		validLaps := []
+		validTimes := []
+
+		for ignore, lap in laps {
+			if (A_Index > 1) { ; skip out lap
+				time := lapTimes[A_Index]
+
+				if time is number
+				{
+					validLaps.Push(lap)
+					validTimes.Push(time)
+				}
+			}
+		}
+
+		drawChartFunction := "function drawChart" . chartID . "() {"
+
+		drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+
+		drawChartFunction .= "`n['" . values2String("', '", translate("Lap"), translate("Lap Time")
+														  , translate("Max"), translate("Avg"), translate("Min")) . "']"
+
+		min := minimum(validTimes)
+		avg := average(validTimes)
+		max := maximum(validTimes)
+
+		for ignore, lap in validLaps
+			drawChartFunction .= ",`n[" . values2String(", ", lap, validTimes[A_Index], max, avg, min) . "]"
+
+		drawChartFunction .= ("`n]);")
+
+		delta := (max - min)
+
+		min := Max(avg - (3 * delta), 0)
+		max := Min(avg + (2 * delta), max)
+
+		window := window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
+		consistency := 0
+
+		for ignore, time in validTimes
+			consistency += (100 - Abs(avg - time))
+
+		consistency := Round(consistency / validTimes.Length(), 2)
+
+		title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
+
+		drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars', series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}, backgroundColor: '#D8D8D8', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '20%', top: '15%', right: '15%', bottom: '15%' } };")
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
+
+		return drawChartFunction
+	}
+
 	createLapDetails(stint) {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
@@ -6870,13 +6924,19 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=""chart_1" . """ style=""width: " . width . "px; height: 248px""></div>")
 
-		html .= ("<br><br><div id=""header""><i>" . translate("Driver") . "</i></div>")
+		html .= ("<br><br><div id=""header""><i>" . translate("Statistics") . "</i></div>")
 
 		chart2 := this.createStintPerformanceChart(2, width, 248, stint)
 
 		html .= ("<br><div id=""chart_2" . """ style=""width: " . width . "px; height: 248px""></div>")
 
-		this.showDetails("Stint", html, [1, chart1], [2, chart2])
+		html .= ("<br><br><div id=""header""><i>" . translate("Consistency") . "</i></div>")
+
+		chart3 := this.createStintConsistencyChart(3, width, 248, stint, laps, lapTimes)
+
+		html .= ("<br><div id=""chart_3" . """ style=""width: " . width . "px; height: 248px""></div>")
+
+		this.showDetails("Stint", html, [1, chart1], [2, chart2], [3, chart3])
 	}
 
 	createLapOverview(lap) {

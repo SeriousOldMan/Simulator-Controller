@@ -762,6 +762,11 @@ class RaceReportViewer extends RaceReportReader {
 					driverTimes[lap].Push(min)
 				}
 			}
+			else {
+				min := minimum(allTimes)
+				avg := average(allTimes)
+				max := maximum(allTimes)
+			}
 
 			drawChartFunction .= "`n['" . values2String("', '", translate("Lap"), cars*) . "']"
 
@@ -770,10 +775,13 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`n]);")
 
-			minValue := Round(Min(allTimes*) / 2)
+			delta := (max - min)
 
+			min := Max(avg - (3 * delta), 0)
+			max := Min(avg + (2 * delta), max)
+
+			window := window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
 			series := ""
-			window := ""
 			title := ""
 
 			if singleChar {
@@ -786,21 +794,12 @@ class RaceReportViewer extends RaceReportReader {
 
 				series := ", series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}"
 
-				delta := (max - min)
-
-				min := Max(avg - (3 * delta), 0)
-				max := Min(avg + (2 * delta), max)
-
 				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
-
-				window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
 			}
-			else
-				window := "baseline: 0, viewWindow: {min: 0}, "
 
 			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#D8D8D8', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
 
-			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
 			this.showReportChart(drawChartFunction)
 			this.showReportInfo(raceData)

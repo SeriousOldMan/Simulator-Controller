@@ -1705,7 +1705,7 @@ class FloatHandler extends DiscreteValuesHandler {
 
 class ClicksHandler extends IntegerHandler {
 	__New(minValue := 0, maxValue := "__Undefined__") {
-		base.__New(0, 1, minValue, maxValue)
+		base.__New(minValue, 1, minValue, maxValue)
 	}
 }
 
@@ -2745,17 +2745,63 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 
+	simulator := false
+	car := false
+	track := false
+	weather := false
+
+	index := 1
+
+	while (index < A_Args.Length()) {
+		switch A_Args[index] {
+			case "-Simulator":
+				simulator := A_Args[index + 1]
+				index += 2
+			case "-Car":
+				car := A_Args[index + 1]
+				index += 2
+			case "-Track":
+				track := A_Args[index + 1]
+				index += 2
+			case "-Weather":
+				weather := A_Args[index + 1]
+				index += 2
+			default:
+				index += 1
+		}
+	}
+
 	current := fixIE()
 
+	simulator := "Assetto Corsa Competizione"
+	car := "honda_nsx_gt3_evo"
+	track := "Hungaroring"
+
 	try {
-		advisor := new SetupAdvisor()
+		if car
+			car := new SessionDatabase().getCarName(simulator, car)
+
+		advisor := new SetupAdvisor(simulator, car, track, weather)
 
 		advisor.createGui(advisor.Configuration)
 
 		advisor.show()
 
 		if !GetKeyState("Ctrl", "P")
-			advisor.loadSimulator(true, true)
+			if simulator {
+				advisor.loadSimulator(simulator, true)
+
+				if inList(advisor.AvailableCars, car)
+					advisor.loadCar(car)
+
+				if track
+					advisor.loadTrack(track)
+
+				if weather
+					advisor.loadWeather(weather)
+			}
+			else
+				advisor.loadSimulator(true, true)
 		else {
 			callback := ObjBindMethod(advisor, "restoreState")
 

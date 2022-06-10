@@ -556,23 +556,26 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		base.simulatorStartup(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
+				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 
-			if (raceEngineer && raceEngineer.isActive()) {
-				raceEngineer.startSimulation(this)
+				if (raceEngineer && raceEngineer.isActive()) {
+					raceEngineer.startSimulation(this)
 
-				this.iRaceEngineer := raceEngineer
+					this.iRaceEngineer := raceEngineer
+				}
 			}
 
-			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
+			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
+				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
 
-			if (raceStrategist && raceStrategist.isActive()) {
-				raceStrategist.startSimulation(this)
+				if (raceStrategist && raceStrategist.isActive()) {
+					raceStrategist.startSimulation(this)
 
-				this.iRaceStrategist := raceStrategist
-			}
+					this.iRaceStrategist := raceStrategist
+				}
 
-			if this.supportsSpotter() {
+			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
 				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
 
 				if (raceSpotter && raceSpotter.isActive()) {
@@ -588,23 +591,27 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		base.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
+				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
 
-			if (raceEngineer && raceEngineer.isActive()) {
-				raceEngineer.stopSimulation(this)
+				if (raceEngineer && raceEngineer.isActive()) {
+					raceEngineer.stopSimulation(this)
 
-				this.iRaceEngineer := false
+					this.iRaceEngineer := false
+				}
 			}
 
-			raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
+			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
+				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
 
-			if (raceStrategist && raceStrategist.isActive()) {
-				raceStrategist.stopSimulation(this)
+				if (raceStrategist && raceStrategist.isActive()) {
+					raceStrategist.stopSimulation(this)
 
-				this.iRaceStrategist := false
+					this.iRaceStrategist := false
+				}
 			}
 
-			if this.supportsSpotter() {
+			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
 				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
 
 				if (raceSpotter && raceSpotter.isActive()) {
@@ -616,8 +623,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	supportsSpotter() {
-		return FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe")
+	supportsRaceAssistant(assistantPlugin) {
+		hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
+
+		if (assistantPlugin = kRaceSpotterPlugin)
+			return (hasProvider && FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe"))
+		else
+			return hasProvider
 	}
 
 	supportsPitstop() {

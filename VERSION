@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.9.0-release
-Target=4.1.9.0-release
+Version=4.2.0.0-dev
+Target=4.2.0.0-release
 Date=06/10/2022
-Download=https://cntr.click/Y4vBNc5
-Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
+Download=
+Changes=Basic support by the Race Assistents for Assetto Corsa
 [Release]
 Version=4.1.9.0-release
 Date=06/10/2022
 Download=https://cntr.click/Y4vBNc5
 Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.1.9.0-release
-Development=4.1.9.0-release
+Development=4.2.0.0-dev

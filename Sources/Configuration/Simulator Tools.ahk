@@ -498,7 +498,7 @@ checkInstallation() {
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
-			packageLocation := normalizePath(kHomeDirectory)
+			packageLocation := normalizePath(normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\"))) ; normalizePath(kHomeDirectory)
 
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]

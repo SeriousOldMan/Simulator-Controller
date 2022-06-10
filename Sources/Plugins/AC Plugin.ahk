@@ -26,10 +26,8 @@ global kACPlugin = "AC"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACPlugin extends SimulatorPlugin {
-	SessionStates[asText := false] {
-		Get {
-			return [(asText ? "Other" : kSessionOther)]
-		}
+	supportsRaceAssistant(assistantPlugin) {
+		return ((assistantPlugin = kRaceEngineerPlugin) && base.supportsRaceAssistant(assistantPlugin))
 	}
 }
 
@@ -49,7 +47,7 @@ startAC() {
 
 initializeACPlugin() {
 	local controller := SimulatorController.Instance
-	
+
 	new ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
 }
 

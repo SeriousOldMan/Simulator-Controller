@@ -1,16 +1,16 @@
 [Development]
-Version=4.1.9.0-rc1
+Version=4.1.9.0-release
 Target=4.1.9.0-release
-Date=06/09/2022
-Download=https://www.dropbox.com/s/50md5d0xrhmko78/Simulator%20Controller%204.1.9.0-rc1.zip?dl=1
+Date=06/10/2022
+Download=https://cntr.click/Y4vBNc5
 Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
 [Release]
-Version=4.1.8.0-release
-Date=06/05/2022
-Download=https://cntr.click/3TBCtn2
-Changes=Skip outdated Spotter anouncements, Increased precision and added new Spotter advises, Added option that Spotter gives distance information each sector, Added Spotter distance thresholds to "Session Database" settings, Additional car rules for "Setup Advisor"
+Version=4.1.9.0-release
+Date=06/10/2022
+Download=https://cntr.click/Y4vBNc5
+Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.1.8.0-release
-Development=4.1.9.0-rc1
+Release=4.1.9.0-release
+Development=4.1.9.0-release

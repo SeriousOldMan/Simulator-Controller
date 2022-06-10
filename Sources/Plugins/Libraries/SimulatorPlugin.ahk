@@ -574,6 +574,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 					this.iRaceStrategist := raceStrategist
 				}
+			}
 
 			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
 				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)

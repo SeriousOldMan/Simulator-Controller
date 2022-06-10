@@ -1,95 +1,64 @@
 ﻿using ACSHMProvider;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
-using System.Timers;
 
 namespace ACSHMProvider
 {
-    public delegate void PhysicsUpdatedHandler(object sender, PhysicsEventArgs e);
-    public delegate void GraphicsUpdatedHandler(object sender, GraphicsEventArgs e);
-    public delegate void StaticInfoUpdatedHandler(object sender, StaticInfoEventArgs e);
-    public delegate void GameStatusChangedHandler(object sender, GameStatusEventArgs e);
-
-    public class AssettoCorsaNotStartedException : Exception
-    {
-        public AssettoCorsaNotStartedException()
-            : base("Shared Memory not connected, is Assetto Corsa running and have you run assettoCorsa.Start()?")
-        {
-        }
-    }
-
     enum AC_MEMORY_STATUS { DISCONNECTED, CONNECTING, CONNECTED }
 
     public class SHMProvider
     {
-        public void ReadSetup() { }
-        public void ReadStandings() { }
-        public void ReadData() { }
-    }
-	
-    public class AssettoCorsa
-    {
-        private Timer sharedMemoryRetryTimer;
+        bool connected = false;
+
         private AC_MEMORY_STATUS memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
         public bool IsRunning { get { return (memoryStatus == AC_MEMORY_STATUS.CONNECTED); } }
 
-        private AC_STATUS gameStatus = AC_STATUS.AC_OFF;
+        Physics physics;
+        Graphics graphics;
+        StaticInfo staticInfo;
 
-        public event GameStatusChangedHandler GameStatusChanged;
-        public virtual void OnGameStatusChanged(GameStatusEventArgs e)
+        public SHMProvider()
         {
-            if (GameStatusChanged != null)
-            {
-                GameStatusChanged(this, e);
+            connected = ConnectToSharedMemory();
+        }
+
+        string GetSession(AC_SESSION_TYPE session) {
+            switch (session) {
+                case AC_SESSION_TYPE.AC_PRACTICE:
+                    return "Practice";
+                case AC_SESSION_TYPE.AC_QUALIFY:
+                    return "Qualification";
+                case AC_SESSION_TYPE.AC_RACE:
+                    return "Race";
+                default:
+                    return "Other";
             }
         }
 
-        public static readonly Dictionary<AC_STATUS, string> StatusNameLookup = new Dictionary<AC_STATUS, string>
-        {
-            { AC_STATUS.AC_OFF, "Off" },
-            { AC_STATUS.AC_LIVE, "Live" },
-            { AC_STATUS.AC_PAUSE, "Pause" },
-            { AC_STATUS.AC_REPLAY, "Replay" },
-        };
-
-        public AssettoCorsa()
-        {
-            sharedMemoryRetryTimer = new Timer(2000);
-            sharedMemoryRetryTimer.AutoReset = true;
-            sharedMemoryRetryTimer.Elapsed += sharedMemoryRetryTimer_Elapsed;
-
-            physicsTimer = new Timer();
-            physicsTimer.AutoReset = true;
-            physicsTimer.Elapsed += physicsTimer_Elapsed;
-            PhysicsInterval = 10;
-
-            graphicsTimer = new Timer();
-            graphicsTimer.AutoReset = true;
-            graphicsTimer.Elapsed += graphicsTimer_Elapsed;
-            GraphicsInterval = 1000;
-
-            staticInfoTimer = new Timer();
-            staticInfoTimer.AutoReset = true;
-            staticInfoTimer.Elapsed += staticInfoTimer_Elapsed;
-            StaticInfoInterval = 1000;
-
-            Stop();
+        string GetGrip(float surfaceGrip) {
+            return "Optimum";
         }
 
-        /// <summary>
-        /// Connect to the shared memory and start the update timers
-        /// </summary>
-        public void Start()
+        private long GetRemainingLaps(long timeLeft)
         {
-            sharedMemoryRetryTimer.Start();
+            if (staticInfo.IsTimedRace == 0)
+                return (graphics.NumberOfLaps - graphics.CompletedLaps);
+            else {
+                if (graphics.iLastTime > 0)
+                    return ((GetRemainingTime(timeLeft) / graphics.iLastTime) + 1);
+                else
+                    return 0;
+            }
         }
 
-        void sharedMemoryRetryTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private long GetRemainingTime(long timeLeft)
         {
-            ConnectToSharedMemory();
+            if (staticInfo.IsTimedRace != 0)
+                return (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
+            else
+                return (GetRemainingLaps(timeLeft) * graphics.iLastTime);
         }
 
         private bool ConnectToSharedMemory()
@@ -97,31 +66,22 @@ namespace ACSHMProvider
             try
             {
                 memoryStatus = AC_MEMORY_STATUS.CONNECTING;
+
                 // Connect to shared memory
                 physicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_physics");
                 graphicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_graphics");
                 staticInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_static");
 
-                // Start the timers
-                staticInfoTimer.Start();
-                ProcessStaticInfo();
+                physics = ReadPhysics();
+                graphics = ReadGraphics();
+                staticInfo = ReadStaticInfo();
 
-                graphicsTimer.Start();
-                ProcessGraphics();
-
-                physicsTimer.Start();
-                ProcessPhysics();
-
-                // Stop retry timer
-                sharedMemoryRetryTimer.Stop();
                 memoryStatus = AC_MEMORY_STATUS.CONNECTED;
+
                 return true;
             }
             catch (FileNotFoundException)
             {
-                staticInfoTimer.Stop();
-                graphicsTimer.Stop();
-                physicsTimer.Stop();
                 return false;
             }
         }
@@ -132,167 +92,11 @@ namespace ACSHMProvider
         public void Stop()
         {
             memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
-            sharedMemoryRetryTimer.Stop();
-
-            // Stop the timers
-            physicsTimer.Stop();
-            graphicsTimer.Stop();
-            staticInfoTimer.Stop();
-        }
-
-        /// <summary>
-        /// Interval for physics updates in milliseconds
-        /// </summary>
-        public double PhysicsInterval
-        {
-            get
-            {
-                return physicsTimer.Interval;
-            }
-            set
-            {
-                physicsTimer.Interval = value;
-            }
-        }
-
-        /// <summary>
-        /// Interval for graphics updates in milliseconds
-        /// </summary>
-        public double GraphicsInterval
-        {
-            get
-            {
-                return graphicsTimer.Interval;
-            }
-            set
-            {
-                graphicsTimer.Interval = value;
-            }
-        }
-
-        /// <summary>
-        /// Interval for static info updates in milliseconds
-        /// </summary>
-        public double StaticInfoInterval
-        {
-            get
-            {
-                return staticInfoTimer.Interval;
-            }
-            set
-            {
-                staticInfoTimer.Interval = value;
-            }
         }
 
         MemoryMappedFile physicsMMF;
         MemoryMappedFile graphicsMMF;
         MemoryMappedFile staticInfoMMF;
-
-        Timer physicsTimer;
-        Timer graphicsTimer;
-        Timer staticInfoTimer;
-
-        /// <summary>
-        /// Represents the method that will handle the physics update events
-        /// </summary>
-        public event PhysicsUpdatedHandler PhysicsUpdated;
-
-        /// <summary>
-        /// Represents the method that will handle the graphics update events
-        /// </summary>
-        public event GraphicsUpdatedHandler GraphicsUpdated;
-
-        /// <summary>
-        /// Represents the method that will handle the static info update events
-        /// </summary>
-        public event StaticInfoUpdatedHandler StaticInfoUpdated;
-
-        public virtual void OnPhysicsUpdated(PhysicsEventArgs e)
-        {
-            if (PhysicsUpdated != null)
-            {
-                PhysicsUpdated(this, e);
-            }
-        }
-
-        public virtual void OnGraphicsUpdated(GraphicsEventArgs e)
-        {
-            if (GraphicsUpdated != null)
-            {
-                GraphicsUpdated(this, e);
-                if (gameStatus != e.Graphics.Status)
-                {
-                    gameStatus = e.Graphics.Status;
-                    GameStatusChanged(this, new GameStatusEventArgs(gameStatus));
-                }
-            }
-        }
-
-        public virtual void OnStaticInfoUpdated(StaticInfoEventArgs e)
-        {
-            if (StaticInfoUpdated != null)
-            {
-                StaticInfoUpdated(this, e);
-            }
-        }
-
-        private void physicsTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            ProcessPhysics();
-        }
-
-        private void graphicsTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            ProcessGraphics();
-        }
-
-        private void staticInfoTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            ProcessStaticInfo();
-        }
-
-        private void ProcessPhysics()
-        {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED)
-                return;
-
-            try
-            {
-                Physics physics = ReadPhysics();
-                OnPhysicsUpdated(new PhysicsEventArgs(physics));
-            }
-            catch (AssettoCorsaNotStartedException)
-            { }
-        }
-
-        private void ProcessGraphics()
-        {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED)
-                return;
-
-            try
-            {
-                Graphics graphics = ReadGraphics();
-                OnGraphicsUpdated(new GraphicsEventArgs(graphics));
-            }
-            catch (AssettoCorsaNotStartedException)
-            { }
-        }
-
-        private void ProcessStaticInfo()
-        {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED)
-                return;
-
-            try
-            {
-                StaticInfo staticInfo = ReadStaticInfo();
-                OnStaticInfoUpdated(new StaticInfoEventArgs(staticInfo));
-            }
-            catch (AssettoCorsaNotStartedException)
-            { }
-        }
 
         /// <summary>
         /// Read the current physics data from shared memory
@@ -300,9 +104,6 @@ namespace ACSHMProvider
         /// <returns>A Physics object representing the current status, or null if not available</returns>
         public Physics ReadPhysics()
         {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED || physicsMMF == null)
-                throw new AssettoCorsaNotStartedException();
-
             using (var stream = physicsMMF.CreateViewStream())
             {
                 using (var reader = new BinaryReader(stream))
@@ -319,9 +120,6 @@ namespace ACSHMProvider
 
         public Graphics ReadGraphics()
         {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED || graphicsMMF == null)
-                throw new AssettoCorsaNotStartedException();
-
             using (var stream = graphicsMMF.CreateViewStream())
             {
                 using (var reader = new BinaryReader(stream))
@@ -338,9 +136,6 @@ namespace ACSHMProvider
 
         public StaticInfo ReadStaticInfo()
         {
-            if (memoryStatus == AC_MEMORY_STATUS.DISCONNECTED || staticInfoMMF == null)
-                throw new AssettoCorsaNotStartedException();
-
             using (var stream = staticInfoMMF.CreateViewStream())
             {
                 using (var reader = new BinaryReader(stream))
@@ -353,6 +148,108 @@ namespace ACSHMProvider
                     return data;
                 }
             }
+        }
+
+        public void ReadSetup()
+        {
+            Console.WriteLine("[Setup Data]");
+            if (connected)
+            {
+            }
+        }
+        public void ReadStandings()
+        {
+            Console.WriteLine("[Position Data]");
+
+            Console.WriteLine("Car.Count=0");
+            Console.WriteLine("Driver.Car=0");
+
+        }
+        public void ReadData() {
+            Console.WriteLine("[Session Data]");
+
+            Console.Write("Active="); Console.WriteLine((connected && graphics.Status != AC_STATUS.AC_OFF) ? "true" : "false");
+
+            long timeLeft = 0;
+
+            if (connected)
+            {
+                Console.Write("Paused="); Console.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
+
+                Console.Write("Session="); Console.WriteLine(GetSession(graphics.Session));
+
+                Console.Write("Car="); Console.WriteLine(staticInfo.CarModel);
+                Console.Write("Track="); Console.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
+                Console.Write("SessionFormat="); Console.WriteLine(staticInfo.IsTimedRace != 0 ? "Time" : "Lap");
+                Console.Write("FuelAmount"); Console.WriteLine(staticInfo.MaxFuel);
+
+                timeLeft = (long)graphics.SessionTimeLeft;
+
+                if (timeLeft < 0)
+                {
+                    timeLeft = 3600 * 1000;
+                }
+
+                Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
+                Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
+            }
+            else
+                return;
+
+            Console.WriteLine("[Stint Data]");
+
+            Console.WriteLine("DriverForname=" + staticInfo.PlayerName);
+            Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
+            Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
+            
+            Console.WriteLine("Sector=", graphics.CurrentSectorIndex + 1);
+            Console.WriteLine("Laps=" + graphics.CompletedLaps);
+
+            Console.WriteLine("LapValid=true");
+            Console.WriteLine("LapLastTime=" + graphics.iLastTime);
+            Console.WriteLine("LapBestTime", graphics.iBestTime);
+
+            long time = GetRemainingTime(timeLeft);
+
+            Console.WriteLine("StintTimeRemaining=" + time);
+            Console.WriteLine("DriverTimeRemaining=" + time);
+            Console.WriteLine("InPit=", graphics.IsInPit != 0 ? "true" : "false");
+
+            Console.WriteLine("[Track Data]");
+
+            Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
+            Console.Write("Grip="); Console.WriteLine(GetGrip(graphics.SurfaceGrip));
+
+            Console.WriteLine("[Weather Data]");
+
+            Console.WriteLine("Temperature=", physics.AirTemp);
+            Console.WriteLine("Weather=Dry");
+            Console.WriteLine("Weather10min=Dry");
+            Console.WriteLine("Weather30min=Dry");
+
+            Console.WriteLine("[Car Data]");
+
+            Console.WriteLine("MAP=n/a");
+            Console.WriteLine("TC=", physics.TC);
+            Console.WriteLine("ABS=", physics.Abs);
+            
+            Console.Write("FuelRemaining"); Console.WriteLine(physics.Fuel);
+
+            Console.WriteLine("TyreCompound=" + graphics.TyreCompound);
+            Console.WriteLine("TyreCompoundColor=Unknown");
+            Console.WriteLine("TyreTemperature=" + physics.TyreCoreTemperature[0] + "," + physics.TyreCoreTemperature[1] + ","
+                                                 + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
+            Console.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
+                                              + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
+
+            float damageFront = physics.CarDamage[0];
+            float damageRear = physics.CarDamage[1];
+            float damageLeft = physics.CarDamage[2];
+            float damageRight = physics.CarDamage[3];
+
+            Console.WriteLine("BodyworkDamage=" + damageFront + "," + damageRear + "," + damageLeft + "," + damageRight + ","
+                                                + (damageFront + damageRear + damageLeft + damageRight));
+            Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
         }
     }
 }

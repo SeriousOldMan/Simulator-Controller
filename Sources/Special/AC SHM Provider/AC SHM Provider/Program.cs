@@ -27,6 +27,8 @@ namespace ACSHMProvider {
                 provider.ReadStandings();
             else
                 provider.ReadData();
+
+            provider.Stop();
         }
     }
 }

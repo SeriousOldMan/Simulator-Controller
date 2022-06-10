@@ -285,10 +285,7 @@ namespace RF2SHMProvider {
 			}
 			else {
 				if (playerScoring.mLastLapTime > 0)
-					if (Normalize(playerScoring.mLastLapTime) == 0)
-						return GetRemainingTime(ref playerScoring) + 1;
-					else
-						return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
+					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
 				else
 					return 0;
 			}

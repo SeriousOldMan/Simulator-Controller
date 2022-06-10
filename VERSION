@@ -2,12 +2,12 @@
 Version=4.1.9.0-release
 Target=4.1.9.0-release
 Date=06/10/2022
-Download=https://cntr.click/Y4vBNc5
+Download=https://www.dropbox.com/s/k5h0pq692zbps89/Simulator%20Controller%204.1.9.0-release.zip?dl=1
 Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
 [Release]
 Version=4.1.9.0-release
 Date=06/10/2022
-Download=https://cntr.click/Y4vBNc5
+Download=https://www.dropbox.com/s/k5h0pq692zbps89/Simulator%20Controller%204.1.9.0-release.zip?dl=1
 Changes=Support in "Setup Advisor" for comparing and merging of ACC Setups, Post race critics by the Race Strategist, Reversed sign of laptime delta in all apps, A couple of situation specific tactical advises by the Spotter, More car specific rules for "Setup Advisor", New Consistency report in "Race Reports" and "Race Center", Reduced volume of radio click noise
 [Current]
 Type=Release

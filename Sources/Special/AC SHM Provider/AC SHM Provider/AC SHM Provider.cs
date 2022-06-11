@@ -86,10 +86,7 @@ namespace ACSHMProvider
             }
         }
 
-        /// <summary>
-        /// Stop the timers and dispose of the shared memory handles
-        /// </summary>
-        public void Stop()
+        public void Close()
         {
             memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
         }
@@ -98,10 +95,6 @@ namespace ACSHMProvider
         MemoryMappedFile graphicsMMF;
         MemoryMappedFile staticInfoMMF;
 
-        /// <summary>
-        /// Read the current physics data from shared memory
-        /// </summary>
-        /// <returns>A Physics object representing the current status, or null if not available</returns>
         public Physics ReadPhysics()
         {
             using (var stream = physicsMMF.CreateViewStream())
@@ -235,8 +228,7 @@ namespace ACSHMProvider
             
             Console.Write("FuelRemaining"); Console.WriteLine(physics.Fuel);
 
-            Console.WriteLine("TyreCompound=" + graphics.TyreCompound);
-            Console.WriteLine("TyreCompoundColor=Unknown");
+            Console.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);
             Console.WriteLine("TyreTemperature=" + physics.TyreCoreTemperature[0] + "," + physics.TyreCoreTemperature[1] + ","
                                                  + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
             Console.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","

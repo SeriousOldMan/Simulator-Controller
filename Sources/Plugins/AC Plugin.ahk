@@ -31,11 +31,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSessionData(data) {
-		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 2) * 10))
-		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 2) * 10))
+		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
+		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 
 		grip := getConfigurationValue(data, "Track Data", "GripRaw", 1)
-		grip := ["Dusty", "Old", "Slow", "Green", "Fast", "Optimum"][Min(6, Max(1, 6 - (((1 - grip) / 0.15) * 6)))]
+		grip := Round(6 - (((1 - grip) / 0.15) * 6))
+		grip := ["Dusty", "Old", "Slow", "Green", "Fast", "Optimum"][Max(1, grip)]
 
 		setConfigurationValue(data, "Track Data", "Grip", grip)
 
@@ -54,7 +55,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", "Dry")
 
 		if (InStr(compound, "Slick") = 1) {
-			compoundColor := string2Values(A_Space, compound, 2)
+			compoundColor := string2Values(A_Space, compound)
 
 			if (compoundColor.Length() > 1) {
 				compoundColor := compoundColor[2]
@@ -71,10 +72,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		setConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
 		setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
 
-		removeConfigurationValue(data, "Car Data", "TCRaw")
-		removeConfigurationValue(data, "Car Data", "ABSRaw")
-		removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
-		removeConfigurationValue(data, "Track Data", "GripRaw")
+		if !isDebug() {
+			removeConfigurationValue(data, "Car Data", "TCRaw")
+			removeConfigurationValue(data, "Car Data", "ABSRaw")
+			removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
+			removeConfigurationValue(data, "Track Data", "GripRaw")
+		}
 	}
 }
 

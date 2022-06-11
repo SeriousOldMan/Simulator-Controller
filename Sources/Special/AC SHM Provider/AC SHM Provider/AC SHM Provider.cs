@@ -174,7 +174,7 @@ namespace ACSHMProvider
                 Console.Write("Car="); Console.WriteLine(staticInfo.CarModel);
                 Console.Write("Track="); Console.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
                 Console.Write("SessionFormat="); Console.WriteLine(staticInfo.IsTimedRace != 0 ? "Time" : "Lap");
-                Console.Write("FuelAmount"); Console.WriteLine(staticInfo.MaxFuel);
+                Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 
                 timeLeft = (long)graphics.SessionTimeLeft;
 
@@ -195,27 +195,27 @@ namespace ACSHMProvider
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
-            Console.WriteLine("Sector=", graphics.CurrentSectorIndex + 1);
+            Console.WriteLine("Sector=" + graphics.CurrentSectorIndex + 1);
             Console.WriteLine("Laps=" + graphics.CompletedLaps);
 
             Console.WriteLine("LapValid=true");
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);
-            Console.WriteLine("LapBestTime", graphics.iBestTime);
+            Console.WriteLine("LapBestTime=" + graphics.iBestTime);
 
             long time = GetRemainingTime(timeLeft);
 
             Console.WriteLine("StintTimeRemaining=" + time);
             Console.WriteLine("DriverTimeRemaining=" + time);
-            Console.WriteLine("InPit=", graphics.IsInPit != 0 ? "true" : "false");
+            Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
 
             Console.WriteLine("[Track Data]");
 
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
-            Console.Write("Grip="); Console.WriteLine(GetGrip(graphics.SurfaceGrip));
-
+            Console.Write("GripRaw=" + graphics.SurfaceGrip);
+            
             Console.WriteLine("[Weather Data]");
 
-            Console.WriteLine("Temperature=", physics.AirTemp);
+            Console.WriteLine("Temperature=" + physics.AirTemp);
             Console.WriteLine("Weather=Dry");
             Console.WriteLine("Weather10min=Dry");
             Console.WriteLine("Weather30min=Dry");
@@ -223,10 +223,10 @@ namespace ACSHMProvider
             Console.WriteLine("[Car Data]");
 
             Console.WriteLine("MAP=n/a");
-            Console.WriteLine("TC=", physics.TC);
-            Console.WriteLine("ABS=", physics.Abs);
+            Console.WriteLine("TCRaw=" + physics.TC);
+            Console.WriteLine("ABSRaw=" + physics.Abs);
             
-            Console.Write("FuelRemaining"); Console.WriteLine(physics.Fuel);
+            Console.Write("FuelRemaining="); Console.WriteLine(physics.Fuel);
 
             Console.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);
             Console.WriteLine("TyreTemperature=" + physics.TyreCoreTemperature[0] + "," + physics.TyreCoreTemperature[1] + ","

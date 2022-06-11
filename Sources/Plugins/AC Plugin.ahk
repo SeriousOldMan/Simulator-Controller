@@ -25,7 +25,7 @@ global kACPlugin = "AC"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACPlugin extends SimulatorPlugin {
+class ACPlugin extends RaceAssistantSimulatorPlugin {
 	supportsRaceAssistant(assistantPlugin) {
 		return ((assistantPlugin = kRaceEngineerPlugin) && base.supportsRaceAssistant(assistantPlugin))
 	}

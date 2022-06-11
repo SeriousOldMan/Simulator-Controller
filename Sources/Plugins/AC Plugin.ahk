@@ -78,6 +78,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
 			removeConfigurationValue(data, "Track Data", "GripRaw")
 		}
+
+		if !getConfigurationValue(data, "Stint Data", "InPit", false)
+			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 }
 

@@ -612,6 +612,9 @@ class RaceSpotter extends RaceAssistant {
 			this.setDebug(kDebugPositions, true)
 		}
 
+		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true, SideProximity: true, RearProximity: true
+													  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
+
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
 

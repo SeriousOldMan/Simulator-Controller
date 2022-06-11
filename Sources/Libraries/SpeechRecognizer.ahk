@@ -1167,6 +1167,37 @@ class GrammarLiteral {
 	}
 }
 
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+matchWords(string1, string2) {
+	static recognizer := false
+
+	if !recognizer {
+		dllName := "Speech.Recognizer.dll"
+		dllFile := kBinariesDirectory . dllName
+
+		try {
+			if (!FileExist(dllFile)) {
+				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
+
+				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+			}
+
+			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
+
+			if !silent
+				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+
+	return (recognizer ? recognizer.Compare(string1, string2) : false)
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;

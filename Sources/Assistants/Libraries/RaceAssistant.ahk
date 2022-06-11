@@ -504,16 +504,19 @@ class RaceAssistant extends ConfigurationItem {
 			announcements.Push(key)
 
 		announcement := false
+		score := 0
 
 		for ignore, fragment in announcements
-			if fragments.HasKey(fragment)
-				if matchFragment(words, fragments[fragment]) {
+			if fragments.HasKey(fragment) {
+				fragmentScore := matchFragment(words, fragments[fragment])
+
+				if (fragmentScore > score) {
 					announcement := fragment
-
-					break
+					score := fragmentScore
 				}
+			}
 
-		if announcement {
+		if (score > 0.5) {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
 			this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
@@ -1102,19 +1105,18 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 ;;;-------------------------------------------------------------------------;;;
 
 matchFragment(words, fragment) {
-	for ignore, word in string2Values(A_Space, fragment) {
-		found := false
+	score := 0
+
+	fragmentWords := string2Values(A_Space, fragment)
+
+	for ignore, word in fragmentWords {
+		wordScore := 0
 
 		for ignore, candidate in words
-			if ((InStr(candidate, word) == 1) || (InStr(word, candidate) == 1)) {
-				found := true
+			wordScore := Max(matchWords(candidate, word), wordScore)
 
-				break
-			}
-
-		if !found
-			return false
+		score += wordScore
 	}
 
-	return true
+	return (score / fragmentWords.Length())
 }

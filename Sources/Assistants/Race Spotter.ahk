@@ -104,13 +104,13 @@ startRaceSpotter() {
 	remotePID := 0
 	spotterName := "Elisa"
 	spotterLogo := false
-	spotterLanguage := "EN"
+	spotterLanguage := false
 	spotterSynthesizer := true
-	spotterSpeaker := true
+	spotterSpeaker := false
 	spotterSpeakerVocalics := false
 	spotterRecognizer := true
-	spotterListener := true
-	debug := true
+	spotterListener := false
+	debug := false
 
 	Process Exist, Voice Server.exe
 

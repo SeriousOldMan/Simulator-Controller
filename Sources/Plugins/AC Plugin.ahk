@@ -35,6 +35,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
+	iRepairSuspensionChosen := false
+	iRepairBodyworkChosen := false
+
+	iPitstopAutoClose := false
+
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -79,7 +84,9 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres"
+					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
+					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
 
@@ -133,131 +140,87 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 	}
 
-	closePitstopMFD(option := false) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Change Tyres")
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-			}
-			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
-					this.sendPitstopCommand(this.PreviousOptionHotkey)
-			}
-
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-		}
+	closePitstopMFD() {
 	}
 
 	requirePitstopMFD() {
-		return this.openPitstopMFD()
+		if (A_Now < this.iPitstopAutoClose) {
+			this.iPitstopAutoClose := (A_Now + 4000)
+
+			return true
+		}
+		else {
+			Sleep 1200
+
+			this.iPitstopAutoClose := (A_Now + 4000)
+
+			return this.openPitstopMFD()
+		}
 	}
 
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
+			Loop 10
+				this.sendPitstopCommand(this.PreviousOptionHotkey)
 
-			if (option = "Change Tyres") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
-
+			if (option = "Strategy")
 				return true
-			}
 			else if (option = "Refuel") {
 				this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
+			else if (option = "Change Tyres") {
+				this.sendPitstopCommand(this.NextOptionHotkey)
 				this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
-			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
+			else if (option = "Front Left") {
 				Loop 3
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
+			else if (option = "Front Right") {
+				Loop 4
+					this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
+			else if (option = "Rear Left") {
+				Loop 5
+					this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
+			else if (option = "Rear Right") {
+				Loop 6
+					this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
+			else if (option = "Repair Bodywork") {
+				Loop 7
+					this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
+			else if (option = "Repair Suspension") {
+				Loop 8
+					this.sendPitstopCommand(this.NextOptionHotkey)
+
+				return true
+			}
 			else {
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
+				Loop 10
+					this.sendPitstopCommand(this.PreviousOptionHotkey)
 
 				return false
 			}
 		}
 		else
 			return false
-	}
-
-	changePitstopOption(option, action := "Increase", steps := 1) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Refuel") {
-				this.dialPitstopOption("Refuel", action, steps)
-
-				Sleep 2000
-
-				this.closePitstopMFD("Refuel")
-			}
-			else if (option = "Change Tyres") {
-				this.iChangeTyresChosen += 1
-
-				if (this.iChangeTyresChosen > 2)
-					this.iChangeTyresChosen := 0
-
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
-
-				if this.iChangeTyresChosen
-					this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
-
-				Sleep 2000
-
-				this.closePitstopMFD("Change Tyres")
-			}
-			else if (option = "Repair Bodywork") {
-				this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
-
-				this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-
-				if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-					this.dialPitstopOption("Repair All", "Increase", 3)
-				else if this.iRepairBodyworkChosen
-					this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-				else if this.iRepairSuspensionChosen
-					this.dialPitstopOption("Repair Suspension", "Increase", 2)
-
-				Sleep 2000
-
-				this.closePitstopMFD("Repair Bodywork")
-			}
-			else if (option = "Repair Suspension") {
-				this.dialPitstopOption("Repair Suspension", "Decrease", 4)
-
-				this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-
-				if (this.iRepairBodyworkChosen && this.iRepairSuspensionChosen)
-					this.dialPitstopOption("Repair All", "Increase", 3)
-				else if this.iRepairBodyworkChosen
-					this.dialPitstopOption("Repair Bodywork", "Increase", 1)
-				else if this.iRepairSuspensionChosen
-					this.dialPitstopOption("Repair Suspension", "Increase", 2)
-
-				Sleep 2000
-
-				this.closePitstopMFD("Repair Suspension")
-			}
-			else
-				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
-		}
 	}
 
 	dialPitstopOption(option, action, steps := 1) {
@@ -270,44 +233,96 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 					Loop %steps%
 						this.sendPitstopCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
 			}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.requirePitstopMFD()
+	changePitstopOption(option, action := "Increase", steps := 1) {
+		if (this.OpenPitstopMFDHotkey != "Off")
+			if inList(["Strategy", "Refuel", "Change Tyres", "Front Left", "Front Right", "Rear Left", "Rear Right"], option)
+				this.dialPitstopOption(option, action, steps)
+			else if (option = "Repair Bodywork") {
+				this.dialPitstopOption("Repair Bodywork", action, steps)
 
+				Loop %steps%
+					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+			}
+			else if (option = "Repair Suspension") {
+				this.dialPitstopOption("Repair Suspension", action, steps)
+
+				Loop %steps%
+					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+			}
+			else
+				Throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
+	}
+
+	setPitstopRefuelAmount(pitstopNumber, litres) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.requirePitstopMFD()
+
 			if this.selectPitstopOption("Refuel") {
 				this.dialPitstopOption("Refuel", "Decrease", 200)
 				this.dialPitstopOption("Refuel", "Increase", Round(litres))
+			}
+		}
+	}
 
-				Sleep 2000
+	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		basePressure := 15
 
-				this.closePitstopMFD("Refuel")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.requirePitstopMFD()
+
+			if this.selectPitstopOption("Front Left") {
+				this.dialPitstopOption("Front Left", "Decrease", 25)
+
+				Loop % Round(pressureFL - basePressure)
+					this.dialPitstopOption("Front Left", "Increase")
+			}
+
+			if this.selectPitstopOption("Front Right") {
+				this.dialPitstopOption("Front Right", "Decrease", 25)
+
+				Loop % Round(pressureFL - basePressure)
+					this.dialPitstopOption("Front Right", "Increase")
+			}
+
+			if this.selectPitstopOption("Rear Left") {
+				this.dialPitstopOption("Rear Left", "Decrease", 25)
+
+				Loop % Round(pressureFL - basePressure)
+					this.dialPitstopOption("Rear Left", "Increase")
+			}
+
+			if this.selectPitstopOption("Rear Right") {
+				this.dialPitstopOption("Rear Right", "Decrease", 25)
+
+				Loop % Round(pressureFL - basePressure)
+					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		this.requirePitstopMFD()
-
 		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.requirePitstopMFD()
+
 			if this.selectPitstopOption("Change Tyres") {
 				this.dialPitstopOption("Change Tyres", "Decrease", 10)
 
-				if (compound = "Dry")
-					this.iChangeTyresChosen := 1
-				else if (compound = "Wet")
-					this.iChangeTyresChosen := 2
-				else
-					this.iChangeTyresChosen := 0
+				if (compound = "Dry") {
+					if (compoundColor = "Soft")
+						steps := 1
+					else if (compoundColor = "Medium")
+						steps := 2
+					else if (compoundColor = "Hard")
+						steps := 3
+					else
+						steps := 2
 
-				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
-
-				Sleep 2000
-
-				this.closePitstopMFD("Change Tyres")
+					this.dialPitstopOption("Change Tyres", "Increase", steps)
+				}
 			}
 		}
 	}
@@ -327,6 +342,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				if this.selectPitstopOption("Repair Bodywork")
 					this.changePitstopOption("Repair Bodywork")
 			}
+		}
+	}
+
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+
+		if (sessionState == kSessionFinished) {
+			this.iRepairSuspensionChosen := true
+			this.iRepairBodyworkChosen := true
 		}
 	}
 

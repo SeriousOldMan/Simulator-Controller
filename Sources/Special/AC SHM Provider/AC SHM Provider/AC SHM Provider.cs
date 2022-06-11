@@ -211,7 +211,7 @@ namespace ACSHMProvider
             Console.WriteLine("[Track Data]");
 
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
-            Console.Write("GripRaw=" + graphics.SurfaceGrip);
+            Console.WriteLine("GripRaw=" + graphics.SurfaceGrip);
             
             Console.WriteLine("[Weather Data]");
 

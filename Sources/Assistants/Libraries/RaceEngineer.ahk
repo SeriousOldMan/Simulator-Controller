@@ -1626,7 +1626,7 @@ class RaceEngineer extends RaceAssistant {
 
 		if !this.supportsPitstop()
 			this.getSpeaker().speakPhrase("NoPitstop")
-		else if this.hasPlannedPitstop() {
+		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
 			this.getSpeaker().speakPhrase("ConfirmRePlan")
 
 			this.setContinuation(ObjBindMethod(this, "invokePlanPitstop", false, lap, arguments*))

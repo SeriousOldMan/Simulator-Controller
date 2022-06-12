@@ -265,21 +265,25 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
-					if ((runningLap > 2) && telemetryData[10])
+					pitstop := telemetryData[10]
+
+					if ((runningLap > 2) && pitstop)
 						runningLap := 0
 
 					runningLap += 1
 
-					pressures := string2Values(",", telemetryData[16])
-					temperatures := string2Values(",", telemetryData[17])
+					if !pitstop {
+						pressures := string2Values(",", telemetryData[16])
+						temperatures := string2Values(",", telemetryData[17])
 
-					telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-												 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
 
-					telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-										   , pressures[1], pressures[2], pressures[4], pressures[4]
-										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-										   , telemetryData[7], telemetryData[8], telemetryData[9])
+						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+											   , pressures[1], pressures[2], pressures[4], pressures[4]
+											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+											   , telemetryData[7], telemetryData[8], telemetryData[9])
+					}
 				}
 				catch exception {
 					break

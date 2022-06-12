@@ -1014,12 +1014,12 @@ class RaceStrategist extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (this.hasEnoughData(false) && this.collectTelemetry() && (this.SaveTelemetry != kNever)) {
-			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+		pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-			if pitstop
-				pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
+		if pitstop
+			pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
 
+		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetry()) {
 			prefix := "Lap." . lapNumber
 
 			validLap := knowledgeBase.getValue(prefix . ".Valid", true)

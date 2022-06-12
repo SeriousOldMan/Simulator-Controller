@@ -37,6 +37,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	iRepairSuspensionChosen := false
 	iRepairBodyworkChosen := false
+	iRepairEngineChosen := false
 
 	iPitstopAutoClose := false
 
@@ -84,9 +85,9 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres"
+		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
 		selectActions := []
 	}
 
@@ -160,17 +161,17 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			Loop 10
+			Loop 15
 				this.sendPitstopCommand(this.PreviousOptionHotkey)
 
-			if (option = "Strategy")
+			if ((option = "Strategy") || (option = "All Around"))
 				return true
 			else if (option = "Refuel") {
 				this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
-			else if (option = "Change Tyres") {
+			else if (option = "Tyre Compound") {
 				this.sendPitstopCommand(this.NextOptionHotkey)
 				this.sendPitstopCommand(this.NextOptionHotkey)
 
@@ -212,12 +213,14 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 				return true
 			}
-			else {
-				Loop 10
-					this.sendPitstopCommand(this.PreviousOptionHotkey)
+			else if (option = "Repair Engine") {
+				Loop 9
+					this.sendPitstopCommand(this.NextOptionHotkey)
 
-				return false
+				return true
 			}
+			else
+				return false
 		}
 		else
 			return false
@@ -239,7 +242,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	changePitstopOption(option, action := "Increase", steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			if inList(["Strategy", "Refuel", "Change Tyres", "Front Left", "Front Right", "Rear Left", "Rear Right"], option)
+			if (option = "All Around") {
+				for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+					if this.selectPitstopOption(tyre)
+						this.changePitstopOption(tyre, action, steps)
+			}
+			else if inList(["Strategy", "Refuel", "Tyre Compound", "Front Left", "Front Right", "Rear Left", "Rear Right"], option)
 				this.dialPitstopOption(option, action, steps)
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", action, steps)
@@ -252,6 +260,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 				Loop %steps%
 					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+			}
+			else if (option = "Repair Engine") {
+				this.dialPitstopOption("Repair Engine", action, steps)
+
+				Loop %steps%
+					this.iRepairEngineChosen := !this.iRepairEngineChosen
 			}
 			else
 				Throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
@@ -308,8 +322,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
-			if this.selectPitstopOption("Change Tyres") {
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+			if this.selectPitstopOption("Tyre Compound") {
+				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
 				if (compound = "Dry") {
 					if (compoundColor = "Soft")
@@ -321,13 +335,13 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 					else
 						steps := 2
 
-					this.dialPitstopOption("Change Tyres", "Increase", steps)
+					this.dialPitstopOption("Tyre Compound", "Increase", steps)
 				}
 			}
 		}
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {
 				this.requirePitstopMFD()
@@ -342,6 +356,13 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				if this.selectPitstopOption("Repair Bodywork")
 					this.changePitstopOption("Repair Bodywork")
 			}
+
+			if (this.iRepairEngineChosen != repairEngine) {
+				this.requirePitstopMFD()
+
+				if this.selectPitstopOption("Repair Engine")
+					this.changePitstopOption("Repair Engine")
+			}
 		}
 	}
 
@@ -349,8 +370,9 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		base.updateSessionState(sessionState)
 
 		if (sessionState == kSessionFinished) {
-			this.iRepairSuspensionChosen := true
-			this.iRepairBodyworkChosen := true
+			this.iRepairSuspensionChosen := false
+			this.iRepairBodyworkChosen := false
+			this.iRepairEngineChosen := false
 		}
 	}
 

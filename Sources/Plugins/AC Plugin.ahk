@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -41,6 +42,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	iPitstopAutoClose := false
 
+	iSettingsDatabase := false
+
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -68,6 +71,20 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	NextChoiceHotkey[] {
 		Get {
 			return this.iNextChoiceHotkey
+		}
+	}
+
+	SettingsDatabase[] {
+		Get {
+			settingsDB := this.iSettingsDatabase
+
+			if !settingsDB {
+				settingsDB := new SettingsDatabase()
+
+				this.iSettingsDatabase := settingsDB
+			}
+
+			return settingsDB
 		}
 	}
 
@@ -160,8 +177,14 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
+		car := (this.Car ? this.Car : "*")
+		track := (this.Track ? this.Track : "*")
+
+		carSettings := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+														   , "Simulator.Assetto Corsa Settings", "Pitstop.Car.Settings", 0)
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			Loop 15
+			Loop 20
 				this.sendPitstopCommand(this.PreviousOptionHotkey)
 
 			if ((option = "Strategy") || (option = "All Around"))
@@ -202,19 +225,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if (option = "Repair Bodywork") {
-				Loop 7
+				Loop % 7 + carSettings
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
-				Loop 8
+				Loop % 8 + carSettings
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
-				Loop 9
+				Loop % 9 + carSettings
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
@@ -283,36 +306,43 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		basePressure := 15
-
 		if (this.OpenPitstopMFDHotkey != "Off") {
+			frontLeftMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+																, "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Left.Min", 15)
+			frontRightMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+																 , "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Right.Min", 15)
+			rearLeftMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+															   , "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Left.Min", 15)
+			rearRightMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+																, "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Right.Min", 15)
+
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Front Left") {
-				this.dialPitstopOption("Front Left", "Decrease", 25)
+				this.dialPitstopOption("Front Left", "Decrease", 30)
 
-				Loop % Round(pressureFL - basePressure)
+				Loop % Round(pressureFL - frontLeftMin)
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
-				this.dialPitstopOption("Front Right", "Decrease", 25)
+				this.dialPitstopOption("Front Right", "Decrease", 30)
 
-				Loop % Round(pressureFL - basePressure)
+				Loop % Round(pressureFR - frontRightMin)
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
-				this.dialPitstopOption("Rear Left", "Decrease", 25)
+				this.dialPitstopOption("Rear Left", "Decrease", 30)
 
-				Loop % Round(pressureFL - basePressure)
+				Loop % Round(pressureRL - rearLeftMin)
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
-				this.dialPitstopOption("Rear Right", "Decrease", 25)
+				this.dialPitstopOption("Rear Right", "Decrease", 30)
 
-				Loop % Round(pressureFL - basePressure)
+				Loop % Round(pressureRR - rearRightMin)
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}
@@ -377,6 +407,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSessionData(data) {
+		base.updateSessionData(data)
+
 		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 

@@ -1118,14 +1118,14 @@ class RaceSpotter extends RaceAssistant {
 		static behindLostThreshold := false
 
 		if (lapUpRangeThreshold = kUndefined) {
-			lapUpRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapUp.Range.Threshold", 1.0)
-			lapDownRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapDown.Range.Threshold", 2.0)
-			frontAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Attack.Threshold", 0.8)
-			frontGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Gain.Threshold", 0.3)
-			frontLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Lost.Threshold", 1.0)
-			behindAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Attack.Threshold", 0.8)
-			behindLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Lost.Threshold", 0.3)
-			behindGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+			lapUpRangeThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "LapUp.Range.Threshold", 1.0)
+			lapDownRangeThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "LapDown.Range.Threshold", 2.0)
+			frontAttackThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Attack.Threshold", 0.8)
+			frontGainThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Gain.Threshold", 0.3)
+			frontLostThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Lost.Threshold", 1.0)
+			behindAttackThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Attack.Threshold", 0.8)
+			behindLostThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Lost.Threshold", 0.3)
+			behindGainThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
 		}
 
 		standingsFront := false

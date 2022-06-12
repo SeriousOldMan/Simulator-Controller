@@ -248,6 +248,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updatePositionsData(data) {
+		base.updatePositionsData(data)
+		
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))

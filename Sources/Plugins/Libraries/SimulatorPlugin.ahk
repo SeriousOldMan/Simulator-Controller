@@ -196,6 +196,9 @@ class SimulatorPlugin extends ControllerPlugin {
 	iSimulator := false
 	iSessionState := kSessionFinished
 
+	iCar := false
+	iTrack := false
+
 	Code[] {
 		Get {
 			return this.Plugin
@@ -360,8 +363,12 @@ class SimulatorPlugin extends ControllerPlugin {
 		if ((sessionState != this.SessionState) && (sessionState != kSessionPaused)) {
 			this.iSessionState := sessionState
 
-			if (sessionState == kSessionFinished)
+			if (sessionState == kSessionFinished) {
+				this.iCar := false
+				this.iTrack := false
+
 				this.Controller.setModes()
+			}
 			else
 				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][sessionState])
 		}
@@ -719,6 +726,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateSessionData(data) {
+		if (this.SessionState != kSessionFinished) {
+			this.iCar := getConfigurationValue(data, "Session Data", "Car")
+			this.iTrack := getConfigurationValue(data, "Session Data", "Track")
+		}
 	}
 
 	restoreSessionState(sessionSettings, sessionState) {

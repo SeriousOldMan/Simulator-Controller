@@ -580,6 +580,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updatePositionsData(data) {
+		base.updatePositionsData(data)
+		
 		standings := readSimulatorData(this.Code, "-Standings")
 		
 		Loop {
@@ -608,6 +610,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	updateSessionData(data) {
+		base.updateSessionData(data)
+		
 		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
 	}
 	

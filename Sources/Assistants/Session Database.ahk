@@ -1202,20 +1202,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if InStr(section, ".Types") {
 				section := StrReplace(section, ".Types", "")
 
-				for key, ignore in values {
-					available := true
+				if (InStr(section, "Simulator.") == 1)
+					skip := (StrReplace(section, "Simulator.", "") != this.SelectedSimulator)
+				else
+					skip := false
 
-					for index, candidate in this.iSettings
-						if (index != selection)
-							if ((section = candidate[1]) && (key = candidate[2])) {
-								available := false
+				if !skip
+					for key, ignore in values {
+						available := true
 
-								break
-							}
+						for index, candidate in this.iSettings
+							if (index != selection)
+								if ((section = candidate[1]) && (key = candidate[2])) {
+									available := false
 
-					if available
-						settings.Push(Array(section, key))
-				}
+									break
+								}
+
+						if available
+							settings.Push(Array(section, key))
+					}
 			}
 
 		return settings

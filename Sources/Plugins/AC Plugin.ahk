@@ -126,7 +126,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startupUDPClient() {
-		if false && !this.UDPClient {
+		if !this.UDPClient {
 			exePath := kBinariesDirectory . "AC UDP Provider.exe"
 
 			try {
@@ -233,7 +233,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	supportsRaceAssistant(assistantPlugin) {
-		return ((assistantPlugin = kRaceEngineerPlugin) && base.supportsRaceAssistant(assistantPlugin))
+		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
+			return ((FileExist(kBinariesDirectory . "AC UDP Provider.exe") != false) && base.supportsRaceAssistant(assistantPlugin))
+		else
+			return base.supportsRaceAssistant(assistantPlugin)
 	}
 
 	updateSessionState(sessionState) {

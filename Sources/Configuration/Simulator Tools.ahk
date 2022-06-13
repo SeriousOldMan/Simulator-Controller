@@ -2103,7 +2103,7 @@ runSpecialTargets(ByRef buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 				try {
-					if InStr(solution, "Speech")
+					if (InStr(solution, "Speech") || InStr(solution, "AC UDP Provider"))
 						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%build.out"", , Hide
 					else
 						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%build.out"", , Hide

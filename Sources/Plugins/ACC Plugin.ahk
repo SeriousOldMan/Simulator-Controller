@@ -1352,6 +1352,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	supportsRaceAssistant(assistantPlugin) {
+		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
+			return ((FileExist(kBinariesDirectory . "ACC UDP Provider.exe") != false) && base.supportsRaceAssistant(assistantPlugin))
+		else
+			return base.supportsRaceAssistant(assistantPlugin)
+	}
+
 	getPitstopOptionValues(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option {

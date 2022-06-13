@@ -8,9 +8,7 @@ namespace ACUDPProvider {
         static void Main(string[] args) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            // UDPProvider provider = new UDPProvider(args[0], args[1]);
-
-            UDPProvider provider = new UDPProvider("ACUDP.cmd", "ACUDP.out");
+            UDPProvider provider = new UDPProvider(args[0], args[1]);
 
             String ip = "127.0.0.1";
 			int port = 9996;

@@ -381,7 +381,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", "Dry")
 
-		if (InStr(compound, "Slick") = 1) {
+		if (InStr(compound, "SemiSlick") = 1)
+			compoundColor := "Soft"
+		else if (InStr(compound, "Street") = 1)
+			compoundColor := "Hard"
+		else if (InStr(compound, "Slick") = 1) {
 			compoundColor := string2Values(A_Space, compound)
 
 			if (compoundColor.Length() > 1) {
@@ -458,7 +462,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		car := (this.Car ? this.Car : "*")
 		track := (this.Track ? this.Track : "*")
 
-		carSettings := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
+		carSettings := this.SettingsDatabase.getSettingValue(this.Simulator[true], car, track, "*"
 														   , "Simulator.Assetto Corsa Settings", "Pitstop.Car.Settings", 0)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
@@ -585,14 +589,16 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			frontLeftMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
-																, "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Left.Min", 15)
-			frontRightMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
-																 , "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Right.Min", 15)
-			rearLeftMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
-															   , "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Left.Min", 15)
-			rearRightMin := this.SettingsDatabase.getSettingValue(this.Simulator.Application, car, track, "*"
-																, "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Right.Min", 15)
+			simulator := this.Simulator[true]
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			showMessage(simulator . A_Space . car . A_Space . track)
+
+			frontLeftMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Left.Min", 15)
+			frontRightMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Right.Min", 15)
+			rearLeftMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Left.Min", 15)
+			rearRightMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Right.Min", 15)
 
 			this.requirePitstopMFD()
 

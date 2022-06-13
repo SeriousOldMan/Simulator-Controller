@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.0.0-dev
 Target=4.2.0.0-release
-Date=06/12/2022
+Date=06/13/2022
 Download=
-Changes=Basic support by the Race Assistents for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa
+Changes=Basic support by the Race Assistents for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database"
 [Release]
 Version=4.1.9.0-release
 Date=06/10/2022

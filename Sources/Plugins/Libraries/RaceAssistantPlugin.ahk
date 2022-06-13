@@ -170,7 +170,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		fireAction(function, trigger) {
 			local action := this.Action
 
-			if (((action = "Accept") || (action = "Reject")) ? this.Plugin.RaceAssistant[true] : this.Plugin.RaceAssistant)
+			if ((action = "Accept") || (action = "Reject"))
+				enabled := (this.Plugin.RaceAssistant[true] != false)
+			else
+				enabled := (this.Plugin.RaceAssistant != false)
+
+			showMessage(action . " " . enabled)
+
+			if enabled
 				switch action {
 					case "InformationRequest":
 						this.Plugin.requestInformation(this.Arguments*)

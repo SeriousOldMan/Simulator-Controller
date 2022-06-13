@@ -205,9 +205,21 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	Simulator[] {
+	Simulator[name := false] {
 		Get {
-			return this.iSimulator
+			return (name ? this.iSimulator.Application : this.iSimulator)
+		}
+	}
+
+	Car[] {
+		Get {
+			return this.iCar
+		}
+	}
+
+	Track[] {
+		Get {
+			return this.iTrack
 		}
 	}
 

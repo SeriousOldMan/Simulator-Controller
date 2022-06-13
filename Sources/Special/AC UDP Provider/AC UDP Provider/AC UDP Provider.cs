@@ -133,15 +133,15 @@ namespace ACUDPProvider
         
 			while (!done) {
                 AcUdpConnection lapClient = new AcUdpConnection(ip, port, AcUdpConnection.ConnectionType.LapTime);
-                AcUdpConnection carClient = new AcUdpConnection(ip, port, AcUdpConnection.ConnectionType.CarInfo);
+                // AcUdpConnection carClient = new AcUdpConnection(ip, port, AcUdpConnection.ConnectionType.CarInfo);
 
                 try
                 {
                     lapClient.Connect();
-                    carClient.Connect();
+                    // carClient.Connect();
 
                     lapClient.LapUpdate += UpdateLap;
-                    carClient.CarUpdate += UpdateCar;
+                    // carClient.CarUpdate += UpdateCar;
                 }
                 catch {
                 }
@@ -179,7 +179,7 @@ namespace ACUDPProvider
 
 							if (command == "Exit")
 								done = true;
-							else if (command == "Read") {
+							else if (true || command == "Read") {
 								StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
 
 								outStream.WriteLine("[Position Data]");
@@ -244,7 +244,7 @@ namespace ACUDPProvider
 				}
 
                 lapClient.Disconnect();
-                carClient.Disconnect();
+                // carClient.Disconnect();
             }
         }
 

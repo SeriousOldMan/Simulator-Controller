@@ -44,11 +44,13 @@ namespace ACUDPProvider
 
             try
             {
-                udpClient = (ipAddress == "127.0.0.1") ? new UdpClient(port) : new UdpClient(ipAddress, port);
+                udpClient = new UdpClient();
 
-                await new Task(DispatchMessages);
+                udpClient.Connect(ipAddress, port);
 
                 sendHandshake(AcConverter.handshaker.HandshakeOperation.Connect);
+
+                Task.Run(DispatchMessages);
             }
             catch (Exception)
             {
@@ -73,14 +75,14 @@ namespace ACUDPProvider
             // Calculate handshake bytes and send them.
             byte[] sendbytes = AcConverter.structToBytes(new AcConverter.handshaker(operationId));
 
-            await udpClient.SendAsync(sendbytes, sendbytes.Length);
+            udpClient.SendAsync(sendbytes, sendbytes.Length).Wait();
         }
 
-        private void DispatchMessages()
+        private async void DispatchMessages()
         {
-            UdpClient client = udpClient;
+            UdpClient client;
 
-            while (isConnected)
+            while ((client = udpClient) != null)
             {
                 System.Net.IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
                 try
@@ -88,7 +90,7 @@ namespace ACUDPProvider
                     // Blocks until a message returns on this socket from a remote host.
                     Byte[] receiveBytes = client.Receive(ref RemoteIpEndPoint);
 
-                    Socket_MessageReceived(receiveBytes);
+                    MessageReceived(receiveBytes);
                 }
                 catch (Exception e)
                 {
@@ -97,10 +99,13 @@ namespace ACUDPProvider
             }
         }
 
-        private void Socket_MessageReceived(byte[] receivebytes)
+        private void MessageReceived(byte[] receivebytes)
         {
             if (!isConnected) // Received data is handshake response.
             {
+                if (receivebytes.Length != Marshal.SizeOf<AcConverter.handshakerResponse>())
+                    return;
+
                 // Check if it is a Handshake response-packet.
                 System.Diagnostics.Debug.Assert(receivebytes.Length == Marshal.SizeOf<AcConverter.handshakerResponse>());
 

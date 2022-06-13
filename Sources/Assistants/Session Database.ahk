@@ -1839,6 +1839,8 @@ chooseSetting() {
 			for ignore, descriptor in settings
 				labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
 
+			bubbleSort(labels)
+
 			GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 			GuiControl Choose, settingDropDown, % inList(labels, setting)
 

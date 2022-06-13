@@ -296,7 +296,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
-		
+
 		static carIDs := false
 		static lastDriverCar := false
 		static lastRead := false

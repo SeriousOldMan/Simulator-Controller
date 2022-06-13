@@ -27,6 +27,9 @@ global kACPlugin = "AC"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACPlugin extends RaceAssistantSimulatorPlugin {
+	iUDPClient := false
+	iUDPConnection := false
+
 	iCommandMode := "Event"
 
 	iOpenPitstopMFDHotkey := false
@@ -74,6 +77,18 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	UDPConnection[] {
+		Get {
+			return this.iUDPConnection
+		}
+	}
+
+	UDPClient[] {
+		Get {
+			return this.iUDPClient
+		}
+	}
+
 	SettingsDatabase[] {
 		Get {
 			settingsDB := this.iSettingsDatabase
@@ -99,6 +114,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")
 		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "{Left}")
 		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "{Right}")
+
+		this.iUDPConnection := this.getArgumentValue("udpConnection", false)
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -106,6 +123,92 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
 		selectActions := []
+	}
+
+	startupUDPClient() {
+		if false && !this.UDPClient {
+			exePath := kBinariesDirectory . "AC UDP Provider.exe"
+
+			try {
+				Loop 6 {
+					Process Exist, AC UDP Provider.exe
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						Sleep 250
+					}
+					else
+						break
+				}
+
+				if FileExist(kTempDirectory . "ACUDP.cmd")
+					FileDelete %kTempDirectory%ACUDP.cmd
+
+				if FileExist(kTempDirectory . "ACUDP.out")
+					FileDelete %kTempDirectory%ACUDP.out
+
+				options := ""
+
+				if this.UDPConnection
+					options := ("-Connect " . this.UDPConnection)
+
+				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACUDP.cmd" "%kTempDirectory%ACUDP.out" %options%", , Hide
+
+				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
+
+				OnExit(this.iUDPClient)
+			}
+			catch exception {
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "AC", protocol: "UDP"})
+														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+														   . kBinariesDirectory . translate(")"))
+
+				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+											  , {exePath: exePath, simulator: "AC", protocol: "UDP"})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+
+	shutdownUDPClient() {
+		if this.UDPClient {
+			FileAppend Exit, %kTempDirectory%ACUDP.cmd
+
+			OnExit(this.iUDPClient, 0)
+
+			Sleep 250
+
+			Loop 5 {
+				Process Exist, AC UDP Provider.exe
+
+				if ErrorLevel {
+					Process Close, %ErrorLevel%
+
+					Sleep 250
+				}
+				else
+					break
+			}
+
+			this.iUDPClient := false
+		}
+
+		return false
+	}
+
+	requireUDPClient() {
+		Process Exist, AC UDP Provider.exe
+
+		if !ErrorLevel {
+			if this.iUDPClient
+				OnExit(this.iUDPClient, 0)
+
+			this.iUDPClient := false
+		}
+
+		if !this.UDPClient
+			this.startupUDPClient()
 	}
 
 	supportsPitstop() {
@@ -131,6 +234,181 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	supportsRaceAssistant(assistantPlugin) {
 		return ((assistantPlugin = kRaceEngineerPlugin) && base.supportsRaceAssistant(assistantPlugin))
+	}
+
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+
+		if (sessionState == kSessionRace)
+			this.startupUDPClient()
+		else if (sessionState != kSessionPaused)
+			this.shutdownUDPClient()
+
+		if (sessionState == kSessionFinished) {
+			this.iRepairSuspensionChosen := false
+			this.iRepairBodyworkChosen := false
+			this.iRepairEngineChosen := false
+		}
+	}
+
+	updatePositionsData(data) {
+		base.updatePositionsData(data)
+
+		static carIDs := false
+		static lastDriverCar := false
+		static lastRead := false
+		static standings := false
+
+		if (this.SessionState == kSessionRace)
+			this.requireUDPClient()
+		else if !this.UDPClient
+			return
+
+		if !carIDs
+			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Car IDs", Object())
+
+		if ((A_Now + 5000) > lastRead) {
+			lastRead := (A_Now + 0)
+
+			fileName := kTempDirectory . "ACUDP.cmd"
+
+			FileAppend Read, %fileName%
+
+			tries := 10
+
+			while FileExist(fileName) {
+				Sleep 200
+
+				if (--tries <= 0)
+					break
+			}
+
+			if (tries > 0) {
+				fileName := kTempDirectory . "ACUDP.out"
+
+				standings := readConfiguration(fileName)
+
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+			}
+			else {
+				standings := false
+
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
+
+				this.iUDPClient := false
+			}
+		}
+
+		if standings {
+			if (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)
+				lastDriverCar := false
+
+			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+
+			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+
+			driverCar := false
+
+			Loop {
+				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+
+				if (carID == kUndefined)
+					break
+				else {
+					car := (carIDs.HasKey(carID) ? carIDs[carID] : "Unknown")
+
+					if ((car = "Unknown") && isDebug())
+						showMessage("Unknown car with ID " . carID . " detected...")
+
+					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", car)
+
+					if !driverCar {
+						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+							driverCar := A_Index
+
+							lastDriverCar := driverCar
+						}
+						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+							driverCar := A_index
+					}
+				}
+			}
+
+			if !driverCar
+				driverCar := lastDriverCar
+
+			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
+			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+		}
+	}
+
+	updateSessionData(data) {
+		base.updateSessionData(data)
+
+		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
+		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
+
+		grip := getConfigurationValue(data, "Track Data", "GripRaw", 1)
+		grip := Round(6 - (((1 - grip) / 0.15) * 6))
+		grip := ["Dusty", "Old", "Slow", "Green", "Fast", "Optimum"][Max(1, grip)]
+
+		setConfigurationValue(data, "Track Data", "Grip", grip)
+
+		forName := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
+		surName := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
+		nickName := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+
+		if ((forName = surName) && (surName = nickName)) {
+			name := string2Values(A_Space, forName, 2)
+
+			setConfigurationValue(data, "Stint Data", "DriverForname", name[1])
+			setConfigurationValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
+			setConfigurationValue(data, "Stint Data", "DriverNickname", "")
+		}
+
+		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", "Dry")
+
+		if (InStr(compound, "Slick") = 1) {
+			compoundColor := string2Values(A_Space, compound)
+
+			if (compoundColor.Length() > 1) {
+				compoundColor := compoundColor[2]
+
+				if !inList(["Hard", "Medium", "Soft"], compoundColor)
+					compoundColor := "Black"
+			}
+			else
+				compoundColor := "Black"
+		}
+		else
+			compoundColor := "Black"
+
+		setConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+		setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+
+		if !isDebug() {
+			removeConfigurationValue(data, "Car Data", "TCRaw")
+			removeConfigurationValue(data, "Car Data", "ABSRaw")
+			removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
+			removeConfigurationValue(data, "Track Data", "GripRaw")
+		}
+
+		if !getConfigurationValue(data, "Stint Data", "InPit", false)
+			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 
 	openPitstopMFD(descriptor := false) {
@@ -394,72 +672,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 					this.changePitstopOption("Repair Engine")
 			}
 		}
-	}
-
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
-
-		if (sessionState == kSessionFinished) {
-			this.iRepairSuspensionChosen := false
-			this.iRepairBodyworkChosen := false
-			this.iRepairEngineChosen := false
-		}
-	}
-
-	updateSessionData(data) {
-		base.updateSessionData(data)
-
-		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
-		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
-
-		grip := getConfigurationValue(data, "Track Data", "GripRaw", 1)
-		grip := Round(6 - (((1 - grip) / 0.15) * 6))
-		grip := ["Dusty", "Old", "Slow", "Green", "Fast", "Optimum"][Max(1, grip)]
-
-		setConfigurationValue(data, "Track Data", "Grip", grip)
-
-		forName := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-		surName := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		nickName := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
-
-		if ((forName = surName) && (surName = nickName)) {
-			name := string2Values(A_Space, forName, 2)
-
-			setConfigurationValue(data, "Stint Data", "DriverForname", name[1])
-			setConfigurationValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
-			setConfigurationValue(data, "Stint Data", "DriverNickname", "")
-		}
-
-		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", "Dry")
-
-		if (InStr(compound, "Slick") = 1) {
-			compoundColor := string2Values(A_Space, compound)
-
-			if (compoundColor.Length() > 1) {
-				compoundColor := compoundColor[2]
-
-				if !inList(["Hard", "Medium", "Soft"], compoundColor)
-					compoundColor := "Black"
-			}
-			else
-				compoundColor := "Black"
-		}
-		else
-			compoundColor := "Black"
-
-		setConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-		setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
-
-		if !isDebug() {
-			removeConfigurationValue(data, "Car Data", "TCRaw")
-			removeConfigurationValue(data, "Car Data", "ABSRaw")
-			removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
-			removeConfigurationValue(data, "Track Data", "GripRaw")
-		}
-
-		if !getConfigurationValue(data, "Stint Data", "InPit", false)
-			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 }
 

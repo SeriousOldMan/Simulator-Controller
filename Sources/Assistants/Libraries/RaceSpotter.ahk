@@ -206,7 +206,7 @@ class CarInfo {
 		if ((lastLap > this.LastLap) && (lapTime > 0)) {
 			this.LapTimes.Push(lapTime)
 
-			if (this.LapTimes.Length() > 20)
+			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
 			this.iLastLap := lastLap
@@ -228,7 +228,7 @@ class CarInfo {
 
 			deltas.Push(delta)
 
-			if (deltas.Length() > 20)
+			if (deltas.Length() > 5)
 				deltas.RemoveAt(1)
 
 			this.iLastDeltas[sector] := delta
@@ -336,9 +336,7 @@ class PositionInfo {
 
 	LapTimeDifference[average := false] {
 		Get {
-			local knowledgeBase := this.Spotter.KnowledgeBase
-
-			return (Round(knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Time") / 1000, 1) - this.Car.LapTime[average])
+			return (this.Spotter.DriverCar.LapTime[average] - this.Car.LapTime[average])
 		}
 	}
 
@@ -364,7 +362,9 @@ class PositionInfo {
 	isFaster(sector) {
 		; return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
 
-		return this.Car.isFaster(sector)
+		; return this.Car.isFaster(sector)
+
+		return (this.LapTimeDifference[true] > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {

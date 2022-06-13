@@ -61,11 +61,13 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 2. [Managing Button Boxes and Stream Decks](https://youtu.be/wPUnjViU15U) - Here we go a lot more into the details how to configure your available hardware controllers like Button Boxes, Stream Decks and Steering Wheels.
 
-3. [Pitstop Automation using Race Engineer](https://youtu.be/V35v0Be2nUE) - We will take a look at pitstop automation using the Race Engineer. You will learn everything about the necessary configuration and see and hear the Race Engineer in action on the track.
+3. [Voice Control](https://youtu.be/u_2cIrZ1zFk) - In this session you will learn the capabilities of voice control, beginning with the simple standard configuration up to a full configuration with individual names, voices and languages for all the different assistants.
 
-4. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
+4. [Pitstop Automation using Race Engineer](https://youtu.be/V35v0Be2nUE) - We will take a look at pitstop automation using the Race Engineer. You will learn everything about the necessary configuration and see and hear the Race Engineer in action on the track.
 
-5. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
+5. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the Virtual Race Assistants and how to manage these settings in the most efficient way.
+
+6. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
 
 This list will be extended with one new video per week.
 

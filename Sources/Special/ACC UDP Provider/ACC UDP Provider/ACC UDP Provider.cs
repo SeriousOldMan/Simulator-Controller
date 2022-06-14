@@ -308,6 +308,8 @@ namespace ACCUDPProvider {
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
 									outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Delta="); outStream.WriteLine(car.Delta);
+
 									outStream.Write("Car."); outStream.Write(index);
 									if (lastLap != null) {
 										string split1MS = lastLap.Split1MS + "";

@@ -12,12 +12,12 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) | This plugin integrates Cato, the Virtual Race Strategist, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Strategist. |
 | [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) | This plugin integrates Elisa, the Virtual Race Spotter, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Spotter. |
 | [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) | The *Team Server* supports using the Virtual Race Assistants even in a multiplayer team race. It is based on a serverside solution, which manages the state of the car and assistants knowledge and passes them between the participating drivers. |
-| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked with the controller hardware using the "Pitstop" mode, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. An integration with Jona, the Virtual Race Engineer, wtih Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
-| [AC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) | One of the smallest plugin in this list only supplies a special splash screem, when *Assetto Corsa* is started. No special controller mode is defined for the moment. |
-| [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Also a small plugin in this list only supplies a special splash screem, when *Automobilista 2* is started. An integration with Jona, the Virtual Race Engineer, wtih Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
-| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, wtih Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked with the controller hardware using the "Pitstop" mode, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. An integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [AC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) | Integration for Assetto Corsa, which supports  Jona, the Virtual Race Engineer. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
+| [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Integration for Automobilista 2, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
+| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
 | [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
-| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, wtih Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -390,7 +390,7 @@ The parameter *openRaceSettings* allows you to bind a plugin action to your hard
 
 ## Plugin *ACC*
 
-This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration. An integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+This plugin handles the *Assetto Corsa Competizione* simulation game. This plugin needs an application with the name "Assetto Corsa Competizione" to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACC", "stopACC" and "isACCRunning" as special function hooks in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Chat*
 
@@ -514,11 +514,106 @@ Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a sma
 
 ## Plugin *AC*
 
-This plugin handles starting and stopping of the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration, and set the window title to "Assetto Corsa Launcher".
+This plugin handles starting and stopping of the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration, and set the window title to "Assetto Corsa Launcher". An integration with Jona is available through the "Race Engineer" plugin.
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can control most of the pitstop settings of *Assetto Corsa*. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2013.JPG)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: P; closePitstopMFD: P;
+	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
+					 TyreCompound Button.2 Button.6, BodyworkRepair Button.3, SuspensionRepair Button.4, EngineRepair Button.7
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" plugin, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2014.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest TyrePressures Button.1, InformationRequest TyreTemperatures Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   Accept Button.7, Reject Button.8
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
+### Configuration
+
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Assetto Corsa* to control the Pitstop MFD. These parameters are defaulted to "{Up}", "{Down]", "{Left}", "{Right]" and the default for *openHotkey* is "{Down}". All these are the default bindings of *Assetto Corsa*, so you won't have to supply them normally.
+
+	openPitstopMFD: *openHotkey*;
+	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
+	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*;
+	pitstopMFDMode: Event | Input | Play | Raw | Default
+
+The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
+
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+	
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings:
+
+| Setting | Description |
+| ------ | ------ |
+| Strategy | Choose one of the predefined pitstop strategies. |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. |
+| TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
+| TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
+| TyreFrontRight | Change the pressure for the front right tyre. Supports the additional increments argument. |
+| TyreRearLeft | Change the pressure for the rear left tyre. Supports the additional increments argument. |
+| TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork. |
+| EngineRepair | Toggles the repair of the engine. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa* simulation.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin, for an overview what information can be requested. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+
+### Special requirements when using the Pitstop automation
+
+*Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD. Therefore, you have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the Virtual Race Engineer or using the Pitsop mode on your hardware controller, as described above. You will have to enter the values mentioned below into the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), as long as the defaults does not fit.
+
+  1. Minimum cold tyre pressure
+  
+     The cold tyre pressures vary between the cars. When tyre pressures are set by the Race Engineer, the lowest possible tyre pressure must be known. The default here is **15** PSI for each tyre. The settings in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) are named "Pitstop: Minimum Pressure Front Left" and so on. You will have enter the values for each individual car you use in the *Assetto Corsa* simulation.
+	 
+  2. Additional pitstop settings
+  
+     Some cars provide additional settings in the Pitstop HUD, for example front wing settings for a F1 car. These are inserted between the tyre pressure section and the repair section, when they are available. It is necessary to know the number of additional settings, that are present, so that the navigation between the settings will function correctly. You will have to provide the number of additional settings (the defaukt here is **0**, obviously) using "Pitstop: # Car Specific Settings" in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 
@@ -609,7 +704,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ## Plugin *RF2*
 
-This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. A Readme file is included.
 
@@ -623,7 +718,7 @@ All this will be achieved using the following plugin arguments:
 
 	openPitstopMFD: P; closePitstopMFD: P;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
-					 TyreCompound Button.2 Button.5, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
+					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
 ### Mode *Assistant*
 
@@ -703,7 +798,7 @@ For *rFactor 2*, you need to install a plugin into a special location for the pi
 
 ## Plugin *R3E*
 
-This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+This plugin handles the *RaceRoom Racing Experience* simulation game. An application with the name "RaceRoom Racing Experience" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startR3E" as a special function hook in this configuration and define "ahk_exe RRRE64.exe" (yes, three "R"s) as the window title. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 
@@ -808,7 +903,7 @@ This plugin handles the *Automobilista 2* simulation game. An application with t
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
 
-The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist".
+The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 

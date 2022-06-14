@@ -206,7 +206,7 @@ class CarInfo {
 		if ((lastLap > this.LastLap) && (lapTime > 0)) {
 			this.LapTimes.Push(lapTime)
 
-			if (this.LapTimes.Length() > 20)
+			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
 			this.iLastLap := lastLap
@@ -228,7 +228,7 @@ class CarInfo {
 
 			deltas.Push(delta)
 
-			if (deltas.Length() > 20)
+			if (deltas.Length() > 5)
 				deltas.RemoveAt(1)
 
 			this.iLastDeltas[sector] := delta
@@ -336,9 +336,7 @@ class PositionInfo {
 
 	LapTimeDifference[average := false] {
 		Get {
-			local knowledgeBase := this.Spotter.KnowledgeBase
-
-			return (Round(knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Time") / 1000, 1) - this.Car.LapTime[average])
+			return (this.Spotter.DriverCar.LapTime[average] - this.Car.LapTime[average])
 		}
 	}
 
@@ -364,7 +362,9 @@ class PositionInfo {
 	isFaster(sector) {
 		; return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
 
-		return this.Car.isFaster(sector)
+		; return this.Car.isFaster(sector)
+
+		return (this.LapTimeDifference[true] > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -612,6 +612,9 @@ class RaceSpotter extends RaceAssistant {
 			this.setDebug(kDebugPositions, true)
 		}
 
+		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true, SideProximity: true, RearProximity: true
+													  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
+
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
 
@@ -807,7 +810,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1)})
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - (minute * 60))
+
+			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 			delta := (driverLapTime - lapTime)
 
@@ -837,7 +843,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1)})
+				minute := Floor(driverLapTime / 60)
+				seconds := (driverLapTime - (minute * 60))
+
+				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
@@ -1115,14 +1124,14 @@ class RaceSpotter extends RaceAssistant {
 		static behindLostThreshold := false
 
 		if (lapUpRangeThreshold = kUndefined) {
-			lapUpRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapUp.Range.Threshold", 1.0)
-			lapDownRangeThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "LapDown.Range.Threshold", 2.0)
-			frontAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Attack.Threshold", 0.8)
-			frontGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Gain.Threshold", 0.3)
-			frontLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Front.Lost.Threshold", 1.0)
-			behindAttackThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Attack.Threshold", 0.8)
-			behindLostThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Lost.Threshold", 0.3)
-			behindGainThreshold := getConfigurationValue(this.Settings, "Spotter Settings", "Behind.Gain.Threshold", 1.5)
+			lapUpRangeThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "LapUp.Range.Threshold", 1.0)
+			lapDownRangeThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "LapDown.Range.Threshold", 2.0)
+			frontAttackThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Attack.Threshold", 0.8)
+			frontGainThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Gain.Threshold", 0.3)
+			frontLostThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Front.Lost.Threshold", 1.0)
+			behindAttackThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Attack.Threshold", 0.8)
+			behindLostThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Lost.Threshold", 0.3)
+			behindGainThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter Settings", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
 		}
 
 		standingsFront := false
@@ -1469,18 +1478,21 @@ class RaceSpotter extends RaceAssistant {
 			this.SpotterSpeaking := true
 
 			try {
+				speaker := this.getSpeaker(true)
+				sectors := string2Values(",", speaker.Fragments["Sectors"])
+
 				switch alert {
 					case "Full":
-						this.getSpeaker(true).speakPhrase("YellowFull", false, false, "YellowFull")
+						speaker.speakPhrase("YellowFull", false, false, "YellowFull")
 					case "Sector":
 						if (arguments.Length() > 1)
-							this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
+							speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
 						else
-							this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
+							speaker.speakPhrase("YellowSector", {sector: sectors[arguments[1]]})
 					case "Clear":
-						this.getSpeaker(true).speakPhrase("YellowClear", false, false, "YellowClear")
+						speaker.speakPhrase("YellowClear", false, false, "YellowClear")
 					case "Ahead":
-						this.getSpeaker(true).speakPhrase("YellowAhead", false, false, "YellowAhead")
+						speaker.speakPhrase("YellowAhead", false, false, "YellowAhead")
 				}
 			}
 			finally {
@@ -1908,4 +1920,13 @@ class RaceSpotter extends RaceAssistant {
 			this.finishSession()
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getTime() {
+	return A_Now
 }

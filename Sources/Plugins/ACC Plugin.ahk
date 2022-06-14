@@ -295,6 +295,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
+		base.updatePositionsData(data)
+
 		static carIDs := false
 		static lastDriverCar := false
 		static lastRead := false
@@ -1348,6 +1350,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	supportsSetupImport() {
 		return true
+	}
+
+	supportsRaceAssistant(assistantPlugin) {
+		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
+			return ((FileExist(kBinariesDirectory . "ACC UDP Provider.exe") != false) && base.supportsRaceAssistant(assistantPlugin))
+		else
+			return base.supportsRaceAssistant(assistantPlugin)
 	}
 
 	getPitstopOptionValues(option) {

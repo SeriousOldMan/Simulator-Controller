@@ -132,8 +132,10 @@ BOOL carBehindReported = FALSE;
 #define BLUE 16
 
 int blueCount = 0;
+int yellowCount = 0;
 
 int lastFlagState = 0;
+int waitYellowFlagState = 0;
 
 BOOL pitWindowOpenReported = FALSE;
 BOOL pitWindowClosedReported = TRUE;
@@ -369,27 +371,64 @@ BOOL checkPositions(int playerID) {
 }
 
 BOOL checkFlagState() {
-	if (map_buffer->flags.blue == 1) {
-		if ((lastFlagState & BLUE) == 0) {
-			sendMessage("blueFlag");
+	int sector = 0;
+	
+	if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
+		if (yellowCount++ > 50) {
+			if (map_buffer->flags.sector_yellow[0] == 0)
+				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
-			lastFlagState |= BLUE;
+			if (map_buffer->flags.sector_yellow[1] == 0)
+				waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
-			return TRUE;
+			if (map_buffer->flags.sector_yellow[2] == 0)
+				waitYellowFlagState &= ~YELLOW_SECTOR_3;
+
+			yellowCount = 0;
+
+			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0) {
+				waitYellowFlagState &= ~YELLOW_SECTOR_1;
+
+				sector = 1;
+			}
+
+			if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0) {
+				waitYellowFlagState &= ~YELLOW_SECTOR_2;
+
+				sector = 2;
+			}
+
+			if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
+				waitYellowFlagState &= ~YELLOW_SECTOR_3;
+
+				sector = 3;
+			}
 		}
-		else if (blueCount++ > 1000) {
+	}
+	else
+		yellowCount = 0;
+
+	if (!sector)
+		if (map_buffer->flags.blue == 1) {
+			if ((lastFlagState & BLUE) == 0) {
+				sendMessage("blueFlag");
+
+				lastFlagState |= BLUE;
+
+				return TRUE;
+			}
+			else if (blueCount++ > 1000) {
+				lastFlagState &= ~BLUE;
+
+				blueCount = 0;
+			}
+		}
+		else {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
-	}
-	else {
-		lastFlagState &= ~BLUE;
 
-		blueCount = 0;
-	}
-
-	int sector = 0;
 	int distance = (int)map_buffer->flags.closest_yellow_distance_into_track;
 
 	if (distance > 1000 || distance < 0)
@@ -397,49 +436,71 @@ BOOL checkFlagState() {
 	else
 		distance = (int)round(distance / 10.0) * 10;
 
-	if ((map_buffer->flags.yellow == 1) &&
-		map_buffer->flags.sector_yellow[0] == 1 &&
-		map_buffer->flags.sector_yellow[1] == 1 &&
-		map_buffer->flags.sector_yellow[2] == 1) {
-		if ((lastFlagState & YELLOW_FULL) == 0) {
-			sendMessage("yellowFlag:Full");
+	if (!sector)
+		if ((map_buffer->flags.yellow == 1) &&
+			map_buffer->flags.sector_yellow[0] == 1 &&
+			map_buffer->flags.sector_yellow[1] == 1 &&
+			map_buffer->flags.sector_yellow[2] == 1) {
+			if ((lastFlagState & YELLOW_FULL) == 0) {
+				sendMessage("yellowFlag:Full");
 
-			lastFlagState |= YELLOW_FULL;
+				lastFlagState |= YELLOW_FULL;
 
-			return TRUE;
+				return TRUE;
+			}
 		}
-	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[0] == 1) {
-		if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
-			sector = 1;
+		else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[0] == 1) {
+			if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
+				/*
+				sector = 1;
 
-			lastFlagState |= YELLOW_SECTOR_1;
+				lastFlagState |= YELLOW_SECTOR_1;
+				*/
+
+				lastFlagState |= YELLOW_SECTOR_1;
+				waitYellowFlagState |= YELLOW_SECTOR_1;
+				yellowCount = 0;
+			}
 		}
-	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[1] == 1) {
-		if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
-			sector = 2;
+		else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[1] == 1) {
+			if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
+				/*
+				sector = 2;
 
-			lastFlagState |= YELLOW_SECTOR_2;
+				lastFlagState |= YELLOW_SECTOR_2;
+				*/
+
+				lastFlagState |= YELLOW_SECTOR_2;
+				waitYellowFlagState |= YELLOW_SECTOR_2;
+				yellowCount = 0;
+			}
 		}
-	}
-	else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[2] == 1) {
-		if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
-			sector = 3;
+		else if (map_buffer->flags.yellow && map_buffer->flags.sector_yellow[2] == 1) {
+			if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
+				/*
+				sector = 3;
 
-			lastFlagState |= YELLOW_SECTOR_3;
+				lastFlagState |= YELLOW_SECTOR_3;
+				*/
+
+				lastFlagState |= YELLOW_SECTOR_2;
+				waitYellowFlagState |= YELLOW_SECTOR_2;
+				yellowCount = 0;
+			}
 		}
-	}
-	else {
-		if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
-			(lastFlagState & YELLOW_SECTOR_3) != 0) {
-			sendMessage("yellowFlag:Clear");
+		else {
+			if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
+				(lastFlagState & YELLOW_SECTOR_3) != 0) {
+				if (waitYellowFlagState != lastFlagState)
+					sendMessage("yellowFlag:Clear");
 
-			lastFlagState &= ~YELLOW_FULL;
+				lastFlagState &= ~YELLOW_FULL;
+				waitYellowFlagState &= ~YELLOW_FULL;
+				yellowCount = 0;
 
-			return TRUE;
+				return TRUE;
+			}
 		}
-	}
 
 	if (sector) {
 		char buffer[128];

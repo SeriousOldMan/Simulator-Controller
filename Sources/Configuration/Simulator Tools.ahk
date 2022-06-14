@@ -498,7 +498,7 @@ checkInstallation() {
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
-			packageLocation := normalizePath(kHomeDirectory)
+			packageLocation := normalizePath(normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\"))) ; normalizePath(kHomeDirectory)
 
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
@@ -2103,7 +2103,7 @@ runSpecialTargets(ByRef buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 				try {
-					if InStr(solution, "Speech")
+					if (InStr(solution, "Speech") || InStr(solution, "AC UDP Provider"))
 						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%build.out"", , Hide
 					else
 						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%build.out"", , Hide

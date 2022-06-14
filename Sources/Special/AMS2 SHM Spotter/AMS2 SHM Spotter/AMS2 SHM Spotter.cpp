@@ -86,8 +86,10 @@ const int YELLOW = 1;
 const int BLUE = 16;
 
 int blueCount = 0;
+int yellowCount = 0;
 
 int lastFlagState = 0;
+int waitYellowFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -319,6 +321,25 @@ bool checkPositions(const SharedMemory* sharedData) {
 }
 
 bool checkFlagState(const SharedMemory* sharedData) {
+	if ((waitYellowFlagState & YELLOW) != 0) {
+		if (yellowCount++ > 50) {
+			if (!(sharedData->mHighestFlagColour == FLAG_COLOUR_YELLOW || sharedData->mHighestFlagColour == FLAG_COLOUR_DOUBLE_YELLOW))
+				waitYellowFlagState &= ~YELLOW;
+
+			yellowCount = 0;
+
+			if ((waitYellowFlagState & YELLOW) != 0) {
+				sendMessage("yellowFlag:Ahead");
+
+				waitYellowFlagState &= ~YELLOW;
+
+				return true;
+			}
+		}
+	}
+	else
+		yellowCount = 0;
+
 	if (sharedData->mHighestFlagColour == FLAG_COLOUR_BLUE) {
 		if ((lastFlagState & BLUE) == 0) {
 			sendMessage("blueFlag");
@@ -341,17 +362,26 @@ bool checkFlagState(const SharedMemory* sharedData) {
 
 	if (sharedData->mHighestFlagColour == FLAG_COLOUR_YELLOW || sharedData->mHighestFlagColour == FLAG_COLOUR_DOUBLE_YELLOW) {
 		if ((lastFlagState & YELLOW) == 0) {
+			/*
 			sendMessage("yellowFlag:Ahead");
 
 			lastFlagState |= YELLOW;
 
 			return true;
+			*/
+
+			lastFlagState |= YELLOW;
+			waitYellowFlagState |= YELLOW;
+			yellowCount = 0;
 		}
 	}
 	else if ((lastFlagState & YELLOW) != 0) {
-		sendMessage("yellowFlag:Clear");
+		if (waitYellowFlagState != lastFlagState)
+			sendMessage("yellowFlag:Clear");
 
 		lastFlagState &= ~YELLOW;
+		waitYellowFlagState &= ~YELLOW;
+		yellowCount = 0;
 
 		return true;
 	}

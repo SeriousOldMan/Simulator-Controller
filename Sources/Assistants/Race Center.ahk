@@ -4361,6 +4361,8 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 
 			while (lap <= lastLap) {
+				pitstop := false
+
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
@@ -4437,7 +4439,14 @@ class RaceCenter extends ConfigurationItem {
 
 				telemetryData := string2Values(";", telemetryData)
 
-				if ((runningLap > 2) && telemetryData[10])
+				if !pitstop {
+					pitstop := telemetryData[10]
+
+					if pitstop
+						telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,"]
+				}
+
+				if ((runningLap > 2) && pitstop)
 					runningLap := 0
 
 				runningLap += 1

@@ -58,7 +58,7 @@ showLogo(name) {
 	image := "1:" . logo
 
 	SysGet mainScreen, MonitorWorkArea
-	
+
 	x := mainScreenRight - 299
 	y := mainScreenBottom - 234
 
@@ -66,7 +66,7 @@ showLogo(name) {
 	title2 := substituteVariables(translate("%name% - The Virtual Race Spotter"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
-	Gui Logo:-Border -Caption 
+	Gui Logo:-Border -Caption
 	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
 
 	videoPlayer.Navigate("about:blank")
@@ -87,20 +87,20 @@ hideLogo() {
 	Gui Logo:Destroy
 	SplashImage 1:Off
 }
-	
+
 checkRemoteProcessAlive() {
 	Process Exist, %vRemotePID%
-	
+
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceSpotter() {
 	icon := kIconsDirectory . "Artificial Intelligence.ico"
-	
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
-	
+
 	remotePID := 0
 	spotterName := "Elisa"
 	spotterLogo := false
@@ -111,13 +111,13 @@ startRaceSpotter() {
 	spotterRecognizer := true
 	spotterListener := false
 	debug := false
-	
+
 	Process Exist, Voice Server.exe
-	
+
 	voiceServer := ErrorLevel
-	
+
 	index := 1
-	
+
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Remote":
@@ -157,40 +157,40 @@ startRaceSpotter() {
 				index += 1
 		}
 	}
-	
+
 	if (spotterSpeaker = kTrue)
 		spotterSpeaker := true
 	else if (spotterSpeaker = kFalse)
 		spotterSpeaker := false
-	
+
 	if (spotterListener = kTrue)
 		spotterListener := true
 	else if (spotterListener = kFalse)
 		spotterListener := false
-	
+
 	if debug
 		setDebug(true)
-	
+
 	RaceSpotter.Instance := new RaceSpotter(kSimulatorConfiguration
 										  , remotePID ? new RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 										  , spotterName, spotterLanguage
 										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
 										  , spotterRecognizer, spotterListener, voiceServer)
-	
+
 	registerEventHandler("Race Spotter", "handleSpotterRemoteCalls")
-	
+
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()
-		
+
 		RaceSpotter.Instance.updateDynamicValues({KnowledgeBase: RaceSpotter.Instance.createKnowledgeBase({})})
 	}
-	
+
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)
-	
+
 	if (remotePID != 0) {
 		vRemotePID := remotePID
-		
+
 		SetTimer checkRemoteProcessAlive, 10000
 	}
 }
@@ -206,7 +206,7 @@ shutdownRaceSpotter(shutdown := false) {
 
 	if (RaceSpotter.Instance.Session == kSessionFinished) {
 		callback := Func("shutdownRaceSpotter").Bind(true)
-		
+
 		SetTimer %callback%, -10000
 	}
 	else
@@ -216,10 +216,10 @@ shutdownRaceSpotter(shutdown := false) {
 handleSpotterRemoteCalls(event, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
-		
+
 		if (data[1] = "Shutdown") {
 			SetTimer shutdownRaceSpotter, -20000
-			
+
 			return true
 		}
 		else

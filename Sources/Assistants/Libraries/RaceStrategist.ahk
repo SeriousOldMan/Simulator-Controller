@@ -467,7 +467,10 @@ class RaceStrategist extends RaceAssistant {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1)})
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - (minute * 60))
+
+			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 			delta := (driverLapTime - lapTime)
 
@@ -498,7 +501,10 @@ class RaceStrategist extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1)})
+				minute := Floor(driverLapTime / 60)
+				seconds := (driverLapTime - (minute * 60))
+
+				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
@@ -1014,12 +1020,12 @@ class RaceStrategist extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (this.hasEnoughData(false) && this.collectTelemetry() && (this.SaveTelemetry != kNever)) {
-			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+		pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
-			if pitstop
-				pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
+		if pitstop
+			pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
 
+		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetry()) {
 			prefix := "Lap." . lapNumber
 
 			validLap := knowledgeBase.getValue(prefix . ".Valid", true)

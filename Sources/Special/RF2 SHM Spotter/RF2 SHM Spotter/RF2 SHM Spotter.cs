@@ -185,8 +185,10 @@ namespace RF2SHMSpotter {
 		const int BLUE = 16;
 
 		int blueCount = 0;
+		int yellowCount = 0;
 
 		int lastFlagState = 0;
+		int waitYellowFlagState = 0;
 
 		string computeAlert(int newSituation) {
 			string alert = noAlert;
@@ -459,6 +461,52 @@ namespace RF2SHMSpotter {
 
 		bool checkFlagState(ref rF2VehicleScoring playerScoring)
 		{
+			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0)
+			{
+				if (yellowCount++ > 50)
+				{
+					if (scoring.mScoringInfo.mSectorFlag[0] == 0)
+						waitYellowFlagState &= ~YELLOW_SECTOR_1;
+
+					if (scoring.mScoringInfo.mSectorFlag[1] == 0)
+						waitYellowFlagState &= ~YELLOW_SECTOR_2;
+
+					if (scoring.mScoringInfo.mSectorFlag[1] == 0)
+						waitYellowFlagState &= ~YELLOW_SECTOR_3;
+
+					yellowCount = 0;
+
+					if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0)
+					{
+						SendMessage("yellowFlag:Sector;1");
+
+						waitYellowFlagState &= ~YELLOW_SECTOR_1;
+
+						return true;
+					}
+
+					if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0)
+					{
+						SendMessage("yellowFlag:Sector;2");
+
+						waitYellowFlagState &= ~YELLOW_SECTOR_2;
+
+						return true;
+					}
+
+					if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0)
+					{
+						SendMessage("yellowFlag:Sector;3");
+
+						waitYellowFlagState &= ~YELLOW_SECTOR_3;
+
+						return true;
+					}
+				}
+			}
+			else
+				yellowCount = 0;
+
 			if (playerScoring.mFlag == (byte)rF2PrimaryFlag.Blue)
 			{
 				if ((lastFlagState & BLUE) == 0)
@@ -498,33 +546,51 @@ namespace RF2SHMSpotter {
 			{
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
 				{
+					/*
 					SendMessage("yellowFlag:Sector;1");
 
 					lastFlagState |= YELLOW_SECTOR_1;
 
 					return true;
+					*/
+
+					lastFlagState |= YELLOW_SECTOR_1;
+					waitYellowFlagState |= YELLOW_SECTOR_1;
+					yellowCount = 0;
 				}
 			}
 			else if (scoring.mScoringInfo.mSectorFlag[1] == 1)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_2) == 0)
 				{
+					/*
 					SendMessage("yellowFlag:Sector;2");
 
 					lastFlagState |= YELLOW_SECTOR_2;
 
 					return true;
+					*/
+
+					lastFlagState |= YELLOW_SECTOR_2;
+					waitYellowFlagState |= YELLOW_SECTOR_2;
+					yellowCount = 0;
 				}
 			}
 			else if (scoring.mScoringInfo.mSectorFlag[2] == 1)
 			{
 				if ((lastFlagState & YELLOW_SECTOR_3) == 0)
 				{
+					/*
 					SendMessage("yellowFlag:Sector;3");
 
 					lastFlagState |= YELLOW_SECTOR_3;
 
 					return true;
+					*/
+
+					lastFlagState |= YELLOW_SECTOR_2;
+					waitYellowFlagState |= YELLOW_SECTOR_2;
+					yellowCount = 0;
 				}
 			}
 			else
@@ -532,9 +598,12 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
 					(lastFlagState & YELLOW_SECTOR_3) != 0)
 				{
-					SendMessage("yellowFlag:Clear");
+					if (waitYellowFlagState != lastFlagState)
+						SendMessage("yellowFlag:Clear");
 
 					lastFlagState &= ~YELLOW_FULL;
+					waitYellowFlagState &= ~YELLOW_FULL;
+					yellowCount = 0;
 
 					return true;
 				}

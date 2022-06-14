@@ -86,7 +86,7 @@ Both, the Virtual Race Engineer and the Virtual Race Strategist will start up an
 
 Note: If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 
-Beside the *builtin* voice recognition capabilities, you can still use specialized external voice recognition appplications like [VoiceMacro](http://www.voicemacro.net/) as an external event source for controller actions, since these specialized applications might have a much better recognition quality in many cases.
+Beside the *builtin* voice recognition capabilities, you can still use specialized external voice recognition appplications like [VoiceMacro](http://www.voicemacro.net/) as an external event source for controller actions, since these specialized applications might have a better recognition quality in some cases.
 
 #### Jona, the Virtual Race Engineer
 

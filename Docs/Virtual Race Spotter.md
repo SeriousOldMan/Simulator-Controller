@@ -69,6 +69,8 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 | Lost on car behind       | 0.3                     |
 | Gained on car behind     | 1.5                     |
 
+Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
+
 ### Enabling and disabling specific warnings and announcements
 
 As you have seen above, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:

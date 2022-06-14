@@ -253,8 +253,10 @@ const int YELLOW = 1;
 const int BLUE = 16;
 
 int blueCount = 0;
+int yellowCount = 0;
 
 int lastFlagState = 0;
+int waitYellowFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -377,6 +379,25 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 	int flags = atoi(buffer);
 
+	if ((waitYellowFlagState & YELLOW) != 0) {
+		if (yellowCount++ > 50) {
+			if ((flags & irsdk_yellow) == 0 && (flags & irsdk_yellowWaving) == 0)
+				waitYellowFlagState &= ~YELLOW;
+
+			yellowCount = 0;
+
+			if ((waitYellowFlagState & YELLOW) != 0) {
+				sendMessage("yellowFlag:Ahead");
+
+				waitYellowFlagState &= ~YELLOW;
+
+				return true;
+			}
+		}
+	}
+	else
+		yellowCount = 0;
+
 	if (laps > 0 && (flags & irsdk_blue) != 0) {
 		if ((lastFlagState & BLUE) == 0) {
 			sendMessage("blueFlag");
@@ -399,17 +420,26 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 	if ((flags & irsdk_yellow) != 0 || (flags & irsdk_yellowWaving) != 0) {
 		if ((lastFlagState & YELLOW) == 0) {
+			/*
 			sendMessage("yellowFlag:Ahead");
 
 			lastFlagState |= YELLOW;
 
 			return true;
+			*/
+
+			lastFlagState |= YELLOW;
+			waitYellowFlagState |= YELLOW;
+			yellowCount = 0;
 		}
 	}
 	else if ((lastFlagState & YELLOW) != 0) {
-		sendMessage("yellowFlag:Clear");
+		if (waitYellowFlagState != lastFlagState)
+			sendMessage("yellowFlag:Clear");
 
 		lastFlagState &= ~YELLOW;
+		waitYellowFlagState &= ~YELLOW;
+		yellowCount = 0;
 
 		return true;
 	}

@@ -43,6 +43,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 4.2.0
+
+Database and configuration update is handled automatically, but you may want to check out the new support for Assetto Corsa (Pitstop mode and integration with the Virtual Race Engineer) and update your configuration accordingly.
+
+***
+
 ## Release 4.1.9
 
 Everything handled automatically.
@@ -406,7 +412,7 @@ This update is handled completely without manual interaction. You might want to 
 
 ## Release 2.8.6
 
-This release finalizes the integration for *iRacing*. A new "Pitstop" mode has been introduced and Jona is aware of iRacing and can execute a pitstop automatically. Please take a look at the configuration documentation for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1), if you want to use the "Pitstop" mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
+This release finalizes the integration for *iRacing*. A new "Pitstop" mode has been introduced and Jona is aware of iRacing and can execute a pitstop automatically. Please take a look at the configuration documentation for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-2), if you want to use the "Pitstop" mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
 
 For Developers: Some of the data fields in the telemtry interface file structure have changed, please consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration), if required.
 

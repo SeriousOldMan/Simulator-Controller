@@ -1,3 +1,17 @@
+## 4.2.0.0-release 06/17/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. An extended integration of *Assetto Corsa* is now available:
+     - Jona, the Virtual Race Engineer is aware of *Assetto Corsa* and can handle a pitstop automatically.
+     - A nuumber of actions are available in the "Pitstop" and "Assistants" modes.
+     - "Simulator Setup" can be used to configure the *Assetto Corsa* integration.
+     - Please see the [fully revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) for the "Assetto Corsa" plugin for more information.
+  4. The settings in the "Session Database" has been renamed and reordered to create groups and make things more clear.
+  5. Fixed german voice output for the Spotter, so that "... in Sektor Erster" is now "... im ersten Sektor".
+  6. Changed the grammars for all Assistants, so that lap times are now announced in a "X minutes YY.Z seconds" format.
+  7. Yellow flag warnings, which are cleared rightaway (< 2.5 seconds) will be suppressed by the Spotter.
+
 ## 4.1.9.0-release 06/10/22
 
   1. Bugfixes, as always
@@ -542,7 +556,7 @@
   2. Documentation updates, as always
   3. New fully integrated telemetry provider for *Automobilista 2* (see [AMS2 SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/AMS2%20SHM%20Reader)).
   4. Full support for Jona and Cato incl. automated pitstop handling for *Automobilista 2*.
-  5. [New "Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-4) for the "AMS2" plugin to control the pitstop settings from your hardware controller.
+  5. [New "Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-5) for the "AMS2" plugin to control the pitstop settings from your hardware controller.
   6. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can integrate and control each Windows application from your hardware controller.
 
 ## 3.1.6-release 07/02/21
@@ -640,7 +654,7 @@
   2. Documentation updates, as always
   3. Low level integration of *iRacing* telemetry information (see [IRC SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/IRC%20SHM%20Reader/IRC%20SHM%20Reader))
   4. Renaming of selected shared memory data fields
-  5. ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-1) for *iRacing* plugin
+  5. ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-2) for *iRacing* plugin
   6. [Jona integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer) incl. pitstop handling for *iRacing*
   7. Two new actions "Accept" and "Reject" have been added to the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), which are aquivalent to the corrsponding voice commands. This will be helpful, if you want to use Jona without voice recognition support.
 

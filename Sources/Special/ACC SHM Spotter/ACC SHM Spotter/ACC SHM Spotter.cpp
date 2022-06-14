@@ -139,10 +139,10 @@ const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 const int BLUE = 16;
 
 int blueCount = 0;
-int flagCount = 0;
+int yellowCount = 0;
 
 int lastFlagState = 0;
-int waitFlagState = 0;
+int waitYellowFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -380,46 +380,46 @@ bool checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if ((waitFlagState & YELLOW_SECTOR_1) != 0 || (waitFlagState & YELLOW_SECTOR_2) != 0 || (waitFlagState & YELLOW_SECTOR_3) != 0) {
-		if (flagCount++ > 500) {
+	if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
+		if (yellowCount++ > 50) {
 			if (!gf->GlobalYellow1)
-				waitFlagState &= ~YELLOW_SECTOR_1;
+				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
 			if (!gf->GlobalYellow2)
-				waitFlagState &= ~YELLOW_SECTOR_2;
+				waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
 			if (!gf->GlobalYellow3)
-				waitFlagState &= ~YELLOW_SECTOR_3;
+				waitYellowFlagState &= ~YELLOW_SECTOR_3;
 
-			flagCount = 0;
+			yellowCount = 0;
 
-			if ((waitFlagState & YELLOW_SECTOR_1) != 0) {
+			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0) {
 				sendMessage("yellowFlag:Sector;1");
 
-				waitFlagState &= ~YELLOW_SECTOR_1;
+				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
 				return true;
 			}
 
-			if ((waitFlagState & YELLOW_SECTOR_2) != 0) {
+			if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0) {
 				sendMessage("yellowFlag:Sector;2");
 
-				waitFlagState &= ~YELLOW_SECTOR_2;
+				waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
 				return true;
 			}
 
-			if ((waitFlagState & YELLOW_SECTOR_3) != 0) {
+			if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
 				sendMessage("yellowFlag:Sector;3");
 
-				waitFlagState &= ~YELLOW_SECTOR_3;
+				waitYellowFlagState &= ~YELLOW_SECTOR_3;
 
 				return true;
 			}
 		}
 	}
 	else
-		flagCount = 0;
+		yellowCount = 0;
 
 	if (gf->flag == AC_BLUE_FLAG) {
 		if ((lastFlagState & BLUE) == 0) {
@@ -429,7 +429,7 @@ bool checkFlagState() {
 
 			return true;
 		}
-		else if (blueCount++ > 3000) {
+		else if (blueCount++ > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
@@ -461,8 +461,8 @@ bool checkFlagState() {
 			*/
 
 			lastFlagState |= YELLOW_SECTOR_1;
-			waitFlagState |= YELLOW_SECTOR_1;
-			flagCount = 0;
+			waitYellowFlagState |= YELLOW_SECTOR_1;
+			yellowCount = 0;
 		}
 	}
 	else if (gf->GlobalYellow2) {
@@ -476,8 +476,8 @@ bool checkFlagState() {
 			*/
 
 			lastFlagState |= YELLOW_SECTOR_2;
-			waitFlagState |= YELLOW_SECTOR_2;
-			flagCount = 0;
+			waitYellowFlagState |= YELLOW_SECTOR_2;
+			yellowCount = 0;
 		}
 	}
 	else if (gf->GlobalYellow3) {
@@ -491,18 +491,19 @@ bool checkFlagState() {
 			*/
 
 			lastFlagState |= YELLOW_SECTOR_3;
-			waitFlagState |= YELLOW_SECTOR_3;
-			flagCount = 0;
+			waitYellowFlagState |= YELLOW_SECTOR_3;
+			yellowCount = 0;
 		}
 	}
 	else {
 		if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
 			(lastFlagState & YELLOW_SECTOR_3) != 0) {
-			sendMessage("yellowFlag:Clear");
+			if (waitYellowFlagState != lastFlagState)
+				sendMessage("yellowFlag:Clear");
 
 			lastFlagState &= ~YELLOW_FULL;
-			waitFlagState &= ~YELLOW_FULL;
-			flagCount = 0;
+			waitYellowFlagState &= ~YELLOW_FULL;
+			yellowCount = 0;
 
 			return true;
 		}
@@ -554,7 +555,7 @@ int main(int argc, char* argv[])
 			if (pf->speedKmh > 120)
 				safety = 200;
 
-			if (safety-- <= 0)
+			if ((safety-- <= 0) && !waitYellowFlagState)
 				running = false;
 		}
 		else if ((safety <= 0) && (pf->speedKmh > 120)) {

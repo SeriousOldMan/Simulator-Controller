@@ -810,7 +810,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1)})
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - minute)
+
+			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 			delta := (driverLapTime - lapTime)
 
@@ -840,7 +843,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1)})
+				minute := Floor(driverLapTime / 60)
+				seconds := (driverLapTime - minute)
+
+				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
@@ -1472,18 +1478,21 @@ class RaceSpotter extends RaceAssistant {
 			this.SpotterSpeaking := true
 
 			try {
+				speaker := this.getSpeaker(true)
+				sectors := speaker.Fragments["Sectors"]
+
 				switch alert {
 					case "Full":
-						this.getSpeaker(true).speakPhrase("YellowFull", false, false, "YellowFull")
+						speaker.speakPhrase("YellowFull", false, false, "YellowFull")
 					case "Sector":
 						if (arguments.Length() > 1)
-							this.getSpeaker(true).speakPhrase("YellowDistance", {sector: arguments[1], distance: arguments[2]})
+							speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})
 						else
-							this.getSpeaker(true).speakPhrase("YellowSector", {sector: arguments[1]})
+							speaker.speakPhrase("YellowSector", {sector: sectors[arguments[1]]})
 					case "Clear":
-						this.getSpeaker(true).speakPhrase("YellowClear", false, false, "YellowClear")
+						speaker.speakPhrase("YellowClear", false, false, "YellowClear")
 					case "Ahead":
-						this.getSpeaker(true).speakPhrase("YellowAhead", false, false, "YellowAhead")
+						speaker.speakPhrase("YellowAhead", false, false, "YellowAhead")
 				}
 			}
 			finally {

@@ -3,7 +3,7 @@ Version=4.2.0.0-dev
 Target=4.2.0.0-release
 Date=06/13/2022
 Download=
-Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database"
+Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database", Changed grammar for lap time announcements, Changed grammar for the current sector in yellow flag announcements
 [Release]
 Version=4.1.9.0-release
 Date=06/10/2022

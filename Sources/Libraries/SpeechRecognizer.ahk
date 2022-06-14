@@ -355,10 +355,8 @@ class SpeechRecognizer {
 			return this.iChoices[name]
 		else if (this.iEngine = "Azure")
 			return []
-		else if this.Instance
-			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 		else
-			return []
+			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
 	}
 
 	setChoices(name, choices) {

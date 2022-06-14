@@ -532,7 +532,7 @@ All this will be achieved using the following plugin arguments:
 
 This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" plugin, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2014.JPG)
 
 The above will be achieved using the following plugin argument:
 
@@ -599,9 +599,17 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Installation of the *rFactor 2* Pitstop Interface
+### Special requirements when using the Pitstop automation
 
-For *rFactor 2*, you need to install a plugin into a special location for the pitstop interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included.
+*Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD. Therefore, you have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the Virtual Race Engineer or using the Pitsop mode on your hardware controller, as described above. You will have to enter the values mentioned below into the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), as long as the defaults does not fit.
+
+  1. Minimum cold tyre pressure
+  
+     The cold tyre pressures vary between the cars. When tyre pressures are set by the Race Engineer, the lowest possible tyre pressure must be known. The default here is **15** PSI for each tyre. The settings in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) are named "Pitstop: Minimum Pressure Front Left" and so on. You will have enter the values for each individual car you use in the *Assetto Corsa* simulation.
+	 
+  2. Additional pitstop settings
+  
+     Some cars provide additional settings in the Pitstop HUD, for example front wing settings for a F1 car. These are inserted between the tyre pressure section and the repair section, when they are available. It is necessary to know the number of additional settings, that are present, so that the navigation between the settings will function correctly. You will have to provide the number of additional settings (the defaukt here is **0**, obviously) using "Pitstop: # Car Specific Settings" in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
 
 ## Plugin *IRC*
 

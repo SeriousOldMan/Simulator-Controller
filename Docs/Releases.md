@@ -11,6 +11,8 @@
   5. Fixed german voice output for the Spotter, so that "... in Sektor Erster" is now "... im ersten Sektor".
   6. Changed the grammars for all Assistants, so that lap times are now announced in a "X minutes YY.Z seconds" format.
   7. Yellow flag warnings, which are cleared rightaway (< 2.5 seconds) will be suppressed by the Spotter.
+  8. Updated the RaceRoom Racing Experience meta and car data to the latest version.
+  9. Added generic support for *Assetto Corsa* to "Setup Advisor".
 
 ## 4.1.9.0-release 06/10/22
 

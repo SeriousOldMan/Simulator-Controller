@@ -733,14 +733,28 @@ class VoiceManager {
 					showMessage("Register command phrase: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString())
 				}
 
-				speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
+				try {
+					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
+						Throw "Recognizer not running..."
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Error while registering voice command """) . definition . translate(""" - please check the configuration"))
+
+					showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: definition})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 			else if (grammar != "Call")
 				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
 		if speechRecognizer
-			speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+			try {
+				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
+			}
+			catch exception {
+				; ignore^
+			}
 		else
 			raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 	}

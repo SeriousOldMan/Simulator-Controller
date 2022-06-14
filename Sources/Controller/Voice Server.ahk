@@ -371,7 +371,8 @@ class VoiceServer extends ConfigurationItem {
 			}
 
 			try {
-				recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
+					Throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -787,7 +788,8 @@ class VoiceServer extends ConfigurationItem {
 			try {
 				command := recognizer.compileGrammar(activationCommand)
 
-				recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
+				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
+					Throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))

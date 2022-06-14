@@ -283,6 +283,8 @@ class SpeechRecognizer {
 			if !silent
 				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			this.Instance := false
 		}
 	}
 
@@ -298,7 +300,7 @@ class SpeechRecognizer {
 				recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language})
 			}
 		}
-		else {
+		else if this.Instance {
 			Loop % this.Instance.GetRecognizerCount()
 			{
 				index := A_Index - 1
@@ -318,12 +320,13 @@ class SpeechRecognizer {
 	}
 
 	initialize(id) {
-		if (this.iEngine = "Azure")
-			this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
-		else if (id > this.Instance.getRecognizerCount() - 1)
-			Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
-		else
-			return this.Instance.Initialize(id)
+		if this.Instance
+			if (this.iEngine = "Azure")
+				this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
+			else if (id > this.Instance.getRecognizerCount() - 1)
+				Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+			else
+				return this.Instance.Initialize(id)
 	}
 
 	startRecognizer() {
@@ -352,8 +355,10 @@ class SpeechRecognizer {
 			return this.iChoices[name]
 		else if (this.iEngine = "Azure")
 			return []
-		else
+		else if this.Instance
 			return (this.Instance ? ((this.iEngine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
+		else
+			return []
 	}
 
 	setChoices(name, choices) {
@@ -361,25 +366,31 @@ class SpeechRecognizer {
 	}
 
 	newGrammar() {
-		switch this.iEngine {
-			case "Desktop":
-				return this.Instance.NewDesktopGrammar()
-			case "Azure":
-				return new Grammar()
-			case "Server":
-				return this.Instance.NewServerGrammar()
-		}
+		if this.Instance
+			switch this.iEngine {
+				case "Desktop":
+					return this.Instance.NewDesktopGrammar()
+				case "Azure":
+					return new Grammar()
+				case "Server":
+					return this.Instance.NewServerGrammar()
+			}
+		else
+			return false
 	}
 
 	newChoices(choices) {
-		switch this.iEngine {
-			case "Desktop":
-				return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
-			case "Azure":
-				return new Grammar.Choices(!IsObject(choices) ? string2Values(",", choices) : choices)
-			case "Server":
-				return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
-		}
+		if this.Instance
+			switch this.iEngine {
+				case "Desktop":
+					return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+				case "Azure":
+					return new Grammar.Choices(!IsObject(choices) ? string2Values(",", choices) : choices)
+				case "Server":
+					return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+			}
+		else
+			return false
 	}
 
 	loadGrammar(name, grammar, callback) {
@@ -395,8 +406,10 @@ class SpeechRecognizer {
 
 			return grammar
 		}
-		else
+		else if this.Instance
 			return this.Instance.LoadGrammar(grammar, name, this._onGrammarCallback.Bind(this))
+		else
+			return false
 	}
 
 	compileGrammar(text) {
@@ -406,16 +419,17 @@ class SpeechRecognizer {
 	allMatches(string, minRating, maxRating, strings*) {
 		ratings := []
 
-		for index, value in strings {
-			rating := this.Instance.Compare(string, value)
+		if this.Instance
+			for index, value in strings {
+				rating := this.Instance.Compare(string, value)
 
-			if (rating > minRating) {
-				ratings.Push({Rating: rating, Target: value})
+				if (rating > minRating) {
+					ratings.Push({Rating: rating, Target: value})
 
-				if (rating > maxRating)
-					break
+					if (rating > maxRating)
+						break
+				}
 			}
-		}
 
 		if (ratings.Length() > 0) {
 			bubbleSort(ratings, "compareRating")
@@ -430,18 +444,19 @@ class SpeechRecognizer {
 		highestRating := 0
 		bestMatch := false
 
-		for key, value in strings {
-			rating := this.Instance.Compare(string, value)
+		if this.Instance
+			for key, value in strings {
+				rating := this.Instance.Compare(string, value)
 
-			if ((rating > minRating) && (highestRating < rating)) {
-				highestRating := rating
+				if ((rating > minRating) && (highestRating < rating)) {
+					highestRating := rating
 
-				bestMatch := value
+					bestMatch := value
 
-				if (rating > maxRating)
-					break
+					if (rating > maxRating)
+						break
+				}
 			}
-		}
 
 		return bestMatch
 	}

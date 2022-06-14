@@ -139,8 +139,10 @@ const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 const int BLUE = 16;
 
 int blueCount = 0;
+int flagCount = 0;
 
 int lastFlagState = 0;
+int waitFlagState = 0;
 
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
@@ -378,6 +380,47 @@ bool checkPositions() {
 bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+	if ((waitFlagState & YELLOW_SECTOR_1) != 0 || (waitFlagState & YELLOW_SECTOR_2) != 0 || (waitFlagState & YELLOW_SECTOR_3) != 0) {
+		if (flagCount++ > 500) {
+			if (!gf->GlobalYellow1)
+				waitFlagState &= ~YELLOW_SECTOR_1;
+
+			if (!gf->GlobalYellow2)
+				waitFlagState &= ~YELLOW_SECTOR_2;
+
+			if (!gf->GlobalYellow3)
+				waitFlagState &= ~YELLOW_SECTOR_3;
+
+			flagCount = 0;
+
+			if ((waitFlagState & YELLOW_SECTOR_1) != 0) {
+				sendMessage("yellowFlag:Sector;1");
+
+				waitFlagState &= ~YELLOW_SECTOR_1;
+
+				return true;
+			}
+
+			if ((waitFlagState & YELLOW_SECTOR_2) != 0) {
+				sendMessage("yellowFlag:Sector;2");
+
+				waitFlagState &= ~YELLOW_SECTOR_2;
+
+				return true;
+			}
+
+			if ((waitFlagState & YELLOW_SECTOR_3) != 0) {
+				sendMessage("yellowFlag:Sector;3");
+
+				waitFlagState &= ~YELLOW_SECTOR_3;
+
+				return true;
+			}
+		}
+	}
+	else
+		flagCount = 0;
+
 	if (gf->flag == AC_BLUE_FLAG) {
 		if ((lastFlagState & BLUE) == 0) {
 			sendMessage("blueFlag");
@@ -386,7 +429,7 @@ bool checkFlagState() {
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount++ > 3000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
@@ -409,29 +452,47 @@ bool checkFlagState() {
 	}
 	else if (gf->GlobalYellow1) {
 		if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
+			/*
 			sendMessage("yellowFlag:Sector;1");
 
 			lastFlagState |= YELLOW_SECTOR_1;
 
 			return true;
+			*/
+
+			lastFlagState |= YELLOW_SECTOR_1;
+			waitFlagState |= YELLOW_SECTOR_1;
+			flagCount = 0;
 		}
 	}
 	else if (gf->GlobalYellow2) {
 		if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
+			/*
 			sendMessage("yellowFlag:Sector;2");
 
 			lastFlagState |= YELLOW_SECTOR_2;
 
 			return true;
+			*/
+
+			lastFlagState |= YELLOW_SECTOR_2;
+			waitFlagState |= YELLOW_SECTOR_2;
+			flagCount = 0;
 		}
 	}
 	else if (gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
+			/*
 			sendMessage("yellowFlag:Sector;3");
 
 			lastFlagState |= YELLOW_SECTOR_3;
 
 			return true;
+			*/
+
+			lastFlagState |= YELLOW_SECTOR_3;
+			waitFlagState |= YELLOW_SECTOR_3;
+			flagCount = 0;
 		}
 	}
 	else {
@@ -440,6 +501,8 @@ bool checkFlagState() {
 			sendMessage("yellowFlag:Clear");
 
 			lastFlagState &= ~YELLOW_FULL;
+			waitFlagState &= ~YELLOW_FULL;
+			flagCount = 0;
 
 			return true;
 		}

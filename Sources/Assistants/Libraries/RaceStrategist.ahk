@@ -468,7 +468,7 @@ class RaceStrategist extends RaceAssistant {
 			fragments := speaker.Fragments
 
 			minute := Floor(lapTime / 60)
-			seconds := (lapTime - minute)
+			seconds := (lapTime - (minute * 60))
 
 			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
@@ -502,7 +502,7 @@ class RaceStrategist extends RaceAssistant {
 
 			try {
 				minute := Floor(driverLapTime / 60)
-				seconds := (driverLapTime - minute)
+				seconds := (driverLapTime - (minute * 60))
 
 				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 

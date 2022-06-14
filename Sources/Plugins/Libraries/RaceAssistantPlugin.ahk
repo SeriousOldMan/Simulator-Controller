@@ -175,8 +175,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else
 				enabled := (this.Plugin.RaceAssistant != false)
 
-			showMessage(action . " " . enabled)
-
 			if enabled
 				switch action {
 					case "InformationRequest":

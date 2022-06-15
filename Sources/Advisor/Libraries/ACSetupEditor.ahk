@@ -95,9 +95,9 @@ class ACSetupEditor extends FileSetupEditor {
 			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
 
 		if (track && (track != true))
-			Loop Files, *.*, D
+			Loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
-					directory .= ("\" . track)
+					directory .= ("\" . A_LoopFileName)
 
 					break
 				}
@@ -173,9 +173,9 @@ class ACSetupComparator extends FileSetupComparator {
 			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
 
 		if (track && (track != true))
-			Loop Files, *.*, D
+			Loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
-					directory .= ("\" . track)
+					directory .= ("\" . A_LoopFileName)
 
 					break
 				}

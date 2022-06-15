@@ -7,13 +7,14 @@
      - A nuumber of actions are available in the "Pitstop" and "Assistants" modes.
      - "Simulator Setup" can be used to configure the *Assetto Corsa* integration.
      - Please see the [fully revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) for the "Assetto Corsa" plugin for more information.
-  4. The settings in the "Session Database" has been renamed and reordered to create groups and make things more clear.
-  5. Fixed german voice output for the Spotter, so that "... in Sektor Erster" is now "... im ersten Sektor".
-  6. Changed the grammars for all Assistants, so that lap times are now announced in a "X minutes YY.Z seconds" format.
-  7. Yellow flag warnings, which are cleared rightaway (< 2.5 seconds) will be suppressed by the Spotter.
-  8. Updated the RaceRoom Racing Experience meta and car data to the latest version.
-  9. Added generic support for *Assetto Corsa* to "Setup Advisor".
-  10. New icons for Stream Deck for *Assetto Corsa* "EngineRepair" pitstop action.
+  4. "Setup Advisor" handles *Assetto Corsa*. Setups can be loaded, edited, compared and merged.
+  5. The settings in the "Session Database" has been renamed and reordered to create groups and make things more clear.
+  6. Fixed german voice output for the Spotter, so that "... in Sektor Erster" is now "... im ersten Sektor".
+  7. Changed the grammars for all Assistants, so that lap times are now announced in a "X minutes YY.Z seconds" format.
+  8. Yellow flag warnings, which are cleared rightaway (< 2.5 seconds) will be suppressed by the Spotter.
+  9. Updated the RaceRoom Racing Experience meta and car data to the latest version.
+  10. Added generic support for *Assetto Corsa* to "Setup Advisor".
+  11. New icons for Stream Deck for *Assetto Corsa* "EngineRepair" pitstop action.
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-420), since there might be manual updates to your local configuration necessary, when you want to use the *Assetto Corsa* integration with your Stream Deck.
 

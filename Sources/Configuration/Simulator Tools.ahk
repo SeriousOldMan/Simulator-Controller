@@ -1549,6 +1549,26 @@ updateConfigurationForV402() {
 	}
 }
 
+updateConfigurationForV420() {
+	Loop Files, %kDatabaseDirectory%User\*.*, D
+		if FileExist(A_LoopFilePath . "\Settings.CSV") {
+			FileRead text, %A_LoopFilePath%\Settings.CSV
+
+			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter Settings")) {
+				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter Settings")
+
+				try {
+					FileDelete %A_LoopFilePath%\Settings.CSV
+				}
+				catch exception {
+					; ignore
+				}
+
+				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
+			}
+		}
+}
+
 updateConfigurationForV400() {
 	try {
 		FileDelete %kDatabaseDirectory%User\UPLOAD

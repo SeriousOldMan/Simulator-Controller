@@ -1474,10 +1474,6 @@ class SetupAdvisor extends ConfigurationItem {
 
 class Setup {
 	iEditor := false
-
-	iOriginalFileName := false
-	iModifiedFileName := false
-
 	iOriginalSetup := ""
 	iModifiedSetup := ""
 
@@ -1487,13 +1483,9 @@ class Setup {
 		}
 	}
 
-	FileName[original := false] {
+	Name[] {
 		Get {
-			return (original ? this.iOriginalFileName : (this.iModifiedFileName ? this.iModifiedFileName : this.iOriginalFileName))
-		}
-
-		Set {
-			return (original ? (this.iOriginalFileName := value) : (this.iModifiedFileName := value))
+			Throw "Virtual property Setup.Name must be implemented in a subclass..."
 		}
 	}
 
@@ -1507,17 +1499,12 @@ class Setup {
 		}
 	}
 
-	__New(editor, originalFileName := false) {
-		local setup
-
+	__New(editor) {
 		this.iEditor := editor
-		this.iOriginalFileName := originalFileName
+	}
 
-		if (originalFileName && FileExist(originalFileName)) {
-			FileRead setup, %originalFileName%
-
-			this.iOriginalSetup := setup
-		}
+	getInitializationArguments() {
+		return []
 	}
 
 	reset() {
@@ -1530,6 +1517,60 @@ class Setup {
 
 	setValue(setting, value) {
 		Throw "Virtual method Setup.setValue must be implemented in a subclass..."
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; FileSetup                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class FileSetup extends Setup {
+	iOriginalFileName := false
+	iModifiedFileName := false
+
+	Name[] {
+		Get {
+			fileName := this.FileName[true]
+
+			SplitPath fileName, , , , fileName
+
+			return fileName
+		}
+	}
+
+	FileName[original := false] {
+		Get {
+			return (original ? this.iOriginalFileName : (this.iModifiedFileName ? this.iModifiedFileName : this.iOriginalFileName))
+		}
+
+		Set {
+			return (original ? (this.iOriginalFileName := value) : (this.iModifiedFileName := value))
+		}
+	}
+
+	__New(editor, originalFileName := false, modifiedFileName := false) {
+		local setup
+
+		base.__New(editor)
+
+		this.iOriginalFileName := originalFileName
+		this.iModifiedFileName := modifiedFileName
+
+		if (originalFileName && FileExist(originalFileName)) {
+			FileRead setup, %originalFileName%
+
+			this.iOriginalSetup := setup
+		}
+
+		if (modifiedFileName && FileExist(modifiedFileName)) {
+			FileRead setup, %modifiedFileName%
+
+			this.iModifiedSetup := setup
+		}
+	}
+
+	getInitializationArguments() {
+		return [this.FileName[true], this.FileName[false]]
 	}
 }
 
@@ -1714,7 +1755,7 @@ class ClicksHandler extends IntegerHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global setupViewer
-global fileNameViewer
+global setupNameViewer
 
 global decreaseSettingButton
 global increaseSettingButton
@@ -1743,6 +1784,12 @@ class SetupEditor extends ConfigurationItem {
 	Comparator[] {
 		Get {
 			return this.iComparator
+		}
+	}
+
+	SetupClass[] {
+		Get {
+			Throw "Virtual property FileSetupComparator.SetupClass must be implemented in a subclass..."
 		}
 	}
 
@@ -1825,7 +1872,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 
 		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("Setup:")
-		Gui %window%:Add, Text, x85 ys+14 w193 vfileNameViewer
+		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameViewer
 		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 
 		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
@@ -1935,16 +1982,91 @@ class SetupEditor extends ConfigurationItem {
 
 		this.Settings := {}
 
-		fileName := ""
+		GuiControl Text, setupNameViewer, % (setup ? setup.Name : "")
+		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
 
-		if setup {
-			fileName := setup.FileName[true]
+		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
 
-			SplitPath fileName, , , , fileName
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+
+		if (categoriesLabels.Count() == 0)
+			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
+
+		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
+
+		if (settingsLabels.Count() == 0)
+			settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels.EN", Object())
+
+		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), Object())
+
+		if (settingsUnits.Count() == 0)
+			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN", Object())
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		LV_Delete()
+
+		this.Settings := {}
+
+		for ignore, setting in this.Advisor.Settings {
+			handler := this.createSettingHandler(setting)
+
+			if handler {
+				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+				if (originalValue = modifiedValue)
+					value := originalValue
+				else if (modifiedValue > originalValue)
+					value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+				else
+					value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+
+				category := ""
+
+				for candidate, settings in categories {
+					for ignore, cSetting in string2Values(";", settings)
+						if (InStr(setting, cSetting) == 1) {
+							category := candidate
+
+							break
+						}
+
+					if (category != "")
+						break
+				}
+
+				label := settingsLabels[setting]
+
+				LV_Add("", categoriesLabels[category], label, value, settingsUnits[setting])
+
+				this.Settings[setting] := label
+				this.Settings[label] := setting
+			}
 		}
 
-		GuiControl Text, fileNameViewer, %fileName%
-		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
+		LV_ModifyCol()
+
+		LV_ModifyCol(1, "AutoHdr Sort")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
+
+		lastCategory := ""
+
+		Loop % LV_getCount()
+		{
+			LV_GetText(category, A_Index)
+
+			if (category = lastCategory)
+				LV_Modify(A_Index, "", "")
+
+			lastCategory := category
+		}
 
 		this.updateState()
 	}
@@ -2073,7 +2195,42 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	updateSetting(setting, newValue) {
-		Throw "Virtual method SetupEditor.updateSetting must be implemented in a subclass..."
+		local setup := this.Setup
+
+		setup.setValue(setting, newValue)
+
+		label := this.Settings[setting]
+		row := false
+
+		Loop {
+			LV_GetText(candidate, A_Index, 2)
+
+			if (label = candidate) {
+				row := A_Index
+
+				break
+			}
+		}
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		handler := this.createSettingHandler(setting)
+		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+		if (originalValue = modifiedValue)
+			value := originalValue
+		else if (modifiedValue > originalValue)
+			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+		else
+			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+
+		LV_Modify(row, "+Vis Col3", value)
+		LV_ModifyCol(3, "AutoHdr")
 	}
 
 	compareSetup() {
@@ -2114,8 +2271,8 @@ class SetupEditor extends ConfigurationItem {
 global decreaseABSettingButton
 global increaseABSettingButton
 
-global fileNameAViewer
-global fileNameBViewer
+global setupNameAViewer
+global setupNameBViewer
 
 global applyMixSlider = 0
 
@@ -2141,6 +2298,12 @@ class SetupComparator extends ConfigurationItem {
 	Editor[] {
 		Get {
 			return this.iEditor
+		}
+	}
+
+	SetupClass[] {
+		Get {
+			return this.Editor.SetupClass
 		}
 	}
 
@@ -2246,9 +2409,9 @@ class SetupComparator extends ConfigurationItem {
 		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
 
 		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupAFile, % translate("Setup A:")
-		Gui %window%:Add, Text, x85 ys+14 w193 vfileNameAViewer
+		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameAViewer
 		Gui %window%:Add, Button, x16 ys+34 w60 gchooseSetupBFile, % translate("Setup B:")
-		Gui %window%:Add, Text, x85 ys+38 w193 vfileNameBViewer
+		Gui %window%:Add, Text, x85 ys+38 w193 vsetupNameBViewer
 
 		Gui %window%:Add, ListView, x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectABSetting, % values2String("|", map(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], "translate")*)
 
@@ -2306,23 +2469,122 @@ class SetupComparator extends ConfigurationItem {
 
 		this.Settings := {}
 
-		fileNameA := ""
-		fileNameB := ""
+		GuiControl Text, setupNameAViewer, % (setupA ? setupA.Name : "")
+		GuiControl Text, setupNameBViewer, % (setupB ? setupB.Name : "")
 
-		if setupA {
-			fileNameA := setupA.FileName[true]
+		setupClass := this.SetupClass
 
-			SplitPath fileNameA, , , , fileNameA
+		setupAB := new %setupClass%(this.Editor, setupA.getInitializationArguments()*)
+
+		setupAB.Setup[false] := setupA.Setup[false]
+
+		this.SetupAB := setupAB
+
+		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
+
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+
+		if (categoriesLabels.Count() == 0)
+			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
+
+		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
+
+		if (settingsLabels.Count() == 0)
+			settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels.EN", Object())
+
+		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), Object())
+
+		if (settingsUnits.Count() == 0)
+			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN", Object())
+
+		LV_Delete()
+
+		this.Settings := {}
+
+		for ignore, setting in this.Advisor.Settings {
+			handler := this.Editor.createSettingHandler(setting)
+
+			if handler {
+				valueA := handler.convertToDisplayValue(setupA.getValue(setting, false))
+				valueB := handler.convertToDisplayValue(setupB.getValue(setting, true))
+
+				category := ""
+
+				for candidate, settings in categories {
+					for ignore, cSetting in string2Values(";", settings)
+						if (InStr(setting, cSetting) == 1) {
+							category := candidate
+
+							break
+						}
+
+					if (category != "")
+						break
+				}
+
+				targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
+				valueAB := ((valueA < valueB) ? valueA : valueB)
+				lastValueAB := kUndefined
+
+				Loop {
+					if (valueAB >= targetAB) {
+						if (lastValueAB != kUndefined) {
+							delta := (valueAB - lastValueAB)
+
+							if ((lastValueAB + (delta / 2)) > targetAB)
+								valueAB := lastValueAB
+						}
+						break
+					}
+					else {
+						lastValueAB := valueAB
+
+						valueAB := handler.increaseValue(valueAB)
+					}
+				}
+
+				setupAB.setValue(setting, handler.convertToRawValue(valueAB))
+
+				valueAB := handler.formatValue(valueAB)
+
+				if (valueB > valueA)
+					valueB := (valueB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+				else if (valueB < valueA)
+					valueB := (valueB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+
+				if (valueAB > valueA)
+					valueAB := (valueAB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
+				else if (valueAB < valueA)
+					valueAB := (valueAB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
+
+				label := settingsLabels[setting]
+
+				LV_Add("", categoriesLabels[category], settingsLabels[setting], valueA, valueB, valueAB, settingsUnits[setting])
+
+				this.Settings[setting] := label
+				this.Settings[label] := setting
+			}
 		}
 
-		if setupB {
-			fileNameB := setupB.FileName[true]
+		LV_ModifyCol()
 
-			SplitPath fileNameB, , , , fileNameB
+		LV_ModifyCol(1, "AutoHdr Sort")
+		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(3, "AutoHdr")
+		LV_ModifyCol(4, "AutoHdr")
+		LV_ModifyCol(5, "AutoHdr")
+
+		lastCategory := ""
+
+		Loop % LV_getCount()
+		{
+			LV_GetText(category, A_Index)
+
+			if (category = lastCategory)
+				LV_Modify(A_Index, "", "")
+
+			lastCategory := category
 		}
-
-		GuiControl Text, fileNameAViewer, %fileNameA%
-		GuiControl Text, fileNameBViewer, %fileNameB%
 
 		this.updateState()
 	}
@@ -2344,7 +2606,42 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	updateSetting(setting, newValue) {
-		Throw "Virtual method SetupComparator.updateSetting must be implemented in a subclass..."
+		local setup := this.SetupAB
+
+		setup.setValue(setting, newValue)
+
+		label := this.Settings[setting]
+		row := false
+
+		Loop {
+			LV_GetText(candidate, A_Index, 2)
+
+			if (label = candidate) {
+				row := A_Index
+
+				break
+			}
+		}
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SettingsListView
+
+		handler := this.Editor.createSettingHandler(setting)
+		originalValue := handler.convertToDisplayValue(this.SetupA.getValue(setting, false))
+		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+		if (originalValue = modifiedValue)
+			value := originalValue
+		else if (modifiedValue > originalValue)
+			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+		else
+			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+
+		LV_Modify(row, "+Vis Col5", value)
+		LV_ModifyCol(5, "AutoHdr")
 	}
 
 	increaseSetting(setting := false) {
@@ -2434,6 +2731,63 @@ class SetupComparator extends ConfigurationItem {
 			GuiControl Disable, increaseABSettingButton
 			GuiControl Disable, decreaseABSettingButton
 		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; FileSetupEditor                                                         ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class FileSetupEditor extends SetupEditor {
+	editSetup(theSetup := false) {
+		if !theSetup
+			theSetup := this.chooseSetup(false)
+
+		if theSetup
+			return base.editSetup(theSetup)
+		else {
+			this.destroy()
+
+			return false
+		}
+	}
+
+	chooseSetup(load := true) {
+		Throw "Virtual method FileSetupEditor.chooseSetup must be implemented in a subclass..."
+	}
+
+	saveSetup() {
+		Throw "Virtual method FileSetupEditor.saveSetup must be implemented in a subclass..."
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; FileSetupComparator                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class FileSetupComparator extends SetupComparator {
+	chooseSetup(type, load := true) {
+		Throw "Virtual method FileSetupComparator.chooseSetup must be implemented in a subclass..."
+	}
+
+	compareSetup(theSetup := false) {
+		if !theSetup
+			theSetup := this.chooseSetup("B", false)
+
+		if theSetup
+			return base.compareSetup(theSetup)
+		else {
+			this.destroy()
+
+			return false
+		}
+	}
+
+	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
+		base.loadSetups(setupA, setupB, mix)
+
+		if this.SetupAB
+			this.SetupAB.FileName[false] := setupA.FileName[false]
 	}
 }
 

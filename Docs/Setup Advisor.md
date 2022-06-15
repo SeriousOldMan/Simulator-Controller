@@ -194,6 +194,16 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   
     Similar in behaviour to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
 
+  - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
+  
+    Similar in behaviour to the *FloatHandler*, but uses integer numbers internally. *precision* defines, how many places after the decimal point are considered and displayed, as well as used as integer increment.
+	
+	Example:
+	
+		DecimalHandler(0, 0.1, 1, -3.5, 0.1)
+	
+	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
+
 The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
 
 ### Introducing new simulators

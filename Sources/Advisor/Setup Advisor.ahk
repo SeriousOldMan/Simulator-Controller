@@ -1695,7 +1695,7 @@ class DiscreteValuesHandler extends NumberHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; IntegerValueHandler                                                     ;;;
+;;; IntegerHandler                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class IntegerHandler extends DiscreteValuesHandler {
@@ -1711,7 +1711,7 @@ class IntegerHandler extends DiscreteValuesHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; FloatValueHandler                                                       ;;;
+;;; FloatHandler                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class FloatHandler extends DiscreteValuesHandler {
@@ -1737,6 +1737,24 @@ class FloatHandler extends DiscreteValuesHandler {
 
 	formatValue(value) {
 		return Round(value, this.Precision)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; DecimalHandler                                                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class DecimalHandler extends FloatHandler {
+	convertToDisplayValue(rawValue) {
+		rawValue := (rawValue / (10 * this.Precision))
+
+		return this.formatValue(this.Zero + (rawValue / (this.Increment * (10 * this.Precision))))
+	}
+
+	convertToRawValue(displayValue) {
+		displayValue := (displayValue * (10 * this.Precision))
+
+		return Round((displayValue - this.Zero) / (this.Increment * (10 * this.Precision)))
 	}
 }
 
@@ -1959,7 +1977,7 @@ class SetupEditor extends ConfigurationItem {
 			return new %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
-			Throw "Unknown handler encoutered in SetupEditor.createSettingHandler..."
+			Throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
 	}
 
 	chooseSetup() {

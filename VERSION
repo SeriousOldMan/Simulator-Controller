@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.0.0-dev
 Target=4.2.0.0-release
-Date=06/14/2022
+Date=06/15/2022
 Download=https://www.dropbox.com/s/6r2ehdhgd9860ta/Simulator%20Controller%204.2.0.0-dev.zip?dl=1
-Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database", Changed grammar for lap time announcements, Changed grammar for the current sector in yellow flag announcements, Unnecessary yellow flag warnings are suppressed, R3E meta data update, Edit, compare and merge Assetto Corsa setups in "Setup Advisor"
+Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database", Changed grammar for lap time announcements, Changed grammar for the current sector in yellow flag announcements, Unnecessary yellow flag warnings are suppressed, R3E meta data update, Edit, compare and merge Assetto Corsa setups in "Setup Advisor", New car models for "Setup Advisor"
 [Release]
 Version=4.1.9.0-release
 Date=06/10/2022

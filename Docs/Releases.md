@@ -15,6 +15,9 @@
   9. Updated the RaceRoom Racing Experience meta and car data to the latest version.
   10. Added generic support for *Assetto Corsa* to "Setup Advisor".
   11. New icons for Stream Deck for *Assetto Corsa* "EngineRepair" pitstop action.
+  11. More car specific rules in "Setup Advisor" for:
+      - Assetto Corsa
+        - Ferrari 458 Italia
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-420), since there might be manual updates to your local configuration necessary, when you want to use the *Assetto Corsa* integration with your Stream Deck.
 

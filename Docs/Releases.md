@@ -13,6 +13,9 @@
   7. Yellow flag warnings, which are cleared rightaway (< 2.5 seconds) will be suppressed by the Spotter.
   8. Updated the RaceRoom Racing Experience meta and car data to the latest version.
   9. Added generic support for *Assetto Corsa* to "Setup Advisor".
+  10. New icons for Stream Deck for *Assetto Corsa* "EngineRepair" pitstop action.
+  
+  Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-420), since there might be manual updates to your local configuration necessary, when you want to use the *Assetto Corsa* integration with your Stream Deck.
 
 ## 4.1.9.0-release 06/10/22
 

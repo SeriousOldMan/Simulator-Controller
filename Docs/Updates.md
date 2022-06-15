@@ -47,6 +47,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Database and configuration update is handled automatically, but you may want to check out the new support for Assetto Corsa (Pitstop mode and integration with the Virtual Race Engineer) and update your configuration accordingly.
 
+New labels and Stream Deck icons where added for *Assetto Corsa*. You may want to take a look in the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons). Engine repair icons has been added to the Stream Deck icon collection and also to the corresponding preset for "Simulator Setup". If you want to benefit of them, open "Simulator Setup", remove the preset and re-add it again. But be careful, if you have modified the icon assignments on your own with the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons), since your changes will be lost, if you do it this way.
+
 ***
 
 ## Release 4.1.9

@@ -87,7 +87,7 @@ On the right side, you will see the simulator specific content of the setup file
 
 The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa* and *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
 
 ## Comparing Car Setups
 
@@ -198,7 +198,7 @@ The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so 
 
 ### Introducing new simulators
 
-Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. Therefore, let's take a look into the simulator specific configuration.
+Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. INI files are supported for *assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
 
 Similar to cars, each simulator has a definition file which is located in the *Resources\Advisor\Definitions* folder in the program directory. You can add your own, as mentioned above, by adding them to *Simulator Controller\Advisor\Definitions* folder in your local *Documents* folder. A rule file for a given simulator is also available, which is located (I think you can guess it) in the *Resources\Advisor\Rules* folder in the program directory. You can also add your own here by adding them to *Simulator Controller\Advisor\Rules* folder in your local *Documents* folder.
 
@@ -227,6 +227,7 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa Competizione* is supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
+  1. Only *Assetto Corsa* and *Assetto Corsa Competizione* are supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementation for *Assetto Corsa Competizione* provides a generic car model and a couple of very detailed car specifications at the moment. More will be added in the future. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
-  3. Last but not least, specifications for specific car models are missing as well at the moment for all other simulators, only a generic car is supported here. But only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 
+  3. The implementation for *Assetto Corsa* currently only provides a generic car model and the settings for front and rear ride height are also not supported, until I have figured out, how to derive the right height from the internal rod length.
+  4. Last but not least, specifications for specific car models are missing as well at the moment for all other simulators, only a generic car is supported here. But only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 

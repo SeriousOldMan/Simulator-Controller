@@ -2755,10 +2755,6 @@ class FileSetupEditor extends SetupEditor {
 	chooseSetup(load := true) {
 		Throw "Virtual method FileSetupEditor.chooseSetup must be implemented in a subclass..."
 	}
-
-	saveSetup() {
-		Throw "Virtual method FileSetupEditor.saveSetup must be implemented in a subclass..."
-	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

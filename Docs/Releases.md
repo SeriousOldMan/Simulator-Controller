@@ -4,7 +4,7 @@
   2. Documentation updates, as always
   3. An extended integration of *Assetto Corsa* is now available:
      - Jona, the Virtual Race Engineer is aware of *Assetto Corsa* and can handle a pitstop automatically.
-     - A nuumber of actions are available in the "Pitstop" and "Assistants" modes.
+     - A number of actions are available in the "Pitstop" and "Assistants" modes.
      - "Simulator Setup" can be used to configure the *Assetto Corsa* integration.
      - Please see the [fully revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) for the "Assetto Corsa" plugin for more information.
   4. "Setup Advisor" handles *Assetto Corsa*. Setups can be loaded, edited, compared and merged.

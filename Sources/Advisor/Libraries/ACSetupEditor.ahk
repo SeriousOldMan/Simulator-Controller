@@ -29,6 +29,15 @@ class ACSetup extends FileSetup {
 		}
 
 		Set {
+			local setup
+
+			setup := parseConfiguration(value)
+
+			setConfigurationValue(setup, "ROD_LENGTH_RF", "VALUE", getConfigurationValue(setup, "ROD_LENGTH_LF", "VALUE"))
+			setConfigurationValue(setup, "ROD_LENGTH_RR", "VALUE", getConfigurationValue(setup, "ROD_LENGTH_LR", "VALUE"))
+
+			value := printConfiguration(setup)
+
 			return (base.Setup[original] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
 		}
 	}

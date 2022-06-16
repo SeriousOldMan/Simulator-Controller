@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
 		printData("TyrePressureRL", gf->mfdTyrePressureRL);
 		printData("TyrePressureRR", gf->mfdTyrePressureRR);
 		
-		wcout << "[Setup Data]" << endl;
+		wcout << "[Car Data]" << endl;
 		wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
 		
 	}

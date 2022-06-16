@@ -1113,6 +1113,12 @@ class SetupAdvisor extends ConfigurationItem {
 		GuiControl Choose, carDropDown, 1
 
 		this.iSelectedCar := ((cars[1] = translate("All")) ? true : cars[1])
+
+		tracks := this.getTracks(this.SelectedSimulator, this.SelectedCar).Clone()
+		trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+
+		GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
+		GuiControl Choose, trackDropDown, 1
 	}
 
 	loadCar(car, force := false) {
@@ -1624,6 +1630,10 @@ class NumberHandler {
 	validValue(displayValue) {
 		return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
 	}
+
+	formatValue(value) {
+		return value
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1695,6 +1705,24 @@ class DiscreteValuesHandler extends NumberHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; RawHandler                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class RawHandler extends DiscreteValuesHandler {
+	__New(increment := 1, minValue := "__Undefined__", maxValue := "__Undefined__") {
+		base.__New(0, increment, minValue, maxValue)
+	}
+
+	convertToDisplayValue(rawValue) {
+		return rawValue
+	}
+
+	convertToRawValue(displayValue) {
+		return displayValue
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; IntegerHandler                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -1711,10 +1739,10 @@ class IntegerHandler extends DiscreteValuesHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; FloatHandler                                                            ;;;
+;;; DecimalHandler                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class FloatHandler extends DiscreteValuesHandler {
+class DecimalHandler extends DiscreteValuesHandler {
 	iPrecision := false
 
 	Precision[] {
@@ -1741,21 +1769,10 @@ class FloatHandler extends DiscreteValuesHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; DecimalHandler                                                          ;;;
+;;; FloatHandler                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class DecimalHandler extends FloatHandler {
-	convertToDisplayValue(rawValue) {
-		rawValue := (rawValue / (10 * this.Precision))
-
-		return this.formatValue(this.Zero + (rawValue / (this.Increment * (10 * this.Precision))))
-	}
-
-	convertToRawValue(displayValue) {
-		displayValue := (displayValue * (10 * this.Precision))
-
-		return Round((displayValue - this.Zero) / (this.Increment * (10 * this.Precision)))
-	}
+class FloatHandler extends DecimalHandler {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

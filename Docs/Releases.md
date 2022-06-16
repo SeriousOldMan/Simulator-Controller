@@ -18,6 +18,9 @@
   11. More car specific rules in "Setup Advisor" for:
       - Assetto Corsa
         - Ferrari 458 Italia
+		- Lotus Exos T125
+      - Assetto Corsa Competizione
+	    - Mercedes AMG GT4
   
   Please also take a look on the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-420), since there might be manual updates to your local configuration necessary, when you want to use the *Assetto Corsa* integration with your Stream Deck.
 

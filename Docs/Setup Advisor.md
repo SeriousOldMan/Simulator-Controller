@@ -182,21 +182,21 @@ Here is an extract from the definition file for the "McLaren 720s GT3":
 
 The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers are available:
 
+  - **RawHandler(increment, minValue, maxValue)**
+  
+    This handler implements a range of numbers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+
   - **ClicksHandler(minValue, maxValue)**
   
     Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   
-    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file.
-
-  - **FloatHandler(baseValue, increment, precision, minValue, maxValue)**
-  
-    Similar in behaviour to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
+    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the underlying raw value.
 
   - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
   
-    Similar in behaviour to the *FloatHandler*, but uses integer numbers internally. *precision* defines, how many places after the decimal point are considered and displayed, as well as used as integer increment.
+    Similar in behaviour to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed. *FloatHandler* can be used as well, as it is synonym to *DecimalHandler*.
 	
 	Example:
 	

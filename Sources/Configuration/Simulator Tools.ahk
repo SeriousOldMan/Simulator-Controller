@@ -1553,10 +1553,21 @@ updateConfigurationForV420() {
 	Loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
-
-			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter Settings")) {
-				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter Settings")
-
+			changed := false
+			
+			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter")) {
+				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter")
+				
+				changed := true
+			}
+			
+			if InStr(text, "Assistant.Spotter Settings") {
+				text := StrReplace(text, "Assistant.Spotter Settings", "Assistant.Spotter")
+				
+				changed := true
+			}
+			
+			if changed {
 				try {
 					FileDelete %A_LoopFilePath%\Settings.CSV
 				}

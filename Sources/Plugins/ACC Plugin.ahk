@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -434,8 +435,31 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		Sleep 20
 	}
 
-	openPitstopMFD(descriptor := false, update := true) {
+	openPitstopMFD(descriptor := false, update := "__Undefined__") {
 		static reported := false
+		static noImageSearch := "__Undefined__"
+		static nextUpdate := 0
+
+		if (noImageSearch = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
+
+			noImageSearch := !getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
+		}
+
+		if (update = kUndefined)
+			if noImageSearch {
+				if (A_Now > nextUpdate)
+					update := true
+				else
+					update := false
+			}
+			else
+				update := true
+
+		nextUpdate := (A_Now + 60000)
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
@@ -443,9 +467,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-				this.initializePitstopMFD()
+				if noImageSearch {
+					if update {
+						this.initializePitstopMFD()
 
-				MsgBox % values2String(", ", this.iPSOptions*)
+						update := false
+					}
+
+					this.iPSIsOpen := true
+				}
 
 				wasOpen := this.iPSIsOpen
 
@@ -543,6 +573,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	initializePitstopMFD() {
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
 		availableOptions := ["Pit Limiter", "Strategy", "Refuel"
 						   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
 						   , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
@@ -557,7 +589,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !tyreChange {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres")
+			Loop % inList(availableOptions, "Change Tyres") - 1
 				this.sendPitstopCommand("{Down}")
 
 			this.sendPitstopCommand("{Right}")
@@ -575,12 +607,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.isBrakeChangeSelected(availableOptions, currentPressures)
 			this.iPSChangeBrakes := true
-		else {
+		else
 			this.iPSChangeBrakes := false
-
-			for ignore, option in ["Front Brake", "Rear Brake"]
-				availableOptions.RemoveAt(inList(allOptions, option))
-		}
 
 		if !this.isDriverAvailable(availableOptions, currentPressures)
 			availableOptions.RemoveAt(inList(availableOptions, "Select Driver"))
@@ -588,25 +616,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !tyreChange {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres")
+			Loop % inList(availableOptions, "Change Tyres") - 1
 				this.sendPitstopCommand("{Down}")
 
-			this.sendPitstopCommand("{Right}")
-
-			for ignore, option in ["Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"] {
-				index := inList(availableOptions, option)
-
-				if index
-					availableOptions.RemoveAt(index)
-			}
+			this.sendPitstopCommand("{Left}")
 
 			this.iPSChangeTyres := false
 		}
 
+		this.iPSOptions := availableOptions
+
 		this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
 		this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 
-		this.iPSOptions := availableOptions
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 	}
 
 	isStrategyAvailable(options, currentPressures) {
@@ -614,7 +637,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Tyres") + 3
+		Loop % inList(options, "Change Tyres") - 1 + 3
 			this.sendPitstopCommand("{Down}")
 
 		this.sendPitstopCommand("{Right}")
@@ -626,7 +649,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if listEqual(currentPressures, modifiedPressures) {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres")
+			Loop % inList(options, "Change Tyres") - 1
 				this.sendPitstopCommand("{Down}")
 
 			this.sendPitstopCommand("{Right}")
@@ -657,7 +680,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Tyres") + 3
+		Loop % inList(options, "Change Tyres") - 1 + 3
 			this.sendPitstopCommand("{Down}")
 
 		this.sendPitstopCommand("{Right}")
@@ -675,7 +698,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres") + 4
+			Loop % inList(options, "Change Tyres") - 1 + 4
 				this.sendPitstopCommand("{Down}")
 
 			this.sendPitstopCommand("{Right}")
@@ -692,10 +715,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 	}
 
-	isBrakeChangeSelected(availableOptions, currentPressures) {
+	isBrakeChangeSelected(options, currentPressures) {
 		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Brakes")
+		Loop % inList(options, "Change Brakes") - 1
 			this.sendPitstopCommand("{Down}")
 
 		Loop % 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions)
@@ -715,12 +738,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return false
 	}
 
-	isDriverAvailable(availableOptions, currentPressures) {
+	isDriverAvailable(options, currentPressures) {
 		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Brakes") + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
-													 + (inList(options, "Strategy") ? 1 : 0)
-													 - (7 - this.iPSTyreOptions)
+		Loop % inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
+														 + (inList(options, "Strategy") ? 1 : 0)
+														 - (7 - this.iPSTyreOptions)
 			this.sendPitstopCommand("{Down}")
 
 		this.sendPitstopCommand("{Right}")

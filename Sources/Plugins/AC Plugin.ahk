@@ -46,6 +46,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopAutoClose := false
 
 	iSettingsDatabase := false
+	iCarMetaData := {}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -100,6 +101,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			return settingsDB
+		}
+	}
+
+	CarMetaData[key := false] {
+		Get {
+			return (key ? this.iCarMetaData[key] : this.iCarMetaData)
 		}
 	}
 
@@ -318,6 +325,26 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 
+	getCarMetaData(meta, default := 0) {
+		car := (this.Car ? this.Car : "*")
+		track := (this.Track ? this.Track : "*")
+		key := (car . "." . meta)
+
+		if this.CarMetaData.HasKey(key)
+			return this.CarMetaData[key]
+		else {
+			value := getConfigurationValue(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
+
+			if (value == kUndefined)
+				value := this.SettingsDatabase.getSettingValue(this.Simulator[true], car, track, "*"
+															 , "Simulator.Assetto Corsa Settings", "Pitstop." . meta, default)
+
+			this.CarMetaData[key] := value
+
+			return value
+		}
+	}
+
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
@@ -362,12 +389,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
-		car := (this.Car ? this.Car : "*")
-		track := (this.Track ? this.Track : "*")
-
-		carSettings := this.SettingsDatabase.getSettingValue(this.Simulator[true], car, track, "*"
-														   , "Simulator.Assetto Corsa Settings", "Pitstop.Car.Settings", 0)
-
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			Loop 20
 				this.sendPitstopCommand(this.PreviousOptionHotkey)
@@ -410,19 +431,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if (option = "Repair Bodywork") {
-				Loop % 7 + carSettings
+				Loop % 7 + this.getCarMetaData("CarSettings")
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
-				Loop % 8 + carSettings
+				Loop % 8 + this.getCarMetaData("CarSettings")
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
-				Loop % 9 + carSettings
+				Loop % 9 + this.getCarMetaData("CarSettings")
 					this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
@@ -492,44 +513,33 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			simulator := this.Simulator[true]
-			car := (this.Car ? this.Car : "*")
-			track := (this.Track ? this.Track : "*")
-
-			showMessage(simulator . A_Space . car . A_Space . track)
-
-			frontLeftMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Left.Min", 15)
-			frontRightMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Front.Right.Min", 15)
-			rearLeftMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Left.Min", 15)
-			rearRightMin := this.SettingsDatabase.getSettingValue(simulator, car, track, "*", "Simulator.Assetto Corsa Settings", "Pitstop.Pressures.Rear.Right.Min", 15)
-
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Front Left") {
 				this.dialPitstopOption("Front Left", "Decrease", 30)
 
-				Loop % Round(pressureFL - frontLeftMin)
+				Loop % Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
 				this.dialPitstopOption("Front Right", "Decrease", 30)
 
-				Loop % Round(pressureFR - frontRightMin)
+				Loop % Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
 				this.dialPitstopOption("Rear Left", "Decrease", 30)
 
-				Loop % Round(pressureRL - rearLeftMin)
+				Loop % Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
 				this.dialPitstopOption("Rear Right", "Decrease", 30)
 
-				Loop % Round(pressureRR - rearRightMin)
+				Loop % Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}

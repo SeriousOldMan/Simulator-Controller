@@ -311,6 +311,7 @@ int main(int argc, char* argv[])
 		wcout << "[Setup Data]" << endl;
 
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
@@ -323,6 +324,10 @@ int main(int argc, char* argv[])
 		printData("TyrePressureFR", gf->mfdTyrePressureFR);
 		printData("TyrePressureRL", gf->mfdTyrePressureRL);
 		printData("TyrePressureRR", gf->mfdTyrePressureRR);
+		
+		wcout << "[Setup Data]" << endl;
+		wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
+		
 	}
 
 	dismiss(m_graphics);

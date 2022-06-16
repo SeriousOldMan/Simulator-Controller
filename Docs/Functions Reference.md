@@ -114,6 +114,9 @@ Joins the given unlimited number of values using *delimiter* into one string. *v
 #### *inList(list :: Array, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
 
+#### *listEqual(list1 :: Array, list2 :: Array)*
+Returns *true*, if the given lists are identical in size and contain the same elements.
+
 #### *concatenate(#rest lists :: Array)*
 Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
 

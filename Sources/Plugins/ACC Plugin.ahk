@@ -443,6 +443,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
+				this.initializePitstopMFD()
+
+				MsgBox % values2String(", ", this.iPSOptions*)
+
 				wasOpen := this.iPSIsOpen
 
 				this.iPSIsOpen := true
@@ -530,10 +534,202 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPSChangeTyres := true
 			this.iPSChangeBrakes := false
 
+			this.iPSTyreOptions := 7
+
 			return true
 		}
 		else
 			return true
+	}
+
+	initializePitstopMFD() {
+		availableOptions := ["Pit Limiter", "Strategy", "Refuel"
+						   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+						   , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
+
+		currentPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+		if !this.isStrategyAvailable(availableOptions, currentPressures)
+			availableOptions.RemoveAt(inList(availableOptions, "Strategy"))
+
+		tyreChange := this.isTyreChangeSelected(availableOptions, currentPressures)
+
+		if !tyreChange {
+			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+			Loop % inList(options, "Change Tyres")
+				this.sendPitstopCommand("{Down}")
+
+			this.sendPitstopCommand("{Right}")
+		}
+
+		this.iPSChangeTyres := true
+
+		if this.isWetTyreSelected(availableOptions, currentPressures) {
+			this.iPSTyreOptions := 6
+
+			availableOptions.RemoveAt(inList(availableOptions, "Tyre Set"))
+		}
+		else
+			this.iPSTyreOptions := 7
+
+		if this.isBrakeChangeSelected(availableOptions, currentPressures)
+			this.iPSChangeBrakes := true
+		else {
+			this.iPSChangeBrakes := false
+
+			for ignore, option in ["Front Brake", "Rear Brake"]
+				availableOptions.RemoveAt(inList(allOptions, option))
+		}
+
+		if !this.isDriverAvailable(availableOptions, currentPressures)
+			availableOptions.RemoveAt(inList(availableOptions, "Select Driver"))
+
+		if !tyreChange {
+			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+			Loop % inList(options, "Change Tyres")
+				this.sendPitstopCommand("{Down}")
+
+			this.sendPitstopCommand("{Right}")
+
+			for ignore, option in ["Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"] {
+				index := inList(availableOptions, option)
+
+				if index
+					availableOptions.RemoveAt(index)
+			}
+
+			this.iPSChangeTyres := false
+		}
+
+		this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+		this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+		this.iPSOptions := availableOptions
+	}
+
+	isStrategyAvailable(options, currentPressures) {
+		index := inList(options, "Change Tyres")
+
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+		Loop % inList(options, "Change Tyres") + 3
+			this.sendPitstopCommand("{Down}")
+
+		this.sendPitstopCommand("{Right}")
+
+		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+		this.sendPitstopCommand("{Left}")
+
+		if listEqual(currentPressures, modifiedPressures) {
+			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+			Loop % inList(options, "Change Tyres")
+				this.sendPitstopCommand("{Down}")
+
+			this.sendPitstopCommand("{Right}")
+
+			Loop 3
+				this.sendPitstopCommand("{Down}")
+
+			this.sendPitstopCommand("{Right}")
+
+			modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+			this.sendPitstopCommand("{Left}")
+
+			Loop 3
+				this.sendPitstopCommand("{Up}")
+
+			this.sendPitstopCommand("{Left}")
+
+			if listEqual(currentPressures, modifiedPressures)
+				return := false
+		}
+
+		return true
+	}
+
+	isTyreChangeSelected(options, currentPressures) {
+		index := inList(options, "Change Tyres")
+
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+		Loop % inList(options, "Change Tyres") + 3
+			this.sendPitstopCommand("{Down}")
+
+		this.sendPitstopCommand("{Right}")
+
+		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+		this.sendPitstopCommand("{Left}")
+
+		return !listEqual(currentPressures, modifiedPressures)
+	}
+
+	isWetTyreSelected(options, currentPressures) {
+		if this.iPSChangeTyres {
+			index := inList(options, "Change Tyres")
+
+			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+			Loop % inList(options, "Change Tyres") + 4
+				this.sendPitstopCommand("{Down}")
+
+			this.sendPitstopCommand("{Right}")
+
+			modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+			this.sendPitstopCommand("{Left}")
+
+			for index, pressure in currentPressures
+				if (modifiedPressures[index] != pressure)
+					return (index = 2)
+		}
+		else
+			return false
+	}
+
+	isBrakeChangeSelected(availableOptions, currentPressures) {
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+		Loop % inList(options, "Change Brakes")
+			this.sendPitstopCommand("{Down}")
+
+		Loop % 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions)
+			this.sendPitstopCommand("{Down}")
+
+		this.sendPitstopCommand("{Right}")
+
+		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+		this.sendPitstopCommand("{Left}")
+
+		for index, pressure in currentPressures
+			if (modifiedPressures[index] != pressure)
+				if ((index = 1) || (index = 2))
+					return true
+
+		return false
+	}
+
+	isDriverAvailable(availableOptions, currentPressures) {
+		this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+
+		Loop % inList(options, "Change Brakes") + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
+													 + (inList(options, "Strategy") ? 1 : 0)
+													 - (7 - this.iPSTyreOptions)
+			this.sendPitstopCommand("{Down}")
+
+		this.sendPitstopCommand("{Right}")
+
+		modifiedPressures := this.getPitstopOptionValues("Tyre Pressures")
+
+		this.sendPitstopCommand("{Left}")
+
+		return (currentPressures[3] != modifiedPressures[3])
 	}
 
 	selectPitstopOption(option, retry := true) {
@@ -1362,6 +1558,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopOptionValues(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option {
+				case "Pit Limiter":
+					data := readSimulatorData(this.Code, "-Setup")
+
+					return [getConfigurationValue(data, "Car Data", "PitLimiter", false)]
 				case "Refuel":
 					data := readSimulatorData(this.Code, "-Setup")
 

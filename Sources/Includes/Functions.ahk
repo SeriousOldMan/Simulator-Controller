@@ -1815,6 +1815,17 @@ inList(list, value) {
 	return false
 }
 
+listEqual(list1, list2) {
+	if (list1.Length() != list2.Length())
+		return false
+	else
+		for index, value in list1
+			if (list2[index] != value)
+				return false
+
+	return true
+}
+
 concatenate(arrays*) {
 	result := []
 

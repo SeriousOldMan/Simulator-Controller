@@ -437,27 +437,27 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {
 		static reported := false
-		static noImageSearch := "__Undefined__"
+		static imageSearch := "__Undefined__"
 		static nextUpdate := 0
 
-		if (noImageSearch = kUndefined) {
+		if (imageSearch = kUndefined) {
 			car := (this.Car ? this.Car : "*")
 			track := (this.Track ? this.Track : "*")
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			noImageSearch := !getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
+			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
 		}
 
 		if (update = kUndefined)
-			if noImageSearch {
+			if imageSearch
+				update := true
+			else {
 				if (A_Now > nextUpdate)
 					update := true
 				else
 					update := false
 			}
-			else
-				update := true
 
 		nextUpdate := (A_Now + 60000)
 
@@ -467,7 +467,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-				if noImageSearch {
+				if !imageSearch {
 					if update {
 						this.initializePitstopMFD()
 
@@ -483,7 +483,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSSelectedOption := 1
 
 				if !this.iFallbackMode
-					if (update || !wasOpen) {
+					if (imageSearch && (update || !wasOpen)) {
 						if this.updatePitStopState()
 							this.openPitstopMFD(false, false)
 

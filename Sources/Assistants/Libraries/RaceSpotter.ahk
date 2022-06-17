@@ -1809,19 +1809,19 @@ class RaceSpotter extends RaceAssistant {
 		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
 		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", Abs(gapAhead))
+			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", Abs(gapAhead))
+				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 		}
 
 		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
 		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", - Abs(gapBehind))
+			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", - Abs(gapBehind))
+				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 		}
 
 		Loop % knowledgeBase.getValue("Car.Count")
@@ -1874,19 +1874,19 @@ class RaceSpotter extends RaceAssistant {
 		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
 		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", Abs(gapAhead))
+			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", Abs(gapAhead))
+				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 		}
 
 		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
 		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", - Abs(gapBehind))
+			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", - Abs(gapBehind))
+				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 		}
 
 		if update

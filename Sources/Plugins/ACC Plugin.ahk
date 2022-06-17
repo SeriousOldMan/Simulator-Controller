@@ -180,7 +180,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
-					 , DriverSelect: "Select Driver"
+					 , DriverSelect: "Driver"
 					 , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
 		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
@@ -566,7 +566,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		availableOptions := ["Pit Limiter", "Strategy", "Refuel"
 						   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-						   , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
+						   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
 
 		currentPressures := this.getPitstopOptionValues("Tyre Pressures")
 
@@ -600,7 +600,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPSChangeBrakes := false
 
 		if !this.isDriverAvailable(availableOptions, currentPressures)
-			availableOptions.RemoveAt(inList(availableOptions, "Select Driver"))
+			availableOptions.RemoveAt(inList(availableOptions, "Driver"))
 
 		if !tyreChange {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
@@ -980,14 +980,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changeDriver(selection) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Select Driver"))
+		if (this.requirePitstopMFD() && this.selectPitstopOption("Driver"))
 			switch selection {
 				case "Next":
-					this.changePitstopOption("Strategy", "Increase")
+					this.changePitstopOption("Driver", "Increase")
 				case "Previous":
-					this.changePitstopOption("Strategy", "Decrease")
+					this.changePitstopOption("Driver", "Decrease")
 				case "Increase", "Decrease":
-					this.changePitstopOption("Strategy", selection)
+					this.changePitstopOption("Driver", selection)
 				default:
 					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
 			}
@@ -1485,8 +1485,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if imageX is Integer
 		{
-			if !inList(this.iPSOptions, "Select Driver") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Select Driver")
+			if !inList(this.iPSOptions, "Driver") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Driver")
 
 				reload := true
 			}
@@ -1495,7 +1495,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
-			position := inList(this.iPSOptions, "Select Driver")
+			position := inList(this.iPSOptions, "Driver")
 
 			if position {
 				this.iPSOptions.RemoveAt(position)
@@ -1661,6 +1661,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (repairBodywork != this.iRepairBodyworkChosen)
 			this.toggleActivity("Repair Bodywork")
+	}
+
+	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+		delta := (nextDriver - currentDriver)
+
+		Loop % Abs(delta)
+			this.changeDriver((delta < 0) ? "Previous" : "Next")
 	}
 
 	restoreSessionState(sessionSettings, sessionState) {

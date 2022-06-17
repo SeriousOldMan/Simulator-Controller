@@ -72,6 +72,10 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("requestPitstopRepairs", arguments*)
 		}
 
+		requestPitstopDriver(arguments*) {
+			this.callRemote("requestPitstopDriver", arguments*)
+		}
+
 		savePressureData(arguments*) {
 			this.callRemote("savePressureData", arguments*)
 		}
@@ -1841,6 +1845,11 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 
+	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+		if this.RemoteHandler
+			this.RemoteHandler.requestPitstopDriver(pitstopNumber, currentDriver, nextDriver)
+	}
+
 	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local knowledgeBase := this.KnowledgeBase
 
@@ -1916,6 +1925,12 @@ setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressure
 
 requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) {
 	context.KnowledgeBase.RaceAssistant.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+
+	return true
+}
+
+requestPitstopDriver(context, pitstopNumber, currentDriver, nextDriver) {
+	context.KnowledgeBase.RaceAssistant.requestPitstopDriver(pitstopNumber, currentDriver, nextDriver)
 
 	return true
 }

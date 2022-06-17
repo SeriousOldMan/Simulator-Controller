@@ -286,6 +286,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
+
+	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+		this.Simulator.requestPitstopDriver(pitstopNumber, currentDriver, nextDriver)
+	}
 	
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				   , compound, compoundColor, coldPressures, hotPressures) {

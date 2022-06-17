@@ -265,6 +265,13 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		else
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Nothing")
 	}
+
+	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+		delta := (nextDriver - currentDriver)
+
+		Loop % Abs(delta)
+			this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
+	}
 	
 	updatePositionsData(data) {
 		base.updatePositionsData(data)

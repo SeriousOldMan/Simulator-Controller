@@ -734,6 +734,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
 	}
 
+	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+	}
+
 	updatePositionsData(data) {
 	}
 

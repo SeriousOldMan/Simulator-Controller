@@ -335,9 +335,11 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		else {
 			value := getConfigurationValue(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
 
-			if (value == kUndefined)
-				value := this.SettingsDatabase.getSettingValue(this.Simulator[true], car, track, "*"
-															 , "Simulator.Assetto Corsa Settings", "Pitstop." . meta, default)
+			if (value == kUndefined) {
+				settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
+
+				value := getConfigurationValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
+			}
 
 			this.CarMetaData[key] := value
 

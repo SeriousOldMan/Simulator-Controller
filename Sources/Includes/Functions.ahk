@@ -889,6 +889,7 @@ loadSimulatorConfiguration() {
 		logMessage(kLogInfo, translate("Session database path set to ") . path)
 	}
 
+    /*
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
 	if path {
 		kHomeDirectory := path . "\"
@@ -897,6 +898,9 @@ loadSimulatorConfiguration() {
 	}
 	else
 		logMessage(kLogWarn, translate("Installation path not set"))
+	*/
+
+	logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
 
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {

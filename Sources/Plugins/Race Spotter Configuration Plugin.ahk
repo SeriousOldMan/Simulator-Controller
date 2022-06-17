@@ -174,7 +174,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", 2)
+			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
 
 			simulatorConfiguration["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DeltaInformation", default)
 

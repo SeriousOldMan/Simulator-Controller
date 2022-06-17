@@ -470,6 +470,8 @@ class RaceSpotter extends RaceAssistant {
 
 	iGridPosition := false
 
+	iWasStartDriver := false
+
 	iLastDeltaInformationLap := false
 	iPositionInfos := {}
 	iAdvices := {}
@@ -613,7 +615,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true, SideProximity: true, RearProximity: true
-													  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
+		 											  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter"))
 	}
@@ -907,7 +909,7 @@ class RaceSpotter extends RaceAssistant {
 					info := this.DriverCar
 
 					if !info {
-						info := new CarInfo(carNr, knowledgeBase.getValue("Car." . A_Index . ".Car", "Unknown"), driverName)
+						info := new CarInfo(carNr, knowledgeBase.getValue("Car." . A_Index . ".Car", "Unknown"))
 
 						this.iDriverCar := info
 					}
@@ -1178,7 +1180,8 @@ class RaceSpotter extends RaceAssistant {
 				lapTimeDifference := Abs(standingsFront.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
-					info := values2String(", ", standingsFront.Car.Nr, standingsFront.Reported, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
+					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+											  , standingsFront.Car.Nr, standingsFront.Reported, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
 											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[false, true, 1]
 											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
 											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
@@ -1237,7 +1240,8 @@ class RaceSpotter extends RaceAssistant {
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
-					info := values2String(", ", standingsBehind.Car.Nr, standingsBehind.Reported, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
+					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+											  , standingsBehind.Car.Nr, standingsBehind.Reported, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
 											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[false, true, 1]
 											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
@@ -1344,7 +1348,7 @@ class RaceSpotter extends RaceAssistant {
 
 						if deltaInformation {
 							if (deltaInformation = "S")
-								regular := true
+								regular := "S"
 							else {
 								regular := (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
 
@@ -1618,22 +1622,20 @@ class RaceSpotter extends RaceAssistant {
 		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		if (!this.Announcements || (this.Announcements.Count() = 0)) {
-			configuration := this.Configuration
+		configuration := this.Configuration
 
-			announcements := {}
+		announcements := {}
 
-			for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "StartSummary", "FinalLaps", "PitWindow"]
-				announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
+						  , "StartSummary", "FinalLaps", "PitWindow"]
+			announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", default)
+		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
+		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 
-			announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
+		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
 
-			this.updateConfigurationValues({Announcements: announcements})
-		}
+		this.updateConfigurationValues({Announcements: announcements})
 	}
 
 	initializeGridPosition(data) {
@@ -1645,6 +1647,8 @@ class RaceSpotter extends RaceAssistant {
 
 	prepareSession(settings, data) {
 		base.prepareSession(settings, data)
+
+		this.iWasStartDriver := true
 
 		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data)
@@ -1668,7 +1672,7 @@ class RaceSpotter extends RaceAssistant {
 				; ignore
 			}
 
-		joined := (!this.Announcements || (this.Announcements.Count() = 0))
+		joined := !this.iWasStartDriver
 
 		if !IsObject(settings)
 			settings := readConfiguration(settings)

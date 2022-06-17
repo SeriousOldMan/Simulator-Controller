@@ -357,7 +357,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
-		delta := Abs(knowledgeBase.getValue("Position.Track.Front.Delta", 0))
+		delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 
 		if (delta != 0) {
 			speaker.startTalk()
@@ -367,7 +367,7 @@ class RaceStrategist extends RaceAssistant {
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Front.Car") . ".Laps"))
+				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Ahead.Car") . ".Laps"))
 
 				if (driverLap < otherLap)
 				  speaker.speakPhrase("NotTheSameLap")
@@ -386,7 +386,7 @@ class RaceStrategist extends RaceAssistant {
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToFront")
 		else {
-			delta := Abs(knowledgeBase.getValue("Position.Standings.Front.Delta", 0) / 1000)
+			delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 
 			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: printNumber(delta, 1)})
 		}
@@ -507,7 +507,7 @@ class RaceStrategist extends RaceAssistant {
 				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 				if (position > 2)
-					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Front.Car", 0))
+					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
 
 				if (position < cars)
 					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
@@ -1003,6 +1003,24 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({StrategyReported: lapNumber})
 		}
 
+		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+
+		if (gapAhead != kUndefined) {
+			knowledgeBase.setFact("Position.Track.Ahead.Delta", Abs(gapAhead))
+
+			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
+				knowledgeBase.setFact("Position.Standings.Ahead.Delta", Abs(gapAhead))
+		}
+
+		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+
+		if (gapBehind != kUndefined) {
+			knowledgeBase.setFact("Position.Track.Behind.Delta", - Abs(gapBehind))
+
+			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+				knowledgeBase.setFact("Position.Standings.Behind.Delta", - Abs(gapBehind))
+		}
+
 		Loop % knowledgeBase.getValue("Car.Count")
 		{
 			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
@@ -1079,7 +1097,27 @@ class RaceStrategist extends RaceAssistant {
 			this.KnowledgeBase.addFact("Sector", sector)
 		}
 
-		return base.updateLap(lapNumber, data)
+		result := base.updateLap(lapNumber, data)
+
+		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+
+		if (gapAhead != kUndefined) {
+			knowledgeBase.setFact("Position.Track.Ahead.Delta", Abs(gapAhead))
+
+			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
+				knowledgeBase.setFact("Position.Standings.Ahead.Delta", Abs(gapAhead))
+		}
+
+		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+
+		if (gapBehind != kUndefined) {
+			knowledgeBase.setFact("Position.Track.Behind.Delta", - Abs(gapBehind))
+
+			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+				knowledgeBase.setFact("Position.Standings.Behind.Delta", - Abs(gapBehind))
+		}
+
+		return result
 	}
 
 	requestInformation(category, arguments*) {

@@ -244,6 +244,9 @@ int main(int argc, char* argv[])
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
 
+		printData("GapAhead", gf->gapAhead);
+		printData("GapBehind", gf->gapBehind);
+
 		double timeLeft = gf->sessionTimeLeft;
 
 		if (timeLeft < 0) {

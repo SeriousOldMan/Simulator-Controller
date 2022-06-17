@@ -285,6 +285,12 @@ struct SPageFileGraphic
     ACC_RAIN_INTENSITY rainIntensity = 0; // Map this
     ACC_RAIN_INTENSITY rainIntensityIn10min = 0; // Map this
     ACC_RAIN_INTENSITY rainIntensityIn30min = 0; // Map this
+
+    int currentTyreSet = 0;
+    int strategyTyreSet = 0;
+
+    int gapAhead = 0;
+    int gapBehind = 0;
 };
 
 

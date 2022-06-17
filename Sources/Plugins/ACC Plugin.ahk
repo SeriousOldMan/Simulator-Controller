@@ -49,7 +49,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
-	iFallbackMode := false
+	iNoImageSearch := false
 
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -449,8 +449,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
 		}
 
+		imgSearch := (imageSearch && !this.iNoImageSearch)
+
 		if (update = kUndefined)
-			if imageSearch
+			if imgSearch
 				update := true
 			else {
 				if (A_Now > nextUpdate)
@@ -467,7 +469,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-				if !imageSearch {
+				if !imgSearch {
 					if update {
 						this.initializePitstopMFD()
 
@@ -482,14 +484,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
 
-				if !this.iFallbackMode
-					if (imageSearch && (update || !wasOpen)) {
-						if this.updatePitStopState()
-							this.openPitstopMFD(false, false)
+				if (imgSearch && (update || !wasOpen)) {
+					if this.updatePitStopState()
+						this.openPitstopMFD(false, false)
 
-						if this.iPSIsOpen
-							SetTimer updatePitstopState, 5000
-					}
+					if this.iPSIsOpen
+						SetTimer updatePitstopState, 5000
+				}
 			}
 		}
 		else if !reported {
@@ -526,11 +527,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	requirePitstopMFD() {
+	requirePitstopMFD(retry := false) {
 		static reported := false
 
-		if (this.iFallbackMode = "Retry")
-			this.iFallbackMode := false
+		if retry
+			this.iNoImageSearch := false
 
 		this.openPitstopMFD()
 
@@ -548,23 +549,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 
-			this.iFallbackMode := true
+			this.iNoImageSearch := true
 
 			SetTimer updatePitstopState, Off
 
-			this.activateACCWindow()
-
-			this.iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-							  , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-							  , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
-
-			this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-			this.iPSChangeTyres := true
-			this.iPSChangeBrakes := false
-
-			this.iPSTyreOptions := 7
+			this.openPitstopMFD(false, true)
 
 			return true
 		}
@@ -1619,10 +1608,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		if this.iFallbackMode
-			this.iFallbackMode := "Retry"
-
-		withProtection(ObjBindMethod(this, "requirePitstopMFD"))
+		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
 	}
 
 	finishPitstopSetup(pitstopNumber) {

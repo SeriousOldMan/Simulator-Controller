@@ -1132,8 +1132,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				selected := LV_GetNext(0)
 
-				section := this.iSettings[selected][1]
-				key := this.iSettings[selected][2]
+				if selected {
+					section := this.iSettings[selected][1]
+					key := this.iSettings[selected][2]
+				}
 			}
 			finally {
 				Gui ListView, %defaultListView%
@@ -1156,8 +1158,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				selected := LV_GetNext(0)
 
-				section := this.iSettings[selected][1]
-				key := this.iSettings[selected][2]
+				if selected {
+					section := this.iSettings[selected][1]
+					key := this.iSettings[selected][2]
+				}
+				else
+					return default
 			}
 			finally {
 				Gui ListView, %defaultListView%

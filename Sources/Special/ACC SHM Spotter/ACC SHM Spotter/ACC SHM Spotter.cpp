@@ -516,19 +516,26 @@ void checkPitWindow() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	int currentTime = sessionDuration - gf->sessionTimeLeft;
+	int pitWindow = (sf->PitWindowEnd - sf->PitWindowStart);
 	
-	if (sf->PitWindowStart < currentTime && sf->PitWindowEnd > currentTime && !pitWindowOpenReported) {
-		pitWindowOpenReported = true;
-		pitWindowClosedReported = false;
+	if (pitWindow > 0) {
+		int currentTime = sessionDuration - gf->sessionTimeLeft;
+	
+		int pitWindowStart = (int)((sessionDuration / 2) - (pitWindow / 2));
+		int pitWindowEnd = (int)((sessionDuration / 2) + (pitWindow / 2));
+		
+		if (pitWindowStart < currentTime && pitWindowEnd > currentTime && !pitWindowOpenReported) {
+			pitWindowOpenReported = true;
+			pitWindowClosedReported = false;
 
-		sendMessage("pitWindow:Open");
-	}
-	else if (sf->PitWindowEnd < currentTime && !pitWindowClosedReported) {
-		pitWindowClosedReported = true;
-		pitWindowOpenReported = false;
+			sendMessage("pitWindow:Open");
+		}
+		else if (pitWindowEnd < currentTime && !pitWindowClosedReported) {
+			pitWindowClosedReported = true;
+			pitWindowOpenReported = false;
 
-		sendMessage("pitWindow:Closed");
+			sendMessage("pitWindow:Closed");
+		}
 	}
 }
 

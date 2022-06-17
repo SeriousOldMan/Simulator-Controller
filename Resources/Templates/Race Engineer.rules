@@ -602,7 +602,8 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
 		(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
-		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
+		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
+		(Clear: Pitstop.Planned.Driver.Request)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},
@@ -626,6 +627,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 	  {None: [?Pitstop.Planned.Tyre.Pressure.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Pitstop.Plan.Tyre.Pressure.RR)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Suspension],
 	  {None: [?Pitstop.Planned.Repair.Suspension]}} => (Set: Pitstop.Planned.Repair.Suspension, ?Pitstop.Plan.Repair.Suspension)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Driver.Request],
+	  {None: [?Pitstop.Planned.Driver.Request]}} => (Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Bodywork],
 	  {None: [?Pitstop.Planned.Repair.Bodywork]}} => (Set: Pitstop.Planned.Repair.Bodywork, ?Pitstop.Plan.Repair.Bodywork)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
@@ -676,6 +679,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 		(Set: Pitstop.Planned.Repair.Suspension, false)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target], [?Pitstop.Plan.Repair.Bodywork]}} =>
 		(Set: Pitstop.Planned.Repair.Bodywork, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Driver.Request]}} =>
+		(Set: Pitstop.Planned.Driver.Request, false)
 
 priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false)
@@ -685,7 +690,8 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.FL), (Clear: Pitstop.Plan.Tyre.Pressure.FR),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
-								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension)
+								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
+								  (Clear: Pitstop.Plan.Driver.Request)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)
@@ -705,7 +711,7 @@ priority: -20, {All: [?Pitstop.Planned], [?Pitstop.Prepare]} => (Clear: Pitstop.
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
 								  setTyreSet(?pitstopNumber), setTyrePressures(?pitstopNumber),
-								  requestRepairs(?pitstopNumber)
+								  requestRepairs(?pitstopNumber), requestDriver(?pitstopNumber)
 preparePitstop(?pitstopNumber) <= Call(finishPitstopSetup, ?pitstopNumber)
 
 setRefuelAmount(?pitstopNumber) <= Call(setPitstopRefuelAmount, ?pitstopNumber, !Pitstop.Planned.Fuel)
@@ -721,6 +727,9 @@ setTyrePressures(?pitstopNumber) <=
 
 requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
 															  !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
+
+requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber,
+															!Pitstop.Planned.Driver.Request)
 
 
 ;;;-------------------------------------------------------------------------;;;

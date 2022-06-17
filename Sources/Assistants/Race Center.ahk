@@ -62,7 +62,7 @@ global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
 											, "Position.Start", "Position.End", "Time.Start"]
-							 , "Driver.Data": ["Forname", "Surname", "Nickname"]
+							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr"]
 							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 										  , "Weather", "Temperature.Air", "Temperature.Track"
 										  , "Fuel.Remaining", "Fuel.Consumption", "Damage", "Accident"
@@ -200,6 +200,7 @@ class RaceCenter extends ConfigurationItem {
 	iTeams := {}
 	iSessions := {}
 	iSessionDrivers := {}
+	iTeamDrivers := []
 
 	iTeamIdentifier := false
 	iTeamName := false
@@ -635,6 +636,15 @@ class RaceCenter extends ConfigurationItem {
 				return this.iSessionDrivers[key]
 			else
 				return this.iSessionDrivers
+		}
+	}
+
+	TeamDrivers[key := false] {
+		Get {
+			if key
+				return this.iTeamDrivers[key]
+			else
+				return this.iTeamDrivers
 		}
 	}
 
@@ -1077,7 +1087,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Select Team...", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -1489,18 +1499,44 @@ class RaceCenter extends ConfigurationItem {
 			teamIdentifier := this.SelectedTeam[true]
 
 			drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : {})
+
+			session := this.SelectedSession[true]
+
+			try {
+				teamDrivers := this.Connector.GetSessionValue(session, "Session Drivers")
+			}
+			catch exception {
+				teamDrivers := ""
+			}
+
+			if (teamDrivers && (teamDrivers != ""))
+				teamDrivers := string2Values("###", teamDrivers)
+			else
+				teamDrivers := []
 		}
 		else {
 			drivers := {}
+			selectedDrivers := {}
 
 			for ignore, driver in this.Drivers {
 				name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 
 				drivers[name] := false
+
+				if drivers.Nr
+					selectedDrivers[drivers.Nr] := name
 			}
+
+			teamDrivers := []
+
+			Loop % selectedDrivers.Count()
+				teamDrivers.Push(selectedDrivers[A_Index . ""])
 		}
 
 		this.iSessionDrivers := drivers
+		this.iTeamDrivers := teamDrivers
+
+		Loop % teamDrivers.Count()
 
 		names := getKeys(drivers)
 		identifiers := getValues(drivers)
@@ -1540,6 +1576,9 @@ class RaceCenter extends ConfigurationItem {
 	createDriver(driver) {
 		if !driver.HasKey("Identifier")
 			driver["Identifier"] := false
+
+		if !driver.HasKey("Nr")
+			driver["Nr"] := false
 
 		for ignore, candidate in this.Drivers
 			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
@@ -2956,11 +2995,13 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 10: ; Update Statistics
+			case 10: ; Manage Team
+				this.manageTeam()
+			case 11: ; Update Statistics
 				this.updateStatistics()
-			case 12: ; Race Summary
+			case 13: ; Race Summary
 				this.showRaceSummary()
-			case 13: ; Driver Statistics
+			case 14: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -5182,6 +5223,32 @@ class RaceCenter extends ConfigurationItem {
 		driver.CarControl := carControl
 	}
 
+	manageTeam() {
+		this.pushTask(ObjBindMethod(this, "manageTeamAsync"))
+	}
+
+	manageTeamAsync() {
+		teamDrivers := manageTeam(this)
+
+		if teamDrivers {
+			if this.SessionActive {
+				session := this.SelectedSession[true]
+
+				this.Connector.SetSessionValue(session, "Session Drivers", values2String("###", teamDrivers*))
+			}
+
+			this.iTeamDrivers := teamDrivers
+
+			for ignore, driver in this.Drivers
+				driver.Nr := false
+
+			for nr, name in teamDrivers
+				for ignore, driver in this.Drivers
+					if (driver.FullName = name)
+						driver.Nr := nr
+		}
+	}
+
 	updateStatistics() {
 		this.pushTask(ObjBindMethod(this, "updateStatisticsAsync"))
 	}
@@ -5377,7 +5444,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
 			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 
-			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name})
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr})
 		}
 	}
 
@@ -8301,6 +8368,111 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 
 	return previousValue
+}
+
+manageTeam(raceCenter) {
+	static result := false
+
+	static availableDriversListView
+	static selectedDriversListView
+
+	if (raceCenter = kCancel)
+		result := kCancel
+	else if (raceCenter = kOk)
+		result := kOk
+	else {
+		result := false
+
+		owner := raceCenter.Window
+
+		Gui TE:Default
+		Gui TE:+Owner%owner%
+
+		Gui TE:-Border ; -Caption
+		Gui TE:Color, D0D0D0, D8D8D8
+
+		Gui TE:Font, s10 Bold, Arial
+
+		Gui TE:Add, Text, w368 Center gmoveTeamManager, % translate("Modular Simulator Controller System")
+
+		Gui TE:Font, s9 Norm, Arial
+		Gui TE:Font, Italic Underline, Arial
+
+		Gui TE:Add, Text, YP+20 w368 cBlue Center gopenTeamManagerDocumentation, % translate("Team Selection")
+
+		Gui TE:Font, s8 Norm, Arial
+
+		availableDriverListViewHandle := false
+		selectedDriverListViewHandle := false
+
+		teamDrivers := raceCenter.TeamDrivers
+
+		Gui TE:Add, ListView, x16 yp+30 w160 h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriverListViewHandle Section, % values2String("|", map(["Available Driver"], "translate")*)
+
+		for name, ignore in raceCenter.SessionDrivers
+			if !inList(teamDrivers, name)
+				LV_Add("", name)
+
+		Gui TE:Add, ListView, x230 ys w160 h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriverListViewHandle, % values2String("|", map(["Selected Driver"], "translate")*)
+
+		for ignore, name in teamDrivers
+			LV_Add("", name)
+
+		Gui TE:Font, s10 Bold, Arial
+
+		Gui TE:Add, Button, x183 ys+95 w40, >
+		Gui TE:Add, Button, x183 yp+30 w40, <
+
+		upDriverButton := false
+		downDriverButton := false
+
+		Gui TE:Add, Button, x205 ys+25 w23 h23 HWNDupDriverButton
+		Gui TE:Add, Button, x205 ys+201 w23 h23 HWNDdownDriverButton
+
+		setButtonIcon(upDriverButton, kIconsDirectory . "Up Arrow.ico", 1, "W12 H12 L6 T6 R6 B6")
+		setButtonIcon(downDriverButton, kIconsDirectory . "Down Arrow.ico", 1, "W12 H12 L4 T4 R4 B4")
+
+		Gui TE:Font, s8 Norm, Arial
+
+		Gui TE:Add, Text, x8 ys+234 w384 0x10
+
+		Gui TE:Add, Button, x120 yp+10 w80 h23 Default GacceptTeamManager, % translate("Ok")
+		Gui TE:Add, Button, x208 yp w80 h23 GcancelTeamManager, % translate("&Cancel")
+
+		Gui TE:Show
+
+		Loop
+			Sleep 100
+		Until result
+
+		if (result = kOk) {
+			result := {}
+
+			Gui TE:Submit
+		}
+		else
+			result := false
+
+		Gui TE:Destroy
+
+		return result
+	}
+}
+
+acceptTeamManager() {
+	manageTeam(kOk)
+}
+
+cancelTeamManager() {
+	manageTeam(kCancel)
+}
+
+moveTeamManager() {
+	moveByMouse("TE")
+}
+
+openTeamManagerDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning
 }
 
 loginDialog(connectorOrCommand := false, teamServerURL := false) {

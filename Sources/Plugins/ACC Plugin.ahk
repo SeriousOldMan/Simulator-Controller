@@ -1663,11 +1663,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.toggleActivity("Repair Bodywork")
 	}
 
-	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
-		delta := (nextDriver - currentDriver)
+	requestPitstopDriver(pitstopNumber, driver) {
+		if driver {
+			driver := string2Values(";", driver)
 
-		Loop % Abs(delta)
-			this.changeDriver((delta < 0) ? "Previous" : "Next")
+			delta := (driver[2] - driver[1])
+
+			Loop % Abs(delta)
+				this.changeDriver((delta < 0) ? "Previous" : "Next")
+		}
 	}
 
 	restoreSessionState(sessionSettings, sessionState) {

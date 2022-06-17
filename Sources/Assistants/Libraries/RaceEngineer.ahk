@@ -1327,8 +1327,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__"
-			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__", tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__"
-			  , tyrePressures := "__Undefined__", repairBodywork := "__Undefined__", repairSuspension := "__Undefined__") {
+			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__"
+			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__", tyrePressures := "__Undefined__"
+			  , repairBodywork := "__Undefined__", repairSuspension := "__Undefined__", requestDriver:= "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 
@@ -1392,6 +1393,9 @@ class RaceEngineer extends RaceAssistant {
 
 		if (repairSuspension != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Repair.Suspension", repairSuspension)
+
+		if (requestDriver != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Driver.Request", requestDriver)
 
 		result := knowledgeBase.produce()
 
@@ -1845,9 +1849,9 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 
-	requestPitstopDriver(pitstopNumber, currentDriver, nextDriver) {
+	requestPitstopDriver(pitstopNumber, driver) {
 		if this.RemoteHandler
-			this.RemoteHandler.requestPitstopDriver(pitstopNumber, currentDriver, nextDriver)
+			this.RemoteHandler.requestPitstopDriver(pitstopNumber, driver)
 	}
 
 	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
@@ -1929,8 +1933,8 @@ requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) 
 	return true
 }
 
-requestPitstopDriver(context, pitstopNumber, currentDriver, nextDriver) {
-	context.KnowledgeBase.RaceAssistant.requestPitstopDriver(pitstopNumber, currentDriver, nextDriver)
+requestPitstopDriver(context, pitstopNumber, driver) {
+	context.KnowledgeBase.RaceAssistant.requestPitstopDriver(pitstopNumber, driver)
 
 	return true
 }

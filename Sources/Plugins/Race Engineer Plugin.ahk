@@ -27,24 +27,24 @@ global kRaceEngineerPlugin = "Race Engineer"
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
-										 
+
 	iPitstopPending := false
-	
+
 	iLapDatabase := false
-	
+
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			base.__New(plugin, "Race Engineer", remotePID)
 		}
-		
+
 		planPitstop(arguments*) {
 			this.callRemote("callPlanPitstop", arguments*)
 		}
-		
+
 		preparePitstop(arguments*) {
 			this.callRemote("callPreparePitstop", arguments*)
 		}
-		
+
 		pitstopOptionChanged(arguments*) {
 			this.callRemote("pitstopOptionChanged", arguments*)
 		}
@@ -60,51 +60,51 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				base.fireAction(function, trigger)
 		}
 	}
-	
+
 	RaceEngineer[] {
 		Get {
 			return this.RaceAssistant
 		}
 	}
-	
+
 	LapDatabase[] {
 		Get {
 			if !this.iLapDatabase
 				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
-			
+
 			return this.iLapDatabase
 		}
 	}
-	
+
 	PitstopPending[] {
 		Get {
 			return this.iPitstopPending
 		}
 	}
-	
+
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
 
 		if (!this.Active && !isDebug())
 			return
-		
+
 		if (this.RaceAssistantName)
 			SetTimer collectRaceEngineerSessionData, 10000
 		else
 			SetTimer updateRaceEngineerSessionState, 5000
 	}
-	
+
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function
-		
+
 		if inList(["PitstopPlan", "PitstopPrepare"], action) {
 			function := controller.findFunction(actionFunction)
-			
+
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
-				
+
 				action := new this.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
-				
+
 				this.registerAction(action)
 			}
 			else
@@ -113,42 +113,42 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		else
 			return base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
-	
+
 	createRaceAssistant(pid) {
 		return new this.RemoteRaceEngineer(this, pid)
 	}
-	
+
 	prepareSettings(data) {
 		settings := base.prepareSettings(data)
-		
+
 		tyresDB := new TyresDatabase()
-							
+
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")
 		track := getConfigurationValue(data, "Session Data", "Track")
-		
+
 		simulatorName := tyresDB.getSimulatorName(simulator)
-		
+
 		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
 		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
 		compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
 		compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
-		
+
 		tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
-		
+
 		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
 			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
-			
+
 			compound := false
 			compoundColor := false
 			pressures := {}
 			certainty := 1.0
-			
+
 			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
-				
+
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
@@ -157,33 +157,36 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 		else if (tpSetting = "Import") {
 			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
-			
+
 			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
-			
+
 			settings := readConfiguration(kTempDirectory . "Race Engineer.settings")
 		}
-		
+
 		return settings
 	}
-	
+
 	startSession(settingsFile, dataFile, teamSession) {
 		base.startSession(settingsFile, dataFile, teamSession)
-		
+
 		this.iLapDatabase := false
 	}
-	
+
 	checkPitstopPlan() {
 		if (this.TeamSession && this.RaceEngineer) {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
-			
+
 			if (pitstopSettings && (pitstopSettings != "")) {
 				this.TeamServer.setSessionValue("Pitstop Plan", "")
-				
+
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
-				
+
 				if (pitstopSettings && (pitstopSettings != "")) {
 					pitstopSettings := parseConfiguration(pitstopSettings)
-					
+
+					requestDriver := getConfigurationValue(pitstopSettings, "Pitstop", "Driver", false)
+					requestDriver := (requestDriver ? [requestDriver] : [])
+
 					this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
@@ -192,77 +195,78 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false))
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
+												, requestDriver*)
 				}
 			}
 		}
 	}
-	
+
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
-		
+
 		this.checkPitstopPlan()
 	}
-	
+
 	updateLap(lapNumber, dataFile) {
 		base.updateLap(lapNumber, dataFile)
-		
+
 		this.checkPitstopPlan()
 	}
-	
+
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["Time", "LapsRemaining", "FuelRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)
-		
+
 			return true
 		}
 		else
 			return false
 	}
-	
+
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()
 	}
-	
+
 	preparePitstop(lap := false) {
 		if this.RaceEngineer
 			this.RaceEngineer.preparePitstop(lap)
 	}
-	
+
 	performPitstop(lapNumber) {
 		base.performPitstop(lapNumber)
-		
+
 		this.iPitstopPending := false
-					
+
 		SetTimer collectRaceEngineerSessionData, 10000
 	}
-	
+
 	pitstopOptionChanged(option, values*) {
 		if this.RaceEngineer
 			this.RaceEngineer.pitstopOptionChanged(option, values*)
 	}
-	
+
 	pitstopPlanned(pitstopNumber, plannedLap := false) {
 		this.Simulator.pitstopPlanned(pitstopNumber, plannedLap := false)
 	}
-	
+
 	pitstopPrepared(pitstopNumber) {
 		this.iPitstopPending := true
-		
+
 		this.Simulator.pitstopPrepared(pitstopNumber)
-		
+
 		SetTimer collectRaceEngineerSessionData, 5000
 	}
-	
+
 	pitstopFinished(pitstopNumber) {
 		this.iPitstopPending := false
-		
+
 		this.Simulator.pitstopFinished(pitstopNumber)
-		
+
 		SetTimer collectRaceEngineerSessionData, 10000
 	}
-	
+
 	startPitstopSetup(pitstopNumber) {
 		this.Simulator.startPitstopSetup(pitstopNumber)
 	}
@@ -274,7 +278,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		this.Simulator.setPitstopRefuelAmount(pitstopNumber, litres)
 	}
-	
+
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
 		this.Simulator.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 	}
@@ -290,11 +294,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	requestPitstopDriver(pitstopNumber, driver) {
 		this.Simulator.requestPitstopDriver(pitstopNumber, driver)
 	}
-	
+
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				   , compound, compoundColor, coldPressures, hotPressures) {
 		teamServer := this.TeamServer
-		
+
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures))
@@ -304,23 +308,23 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 											 , "Compound": compound, "Compound.Color": compoundColor
 											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
 	}
-	
+
 	updateTyresDatabase() {
 		tyresDB := new TyresDatabase()
 		teamServer := this.TeamServer
 		session := this.TeamSession
-		
+
 		if (teamServer && teamServer.Active && session)
 			Loop % teamServer.getCurrentLap(session)
 			{
 				try {
 					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
-					
+
 					if (!lapPressures || (lapPressures == ""))
 						continue
-					
+
 					lapPressures := string2Values(";", lapPressures)
-					
+
 					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
 										  , string2Values(",", lapPressures[10]), false)
@@ -353,7 +357,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 planPitstop() {
 	protectionOn()
-	
+
 	try {
 		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).planPitstop()
 	}
@@ -364,7 +368,7 @@ planPitstop() {
 
 preparePitstop() {
 	protectionOn()
-	
+
 	try {
 		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).preparePitstop()
 	}
@@ -380,7 +384,7 @@ preparePitstop() {
 
 updateRaceEngineerSessionState() {
 	protectionOn()
-	
+
 	try {
 		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).updateSessionState()
 	}
@@ -391,7 +395,7 @@ updateRaceEngineerSessionState() {
 
 collectRaceEngineerSessionData() {
 	protectionOn()
-	
+
 	try {
 		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).collectSessionData()
 	}
@@ -402,7 +406,7 @@ collectRaceEngineerSessionData() {
 
 initializeRaceEngineerPlugin() {
 	local controller := SimulatorController.Instance
-	
+
 	new RaceEngineerPlugin(controller, kRaceEngineerPlugin, controller.Configuration)
 }
 

@@ -268,9 +268,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 	requestPitstopDriver(pitstopNumber, driver) {
 		if driver {
-			driver := string2Values(";", driver)
+			driver := string2Values("|", driver)
 
-			delta := (driver[2] - driver[1])
+			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
 
 			Loop % Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")

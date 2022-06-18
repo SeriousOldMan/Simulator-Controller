@@ -129,6 +129,9 @@ Returns a new list with the result of *function* applied to each element in *lis
 #### *remove(list :: Array, object :: Object)*
 Returns a new list with all occurencies of *object* removed from the original list.
 
+#### *removeDuplicates(list :: Array)*
+Returns a new list with all duplicate values removed.
+
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
 Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
 

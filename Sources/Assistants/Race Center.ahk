@@ -176,6 +176,7 @@ global overtakeDeltaEdit = 2
 global trafficConsideredEdit = 7
 
 global pitstopLapEdit
+global pitstopDriverDropDown
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
@@ -1087,7 +1088,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Select Team...", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -1303,6 +1304,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
+
+		Gui %window%:Add, Text, x24 yp+30 w80 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDown
 
 		Gui %window%:Add, Text, x24 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
@@ -1524,7 +1528,7 @@ class RaceCenter extends ConfigurationItem {
 				drivers[name] := false
 
 				if drivers.Nr
-					selectedDrivers[drivers.Nr] := name
+					selectedDrivers[drivers.Nr . ""] := name
 			}
 
 			teamDrivers := []
@@ -1536,13 +1540,13 @@ class RaceCenter extends ConfigurationItem {
 		this.iSessionDrivers := drivers
 		this.iTeamDrivers := teamDrivers
 
-		Loop % teamDrivers.Count()
-
 		names := getKeys(drivers)
 		identifiers := getValues(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
 		GuiControl, , plansetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
+		GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
+		GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
 	}
 
 	selectSession(identifier) {
@@ -1846,7 +1850,7 @@ class RaceCenter extends ConfigurationItem {
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -2060,6 +2064,33 @@ class RaceCenter extends ConfigurationItem {
 			MsgBox 262192, %title%, % translate("You are not connected to an active session.")
 			OnMessage(0x44, "")
 		}
+	}
+
+	getPlanDrivers() {
+		drivers := {}
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.PlanListView
+
+			Loop % LV_GetCount()
+			{
+				LV_GetText(stint, A_Index, 1)
+				LV_GetText(driver, A_Index, 2)
+
+				drivers[stint + 0] := driver
+			}
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
+
+		return drivers
 	}
 
 	loadPlanFromStrategy() {
@@ -2507,6 +2538,19 @@ class RaceCenter extends ConfigurationItem {
 	initializePitstopFromSession() {
 		local compound
 
+		stint := this.CurrentStint
+
+		if stint {
+			drivers := this.getPlanDrivers()
+
+			if (drivers.HasKey(stint.Nr + 1)) {
+				index := inList(this.TeamDrivers, drivers[stint.Nr + 1])
+
+				if index
+					GuiControl Choose, pitstopDriverDropDown, %index%
+			}
+		}
+
 		pressuresDB := this.PressuresDatabase
 
 		if pressuresDB {
@@ -2868,6 +2912,7 @@ class RaceCenter extends ConfigurationItem {
 			Gui %window%:Default
 
 			GuiControlGet pitstopLapEdit
+			GuiControlGet pitstopDriverDropDown
 			GuiControlGet pitstopRefuelEdit
 			GuiControlGet pitstopTyreCompoundDropDown
 			GuiControlGet pitstopTyreSetEdit
@@ -2881,6 +2926,23 @@ class RaceCenter extends ConfigurationItem {
 
 			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
 			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
+
+			stint := this.CurrentStint
+
+			if (stint && pitstopDriverDropDown && (pitstopDriverDropDown != "")) {
+				drivers := this.getPlanDrivers()
+
+				if (drivers.HasKey(stint.Nr)) {
+					currentDriver := drivers[stint.Nr]
+					nextDriver := pitstopDriverDropDown
+
+					currentNr := inList(this.TeamDrivers, currentDriver)
+					nextNr := inList(this.TeamDrivers, nextDriver)
+
+					if (currentNr && nextNr)
+						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNR . "|" . nextDriver . ":" . nextNr)
+				}
+			}
 
 			if (pitstopTyreCompoundDropDown > 1) {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
@@ -2995,13 +3057,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 10: ; Manage Team
-				this.manageTeam()
-			case 11: ; Update Statistics
+			case 10: ; Update Statistics
 				this.updateStatistics()
-			case 13: ; Race Summary
+			case 12: ; Race Summary
 				this.showRaceSummary()
-			case 14: ; Driver Statistics
+			case 13: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -3221,9 +3281,11 @@ class RaceCenter extends ConfigurationItem {
 
 	choosePitstopMenu(line) {
 		switch line {
-			case 3:
+			case 3: ; Manage Team
+				this.manageTeam()
+			case 5:
 				this.initializePitstopFromSession()
-			case 4:
+			case 6:
 				exePath := kBinariesDirectory . "Session Database.exe"
 
 				try {
@@ -3251,21 +3313,21 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-			case 5:
-				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
 			case 7:
+				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
+			case 9:
 				this.showSetupsDetails()
 
 				this.iSelectedDetailReport := "Setups"
-			case 9:
+			case 11:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				this.updateState()
-			case 10:
+			case 12:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 12:
+			case 14:
 				this.planPitstop()
 		}
 	}
@@ -5228,7 +5290,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	manageTeamAsync() {
-		teamDrivers := manageTeam(this)
+		teamDrivers := manageTeam(this, (this.TeamDrivers.Length() = 0) ? removeDuplicates(getValues(this.getPlanDrivers()))
+																		: this.TeamDrivers)
 
 		if teamDrivers {
 			if this.SessionActive {
@@ -5246,6 +5309,13 @@ class RaceCenter extends ConfigurationItem {
 				for ignore, driver in this.Drivers
 					if (driver.FullName = name)
 						driver.Nr := nr
+
+			window := this.Window
+
+			Gui %window%:Default
+
+			GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
+			GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
 		}
 	}
 
@@ -8370,20 +8440,110 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
-manageTeam(raceCenter) {
+manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	static result := false
 
 	static availableDriversListView
 	static selectedDriversListView
 
-	if (raceCenter = kCancel)
+	static selectDriverButton
+	static deselectDriverButton
+	static upDriverButton
+	static downDriverButton
+
+	if (raceCenterOrCommand = kCancel)
 		result := kCancel
-	else if (raceCenter = kOk)
+	else if (raceCenterOrCommand = kOk)
 		result := kOk
+	else if (raceCenterOrCommand = "SelectDriver") {
+		Gui ListView, %availableDriversListView%
+
+		row := LV_GetNext(0)
+
+		LV_GetText(driver, row)
+		LV_Delete(row)
+
+		Gui ListView, %selectedDriversListView%
+
+		LV_Add("Select Vis", driver)
+
+		updateTeamManager()
+	}
+	else if (raceCenterOrCommand = "DeselectDriver") {
+		Gui ListView, %selectedDriversListView%
+
+		row := LV_GetNext(0)
+
+		LV_GetText(driver, row)
+		LV_Delete(row)
+
+		Gui ListView, %availableDriversListView%
+
+		LV_Add("Vis", driver)
+
+		updateTeamManager()
+	}
+	else if (raceCenterOrCommand = "UpDriver") {
+		Gui ListView, %selectedDriversListView%
+
+		row := LV_GetNext(0)
+
+		LV_GetText(driver, row)
+		LV_Delete(row)
+
+		LV_Insert(row - 1, "Select Vis", driver)
+
+		updateTeamManager()
+	}
+	else if (raceCenterOrCommand = "DownDriver") {
+		Gui ListView, %selectedDriversListView%
+
+		row := LV_GetNext(0)
+
+		LV_GetText(driver, row)
+		LV_Delete(row)
+
+		LV_Insert(row + 1, "Select Vis", driver)
+
+		updateTeamManager()
+	}
+	else if (raceCenterOrCommand = "UpdateState") {
+		Gui TE:Default
+
+		Gui ListView, %availableDriversListView%
+
+		if LV_GetNext(0)
+			GuiControl Enable, selectDriverButton
+		else
+			GuiControl Disable, selectDriverButton
+
+		Gui ListView, %selectedDriversListView%
+
+		row := LV_GetNext(0)
+
+		if row {
+			GuiControl Enable, deselectDriverButton
+
+			if (row > 1)
+				GuiControl Enable, upDriverButton
+			else
+				GuiControl Disable, upDriverButton
+
+			if (row < LV_GetCount())
+				GuiControl Enable, downDriverButton
+			else
+				GuiControl Disable, downDriverButton
+		}
+		else {
+			GuiControl Disable, deselectDriverButton
+			GuiControl Disable, upDriverButton
+			GuiControl Disable, downDriverButton
+		}
+	}
 	else {
 		result := false
 
-		owner := raceCenter.Window
+		owner := raceCenterOrCommand.Window
 
 		Gui TE:Default
 		Gui TE:+Owner%owner%
@@ -8402,53 +8562,61 @@ manageTeam(raceCenter) {
 
 		Gui TE:Font, s8 Norm, Arial
 
-		availableDriverListViewHandle := false
-		selectedDriverListViewHandle := false
+		Gui TE:Add, ListView, x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gupdateTeamManager Section, % values2String("|", map(["Available Driver"], "translate")*)
 
-		teamDrivers := raceCenter.TeamDrivers
+		if !teamDrivers
+			teamDrivers := raceCenterOrCommand.TeamDrivers
 
-		Gui TE:Add, ListView, x16 yp+30 w160 h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriverListViewHandle Section, % values2String("|", map(["Available Driver"], "translate")*)
-
-		for name, ignore in raceCenter.SessionDrivers
+		for name, ignore in raceCenterOrCommand.SessionDrivers
 			if !inList(teamDrivers, name)
 				LV_Add("", name)
 
-		Gui TE:Add, ListView, x230 ys w160 h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriverListViewHandle, % values2String("|", map(["Selected Driver"], "translate")*)
+		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver"], "translate")*)
 
 		for ignore, name in teamDrivers
 			LV_Add("", name)
 
 		Gui TE:Font, s10 Bold, Arial
 
-		Gui TE:Add, Button, x183 ys+95 w40, >
-		Gui TE:Add, Button, x183 yp+30 w40, <
+		Gui TE:Add, Button, x183 ys+75 w40 vselectDriverButton gselectTeamDriver, >
+		Gui TE:Add, Button, x183 yp+30 w40 vdeselectDriverButton gdeselectTeamDriver, <
 
 		upDriverButton := false
 		downDriverButton := false
 
-		Gui TE:Add, Button, x205 ys+25 w23 h23 HWNDupDriverButton
-		Gui TE:Add, Button, x205 ys+201 w23 h23 HWNDdownDriverButton
+		Gui TE:Add, Button, x205 ys+25 w23 h23 HWNDupDriverButton vupDriverButton gupTeamDriver
+		Gui TE:Add, Button, x205 ys+161 w23 h23 HWNDdownDriverButton vdownDriverButton gdownTeamDriver
 
 		setButtonIcon(upDriverButton, kIconsDirectory . "Up Arrow.ico", 1, "W12 H12 L6 T6 R6 B6")
 		setButtonIcon(downDriverButton, kIconsDirectory . "Down Arrow.ico", 1, "W12 H12 L4 T4 R4 B4")
 
 		Gui TE:Font, s8 Norm, Arial
 
-		Gui TE:Add, Text, x8 ys+234 w384 0x10
+		Gui TE:Add, Text, x8 ys+194 w384 0x10
 
 		Gui TE:Add, Button, x120 yp+10 w80 h23 Default GacceptTeamManager, % translate("Ok")
 		Gui TE:Add, Button, x208 yp w80 h23 GcancelTeamManager, % translate("&Cancel")
 
 		Gui TE:Show
 
+		updateTeamManager()
+
 		Loop
 			Sleep 100
 		Until result
 
 		if (result = kOk) {
-			result := {}
+			Gui TE:Default
+			Gui ListView, %selectedDriversListView%
 
-			Gui TE:Submit
+			result := []
+
+			Loop % LV_GetCount()
+			{
+				LV_GetText(driver, A_Index)
+
+				result.Push(driver)
+			}
 		}
 		else
 			result := false
@@ -8465,6 +8633,26 @@ acceptTeamManager() {
 
 cancelTeamManager() {
 	manageTeam(kCancel)
+}
+
+updateTeamManager() {
+	manageTeam("UpdateState")
+}
+
+selectTeamDriver() {
+	manageTeam("SelectDriver")
+}
+
+deselectTeamDriver() {
+	manageTeam("DeselectDriver")
+}
+
+upTeamDriver() {
+	manageTeam("UpDriver")
+}
+
+downTeamDriver() {
+	manageTeam("DownDriver")
 }
 
 moveTeamManager() {

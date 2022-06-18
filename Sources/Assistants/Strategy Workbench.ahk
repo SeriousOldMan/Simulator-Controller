@@ -1062,6 +1062,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		drawChartFunction .= "`ndata.addRows(["
 
+		minValue := kUndefined
+		maxValue := kUndefined
+
 		for ignore, values in data {
 			if (A_Index > 1)
 				drawChartFunction .= ",`n"
@@ -1070,6 +1073,17 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if ((value = "n/a") || (isNull(value)))
 				value := kNull
+			else if (this.SelectedChartType = "Bar") {
+				if (minValue = kUndefined)
+					minValue := value
+				else
+					minValue := Min(value, minValue)
+
+				if (maxValue = kUndefined)
+					maxValue := value
+				else
+					maxValue := Max(value, maxValue)
+			}
 
 			if (this.SelectedChartType = "Bubble")
 				drawChartFunction .= ("['', " . value)
@@ -1113,8 +1127,14 @@ class StrategyWorkbench extends ConfigurationItem {
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bar") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' } };")
+			if (minValue = kUndefined)
+				minValue := 0
 
+			if (maxValue = kUndefined)
+				maxValue := 0
+
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: {minValue: " . minValue . ", maxValue: " . maxValue . "} };")
+			; , hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' }
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {

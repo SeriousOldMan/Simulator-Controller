@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\JSON.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
@@ -72,6 +73,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
+
+	iLastPitstopData := false
 
 	class ChatMode extends ControllerMode {
 		Mode[] {
@@ -288,6 +291,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (sessionState == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
 				this.iRepairBodyworkChosen := true
+				this.iLastPitstopData := false
 			}
 
 			if (sessionState != kSessionPaused)
@@ -405,6 +409,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setConfigurationValue(data, "Session Data", "Paused", true)
+
+		if this.iLastPitstopData {
+			setConfigurationValue(data, "Pitstop Data", "Pitstop", this.iLastPitstopData.Nr)
+
+			for key, value in this.iLastPitstopData
+				if (InStr(key, "Service.") = 1)
+					setConfigurationValue(data, "Pitstop Data", key, IsObject(value) ? values2String(",", value*): value)
+
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Set", this.iLastPitstopData.TyreSet)
+
+			for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
+				for key, value in this.iLastPitstopData.Tyres[A_Index]
+					setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*): value)
+
+			this.iLastPitstopData := false
+		}
 	}
 
 	activateACCWindow() {
@@ -1613,6 +1633,66 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	finishPitstopSetup(pitstopNumber) {
 		closePitstopMFD()
+	}
+
+	pitstopFinished(pitstopNumber) {
+		base.pitstopFinished(pitstopNumber)
+
+		if this.RaceEngineer {
+			directory := (A_MyDocuments . "Assetto Corsa Competizione\Debug\")
+
+			try {
+				FileRead carState, %A_MyDocuments%Assetto Corsa Competizione\Debug\swap_dump_carstate.json
+
+				carState := JSON.parse(carState)
+
+				currentTyreSet := carState["currentTyreSet"]
+				tyreStates := []
+
+				for ignore, tyreSet in carState["tyreSets"]
+					if (tyreSet["tyreSet"] = currentTyreSet) {
+						for ignore, wearState in tyreSet["wearStatus"] {
+							tread := wearState["treadMM"].Clone()
+
+							for index, section in tread
+								tread[index] := Round(section, 2)
+
+							grain := Round(wearState["grain"], 2)
+							blister := Round(wearState["blister"], 2)
+							flatSpot := Round(wearState["flatSpot"], 2)
+
+							tyreStates.Push({Tread: tread, Grain: grain, Blister: blister, FlatSpot: flatSpot})
+						}
+
+						pitstopState := carState["pitstopMFD"]
+
+						this.iLastPitstopData := {Nr: pitstopNumber, "Service.Time": pitstopState["timeRequired"]
+												, "Service.Refuel": pitstopState["fuelToAdd"]
+												, "Service.Bodywork.Repair": pitstopState["repairBody"]
+												, "Service.Suspension.Repair": pitstopState["repairSuspension"]
+												, "Service.Engine.Repair": false
+												, TyreSet: currentTyreSet, Tyres: tyreStates}
+
+						if (listEqual(pitstopState["tyreToChange"], [true, true, true, true])) {
+							this.iLastPitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
+							this.iLastPitstopData["Service.Tyre.Compound.Color"] := "Black"
+							this.iLastPitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
+
+							pressures := pitstopState["tyrePressures"]
+
+							for index, pressure in pressures
+								pressures[index] := Round(pressure, 1)
+
+							this.iLastPitstopData["Service.Tyre.Pressures"] := pressures
+						}
+
+						break
+					}
+			}
+			catch exception {
+				; ignore
+			}
+		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {

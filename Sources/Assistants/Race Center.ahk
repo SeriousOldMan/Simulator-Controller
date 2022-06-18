@@ -80,6 +80,9 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 											  , "Repair.Bodywork", "Repair.Suspension"]
+							 , "Pitstop.Service.Data": ["Time", "Refuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
+													  , "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
+							 , "Pitstop.TyreSet.Data": ["Pitstop", "Tyre.Set", "Tyre", "Tread", "Grain", "Blister", "FlatSpot"]
 							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance"]
 							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]
 							 , "Plan.Data": ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
@@ -4773,6 +4776,29 @@ class RaceCenter extends ConfigurationItem {
 					logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
 
 				state := parseConfiguration(state)
+
+				pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
+
+				if ((pitstop != kUndefined) && (sessionDB.query("Pitstop.TyreSet.Data", {Where: {Pitstop: pitstop}}).Length() = 0)) {
+					sessionDB.add("Pitstop.Service.Data", {Time: getConfigurationValue(state, "Pitstop Data", "Service.Time")
+														 , Refuel: getConfigurationValue(state, "Pitstop Data", "Service.Refuel", 0)
+														 , "Tyre.Compound": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
+														 , "Tyre.Compound.Color": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+														 , "Tyre.Set": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Set", false)
+														 , "Tyre.Pressures": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
+														 , "Bodywork.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
+														 , "Suspension.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
+														 , "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
+
+					tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", kUndefined)
+
+					for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+						sessionDB.add("Pitstop.TyreSet.Data", {Pitstop: pitstop, "Tyre.Set": tyreSet, Tyre: tyre
+															 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread")
+															 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain")
+															 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister")
+															 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot")})
+				}
 
 				Loop {
 					lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)

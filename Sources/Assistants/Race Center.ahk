@@ -7473,7 +7473,7 @@ class RaceCenter extends ConfigurationItem {
 				if ((tyreSet != false) && (tyreSet != "-"))
 					html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
 
-				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . serviceData["Tyre.Pressures"] . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . values2String(", ", string2Values(",", serviceData["Tyre.Pressures"])*) . "</td></tr>")
 			}
 
 			if (repairs != "-")
@@ -7703,6 +7703,8 @@ class RaceCenter extends ConfigurationItem {
 					tyreSet := "-"
 					tyrePressures := "-, -, -, -"
 				}
+				else
+					tyrePressures := values2String(", ", string2Values(",", tyrePressures)*)
 
 				tyreSetData.Push("<td class=""td-std"">" . tyreSet . "</td>")
 				tyrePressuresData.Push("<td class=""td-std"">" . tyrePressures . "</td>")
@@ -7710,15 +7712,21 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		html := "<table class=""table-std"">"
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop") . "</th>" . values2String("", pitstopNRs*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Lap") . "</th>" . values2String("", lapData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Time") . "</th>" . values2String("", timeData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Last Driver") . "</th>" . values2String("", previousDriverData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Next Driver") . "</th>" . values2String("", nextDriverData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Compound") . "</th>" . values2String("", tyreCompoundData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Set") . "</th>" . values2String("", tyreSetData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Pressures") . "</th>" . values2String("", tyrePressuresData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Repairs") . "</th>" . values2String("", repairsData*) . "</tr>")
+
+		headers := []
+
+		for ignore, header in ["Pitstop", "Lap", "Time", "Last Driver", "Next Driver", "Fuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
+			headers.Push("<th class=""th-std th-left"">" . translate(header) . "</th>")
+
+		html .= ("<tr>" . values2String("", headers*) . "</tr>")
+
+		Loop % pitstopNRs.Length()
+			html .= ("<tr>" . pitstopNRs[A_Index] . lapData[A_Index] . timeData[A_Index]
+							. previousDriverData[A_Index] . nextDriverData[A_Index] . refuelData[A_Index]
+							. tyreCompoundData[A_Index] . tyreSetData[A_Index] . tyrePressuresData[A_Index]
+							. repairsData[A_Index]
+				   . "</tr>")
+
 		html .= "</table>"
 
 		return html

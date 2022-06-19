@@ -412,6 +412,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
+	LastLap[] {
+		Get {
+			return this.iLastLap
+		}
+	}
+
+	InPit[] {
+		Get {
+			return this.iInPit
+		}
+	}
+
 	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, register)
 
@@ -1168,7 +1180,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					return
 				}
 
-				if ((dataLastLap < this.iLastLap) || (this.iLastSession != sessionState)) {
+				if ((dataLastLap < this.LastLap) || (this.iLastSession != sessionState)) {
 					; Start of new session without finishing previous session first
 
 					this.iLastSession := sessionState
@@ -1193,7 +1205,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 
-						if !this.iInPit {
+						if !this.InPit {
 							this.performPitstop(dataLastLap)
 
 							this.iInPit := dataLastLap
@@ -1221,7 +1233,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						; Car has finished the first lap
 
 						if (dataLastLap > 1) {
-							if (this.iLastLap == 0) {
+							if (this.LastLap == 0) {
 								; Missed the start of the session, might be a team session
 
 								teamSessionActive := this.connectTeamSession()
@@ -1236,7 +1248,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								joinedSession := true
 							}
-							else if (this.iLastLap < (dataLastLap - 1)) {
+							else if (this.LastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
 
 								if !this.driverActive(data)
@@ -1248,15 +1260,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								this.restoreSessionState()
 							}
-							else ; (this.iLastLap == (dataLastLap - 1))
+							else ; (this.LastLap == (dataLastLap - 1))
 								if !this.driverActive(data)
 									return ; Oops, a different driver, might happen in some simulations after a pitstop
 						}
 
-						newLap := (dataLastLap > this.iLastLap)
+						newLap := (dataLastLap > this.LastLap)
 						firstLap := ((dataLastLap == 1) && newLap)
 
-						if this.iInPit {
+						if this.InPit {
 							this.iInPit := false
 
 							; Was in the pits, check if same driver for next stint...
@@ -1288,7 +1300,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 						this.iLastLapCounter := this.iLastLapCounter + 1
 
-						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.iLastLap . "." . this.iLastLapCounter . ".data"
+						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iLastLapCounter . ".data"
 
 						writeConfiguration(newDataFile, data)
 

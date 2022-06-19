@@ -80,9 +80,11 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 											  , "Repair.Bodywork", "Repair.Suspension", "Repair.Engine", "Driver"]
-							 , "Pitstop.Service.Data": ["Time", "Refuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
+							 , "Pitstop.Service.Data": ["Pitstop", "Lap", "Time", "Driver.Previous", "Driver.Next", "Fuel"
+													  , "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
 													  , "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
-							 , "Pitstop.Tyre.Set.Data": ["Pitstop", "Tyre.Set", "Tyre", "Tread", "Grain", "Blister", "FlatSpot"]
+							 , "Pitstop.Tyre.Data": ["Pitstop", "Driver", "Laps", "Compound", "Compound.Color", "Set"
+												   , "Tyre", "Tread", "Wear", "Grain", "Blister", "FlatSpot"]
 							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance"]
 							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]
 							 , "Plan.Data": ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
@@ -1853,7 +1855,7 @@ class RaceCenter extends ConfigurationItem {
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Pitstops Summary", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -3319,18 +3321,22 @@ class RaceCenter extends ConfigurationItem {
 			case 7:
 				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
 			case 9:
+				this.showPitstopsDetails()
+
+				this.iSelectedDetailReport := "Pitstops"
+			case 10:
 				this.showSetupsDetails()
 
 				this.iSelectedDetailReport := "Setups"
-			case 11:
+			case 12:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
 				this.updateState()
-			case 12:
+			case 13:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 14:
+			case 15:
 				this.planPitstop()
 		}
 	}
@@ -4777,29 +4783,6 @@ class RaceCenter extends ConfigurationItem {
 
 				state := parseConfiguration(state)
 
-				pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
-
-				if ((pitstop != kUndefined) && (sessionDB.query("Pitstop.Tyre.Set.Data", {Where: {Pitstop: pitstop}}).Length() = 0)) {
-					sessionDB.add("Pitstop.Service.Data", {Time: getConfigurationValue(state, "Pitstop Data", "Service.Time")
-														 , Refuel: getConfigurationValue(state, "Pitstop Data", "Service.Refuel", 0)
-														 , "Tyre.Compound": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
-														 , "Tyre.Compound.Color": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
-														 , "Tyre.Set": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Set", false)
-														 , "Tyre.Pressures": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
-														 , "Bodywork.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
-														 , "Suspension.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
-														 , "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
-
-					tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", kUndefined)
-
-					for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
-						sessionDB.add("Pitstop.Tyre.Set.Data", {Pitstop: pitstop, "Tyre.Set": tyreSet, Tyre: tyre
-															  , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread")
-															  , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain")
-															  , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister")
-															  , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot")})
-				}
-
 				Loop {
 					lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 
@@ -4854,6 +4837,9 @@ class RaceCenter extends ConfigurationItem {
 													 , Driver: this.Laps[lap].Stint.Driver.FullName})
 
 						nextStop += 1
+
+						if (this.SelectedDetailReport = "Pitstops")
+							this.showSetupsDetails()
 					}
 					else
 						break
@@ -4862,6 +4848,95 @@ class RaceCenter extends ConfigurationItem {
 		}
 		finally {
 			Gui ListView, %currentListView%
+		}
+	}
+
+	syncPitstopStates() {
+		local compound
+
+		sessionDB := this.SessionDatabase
+
+		lastPitstop := sessionDB.Tables["Pitstop.Data"].Length()
+
+		if (lastPitstop != 0) {
+			hasServiceData := (sessionDB.query("Pitstop.Service.Data", {Where: {Pitstop: lastPitstop}}).Length() > 0)
+			hasTyreData := (sessionDB.query("Pitstop.Tyre.Data", {Where: {Pitstop: lastPitstop}}).Length() > 0)
+
+			if (!hasServiceData || !hasTyreData) {
+				lastlap := this.LastLap
+
+				if lastLap
+					lastLap := lastLap.Nr
+
+				startLap := Max(1, sessionDB.Tables["Pitstop.Data"][lastPitstop].Lap - 1)
+
+				Loop {
+					if ((startLap + A_Index) > lastLap)
+						break
+
+					if (hasServiceData && hasTyreData)
+						break
+
+					state := false
+
+					try {
+						state := this.Connector.GetLapValue(this.Laps[startLap + A_Index].Identifier, "Race Engineer Pistop State")
+					}
+					catch exception {
+						; ignore
+					}
+
+					if (state && (state != "")) {
+						state := parseConfiguration(state)
+
+						pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
+
+						if (pitstop = lastPitstop) {
+							if (!hasServiceData && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
+								hasServiceData := true
+
+								sessionDB.add("Pitstop.Service.Data"
+											, {Pitstop: pitstop
+											 , Lap: getConfigurationValue(state, "Pitstop Data", "Service.Lap", false)
+											 , Time: getConfigurationValue(state, "Pitstop Data", "Service.Time", false)
+											 , "Driver.Previous": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Previous", false)
+											 , "Driver.Next": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Next", false)
+											 , Fuel: getConfigurationValue(state, "Pitstop Data", "Service.Refuel", 0)
+											 , "Tyre.Compound": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
+											 , "Tyre.Compound.Color": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+											 , "Tyre.Set": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Set", false)
+											 , "Tyre.Pressures": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
+											 , "Bodywork.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
+											 , "Suspension.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
+											 , "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
+							}
+
+							if (!hasTyreData && (getConfigurationValue(state, "Pitstop Data", "Tyre.Set", kUndefined) != kUndefined)) {
+								driver := getConfigurationValue(state, "Pitstop Data", "Tyre.Driver")
+								laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
+								compound := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
+								compoundColor := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound.Color", "Black")
+								tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", false)
+
+								for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+									sessionDB.add("Pitstop.Tyre.Data"
+												, {Pitstop: pitstop, Driver: driver, Laps: laps
+												 , Compound: compound, "Compound.Color": compoundColor
+												 , Set: tyreSet, Tyre: tyre
+												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread")
+												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear")
+												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain")
+												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister")
+												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot")})
+							}
+						}
+					}
+				}
+
+				if (this.SelectedDetailReport = "Pitstops")
+					if (hasServiceData && hasTyreData)
+						this.showSetupsDetails()
+			}
 		}
 	}
 
@@ -5077,8 +5152,11 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if newLaps
+				if newLaps {
 					this.syncPitstops()
+
+					this.syncPitstopStates()
+				}
 
 				if (newData || newLaps)
 					this.updateReports()
@@ -7303,7 +7381,7 @@ class RaceCenter extends ConfigurationItem {
 		this.showDetails("Lap", html)
 	}
 
-	createPitstopOverview(pitstopNr) {
+	createPitstopPlanDetails(pitstopNr) {
 		local compound
 
 		pitstopData := this.SessionDatabase.Tables["Pitstop.Data"][pitstopNr]
@@ -7324,44 +7402,182 @@ class RaceCenter extends ConfigurationItem {
 			repairs := "-"
 
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . pitstopData.Lap . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></div></td><td>" . pitstopData.Fuel . A_Space . translate("Litres") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . translate(compound(pitstopData["Tyre.Compound"]
-																										, pitstopData["Tyre.Compound.Color"])) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . pitstopData["Tyre.Set"] . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Repairs:") . "</b></div></td><td>" . repairs . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . (pitstopData.Lap + 1) . "</td></tr>")
+
+		if (pitstopData.Fuel > 0)
+			html .= ("<tr><td><b>" . translate("Fuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
+
+		compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
+
+		if (compound != "-") {
+			tyreSet := pitstopData["Tyre.Set"]
+
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . compound . "</td></tr>")
+
+			if ((tyreSet != false) && (tyreSet != "-"))
+				html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . pitstopData["Tyre.Set"] . "</td></tr>")
+
+			html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
+		}
+
+		if (repairs != "-")
+			html .= ("<tr><td><b>" . translate("Repairs:") . "</b></div></td><td>" . repairs . "</td></tr>")
+
 		html .= "</table>"
 
 		return html
 	}
 
-	createPitstopTyreSetDetails(pitstopNr) {
+	createPitstopServiceDetails(pitstopNr) {
+		local compound
+
+		serviceData := this.SessionDatabase.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
+
+		if (serviceData.Length() > 0) {
+			serviceData := serviceData[1]
+
+			repairs := ""
+
+			for name, key in {Engine: "Engine.Repair", Bodywork: "Bodywork.Repair", Suspension: "Suspension.Repair"}
+				if serviceData[key] {
+					if (repairs != "")
+						repairs .= ", "
+
+					repairs .= translate(name)
+				}
+
+			html := "<table>"
+
+			if serviceData.Lap
+				html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . serviceData.Lap . "</td></tr>")
+
+			if serviceData.Time
+				html .= ("<tr><td><b>" . translate("Service Time:") . "</b></div></td><td>" . Round(serviceData.Time, 1) . "</td></tr>")
+
+			if serviceData["Driver.Previous"]
+				html .= ("<tr><td><b>" . translate("Last Driver:") . "</b></div></td><td>" . serviceData["Driver.Previous"] . "</td></tr>")
+
+			if serviceData["Driver.Next"]
+				html .= ("<tr><td><b>" . translate("Next Driver:") . "</b></div></td><td>" . serviceData["Driver.Next"] . "</td></tr>")
+
+			if serviceData.Fuel
+				html .= ("<tr><td><b>" . translate("Fuel:") . "</b></div></td><td>" . serviceData.Fuel . "</td></tr>")
+
+			compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
+
+			if (compound != "-") {
+				tyreSet := serviceData["Tyre.Set"]
+
+				html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . compound . "</td></tr>")
+
+				if ((tyreSet != false) && (tyreSet != "-"))
+					html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . serviceData["Tyre.Set"] . "</td></tr>")
+
+				html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . serviceData["Tyre.Pressures"] . "</td></tr>")
+			}
+
+			if (repairs != "-")
+				html .= ("<tr><td><b>" . translate("Repairs:") . "</b></div></td><td>" . repairs . "</td></tr>")
+
+			html .= "</table>"
+
+			return html
+		}
+		else
+			return ""
+	}
+
+	computeTyreWearColor(damage) {
+		if (damage < 15)
+			return "bgcolor=""Green"" style=""color:#FFFFFF"""
+		else if (damage < 25)
+			return "bgcolor=""Yellow"""
+		else if (damage < 50)
+			return "bgcolor=""Orange"""
+		else if (damage < 70)
+			return "bgcolor=""Red"" style=""color:#FFFFFF"""
+		else
+			return "bgcolor=""DarkRed"" style=""color:#FFFFFF"""
+	}
+
+	computeTyreDamageColor(damage) {
+		if (damage < 15)
+			return "bgcolor=""Green"" style=""color:#FFFFFF"""
+		else if (damage < 25)
+			return "bgcolor=""Yellow"" style=""color:#FFFFFF"""
+		else if (damage < 40)
+			return "bgcolor=""Orange"" style=""color:#FFFFFF"""
+		else if (damage < 80)
+			return "bgcolor=""Red"" style=""color:#FFFFFF"""
+		else
+			return "bgcolor=""DarkRed"" style=""color:#FFFFFF"""
+	}
+
+	createPitstopTyresDetails(pitstopNr) {
+		local compound
+
 		tyres := {}
 
-		for ignore, tyreData in this.SessionDatabase.query("Pitstop.Tyre.Set.Data", {Where: {Pitstop: pitstopNr}})
+		for ignore, tyreData in this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData.Tyre] := tyreData
 
+		driver := false
+		laps := false
+		compound := false
 		tyreSet := false
 
 		tyreNames := []
 		treadData := []
+		wearData := []
 		grainData := []
 		blisterData := []
 		flatSpotData := []
 
-		for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-			if !tyreSet
-				tyreSet := tyres[tyre]["Tyre.Set"]
+		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"} {
+			if !driver
+				driver := tyres[key]["Driver"]
 
-			tyreNames.Push("<th class=""th-std"">" . translate(StrReplace(tyre, ".", A_Space)) . "</th>")
-			treadData.Push("<td class=""td-std"">" . tyres[tyre].Tread . "</td>")
-			grainData.Push("<td class=""td-std"">" . tyres[tyre].Grain . "</td>")
-			blisterData.Push("<td class=""td-std"">" . tyres[tyre].Blister . "</td>")
-			flatSpotData.Push("<td class=""td-std"">" . tyres[tyre].FlatSpot . "</td>")
+			if !laps
+				laps := tyres[key]["Laps"]
+
+			if !compound
+				compound := translate(compound(tyres[key]["Compound"], tyres[key]["Compound.Color"]))
+
+			if !tyreSet
+				tyreSet := tyres[key]["Set"]
+
+			tyreNames.Push("<th class=""th-std"">" . translate(tyre) . "</th>")
+
+			treadData.Push("<td class=""td-std"" " . this.computeTyreWearColor(tyres[key].Wear) . ">"
+						 . values2String(", ", string2Values(",", tyres[key].Tread)*) . "</td>")
+
+			grain := tyres[key].Grain
+			grainData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(grain) . ">" . grain . "</td>")
+
+			blister := tyres[key].Blister
+			blisterData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(blister) . ">" . blister . "</td>")
+
+			flatSpot := tyres[key].FlatSpot
+			flatSpotData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(flatSpot) . ">" . flatSpot . "</td>")
 		}
 
-		html := "<table class=""table-std"">"
+		html := "<table>"
+
+		if driver
+			html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
+
+		if laps
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></div></td><td>" . laps . "</td></tr>")
+
+		if compound
+			html .= ("<tr><td><b>" . translate("Tyre Compound:") . "</b></div></td><td>" . compound . "</td></tr>")
+
+		if tyreSet
+			html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . tyreSet . "</td></tr>")
+
+		html .= "</table><br><br>"
+
+		html .= "<table class=""table-std"">"
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
@@ -7381,17 +7597,169 @@ class RaceCenter extends ConfigurationItem {
 	showPitstopDetailsAsync(pitstopNr) {
 		html := ("<div id=""header""><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
 
-		html .= ("<br><br><div id=""header""><i>" . translate("Plan") . "</i></div>")
+		html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
 
-		html .= ("<br>" . this.createPitstopOverview(pitstopNr))
+		if (this.SessionDatabase.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}}).Length() = 0)
+			html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
+		else
+			html .= ("<br>" . this.createPitstopServiceDetails(pitstopNr))
 
-		if (this.SessionDatabase.query("Pitstop.Tyre.Set.Data", {Where: {Pitstop: pitstopNr}}).Length() > 0) {
-			html .= ("<br><br><div id=""header""><i>" . translate("Tyres") . "</i></div>")
+		if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length() > 0) {
+			html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
 
-			html .= ("<br>" . this.createPitstopTyreSetDetails(pitstopNr))
+			html .= ("<br>" . this.createPitstopTyresDetails(pitstopNr))
 		}
 
 		this.showDetails("Pitstop", html)
+	}
+
+	createPitstopsServiceDetails() {
+		local compound
+
+		pitstopNRs := []
+		lapData := []
+		timeData := []
+		previousDriverData := []
+		nextDriverData := []
+		refuelData := []
+		tyreCompoundData := []
+		tyreSetData := []
+		tyrePressuresData := []
+		repairsData := []
+
+		for ignore, pitstopData in this.SessionDatabase.Tables["Pitstop.Data"] {
+			pitstopNRs.Push("<td class=""td-std"">" . A_Index . "</td>")
+
+			serviceData := this.SessionDatabase.query("Pitstop.Service.Data", {Where: {Pitstop: A_Index}})
+
+			if (serviceData.Length() = 0) {
+				timeData.Push("<td class=""td-std"">" . "-" . "</td>")
+				previousDriverData.Push("<td class=""td-std"">" . "-" . "</td>")
+				nextDriverData.Push("<td class=""td-std"">" . "-" . "</td>")
+
+				pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
+											   , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"])
+
+				repairBodywork := pitstopData["Repair.Bodywork"]
+				repairSuspension := pitstopData["Repair.Suspension"]
+
+				if (repairBodywork && repairSuspension)
+					repairs := (translate("Bodywork") . ", " . translate("Suspension"))
+				else if repairBodywork
+					repairs := translate("Bodywork")
+				else if repairSuspension
+					repairs := translate("Suspension")
+				else
+					repairs := "-"
+
+				repairsData.Push("<td class=""td-std"">" . repairs . "</td>")
+
+				lapData.Push("<td class=""td-std"">" . (pitstopData.Lap + 1) . "</td>")
+				refuelData.Push("<td class=""td-std"">" . ((pitstopData.Fuel != 0) ? pitstopData.Fuel : "-") . "</td>")
+
+				compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
+
+				tyreCompoundData.Push("<td class=""td-std"">" . compound . "</td>")
+
+				tyreSet := pitstopData["Tyre.Set"]
+
+				if (compound = "-") {
+					tyreSet := "-"
+					pressures := "-, -, -, -"
+				}
+
+				tyreSetData.Push("<td class=""td-std"">" . tyreSet . "</td>")
+				tyrePressuresData.Push("<td class=""td-std"">" . pressures . "</td>")
+			}
+			else {
+				serviceData := serviceData[1]
+
+				repairs := ""
+
+				for name, key in {Engine: "Engine.Repair", Bodywork: "Bodywork.Repair", Suspension: "Suspension.Repair"}
+					if serviceData[key] {
+						if (repairs != "")
+							repairs .= ", "
+
+						repairs .= translate(name)
+					}
+
+				repairsData.Push("<td class=""td-std"">" . repairs . "</td>")
+
+				lapData.Push("<td class=""td-std"">" . (serviceData.Lap ? serviceData.Lap : "-") . "</td>")
+				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? Round(serviceData.Time, 1) : "-") . "</td>")
+				previousDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
+				nextDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? serviceData.Fuel : "-") . "</td>")
+
+				compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
+
+				tyreCompoundData.Push("<td class=""td-std"">" . compound . "</td>")
+
+				tyreSet := serviceData["Tyre.Set"]
+				tyrePressures := serviceData["Tyre.Pressures"]
+
+				if (compound = "-") {
+					tyreSet := "-"
+					tyrePressures := "-, -, -, -"
+				}
+
+				tyreSetData.Push("<td class=""td-std"">" . tyreSet . "</td>")
+				tyrePressuresData.Push("<td class=""td-std"">" . tyrePressures . "</td>")
+			}
+		}
+
+		html := "<table class=""table-std"">"
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop") . "</th>" . values2String("", pitstopNRs*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Lap") . "</th>" . values2String("", lapData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Time") . "</th>" . values2String("", timeData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Last Driver") . "</th>" . values2String("", previousDriverData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Next Driver") . "</th>" . values2String("", nextDriverData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Compound") . "</th>" . values2String("", tyreCompoundData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Set") . "</th>" . values2String("", tyreSetData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Pressures") . "</th>" . values2String("", tyrePressuresData*) . "</tr>")
+		html .= ("<tr><th class=""th-std th-left"">" . translate("Repairs") . "</th>" . values2String("", repairsData*) . "</tr>")
+		html .= "</table>"
+
+		return html
+	}
+
+	createPitstopsTyresDetails() {
+		html := ""
+
+		Loop % this.SessionDatabase.Tables["Pitstop.Data"].Length()
+			if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length() > 0) {
+				if (html != "")
+					html .= "<br><br>"
+
+				html .= "<i><b>" . translate("Pitstop: ") . A_Index . "</b></i><br><br>"
+
+				html .= this.createPitstopTyresDetails(A_Index)
+			}
+
+		return html
+	}
+
+	showPitstopsDetails() {
+		this.pushTask(ObjBindMethod(this, "syncSessionDatabase"))
+
+		this.pushTask(ObjBindMethod(this, "showPitstopsDetailsAsync"))
+	}
+
+	showPitstopsDetailsAsync() {
+		html := ("<div id=""header""><b>" . translate("Pitstops Summary") . "</b></div>")
+
+		html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
+
+		html .= ("<br>" . this.createPitstopsServiceDetails())
+
+		if (this.SessionDatabase.Tables["Pitstop.Tyre.Data"].Length() > 0) {
+			html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
+
+			html .= ("<br>" . this.createPitstopsTyresDetails())
+		}
+
+		this.showDetails("Pitstops", html)
 	}
 
 	createDriverDetails(drivers) {

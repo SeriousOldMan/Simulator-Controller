@@ -295,6 +295,16 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.Simulator.requestPitstopDriver(pitstopNumber, driver)
 	}
 
+	updatePitstopState(data) {
+		teamServer := this.TeamServer
+
+		if (teamServer && teamServer.SessionActive) {
+			teamServer.setLapValue(this.LastLap, this.Plugin . " Pitstop State", printConfiguration(data))
+
+			teamServer.setSessionValue(this.Plugin . " Pitstop State", this.LastLap)
+		}
+	}
+
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				   , compound, compoundColor, coldPressures, hotPressures) {
 		teamServer := this.TeamServer

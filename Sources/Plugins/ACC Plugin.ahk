@@ -448,7 +448,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
+			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", false)
 		}
 
 		imgSearch := (imageSearch && !this.iNoImageSearch)

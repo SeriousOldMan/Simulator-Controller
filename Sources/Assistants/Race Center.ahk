@@ -1341,7 +1341,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Button, x66 ys+279 w160 gplanPitstop, % translate("Instruct Engineer")
 
-		Gui %window%:Add, ListView, x270 ys+34 w331 h269 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Fuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
+		Gui %window%:Add, ListView, x270 ys+34 w331 h269 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchoosePitstop, % values2String("|", map(["#", "Lap", "Refuel", "Compound", "Set", "Pressures", "Repairs"], "translate")*)
 
 		this.iPitstopsListView := listHandle
 
@@ -7405,7 +7405,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . (pitstopData.Lap + 1) . "</td></tr>")
 
 		if (pitstopData.Fuel > 0)
-			html .= ("<tr><td><b>" . translate("Fuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
 
 		compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -7461,7 +7461,7 @@ class RaceCenter extends ConfigurationItem {
 				html .= ("<tr><td><b>" . translate("Next Driver:") . "</b></div></td><td>" . serviceData["Driver.Next"] . "</td></tr>")
 
 			if serviceData.Fuel
-				html .= ("<tr><td><b>" . translate("Fuel:") . "</b></div></td><td>" . serviceData.Fuel . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . serviceData.Fuel . "</td></tr>")
 
 			compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -7715,7 +7715,7 @@ class RaceCenter extends ConfigurationItem {
 
 		headers := []
 
-		for ignore, header in ["Pitstop", "Lap", "Time", "Last Driver", "Next Driver", "Fuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
+		for ignore, header in ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
 			headers.Push("<th class=""th-std th-left"">" . translate(header) . "</th>")
 
 		html .= ("<tr>" . values2String("", headers*) . "</tr>")

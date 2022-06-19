@@ -1855,7 +1855,7 @@ class RaceCenter extends ConfigurationItem {
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
 
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Pitstops Summary", "Setups Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -3321,13 +3321,13 @@ class RaceCenter extends ConfigurationItem {
 			case 7:
 				this.pushTask(ObjBindMethod(this, "clearSetupsAsync"))
 			case 9:
-				this.showPitstopsDetails()
-
-				this.iSelectedDetailReport := "Pitstops"
-			case 10:
 				this.showSetupsDetails()
 
 				this.iSelectedDetailReport := "Setups"
+			case 10:
+				this.showPitstopsDetails()
+
+				this.iSelectedDetailReport := "Pitstops"
 			case 12:
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Reference") ? false : "Reference")
 
@@ -7628,7 +7628,7 @@ class RaceCenter extends ConfigurationItem {
 		repairsData := []
 
 		for ignore, pitstopData in this.SessionDatabase.Tables["Pitstop.Data"] {
-			pitstopNRs.Push("<td class=""td-std"">" . A_Index . "</td>")
+			pitstopNRs.Push("<th class=""th-std"">" . A_Index . "</th>")
 
 			serviceData := this.SessionDatabase.query("Pitstop.Service.Data", {Where: {Pitstop: A_Index}})
 
@@ -7724,22 +7724,6 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	createPitstopsTyresDetails() {
-		html := ""
-
-		Loop % this.SessionDatabase.Tables["Pitstop.Data"].Length()
-			if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length() > 0) {
-				if (html != "")
-					html .= "<br><br>"
-
-				html .= "<i><b>" . translate("Pitstop: ") . A_Index . "</b></i><br><br>"
-
-				html .= this.createPitstopTyresDetails(A_Index)
-			}
-
-		return html
-	}
-
 	showPitstopsDetails() {
 		this.pushTask(ObjBindMethod(this, "syncSessionDatabase"))
 
@@ -7753,11 +7737,13 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br>" . this.createPitstopsServiceDetails())
 
-		if (this.SessionDatabase.Tables["Pitstop.Tyre.Data"].Length() > 0) {
-			html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
+		if (this.SessionDatabase.Tables["Pitstop.Tyre.Data"].Length() > 0)
+			Loop % this.SessionDatabase.Tables["Pitstop.Data"].Length()
+				if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length() > 0) {
+					html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
 
-			html .= ("<br>" . this.createPitstopsTyresDetails())
-		}
+					html .= ("<br>" . this.createPitstopTyresDetails(A_Index))
+				}
 
 		this.showDetails("Pitstops", html)
 	}
@@ -9034,6 +9020,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		Gui TE:Default
 		Gui TE:+Owner%owner%
 
+		Gui %owner%:+Disabled
+
 		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0, D8D8D8
 
@@ -9106,6 +9094,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		}
 		else
 			result := false
+
+		Gui %owner%:-Disabled
 
 		Gui TE:Destroy
 

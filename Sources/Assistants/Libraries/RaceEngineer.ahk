@@ -1430,11 +1430,12 @@ class RaceEngineer extends RaceAssistant {
 				if ((options == true) || options.Compound) {
 					if compound {
 						color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
+						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0)
 
 						if (compound = "Dry")
-							speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+							speaker.speakPhrase(!tyreSet ? "DryTyresNoSet" : "DryTyres", {compound: fragments[compound], color: color, set: tyreSet})
 						else
-							speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound], color: color, set: tyreSet})
 					}
 					else {
 						if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)

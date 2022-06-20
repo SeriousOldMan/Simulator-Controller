@@ -310,6 +310,8 @@ class RaceReportViewer extends RaceReportReader {
 
 					if (!isNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
+					else if (A_Index <= 2)
+						lapTimes.Push("null")
 					else
 						result := "DNF"
 				}

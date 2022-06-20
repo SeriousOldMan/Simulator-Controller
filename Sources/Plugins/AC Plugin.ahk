@@ -376,15 +376,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requirePitstopMFD() {
-		if (A_Now < this.iPitstopAutoClose) {
-			this.iPitstopAutoClose := (A_Now + 4000)
+		if (A_TickCount < this.iPitstopAutoClose) {
+			this.iPitstopAutoClose := (A_TickCount + 4000)
 
 			return true
 		}
 		else {
 			Sleep 1200
 
-			this.iPitstopAutoClose := (A_Now + 4000)
+			this.iPitstopAutoClose := (A_TickCount + 4000)
 
 			return this.openPitstopMFD()
 		}

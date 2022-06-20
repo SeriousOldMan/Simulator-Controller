@@ -314,8 +314,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !carIDs
 			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
 
-		if ((A_Now + 5000) > lastRead) {
-			lastRead := (A_Now + 0)
+		if ((A_TickCount + 5000) > lastRead) {
+			lastRead := (A_TickCount + 0)
 
 			fileName := kTempDirectory . "ACCUDP.cmd"
 
@@ -457,13 +457,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if imgSearch
 				update := true
 			else {
-				if (A_Now > this.iNextPitstopMFDOptionsUpdate)
+				if (A_TickCount > this.iNextPitstopMFDOptionsUpdate)
 					update := true
 				else
 					update := false
 			}
 
-		this.iNextPitstopMFDOptionsUpdate := (A_Now + 60000)
+		this.iNextPitstopMFDOptionsUpdate := (A_TickCount + 60000)
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
@@ -1626,16 +1626,24 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			base.pitstopFinished(pitstopNumber)
 
 		if this.RaceEngineer {
-			if udateState {
-				directory := (A_MyDocuments . "Assetto Corsa Competizione\Debug\")
-
+			if updateState {
 				try {
-					FileRead carState, %A_MyDocuments%Assetto Corsa Competizione\Debug\swap_dump_carstate.json
+					if !FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json")
+						return
+
+					FileGetTime updateTime, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json, M
+
+					EnvAdd updateTime, 10, Minutes
+
+					if (updateTime < A_Now)
+						return
+
+					FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
 
 					carState := JSON.parse(carState)
 					pitstopState := carState["pitstopMFD"]
 
-					currentDriver := pitstopState["driverNames"][pitstopState["currentDriverIndex"]]
+					currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
 
 					currentTyreSet := carState["currentTyreSet"]
 					tyreStates := []
@@ -1646,11 +1654,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 								  , "Service.Driver.Previous": currentDriver
 								  , "Service.Driver.Next": pitstopState["newDriverNameToDisplay"]
 								  , "Service.Refuel": pitstopState["fuelToAdd"]
-								  , "Service.Bodywork.Repair": pitstopState["repairBody"]
-								  , "Service.Suspension.Repair": pitstopState["repairSuspension"]
+								  , "Service.Bodywork.Repair": (pitstopState["repairBody"] ? true : false)
+								  , "Service.Suspension.Repair": (pitstopState["repairSuspension"] ? true : false)
 								  , "Service.Engine.Repair": false}
 
-					if (listEqual(pitstopState["tyreToChange"], [true, true, true, true])) {
+					if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
 						pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
 						pitstopData["Service.Tyre.Compound.Color"] := "Black"
 						pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
@@ -1669,7 +1677,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 								wearState := tyreSet["wearStatus"][A_Index]
 								tread := wearState["treadMM"].Clone()
 
-								wear := (100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100))
+								wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100), 1)
 
 								for index, section in tread
 									tread[index] := Round(section, 2)

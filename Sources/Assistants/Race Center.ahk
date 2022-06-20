@@ -4753,6 +4753,8 @@ class RaceCenter extends ConfigurationItem {
 	syncPitstops(state := false) {
 		local compound
 
+		newData := false
+
 		sessionDB := this.SessionDatabase
 		window := this.Window
 
@@ -4836,10 +4838,12 @@ class RaceCenter extends ConfigurationItem {
 													 , "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": false
 													 , Driver: this.Laps[lap].Stint.Driver.FullName})
 
+						newData := true
+
 						nextStop += 1
 
 						if (this.SelectedDetailReport = "Pitstops")
-							this.showSetupsDetails()
+							this.showPitstopsDetails()
 					}
 					else
 						break
@@ -4849,10 +4853,14 @@ class RaceCenter extends ConfigurationItem {
 		finally {
 			Gui ListView, %currentListView%
 		}
+
+		return newData
 	}
 
-	syncPitstopStates() {
+	syncPitstopsDetails() {
 		local compound
+
+		newData := false
 
 		sessionDB := this.SessionDatabase
 
@@ -4880,7 +4888,7 @@ class RaceCenter extends ConfigurationItem {
 					state := false
 
 					try {
-						state := this.Connector.GetLapValue(this.Laps[startLap + A_Index].Identifier, "Race Engineer Pistop State")
+						state := this.Connector.GetLapValue(this.Laps[startLap + A_Index].Identifier, "Race Engineer Pitstop State")
 					}
 					catch exception {
 						; ignore
@@ -4894,6 +4902,7 @@ class RaceCenter extends ConfigurationItem {
 						if (pitstop = lastPitstop) {
 							if (!hasServiceData && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
 								hasServiceData := true
+								newData := true
 
 								sessionDB.add("Pitstop.Service.Data"
 											, {Pitstop: pitstop
@@ -4912,6 +4921,9 @@ class RaceCenter extends ConfigurationItem {
 							}
 
 							if (!hasTyreData && (getConfigurationValue(state, "Pitstop Data", "Tyre.Set", kUndefined) != kUndefined)) {
+								hasTyreData := true
+								newData := true
+
 								driver := getConfigurationValue(state, "Pitstop Data", "Tyre.Driver")
 								laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
 								compound := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
@@ -4925,9 +4937,9 @@ class RaceCenter extends ConfigurationItem {
 												 , Set: tyreSet, Tyre: tyre
 												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread")
 												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear")
-												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain")
-												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister")
-												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot")})
+												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain", "-")
+												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister", "-")
+												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot", "-")})
 							}
 						}
 					}
@@ -4935,9 +4947,11 @@ class RaceCenter extends ConfigurationItem {
 
 				if (this.SelectedDetailReport = "Pitstops")
 					if (hasServiceData && hasTyreData)
-						this.showSetupsDetails()
+						this.showPitstopsDetails()
 			}
 		}
+
+		return newData
 	}
 
 	syncStrategy() {
@@ -5152,11 +5166,12 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if newLaps {
-					this.syncPitstops()
+				if newLaps
+					if this.syncPitstops()
+						newData := true
 
-					this.syncPitstopStates()
-				}
+				if this.syncPitstopsDetails()
+					newData := true
 
 				if (newData || newLaps)
 					this.updateReports()
@@ -7462,6 +7477,12 @@ class RaceCenter extends ConfigurationItem {
 
 			if serviceData.Fuel
 				html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . serviceData.Fuel . "</td></tr>")
+			else {
+				pitstopData := this.SessionDatabase.Tables["Pitstop.Data"][pitstopNr]
+
+				if (pitstopData.Fuel > 0)
+					html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
+			}
 
 			compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -7501,7 +7522,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeTyreDamageColor(damage) {
-		if (damage < 15)
+		if ((damage = "-") || (damage < 15))
 			return "bgcolor=""Green"" style=""color:#FFFFFF"""
 		else if (damage < 25)
 			return "bgcolor=""Yellow"" style=""color:#FFFFFF"""
@@ -7533,6 +7554,10 @@ class RaceCenter extends ConfigurationItem {
 		blisterData := []
 		flatSpotData := []
 
+		hasGrain := false
+		hasBlister := false
+		hasFlatSpot := false
+
 		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"} {
 			if !driver
 				driver := tyres[key]["Driver"]
@@ -7554,11 +7579,20 @@ class RaceCenter extends ConfigurationItem {
 			grain := tyres[key].Grain
 			grainData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(grain) . ">" . grain . "</td>")
 
+			if (grain != "-")
+				hasGrain := true
+
 			blister := tyres[key].Blister
 			blisterData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(blister) . ">" . blister . "</td>")
 
+			if (blister != "-")
+				hasBlister := true
+
 			flatSpot := tyres[key].FlatSpot
 			flatSpotData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(flatSpot) . ">" . flatSpot . "</td>")
+
+			if (flatSpot != "-")
+				hasFlatSpot := true
 		}
 
 		html := "<table>"
@@ -7580,9 +7614,16 @@ class RaceCenter extends ConfigurationItem {
 		html .= "<table class=""table-std"">"
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Blister") . "</th>" . values2String("", blisterData*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot") . "</th>" . values2String("", flatSpotData*) . "</tr>")
+
+		if hasGrain
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
+
+		if hasBlister
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Blister") . "</th>" . values2String("", blisterData*) . "</tr>")
+
+		if hasFlatSpot
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot") . "</th>" . values2String("", flatSpotData*) . "</tr>")
+
 		html .= "</table>"
 
 		return html
@@ -7690,7 +7731,7 @@ class RaceCenter extends ConfigurationItem {
 				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? Round(serviceData.Time, 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
-				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? serviceData.Fuel : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? pitstopData.Fuel : "-") : "-") . "</td>")
 
 				compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 

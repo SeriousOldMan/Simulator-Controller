@@ -433,6 +433,9 @@ class SimulatorPlugin extends ControllerPlugin {
 		Throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
 	}
 
+	resetPitstopMFD(descriptor := false) {
+	}
+
 	closePitstopMFD() {
 		Throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
 	}
@@ -789,10 +792,16 @@ openPitstopMFD(descriptor := false) {
 		protectionOn()
 
 		try {
-			if descriptor
+			if descriptor {
+				plugin.resetPitstopMFD(descriptor)
+
 				plugin.openPitstopMFD(descriptor)
-			else
+			}
+			else {
+				plugin.resetPitstopMFD()
+
 				plugin.openPitstopMFD()
+			}
 		}
 		finally {
 			protectionOff()

@@ -786,6 +786,9 @@ Whenever a simulator plugin can provide functionality to handle the pitstop sett
 #### [Abstract] *openPitstopMFD()*
 The implementation of *openPitstopMFD*, which must be provided by a subclass, must open the pitstop settings dialog in order to automatically apply the necessary value changes using the methods below. *openPitstopMFD* must return *true*, when the pitstop settings dialog has been opened successfully.
 
+#### *resetPitstopMFD()*
+This method is called, when the user may have changed pitstop settings by its own. It marks the Pitstop MFD state as dirty, so to say. The default method does nothing.
+
 #### [Abstract] *closePitstopMFD()*
 This method, which also must be implemented by a subclass, must close the pitstop settings dialog.
 	

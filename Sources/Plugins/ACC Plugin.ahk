@@ -52,6 +52,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iClosePitstopMFDHotkey := false
 
 	iNoImageSearch := false
+	iNextPitstopMFDOptionsUpdate := false
 
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -440,7 +441,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {
 		static reported := false
 		static imageSearch := "__Undefined__"
-		static nextUpdate := 0
 
 		if (imageSearch = kUndefined) {
 			car := (this.Car ? this.Car : "*")
@@ -457,13 +457,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if imgSearch
 				update := true
 			else {
-				if (A_Now > nextUpdate)
+				if (A_Now > this.iNextPitstopMFDOptionsUpdate)
 					update := true
 				else
 					update := false
 			}
 
-		nextUpdate := (A_Now + 60000)
+		this.iNextPitstopMFDOptionsUpdate := (A_Now + 60000)
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
@@ -503,6 +503,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+	}
+
+	resetPitstopMFD(descriptor := false) {
+		this.iNextPitstopMFDOptionsUpdate := 0
 	}
 
 	closePitstopMFD() {
@@ -1656,7 +1660,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						for index, pressure in pressures
 							pressures[index] := Round(pressure, 1)
 
-						pitstopData["Service.Tyre.Pressures"] := pressures
+						pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 					}
 
 					for ignore, tyreSet in carState["tyreSets"]
@@ -1682,26 +1686,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							pitstopData["Tyre.Compound"] := "Dry"
 							pitstopData["Tyre.Compound.Color"] := "Black"
 							pitstopData["Tyre.Set"] := (currentTyreSet + 1)
-							pitstopData["Tyre.States"] := tyreStates
+							; pitstopData["Tyre.States"] := tyreStates
 
 							break
 						}
 
 					data := newConfiguration()
 
-					for key, value in pitstopData
-						if (InStr(key, "Service.") = 1)
-							setConfigurationValue(data, "Pitstop Data", key, IsObject(value) ? values2String(",", value*): value)
-
-					setConfigurationValue(data, "Pitstop Data", "Tyre.Driver", pitstopData["Tyre.Driver"])
-					setConfigurationValue(data, "Pitstop Data", "Tyre.Laps", pitstopData["Tyre.Laps"])
-					setConfigurationValue(data, "Pitstop Data", "Tyre.Set", pitstopData["Tyre.Set"])
-					setConfigurationValue(data, "Pitstop Data", "Tyre.Compound", pitstopData["Tyre.Compound"])
-					setConfigurationValue(data, "Pitstop Data", "Tyre.Compound.Color", pitstopData["Tyre.Compound.Color"])
+					setConfigurationSectionValues(data, "Pitstop Data", pitstopData)
 
 					for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
-						for key, value in this.iLastPitstopData["Tyre.States"][A_Index]
+						for key, value in tyreStates[A_Index]
 							setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*) : value)
+
+					writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
 
 					this.RaceEngineer.updatePitstopState(data)
 				}

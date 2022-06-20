@@ -7757,7 +7757,7 @@ class RaceCenter extends ConfigurationItem {
 		headers := []
 
 		for ignore, header in ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
-			headers.Push("<th class=""th-std th-left"">" . translate(header) . "</th>")
+			headers.Push("<th class=""th-std"">" . translate(header) . "</th>")
 
 		html .= ("<tr>" . values2String("", headers*) . "</tr>")
 

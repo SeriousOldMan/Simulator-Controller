@@ -7,6 +7,10 @@
   5. The delta calculation by the Spotter has been improved again. Still not perfectly correct and sometimes way off, after a crash for example, but it keeps getting better.
   6. Driver selection now works remptely by the "Race Center" for ACC and RF2. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) for more information.
   7. There are now several reports for past pitstops available in "Race Center", where you can examine the used tyres for almost all simulators. You will find more information also in the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop).
+  8. New voice command for the Race Engineer to request the current tyre wear. Not supported in all simulators.
+  9. New information request action "TyreWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the tyre wear by pressing a button on your hardware controller.
+  10. New icon for Stream Deck for the "TyreWear" information request action.
+  
   
   Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421), especially for the changes in the Pitstop MFD handling in ACC.
 

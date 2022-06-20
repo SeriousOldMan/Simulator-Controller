@@ -1,6 +1,6 @@
 Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
 
-Regarding special steps, that might be necessary for using voice control for the *Assetto Corsa Competizione* Pitstop MFD, please read the update information for [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20) carefully. The same preparation applies for RaceRoom Racing Experience, which is described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
+Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
 ***
 
@@ -42,6 +42,12 @@ The update procedure itself is handled by the application *Simulator Tools*. It 
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
+
+## Release 4.2.1
+
+Database and configuration update is again handled automatically, but there is a major change in this version, how the Pitstop MFD in ACC is handled. Before this release, you had to create small search images, so that the available options and the current state of the ACC Pitstop MFD could be detected using image recognition. The new method introduced with this release uses a different approach, a kind of fuzzy option walk, to achieve the same result. But you can still use the image recognition method, if you feel disturbed by the fast moving cursor of the Pitstop MFD. To do this, open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator.
+
+***
 
 ## Release 4.2.0
 
@@ -549,6 +555,8 @@ Beside that, all other changes for Release 2.1, for example for the translation 
 ***
 
 ## Release 2.0
+
+Note: The following information is outdated. Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for the *ACC* plugin for up to date information.
 
 Release 2.0 introduces, beside the new automated update mechanism, a full rework of the *ACC* plugin for *Assetto Corsa Competizione*. See the *ACC* plugin documentation about the [new features](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) for an in depth introduction of pitstop management. To support this new functionality, there are new plugin arguments for the *ACC* plugin, which will be autmatically added to the plugin configuration item by the automated update procedure. Please use the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) to edit the arguments for the *ACC* plugin according to your needs.
 

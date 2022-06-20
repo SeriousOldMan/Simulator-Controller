@@ -1622,94 +1622,112 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	pitstopFinished(pitstopNumber, updateState := false) {
-		if !updateState
+		static callback := false
+
+		if !updateState {
+			if callback
+				SetTimer %callback%, Off
+
 			base.pitstopFinished(pitstopNumber)
+		}
 
 		if this.RaceEngineer {
 			if updateState {
 				try {
-					if !FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json")
-						return
+					retry := false
 
-					FileGetTime updateTime, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json, M
+					if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json") {
+						FileGetTime updateTime, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json, M
 
-					EnvAdd updateTime, 10, Minutes
+						EnvAdd updateTime, 5, Minutes
 
-					if (updateTime < A_Now)
-						return
-
-					FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
-
-					carState := JSON.parse(carState)
-					pitstopState := carState["pitstopMFD"]
-
-					currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
-
-					currentTyreSet := carState["currentTyreSet"]
-					tyreStates := []
-
-					pitstopData := {Pitstop: pitstopNumber
-								  , "Service.Time": pitstopState["timeRequired"]
-								  , "Service.Lap": carState["lapCount"]
-								  , "Service.Driver.Previous": currentDriver
-								  , "Service.Driver.Next": pitstopState["newDriverNameToDisplay"]
-								  , "Service.Refuel": pitstopState["fuelToAdd"]
-								  , "Service.Bodywork.Repair": (pitstopState["repairBody"] ? true : false)
-								  , "Service.Suspension.Repair": (pitstopState["repairSuspension"] ? true : false)
-								  , "Service.Engine.Repair": false}
-
-					if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
-						pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
-						pitstopData["Service.Tyre.Compound.Color"] := "Black"
-						pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
-
-						pressures := pitstopState["tyrePressures"]
-
-						for index, pressure in pressures
-							pressures[index] := Round(pressure, 1)
-
-						pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
+						if (updateTime < A_Now)
+							retry := true
+						else
+							Sleep 5000
 					}
+					else
+						retry := true
 
-					for ignore, tyreSet in carState["tyreSets"]
-						if (tyreSet["tyreSet"] = currentTyreSet) {
-							for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-								wearState := tyreSet["wearStatus"][A_Index]
-								tread := wearState["treadMM"].Clone()
+					if retry {
+						callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
 
-								wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100), 1)
+						SetTimer %callback%, -10000
+					}
+					else {
+						FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
 
-								for index, section in tread
-									tread[index] := Round(section, 2)
+						carState := JSON.parse(carState)
+						pitstopState := carState["pitstopMFD"]
 
-								grain := Round(wearState["grain"], 2)
-								blister := Round(wearState["blister"], 2)
-								flatSpot := Round(wearState["flatSpot"], 2)
+						currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
 
-								tyreStates.Push({Tyre: tyre, Tread: tread, Wear: wear, Grain: grain, Blister: blister, FlatSpot: flatSpot})
-							}
+						currentTyreSet := carState["currentTyreSet"]
+						tyreStates := []
 
-							pitstopData["Tyre.Driver"] := currentDriver
-							pitstopData["Tyre.Laps"] := false
-							pitstopData["Tyre.Compound"] := "Dry"
-							pitstopData["Tyre.Compound.Color"] := "Black"
-							pitstopData["Tyre.Set"] := (currentTyreSet + 1)
-							; pitstopData["Tyre.States"] := tyreStates
+						pitstopData := {Pitstop: pitstopNumber
+									  , "Service.Time": pitstopState["timeRequired"]
+									  , "Service.Lap": carState["lapCount"]
+									  , "Service.Driver.Previous": currentDriver
+									  , "Service.Driver.Next": pitstopState["newDriverNameToDisplay"]
+									  , "Service.Refuel": pitstopState["fuelToAdd"]
+									  , "Service.Bodywork.Repair": (pitstopState["repairBody"] ? true : false)
+									  , "Service.Suspension.Repair": (pitstopState["repairSuspension"] ? true : false)
+									  , "Service.Engine.Repair": false}
 
-							break
+						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
+							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
+							pitstopData["Service.Tyre.Compound.Color"] := "Black"
+							pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
+
+							pressures := pitstopState["tyrePressures"]
+
+							for index, pressure in pressures
+								pressures[index] := Round(pressure, 1)
+
+							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 						}
 
-					data := newConfiguration()
+						for ignore, tyreSet in carState["tyreSets"]
+							if (tyreSet["tyreSet"] = currentTyreSet) {
+								for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+									wearState := tyreSet["wearStatus"][A_Index]
+									tread := wearState["treadMM"].Clone()
 
-					setConfigurationSectionValues(data, "Pitstop Data", pitstopData)
+									wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100), 1)
 
-					for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
-						for key, value in tyreStates[A_Index]
-							setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*) : value)
+									for index, section in tread
+										tread[index] := Round(section, 2)
 
-					writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
+									grain := Round(wearState["grain"], 2)
+									blister := Round(wearState["blister"], 2)
+									flatSpot := Round(wearState["flatSpot"], 2)
 
-					this.RaceEngineer.updatePitstopState(data)
+									tyreStates.Push({Tyre: tyre, Tread: tread, Wear: wear, Grain: grain, Blister: blister, FlatSpot: flatSpot})
+								}
+
+								pitstopData["Tyre.Driver"] := currentDriver
+								pitstopData["Tyre.Laps"] := false
+								pitstopData["Tyre.Compound"] := "Dry"
+								pitstopData["Tyre.Compound.Color"] := "Black"
+								pitstopData["Tyre.Set"] := (currentTyreSet + 1)
+								; pitstopData["Tyre.States"] := tyreStates
+
+								break
+							}
+
+						data := newConfiguration()
+
+						setConfigurationSectionValues(data, "Pitstop Data", pitstopData)
+
+						for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
+							for key, value in tyreStates[A_Index]
+								setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*) : value)
+
+						writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
+
+						this.RaceEngineer.updatePitstopState(data)
+					}
 				}
 				catch exception {
 					; ignore
@@ -1718,7 +1736,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else {
 				callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
 
-				SetTimer %callback%, -180000
+				SetTimer %callback%, -10000
 			}
 		}
 	}

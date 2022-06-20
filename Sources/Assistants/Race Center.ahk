@@ -4722,8 +4722,8 @@ class RaceCenter extends ConfigurationItem {
 				coldPressures := string2Values(",", lapPressures[9])
 				hotPressures := string2Values(",", lapPressures[10])
 
-				coldPressures := map(coldPressures, "null")
-				hotPressures := map(hotPressures, "null")
+				coldPressures := map(coldPressures, kNull)
+				hotPressures := map(hotPressures, kNull)
 
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
@@ -6183,6 +6183,9 @@ class RaceCenter extends ConfigurationItem {
 	showDataPlot(data, xAxis, yAxises) {
 		double := (yAxises.Length() > 1)
 
+		minValue := kUndefined
+		maxValue := kUndefined
+
 		drawChartFunction := ""
 
 		drawChartFunction .= "function drawChart() {"
@@ -6232,7 +6235,11 @@ class RaceCenter extends ConfigurationItem {
 				value := values[yAxis]
 
 				if ((value = "n/a") || (isNull(value)))
-					value := "null"
+					value := kNull
+				else {
+					minValue := ((minValue == kUndefined) ? value : Min(minValue, value))
+					maxValue := ((maxValue == kUndefined) ? value : Max(maxValue, value))
+				}
 
 				drawChartFunction .= (", " . value)
 			}
@@ -6243,7 +6250,8 @@ class RaceCenter extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: 'E0E0E0' }, "
+		vAxis := "vAxis: { "
+
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
 				series .= ", "
@@ -6260,12 +6268,20 @@ class RaceCenter extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "' }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bar") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { viewWindowMode: 'pretty' }, vAxis: { viewWindowMode: 'pretty' } };")
+			if (minValue == kUndefined)
+				minValue := 0
+			else
+				minValue := Min(0, minValue)
+
+			if (maxValue == kUndefined)
+				maxValue := 0
+
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { viewWindow: {min: " . minValue . ", max: " . maxValue . "} }, vAxis: { viewWindowMode: 'pretty' } };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -7023,7 +7039,7 @@ class RaceCenter extends ConfigurationItem {
 									  . "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -7047,7 +7063,10 @@ class RaceCenter extends ConfigurationItem {
 
 		drawChartFunction .= ("`n]);")
 
-		drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' } };"
+		minValue := Min(0, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+		maxValue := Max(stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+
+		drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
 		drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }"
 
 		return drawChartFunction
@@ -7943,8 +7962,8 @@ class RaceCenter extends ConfigurationItem {
 
 		text =
 		(
-			hAxis: { title: '%drivers%', gridlines: { color: '#777' } },
-			vAxis: { title: '%seconds%' },
+			hAxis: { title: '%drivers%', gridlines: {count: 0} },
+			vAxis: { title: '%seconds%', gridlines: {count: 0} },
 			lineWidth: 0,
 			series: [ { 'color': 'D8D8D8' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -7990,7 +8009,10 @@ class RaceCenter extends ConfigurationItem {
 
 		drawChartFunction .= ("`n]);")
 
-		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' } };"
+		minValue := Min(0, minimum(potentialsData), minimum(raceCraftsData), minimum(speedsData), minimum(consistenciesData), minimum(carControlsData))
+		maxValue := Max(maximum(potentialsData), maximum(raceCraftsData), maximum(speedsData), maximum(consistenciesData), maximum(carControlsData))
+
+		drawChartFunction .= "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}} };"
 		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction
@@ -8043,7 +8065,7 @@ class RaceCenter extends ConfigurationItem {
 									  . "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 

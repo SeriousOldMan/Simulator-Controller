@@ -209,6 +209,12 @@ namespace RF2SHMProvider {
 								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
+				Console.Write("TyreWear=");
+				if (extended.mPhysics.mTireMult > 0)
+					Console.WriteLine(playerTelemetry.mWheels[0].mWear + "," + playerTelemetry.mWheels[1].mWear + "," +
+									  playerTelemetry.mWheels[2].mWear + "," + playerTelemetry.mWheels[3].mWear);
+				else
+					Console.WriteLine("0,0,0,0");
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 

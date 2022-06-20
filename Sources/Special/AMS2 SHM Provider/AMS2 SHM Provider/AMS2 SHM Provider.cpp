@@ -227,15 +227,20 @@ int main(int argc, char* argv[]) {
 		printf("TyreCompound=Dry\n");
 		printf("TyreCompoundColor=Black\n");
 
-		printf("TyreTemperature=%f, %f, %f, %f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
+		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
 			localCopy->mTyreTemp[TYRE_FRONT_RIGHT],
 			localCopy->mTyreTemp[TYRE_REAR_LEFT],
 			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
-		printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
+		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
+
+		printf("TyreWear=%f,%f,%f,%f\n", localCopy->mTyreWear[TYRE_FRONT_LEFT],
+			localCopy->mTyreWear[TYRE_FRONT_RIGHT],
+			localCopy->mTyreWear[TYRE_REAR_LEFT],
+			localCopy->mTyreWear[TYRE_REAR_RIGHT]);
 
 		printf("[Stint Data]\n");
 

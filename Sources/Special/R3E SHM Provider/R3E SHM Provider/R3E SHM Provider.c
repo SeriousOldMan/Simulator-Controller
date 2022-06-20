@@ -257,16 +257,24 @@ int main(int argc, char* argv[])
 				
 			wprintf_s(L"TyreCompound=Dry\n");
 			wprintf_s(L"TyreCompoundColor=%S\n", tyreCompoundColor);
-			wprintf_s(L"TyreTemperature = %f, %f, %f, %f\n",
+			wprintf_s(L"TyreTemperature=%f,%f,%f,%f\n",
 				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_REAR_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_REAR_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER]);
-			wprintf_s(L"TyrePressure = %f, %f, %f, %f\n",
+			wprintf_s(L"TyrePressure=%f,%f,%f,%f\n",
 				map_buffer->tire_pressure[R3E_TIRE_FRONT_LEFT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_FRONT_RIGHT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895);
+			if (map_buffer->tire_wear_active > 0)
+				wprintf_s(L"TyreWear=%f,%f,%f,%f\n",
+					normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]),
+					normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]),
+					normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]),
+					normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]));
+			else
+				wprintf_s(L"TyreWear=0,0,0,0\n");
 		}
 
 		wprintf_s(L"[Stint Data]\n");

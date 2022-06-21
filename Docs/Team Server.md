@@ -172,7 +172,7 @@ Beside that, you can request several context specific data, which will be shown 
   
   8. Pitstops Summary
   
-     This report is also available in the "Pitstop" menu and gives you a complete list of all recent pitstops and the corresponding tyre data, if available. The information provided is the same as in the report for a single pitstop.
+     This report is also available in the "Pitstop" menu and gives you a complete list of all recent pitstops and the corresponding tyre data, if available. The information provided is the same as in the report for a single pitstop, but you will see all the data for all pitstops at the same time.
 
   9. Driver Statistics
   
@@ -270,19 +270,30 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
-Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan, or from the stratetgy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information there from previous sessions in comparable conditions.
+Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will use the values, that are currently recommended by Jona, the Virtual Race Engineer, for tyre pressures. Also, the recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan, or from the stratetgy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
 
-Below these two commands you can choose between two strategies to adjust tyre pressures, when swapping drivers, as described in the previous section:
+You can also choose between two different methods to further adjust tyre pressures, when swapping drivers, as described in the previous section:
 
   1. Reference
   
-     When you choose this strategy and there are tyre pressure setups are available for the next driver in the Stint Plan, these reference pressures will be used (possibly temperature corrected) and the pressure values derived by the Virtual Race Engineer will be ignored.
+     When you choose this method and there are tyre pressure setups available for the next driver according to the stint plan, these reference pressures will be used (possibly temperature corrected) and the pressure values derived by the Virtual Race Engineer will be ignored.
 
   2. Relative
   
-     Using this strategy will use the target pressures derived by the Virtual Race Engineer, but these values will corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the Stint Plan. This will work best, when the reference pressures are for very similar conditions.
+     Using this method will use the target pressures derived by the Virtual Race Engineer, but these values will corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the stint plan. This will work best, when the reference pressures have been entered for very similar conditions.
 
 Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
+
+#### Automatically select the next driver
+
+The automatic selection of the next driver is supported for *Assetto Corsa Competizione* and *rFactor 2*, as long a sthe following apply:
+
+  1. A stint plan is available and is up to date, at least for the driver of the current and the driver for the next stint.
+  2. You selected the participating drivers from all available drivers of your team and ordered them according to the entry list of the event using "Select Team..." command in the "Pitstop" menu. Once you have done this, you can choose the next driver when planning a pitstop using the correspnding drop down menu.
+  
+     ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2018.JPG)
+	 
+	 Please make sure, that the names and the order of the selected drivers are identical to the content of the entry list for your team in the upcoming session. Otherwise, wrong drivers might be selected for the next stint in the pitstop automation.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
   

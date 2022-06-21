@@ -160,7 +160,7 @@ Beside that, you can request several context specific data, which will be shown 
   
      You will get a summary of a given pitstop, when you select it in the *Pitstops* tab, incl. tyre wear data. The amount of infomration provided here depends of the data available for the current simulator.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2016.JPG)
 	 
 	 Note: For *Assetto Corsa Competizione*, detailed tyre data is only available after a real driver swap when running on an ACC server (no single user session). For most of the other simulators, only the tyre wear percentage is provided for each tyre.
 	 
@@ -168,7 +168,7 @@ Beside that, you can request several context specific data, which will be shown 
 	 
 	 This report, which can be selected with "Setups Summary" command in the "Pitstop" menu, lists all registered, driver-specific tyre setups. Very helpful, if you want to have a printed version, just in case.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2017.JPG)
   
   8. Pitstops Summary
   

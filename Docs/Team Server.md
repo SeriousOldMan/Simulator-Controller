@@ -182,9 +182,9 @@ Beside that, you can request several context specific data, which will be shown 
 	 
   10. Race Summary
   
-     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
+      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
+	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 

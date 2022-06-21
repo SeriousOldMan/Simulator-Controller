@@ -221,6 +221,7 @@ class RaceCenter extends ConfigurationItem {
 	iSessionFinished := false
 
 	iSetupsVersion := false
+	iTeamDriversVersion := false
 
 	iPlanVersion := false
 	iDate := false
@@ -696,6 +697,12 @@ class RaceCenter extends ConfigurationItem {
 	SetupsVersion[] {
 		Get {
 			return this.iSetupsVersion
+		}
+	}
+
+	TeamDriversVersion[] {
+		Get {
+			return this.iTeamDriversVersion
 		}
 	}
 
@@ -1513,18 +1520,6 @@ class RaceCenter extends ConfigurationItem {
 			drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : {})
 
 			session := this.SelectedSession[true]
-
-			try {
-				teamDrivers := this.Connector.GetSessionValue(session, "Session Drivers")
-			}
-			catch exception {
-				teamDrivers := ""
-			}
-
-			if (teamDrivers && (teamDrivers != ""))
-				teamDrivers := string2Values("###", teamDrivers)
-			else
-				teamDrivers := []
 		}
 		else {
 			drivers := {}
@@ -1538,23 +1533,14 @@ class RaceCenter extends ConfigurationItem {
 				if drivers.Nr
 					selectedDrivers[drivers.Nr . ""] := name
 			}
-
-			teamDrivers := []
-
-			Loop % selectedDrivers.Count()
-				teamDrivers.Push(selectedDrivers[A_Index . ""])
 		}
 
 		this.iSessionDrivers := drivers
-		this.iTeamDrivers := teamDrivers
 
 		names := getKeys(drivers)
-		identifiers := getValues(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
 		GuiControl, , plansetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
-		GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
-		GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
 	}
 
 	selectSession(identifier) {
@@ -3812,6 +3798,9 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , plansetupDriverDropDownMenu, % "|"
 			}
 
+			this.iTeamDrivers := []
+			this.iTeamDriversVersion := false
+
 			this.iDrivers := []
 			this.iStints := {}
 			this.iLaps := {}
@@ -4929,7 +4918,7 @@ class RaceCenter extends ConfigurationItem {
 											 , "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
 							}
 
-							if (!hasTyreData && (getConfigurationValue(state, "Pitstop Data", "Tyre.Set", kUndefined) != kUndefined)) {
+							if (!hasTyreData && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
 								hasTyreData := true
 								newData := true
 
@@ -4944,8 +4933,8 @@ class RaceCenter extends ConfigurationItem {
 												, {Pitstop: pitstop, Driver: driver, Laps: laps
 												 , Compound: compound, "Compound.Color": compoundColor
 												 , Set: tyreSet, Tyre: tyre
-												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread")
-												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear")
+												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread", "-")
+												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear", 0)
 												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain", "-")
 												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister", "-")
 												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot", "-")})
@@ -5061,6 +5050,45 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	syncTeamDrivers() {
+		try {
+			session := this.SelectedSession[true]
+
+			version := this.Connector.getSessionValue(session, "Team Drivers Version")
+
+			if (version && (version != "")) {
+				this.showMessage(translate("Syncing team drivers"))
+
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Syncing team drivers (Version: ") . version . translate(")"))
+
+				if (!this.TeamDriversVersion || (this.TeamDriversVersion < version)) {
+					this.iTeamDriversVersion := version
+
+					try {
+						teamDrivers := this.Connector.GetSessionValue(session, "Team Drivers")
+					}
+					catch exception {
+						teamDrivers := ""
+					}
+
+					if (teamDrivers && (teamDrivers != ""))
+						teamDrivers := string2Values("###", teamDrivers)
+					else
+						teamDrivers := []
+
+					this.iTeamDrivers := teamDrivers
+
+					GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
+					GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
+				}
+			}
+		}
+		catch exception {
+			; ignore
+		}
+	}
+
 	syncPlan() {
 		try {
 			session := this.SelectedSession[true]
@@ -5157,6 +5185,7 @@ class RaceCenter extends ConfigurationItem {
 					hadLastLap := true
 
 				this.syncSetups()
+				this.syncTeamDrivers()
 				this.syncPlan()
 				this.syncStrategy()
 
@@ -5426,7 +5455,12 @@ class RaceCenter extends ConfigurationItem {
 			if this.SessionActive {
 				session := this.SelectedSession[true]
 
-				this.Connector.SetSessionValue(session, "Session Drivers", values2String("###", teamDrivers*))
+				version := (A_Now . "")
+
+				this.iTeamDriversVersion := version
+
+				this.Connector.setSessionValue(session, "Team Drivers Version", version)
+				this.Connector.SetSessionValue(session, "Team Drivers", values2String("###", teamDrivers*))
 			}
 
 			this.iTeamDrivers := teamDrivers
@@ -7581,7 +7615,7 @@ class RaceCenter extends ConfigurationItem {
 			return "bgcolor=""DarkRed"" style=""color:#FFFFFF"""
 	}
 
-	createPitstopTyresDetails(pitstopNr) {
+	createTyreWearDetails(pitstopNr) {
 		local compound
 
 		tyres := {}
@@ -7601,6 +7635,8 @@ class RaceCenter extends ConfigurationItem {
 		blisterData := []
 		flatSpotData := []
 
+		hasTread := false
+		hasWear := false
 		hasGrain := false
 		hasBlister := false
 		hasFlatSpot := false
@@ -7620,8 +7656,21 @@ class RaceCenter extends ConfigurationItem {
 
 			tyreNames.Push("<th class=""th-std"">" . translate(tyre) . "</th>")
 
-			treadData.Push("<td class=""td-std"" " . this.computeTyreWearColor(tyres[key].Wear) . ">"
-						 . values2String(", ", string2Values(",", tyres[key].Tread)*) . "</td>")
+			wear := tyres[key].Wear
+			wearData.Push("<td class=""td-std"" " . this.computeTyreWearColor(tyres[key].Wear) . ">" . wear . "</td>")
+
+			if (tread != "-")
+				hasTread := true
+
+			tread := tyres[key].Tread
+			if hasWear
+				treadData.Push("<td class=""td-std"" " . this.computeTyreWearColor(tyres[key].Wear) . ">"
+							 . values2String(", ", string2Values(",", tread)*) . "</td>")
+			else
+				treadData.Push("<td class=""td-std"">" . values2String(", ", string2Values(",", tread)*) . "</td>")
+
+			if (tread != "-")
+				hasTread := true
 
 			grain := tyres[key].Grain
 			grainData.Push("<td class=""td-std"" " . this.computeTyreDamageColor(grain) . ">" . grain . "</td>")
@@ -7660,7 +7709,11 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= "<table class=""table-std"">"
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
+
+		if hasTread
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
+		else if hasWear
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Wear") . "</th>" . values2String("", wearData*) . "</tr>")
 
 		if hasGrain
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
@@ -7695,7 +7748,7 @@ class RaceCenter extends ConfigurationItem {
 		if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length() > 0) {
 			html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
 
-			html .= ("<br>" . this.createPitstopTyresDetails(pitstopNr))
+			html .= ("<br>" . this.createTyreWearDetails(pitstopNr))
 		}
 
 		this.showDetails("Pitstop", html)
@@ -7838,7 +7891,7 @@ class RaceCenter extends ConfigurationItem {
 				if (this.SessionDatabase.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length() > 0) {
 					html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
 
-					html .= ("<br>" . this.createPitstopTyresDetails(A_Index))
+					html .= ("<br>" . this.createTyreWearDetails(A_Index))
 				}
 
 		this.showDetails("Pitstops", html)

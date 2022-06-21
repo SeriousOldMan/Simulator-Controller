@@ -1694,7 +1694,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 									wearState := tyreSet["wearStatus"][A_Index]
 									tread := wearState["treadMM"].Clone()
 
-									wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100), 1)
+									wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100))
 
 									for index, section in tread
 										tread[index] := Round(section, 2)
@@ -1711,7 +1711,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 								pitstopData["Tyre.Compound"] := "Dry"
 								pitstopData["Tyre.Compound.Color"] := "Black"
 								pitstopData["Tyre.Set"] := (currentTyreSet + 1)
-								; pitstopData["Tyre.States"] := tyreStates
 
 								break
 							}

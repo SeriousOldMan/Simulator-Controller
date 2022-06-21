@@ -719,6 +719,27 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	pitstopFinished(pitstopNumber) {
 	}
 
+	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {
+		if this.RaceEngineer {
+			data := newConfiguration()
+
+			setConfigurationValue(data, "Pitstop Data", "Pitstop", pitstopNumber)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Driver", driver)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Laps", laps)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Compound", compound)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Compound.Color", compoundColor)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Set", set)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Front.Left", flWear)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Front.Right", frWear)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Rear.Left", rlWear)
+			setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Rear.Right", rrWear)
+
+			writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
+
+			this.RaceEngineer.updatePitstopState(data)
+		}
+	}
+
 	startPitstopSetup(pitstopNumber) {
 	}
 

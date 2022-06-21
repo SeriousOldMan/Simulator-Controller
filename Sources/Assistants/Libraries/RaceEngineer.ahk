@@ -56,6 +56,10 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("finishPitstopSetup", arguments*)
 		}
 
+		updateTyreSet(arguments*) {
+			this.callRemote("updateTyreSet", arguments*)
+		}
+
 		setPitstopRefuelAmount(arguments*) {
 			this.callRemote("setPitstopRefuelAmount", arguments*)
 		}
@@ -1666,10 +1670,32 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	finishPitstop(lapNumber := false) {
+		local knowledgebase := this.KnowledgeBase
+
 		base.finishPitstop(lapNumber)
 
-		if this.RemoteHandler
+		if this.RemoteHandler {
+			lap := (knowledgeBase.getValue("Pitstop." . pitstopNumber . ".Lap") - 1)
+			flWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FL", kUndefined)
+
+			if (flWear != kUndefined) {
+				frWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FR")
+				rlWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RL")
+				rrWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RR")
+
+				driver := computeDriverName(knowledgeBase.getValue("Lap." . lap . ".Driver.Forname")
+										  , knowledgeBase.getValue("Lap." . lap . ".Driver.Surname")
+										  , knowledgeBase.getValue("Lap." . lap . ".Driver.Nickname"))
+
+				this.RemoteHandler.updateTyreSet(pitstopNumber, driver, false
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound")
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color")
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Set", false)
+											   , flWear, frWear, rlWear, rrWear)
+			}
+
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
+		}
 	}
 
 	callPlanPitstop(lap := "__Undefined__", arguments*) {

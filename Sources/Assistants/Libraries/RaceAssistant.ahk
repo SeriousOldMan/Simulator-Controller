@@ -849,6 +849,11 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getConfigurationValue(data, "Car Data", "TyreCompound", "Dry"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black"))
 
+		tyreSet := getConfigurationValue(data, "Car Data", "TyreSet", kUndefined)
+
+		if (tyreSet != kUndefined)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Set", tyreSet)
+
 		timeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
 		knowledgeBase.setFact("Driver.Time.Remaining", getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))

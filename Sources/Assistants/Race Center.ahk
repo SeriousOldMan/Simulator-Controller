@@ -7659,8 +7659,8 @@ class RaceCenter extends ConfigurationItem {
 			wear := tyres[key].Wear
 			wearData.Push("<td class=""td-std"" " . this.computeTyreWearColor(tyres[key].Wear) . ">" . wear . "</td>")
 
-			if (tread != "-")
-				hasTread := true
+			if (wear != "-")
+				hasWear := true
 
 			tread := tyres[key].Tread
 			if hasWear

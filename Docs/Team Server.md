@@ -90,8 +90,8 @@ Every simulation game is unique and handles multiplayer team races different. Th
 
 #### Assetto Corsa Competizione
 
-  1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to *both selected*, to have some sort of initial state. This means, that you have to open the Pitstop MFD and select both repair options, once you've picked up the car, and put them to the state of the last pitstop performed by your team mate. And you must do this **without** the help and control of the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. The other possibility is to leave them as they are, but double check later, after Jona has dialed the pitstop options.
-
+  1. *Assetto Corsa Competizione* looses the knowledge about the currently selected repair options in the Pitstop MFD sometimes after a driver swap. The internal selection state of the ["ACC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) will therefore be reset to the selection during the last pitstop of the previous driver, but this might not reflect the internal state of the Pitstop MFD of the current driver. This means, that you have to open the Pitstop MFD and check both repair options, after the next pitstop has been planned. If you have to correct one or both settings, you must do this **without** the help and control of the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of the "ACC" plugin. So do not use your Button Box here. 
+  
 ## Race Center
 
 During a team session, all team members can use the "Race Center" application, even if they are not an active driver of the session and are not running the simulation. This tool gives you complete insights into the telemetry and standings data for the current race session. It also allows you to interact with the Virtual Race Assistants, even when you are not the currently active driver. By this functionality, each team member or a dedicated race engineer can, for example, prepare the perfect settings for an upcoming pitstop based on the myriads of data suppplied by the "Race Center". Before we dig into the details, take a look at the various screens of the "Race Center":
@@ -156,13 +156,31 @@ Beside that, you can request several context specific data, which will be shown 
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 
-  5. Driver Statistics
+  6. Details for a given pitstop
+  
+     You will get a summary of a given pitstop, when you select it in the *Pitstops* tab, incl. tyre wear data. The amount of infomration provided here depends of the data available for the current simulator.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+	 
+	 Note: For *Assetto Corsa Competizione*, detailed tyre data is only available after a real driver swap when running on an ACC server (no single user session). For most of the other simulators, only the tyre wear percentage is provided for each tyre.
+	 
+  7. Setups Summary
+	 
+	 This report, which can be selected with "Setups Summary" command in the "Pitstop" menu, lists all registered, driver-specific tyre setups. Very helpful, if you want to have a printed version, just in case.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+  
+  8. Pitstops Summary
+  
+     This report is also available in the "Pitstop" menu and gives you a complete list of all recent pitstops and the corresponding tyre data, if available. The information provided is the same as in the report for a single pitstop.
+
+  9. Driver Statistics
   
      You can generate a special report for all active drivers the team with detailed information about their stints as well as their individual performance figures (potential, race craft, pace, consistency and car control). Choose the "Driver Statistics" command from the "Session" menu to generate this report.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2010.JPG) ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2012.JPG)
 	 
-  6. Race Summary
+  10. Race Summary
   
      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 

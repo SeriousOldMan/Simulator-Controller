@@ -327,12 +327,12 @@ float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, co
 		return 0;
 }
 
-float getTyreWear(const irsdk_header* header, const char* sessionInfo, const char* data,
+int getTyreWear(const irsdk_header* header, const char* sessionInfo, const char* data,
 	char* dataVariableO, char* dataVariableM, char* dataVariableI) {
 	char result[32];
 
 	if (getDataValue(result, header, data, dataVariableO))
-		return ((atof(result) + getDataFloat(header, data, dataVariableM) + getDataFloat(header, data, dataVariableI)) / 3) / 100;
+		return (int)((atof(result) + getDataFloat(header, data, dataVariableM) + getDataFloat(header, data, dataVariableI)) / 3);
 	else
 		return 0;
 }
@@ -801,7 +801,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastTempsOMI:", "LRtempCL", "LRtempCM", "LRtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
 
-			printf("TyreWear=%f,%f,%f,%f\n",
+			printf("TyreWear=%d,%d,%d,%d\n",
 				getTyreWear(header, sessionInfo, data, "LFwearL", "LFwearM", "LFwearR"),
 				getTyreWear(header, sessionInfo, data, "RFwearL", "RFwearM", "RFwearR"),
 				getTyreWear(header, sessionInfo, data, "LRwearL", "LRwearM", "LRwearR"),

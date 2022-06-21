@@ -233,8 +233,8 @@ namespace ACSHMProvider
                                                  + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
             Console.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
                                               + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
-            Console.WriteLine("TyreWear=" + physics.TyreWear[0] + "," + physics.TyreWear[1] + ","
-                                          + physics.TyreWear[2] + "," + physics.TyreWear[3]);
+            Console.WriteLine("TyreWear=" + Math.Round(physics.TyreWear[0] * 100) + "," + Math.Round(physics.TyreWear[1] * 100) + ","
+                                          + Math.Round(physics.TyreWear[2] * 100) + "," + Math.Round(physics.TyreWear[3] * 100));
 
             float damageFront = physics.CarDamage[0];
             float damageRear = physics.CarDamage[1];

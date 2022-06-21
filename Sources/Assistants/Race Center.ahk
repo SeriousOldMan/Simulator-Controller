@@ -75,7 +75,10 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 										  , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 										  , "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 										  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
-										  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+										  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+										  , "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
+										  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+										  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -4546,7 +4549,7 @@ class RaceCenter extends ConfigurationItem {
 						}
 					}
 
-					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,")
+					telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null")
 				}
 
 				telemetryData := string2Values(";", telemetryData)
@@ -4555,7 +4558,7 @@ class RaceCenter extends ConfigurationItem {
 					pitstop := telemetryData[10]
 
 					if pitstop
-						telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,"]
+						telemetryData := ["-", "-", "-", "-", "-", "-", "-", "-", "-", pitstop, "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null"]
 				}
 
 				if ((runningLap > 2) && pitstop)
@@ -4566,13 +4569,19 @@ class RaceCenter extends ConfigurationItem {
 				pressures := string2Values(",", telemetryData[16])
 				temperatures := string2Values(",", telemetryData[17])
 
+				if (telemetryData.Length() >= 18)
+					wear := string2Values(",", telemetryData[18])
+				else
+					wear := [kNull, kNull, kNull, kNull]
+
 				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
 
 				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , telemetryData[7], telemetryData[8], telemetryData[9])
+									   , telemetryData[7], telemetryData[8], telemetryData[9]
+									   , wear[1], wear[2], wear[3], wear[4])
 
 				currentListView := A_DefaultListView
 
@@ -6584,13 +6593,15 @@ class RaceCenter extends ConfigurationItem {
 			y6Choices := []
 
 			if (report = "Pressures") {
-				xChoices := ["Stint", "Lap", "Lap.Time"]
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"]
+							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
+							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -6599,13 +6610,15 @@ class RaceCenter extends ConfigurationItem {
 				y6Choices := y1Choices
 			}
 			else if (report = "Temperatures") {
-				xChoices := ["Stint", "Lap", "Lap.Time"]
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
-							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
+							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -6614,14 +6627,16 @@ class RaceCenter extends ConfigurationItem {
 				y6Choices := y1Choices
 			}
 			else if (report = "Free") {
-				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track"]
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
-							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"]
+							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
+							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -6791,6 +6806,19 @@ class RaceCenter extends ConfigurationItem {
 				lapData["Tyre.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
 				lapData["Tyre.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
 				lapData["Tyre.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
+
+				wearFL := tyres["Tyre.Wear.Front.Left"]
+				wearFR := tyres["Tyre.Wear.Front.Right"]
+				wearRL := tyres["Tyre.Wear.Rear.Left"]
+				wearRR := tyres["Tyre.Wear.Rear.Right"]
+
+				lapData["Tyre.Wear.Front.Left"] := null(wearFL)
+				lapData["Tyre.Wear.Front.Right"] := null(wearFR)
+				lapData["Tyre.Wear.Rear.Left"] := null(wearRL)
+				lapData["Tyre.Wear.Rear.Right"] := null(wearRR)
+				lapData["Tyre.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
+				lapData["Tyre.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
+				lapData["Tyre.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
 
 				sessionDB.add("Lap.Data", lapData)
 

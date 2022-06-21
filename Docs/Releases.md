@@ -10,7 +10,7 @@
   8. New voice command for the Race Engineer to request the current tyre wear. Not supported in all simulators.
   9. New information request action "TyreWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the tyre wear by pressing a button on your hardware controller.
   10. New icon for Stream Deck for the "TyreWear" information request action.
-  
+  11. Tyre wear data is available in "Strategy Workbench" and "Race Center" for those simulators that support this.
   
   Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421), especially for the changes in the Pitstop MFD handling in ACC.
 

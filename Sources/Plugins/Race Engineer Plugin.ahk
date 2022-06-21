@@ -215,7 +215,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	requestInformation(arguments*) {
-		if (this.RaceEngineer && inList(["Time", "LapsRemaining", "FuelRemaining", "Weather", "TyrePressures", "TyreTemperatures"], arguments[1])) {
+		if (this.RaceEngineer && inList(["Time", "LapsRemaining", "FuelRemaining", "Weather"
+									   , "TyrePressures", "TyreTemperatures", "TyreWear"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)
 
 			return true

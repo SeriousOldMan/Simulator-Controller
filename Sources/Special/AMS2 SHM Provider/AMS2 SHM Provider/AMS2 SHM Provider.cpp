@@ -5,6 +5,7 @@
 // Used for this example
 #include <stdio.h>
 #include <conio.h>
+#include <tgmath.h>
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
@@ -237,10 +238,10 @@ int main(int argc, char* argv[]) {
 			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
 
-		printf("TyreWear=%f,%f,%f,%f\n", localCopy->mTyreWear[TYRE_FRONT_LEFT],
-			localCopy->mTyreWear[TYRE_FRONT_RIGHT],
-			localCopy->mTyreWear[TYRE_REAR_LEFT],
-			localCopy->mTyreWear[TYRE_REAR_RIGHT]);
+		printf("TyreWear=%d,%d,%d,%d\n", round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100),
+			round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),
+			round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
+			round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
 
 		printf("[Stint Data]\n");
 

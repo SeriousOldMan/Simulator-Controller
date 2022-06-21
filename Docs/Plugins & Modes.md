@@ -259,6 +259,7 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
 | TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |
+| TyreWear | This command will give you the current tyre wear in percentage of total wear. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

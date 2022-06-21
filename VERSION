@@ -1,16 +1,16 @@
 [Development]
-Version=4.2.0.0-release
-Target=4.2.0.0-release
-Date=06/17/2022
-Download=https://cntr.click/GAr75qh
-Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database", Changed grammar for lap time announcements, Changed grammar for the current sector in yellow flag announcements, Unnecessary yellow flag warnings are suppressed, R3E meta data update, Edit, compare and merge Assetto Corsa setups in "Setup Advisor", New car models for "Setup Advisor"
+Version=4.2.1.0-dev
+Target=4.2.1.0-release
+Date=06/21/2022
+Download=
+Changes=New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data, Tyre wear data for "Strategy Workbench" and "Race Center", Race Engineer supports a voice command to request the current tyre wear, New InformationRequest action "TyreWear" for the "Race Engineer" plugin.
 [Release]
 Version=4.2.0.0-release
 Date=06/17/2022
 Download=https://www.dropbox.com/s/6qes6udj14d75m4/Simulator%20Controller%204.2.0.0-release.zip?dl=1
 Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by the Race Strategist for Assetto Corsa, New "Pitstop" and "Assistant" modes for Assetto Corsa, Renamed and reordered settings in "Session Database", Changed grammar for lap time announcements, Changed grammar for the current sector in yellow flag announcements, Unnecessary yellow flag warnings are suppressed, R3E meta data update, Edit, compare and merge Assetto Corsa setups in "Setup Advisor", New car models for "Setup Advisor"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.2.0.0-release
-Development=4.2.0.0-release
+Development=4.2.1.0-dev

@@ -9,6 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\JSON.ahk
+#Include ..\Libraries\Math.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
@@ -49,7 +51,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
-	iFallbackMode := false
+	iNoImageSearch := false
+	iNextPitstopMFDOptionsUpdate := false
 
 	iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
 				 , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
@@ -180,7 +183,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
-					 , DriverSelect: "Select Driver"
+					 , DriverSelect: "Driver"
 					 , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
 		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
@@ -311,8 +314,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !carIDs
 			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
 
-		if ((A_Now + 5000) > lastRead) {
-			lastRead := (A_Now + 0)
+		if ((A_TickCount + 5000) > lastRead) {
+			lastRead := (A_TickCount + 0)
 
 			fileName := kTempDirectory . "ACCUDP.cmd"
 
@@ -438,7 +441,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {
 		static reported := false
 		static imageSearch := "__Undefined__"
-		static nextUpdate := 0
 
 		if (imageSearch = kUndefined) {
 			car := (this.Car ? this.Car : "*")
@@ -446,20 +448,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", true)
+			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", false)
 		}
 
+		imgSearch := (imageSearch && !this.iNoImageSearch)
+
 		if (update = kUndefined)
-			if imageSearch
+			if imgSearch
 				update := true
 			else {
-				if (A_Now > nextUpdate)
+				if (A_TickCount > this.iNextPitstopMFDOptionsUpdate)
 					update := true
 				else
 					update := false
 			}
 
-		nextUpdate := (A_Now + 60000)
+		this.iNextPitstopMFDOptionsUpdate := (A_TickCount + 60000)
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
@@ -467,7 +471,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
-				if !imageSearch {
+				if !imgSearch {
 					if update {
 						this.initializePitstopMFD()
 
@@ -482,14 +486,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.iPSIsOpen := true
 				this.iPSSelectedOption := 1
 
-				if !this.iFallbackMode
-					if (imageSearch && (update || !wasOpen)) {
-						if this.updatePitStopState()
-							this.openPitstopMFD(false, false)
+				if (imgSearch && (update || !wasOpen)) {
+					if this.updatePitStopState()
+						this.openPitstopMFD(false, false)
 
-						if this.iPSIsOpen
-							SetTimer updatePitstopState, 5000
-					}
+					if this.iPSIsOpen
+						SetTimer updatePitstopState, 5000
+				}
 			}
 		}
 		else if !reported {
@@ -500,6 +503,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+	}
+
+	resetPitstopMFD(descriptor := false) {
+		this.iNextPitstopMFDOptionsUpdate := 0
 	}
 
 	closePitstopMFD() {
@@ -526,11 +533,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	requirePitstopMFD() {
+	requirePitstopMFD(retry := false) {
 		static reported := false
 
-		if (this.iFallbackMode = "Retry")
-			this.iFallbackMode := false
+		if retry
+			this.iNoImageSearch := false
 
 		this.openPitstopMFD()
 
@@ -548,23 +555,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 
-			this.iFallbackMode := true
+			this.iNoImageSearch := true
 
 			SetTimer updatePitstopState, Off
 
-			this.activateACCWindow()
-
-			this.iPSOptions := ["Pit Limiter", "Strategy", "Refuel"
-							  , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-							  , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
-
-			this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-			this.iPSChangeTyres := true
-			this.iPSChangeBrakes := false
-
-			this.iPSTyreOptions := 7
+			this.openPitstopMFD(false, true)
 
 			return true
 		}
@@ -577,7 +572,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		availableOptions := ["Pit Limiter", "Strategy", "Refuel"
 						   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-						   , "Change Brakes", "Front Brake", "Rear Brake", "Select Driver", "Repair Suspension", "Repair Bodywork"]
+						   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
 
 		currentPressures := this.getPitstopOptionValues("Tyre Pressures")
 
@@ -611,7 +606,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPSChangeBrakes := false
 
 		if !this.isDriverAvailable(availableOptions, currentPressures)
-			availableOptions.RemoveAt(inList(availableOptions, "Select Driver"))
+			availableOptions.RemoveAt(inList(availableOptions, "Driver"))
 
 		if !tyreChange {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
@@ -991,14 +986,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changeDriver(selection) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Select Driver"))
+		if (this.requirePitstopMFD() && this.selectPitstopOption("Driver"))
 			switch selection {
 				case "Next":
-					this.changePitstopOption("Strategy", "Increase")
+					this.changePitstopOption("Driver", "Increase")
 				case "Previous":
-					this.changePitstopOption("Strategy", "Decrease")
+					this.changePitstopOption("Driver", "Decrease")
 				case "Increase", "Decrease":
-					this.changePitstopOption("Strategy", selection)
+					this.changePitstopOption("Driver", selection)
 				default:
 					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
 			}
@@ -1496,8 +1491,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if imageX is Integer
 		{
-			if !inList(this.iPSOptions, "Select Driver") {
-				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Select Driver")
+			if !inList(this.iPSOptions, "Driver") {
+				this.iPSOptions.InsertAt(inList(this.iPSOptions, "Repair Suspension"), "Driver")
 
 				reload := true
 			}
@@ -1506,7 +1501,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogInfo, translate("'Select Driver' detected, adjusting pitstop options: ") . values2String(", ", this.iPSOptions*))
 		}
 		else {
-			position := inList(this.iPSOptions, "Select Driver")
+			position := inList(this.iPSOptions, "Driver")
 
 			if position {
 				this.iPSOptions.RemoveAt(position)
@@ -1619,14 +1614,130 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		if this.iFallbackMode
-			this.iFallbackMode := "Retry"
-
-		withProtection(ObjBindMethod(this, "requirePitstopMFD"))
+		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		closePitstopMFD()
+	}
+
+	pitstopFinished(pitstopNumber, updateState := false) {
+		static callback := false
+
+		if !updateState {
+			if callback
+				SetTimer %callback%, Off
+
+			base.pitstopFinished(pitstopNumber)
+		}
+
+		if this.RaceEngineer {
+			if updateState {
+				try {
+					retry := false
+
+					if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json") {
+						FileGetTime updateTime, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json, M
+
+						EnvAdd updateTime, 5, Minutes
+
+						if (updateTime < A_Now)
+							retry := true
+						else
+							Sleep 5000
+					}
+					else
+						retry := true
+
+					if retry {
+						callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+
+						SetTimer %callback%, -10000
+					}
+					else {
+						FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
+
+						carState := JSON.parse(carState)
+						pitstopState := carState["pitstopMFD"]
+
+						currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
+
+						currentTyreSet := carState["currentTyreSet"]
+						tyreStates := []
+
+						pitstopData := {Pitstop: pitstopNumber
+									  , "Service.Time": pitstopState["timeRequired"]
+									  , "Service.Lap": carState["lapCount"]
+									  , "Service.Driver.Previous": currentDriver
+									  , "Service.Driver.Next": pitstopState["newDriverNameToDisplay"]
+									  , "Service.Refuel": pitstopState["fuelToAdd"]
+									  , "Service.Bodywork.Repair": (pitstopState["repairBody"] ? true : false)
+									  , "Service.Suspension.Repair": (pitstopState["repairSuspension"] ? true : false)
+									  , "Service.Engine.Repair": false}
+
+						if !listEqual(pitstopState["tyreToChange"], [false, false, false, false]) {
+							pitstopData["Service.Tyre.Compound"] := ((pitstopState["newTyreCompound"] = 0) ? "Dry" : "Wet")
+							pitstopData["Service.Tyre.Compound.Color"] := "Black"
+							pitstopData["Service.Tyre.Set"] := ((pitstopState["newTyreCompound"] = 0) ? pitstopState["tyreSet"] : false)
+
+							pressures := pitstopState["tyrePressures"]
+
+							for index, pressure in pressures
+								pressures[index] := Round(pressure, 1)
+
+							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
+						}
+
+						for ignore, tyreSet in carState["tyreSets"]
+							if (tyreSet["tyreSet"] = currentTyreSet) {
+								for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+									wearState := tyreSet["wearStatus"][A_Index]
+									tread := wearState["treadMM"].Clone()
+
+									wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100))
+
+									for index, section in tread
+										tread[index] := Round(section, 2)
+
+									grain := Round(wearState["grain"], 2)
+									blister := Round(wearState["blister"], 2)
+									flatSpot := Round(wearState["flatSpot"], 2)
+
+									tyreStates.Push({Tyre: tyre, Tread: tread, Wear: wear, Grain: grain, Blister: blister, FlatSpot: flatSpot})
+								}
+
+								pitstopData["Tyre.Driver"] := currentDriver
+								pitstopData["Tyre.Laps"] := false
+								pitstopData["Tyre.Compound"] := "Dry"
+								pitstopData["Tyre.Compound.Color"] := "Black"
+								pitstopData["Tyre.Set"] := (currentTyreSet + 1)
+
+								break
+							}
+
+						data := newConfiguration()
+
+						setConfigurationSectionValues(data, "Pitstop Data", pitstopData)
+
+						for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
+							for key, value in tyreStates[A_Index]
+								setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*) : value)
+
+						writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
+
+						this.RaceEngineer.updatePitstopState(data)
+					}
+				}
+				catch exception {
+					; ignore
+				}
+			}
+			else {
+				callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+
+				SetTimer %callback%, -10000
+			}
+		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -1675,6 +1786,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (repairBodywork != this.iRepairBodyworkChosen)
 			this.toggleActivity("Repair Bodywork")
+	}
+
+	requestPitstopDriver(pitstopNumber, driver) {
+		if driver {
+			driver := string2Values("|", driver)
+
+			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
+
+			Loop % Abs(delta)
+				this.changeDriver((delta < 0) ? "Previous" : "Next")
+		}
 	}
 
 	restoreSessionState(sessionSettings, sessionState) {

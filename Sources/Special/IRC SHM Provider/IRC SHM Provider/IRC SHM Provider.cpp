@@ -299,7 +299,7 @@ void requestPitstopTyreChange(bool change) {
 }
 
 float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, const char* data, char* sessionPath,
-						 char* dataVariableO, char* dataVariableM, char* dataVariableI) {
+	char* dataVariableO, char* dataVariableM, char* dataVariableI) {
 	char result[32];
 
 	if (getDataValue(result, header, data, dataVariableO))
@@ -323,6 +323,16 @@ float getTyreTemperature(const irsdk_header* header, const char* sessionInfo, co
 
 		return (temps[0] + temps[1] + temps[2]) / 3;
 	}
+	else
+		return 0;
+}
+
+int getTyreWear(const irsdk_header* header, const char* sessionInfo, const char* data,
+	char* dataVariableO, char* dataVariableM, char* dataVariableI) {
+	char result[32];
+
+	if (getDataValue(result, header, data, dataVariableO))
+		return (int)((atof(result) + getDataFloat(header, data, dataVariableM) + getDataFloat(header, data, dataVariableI)) / 3);
 	else
 		return 0;
 }
@@ -779,17 +789,23 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("TyreCompound=Dry\n");
 			printf("TyreCompoundColor=Black\n");
 
-			printf("TyrePressure = %f, %f, %f, %f\n",
+			printf("TyrePressure=%f,%f,%f,%f\n",
 				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastHotPressure:", "LFpressure")),
 				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastHotPressure:", "RFpressure")),
 				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastHotPressure:", "LRpressure")),
 				GetPsi(getTyrePressure(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastHotPressure:", "RRpressure")));
 
-			printf("TyreTemperature = %f, %f, %f, %f\n",
+			printf("TyreTemperature=%f,%f,%f,%f\n",
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftFront:LastTempsOMI:", "LFtempCL", "LFtempCM", "LFtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightFront:LastTempsOMI:", "RFtempCL", "RFtempCM", "RFtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:LeftRear:LastTempsOMI:", "LRtempCL", "LRtempCM", "LRtempCR"),
 				getTyreTemperature(header, sessionInfo, data, "CarSetup:Suspension:RightRear:LastTempsOMI:", "RRtempCL", "RRtempCM", "RRtempCR"));
+
+			printf("TyreWear=%d,%d,%d,%d\n",
+				getTyreWear(header, sessionInfo, data, "LFwearL", "LFwearM", "LFwearR"),
+				getTyreWear(header, sessionInfo, data, "RFwearL", "RFwearM", "RFwearR"),
+				getTyreWear(header, sessionInfo, data, "LRwearL", "LRwearM", "LRwearR"),
+				getTyreWear(header, sessionInfo, data, "RRwearL", "RRwearM", "RRwearR"));
 
 			printf("[Stint Data]\n");
 			

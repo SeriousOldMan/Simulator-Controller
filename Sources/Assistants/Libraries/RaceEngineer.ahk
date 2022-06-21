@@ -56,6 +56,10 @@ class RaceEngineer extends RaceAssistant {
 			this.callRemote("finishPitstopSetup", arguments*)
 		}
 
+		updateTyreSet(arguments*) {
+			this.callRemote("updateTyreSet", arguments*)
+		}
+
 		setPitstopRefuelAmount(arguments*) {
 			this.callRemote("setPitstopRefuelAmount", arguments*)
 		}
@@ -70,6 +74,10 @@ class RaceEngineer extends RaceAssistant {
 
 		requestPitstopRepairs(arguments*) {
 			this.callRemote("requestPitstopRepairs", arguments*)
+		}
+
+		requestPitstopDriver(arguments*) {
+			this.callRemote("requestPitstopDriver", arguments*)
 		}
 
 		savePressureData(arguments*) {
@@ -139,6 +147,8 @@ class RaceEngineer extends RaceAssistant {
 				this.lapInfoRecognized(words)
 			case "FuelRemaining":
 				this.fuelInfoRecognized(words)
+			case "TyreWear":
+				this.tyreWearRecognized(words)
 			case "TyreTemperatures":
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyrePressures":
@@ -292,6 +302,44 @@ class RaceEngineer extends RaceAssistant {
 		}
 		finally {
 			speaker.finishTalk()
+		}
+	}
+
+	tyreWearRecognized(words) {
+		local value
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+
+		lap := knowledgeBase.getValue("Lap")
+		flWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FL", kUndefined)
+
+		if (flWear == kUndefined)
+			speaker.speakPhrase("NoWear")
+		else {
+			frWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FR")
+			rlWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RL")
+			rrWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RR")
+
+			speaker.startTalk()
+
+			try {
+				speaker.speakPhrase("Wear")
+
+				speaker.speakPhrase("WearFL", {used: Round(flWear), remaining: Round(100 - flWear)})
+
+				speaker.speakPhrase("WearFR", {used: Round(frWear), remaining: Round(100 - frWear)})
+
+				speaker.speakPhrase("WearRL", {used: Round(rlWear), remaining: Round(100 - rlWear)})
+
+				speaker.speakPhrase("WearRR", {used: Round(rrWear), remaining: Round(100 - rrWear)})
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 
@@ -1319,12 +1367,15 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
 			case "TyreTemperatures":
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
+			case "TyreWear":
+				this.tyreWearRecognized([])
 		}
 	}
 
 	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__"
-			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__", tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__"
-			  , tyrePressures := "__Undefined__", repairBodywork := "__Undefined__", repairSuspension := "__Undefined__") {
+			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__"
+			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__", tyrePressures := "__Undefined__"
+			  , repairBodywork := "__Undefined__", repairSuspension := "__Undefined__", requestDriver:= "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local compound
 
@@ -1389,6 +1440,9 @@ class RaceEngineer extends RaceAssistant {
 		if (repairSuspension != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Repair.Suspension", repairSuspension)
 
+		if (requestDriver != kUndefined)
+			knowledgeBase.addFact("Pitstop.Plan.Driver.Request", requestDriver)
+
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
@@ -1422,11 +1476,12 @@ class RaceEngineer extends RaceAssistant {
 				if ((options == true) || options.Compound) {
 					if compound {
 						color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
+						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0)
 
 						if (compound = "Dry")
-							speaker.speakPhrase("DryTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+							speaker.speakPhrase(!tyreSet ? "DryTyresNoSet" : "DryTyres", {compound: fragments[compound], color: color, set: tyreSet})
 						else
-							speaker.speakPhrase("WetTyres", {compound: fragments[compound], color: color, set: knowledgeBase.getValue("Pitstop.Planned.Tyre.Set")})
+							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound], color: color, set: tyreSet})
 					}
 					else {
 						if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
@@ -1615,10 +1670,32 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	finishPitstop(lapNumber := false) {
+		local knowledgebase := this.KnowledgeBase
+
 		base.finishPitstop(lapNumber)
 
-		if this.RemoteHandler
+		if this.RemoteHandler {
+			lap := (knowledgeBase.getValue("Pitstop." . pitstopNumber . ".Lap") - 1)
+			flWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FL", kUndefined)
+
+			if (flWear != kUndefined) {
+				frWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.FR")
+				rlWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RL")
+				rrWear := knowledgeBase.getValue("Lap." . lap . ".Tyre.Wear.RR")
+
+				driver := computeDriverName(knowledgeBase.getValue("Lap." . lap . ".Driver.Forname")
+										  , knowledgeBase.getValue("Lap." . lap . ".Driver.Surname")
+										  , knowledgeBase.getValue("Lap." . lap . ".Driver.Nickname"))
+
+				this.RemoteHandler.updateTyreSet(pitstopNumber, driver, false
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound")
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color")
+											   , knowledgeBase.getValue("Lap." . lap . ".Tyre.Set", false)
+											   , flWear, frWear, rlWear, rrWear)
+			}
+
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
+		}
 	}
 
 	callPlanPitstop(lap := "__Undefined__", arguments*) {
@@ -1841,6 +1918,11 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
 	}
 
+	requestPitstopDriver(pitstopNumber, driver) {
+		if this.RemoteHandler
+			this.RemoteHandler.requestPitstopDriver(pitstopNumber, driver)
+	}
+
 	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
 		local knowledgeBase := this.KnowledgeBase
 
@@ -1916,6 +1998,12 @@ setPitstopTyrePressures(context, pitstopNumber, pressureFL, pressureFR, pressure
 
 requestPitstopRepairs(context, pitstopNumber, repairSuspension, repairBodywork) {
 	context.KnowledgeBase.RaceAssistant.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+
+	return true
+}
+
+requestPitstopDriver(context, pitstopNumber, driver) {
+	context.KnowledgeBase.RaceAssistant.requestPitstopDriver(pitstopNumber, driver)
 
 	return true
 }

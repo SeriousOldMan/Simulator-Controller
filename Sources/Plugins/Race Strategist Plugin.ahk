@@ -33,7 +33,7 @@ global kRaceStrategistPlugin = "Race Strategist"
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Telemetry: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
-										 , "Compound", "Compound.Color", "Pressures", "Temperatures"]}
+										 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"]}
 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -228,20 +228,24 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures) {
+					, compound, compoundColor, pressures, temperatures, wear) {
 		teamServer := this.TeamServer
+
+		if !wear
+			wear := "null,null,null,null"
 
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 													, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-													, compound, compoundColor, pressures, temperatures))
+													, compound, compoundColor, pressures, temperatures, wear))
 		else
 			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , "Fuel.Consumption": fuelConsumption, "Fuel.Remaining": fuelRemaining, LapTime: lapTime
 											 , Pitstop: pitstop, Map: map, TC: tc, ABS: abs
-											 , "Compound": compound, "Compound.Color": compoundColor, Pressures: pressures, Temperatures: temperatures})
+											 , "Compound": compound, "Compound.Color": compoundColor
+											 , Pressures: pressures, Temperatures: temperatures, Wear: wear})
 	}
 
 	updateTelemetryDatabase() {
@@ -275,14 +279,17 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					if !pitstop {
 						pressures := string2Values(",", telemetryData[16])
 						temperatures := string2Values(",", telemetryData[17])
+						wear := string2Values(",", telemetryData[18])
 
 						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
+													 , telemetryData[9])
 
 						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 											   , pressures[1], pressures[2], pressures[4], pressures[4]
 											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-											   , telemetryData[7], telemetryData[8], telemetryData[9])
+											   , telemetryData[7], telemetryData[8], telemetryData[9]
+											   , wear[1], wear[2], wear[3], wear[4])
 					}
 				}
 				catch exception {
@@ -306,12 +313,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				pressures := string2Values(",", telemetryData.Pressures)
 				temperatures := string2Values(",", telemetryData.Temperatures)
+				wear := string2Values(",", telemetryData.Wear)
 
 				telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
 									   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime
+									   , wear[1], wear[2], wear[3], wear[4])
 			}
 	}
 

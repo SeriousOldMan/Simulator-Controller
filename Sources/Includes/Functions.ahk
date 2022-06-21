@@ -1869,6 +1869,16 @@ remove(list, object) {
 	return result
 }
 
+removeDuplicates(list) {
+	result := []
+
+	for ignore, value in list
+		if !inList(result, value)
+			result.Push(value)
+
+	return result
+}
+
 greaterComparator(a, b) {
 	return (a > b)
 }

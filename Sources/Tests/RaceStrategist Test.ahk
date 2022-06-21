@@ -134,10 +134,10 @@ class GapReporting extends Assert {
 		if (behindDelta != Round(knowledgeBase.getValue("Position." . type . ".Behind.Delta", false)))
 			return false
 
-		if (frontCar != knowledgeBase.getValue("Position." . type . ".Front.Car", false))
+		if (frontCar != knowledgeBase.getValue("Position." . type . ".Ahead.Car", knowledgeBase.getValue("Position." . type . ".Front.Car", false)))
 			return false
 
-		if (frontDelta != Round(knowledgeBase.getValue("Position." . type . ".Front.Delta", false)))
+		if (frontDelta != Round(knowledgeBase.getValue("Position." . type . ".Ahead.Delta", knowledgeBase.getValue("Position." . type . ".Front.Delta", false))))
 			return false
 
 		if ((type = "Standings") && leaderCar) {

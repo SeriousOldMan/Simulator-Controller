@@ -5,6 +5,7 @@
 // Used for this example
 #include <stdio.h>
 #include <conio.h>
+#include <tgmath.h>
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
@@ -227,15 +228,20 @@ int main(int argc, char* argv[]) {
 		printf("TyreCompound=Dry\n");
 		printf("TyreCompoundColor=Black\n");
 
-		printf("TyreTemperature=%f, %f, %f, %f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
+		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
 			localCopy->mTyreTemp[TYRE_FRONT_RIGHT],
 			localCopy->mTyreTemp[TYRE_REAR_LEFT],
 			localCopy->mTyreTemp[TYRE_REAR_RIGHT]);
 
-		printf("TyrePressure = %f, %f, %f, %f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
+		printf("TyrePressure=%f,%f,%f,%f\n", localCopy->mAirPressure[TYRE_FRONT_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_FRONT_RIGHT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
+
+		printf("TyreWear=%d,%d,%d,%d\n", round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100),
+			round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),
+			round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
+			round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
 
 		printf("[Stint Data]\n");
 

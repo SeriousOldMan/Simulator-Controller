@@ -1321,7 +1321,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
 
 		Gui %window%:Add, Text, x24 yp+30 w80 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDown
+		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDownMenu
 
 		Gui %window%:Add, Text, x24 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit

@@ -1698,13 +1698,13 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger) {
-	protectionOn()
+	protectionOn(true, true)
 
 	try {
 		function.Controller.fireActions(function, trigger)
 	}
 	finally {
-		protectionOff()
+		protectionOff(true, true)
 	}
 }
 

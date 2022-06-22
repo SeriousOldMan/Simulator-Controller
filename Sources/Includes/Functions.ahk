@@ -150,18 +150,24 @@ moveConsentDialog() {
 	moveByMouse("CNS")
 }
 
-changeProtection(up) {
+changeProtection(up, critical := false, block := false) {
 	static level := 0
 
 	level += (up ? 1 : -1)
 
 	if (level > 0) {
-        Critical 100
-		; BlockInput On
+		if critical
+			Critical 100
+
+		if block
+			BlockInput On
 	}
 	else if (level == 0) {
-		; BlockInput Off
-        Critical Off
+		if block
+			BlockInput Off
+
+		if critical
+			Critical Off
 	}
 	else if (level <= 0)
 		Throw "Nesting error detected in changeProtection..."
@@ -1660,12 +1666,12 @@ getLanguage() {
 	return vTargetLanguageCode
 }
 
-protectionOn() {
-	; changeProtection(true)
+protectionOn(critical := false, block := false) {
+	changeProtection(true, critical, block)
 }
 
-protectionOff() {
-	; changeProtection(false)
+protectionOff(critical := false, block := false) {
+	changeProtection(false, critical, block)
 }
 
 withProtection(function, params*) {

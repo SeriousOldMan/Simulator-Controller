@@ -66,10 +66,16 @@ class StrategyViewer {
 	}
 
 	createStrategyInfo(strategy) {
+		sessionDB := new SessionDatabase()
+
+		simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
+		car := (strategy.Car ? strategy.Car : translate("Unknown"))
+		track := (strategy.Track ? strategy.Track : translate("Unknown"))
+
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (strategy.Simulator ? strategy.Simulator : translate("Unknown")) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . (strategy.Car ? new SessionDatabase().getCarName(strategy.Simulator, strategy.Car) : translate("Unknown")) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . (strategy.Track ? strategy.Track : translate("Unknown")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . simulator . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . sessionDB.getCarName(simulator, car) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . sessionDB.getTrackName(simulator, track) . "</td></tr>")
 
 		if (strategy.SessionType = "Duration") {
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")

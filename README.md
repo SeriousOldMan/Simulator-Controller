@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.2.1.0-beta](https://www.dropbox.com/s/av8x9wu0c2q965v/Simulator%20Controller%204.2.1.0-beta.zip?dl=1) (Test version for 4.2.1.0. New features: New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data, Tyre wear data for "Strategy Workbench" and "Race Center", Race Engineer supports a voice command to request the current tyre wear, New InformationRequest action "TyreWear" for the "Race Engineer" plugin. Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-420) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

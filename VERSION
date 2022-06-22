@@ -1,8 +1,8 @@
 [Development]
-Version=4.2.1.0-dev
+Version=4.2.1.0-beta
 Target=4.2.1.0-release
 Date=06/22/2022
-Download=
+Download=https://www.dropbox.com/s/av8x9wu0c2q965v/Simulator%20Controller%204.2.1.0-beta.zip?dl=1
 Changes=New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data, Tyre wear data for "Strategy Workbench" and "Race Center", Race Engineer supports a voice command to request the current tyre wear, New InformationRequest action "TyreWear" for the "Race Engineer" plugin.
 [Release]
 Version=4.2.0.0-release
@@ -13,4 +13,4 @@ Changes=Full support by the Race Engineer for Assetto Corsa, Basic support by th
 Type=Development
 [Version]
 Release=4.2.0.0-release
-Development=4.2.1.0-dev
+Development=4.2.1.0-beta

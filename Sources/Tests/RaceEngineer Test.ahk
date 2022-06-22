@@ -905,9 +905,9 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
-	AHKUnit.AddTestClass(DamageAnalysis)
+	;~ AHKUnit.AddTestClass(FuelReporting)
+	;~ AHKUnit.AddTestClass(DamageReporting)
+	;~ AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

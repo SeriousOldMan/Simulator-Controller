@@ -4935,11 +4935,11 @@ class RaceCenter extends ConfigurationItem {
 												, {Pitstop: pitstop, Driver: driver, Laps: laps
 												 , Compound: compound, "Compound.Color": compoundColor
 												 , Set: tyreSet, Tyre: tyre
-												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread", "-")
-												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear", 0)
-												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain", "-")
-												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister", "-")
-												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot", "-")})
+												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
+												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
+												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
+												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
+												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")})
 							}
 						}
 					}
@@ -7713,18 +7713,18 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
 
 		if hasTread
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Tread (mm)") . "</th>" . values2String("", treadData*) . "</tr>")
 		else if hasWear
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Wear") . "</th>" . values2String("", wearData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Wear (%)") . "</th>" . values2String("", wearData*) . "</tr>")
 
 		if hasGrain
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain (%)") . "</th>" . values2String("", grainData*) . "</tr>")
 
 		if hasBlister
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Blister") . "</th>" . values2String("", blisterData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Blister (%)") . "</th>" . values2String("", blisterData*) . "</tr>")
 
 		if hasFlatSpot
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot") . "</th>" . values2String("", flatSpotData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot (%)") . "</th>" . values2String("", flatSpotData*) . "</tr>")
 
 		html .= "</table>"
 

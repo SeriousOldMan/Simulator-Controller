@@ -694,7 +694,7 @@ restart:
 
 					editSettings(kUpdate, "Team")
 
-					showMessage(translate("Successfully connected to the team server."))
+					showMessage(translate("Successfully connected to the Team Server."))
 				}
 				else
 					Throw Exception("Invalid or missing token...")

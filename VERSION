@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.1.0-dev
 Target=4.2.1.0-release
-Date=06/20/2022
+Date=06/21/2022
 Download=
-Changes=New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data
+Changes=New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data, Tyre wear data for "Strategy Workbench" and "Race Center", Race Engineer supports a voice command to request the current tyre wear, New InformationRequest action "TyreWear" for the "Race Engineer" plugin.
 [Release]
 Version=4.2.0.0-release
 Date=06/17/2022

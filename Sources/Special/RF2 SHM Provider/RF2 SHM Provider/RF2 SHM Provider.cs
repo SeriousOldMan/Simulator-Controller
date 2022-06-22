@@ -211,8 +211,10 @@ namespace RF2SHMProvider {
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
 				Console.Write("TyreWear=");
 				if (extended.mPhysics.mTireMult > 0)
-					Console.WriteLine(playerTelemetry.mWheels[0].mWear + "," + playerTelemetry.mWheels[1].mWear + "," +
-									  playerTelemetry.mWheels[2].mWear + "," + playerTelemetry.mWheels[3].mWear);
+					Console.WriteLine(Math.Round(playerTelemetry.mWheels[0].mWear * 100) + "," +
+									  Math.Round(playerTelemetry.mWheels[1].mWear * 100) + "," +
+									  Math.Round(playerTelemetry.mWheels[2].mWear * 100) + "," +
+									  Math.Round(playerTelemetry.mWheels[3].mWear * 100));
 				else
 					Console.WriteLine("0,0,0,0");
 

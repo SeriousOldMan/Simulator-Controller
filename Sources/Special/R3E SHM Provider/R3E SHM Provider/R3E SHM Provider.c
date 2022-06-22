@@ -268,11 +268,11 @@ int main(int argc, char* argv[])
 				map_buffer->tire_pressure[R3E_TIRE_REAR_LEFT] / 6.895,
 				map_buffer->tire_pressure[R3E_TIRE_REAR_RIGHT] / 6.895);
 			if (map_buffer->tire_wear_active > 0)
-				wprintf_s(L"TyreWear=%f,%f,%f,%f\n",
-					normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]),
-					normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]),
-					normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]),
-					normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]));
+				wprintf_s(L"TyreWear=%d,%d,%d,%d\n",
+					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_LEFT]) * 100),
+					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_FRONT_RIGHT]) * 100),
+					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_LEFT]) * 100),
+					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
 			else
 				wprintf_s(L"TyreWear=0,0,0,0\n");
 		}

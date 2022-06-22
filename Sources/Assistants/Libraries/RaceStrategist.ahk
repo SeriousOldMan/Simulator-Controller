@@ -1072,9 +1072,17 @@ class RaceStrategist extends RaceAssistant {
 												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
 												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
 
+				wear := false
+
+				if (knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL", kUndefined) != kUndefined)
+					wear := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
+											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR")))
+
 				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-									 , compound, compoundColor, pressures, temperatures)
+									 , compound, compoundColor, pressures, temperatures, wear)
 			}
 		}
 

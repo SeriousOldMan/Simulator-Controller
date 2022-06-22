@@ -223,6 +223,7 @@ int main(int argc, char* argv[])
 		printData("FuelRemaining", pf->fuel);
 		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 		wcout << "TyreCompoundColor=Black" << endl;
+		printData("TyreSet", gf->currentTyreSet);
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
 	}

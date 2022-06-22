@@ -69,6 +69,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 6. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Race Center" and using the Virtual Race Assistents.
 
+7. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the race assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
+
 This list will be extended with one new video per week.
 
 ### Discord Community

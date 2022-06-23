@@ -552,7 +552,7 @@ launchSimulatorDownload() {
 }
 
 openLaunchPadDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
 }
 
 WM_MOUSEMOVE()
@@ -628,7 +628,10 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	launchPad()
+	if inList(A_Args, "-NoLaunchPad")
+		startupSimulator()
+	else
+		launchPad()
 }
 
 playSong(songFile) {

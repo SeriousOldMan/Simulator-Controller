@@ -535,6 +535,8 @@ addThemePicture() {
 	try {
 		title := translate("Select Image...")
 	
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
 		OnMessage(0x44, "")
@@ -570,6 +572,8 @@ chooseSoundFilePath() {
 		
 		title := translate("Select Sound File...")
 		
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
 		OnMessage(0x44, "")
@@ -599,6 +603,8 @@ chooseVideoFilePath() {
 			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
 		
 		title := translate("Select Video (GIF) File...")
+		
+		Gui +OwnDialogs
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)

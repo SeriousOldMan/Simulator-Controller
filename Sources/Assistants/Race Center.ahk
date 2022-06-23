@@ -3102,6 +3102,8 @@ class RaceCenter extends ConfigurationItem {
 			case 4:
 				title := translate("Load Race Strategy...")
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -3118,6 +3120,8 @@ class RaceCenter extends ConfigurationItem {
 
 					fileName := (dirName . "\" . this.Strategy.Name . ".strategy")
 
+					Gui +OwnDialogs
+		
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -5661,6 +5665,8 @@ class RaceCenter extends ConfigurationItem {
 
 			title := translate("Select target folder...")
 
+			Gui +OwnDialogs
+		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
@@ -6062,6 +6068,8 @@ class RaceCenter extends ConfigurationItem {
 
 		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder folder, *%directory%, 0, %title%
 		OnMessage(0x44, "")

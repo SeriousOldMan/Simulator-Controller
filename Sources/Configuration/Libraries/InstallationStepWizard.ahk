@@ -298,6 +298,8 @@ locateSoftware() {
 	
 	title := substituteVariables(translate("Select %name% executable..."), {name: name})
 	
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 	FileSelectFile file, 1, , %title%, Executable (*.exe)
 	OnMessage(0x44, "")

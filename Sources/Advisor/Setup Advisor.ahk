@@ -2936,6 +2936,8 @@ factPath(path*) {
 loadSetup() {
 	title := translate("Load Setup...")
 
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 	FileSelectFile fileName, 1, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")
@@ -2947,6 +2949,8 @@ loadSetup() {
 saveSetup() {
 	title := translate("Save Setup...")
 
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 	FileSelectFile fileName, S17, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")

@@ -12,6 +12,7 @@
   10. New icon for Stream Deck for the "TyreWear" information request action.
   11. The Stream Deck Icons preset has been updated as well.
   12. Tyre wear data is available in "Strategy Workbench" and "Race Center" for those simulators that support this.
+  13. New application launch pad in "Simulator Startup". See the [revised documentation](*) for more information.
   
   Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421), especially for the changes in the Pitstop MFD handling in ACC.
 

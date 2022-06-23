@@ -12,7 +12,17 @@
   10. New icon for Stream Deck for the "TyreWear" information request action.
   11. The Stream Deck Icons preset has been updated as well.
   12. Tyre wear data is available in "Strategy Workbench" and "Race Center" for those simulators that support this.
-  13. New application launch pad in "Simulator Startup". See the [revised documentation](*) for more information.
+  13. New application launch pad in "Simulator Startup". From now on, you will see the following window, when you run "Simulator Startup":
+
+      ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Launch%20Pad.JPG)
+	  
+	  You can either continue the startup process by clicking on the top left button or you can launch any of the other application of Simulator Controller. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
+  14. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - Ferrari 458 GT3
+		- McLaren 650s GT3
+      - Assetto Corsa Competizione
+	    - KTM X-Bow GT4
   
   Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421), especially for the changes in the Pitstop MFD handling in ACC.
 

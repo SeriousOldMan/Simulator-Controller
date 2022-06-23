@@ -309,7 +309,7 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 
-	cancelStartup(hide := false) {
+	cancelStartup() {
 		this.iCanceled := true
 
 		this.hideSplashTheme()

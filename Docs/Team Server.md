@@ -46,7 +46,7 @@ If you want to setup and operate a server, which is not only used by your direct
 
 ### Updating Team Server
 
-Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [up0date notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
+Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
 
 ## Managing teams
 

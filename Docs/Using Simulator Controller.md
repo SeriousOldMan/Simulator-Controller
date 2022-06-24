@@ -30,11 +30,11 @@ In the next group, you can decide, how Simulator Controller will notify you abou
 
 ### Configuration of the Controller Mode automation
 
-If you click on then button "Controller Automation...", a neeew dialog will open up, where you can select predefined Modes for your connected hardware controller.
+If you click on then button "Controller Automation...", a new dialog will open up, where you can select predefined Modes for your connected hardware controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor.JPG)
 
-You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers  exclusively.
+You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers exclusively.
 
 ### Themes configuration
 

@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Includes\Includes.ahk
+#Include ..\Libraries\JSON.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -473,6 +474,8 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
+			case "Joke":
+				this.jokeRecognized(words)
 			case "AnnouncementsOn":
 				this.clearContinuation()
 
@@ -560,6 +563,78 @@ class RaceAssistant extends ConfigurationItem {
 
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
+	}
+
+	jokeRecognized(words) {
+		Random rnd, 0, 3
+
+		hasJoke := (rnd > 1)
+
+		if hasJoke
+			if (this.VoiceManager.Language = "EN")
+				try {
+					URLDownloadToFile https://api.chucknorris.io/jokes/random, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					joke := JSON.parse(joke)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke.value)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else if (this.VoiceManager.Language = "DE")
+				try {
+					URLDownloadToFile http://www.hahaha.de/witze/zufallswitz.js.php, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					html := ComObjCreate("HtmlFile")
+
+					html.write(joke)
+
+					joke := html.documentElement.innerText
+
+					joke := StrReplace(StrReplace(StrReplace(joke, "document.writeln('", ""), "`n", " "), "\", "")
+
+					index := InStr(joke, "</div")
+
+					if index
+						joke := SubStr(joke, 1, index - 1)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else
+				hasJoke := false
+
+		if !hasJoke
+			this.getSpeaker().speakPhrase("NoJoke")
 	}
 
 	setContinuation(continuation) {

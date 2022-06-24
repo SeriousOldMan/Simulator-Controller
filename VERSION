@@ -3,7 +3,7 @@ Version=4.2.2.0-dev
 Target=4.2.2.0-release
 Date=06/24/2022
 Download=
-Changes=
+Changes=The Race Assistants can tell you jokes now
 [Release]
 Version=4.2.1.0-release
 Date=06/24/2022

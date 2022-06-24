@@ -1,4 +1,10 @@
-## 4.2.1.0-release 06/24/22 (planned)
+## 4.2.1.0-release 07/01/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Ceased support for automatic updates prior to version 3.8.0.
+
+## 4.2.1.0-release 06/24/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

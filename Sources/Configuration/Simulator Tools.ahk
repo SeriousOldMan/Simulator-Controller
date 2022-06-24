@@ -1511,37 +1511,6 @@ updateInstallationForV392() {
 	}
 }
 
-updateInstallationForV376() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
-
-		FileCreateShortCut %installLocation%\Binaries\Race Center.exe, %A_StartMenu%\Simulator Controller\Race Center.lnk, %installLocation%\Binaries
-		FileCreateShortCut %installLocation%\Binaries\Server Administration.exe, %A_StartMenu%\Simulator Controller\Server Administration.lnk, %installLocation%\Binaries
-	}
-}
-
-updateInstallationForV358() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
-
-		FileCreateShortCut %installLocation%\Binaries\Strategy Workbench.exe, %A_StartMenu%\Simulator Controller\Strategy Workbench.lnk, %installLocation%\Binaries
-	}
-}
-
-updateInstallationForV354() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
-
-		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
-	}
-}
-
 updateConfigurationForV402() {
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
@@ -1554,19 +1523,19 @@ updateConfigurationForV420() {
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
 			changed := false
-			
+
 			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter")) {
 				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter")
-				
+
 				changed := true
 			}
-			
+
 			if InStr(text, "Assistant.Spotter Settings") {
 				text := StrReplace(text, "Assistant.Spotter Settings", "Assistant.Spotter")
-				
+
 				changed := true
 			}
-			
+
 			if changed {
 				try {
 					FileDelete %A_LoopFilePath%\Settings.CSV
@@ -1720,161 +1689,6 @@ updateConfigurationForV384() {
 	}
 }
 
-updateConfigurationForV378() {
-	if FileExist(kDatabaseDirectory . "Local\ACC\iexus_rc_f_gt3")
-		FileMoveDir %kDatabaseDirectory%Local\ACC\iexus_rc_f_gt3, %kDatabaseDirectory%Local\ACC\lexus_rc_f_gt3, R
-}
-
-updateConfigurationForV372() {
-	setupDB := new TyresDatabase()
-
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
-	{
-		simulator := A_LoopFileName
-
-		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
-		{
-			car := A_LoopFileName
-
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
-			{
-				track := A_LoopFileName
-
-				Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
-				{
-					condition := string2Values(A_Space, StrReplace(StrReplace(A_LoopFileName, "Tyre Setup ", ""), ".data", ""))
-
-					if (condition.Length() == 2) {
-						compound := condition[1]
-						compoundColor := "Black"
-						weather := condition[2]
-					}
-					else {
-						compound := condition[1]
-						compoundColor := condition[2]
-						weather := condition[3]
-					}
-
-					setupDB.requireDatabase(simulator, car, track)
-
-					pressureData := readConfiguration(A_LoopFilePath)
-
-					for temperature, pressures in getConfigurationSectionValues(pressureData, "Pressures", Object()) {
-						temperature := ConfigurationItem.splitDescriptor(temperature)
-						airTemperature := temperature[1]
-						trackTemperature := temperature[2]
-						pressures := string2Values(";", pressures)
-
-						for index, tyre in ["FL", "FR", "RL", "RR"]
-							for ignore, pressure in string2Values(",", pressures[index]) {
-								pressure := string2Values(":", pressure)
-
-								setupDB.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-													 , "Cold", tyre, pressure[1], pressure[2], false, false)
-							}
-					}
-
-					setupDB.flush()
-
-					try {
-						FileDelete %A_LoopFilePath%
-					}
-					catch exception {
-						; ignore
-					}
-				}
-			}
-		}
-	}
-}
-
-updateConfigurationForV368() {
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		setupConfig := readConfiguration(kUserHomeDirectory . "Setup\Setup.data")
-
-		if (getConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", kUndefined) == kUndefined) {
-			setConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", getConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected", false))
-			removeConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected")
-
-			writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", setupConfig)
-		}
-	}
-}
-
-updateConfigurationForV358() {
-	sourceDirectory := (kUserHomeDirectory . "Setup Database")
-	destinationDirectory := (kUserHomeDirectory . "Database")
-
-	if FileExist(sourceDirectory)
-		FileMoveDir %sourceDirectory%, %destinationDirectory%, 1
-}
-
-updateConfigurationForV314() {
-	if FileExist(kUserConfigDirectory . "Race Engineer.settings")
-		try {
-			FileMove %kUserConfigDirectory%Race Engineer.settings, %kUserConfigDirectory%Race.settings, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
-	{
-		simulator := A_LoopFileName
-
-		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
-		{
-			car := A_LoopFileName
-
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
-			{
-				track := A_LoopFileName
-
-				try {
-					FileMoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Settings, R
-				}
-				catch exception {
-					; ignore
-				}
-			}
-		}
-	}
-}
-
-updateConfigurationForV310() {
-	if FileExist(kUserConfigDirectory . "Race Engineer.rules")
-		try {
-			FileMove %kUserConfigDirectory%Race Engineer.rules, %kUserRulesDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Translations.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserTranslationsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserTranslationsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserGrammarsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-}
-
 updatePluginsForV402() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1959,107 +1773,7 @@ updatePluginsForV386() {
 	}
 }
 
-updatePluginsForV370() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "Team Server", false) {
-			teamServer := new Plugin("Team Server", false, false, "", "teamServer: Off")
-
-			teamServer.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-	}
-}
-
-updatePluginsForV322() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
-
-		if engineerDescriptor {
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerCommands", "assistantCommands")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSettings", "openRaceSettings")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSetups", "openSetupDatabase")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSettings", "importSetup")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineer", "raceAssistant")
-
-			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
-		}
-
-		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
-
-		if strategistDescriptor {
-			strategistDescriptor := StrReplace(strategistDescriptor, "Cato", "Khato")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistCommands", "assistantCommands")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSettings", "openRaceSettings")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSetups", "openSetupDatabase")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSettings", "importSetup")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategist", "raceAssistant")
-
-			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
-		}
-
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
-updatePluginsForV316() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "AMS2", false) {
-			ams2Plugin := new Plugin("AMS2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-
-			ams2Plugin.iIsActive := false
-
-			ams2Plugin.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-	}
-}
-
-updatePluginsForV312() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0)
-		if getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
-			raceStrategistPlugin := new Plugin("Race Strategist", userConfiguration)
-
-			if (raceStrategistPlugin.getArgumentValue("raceStrategistName", "Toni") = "Toni") {
-				raceStrategistPlugin.setArgumentValue("raceStrategistName", "Cato")
-
-				raceStrategistPlugin.saveToConfiguration(userConfiguration)
-
-				writeConfiguration(userConfigurationFile, userConfiguration)
-			}
-		}
-}
-
-updatePluginsForV310() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0)
-		if !getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
-			raceStrategistPlugin := new Plugin("Race Strategist", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-
-			raceStrategistPlugin.iIsActive := false
-
-			raceStrategistPlugin.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-}
-
-updateToV30() {
+updateToV380() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 	title := translate("Error")
 	MsgBox 262160, %title%, % translate("Your installed version is to old to be updated automatically. Please remove the ""Simulator Controller"" folder in your user ""Documents"" folder and restart the application. Application will exit...")

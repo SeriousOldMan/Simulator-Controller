@@ -607,14 +607,12 @@ class RaceStrategist extends RaceAssistant {
 					else
 						speaker.speakPhrase("BadPace")
 
-					conjunction := speaker.Fragments[goodPace ? "And" : "But"]
-
 					if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
-						speaker.speakPhrase("GoodConsistency", {conjunction: conjunction})
+						speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
 					else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
-						speaker.speakPhrase("MediocreConsistency", {conjunction: conjunction})
+						speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 					else
-						speaker.speakPhrase("BadConsistency", {conjunction: conjunction})
+						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				}
 			}
 		}

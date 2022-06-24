@@ -1,0 +1,16 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         McLaren 650s GT3                ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "McLaren 650s GT3",
+										[Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right]))

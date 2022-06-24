@@ -1965,6 +1965,8 @@ chooseLayout() {
 chooseImageFile(path) {
 	title := translate("Select Image...")
 
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 	FileSelectFile pictureFile, 1, %path%, %title%, Image (*.jpg; *.png; *.gif; *.ico)
 	OnMessage(0x44, "")

@@ -1,17 +1,28 @@
-## 4.2.1.0-release 06/24/22 (planned)
+## 4.2.1.0-release 06/24/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
-  3. The new ACC Pitstop MFD learning algorithm is now standard. If you still want to use the *old* image search method, take a look ate the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421). Information about the new method can be found in the [documentation](*).
+  3. The new ACC Pitstop MFD learning algorithm is now standard. If you still want to use the *old* image search method, take a look ate the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421). Information about the new method can be found in the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling).
   4. The pitstop window calculation for ACC by the Spotter will be correct now for all kind of sessions.
   5. The delta calculation by the Spotter has been improved again. Still not perfectly correct and sometimes way off, after a crash for example, but it keeps getting better.
-  6. Selection of the next driver can now be controlled by the "Race Center" for ACC and RF2. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) for more information.
+  6. Selection of the next driver can now be controlled by the "Race Center" for ACC and RF2. Please see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#automatically-select-the-next-driver) for more information.
   7. There are now several reports for past pitstops available in "Race Center", where you will get wear information for the used tyres for almost all simulators. You will find more information also in the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop).
   8. New voice command for the Race Engineer to request the current tyre wear. Not supported for all simulators, since some of them provide the data only after a pitstop, which is more relaistic imho.
   9. New information request action "TyreWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the tyre wear by pressing a button on your hardware controller.
   10. New icon for Stream Deck for the "TyreWear" information request action.
-  11. The Stream Deck icon preset has been updated as well.
+  11. The Stream Deck Icons preset has been updated as well.
   12. Tyre wear data is available in "Strategy Workbench" and "Race Center" for those simulators that support this.
+  13. New application launch pad in "Simulator Startup". From now on, you will see the following window, when you run "Simulator Startup":
+
+      ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Launch%20Pad.JPG)
+	  
+	  You can either continue the startup process by clicking on the top left button or you can launch any of the other application of Simulator Controller. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
+  14. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - Ferrari 458 GT3
+		- McLaren 650s GT3
+      - Assetto Corsa Competizione
+	    - KTM X-Bow GT4
   
   Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-421), especially for the changes in the Pitstop MFD handling in ACC.
 

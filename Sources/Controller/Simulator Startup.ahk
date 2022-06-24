@@ -169,7 +169,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 			Run %exePath%, %kBinariesDirectory%, , processID
 
-			Sleep 5000
+			Sleep 1000
 
 			return processID
 		}
@@ -274,8 +274,10 @@ class SimulatorStartup extends ConfigurationItem {
 		this.iFinished := true
 		hidden := false
 
+		hasSplashTheme := this.iSplashTheme
+
 		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
-			if (!kSilentMode && this.iSplashTheme) {
+			if (!kSilentMode && hasSplashTheme) {
 				this.hideSplashTheme()
 
 				hidden := true
@@ -288,13 +290,13 @@ class SimulatorStartup extends ConfigurationItem {
 			hideProgress()
 
 		if (kSilentMode || this.Canceled) {
-			if (!hidden && !kSilentMode && this.iSplashTheme)
+			if (!hidden && !kSilentMode && hasSplashTheme)
 				this.hideSplashTheme()
 
 			exitStartup(true)
 		}
 		else {
-			if !this.iSplashTheme
+			if !hasSplashTheme
 				exitStartup(true)
 		}
 	}
@@ -364,6 +366,7 @@ launchPad(command := false, arguments*) {
 	local application
 
 	static result := false
+
 	static toolTips
 	static executables
 
@@ -421,7 +424,7 @@ launchPad(command := false, arguments*) {
 		startupSimulator()
 
 		if !vStartupStayOpen
-			exitStartup(true)
+			launchPad(kClose)
 	}
 	else {
 		result := false
@@ -435,10 +438,10 @@ launchPad(command := false, arguments*) {
 		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
 		toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 
-		toolTips["SimulatorSetup"] := "Setup: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
+		toolTips["SimulatorSetup"] := "Setup & Configuration: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
 		toolTips["SimulatorConfiguration"] := "Configuration: Directly edit the configuration of Simulator Controller. Requires profund knowledge of the internals of the various plugins."
 		toolTips["SimulatorDownload"] := "Update: Downloads and installs the latest version of Simulator Controller. Not needed, unless you disabled automatic updates during the initial installation."
-		toolTips["SimulatorSettings"] := "Simulator Settings: Change the behaviour of Simulator Controller during startup and in a running simulation."
+		toolTips["SimulatorSettings"] := "Settings: Change the behaviour of Simulator Controller during startup and in a running simulation."
 		toolTips["RaceSettings"] := "Race Settings: Manage the settings for the Virtual Race Assistants and also the connection to the Team Server for team races."
 		toolTips["SessionDatabase"] := "Session Database: Manage simulator, car and track specific settings and gives access to various areas of the data collected by Simulator Controller during the sessions."
 		toolTips["SetupAdvisor"] := "Setup Advisor: Develop car setups using an interview-based approach, where you describe your handling problems."
@@ -549,7 +552,7 @@ launchSimulatorDownload() {
 }
 
 openLaunchPadDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
 }
 
 WM_MOUSEMOVE()
@@ -625,9 +628,10 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	launchPad()
-
-	ExitApp 0
+	if inList(A_Args, "-NoLaunchPad")
+		startupSimulator()
+	else
+		launchPad()
 }
 
 playSong(songFile) {
@@ -640,8 +644,8 @@ playSong(songFile) {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitStartup(sayGoodbye := false) {
-	if (sayGoodbye && (vSimulatorControllerPID != false)) {
+exitStartup(sayGoodBye := false) {
+	if (sayGoodBye && (vSimulatorControllerPID != false)) {
 		raiseEvent(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 
 		SetTimer exitStartup, -2000
@@ -658,11 +662,7 @@ exitStartup(sayGoodbye := false) {
 			; ignore
 		}
 
-		if vStartupStayOpen {
-			if vStartupManager
-				vStartupManager.cancelStartup()
-		}
-		else
+		if !vStartupStayOpen
 			ExitApp 0
 	}
 }

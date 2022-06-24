@@ -332,7 +332,9 @@ int getTyreWear(const irsdk_header* header, const char* sessionInfo, const char*
 	char result[32];
 
 	if (getDataValue(result, header, data, dataVariableO))
-		return (int)((atof(result) + getDataFloat(header, data, dataVariableM) + getDataFloat(header, data, dataVariableI)) / 3);
+		return 100 - (int)(((atof(result) +
+							 getDataFloat(header, data, dataVariableM) +
+							 getDataFloat(header, data, dataVariableI)) / 3) * 100);
 	else
 		return 0;
 }

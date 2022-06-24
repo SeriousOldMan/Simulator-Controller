@@ -46,7 +46,7 @@ If you want to setup and operate a server, which is not only used by your direct
 
 ### Updating Team Server
 
-Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [up0date notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
+Whenever a new version of Simulator Controller is released, there might be changes to the Team Server as well. Normally this is mentioned in the [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes). If you host your own Team Server, you will have to redeploy the software, so that frontend and backend are compatible. In most cases you can retain your data, if you are running a persistent database, unless otherwise stated in the update notes. To do that, make a backup copy of the "TeamServer.db" file located in the root directory of your hosted Team Server, and restore this file after the update.
 
 ## Managing teams
 
@@ -160,7 +160,7 @@ Beside that, you can request several context specific data, which will be shown 
   
      You will get a summary of a given pitstop, when you select it in the *Pitstops* tab, incl. tyre wear data. The amount of infomration provided here depends of the data available for the current simulator.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2016.JPG)
 	 
 	 Note: For *Assetto Corsa Competizione*, detailed tyre data is only available after a real driver swap when running on an ACC server (no single user session). For most of the other simulators, only the tyre wear percentage is provided for each tyre.
 	 
@@ -168,7 +168,7 @@ Beside that, you can request several context specific data, which will be shown 
 	 
 	 This report, which can be selected with "Setups Summary" command in the "Pitstop" menu, lists all registered, driver-specific tyre setups. Very helpful, if you want to have a printed version, just in case.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%216.JPG)
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2017.JPG)
   
   8. Pitstops Summary
   
@@ -182,9 +182,9 @@ Beside that, you can request several context specific data, which will be shown 
 	 
   10. Race Summary
   
-     This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
+      This report is usefull by the end of a race to create a document to be stored away in the archive. It contains data on all stints and drivers. This report can be created using the "Race Summary" command from the "Session" menu.
 	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
+	  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2011.JPG)
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking into the output area.
 

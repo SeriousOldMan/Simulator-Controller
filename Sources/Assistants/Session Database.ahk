@@ -1440,6 +1440,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		title := translate("Upload Setup File...")
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, , %title%
 		OnMessage(0x44, "")
@@ -1467,6 +1469,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		title := translate("Download Setup File...")
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 		FileSelectFile fileName, S16, %setupName%, %title%
 		OnMessage(0x44, "")
@@ -1649,6 +1653,8 @@ chooseDatabasePath() {
 	protectionOn()
 
 	try {
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
 		OnMessage(0x44, "")

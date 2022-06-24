@@ -318,6 +318,8 @@ moveUninstallEditor() {
 chooseInstallLocationPath() {
 	GuiControlGet installLocationPathEdit
 
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
 	OnMessage(0x44, "")

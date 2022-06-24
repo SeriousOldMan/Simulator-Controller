@@ -430,7 +430,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
 
 				if verbose
-					showMessage(translate("Successfully connected to the team server.") . "`n`n"
+					showMessage(translate("Successfully connected to the Team Server.") . "`n`n"
 										. translate("Team: ") . teamName . "`n"
 										. translate("Driver: ") . driverName . "`n"
 										. translate("Session: ") . sessionName

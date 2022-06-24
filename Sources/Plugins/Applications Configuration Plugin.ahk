@@ -258,6 +258,8 @@ chooseApplicationExePath() {
 		
 		title := translate("Select application executable...")
 		
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 		FileSelectFile file, 1, %applicationExePathEdit%, %title%, Executable (*.exe)
 		OnMessage(0x44, "")
@@ -280,6 +282,8 @@ chooseApplicationWorkingDirectoryPath() {
 	
 	try {
 		GuiControlGet applicationWorkingDirectoryPathEdit
+		
+		Gui +OwnDialogs
 		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")

@@ -146,6 +146,8 @@ class ACCSetupEditor extends FileSetupEditor {
 
 		title := translate("Load ACC Setup File...")
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")
@@ -172,6 +174,8 @@ class ACCSetupEditor extends FileSetupEditor {
 
 		title := translate("Save ACC Setup File...")
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 		FileSelectFile fileName, S17, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")
@@ -219,6 +223,8 @@ class ACCSetupComparator extends FileSetupComparator {
 
 		title := (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File..."))
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")

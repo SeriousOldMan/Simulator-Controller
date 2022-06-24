@@ -739,6 +739,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 chooseSessionStorePath() {
 	GuiControlGet sessionStorePathEdit
 
+	Gui +OwnDialogs
+		
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%sessionStorePathEdit%, 0, % translate("Select local Session Folder...")
 	OnMessage(0x44, "")

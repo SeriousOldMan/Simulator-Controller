@@ -814,7 +814,11 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	activationCommand(words*) {
-		if !kSilentMode
+		static first := true
+
+		if first
+			first := false
+		else
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 	}
 
@@ -1698,13 +1702,13 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger) {
-	protectionOn()
+	protectionOn(true, true)
 
 	try {
 		function.Controller.fireActions(function, trigger)
 	}
 	finally {
-		protectionOff()
+		protectionOff(true, true)
 	}
 }
 

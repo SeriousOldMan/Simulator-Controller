@@ -1719,9 +1719,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						setConfigurationSectionValues(data, "Pitstop Data", pitstopData)
 
-						for ignore, prefix in ["Tyre.Front.Left.", "Tyre.Front.Right.", "Tyre.Rear.Left.", "Tyre.Rear.Right."]
+						for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
 							for key, value in tyreStates[A_Index]
-								setConfigurationValue(data, "Pitstop Data", prefix . key, IsObject(value) ? values2String(",", value*) : value)
+								setConfigurationValue(data, "Pitstop Data", "Tyre." . key . "." . tyre, IsObject(value) ? values2String(",", value*) : value)
 
 						writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
 

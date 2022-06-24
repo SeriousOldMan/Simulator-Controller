@@ -641,13 +641,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundDropDown, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Tyre Usage")
-		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimMaxTyreLapsEdit, %simMaxTyreLapsEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMaxTyreLapsEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimMaxTyreLapsEdit gvalidateSimMaxTyreLaps, %simMaxTyreLapsEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-99, %simMaxTyreLapsEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Laps")
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Fuel Amount")
-		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimInitialFuelAmountEdit, %simInitialFuelAmountEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simInitialFuelAmountEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimInitialFuelAmountEdit gvalidateSimInitialFuelAmount, %simInitialFuelAmountEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999, %simInitialFuelAmountEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
@@ -1564,7 +1564,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						title := translate("Load Race Settings...")
 
 						Gui +OwnDialogs
-		
+
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 						FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 						OnMessage(0x44, "")
@@ -1872,7 +1872,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				title := translate("Load Race Strategy...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -1890,7 +1890,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
 
 					Gui +OwnDialogs
-		
+
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -1914,7 +1914,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				title := translate("Choose two or more Race Strategies for comparison...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
 				FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -2556,6 +2556,32 @@ validateNumber(field) {
 
 		GuiControl, , %field%, %oldValue%
 	}
+}
+
+validatePositiveInteger(field) {
+	oldValue := %field%
+
+	GuiControlGet %field%
+
+	if %field% is not Number
+	{
+		%field%:= oldValue
+
+		GuiControl, , %field%, %oldValue%
+	}
+	else if (%field% <= 0) {
+		%field%:= oldValue
+
+		GuiControl, , %field%, %oldValue%
+	}
+}
+
+validateSimMaxTyreLaps() {
+	validatePositiveInteger("simMaxTyreLapsEdit")
+}
+
+validateSimInitialFuelAmount() {
+	validatePositiveInteger("simInitialFuelAmountEdit")
 }
 
 validateSimAvgLapTime() {

@@ -438,7 +438,7 @@ launchPad(command := false, arguments*) {
 		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
 		toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 
-		toolTips["SimulatorSetup"] := "Setup: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
+		toolTips["SimulatorSetup"] := "Setup & Configuration: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
 		toolTips["SimulatorConfiguration"] := "Configuration: Directly edit the configuration of Simulator Controller. Requires profund knowledge of the internals of the various plugins."
 		toolTips["SimulatorDownload"] := "Update: Downloads and installs the latest version of Simulator Controller. Not needed, unless you disabled automatic updates during the initial installation."
 		toolTips["SimulatorSettings"] := "Settings: Change the behaviour of Simulator Controller during startup and in a running simulation."

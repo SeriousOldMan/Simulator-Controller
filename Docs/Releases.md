@@ -1,4 +1,4 @@
-## 4.2.1.0-release 06/24/22 (planned)
+## 4.2.1.0-release 06/24/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always

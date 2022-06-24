@@ -238,10 +238,10 @@ int main(int argc, char* argv[]) {
 			localCopy->mAirPressure[TYRE_REAR_LEFT] / 10,
 			localCopy->mAirPressure[TYRE_REAR_RIGHT] / 10);
 
-		printf("TyreWear=%d,%d,%d,%d\n", round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100),
-			round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),
-			round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
-			round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
+		printf("TyreWear=%d,%d,%d,%d\n", (int)round(localCopy->mTyreWear[TYRE_FRONT_LEFT] * 100),
+			(int)round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),
+			(int)round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
+			(int)round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
 
 		printf("[Stint Data]\n");
 

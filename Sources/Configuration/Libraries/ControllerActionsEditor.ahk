@@ -635,6 +635,8 @@ clickIcon() {
 	
 			pictureFile := (actionsList.iCurrentIcon ? substituteVariables(actionsList.iCurrentIcon) : "")
 			
+			Gui +OwnDialogs
+		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 			FileSelectFile pictureFile, 1, %pictureFile%, %title%, Image (*.ico; *.png; *.jpg; *.gif)
 			OnMessage(0x44, "")

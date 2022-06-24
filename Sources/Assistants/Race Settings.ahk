@@ -694,7 +694,7 @@ restart:
 
 					editSettings(kUpdate, "Team")
 
-					showMessage(translate("Successfully connected to the team server."))
+					showMessage(translate("Successfully connected to the Team Server."))
 				}
 				else
 					Throw Exception("Invalid or missing token...")
@@ -1263,6 +1263,8 @@ restart:
 				else
 					dirName := kRaceSettingsFile
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
@@ -1292,6 +1294,8 @@ restart:
 
 				title := translate("Save Race Settings...")
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")

@@ -612,7 +612,7 @@ class RaceStrategist extends RaceAssistant {
 					else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
 						speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 					else
-						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments["And"]})
+						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				}
 			}
 		}
@@ -1074,7 +1074,7 @@ class RaceStrategist extends RaceAssistant {
 
 				wear := false
 
-				if (knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL", kUndefined) != kUndefined)
+				if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
 					wear := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
 											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
 											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
@@ -1688,11 +1688,11 @@ class RaceStrategist extends RaceAssistant {
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-					, compound, compoundColor, pressures, temperatures) {
-		if (this.RemoteHandler && this.collectTelemetry())
+					, compound, compoundColor, pressures, temperatures, wear) {
+		if this.RemoteHandler
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-											   , compound, compoundColor, pressures, temperatures)
+											   , compound, compoundColor, pressures, temperatures, wear)
 	}
 
 	updateTelemetryDatabase() {

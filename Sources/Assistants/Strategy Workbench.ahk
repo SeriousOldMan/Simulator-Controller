@@ -1563,6 +1563,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						title := translate("Load Race Settings...")
 
+						Gui +OwnDialogs
+		
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 						FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 						OnMessage(0x44, "")
@@ -1869,6 +1871,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 4: ; "Load Strategy..."
 				title := translate("Load Race Strategy...")
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -1885,6 +1889,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
 
+					Gui +OwnDialogs
+		
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -1907,6 +1913,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 7: ; "Compare Strategies..."
 				title := translate("Choose two or more Race Strategies for comparison...")
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Compare", "Cancel"]))
 				FileSelectFile files, M1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")

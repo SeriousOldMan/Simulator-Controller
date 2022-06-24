@@ -157,7 +157,7 @@ global deleteSetupButton
 
 global sessionDateCal
 global sessionTimeEdit
-global plansetupDriverDropDownMenu
+global planSetupDriverDropDownMenu
 global planTimeEdit
 global actTimeEdit
 global planLapEdit
@@ -184,7 +184,7 @@ global overtakeDeltaEdit = 2
 global trafficConsideredEdit = 7
 
 global pitstopLapEdit
-global pitstopDriverDropDown
+global pitstopDriverDropDownMenu
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
@@ -1147,7 +1147,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPlanListView := listHandle
 
 		Gui %window%:Add, Text, x378 ys+68 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplansetupDriverDropDownMenu gupdatePlan
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanSetupDriverDropDownMenu gupdatePlan
 
 		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (est. / act.)")
 		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit gupdatePlan 1, HH:mm
@@ -1321,7 +1321,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
 
 		Gui %window%:Add, Text, x24 yp+30 w80 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDown
+		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDownMenu
 
 		Gui %window%:Add, Text, x24 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
@@ -1540,7 +1540,7 @@ class RaceCenter extends ConfigurationItem {
 		names := getKeys(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
-		GuiControl, , plansetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
+		GuiControl, , planSetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
 	}
 
 	selectSession(identifier) {
@@ -1746,7 +1746,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if selected {
-				GuiControl Enable, plansetupDriverDropDownMenu
+				GuiControl Enable, planSetupDriverDropDownMenu
 				GuiControl Enable, planTimeEdit
 				GuiControl Enable, actTimeEdit
 				GuiControl Enable, deletePlanButton
@@ -1772,7 +1772,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else {
-				GuiControl Disable, plansetupDriverDropDownMenu
+				GuiControl Disable, planSetupDriverDropDownMenu
 				GuiControl Disable, planTimeEdit
 				GuiControl Disable, actTimeEdit
 				GuiControl Disable, planLapEdit
@@ -1781,7 +1781,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, planTyreCompoundDropDown
 				GuiControl Disable, deletePlanButton
 
-				GuiControl Choose, plansetupDriverDropDownMenu, 0
+				GuiControl Choose, planSetupDriverDropDownMenu, 0
 				GuiControl, , planTimeEdit, 20200101000000
 				GuiControl, , actTimeEdit, 20200101000000
 				GuiControl, , planLapEdit, % ""
@@ -2359,7 +2359,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedPlanStint := LV_GetCount()
 			}
 
-			GuiControl Choose, plansetupDriverDropDownMenu, 1
+			GuiControl Choose, planSetupDriverDropDownMenu, 1
 			GuiControl, , planTimeEdit, 20200101000000
 			GuiControl, , actTimeEdit, 20200101000000
 			GuiControl, , planLapEdit, % ""
@@ -2541,7 +2541,7 @@ class RaceCenter extends ConfigurationItem {
 				index := inList(this.TeamDrivers, drivers[stint.Nr + 1])
 
 				if index
-					GuiControl Choose, pitstopDriverDropDown, %index%
+					GuiControl Choose, pitstopDriverDropDownMenu, %index%
 			}
 		}
 
@@ -2906,7 +2906,7 @@ class RaceCenter extends ConfigurationItem {
 			Gui %window%:Default
 
 			GuiControlGet pitstopLapEdit
-			GuiControlGet pitstopDriverDropDown
+			GuiControlGet pitstopDriverDropDownMenu
 			GuiControlGet pitstopRefuelEdit
 			GuiControlGet pitstopTyreCompoundDropDown
 			GuiControlGet pitstopTyreSetEdit
@@ -2923,12 +2923,12 @@ class RaceCenter extends ConfigurationItem {
 
 			stint := this.CurrentStint
 
-			if (stint && pitstopDriverDropDown && (pitstopDriverDropDown != "")) {
+			if (stint && pitstopDriverDropDownMenu && (pitstopDriverDropDownMenu != "")) {
 				drivers := this.getPlanDrivers()
 
 				if (drivers.HasKey(stint.Nr)) {
 					currentDriver := drivers[stint.Nr]
-					nextDriver := pitstopDriverDropDown
+					nextDriver := pitstopDriverDropDownMenu
 
 					currentNr := inList(this.TeamDrivers, currentDriver)
 					nextNr := inList(this.TeamDrivers, nextDriver)
@@ -3102,6 +3102,8 @@ class RaceCenter extends ConfigurationItem {
 			case 4:
 				title := translate("Load Race Strategy...")
 
+				Gui +OwnDialogs
+		
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -3118,6 +3120,8 @@ class RaceCenter extends ConfigurationItem {
 
 					fileName := (dirName . "\" . this.Strategy.Name . ".strategy")
 
+					Gui +OwnDialogs
+		
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -3795,8 +3799,10 @@ class RaceCenter extends ConfigurationItem {
 				this.loadSessionDrivers()
 			else {
 				GuiControl, , setupDriverDropDownMenu, % "|"
-				GuiControl, , plansetupDriverDropDownMenu, % "|"
+				GuiControl, , planSetupDriverDropDownMenu, % "|"
 			}
+
+			GuiControl, , pitstopDriverDropDownMenu, % "|"
 
 			this.iTeamDrivers := []
 			this.iTeamDriversVersion := false
@@ -4933,11 +4939,11 @@ class RaceCenter extends ConfigurationItem {
 												, {Pitstop: pitstop, Driver: driver, Laps: laps
 												 , Compound: compound, "Compound.Color": compoundColor
 												 , Set: tyreSet, Tyre: tyre
-												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Tread", "-")
-												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Wear", 0)
-												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Grain", "-")
-												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".Blister", "-")
-												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre." . tyre . ".FlatSpot", "-")})
+												 , Tread: getConfigurationValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
+												 , Wear: getConfigurationValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
+												 , Grain: getConfigurationValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
+												 , Blister: getConfigurationValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
+												 , FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")})
 							}
 						}
 					}
@@ -5079,8 +5085,8 @@ class RaceCenter extends ConfigurationItem {
 
 					this.iTeamDrivers := teamDrivers
 
-					GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
-					GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
+					GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", teamDrivers*))
+					GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 1 : 0
 				}
 			}
 		}
@@ -5477,8 +5483,8 @@ class RaceCenter extends ConfigurationItem {
 
 			Gui %window%:Default
 
-			GuiControl, , pitstopDriverDropDown, % ("|" . values2String("|", teamDrivers*))
-			GuiControl Choose, pitstopDriverDropDown, % (teamDrivers.Length() > 0) ? 1 : 0
+			GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", teamDrivers*))
+			GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 1 : 0
 		}
 	}
 
@@ -5659,6 +5665,8 @@ class RaceCenter extends ConfigurationItem {
 
 			title := translate("Select target folder...")
 
+			Gui +OwnDialogs
+		
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
@@ -6060,6 +6068,8 @@ class RaceCenter extends ConfigurationItem {
 
 		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
 
+		Gui +OwnDialogs
+		
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder folder, *%directory%, 0, %title%
 		OnMessage(0x44, "")
@@ -7711,18 +7721,18 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre") . "</th>" . values2String("", tyreNames*) . "</tr>")
 
 		if hasTread
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Tread") . "</th>" . values2String("", treadData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Tread (mm)") . "</th>" . values2String("", treadData*) . "</tr>")
 		else if hasWear
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Wear") . "</th>" . values2String("", wearData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Wear (%)") . "</th>" . values2String("", wearData*) . "</tr>")
 
 		if hasGrain
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain") . "</th>" . values2String("", grainData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Grain (%)") . "</th>" . values2String("", grainData*) . "</tr>")
 
 		if hasBlister
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Blister") . "</th>" . values2String("", blisterData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Blister (%)") . "</th>" . values2String("", blisterData*) . "</tr>")
 
 		if hasFlatSpot
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot") . "</th>" . values2String("", flatSpotData*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Flat Spot (%)") . "</th>" . values2String("", flatSpotData*) . "</tr>")
 
 		html .= "</table>"
 
@@ -9905,7 +9915,7 @@ choosePlan() {
 
 			timeActual := currentTime
 
-			GuiControl Choose, plansetupDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
+			GuiControl Choose, planSetupDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
 			GuiControl, , planTimeEdit, %timePlanned%
 			GuiControl, , actTimeEdit, %timeActual%
 			GuiControl, , planLapEdit, %lapPlanned%
@@ -9947,7 +9957,7 @@ updatePlanAsync() {
 		}
 
 		if (row > 0) {
-			GuiControlGet plansetupDriverDropDownMenu
+			GuiControlGet planSetupDriverDropDownMenu
 			GuiControlGet planTimeEdit
 			GuiControlGet actTimeEdit
 			GuiControlGet planLapEdit
@@ -9955,10 +9965,10 @@ updatePlanAsync() {
 			GuiControlGet planRefuelEdit
 			GuiControlGet planTyreCompoundDropDown
 
-			if (plansetupDriverDropDownMenu = 1)
+			if (planSetupDriverDropDownMenu = 1)
 				LV_Modify(row, "Col2", "")
 			else
-				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[plansetupDriverDropDownMenu - 1])
+				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planSetupDriverDropDownMenu - 1])
 
 			FormatTime time, %planTimeEdit%, HH:mm
 

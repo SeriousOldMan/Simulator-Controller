@@ -1690,7 +1690,7 @@ class RaceEngineer extends RaceAssistant {
 			this.finishPitstop(lapNumber)
 
 			if (this.RemoteHandler && (flWear != kUndefined))
-				this.RemoteHandler.updateTyreSet(pitstopNumber, driver, false
+				this.RemoteHandler.updateTyreSet(knowledgeBase.getValue("Pitstop.Last", 0), driver, false
 											   , tyreCompound, tyreCompoundColor, tyreSet
 											   , flWear, frWear, rlWear, rrWear)
 		}

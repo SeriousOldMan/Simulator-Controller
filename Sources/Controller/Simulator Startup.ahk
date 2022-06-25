@@ -632,6 +632,9 @@ startSimulator() {
 		startupSimulator()
 	else
 		launchPad()
+
+	if (!vStartupManager || vStartupManager.Finished)
+		ExitApp 0
 }
 
 playSong(songFile) {
@@ -652,6 +655,9 @@ exitStartup(sayGoodBye := false) {
 	}
 	else {
 		Hotkey Escape, Off
+
+		if vStartupManager
+			vStartupManager.cancelStartup()
 
 		fileName := (kTempDirectory . "Startup.semaphore")
 
@@ -709,6 +715,8 @@ try {
 		else {
 			if (vSimulatorControllerPID != 0)
 				raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
+
+			vStartupManager.hideSplashTheme()
 
 			exitStartup(true)
 		}

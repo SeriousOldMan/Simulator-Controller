@@ -1,3 +1,7 @@
+## 4.2.1.1-release 06/24/22
+
+  1. Critical fix for unsupressed error message after a pitstop in IRC, AMS2, R3E and RF2.
+
 ## 4.2.1.0-release 06/24/22
 
   1. Bugfixes, as always

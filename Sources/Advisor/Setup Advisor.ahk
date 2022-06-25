@@ -288,7 +288,7 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenAdvisorDocumentation, % translate("Setup Advisor")
+		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenAdvisorDocumentation, % translate("Setup Advisor")
 
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10 Section
 
@@ -1900,7 +1900,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w784 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
+		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
 
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -2437,7 +2437,7 @@ class SetupComparator extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w784 cBlue Center gopenComparatorDocumentation, % translate("Setup Comparator")
+		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenComparatorDocumentation, % translate("Setup Comparator")
 
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -2937,7 +2937,7 @@ loadSetup() {
 	title := translate("Load Setup...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 	FileSelectFile fileName, 1, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")
@@ -2950,7 +2950,7 @@ saveSetup() {
 	title := translate("Save Setup...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 	FileSelectFile fileName, S17, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")

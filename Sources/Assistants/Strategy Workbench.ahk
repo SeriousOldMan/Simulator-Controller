@@ -333,7 +333,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1334 cBlue Center gopenWorkbenchDocumentation, % translate("Strategy Workbench")
+		Gui %window%:Add, Text, x608 YP+20 w134 cBlue Center gopenWorkbenchDocumentation, % translate("Strategy Workbench")
 
 		Gui %window%:Add, Text, x8 yp+30 w1350 0x10
 

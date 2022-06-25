@@ -155,8 +155,9 @@ installOptions(options) {
 		Gui Install:Add, Text, w330 Center gmoveInstallEditor, % translate("Modular Simulator Controller System")
 
 		Gui Install:Font, Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
 
-		Gui Install:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Install")
+		Gui Install:Add, Text, x108 YP+20 w130 cBlue Center gopenInstallDocumentation, % translate("Install")
 
 		Gui Install:Font, Norm, Arial
 
@@ -250,8 +251,9 @@ uninstallOptions(options) {
 		Gui Uninstall:Add, Text, w330 Center gmoveUninstallEditor, % translate("Modular Simulator Controller System")
 
 		Gui Uninstall:Font, Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
 
-		Gui Uninstall:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
+		Gui Uninstall:Add, Text, x108 YP+20 w130 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
 
 		Gui Uninstall:Font, Norm, Arial
 

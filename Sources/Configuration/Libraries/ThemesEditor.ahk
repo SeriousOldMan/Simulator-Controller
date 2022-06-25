@@ -58,7 +58,7 @@ class ThemesEditor extends ConfigurationItem {
 		Gui TE:Font, Norm, Arial
 		Gui TE:Font, Italic Underline, Arial
 
-		Gui TE:Add, Text, YP+20 w388 cBlue Center gopenThemesDocumentation, % translate("Themes")
+		Gui TE:Add, Text, x158 YP+20 w88 cBlue Center gopenThemesDocumentation, % translate("Themes")
 
 		Gui TE:Font, Norm, Arial
 		

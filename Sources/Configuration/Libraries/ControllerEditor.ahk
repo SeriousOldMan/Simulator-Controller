@@ -151,7 +151,7 @@ class ControllerEditor extends ConfigurationItem {
 		Gui CTRLE:Font, Norm, Arial
 		Gui CTRLE:Font, Italic Underline, Arial
 
-		Gui CTRLE:Add, Text, x0 YP+20 w432 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
+		Gui CTRLE:Add, Text, x160 YP+20 w112 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
 
 		this.iControlsList.createGui(buttonBoxConfiguration)
 		this.iLabelsList.createGui(buttonBoxConfiguration)
@@ -1612,7 +1612,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Font, Norm, Arial
 		Gui IRE:Font, Italic Underline, Arial
 
-		Gui IRE:Add, Text, x0 YP+20 w332 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
+		Gui IRE:Add, Text, x110 YP+20 w112 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
 
 		Gui IRE:Font, Norm, Arial
 

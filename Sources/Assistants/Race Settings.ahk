@@ -902,7 +902,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
+		Gui RES:Add, Text, x118 YP+20 w168 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
 

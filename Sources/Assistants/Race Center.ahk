@@ -1017,7 +1017,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1334 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
+		Gui %window%:Add, Text, x608 YP+20 w134 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
 
 		Gui %window%:Add, Text, x8 yp+30 w1350 0x10
 
@@ -9189,12 +9189,12 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s10 Bold, Arial
 
-		Gui TE:Add, Text, w368 Center gmoveTeamManager, % translate("Modular Simulator Controller System")
+		Gui TE:Add, Text, w392 Center gmoveTeamManager, % translate("Modular Simulator Controller System")
 
 		Gui TE:Font, s9 Norm, Arial
 		Gui TE:Font, Italic Underline, Arial
 
-		Gui TE:Add, Text, YP+20 w368 cBlue Center gopenTeamManagerDocumentation, % translate("Team Selection")
+		Gui TE:Add, Text, x148 YP+20 w112 cBlue Center gopenTeamManagerDocumentation, % translate("Team Selection")
 
 		Gui TE:Font, s8 Norm, Arial
 
@@ -9228,7 +9228,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s8 Norm, Arial
 
-		Gui TE:Add, Text, x8 ys+194 w384 0x10
+		Gui TE:Add, Text, x8 ys+194 w392 0x10
 
 		Gui TE:Add, Button, x120 yp+10 w80 h23 Default GacceptTeamManager, % translate("Ok")
 		Gui TE:Add, Button, x208 yp w80 h23 GcancelTeamManager, % translate("&Cancel")

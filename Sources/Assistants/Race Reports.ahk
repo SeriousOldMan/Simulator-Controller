@@ -180,7 +180,7 @@ class RaceReports extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenReportsDocumentation, % translate("Race Reports")
+		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenReportsDocumentation, % translate("Race Reports")
 
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
 

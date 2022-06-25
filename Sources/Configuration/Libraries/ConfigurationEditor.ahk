@@ -112,7 +112,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w478 cBlue Center gopenConfigurationDocumentation, % translate("Configuration")
+		Gui %window%:Add, Text, x178 YP+20 w138 cBlue Center gopenConfigurationDocumentation, % translate("Configuration")
 
 		Gui %window%:Font, Norm, Arial
 		

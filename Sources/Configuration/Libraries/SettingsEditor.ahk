@@ -252,7 +252,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		Gui ME:Font, Norm, Arial
 		Gui ME:Font, Italic Underline, Arial
 
-		Gui ME:Add, Text, YP+20 w330 cBlue Center gopenSettingsDocumentation, % translate("Controller Automation")
+		Gui ME:Add, Text, x108 YP+20 w130 cBlue Center gopenSettingsDocumentation, % translate("Controller Automation")
 
 		Gui ME:Font, Norm, Arial
 				
@@ -445,7 +445,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic Underline, Arial
 	
-		Gui SE:Add, Text, YP+20 w220 cBlue Center gopenSettingsDocumentation, % translate("Settings")
+		Gui SE:Add, Text, x68 YP+20 w100 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 	
 		coreSettings := [["Simulator Controller", true, false]]
 		feedbackSettings := []		
@@ -471,7 +471,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 	
-		Gui SE:Add, GroupBox, -Theme YP+30 w220 h%coreHeight%, % translate("Start Core System")
+		Gui SE:Add, GroupBox, -Theme x8 YP+30 w220 h%coreHeight%, % translate("Start Core System")
 	
 		Gui SE:Font, Norm, Arial
 	

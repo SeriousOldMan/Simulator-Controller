@@ -404,9 +404,9 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w684 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
+		Gui %window%:Add, Text, x258 YP+20 w184 cBlue Center gopenSetupDocumentation, % translate("Setup && Configuration")
 		
-		Gui %window%:Add, Text, yp+20 w700 0x10
+		Gui %window%:Add, Text, x8 yp+20 w700 0x10
 
 		Gui %window%:Font, s8 Norm, Arial
 		

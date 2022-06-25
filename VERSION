@@ -3,7 +3,7 @@ Version=4.2.2.0-dev
 Target=4.2.2.0-release
 Date=06/24/2022
 Download=
-Changes=The Race Assistants can tell you jokes now
+Changes=No support for automatic updates for versions prior to 3.8.0, Race Assistants can tell you jokes now, Reduced lick area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now
 [Release]
 Version=4.2.1.0-release
 Date=06/24/2022

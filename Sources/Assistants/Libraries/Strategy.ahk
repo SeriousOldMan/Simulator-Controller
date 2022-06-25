@@ -1101,10 +1101,10 @@ class Strategy extends ConfigurationItem {
 					tyreCompound := strategy.TyreCompound[true]
 					tyreCompoundColor := strategy.TyreCompoundColor[true]
 
-					this.iStintLaps := stintLaps
+					this.iStintLaps := Round(stintLaps)
 				}
 				else
-					this.iStintLaps := Min(stintLaps, this.iRemainingTyreLaps)
+					this.iStintLaps := Round(Min(stintLaps, this.iRemainingTyreLaps))
 
 				this.iTyreCompound := tyreCompound
 				this.iTyreCompoundColor := tyreCompoundColor

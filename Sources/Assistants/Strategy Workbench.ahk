@@ -2558,7 +2558,7 @@ validateNumber(field) {
 	}
 }
 
-validatePositiveInteger(field) {
+validatePositiveInteger(field, minValue) {
 	oldValue := %field%
 
 	GuiControlGet %field%
@@ -2569,7 +2569,7 @@ validatePositiveInteger(field) {
 
 		GuiControl, , %field%, %oldValue%
 	}
-	else if (%field% <= 0) {
+	else if (%field% <= minValue) {
 		%field%:= oldValue
 
 		GuiControl, , %field%, %oldValue%
@@ -2577,11 +2577,11 @@ validatePositiveInteger(field) {
 }
 
 validateSimMaxTyreLaps() {
-	validatePositiveInteger("simMaxTyreLapsEdit")
+	validatePositiveInteger("simMaxTyreLapsEdit", 10)
 }
 
 validateSimInitialFuelAmount() {
-	validatePositiveInteger("simInitialFuelAmountEdit")
+	validatePositiveInteger("simInitialFuelAmountEdit", 10)
 }
 
 validateSimAvgLapTime() {

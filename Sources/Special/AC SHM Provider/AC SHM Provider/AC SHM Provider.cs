@@ -38,8 +38,10 @@ namespace ACSHMProvider
             }
         }
 
-        string GetGrip(float surfaceGrip) {
-            return "Optimum";
+        static string GetGrip(float surfaceGrip) {
+            string[] gripNames = { "Dusty", "Old", "Slow", "Green", "Fast", "Optimum" };
+            
+            return gripNames[Math.Max(1, (int)Math.Round(6 - (((1 - surfaceGrip) / 0.15) * 6)))];
         }
 
         private long GetRemainingLaps(long timeLeft)
@@ -317,7 +319,7 @@ namespace ACSHMProvider
             Console.WriteLine("[Track Data]");
 
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
-            Console.WriteLine("GripRaw=" + graphics.SurfaceGrip);
+            Console.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
             
             Console.WriteLine("[Weather Data]");
 

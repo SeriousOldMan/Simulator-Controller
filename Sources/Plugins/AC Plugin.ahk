@@ -160,12 +160,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 
-		grip := getConfigurationValue(data, "Track Data", "GripRaw", 1)
-		grip := Round(6 - (((1 - grip) / 0.15) * 6))
-		grip := ["Dusty", "Old", "Slow", "Green", "Fast", "Optimum"][Max(1, grip)]
-
-		setConfigurationValue(data, "Track Data", "Grip", grip)
-
 		forName := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
 		surName := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		nickName := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")

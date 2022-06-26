@@ -54,6 +54,8 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceManager := false
 
+	iMuted := false
+
 	iAnnouncements := false
 
 	iRemoteHandler := false
@@ -210,9 +212,15 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Speaker[] {
+	Muted[]  {
 		Get {
-			return this.VoiceManager.Speaker
+			return this.VoiceManager.Muted
+		}
+	}
+
+	Speaker[muted := false] {
+		Get {
+			return this.VoiceManager.Speaker[muted]
 		}
 	}
 
@@ -474,6 +482,14 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
+			case "Activate":
+				this.clearContinuation()
+
+				this.activateRecognized(words)
+			case "Deactivate":
+				this.clearContinuation()
+
+				this.deactivateRecognized(words)
 			case "Joke":
 				this.jokeRecognized(words)
 			case "AnnouncementsOn":
@@ -563,6 +579,18 @@ class RaceAssistant extends ConfigurationItem {
 
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
+	}
+
+	activateRecognized(words) {
+		this.iMuted := false
+
+		this.getSpeaker().speakPhrase("Roger")
+	}
+
+	deactivateRecognized(words) {
+		this.iMuted := true
+
+		this.getSpeaker().speakPhrase("Okay")
 	}
 
 	jokeRecognized(words) {

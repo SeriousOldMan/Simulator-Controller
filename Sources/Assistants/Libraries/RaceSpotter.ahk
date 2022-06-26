@@ -1322,7 +1322,7 @@ class RaceSpotter extends RaceAssistant {
 	updateDriver(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
 
-		if (this.Speaker && (this.Session = kSessionRace)) {
+		if (this.Speaker[false] && (this.Session = kSessionRace)) {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector)
 
@@ -1421,7 +1421,7 @@ class RaceSpotter extends RaceAssistant {
 	proximityAlert(alert) {
 		static alerting := false
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker(true)
 
 			if alert {
@@ -1478,7 +1478,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	yellowFlag(alert, arguments*) {
-		if (this.Announcements["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["YellowFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1508,7 +1508,7 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Announcements["BlueFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["BlueFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1527,7 +1527,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pitWindow(state) {
-		if (this.Announcements["PitWindow"] && this.Speaker && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
+		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
 			this.SpotterSpeaking := true
 
 			try {

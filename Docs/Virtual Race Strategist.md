@@ -82,6 +82,14 @@ As you might expect, the word "please" is optional. Only one option for *warning
 
 	[Please] Give me *warning* [please]
 
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Racing with Cato
 
 Cato will be active during practice and race sessions by default, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). 

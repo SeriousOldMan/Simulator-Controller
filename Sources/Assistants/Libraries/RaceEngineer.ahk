@@ -1641,7 +1641,7 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
 			}
 
-			if this.Speaker
+			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")
 		}
 	}
@@ -1649,7 +1649,7 @@ class RaceEngineer extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if this.Speaker
+		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
 
 		if !lapNumber
@@ -1761,7 +1761,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	lowFuelWarning(remainingLaps) {
-		if (this.Speaker && this.Announcements["FuelWarning"]) {
+		if (this.Speaker[false] && this.Announcements["FuelWarning"]) {
 			speaker := this.getSpeaker()
 
 			speaker.startTalk()
@@ -1793,7 +1793,7 @@ class RaceEngineer extends RaceAssistant {
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && this.Announcements["DamageReporting"]) {
+		if (this.Speaker[false] && this.Announcements["DamageReporting"]) {
 			speaker := this.getSpeaker()
 			phrase := false
 
@@ -1824,7 +1824,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if (this.Speaker && this.Announcements["DamageAnalysis"]) {
+			if (this.Speaker[false] && this.Announcements["DamageAnalysis"]) {
 				speaker := this.getSpeaker()
 
 				stintLaps := Round(stintLaps)
@@ -1856,7 +1856,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 
 		if !ErrorLevel
-			if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+			if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1869,7 +1869,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 
 		if (!ErrorLevel && (knowledgeBase.getValue("Lap.Remaining") > 3))
-			if (this.Speaker && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 

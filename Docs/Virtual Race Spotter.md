@@ -81,6 +81,14 @@ As you might expect, the word "please" is optional. Available options for *annou
 
 	[Please] Give me *announcement* [please]
 
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Simulator Integration
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.

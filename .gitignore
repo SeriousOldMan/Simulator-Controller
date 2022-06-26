@@ -2,6 +2,7 @@ Binaries/
 desktop.ini
 Releases/
 Utilities/Plugins/
+Resources/Setup/Plugins/
 Build.lnk
 Setup.lnk
 Sources/Special/**/.vs/

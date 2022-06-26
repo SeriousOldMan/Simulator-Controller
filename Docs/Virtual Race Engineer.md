@@ -184,13 +184,21 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 ### Enabling and disabling specific warnings and announcements
 
-Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings by using a special voice command:
+Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings individually by using a special voice command:
 
 	[Please] No more *warning* [please]
 
 As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] Give me *warning* [please]
+
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
 
 ## Racing with Jona
 

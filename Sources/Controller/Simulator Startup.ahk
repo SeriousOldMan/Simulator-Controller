@@ -474,7 +474,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, x8 yp+30 w590 0x10
+		Gui LP:Add, Text, yp+30 w590 0x10
 
 		Gui LP:Add, Picture, x16 yp+24 w60 h60 Section vStartup glaunchStartup, % kIconsDirectory . "Startup.ico"
 
@@ -494,7 +494,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, x8 yp+80 w590 0x10
+		Gui LP:Add, Text, yp+80 w590 0x10
 
 		startupConfig := readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
 
@@ -628,7 +628,9 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	if (inList(A_Args, "-NoLaunchPad") && !GetKeyState("Shift"))
+	noLaunch := inList(A_Args, "-NoLaunchPad")
+
+	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 		startupSimulator()
 	else
 		launchPad()

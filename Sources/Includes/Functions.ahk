@@ -812,6 +812,7 @@ checkForUpdates() {
 restartUpdate:
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
 			if !getConfigurationValue(updates, "Processed", target, false) {
+				/*
 				SoundPlay *32
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
@@ -852,6 +853,13 @@ restartUpdate:
 				{
 					break
 				}
+				*/
+
+				RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
+
+				loadSimulatorConfiguration()
+
+				break
 			}
 	}
 }

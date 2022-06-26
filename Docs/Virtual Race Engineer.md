@@ -110,15 +110,21 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 ### Installation of Telemetry Providers
 
-Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work.
+Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* a change in the settings is necessary.
 
-  1. Assetto Corsa
+Please, note that all of this also applices to all other Virtual Race Assistants, but  you have to do it only once, of course.
+
+  1. *Assetto Corsa*
   
-     Please copy the complete *SimlatorController* directory, which is located in the *Utilities* folder, to the Steam installation folder of *Assetto Corsa* and there into the *apps\python* folder. You will have to enable this plugin in the *Asseto Corsa* settings afterwards.
+     Please copy the complete *SimlatorController* folder, which is located in the *Utilities\Plugins* folder of the Simulator Controller installation, to the Steam installation folder of *Assetto Corsa* and there into the *apps\python* folder. You will have to enable this plugin in the *Asseto Corsa* settings afterwards. This plugin uses code originally developed by *Sparten* which can be found at [GitHub](https://github.com/Sparten/ACInternalMemoryReader).
   
-  2. rFactor 2
+  2. *rFactor 2*
   
-     You can find the plugin in the *Utilities\3rd Party\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included. For *Automobilista 2*, you have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+
+  3. *Automobilista 2*
+  
+     You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
 
 ### Important preparation for the Pitstop MFD handling in *Assetto Corsa Competizione* and *RaceRoom Racing Experience*
 

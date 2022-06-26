@@ -6,7 +6,7 @@ Once you have configured everything for your simulation rig, there are two appli
 
 This window will give you access to all applications of Simulator Controller. You will get some information about a given application, when you hover with the mouse above the icon. Beside starting any of the applications and tools of Simulator Controller, you can continue the startup process of all the components you need, when running a simulation, by clicking on the top left icon. Depending on your concrete configuration, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller. Put a check mark in the check box in the lower left corner, when you want the launch window to be closed automatically, when you enter your simulation.
 
-Note: If you don't want to use the launch window and want *Simulator Startup* to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown.
+Note: If you don't want to use the launch window and want *Simulator Startup* to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running *Simulator Startup".
 
 ## Startup Process & Settings
 

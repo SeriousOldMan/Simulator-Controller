@@ -628,7 +628,7 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	if inList(A_Args, "-NoLaunchPad")
+	if (inList(A_Args, "-NoLaunchPad") && !GetKeyState("Shift"))
 		startupSimulator()
 	else
 		launchPad()

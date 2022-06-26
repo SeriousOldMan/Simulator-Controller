@@ -316,8 +316,8 @@ namespace RF2SHMSpotter {
 					{
 						carBehind = true;
 
-						if ((faster && transY < longitudinalDistance * 1.5) ||
-							(transY < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
+							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
 							if (transX > 0)
 								carBehindRight = true;
 							else

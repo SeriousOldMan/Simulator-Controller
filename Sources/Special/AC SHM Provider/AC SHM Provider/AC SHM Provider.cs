@@ -1,5 +1,4 @@
-﻿using ACSHMProvider;
-using System;
+﻿using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
@@ -78,7 +77,7 @@ namespace ACSHMProvider
                 physics = ReadPhysics();
                 graphics = ReadGraphics();
                 staticInfo = ReadStaticInfo();
-                cars = ReadCarsInfo();
+                cars = ReadCars();
 
                 memoryStatus = AC_MEMORY_STATUS.CONNECTED;
 
@@ -148,7 +147,7 @@ namespace ACSHMProvider
             }
         }
 
-        public Cars ReadCarsInfo()
+        public Cars ReadCars()
         {
             using (var stream = carsInfoMMF.CreateViewStream())
             {

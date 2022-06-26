@@ -85,20 +85,20 @@ As you might expect, the word "please" is optional. Available options for *annou
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| ------------------------- | -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert              | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
-| Yellow Flag               | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Full Course Yellow        | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow             | Yes                        | No              | No      | Yes                        | Yes       |
-| Yellow Distance           | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Pit Window                | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
-| Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
-| Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Tactical Advices          | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
+| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| Side Alert                | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert              | Yes           | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       |
+| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       |
+| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        |
+| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
+| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Delta Information         | Yes           | Yes (2)                    | Yes             | Yes     | Yes                        | Yes       |
+| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 ##### Notes
 

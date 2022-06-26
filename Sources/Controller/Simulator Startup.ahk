@@ -465,7 +465,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s10 Bold, Arial
 
-		Gui LP:Add, Text, w590 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
+		Gui LP:Add, Text, w580 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
 
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
@@ -474,7 +474,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, yp+30 w590 0x10
+		Gui LP:Add, Text, x8 yp+30 w590 0x10
 
 		Gui LP:Add, Picture, x16 yp+24 w60 h60 Section vStartup glaunchStartup, % kIconsDirectory . "Startup.ico"
 
@@ -494,7 +494,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, yp+80 w590 0x10
+		Gui LP:Add, Text, x8 yp+80 w590 0x10
 
 		startupConfig := readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
 

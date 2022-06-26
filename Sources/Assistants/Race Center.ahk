@@ -985,6 +985,9 @@ class RaceCenter extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 
+		if FileExist(kUserConfigDirectory . "Team Server.ini")
+			configuration := readConfiguration(kUserConfigDirectory . "Team Server.ini")
+
 		directory := getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
 		if (!directory || (directory = ""))
@@ -994,8 +997,10 @@ class RaceCenter extends ConfigurationItem {
 
 		settings := this.RaceSettings
 
-		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "__INVALID__")
+		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL"
+														 , getConfigurationValue(configuration, "Team Server", "Server.URL", ""))
+		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token"
+														   , getConfigurationValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
 		this.iTeamName := getConfigurationValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getConfigurationValue(settings, "Team Settings", "Session.Name", "")
@@ -3103,7 +3108,7 @@ class RaceCenter extends ConfigurationItem {
 				title := translate("Load Race Strategy...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -3121,7 +3126,7 @@ class RaceCenter extends ConfigurationItem {
 					fileName := (dirName . "\" . this.Strategy.Name . ".strategy")
 
 					Gui +OwnDialogs
-		
+
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -5666,7 +5671,7 @@ class RaceCenter extends ConfigurationItem {
 			title := translate("Select target folder...")
 
 			Gui +OwnDialogs
-		
+
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
@@ -6069,7 +6074,7 @@ class RaceCenter extends ConfigurationItem {
 		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder folder, *%directory%, 0, %title%
 		OnMessage(0x44, "")

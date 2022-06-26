@@ -248,6 +248,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 
+		if FileExist(kUserConfigDirectory . "Team Server.ini")
+			configuration := readConfiguration(kUserConfigDirectory . "Team Server.ini")
+
 		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
 		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
@@ -278,6 +281,12 @@ class TeamServerConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
 
 		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
+
+		tsConfiguration := newConfiguration()
+
+		setConfigurationSectionValues(tsConfiguration, "Team Server", getConfigurationSectionValues(configuration, "Team Server"))
+
+		writeConfiguration(kUserConfigDirectory . "Team Server.ini", tsConfiguration)
 	}
 
 	connect(message := true) {
@@ -740,7 +749,7 @@ chooseSessionStorePath() {
 	GuiControlGet sessionStorePathEdit
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%sessionStorePathEdit%, 0, % translate("Select local Session Folder...")
 	OnMessage(0x44, "")

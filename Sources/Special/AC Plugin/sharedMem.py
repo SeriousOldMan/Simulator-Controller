@@ -30,7 +30,7 @@ class acsVehicleInfo(ctypes.Structure):
         ('isCarInPit', c_int32  ),
         ('carLeaderboardPosition', c_int32),
         ('carRealTimeLeaderboardPosition', c_int32),
-        ('spLineLength', c_float),
+        ('splinePosition', c_float),
         ('isConnected', c_int32),
         ('suspensionDamage', c_float * 4),
         ('engineLifeLeft', c_float),

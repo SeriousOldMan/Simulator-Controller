@@ -27,9 +27,6 @@ global kACPlugin = "AC"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACPlugin extends RaceAssistantSimulatorPlugin {
-	iUDPClient := false
-	iUDPConnection := false
-
 	iCommandMode := "Event"
 
 	iOpenPitstopMFDHotkey := false
@@ -78,18 +75,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	UDPConnection[] {
-		Get {
-			return this.iUDPConnection
-		}
-	}
-
-	UDPClient[] {
-		Get {
-			return this.iUDPClient
-		}
-	}
-
 	SettingsDatabase[] {
 		Get {
 			settingsDB := this.iSettingsDatabase
@@ -121,8 +106,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")
 		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "{Left}")
 		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "{Right}")
-
-		this.iUDPConnection := this.getArgumentValue("udpConnection", false)
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -130,92 +113,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
 		selectActions := []
-	}
-
-	startupUDPClient() {
-		if !this.UDPClient {
-			exePath := kBinariesDirectory . "AC UDP Provider.exe"
-
-			try {
-				Loop 6 {
-					Process Exist, AC UDP Provider.exe
-
-					if ErrorLevel {
-						Process Close, %ErrorLevel%
-
-						Sleep 250
-					}
-					else
-						break
-				}
-
-				if FileExist(kTempDirectory . "ACUDP.cmd")
-					FileDelete %kTempDirectory%ACUDP.cmd
-
-				if FileExist(kTempDirectory . "ACUDP.out")
-					FileDelete %kTempDirectory%ACUDP.out
-
-				options := ""
-
-				if this.UDPConnection
-					options := ("-Connect " . this.UDPConnection)
-
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACUDP.cmd" "%kTempDirectory%ACUDP.out" %options%", , Hide
-
-				this.iUDPClient := ObjBindMethod(this, "shutdownUDPClient")
-
-				OnExit(this.iUDPClient)
-			}
-			catch exception {
-				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "AC", protocol: "UDP"})
-														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-														   . kBinariesDirectory . translate(")"))
-
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: "AC", protocol: "UDP"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-		}
-	}
-
-	shutdownUDPClient() {
-		if this.UDPClient {
-			FileAppend Exit, %kTempDirectory%ACUDP.cmd
-
-			OnExit(this.iUDPClient, 0)
-
-			Sleep 250
-
-			Loop 5 {
-				Process Exist, AC UDP Provider.exe
-
-				if ErrorLevel {
-					Process Close, %ErrorLevel%
-
-					Sleep 250
-				}
-				else
-					break
-			}
-
-			this.iUDPClient := false
-		}
-
-		return false
-	}
-
-	requireUDPClient() {
-		Process Exist, AC UDP Provider.exe
-
-		if !ErrorLevel {
-			if this.iUDPClient
-				OnExit(this.iUDPClient, 0)
-
-			this.iUDPClient := false
-		}
-
-		if !this.UDPClient
-			this.startupUDPClient()
 	}
 
 	supportsPitstop() {
@@ -239,20 +136,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		Sleep 20
 	}
 
-	supportsRaceAssistant(assistantPlugin) {
-		if ((assistantPlugin = kRaceStrategistPlugin) || (assistantPlugin = kRaceSpotterPlugin))
-			return ((FileExist(kBinariesDirectory . "AC UDP Provider.exe") != false) && base.supportsRaceAssistant(assistantPlugin))
-		else
-			return base.supportsRaceAssistant(assistantPlugin)
-	}
-
 	updateSessionState(sessionState) {
 		base.updateSessionState(sessionState)
-
-		if (sessionState == kSessionRace)
-			this.startupUDPClient()
-		else if (sessionState != kSessionPaused)
-			this.shutdownUDPClient()
 
 		if (sessionState == kSessionFinished) {
 			this.iRepairSuspensionChosen := false
@@ -263,6 +148,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
+
+		standings := readSimulatorData(this.Code, "-Standings")
+
+		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 
 	updateSessionData(data) {

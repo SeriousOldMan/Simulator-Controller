@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace ACSHMProvider
 {
@@ -17,6 +18,7 @@ namespace ACSHMProvider
 
         Physics physics;
         Graphics graphics;
+        Cars cars;
         StaticInfo staticInfo;
 
         public SHMProvider()
@@ -71,10 +73,12 @@ namespace ACSHMProvider
                 physicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_physics");
                 graphicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_graphics");
                 staticInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_static");
+                carsInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_cars");
 
                 physics = ReadPhysics();
                 graphics = ReadGraphics();
                 staticInfo = ReadStaticInfo();
+                cars = ReadCarsInfo();
 
                 memoryStatus = AC_MEMORY_STATUS.CONNECTED;
 
@@ -94,6 +98,7 @@ namespace ACSHMProvider
         MemoryMappedFile physicsMMF;
         MemoryMappedFile graphicsMMF;
         MemoryMappedFile staticInfoMMF;
+        MemoryMappedFile carsInfoMMF;
 
         public Physics ReadPhysics()
         {
@@ -143,6 +148,115 @@ namespace ACSHMProvider
             }
         }
 
+        public Cars ReadCarsInfo()
+        {
+            using (var stream = carsInfoMMF.CreateViewStream())
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    var size = Marshal.SizeOf(typeof(Cars));
+                    var bytes = reader.ReadBytes(size);
+                    var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                    var data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
+                    handle.Free();
+                    return data;
+                }
+            }
+        }
+
+        private static string GetStringFromBytes(byte[] bytes)
+        {
+            if (bytes == null)
+                return "";
+
+            var nullIdx = Array.IndexOf(bytes, (byte)0);
+
+            return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
+        }
+
+        public string GetForname(string name)
+        {
+            if (name.Contains(" "))
+            {
+                string[] names = name.Split(' ');
+
+                return names[0];
+            }
+            else
+                return name;
+        }
+
+        public string GetSurname(string name)
+        {
+            if (name.Contains(" "))
+            {
+                string[] names = name.Split(' ');
+
+                return names[1];
+            }
+            else
+                return "";
+        }
+
+        public string GetNickname(string name)
+        {
+            if (name.Contains(" "))
+            {
+                string[] names = name.Split(' ');
+
+                return names[0].Substring(0, 1) + names[1].Substring(0, 1);
+            }
+            else
+                return "";
+        }
+
+        public void ReadStandings()
+        {
+            Console.WriteLine("[Position Data]");
+
+            if (connected)
+            {
+                Console.Write("Car.Count="); Console.WriteLine(cars.numVehicles);
+
+                for (int i = 1; i <= cars.numVehicles; ++i)
+                {
+                    AcCarInfo car = cars.cars[i - 1];
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(car.carId);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition);
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(car.lapCount);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition / staticInfo.TrackSPlineLength);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine((car.currentLapInvalid == 0) ? "false" : "true");
+
+                    int lapTime = car.lastLapTimeMS;
+                    int sector1Time = 0;
+                    int sector2Time = 0;
+                    int sector3Time = 0;
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+
+                    string carModel = GetStringFromBytes(car.carModel);
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
+
+                    string driverName = GetStringFromBytes(car.driverName);
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(driverName));
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
+                }
+
+                Console.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
+            }
+            else
+            {
+                Console.WriteLine("Car.Count=0");
+                Console.WriteLine("Driver.Car=0");
+            }
+        }
+
         public void ReadSetup()
         {
             Console.WriteLine("[Setup Data]");
@@ -150,14 +264,7 @@ namespace ACSHMProvider
             {
             }
         }
-        public void ReadStandings()
-        {
-            Console.WriteLine("[Position Data]");
 
-            Console.WriteLine("Car.Count=0");
-            Console.WriteLine("Driver.Car=0");
-
-        }
         public void ReadData() {
             Console.WriteLine("[Session Data]");
 

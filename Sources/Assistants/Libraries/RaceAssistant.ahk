@@ -598,7 +598,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
-		Random rnd, 0, 3
+		Random rnd, 0, 4
 
 		hasJoke := (rnd > 1)
 

@@ -1594,10 +1594,74 @@ updateInstallationForV392() {
 	}
 }
 
-updateConfigurationForV402() {
+addOwnerColumn(fileName, id) {
+	if FileExist(fileName) {
+		data := ""
+
+		Loop Read, %fileName%
+			if (InStr(A_LoopReadLine, id, false, 0) = (StrLen(A_LoopReadLine) - StrLen(id) + 1))
+				return
+			else {
+				if (A_Index == 1)
+					line := (A_LoopReadLine . ";" . id)
+				else
+					line := ("`n" . A_LoopReadLine . ";" . id)
+
+				data .= line
+			}
+
+		try {
+			FileDelete %fileName%
+		}
+		catch exception {
+			; ignore
+		}
+
+		FileAppend %data%, %fileName%
+	}
+}
+
+updateConfigurationForV422() {
+	FileRead id, % kUserConfigDirectory . "ID"
+
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Electronics.CSV
+
+				addOwnerColumn(fileName, id)
+
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.CSV
+
+				addOwnerColumn(fileName, id)
+
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.CSV
+
+				addOwnerColumn(fileName, id)
+
+				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.Distribution.CSV
+
+				addOwnerColumn(fileName, id)
+			}
+		}
+	}
+
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
-		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+
+		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
+
+		FileDelete %kUserHomeDirectory%Setup\Setup.data
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
 
@@ -1630,6 +1694,13 @@ updateConfigurationForV420() {
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
 		}
+}
+
+updateConfigurationForV402() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+	}
 }
 
 updateConfigurationForV400() {

@@ -33,10 +33,17 @@ global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSe
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Variables Section                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vUserID = false
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class SessionDatabase extends ConfigurationItem {
+	iID := false
 	iControllerConfiguration := false
 
 	iUseCommunity := false
@@ -67,6 +74,14 @@ class SessionDatabase extends ConfigurationItem {
 
 	__New(controllerConfiguration := false) {
 		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
+
+		if !vUserID {
+			FileRead identifier, % kUserConfigDirectory . "ID"
+
+			vUserID := identifier
+		}
+
+		this.iID := vUserID
 
 		if !controllerConfiguration {
 			controllerConfiguration := getControllerConfiguration()

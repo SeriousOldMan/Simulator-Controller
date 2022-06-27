@@ -5,14 +5,16 @@
   3. Dropped support for automatic updates prior to version 3.8.0.
   4. Update procedures for local configuration database is now manadatory (no more questions asked).
   5. When an update is installed, it is checked, whether there are still running processes of Simulator Controller.
-  6. All Race Assistants can entertain you now you by telling some jokes.
-  7. Reduced click area for window subtitles fixes the unwanted opening of a browser with context-sensitive documentation.
-  8. Minimum number of tyre laps and minimum amount of start fuel is set to 10 now.
-  9. Full support for the Spotter in *Assetto Corsa*.
-  10. Full support for the Strategist in *Assetto Corsa*.
-  11. "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration".
-  12. Added installation support for all integration plugins to "Simulator Setup".
-  13. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again".
+  6. Update manager now checks for active processes and asks for termination before running the update.
+  7. All Race Assistants can entertain you now you by telling some jokes.
+  8. Reduced click area for window subtitles fixes the unwanted opening of a browser with context-sensitive documentation.
+  9. Minimum number of tyre laps and minimum amount of start fuel is set to 10 now.
+  10. Full support for the Spotter in *Assetto Corsa*.
+  11. Full support for the Strategist in *Assetto Corsa*.
+  12. "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration".
+  13. Added installation support for all integration plugins to "Simulator Setup".
+  14. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again".
+  15. Added Owner column to all database tables to identify the driver who provided the data.
 
 ## 4.2.1.0-release 06/24/22
 

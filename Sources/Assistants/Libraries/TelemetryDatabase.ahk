@@ -26,7 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS"]
+										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Owner"]
 						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
 								  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
@@ -34,7 +34,7 @@ global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Tempera
 								  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
 								  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 								  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-								  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]}
+								  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Owner"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,8 +42,6 @@ global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Tempera
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryDatabase extends SessionDatabase {
-	iDatabase := false
-
 	Database[] {
 		Get {
 			return this.iDatabase
@@ -89,112 +87,155 @@ class TelemetryDatabase extends SessionDatabase {
 		return schema
 	}
 
-	getElectronicEntries(weather, compound, compoundColor) {
+	getElectronicEntries(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Electronics", {Transform: "removeInvalidLaps"
-													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , Where: {Owner: owner, Weather: weather
+															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getTyreEntries(weather, compound, compoundColor) {
+	getTyreEntries(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Owner: owner, Weather: weather
+													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getMapsCount(weather) {
+	getMapsCount(weather, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Weather: weather}})
+													 , Where: {Owner: owner, Weather: weather}})
 		else
 			return []
 	}
 
-	getMapData(weather, compound, compoundColor) {
+	getMapData(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
 													 , By: "Map"
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , Where: {Owner: owner, Weather: weather
+															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getTyreData(weather, compound, compoundColor) {
+	getTyreData(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Owner: owner, Weather: weather
+													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getTyreCompoundColors(weather, compound) {
+	getTyreCompoundColors(weather, compound, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Tyres", {Select: ["Tyre.Compound.Color"], By: "Tyre.Compound.Color"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Weather: weather, "Tyre.Compound": compound}})
+											   , Where: {Owner: owner, Weather: weather, "Tyre.Compound": compound}})
 		else
 			return []
 	}
 
-	getMapLapTimes(weather, compound, compoundColor) {
+	getMapLapTimes(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , Where: {Owner: owner, Weather: weather
+															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getTyreLapTimes(weather, compound, compoundColor) {
+	getTyreLapTimes(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Owner: owner, Weather: weather
+													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getFuelLapTimes(weather, compound, compoundColor) {
+	getFuelLapTimes(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Owner: owner, Weather: weather
+													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		else
 			return []
 	}
 
-	getPressuresCount(weather) {
+	getPressuresCount(weather, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
 											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: {Weather: weather}})
+											   , Where: {Owner: owner, Weather: weather}})
 		}
 		else
 			return []
 	}
 
-	getLapTimePressures(weather, compound, compoundColor) {
+	getLapTimePressures(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
 													   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
 													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
 											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: {Owner: owner, Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
 		}
 		else
 			return []
 	}
 
-	cleanupData(weather, compound, compoundColor) {
+	cleanupData(weather, compound, compoundColor, owner := false) {
+		if !owner
+			owner := this.ID
+
 		if this.Database {
-			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+			where := {Owner: owner, Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
 
 			ltAvg := false
 			ltStdDev := false
@@ -215,8 +256,12 @@ class TelemetryDatabase extends SessionDatabase {
 		}
 	}
 
-	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor, map, tc, abs, fuelConsumption, fuelRemaining, lapTime) {
-		this.Database.add("Electronics", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
+					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime, owner := false) {
+		if !owner
+			owner := this.ID
+
+		this.Database.add("Electronics", {Owner: owner, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 										, "Fuel.Remaining": valueOrNull(fuelRemaining)
 										, "Fuel.Consumption": valueOrNull(fuelConsumption)
@@ -226,8 +271,11 @@ class TelemetryDatabase extends SessionDatabase {
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-				, fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR) {
-		this.Database.add("Tyres", {Weather: weather
+				, fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, owner := false) {
+		if !owner
+			owner := this.ID
+
+		this.Database.add("Tyres", {Owner: owner, Weather: weather
 								  , "Temperature.Air": valueOrNull(airTemperature), "Temperature.Track": valueOrNull(trackTemperature)
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 								  , "Fuel.Remaining": valueOrNull(fuelRemaining)

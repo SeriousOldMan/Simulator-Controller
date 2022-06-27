@@ -2600,7 +2600,7 @@ filterSchema(schema) {
 	newSchema := []
 
 	for ignore, column in schema
-		if !inList(["Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
+		if !inList(["Owner", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
 			newSchema.Push(column)
 
 	return newSchema

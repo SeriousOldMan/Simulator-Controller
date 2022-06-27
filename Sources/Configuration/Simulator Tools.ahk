@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1636,13 +1637,27 @@ updateConfigurationForV422() {
 			{
 				track := A_LoopFileName
 
-				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Electronics.CSV
+				telemetryDB := new TelemetryDatabase(simulator, car, track).Database
 
-				addOwnerColumn(fileName, id)
+				rows := telemetryDB.Tables["Electronics"]
 
-				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.CSV
+				if (rows.Length() > 0) {
+					for ignore, row in rows
+						row.Owner := id
 
-				addOwnerColumn(fileName, id)
+					telemetryDB.changed("Electronics")
+				}
+
+				rows := telemetryDB.Tables["Tyres"]
+
+				if (rows.Length() > 0) {
+					for ignore, row in rows
+						row.Owner := id
+
+					telemetryDB.changed("Tyres")
+				}
+
+				telemetryDB.flush()
 
 				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.CSV
 

@@ -48,6 +48,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	iUseCommunity := false
 
+	ID[] {
+		Get {
+			return this.iID
+		}
+	}
+
 	ControllerConfiguration[] {
 		Get {
 			return this.iControllerConfiguration
@@ -150,7 +156,7 @@ class SessionDatabase extends ConfigurationItem {
 			if code
 				return string2Values("|", code)[1]
 			else {
-				for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+				for ignore, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 

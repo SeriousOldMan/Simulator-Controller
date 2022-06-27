@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace ACSHMProvider
 {
@@ -155,12 +156,33 @@ namespace ACSHMProvider
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    var size = Marshal.SizeOf(typeof(Cars));
-                    var bytes = reader.ReadBytes(size);
-                    var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-                    var data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
-                    handle.Free();
-                    return data;
+                    while (true)
+                    {
+                        var size = Marshal.SizeOf(typeof(Cars));
+                        var bytes = reader.ReadBytes(size);
+                        var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                        var data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
+
+                        int packetID = data.packetID;
+
+                        if (packetID == -1)
+                        {
+                            handle.Free();
+
+                            Thread.Sleep(10);
+
+                            continue;
+                        }
+
+                        data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
+
+                        handle.Free();
+
+                        if (packetID == data.packetID)
+                            return data;
+                        else
+                            Thread.Sleep(10);
+                    }
                 }
             }
         }

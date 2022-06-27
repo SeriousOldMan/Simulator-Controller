@@ -1626,8 +1626,8 @@ updateConfigurationForV422() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
 
-	if (getConfigurationValue(userConfiguration, "Asetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
-		setConfigurationValue(userConfiguration, "Asetto Corsa", "Window Title", "ahk_exe acs.exe")
+	if (getConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
+		setConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")
 
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}

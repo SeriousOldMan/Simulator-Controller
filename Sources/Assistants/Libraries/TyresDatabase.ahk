@@ -100,12 +100,12 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
-						   , ByRef distributions, owner := false) {
-		if !owner
-			owner := this.ID
-
-		where := {Owner: owner, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+						   , ByRef distributions, owner := "__Undefined__") {
+		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 				, Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
+
+		if ((owner = kUndefined) && (owner != "Community"))
+			where["Owner"] := owner
 
 		if (weather != true)
 			where["Weather"] := weather
@@ -145,8 +145,7 @@ class TyresDatabase extends SessionDatabase {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
 			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																	  , Where: {Owner: owner}})
+																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				conditions[values2String("|", condition*)] := true
 		}
 
@@ -247,8 +246,7 @@ class TyresDatabase extends SessionDatabase {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
-																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																			 , Where: {Owner: owner}})
+																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 						 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
 		}
@@ -291,7 +289,7 @@ class TyresDatabase extends SessionDatabase {
 
 					if this.UseCommunity
 						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
-													, compound, compoundColor, distributions, owner)
+													, compound, compoundColor, distributions, "Community")
 
 					if (distributions["FL"].Count() != 0) {
 						thePressures := {}

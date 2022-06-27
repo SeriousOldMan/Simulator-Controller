@@ -71,6 +71,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 7. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the race assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
 
+8. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
+
 This list will be extended with one new video per week.
 
 ### Discord Community

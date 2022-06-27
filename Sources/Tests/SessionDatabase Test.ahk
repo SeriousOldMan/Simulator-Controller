@@ -133,7 +133,12 @@ class ClearDatabase extends DatabaseTest {
 	Clear_Test() {
 		this.clearDatabase()
 
-		FileRemoveDir %kDatabaseDirectory%User\Unknown, 1
+		try {
+			FileRemoveDir %kDatabaseDirectory%User\Unknown, 1
+		}
+		catch exception {
+			; ignore
+		}
 	}
 }
 

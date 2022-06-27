@@ -101,10 +101,14 @@ class ControllerEditor extends ConfigurationItem {
 	AutoSave[] {
 		Get {
 			try {
+				/*
 				if (ConfigurationEditor && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
+				*/
+
+				return false
 			}
 			catch exception {
 				return false
@@ -294,6 +298,12 @@ global controlDeleteButton
 global controlUpdateButton
 
 class ControlsList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -450,6 +460,12 @@ global labelDeleteButton
 global labelUpdateButton
 
 class LabelsList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -564,7 +580,7 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	getLabels() {
-		if this.AutoSave {
+		if ControllerEditor.Instance.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
@@ -614,6 +630,12 @@ class LayoutsList extends ConfigurationItemList {
 
 	iButtonBoxWidgets := []
 	iStreamDeckWidgets := []
+
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
 
 	ButtonBoxConfiguration[] {
 		Get {
@@ -1762,6 +1784,12 @@ global displayRuleDeleteButton
 global displayRuleUpdateButton
 
 class DisplayRulesList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -1966,7 +1994,7 @@ chooseImageFile(path) {
 	title := translate("Select Image...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 	FileSelectFile pictureFile, 1, %path%, %title%, Image (*.jpg; *.png; *.gif; *.ico)
 	OnMessage(0x44, "")

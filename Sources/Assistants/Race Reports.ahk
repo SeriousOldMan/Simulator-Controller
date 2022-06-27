@@ -608,8 +608,24 @@ class RaceReports extends ConfigurationItem {
 				this.loadTrack(this.SelectedTrack, true)
 			else if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
 				this.loadCar(this.SelectedCar, true)
-			else
-				this.loadSimulator(this.SelectedSimulator, true)
+			else {
+				simulators := this.getSimulators()
+
+				if inList(simulators, this.SelectedSimulator)
+					this.loadSimulator(this.SelectedSimulator, true)
+				else {
+					window := this.Window
+
+					Gui %window%:Default
+
+					GuiControl, , simulatorDropDown, % ("|" . values2String("|", simulators*))
+
+					if (simulators.Length() > 0)
+						this.loadSimulator(simulators[1], true)
+					else
+						GuiControl Choose, simulatorDropDown, 0
+				}
+			}
 		}
 	}
 

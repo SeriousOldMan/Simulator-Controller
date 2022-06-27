@@ -270,8 +270,8 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
-				, pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-				, fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, owner := false) {
+			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
+			   , fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, owner := false) {
 		if !owner
 			owner := this.ID
 

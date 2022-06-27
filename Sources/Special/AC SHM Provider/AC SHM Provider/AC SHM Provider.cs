@@ -38,10 +38,10 @@ namespace ACSHMProvider
             }
         }
 
+        static string[] gripNames = { "Dusty", "Old", "Slow", "Green", "Fast", "Optimum" };
+
         static string GetGrip(float surfaceGrip) {
-            string[] gripNames = { "Dusty", "Old", "Slow", "Green", "Fast", "Optimum" };
-            
-            return gripNames[Math.Max(1, (int)Math.Round(6 - (((1 - surfaceGrip) / 0.15) * 6)))];
+            return gripNames[Math.Max(1, (int)Math.Round(6 - (((1 - surfaceGrip) / 0.15) * 6))) - 1];
         }
 
         private long GetRemainingLaps(long timeLeft)

@@ -38,9 +38,14 @@ funcGetTyreInflation = lib['GetTyreInflation']
 funcGetTyreInflation.restype = ctypes.c_float
 funcGetTyreInflation.argtypes = [ctypes.c_int32, ctypes.c_int32]
 
+packetID = 1
+
 def updateSharedMemory():
     global sharedMem
+    global packetID
+
     sharedmem = sharedMem.getsharedmem()
+    sharedmem.packetID = -1
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     
@@ -77,6 +82,9 @@ def updateSharedMemory():
                 sharedmem.vehicleInfo[carId].tyreInflation[1] = funcGetTyreInflation(carId,1)
                 sharedmem.vehicleInfo[carId].tyreInflation[2] = funcGetTyreInflation(carId,2)
                 sharedmem.vehicleInfo[carId].tyreInflation[3] = funcGetTyreInflation(carId,3)
+                
+    packetID = packetID + 1
+    sharedmem.packetID = packetID
 
 def acMain(ac_version):
   global appWindow,sharedMem

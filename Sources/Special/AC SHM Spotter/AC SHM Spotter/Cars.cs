@@ -56,6 +56,7 @@ namespace ACSHMSpotter
     [Serializable]
     public struct Cars
     {
+        public int packetID;
         public int numVehicles;
         public int focusVehicle;
         [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 512)]

@@ -40,6 +40,7 @@ class acsVehicleInfo(ctypes.Structure):
 class SPageFileSC(ctypes.Structure):
     _pack_ = 4
     _fields_ = [
+        ('packetID', c_int32),
         ('numVehicles', c_int32),
         ('focusVehicle', c_int32),
         ('serverName', c_char * 512),

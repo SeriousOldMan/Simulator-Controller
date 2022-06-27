@@ -157,12 +157,33 @@ namespace ACSHMSpotter {
 			{
 				using (var reader = new BinaryReader(stream))
 				{
-					var size = Marshal.SizeOf(typeof(Cars));
-					var bytes = reader.ReadBytes(size);
-					var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-					var data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
-					handle.Free();
-					return data;
+					while (true)
+					{
+						var size = Marshal.SizeOf(typeof(Cars));
+						var bytes = reader.ReadBytes(size);
+						var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+						var data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
+
+						int packetID = data.packetID;
+
+						if (packetID == -1)
+						{
+							handle.Free();
+
+							Thread.Sleep(10);
+
+							continue;
+						}
+
+						data = (Cars)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Cars));
+
+						handle.Free();
+
+						if (packetID == data.packetID)
+							return data;
+						else
+							Thread.Sleep(10);
+					}
 				}
 			}
 		}
@@ -415,7 +436,13 @@ namespace ACSHMSpotter {
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
-				double angle = vectorAngle(velocityX, velocityY);
+				// double angle = vectorAngle(velocityX, velocityY);
+				float playerRotation = physics.Heading;
+				if (playerRotation < 0)
+				{
+					playerRotation = (float)(2 * Math.PI) + playerRotation;
+				}
+				double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
 
 				int carID = 0;
 

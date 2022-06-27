@@ -1623,6 +1623,15 @@ addOwnerColumn(fileName, id) {
 }
 
 updateConfigurationForV422() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	if (getConfigurationValue(userConfiguration, "Asetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
+		setConfigurationValue(userConfiguration, "Asetto Corsa", "Window Title", "ahk_exe acs.exe")
+
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+
 	FileRead id, % kUserConfigDirectory . "ID"
 
 	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator

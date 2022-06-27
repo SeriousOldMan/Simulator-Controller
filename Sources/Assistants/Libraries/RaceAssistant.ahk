@@ -216,6 +216,10 @@ class RaceAssistant extends ConfigurationItem {
 		Get {
 			return this.VoiceManager.Muted
 		}
+
+		Set {
+			return (this.VoiceManager.Muted := value)
+		}
 	}
 
 	Speaker[muted := false] {
@@ -582,13 +586,13 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	activateRecognized(words) {
-		this.iMuted := false
+		this.Muted := false
 
 		this.getSpeaker().speakPhrase("Roger")
 	}
 
 	deactivateRecognized(words) {
-		this.iMuted := true
+		this.Muted := true
 
 		this.getSpeaker().speakPhrase("Okay")
 	}

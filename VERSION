@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.2.0-dev
 Target=4.2.2.0-release
-Date=06/27/2022
+Date=06/26/2022
 Download=
-Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command
+Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Update manager now checks for active processes, Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command, Update manager now checks for active processes
 [Release]
 Version=4.2.1.0-release
 Date=06/24/2022

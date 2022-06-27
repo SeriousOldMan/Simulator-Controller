@@ -321,7 +321,7 @@ chooseInstallLocationPath() {
 	GuiControlGet installLocationPathEdit
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
 	OnMessage(0x44, "")
@@ -365,6 +365,78 @@ openInstallDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration
 }
 
+exitProcesses(silent := false, force := false) {
+	Process Exist
+
+	self := ErrorLevel
+
+	while true {
+		hasFGProcesses := false
+		hasBGProcesses := false
+
+		for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
+			Process Exist, %app%.exe
+
+			if ErrorLevel {
+				hasFGProcesses := true
+
+				break
+			}
+		}
+
+		for ignore, app in kBackgroundApps {
+			Process Exist, %app%.exe
+
+			if (ErrorLevel && (ErrorLevel != self)) {
+				hasBGProcesses := true
+
+				break
+			}
+		}
+
+		if (hasFGProcesses && !silent) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Continue", "Cancel"]))
+			title := translate("Installation")
+			MsgBox 8500, %title%, % translate("Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools).")
+			OnMessage(0x44, "")
+
+			IfMsgBox Yes
+				continue
+			else
+				return false
+		}
+
+		if hasFGProcesses
+			if force
+				for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
+					Process Exist, %app%.exe
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						if !ErrorLevel
+							return false
+					}
+				}
+			else
+				return false
+
+		if hasBGProcesses
+			for ignore, app in kBackgroundApps {
+				Process Exist, %app%.exe
+
+				if (ErrorLevel && (ErrorLevel != self)) {
+					Process Close, %ErrorLevel%
+
+					if !ErrorLevel
+						return false
+				}
+			}
+
+		return true
+	}
+}
+
 checkInstallation() {
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 
@@ -389,6 +461,9 @@ checkInstallation() {
 
 			ExitApp 0
 		}
+
+		if !exitProcesses()
+			ExitApp 1
 
 		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 				  , InstallLocation: normalizePath(installLocation)
@@ -483,7 +558,7 @@ checkInstallation() {
 						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
 				catch exception {
-					;ignore
+					; ignore
 				}
 
 				ExitApp 0
@@ -493,6 +568,10 @@ checkInstallation() {
 				installLocation := normalizePath(kInstallDirectory)
 
 			isNew := !FileExist(installLocation)
+
+			if !isNew
+				if !exitProcesses()
+					ExitApp 1
 
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))

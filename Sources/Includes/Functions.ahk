@@ -19,10 +19,6 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
-
-global kForegroundApps = ["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;

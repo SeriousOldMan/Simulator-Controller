@@ -61,8 +61,8 @@ global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
-											, "Position.Start", "Position.End", "Time.Start"]
-							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr"]
+											, "Position.Start", "Position.End", "Time.Start", "Driver.ID"]
+							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr", "ID"]
 							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 										  , "Weather", "Temperature.Air", "Temperature.Track"
 										  , "Fuel.Remaining", "Fuel.Consumption", "Damage", "Accident"
@@ -1583,11 +1583,24 @@ class RaceCenter extends ConfigurationItem {
 		if !driver.HasKey("Nr")
 			driver["Nr"] := false
 
-		for ignore, candidate in this.Drivers
+		if !driver.HasKey("ID")
+			driver["ID"] := false
+
+		for ignore, candidate in this.Drivers {
+			found := false
+
 			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
-				return candidate
-			else if ((candidate.Forname = driver.Forname) && (candidate.Surname = driver.Surname) && (candidate.Nickname = driver.Nickname))
-				return candidate
+				found := candidate
+			else if ((candidate.Forname = driver.Forname) && (candidate.Surname = driver.Surname))
+				found := candidate
+
+			if found {
+				if driver.ID
+					found.ID := driver.ID
+
+				return found
+			}
+		}
 
 		driver.FullName := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 		driver.Laps := []
@@ -3881,6 +3894,16 @@ class RaceCenter extends ConfigurationItem {
 					else
 						newStint.Time := time
 
+					try {
+						newStint.ID := this.Connector.GetStintValue(identifier, "ID")
+
+						if (newStint.ID = "")
+							newStint.ID := false
+					}
+					catch exception {
+						newStint.ID := false
+					}
+
 					newStints.Push(newStint)
 				}
 
@@ -3889,7 +3912,10 @@ class RaceCenter extends ConfigurationItem {
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
 
-				driver := this.createDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
+				driver := parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier)))
+				driver["ID"] := stint.ID
+
+				driver := this.createDriver(driver)
 
 				message := (translate("Load stint (Stint: ") . stint.Nr . translate(", Driver: ") . driver.FullName . translate(")"))
 
@@ -4476,6 +4502,8 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 
 			while (lap <= lastLap) {
+				driverID := this.Laps[lap].Stint.ID
+
 				pitstop := false
 
 				if !this.Laps.HasKey(lap) {
@@ -4575,13 +4603,15 @@ class RaceCenter extends ConfigurationItem {
 					wear := [kNull, kNull, kNull, kNull]
 
 				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+											 , driverID)
 
 				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 									   , telemetryData[7], telemetryData[8], telemetryData[9]
-									   , wear[1], wear[2], wear[3], wear[4])
+									   , wear[1], wear[2], wear[3], wear[4]
+									   , driverID)
 
 				currentListView := A_DefaultListView
 
@@ -4681,6 +4711,8 @@ class RaceCenter extends ConfigurationItem {
 			flush := (Abs(lastLap - lap) <= 2)
 
 			while (lap <= lastLap) {
+				driverID := this.Laps[lap].Stint.ID
+
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
@@ -4735,7 +4767,7 @@ class RaceCenter extends ConfigurationItem {
 				hotPressures := map(hotPressures, kNull)
 
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
+										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush, driverID)
 
 				currentListView := A_DefaultListView
 
@@ -5690,7 +5722,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
 			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 
-			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr})
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr, ID: driver.ID})
 		}
 	}
 
@@ -5699,11 +5731,11 @@ class RaceCenter extends ConfigurationItem {
 
 		for ignore, lap in this.SessionDatabase.Tables["Lap.Data"] {
 			newLap := {Nr: lap.Nr, Stint: lap.Stint, Laptime: lap["Lap.Time"], Position: lap.Position, Grip: lap.Grip
-						  , Map: lap.Map, TC: lap.TC, ABS: lap.ABS
-						  , Weather: lap.Weather, AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
-						  , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
-						  , Damage: lap.Damage, Accident: lap.Accident
-						  , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
+					 , Map: lap.Map, TC: lap.TC, ABS: lap.ABS
+					 , Weather: lap.Weather, AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
+					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
+					 , Damage: lap.Damage, Accident: lap.Accident
+					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
 
 			if (isNull(newLap.Map))
 				newLap.Map := "n/a"
@@ -5741,7 +5773,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iStints := []
 
 		for ignore, stint in this.SessionDatabase.Tables["Stint.Data"] {
-			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"]})
+			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint.ID})
 
 			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
 					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
@@ -6995,7 +7027,7 @@ class RaceCenter extends ConfigurationItem {
 									, "Weather": stint.Weather, "Compound": stint.Compound, "Lap.Time.Average": null(stint.AvgLaptime), "Lap.Time.Best": null(stint.BestLapTime)
 									, "Fuel.Consumption": null(stint.FuelConsumption), "Accidents": stint.Accidents
 									, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)
-									, "Time.Start": stint.Time}
+									, "Time.Start": stint.Time, "Driver.ID": stint.ID}
 
 						sessionDB.add("Stint.Data", stintData)
 					}
@@ -7008,7 +7040,7 @@ class RaceCenter extends ConfigurationItem {
 				sessionDB.clear("Driver.Data")
 
 				for ignore, driver in this.Drivers
-					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
+					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, ID: driver.ID})
 			}
 
 			sessionDB.flush()

@@ -421,6 +421,8 @@ class GuiFunctionController extends FunctionController {
 }
 
 class SimulatorController extends ConfigurationItem {
+	iID := false
+
 	iStarted := false
 
 	iSettings := false
@@ -441,6 +443,12 @@ class SimulatorController extends ConfigurationItem {
 
 	iShowLogo := false
 	iLogoIsVisible := false
+
+	ID[] {
+		Get {
+			return this.iID
+		}
+	}
 
 	Settings[] {
 		Get {
@@ -529,6 +537,10 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
+		FileRead identifier, % kUserConfigDirectory . "ID"
+
+		this.iID := identifier
+
 		SimulatorController.Controller := this
 
 		this.iSettings := settings

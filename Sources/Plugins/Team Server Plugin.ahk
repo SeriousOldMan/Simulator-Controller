@@ -56,6 +56,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
 
+
 			base.__New(function, label, icon)
 		}
 
@@ -136,6 +137,12 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
+		}
+	}
+
+	ID[] {
+		Get {
+			return this.Controller.ID
 		}
 	}
 
@@ -814,6 +821,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				try {
 					this.Connector.SetStintValue(stint, "Time", A_Now)
+					this.Connector.SetStintValue(stint, "ID", this.ID)
 				}
 				catch exception {
 					; ignore

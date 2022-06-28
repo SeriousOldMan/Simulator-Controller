@@ -87,136 +87,193 @@ class TelemetryDatabase extends SessionDatabase {
 		return schema
 	}
 
-	getElectronicEntries(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getElectronicEntries(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
-			return this.Database.query("Electronics", {Transform: "removeInvalidLaps"
-													 , Where: {Owner: owner, Weather: weather
-															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+			return this.Database.query("Electronics", {Transform: "removeInvalidLaps", Where: where})
 		else
 			return []
 	}
 
-	getTyreEntries(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getTyreEntries(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
-											   , Where: {Owner: owner, Weather: weather
-													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: where})
 		else
 			return []
 	}
 
-	getMapsCount(weather, owner := false) {
-		if !owner
-			owner := this.ID
+	getMapsCount(weather, owner := "__Undefined__") {
+		where := {Weather: weather}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Owner: owner, Weather: weather}})
+													 , Where: where})
 		else
 			return []
 	}
 
-	getMapData(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getMapData(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
-													 , By: "Map"
-													 , Transform: "removeInvalidLaps"
-													 , Where: {Owner: owner, Weather: weather
-															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , By: "Map", Transform: "removeInvalidLaps"
+													 , Where: where})
 		else
 			return []
 	}
 
-	getTyreData(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getTyreData(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Owner: owner, Weather: weather
-													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: where})
 		else
 			return []
 	}
 
-	getTyreCompoundColors(weather, compound, owner := false) {
-		if !owner
-			owner := this.ID
+	getTyreCompoundColors(weather, compound, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Tyres", {Select: ["Tyre.Compound.Color"], By: "Tyre.Compound.Color"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Owner: owner, Weather: weather, "Tyre.Compound": compound}})
+											   , Where: where})
 		else
 			return []
 	}
 
-	getMapLapTimes(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getMapLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 													 , Transform: "removeInvalidLaps"
-													 , Where: {Owner: owner, Weather: weather
-															 , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+													 , Where: where})
 		else
 			return []
 	}
 
-	getTyreLapTimes(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getTyreLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Owner: owner, Weather: weather
-													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: where})
 		else
 			return []
 	}
 
-	getFuelLapTimes(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getFuelLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database
 			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
 											   , Transform: "removeInvalidLaps"
-											   , Where: {Owner: owner, Weather: weather
-													   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: where})
 		else
 			return []
 	}
 
-	getPressuresCount(weather, owner := false) {
-		if !owner
-			owner := this.ID
+	getPressuresCount(weather, owner := "__Undefined__") {
+		where := {Weather: weather}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
 											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: {Owner: owner, Weather: weather}})
+											   , Where: where})
 		}
 		else
 			return []
 	}
 
-	getLapTimePressures(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getLapTimePressures(weather, compound, compoundColor, owner := "__Undefined__") {
+		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+		if ((owner != kUndefined) && owner) {
+			if (owner == true)
+				owner := this.ID
+
+			where["Owner"] := owner
+		}
 
 		if this.Database {
 			return this.Database.query("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
@@ -224,18 +281,22 @@ class TelemetryDatabase extends SessionDatabase {
 													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
 											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: {Owner: owner, Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}})
+											   , Where: where})
 		}
 		else
 			return []
 	}
 
-	cleanupData(weather, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
-
+	cleanupData(weather, compound, compoundColor, owner := "__Undefined__") {
 		if this.Database {
-			where := {Owner: owner, Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
+
+			if ((owner != kUndefined) && owner) {
+				if (owner == true)
+					owner := this.ID
+
+				where["Owner"] := owner
+			}
 
 			ltAvg := false
 			ltStdDev := false

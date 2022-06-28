@@ -104,7 +104,7 @@ class TyresDatabase extends SessionDatabase {
 		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 				, Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
 
-		if ((owner = kUndefined) && (owner != "Community"))
+		if ((owner != kUndefined) && owner)
 			where["Owner"] := owner
 
 		if (weather != true)
@@ -121,13 +121,19 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
-	getConditions(simulator, car, track, owner := false) {
+	getConditions(simulator, car, track, owner := "__Undefined__") {
 		local database
 		local condition
 		local compound
 
-		if !owner
-			owner := this.ID
+		if ((owner = kUndefined) || !owner)
+			where := {Type: "Cold"}
+		else {
+			if (owner == true)
+				owner := this.ID
+
+			where := {Owner: owner, Type: "Cold"}
+		}
 
 		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
 
@@ -137,7 +143,7 @@ class TyresDatabase extends SessionDatabase {
 
 		for ignore, condition in database.query("Tyres.Pressures.Distribution"
 											  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-											   , Where: {Owner: owner, Type: "Cold"}})
+											   , Where: where})
 			conditions[values2String("|", condition.Weather, condition["Temperature.Air"], condition["Temperature.Track"]
 										, condition.Compound, condition["Compound.Color"])] := true
 
@@ -158,11 +164,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature
-			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, owner := false) {
+			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, owner := "__Undefined__") {
 		local condition
-
-		if !owner
-			owner := this.ID
 
 		simulator := this.getSimulatorName(simulator)
 
@@ -226,11 +229,17 @@ class TyresDatabase extends SessionDatabase {
 		return false
 	}
 
-	getPressureInfo(simulator, car, track, weather, owner := false) {
+	getPressureInfo(simulator, car, track, weather, owner := "__Undefined__") {
 		local database
 
-		if !owner
-			owner := this.ID
+		if ((owner = kUndefined) || !owner)
+			where := {}
+		else {
+			if (owner == true)
+				owner := this.ID
+
+			where := {Owner: owner}
+		}
 
 		info := []
 
@@ -238,7 +247,7 @@ class TyresDatabase extends SessionDatabase {
 
 		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																		 , Where: {Owner: owner}})
+																		 , Where: where})
 			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
 
@@ -289,7 +298,7 @@ class TyresDatabase extends SessionDatabase {
 
 					if this.UseCommunity
 						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
-													, compound, compoundColor, distributions, "Community")
+													, compound, compoundColor, distributions, false)
 
 					if (distributions["FL"].Count() != 0) {
 						thePressures := {}

@@ -232,21 +232,6 @@ moveSettingsEditor() {
 	moveByMouse("RES")
 }
 
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
-}
-
 loadSettings() {
 	editSettings(kLoad)
 }

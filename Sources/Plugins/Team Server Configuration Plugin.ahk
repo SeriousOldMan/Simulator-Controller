@@ -11,6 +11,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -619,24 +620,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	normalizeDriverName(name) {
-		parts := string2Values(A_Space, name)
-
 		forName := ""
 		surName := ""
 		nickName := ""
 
-		if (parts.Length() > 0)
-			forName := parts[1]
+		parseDriverName(name, forName, surName, nickName)
 
-		if (parts.Length() > 1)
-			surName := parts[2]
-
-		if (parts.Length() > 2) {
-			parts.RemoveAt(1, 2)
-
-			nickName := Trim(StrReplace(StrReplace(values2String(A_Space, parts*), "(", ""), ")", ""))
-		}
-		else {
+		if (nickName = "") {
 			StringUpper initialForName, % SubStr(forName, 1, 1)
 			StringUpper initialSurName, % SubStr(surName, 1, 1)
 
@@ -645,15 +635,19 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		nickName := SubStr(nickName, 1, 3)
 
-		return (forName . A_Space . surName . A_Space . translate("(") . nickName . translate(")"))
+		return computeDriverName(forName, surName, nickName)
 	}
 
 	addDriver(name) {
 		name := this.normalizeDriverName(name)
 
-		parts := string2Values(A_Space, name)
+		forName := ""
+		surName := ""
+		nickName := ""
 
-		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], parts[1], parts[2], StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		parseDriverName(name, forName, surName, nickName)
+
+		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], forName, surName, nickName)
 
 		drivers := this.Drivers
 
@@ -756,21 +750,6 @@ chooseSessionStorePath() {
 
 	if (directory != "")
 		GuiControl Text, sessionStorePathEdit, %directory%
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 copyURL() {

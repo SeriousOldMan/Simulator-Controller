@@ -307,10 +307,10 @@ locateSoftware() {
 	definition := stepWizard.Definition
 	name := definition[StrReplace(A_GuiControl, "locateButton", "")]
 
-	folder := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . name . ".Folder", false)
+	folder := getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name . ".Folder", false)
 
 	if folder {
-		folder := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . name))
+		folder := substituteVariables(getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name))
 
 		Run explore %folder%
 	}

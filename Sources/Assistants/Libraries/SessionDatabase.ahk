@@ -106,9 +106,9 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
-	registerDriverName(simulator, car, track, id, name := false) {
-		if id
-			id := values2String(".", simulator, car, track, id)
+	registerDriverName(simulator, id, name := false) {
+		if (simulator && id)
+			id := (this.getSimulatorName(simulator) . "." . id)
 		else
 			return
 
@@ -147,10 +147,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	getDriverNames(simulator, car, track, id) {
-		if id
+	getDriverNames(simulator, id) {
+		if (simulator && id)
 			names := string2Values("###", getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
-															  , "Drivers", values2String(".", simulator, car, track, id), ""))
+															  , "Drivers", (this.getSimulatorName(simulator) . "." . id), ""))
 		else
 			names := []
 

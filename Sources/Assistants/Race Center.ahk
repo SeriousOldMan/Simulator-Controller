@@ -1599,9 +1599,9 @@ class RaceCenter extends ConfigurationItem {
 					found.ID := driver.ID
 
 					if this.Simulator
-						new SessionDatabase().registerDriverName(this.Simulator, this.Car, this.Track, driver.ID, found.FullName)
+						new SessionDatabase().registerDriverName(this.Simulator, driver.ID, found.FullName)
 				}
-				
+
 				return found
 			}
 		}
@@ -1612,7 +1612,7 @@ class RaceCenter extends ConfigurationItem {
 		driver.Accidents := 0
 
 		if (driver.ID && this.Simulator)
-			new SessionDatabase().registerDriverName(this.Simulator, this.Car, this.Track, driver.ID, driver.FullName)
+			new SessionDatabase().registerDriverName(this.Simulator, driver.ID, driver.FullName)
 
 		this.Drivers.Push(driver)
 
@@ -5202,6 +5202,7 @@ class RaceCenter extends ConfigurationItem {
 		static hadLastLap := false
 
 		if this.SessionActive {
+			session := this.SelectedSession[true]
 			window := this.Window
 
 			Gui %window%:Default
@@ -5213,7 +5214,7 @@ class RaceCenter extends ConfigurationItem {
 					logMessage(kLogInfo, translate("Syncing session"))
 
 				try {
-					lastLap := this.Connector.GetSessionLastLap(this.SelectedSession[true])
+					lastLap := this.Connector.GetSessionLastLap(session)
 
 					if lastLap {
 						lastLap := parseObject(this.Connector.GetLap(lastLap))
@@ -5233,6 +5234,22 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else if lastLap
 					hadLastLap := true
+
+				if !this.Simulator
+					try {
+						this.iSimulator := this.Connector.GetSessionValue(session, "Simulator")
+						this.iCar := this.Connector.GetSessionValue(session, "Car")
+						this.iTrack := this.Connector.GetSessionValue(session, "Track")
+
+						if (this.iSimulator = "") {
+							this.iSimulator := false
+							this.iCar := false
+							this.iTrack := false
+						}
+					}
+					catch exception {
+						; ignore
+					}
 
 				this.syncSetups()
 				this.syncTeamDrivers()

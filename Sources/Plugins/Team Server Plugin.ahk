@@ -532,7 +532,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
 
-	startSession(duration, car, track) {
+	startSession(simulator, car, track, duration) {
 		if this.SessionActive
 			this.leaveSession()
 
@@ -545,6 +545,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				this.Connector.StartSession(this.Session, duration, car, track)
 
+				this.Connector.SetSessionValue(this.Session, "Simulator", simulator)
+				this.Connector.SetSessionValue(this.Session, "Car", car)
+				this.Connector.SetSessionValue(this.Session, "Track", track)
 				this.Connector.SetSessionValue(this.Session, "Time", A_Now)
 
 				this.iSessionActive := true
@@ -586,14 +589,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iSessionActive := false
 	}
 
-	joinSession(car, track, lapNumber, duration := 0) {
+	joinSession(simulator, car, track, lapNumber, duration := 0) {
 		if this.TeamServerActive {
 			if !this.SessionActive {
 				if (lapNumber = 1) {
 					if isDebug()
 						showMessage("Creating team session: " . car . ", " . track)
 
-					this.startSession(duration, car, track)
+					this.startSession(simulator, car, track, duration)
 				}
 				else {
 					if isDebug()
@@ -912,7 +915,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				if isDebug() {
 					showMessage("Updating lap for team session: " . lapNumber)
-					
+
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
 						Throw Exception("Driver inconsistency detected...")
 				}
@@ -923,11 +926,10 @@ class TeamServerPlugin extends ControllerPlugin {
 					simulator := getConfigurationValue(telemetryData, "Session Data", "Simulator", "Unknown")
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
-					
-					new SessionDatabase().registerDriverName(simulator, car, track, this.ID
-														   , computeDriverName(driverForName, driverSurName, driverNickName))
 
-					stint := this.joinSession(car, track, lapNumber)
+					new SessionDatabase().registerDriverName(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+
+					stint := this.joinSession(simulator, car, track, lapNumber)
 				}
 				else if !this.DriverActive
 					stint := this.addStint(lapNumber)

@@ -1312,7 +1312,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if this.connectTeamSession() {
 								teamServer := this.TeamServer
 
-								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+													 , getConfigurationValue(data, "Session Data", "Car")
 													 , getConfigurationValue(data, "Session Data", "Track")
 													 , dataLastLap
 													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
@@ -1329,7 +1330,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
 						}
 						else if joinedSession {
-							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+													  , getConfigurationValue(data, "Session Data", "Car")
 													  , getConfigurationValue(data, "Session Data", "Track")
 													  , dataLastLap)
 
@@ -1475,7 +1477,7 @@ prepareSessionDatabase(data) {
 		if ((car != kUndefined) && (track != kUndefined))
 			sessionDB.prepareDatabase(simulator, car, track)
 
-		sessionDB.registerDriverName(simulator, car, track, plugin.Controller.ID
+		sessionDB.registerDriverName(simulator, plugin.Controller.ID
 								   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
 													 , getConfigurationValue(data, "Stint Data", "DriverSurname")
 													 , getConfigurationValue(data, "Stint Data", "DriverNickname")))

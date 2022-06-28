@@ -1451,8 +1451,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						pitstopRule := strategy.PitstopRule
 
-						if !pitstopRule
+						if !pitstopRule {
 							GuiControl Choose, pitstopRequirementsDropDown, 1
+
+							pitstopWindowEdit := ""
+						}
 						else if IsObject(pitstopRule) {
 							GuiControl Choose, pitstopRequirementsDropDown, 3
 
@@ -1464,6 +1467,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							pitstopWindowEdit := pitstopRule
 						}
 
+						GuiControl, , pitstopWindowEdit, %pitstopWindowEdit%
 						choosePitstopRequirements()
 
 						if pitstopRule {
@@ -1717,12 +1721,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				if simulator {
 					switch simulator {
+						case "Assetto Corsa":
+							prefix := "AC"
 						case "Assetto Corsa Competizione":
 							prefix := "ACC"
+						case "Automobilista 2":
+							prefix := "AMS2"
 						case "RaceRoom Racing Experience":
 							prefix := "R3E"
 						case "rFactor 2":
 							prefix := "RF2"
+						case "iRacing":
+							prefix := "IRC"
 						default:
 							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 							title := translate("Warning")

@@ -1595,30 +1595,43 @@ updateInstallationForV392() {
 	}
 }
 
-addOwnerColumn(fileName, id) {
-	if FileExist(fileName) {
-		data := ""
+addOwnerField(database, table, id) {
+	rows := database.Tables[table]
 
-		Loop Read, %fileName%
-			if (InStr(A_LoopReadLine, id, false, 0) = (StrLen(A_LoopReadLine) - StrLen(id) + 1))
-				return
-			else {
-				if (A_Index == 1)
-					line := (A_LoopReadLine . ";" . id)
-				else
-					line := ("`n" . A_LoopReadLine . ";" . id)
+	if (rows.Length() > 0) {
+		changed := false
 
-				data .= line
+		for ignore, row in rows
+			if (!row.HasKey("Owner") || (row.Owner = kNull)) {
+				row.Owner := id
+
+				changed := true
 			}
 
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		if changed
+			database.changed(table)
+	}
+}
 
-		FileAppend %data%, %fileName%
+clearWearFields(database, table, id) {
+	rows := database.Tables[table]
+
+	if (rows.Length() > 0) {
+		changed := false
+
+		for ignore, row in rows
+			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				field := ("Tyre.Wear." . tyre)
+
+				if (row.HasKey(field) && (row[field] = id)) {
+					row[field] := kNull
+
+					changed := true
+				}
+			}
+
+		if changed
+			database.changed(table)
 	}
 }
 
@@ -1634,6 +1647,8 @@ updateConfigurationForV422() {
 
 	FileRead id, % kUserConfigDirectory . "ID"
 
+	tyresDB := new TyresDatabase()
+
 	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
@@ -1646,46 +1661,22 @@ updateConfigurationForV422() {
 			{
 				track := A_LoopFileName
 
-				telemetryDB := new TelemetryDatabase(simulator, car, track).Database
+				db := new TelemetryDatabase(simulator, car, track).Database
 
-				rows := telemetryDB.Tables["Electronics"]
+				addOwnerField(db, "Electronics", id)
+				clearWearFields(db, "Tyres", id)
+				addOwnerField(db, "Tyres", id)
 
-				if (rows.Length() > 0) {
-					for ignore, row in rows
-						row.Owner := id
+				db.flush()
 
-					telemetryDB.changed("Electronics")
-				}
+				db := tyresDB.getTyresDatabase(simulator, car, track)
 
-				rows := telemetryDB.Tables["Tyres"]
+				addOwnerField(db, "Tyres.Pressures", id)
+				addOwnerField(db, "Tyres.Pressures.Distribution", id)
 
-				if (rows.Length() > 0) {
-					for ignore, row in rows
-						row.Owner := id
-
-					telemetryDB.changed("Tyres")
-				}
-
-				telemetryDB.flush()
-
-				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.CSV
-
-				addOwnerColumn(fileName, id)
-
-				fileName = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Tyres.Pressures.Distribution.CSV
-
-				addOwnerColumn(fileName, id)
+				db.flush()
 			}
 		}
-	}
-
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		FileRead text, %kUserHomeDirectory%Setup\Setup.data
-
-		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
-
-		FileDelete %kUserHomeDirectory%Setup\Setup.data
-		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
 

@@ -16,6 +16,7 @@
   14. Added Owner column to all database tables to identify the driver who provided the data. Please note, that updating the local configuration database can take quite some time for this reorganization.
   15. New version of the Team Server to support the data owner concept introduced above. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422) for more information.
   16. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
+  17. New car models for "Setup Advisor":
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do and you may have to update your Team Server.
 

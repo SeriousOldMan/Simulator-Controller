@@ -1309,18 +1309,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)
 
 						if firstLap {
-							if this.connectTeamSession() {
-								teamServer := this.TeamServer
+							if this.connectTeamSession()
+								if this.driverActive(data) {
+									teamServer := this.TeamServer
 
-								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
-													 , getConfigurationValue(data, "Session Data", "Car")
-													 , getConfigurationValue(data, "Session Data", "Track")
-													 , dataLastLap
-													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
+									teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+														 , getConfigurationValue(data, "Session Data", "Car")
+														 , getConfigurationValue(data, "Session Data", "Track")
+														 , dataLastLap
+														 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
-								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
-								this.TeamServer.setSessionValue(this.Plugin . " State", "")
-							}
+									this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
+									this.TeamServer.setSessionValue(this.Plugin . " State", "")
+								}
+								else ; Wrong Driver - no team session
+									this.disconnectTeamSession()
 
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")

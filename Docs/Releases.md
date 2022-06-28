@@ -285,7 +285,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. New voice commands for the Virtual Race Spotter and the other assistants to enable or disable announcments and warnings while out on the track. You can say, for example: "No more weather warnings please" or "Please give me blue flag warnings". See the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements) for more information.
   5. Support for .NET compatible TTS 5.1 voices for voice output. See the revised documentation for [voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) configuration for more information.
   6. Support for an additional voice recognition framework, which provide a much better recognition rate and quality, as long as you have a decent voice audio quality (for example when using a headset). The changes are documented [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well.
-  7. Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer" and introduced new parameter "raceAssistantRecognizer" for all race assistant plugins. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
+  7. Renamed plugin parameter "raceAssistantService" to "raceAssistantSynthesizer" and introduced new parameter "raceAssistantRecognizer" for all Race Assistant plugins. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Integrated the new cars of the Challenger DLC into the car model file for ACC.
   9. Updated the spectator overlay file for R3E to reflect the latest additions in RaceRoom Racing Experience.
   10. Spotter side proximity warnings may now be disabled as well.
@@ -556,7 +556,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - Driver - compare the different drivers on the grid regarding potential, race craft, speed, consistency and car control.
   4. Improved "Pace" report including median and quartile calculation.
   5. Various usability improvements for the "Race Reports" tool, incl. better selection of reports based on car and track grouping.
-  6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a race assistant by the touch of a button on your Button Box.
+  6. [New "Call" command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) allows you to actiavte the listen mode of a Race Assistant by the touch of a button on your Button Box.
   7. Improved reliability for voice control of multiple Race Assistants, when Push-to-Talk is not used.
   8. Optimized language handling for SAPI voices to support non-Microsoft language packs.
 
@@ -608,12 +608,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. More information is supplied by Cato. You can ask for gaps to other cars either in relation to the standings or in relation to the positions on the track. See the [command phrases](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Assistants/Grammars) for more information.
   4. New plugin arguments for ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist). You can trigger the recommendation of a pitstop lap by your hardware controller now.
-  5. Accept & Reject plugin actions now work always for the currently focused voice assistant.
+  5. Accept & Reject plugin actions now work always for the currently focused voice Assistant.
   6. New information actions for ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugins. With those you can request almost any information regarding your car state or the race situation with the press of a button on your hardware controller.
-  7. New ["Assistant" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant) for all simulator plugins, which may be used to group all assistant actions, like information requests or pitstop planning, into one dedicated layer for your hardware controller.
+  7. New ["Assistant" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant) for all simulator plugins, which may be used to group all Assistant actions, like information requests or pitstop planning, into one dedicated layer for your hardware controller.
   8. Many of the plugin parameters for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) and ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) have been renamed.
   9. Support for the new repair options in [*RaceRoom Racing Experience* Pitstop MFD](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). Please note that "Repair Bodywork", "Repair Front Aero" and "Repair Rear Aero" can only be toggled together for the moment.
-  10. [Developer] Refactoring of assistant plugins and introduction of *RaceAssistantPlugin* base class.
+  10. [Developer] Refactoring of Assistant plugins and introduction of *RaceAssistantPlugin* base class.
   11. [Developer] Automated unit tests for *RaceStrategist* class.
 
 ## 3.2.0-release 07/09/21
@@ -663,7 +663,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. New rFactor 2 data acquisition for Cato, the Virtual Race Strategist.
   7. New  RaceRoom Racing Experience data acquisition for Cato, the Virtual Race Strategist.
   8. [For Developers]:
-     - Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple race assistants.
+     - Refactored *RaceEngineerSimulatorPlugin* into *RaceAssistantSimulatorPlugin*, which now can handle multiple Race Assistants.
 	 - Refactord the *getAction* and *fireAction* methods of *SimulatorController* into *getActions* and *fireActions* for multiple actions per controller function.
 
 ## 3.1.0-release 06/11/21

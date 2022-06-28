@@ -19,7 +19,7 @@ Welcome to the Simulator Controller documentation. Here you will find everything
 	
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 
-    General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the race assistants using.
+    General information how to start and use the Simulator Controller and how to use the available runtime options.	You will also find information on how to use voice control and how to interact with the Race Assistants using.
 	
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 
@@ -35,11 +35,11 @@ Welcome to the Simulator Controller documentation. Here you will find everything
 	
   - [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist)
 
-    The other assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
+    The other Assistant, Cato, takes care of all strategic aspects during races with one or more pit stops, even under changing weather conditions. It will provide you with extensive after race reports for analysis and documentation and will help you with strategy development based on telemetry data of past sessions.
 	
   - [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 
-    The third assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
+    The third Assistant, Elisa, will watch your race and will warn you about nearby other cars and will give you general information about the current race situation.
 	
   - [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 

@@ -352,14 +352,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			{
 				try {
 					stint := teamServer.getLapStint(A_Index)
+					newStint := (stint != lastStint)
 
-					if (stint != lastStint) {
+					if newStint {
 						lastStint := stint
 
 						driverID := teamServer.getStintValue(stint, "ID")
-
-						if driverID
-							tyresDB.registerDriverName(driverID, teamServer.getStintDriverName(stint))
 					}
 
 					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
@@ -368,6 +366,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						continue
 
 					lapPressures := string2Values(";", lapPressures)
+
+					if (newStint && driverID)
+						tyresDB.registerDriverName(lapPressures[1], lapPressures[2], lapPressures[3], driverID
+												 , teamServer.getStintDriverName(stint))
 
 					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])

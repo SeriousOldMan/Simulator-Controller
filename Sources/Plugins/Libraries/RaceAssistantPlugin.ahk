@@ -1468,13 +1468,14 @@ prepareSessionDatabase(data) {
 	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
 		sessionDB := new SessionDatabase()
 
+		simulator := plugin.Simulator.runningSimulator()
 		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
 		if ((car != kUndefined) && (track != kUndefined))
-			sessionDB.prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
+			sessionDB.prepareDatabase(simulator, car, track)
 
-		sessionDB.registerDriverName(this.Controller.ID
+		sessionDB.registerDriverName(simulator, car, track, plugin.Controller.ID
 								   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
 													 , getConfigurationValue(data, "Stint Data", "DriverSurname")
 													 , getConfigurationValue(data, "Stint Data", "DriverNickname")))

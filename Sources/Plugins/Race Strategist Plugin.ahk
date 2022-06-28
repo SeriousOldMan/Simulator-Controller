@@ -263,14 +263,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			{
 				try {
 					stint := teamServer.getLapStint(A_Index)
+					newStint := (stint != lastStint)
 
-					if (stint != lastStint) {
+					if newStint {
 						lastStint := stint
 
 						driverID := teamServer.getStintValue(stint, "ID")
-
-						if driverID
-							new SessionDatabase().registerDriverName(driverID, teamServer.getStintDriverName(stint))
 					}
 
 					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
@@ -282,6 +280,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+
+					if (newStint && driverID)
+						telemetryDB.registerDriverName(telemetryData[1], telemetryData[2], telemetryData[3], driverID
+													 , teamServer.getStintDriverName(stint))
 
 					pitstop := telemetryData[10]
 

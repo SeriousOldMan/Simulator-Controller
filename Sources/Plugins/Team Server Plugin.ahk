@@ -906,25 +906,26 @@ class TeamServerPlugin extends ControllerPlugin {
 	addLap(lapNumber, telemetryData, positionsData) {
 		if this.TeamServerActive {
 			try {
-				if isDebug()
-					showMessage("Updating lap for team session: " . lapNumber)
+				driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
+				driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+				driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 
 				if isDebug() {
-					driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
-					driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-					driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
-
+					showMessage("Updating lap for team session: " . lapNumber)
+					
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
 						Throw Exception("Driver inconsistency detected...")
-
-					new SessionDatabase().registerDriverName(this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
 				}
 
 				stint := false
 
 				if !this.SessionActive {
+					simulator := getConfigurationValue(telemetryData, "Session Data", "Simulator", "Unknown")
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
+					
+					new SessionDatabase().registerDriverName(simulator, car, track, this.ID
+														   , computeDriverName(driverForName, driverSurName, driverNickName))
 
 					stint := this.joinSession(car, track, lapNumber)
 				}

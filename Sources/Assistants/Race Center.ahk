@@ -1595,12 +1595,13 @@ class RaceCenter extends ConfigurationItem {
 				found := candidate
 
 			if found {
-				if (driver.ID && !found.ID) {
+				if driver.ID {
 					found.ID := driver.ID
 
-					new SessionDatabase().registerDriverName(driver.ID, found.FullName)
+					if this.Simulator
+						new SessionDatabase().registerDriverName(this.Simulator, this.Car, this.Track, driver.ID, found.FullName)
 				}
-
+				
 				return found
 			}
 		}
@@ -1610,8 +1611,8 @@ class RaceCenter extends ConfigurationItem {
 		driver.Stints := []
 		driver.Accidents := 0
 
-		if driver.ID
-			new SessionDatabase().registerDriverName(driver.ID, driver.FullName)
+		if (driver.ID && this.Simulator)
+			new SessionDatabase().registerDriverName(this.Simulator, this.Car, this.Track, driver.ID, driver.FullName)
 
 		this.Drivers.Push(driver)
 

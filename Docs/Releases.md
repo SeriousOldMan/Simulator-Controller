@@ -15,6 +15,8 @@
   13. Added installation support for all integration plugins to "Simulator Setup".
   14. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again".
   15. Added Owner column to all database tables to identify the driver who provided the data. Please note, that updating the local configuration database can take quite some time for this reorganization.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do.
 
 ## 4.2.1.0-release 06/24/22
 

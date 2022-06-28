@@ -971,6 +971,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.updatePositionsData(data)
 	}
 
+	runningSession(data) {
+		return getConfigurationValue(data, "Session Data", "Active", false)
+	}
+
 	activeSession(data) {
 		return (getDataSessionState(data) >= kSessionPractice)
 	}
@@ -1135,7 +1139,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 
-			if (dataLastLap == 0)
+			if (this.runningSession(data) && (this.iLastLap == 0))
 				prepareSessionDatabase(data)
 
 			if isDebug() {
@@ -1465,7 +1469,7 @@ prepareSessionDatabase(data) {
 		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
-		if ((car != kUndefined) && (track && kUndefined))
+		if ((car != kUndefined) && (track != kUndefined))
 			new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
 	}
 }

@@ -1595,8 +1595,11 @@ class RaceCenter extends ConfigurationItem {
 				found := candidate
 
 			if found {
-				if driver.ID
+				if (driver.ID && !found.ID) {
 					found.ID := driver.ID
+
+					new SessionDatabase().registerDriverName(driver.ID, found.FullName)
+				}
 
 				return found
 			}
@@ -1606,6 +1609,9 @@ class RaceCenter extends ConfigurationItem {
 		driver.Laps := []
 		driver.Stints := []
 		driver.Accidents := 0
+
+		if driver.ID
+			new SessionDatabase().registerDriverName(driver.ID, driver.FullName)
 
 		this.Drivers.Push(driver)
 
@@ -9475,37 +9481,6 @@ parseObject(properties) {
 	}
 
 	return result
-}
-
-parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
-	if InStr(fullName, "(") {
-		fullname := StrSplit(fullName, "(", " `t", 2)
-
-		nickName := Trim(StrReplace(fullName[2], ")", ""))
-		fullName := fullName[1]
-	}
-	else
-		nickName := ""
-
-	fullName := StrSplit(fullName, A_Space, " `t", 2)
-
-	forName := fullName[1]
-	surName := fullName[2]
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 getKeys(map) {

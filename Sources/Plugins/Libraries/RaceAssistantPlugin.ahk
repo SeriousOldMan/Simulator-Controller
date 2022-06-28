@@ -1466,11 +1466,18 @@ prepareSessionDatabase(data) {
 		plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+		sessionDB := new SessionDatabase()
+
 		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
 		if ((car != kUndefined) && (track != kUndefined))
-			new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
+			sessionDB.prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
+
+		sessionDB.registerDriverName(this.Controller.ID
+								   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
+													 , getConfigurationValue(data, "Stint Data", "DriverSurname")
+													 , getConfigurationValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 

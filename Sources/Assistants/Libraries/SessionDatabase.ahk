@@ -38,11 +38,14 @@ global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSe
 
 global vUserID = false
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class SessionDatabase extends ConfigurationItem {
+	static sDriver := false
+
 	iID := false
 	iControllerConfiguration := false
 
@@ -101,6 +104,51 @@ class SessionDatabase extends ConfigurationItem {
 
 	loadFromConfiguration(configuration) {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+	}
+
+	registerDriverName(id, name := false) {
+		if !id
+			return
+
+		anonymous := false
+
+		if !name {
+			name := translate("User")
+
+			anonymous := true
+		}
+
+		if (name != this.sDriver) {
+			this.sDriver := name
+
+			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			names := string2Values("###", getConfigurationValue(configuration, "Drivers", id, ""))
+
+			if (names.Length() == 0) {
+				setConfigurationValue(configuration, "Drivers", id, name)
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+			else if (!anonymous && !inList(names, name)) {
+				index := inList(names, translate("User"))
+
+				if index
+					names.RemoveAt(index)
+
+				names.Push(name)
+
+				setConfigurationValue(configuration, "Drivers", id, values2String("###", names*))
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+		}
+	}
+
+	getDriverNames(id) {
+		names := string2Values("###", getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini"), "Drivers", id, ""))
+
+		return ((names.Length() > 0) ? names : [translate("Unknown")])
 	}
 
 	prepareDatabase(simulator, car, track) {
@@ -422,4 +470,40 @@ class SessionDatabase extends ConfigurationItem {
 			; ignore
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
+	if InStr(fullName, "(") {
+		fullname := StrSplit(fullName, "(", " `t", 2)
+
+		nickName := Trim(StrReplace(fullName[2], ")", ""))
+		fullName := fullName[1]
+	}
+	else
+		nickName := ""
+
+	fullName := StrSplit(fullName, A_Space, " `t", 2)
+
+	forName := fullName[1]
+	surName := fullName[2]
+}
+
+computeDriverName(forName, surName, nickName) {
+	name := ""
+
+	if (forName != "")
+		name .= (forName . A_Space)
+
+	if (surName != "")
+		name .= (surName . A_Space)
+
+	if (nickName != "")
+		name .= (translate("(") . nickName . translate(")"))
+
+	return Trim(name)
 }

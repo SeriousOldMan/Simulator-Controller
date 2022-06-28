@@ -357,6 +357,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						lastStint := stint
 
 						driverID := teamServer.getStintValue(stint, "ID")
+
+						if driverID
+							tyresDB.registerDriverName(driverID, teamServer.getStintDriverName(stint))
 					}
 
 					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)

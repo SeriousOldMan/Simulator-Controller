@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -470,6 +477,27 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.keepAlive()
 	}
 
+	getStintDriverName(stint, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if stint is Integer
+					stint := this.Connector.GetSessionStint(session, stint)
+
+				driver := this.parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(stint)))
+
+				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
+	}
+
 	getDriverForName() {
 		if (!this.iDriverForName && this.TeamServerActive) {
 			try {
@@ -725,6 +753,25 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
+	getStintSession(stint, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if stint is Integer
+					stint := this.Connector.GetSessionStint(session, stint)
+
+				return this.Connector.GetStintSession(stint)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
+	}
+
 	getCurrentLap(session := false) {
 		if (!session && this.SessionActive)
 			session := this.Session
@@ -869,6 +916,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
 						Throw Exception("Driver inconsistency detected...")
+
+					new SessionDatabase().registerDriverName(this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
 				}
 
 				stint := false

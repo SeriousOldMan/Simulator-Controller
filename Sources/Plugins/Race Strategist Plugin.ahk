@@ -268,6 +268,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						lastStint := stint
 
 						driverID := teamServer.getStintValue(stint, "ID")
+
+						if driverID
+							new SessionDatabase().registerDriverName(driverID, teamServer.getStintDriverName(stint))
 					}
 
 					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)

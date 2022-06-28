@@ -33,13 +33,29 @@ global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSe
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Private Variables Section                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vUserID = false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class SessionDatabase extends ConfigurationItem {
+	static sDriver := false
+
+	iID := false
 	iControllerConfiguration := false
 
 	iUseCommunity := false
+
+	ID[] {
+		Get {
+			return this.iID
+		}
+	}
 
 	ControllerConfiguration[] {
 		Get {
@@ -68,6 +84,14 @@ class SessionDatabase extends ConfigurationItem {
 	__New(controllerConfiguration := false) {
 		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
 
+		if !vUserID {
+			FileRead identifier, % kUserConfigDirectory . "ID"
+
+			vUserID := identifier
+		}
+
+		this.iID := vUserID
+
 		if !controllerConfiguration {
 			controllerConfiguration := getControllerConfiguration()
 
@@ -80,6 +104,57 @@ class SessionDatabase extends ConfigurationItem {
 
 	loadFromConfiguration(configuration) {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+	}
+
+	registerDriverName(simulator, id, name := false) {
+		if (simulator && id)
+			id := (this.getSimulatorName(simulator) . "." . id)
+		else
+			return
+
+		anonymous := false
+
+		if !name {
+			name := translate("User")
+
+			anonymous := true
+		}
+
+		if (name != this.sDriver) {
+			this.sDriver := name
+
+			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			names := string2Values("###", getConfigurationValue(configuration, "Drivers", id, ""))
+
+			if (names.Length() == 0) {
+				setConfigurationValue(configuration, "Drivers", id, name)
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+			else if (!anonymous && !inList(names, name)) {
+				index := inList(names, translate("User"))
+
+				if index
+					names.RemoveAt(index)
+
+				names.Push(name)
+
+				setConfigurationValue(configuration, "Drivers", id, values2String("###", names*))
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			}
+		}
+	}
+
+	getDriverNames(simulator, id) {
+		if (simulator && id)
+			names := string2Values("###", getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
+															  , "Drivers", (this.getSimulatorName(simulator) . "." . id), ""))
+		else
+			names := []
+
+		return ((names.Length() > 0) ? names : [translate("Unknown")])
 	}
 
 	prepareDatabase(simulator, car, track) {
@@ -135,7 +210,7 @@ class SessionDatabase extends ConfigurationItem {
 			if code
 				return string2Values("|", code)[1]
 			else {
-				for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+				for ignore, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 
@@ -401,4 +476,40 @@ class SessionDatabase extends ConfigurationItem {
 			; ignore
 		}
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
+	if InStr(fullName, "(") {
+		fullname := StrSplit(fullName, "(", " `t", 2)
+
+		nickName := Trim(StrReplace(fullName[2], ")", ""))
+		fullName := fullName[1]
+	}
+	else
+		nickName := ""
+
+	fullName := StrSplit(fullName, A_Space, " `t", 2)
+
+	forName := fullName[1]
+	surName := fullName[2]
+}
+
+computeDriverName(forName, surName, nickName) {
+	name := ""
+
+	if (forName != "")
+		name .= (forName . A_Space)
+
+	if (surName != "")
+		name .= (surName . A_Space)
+
+	if (nickName != "")
+		name .= (translate("(") . nickName . translate(")"))
+
+	return Trim(name)
 }

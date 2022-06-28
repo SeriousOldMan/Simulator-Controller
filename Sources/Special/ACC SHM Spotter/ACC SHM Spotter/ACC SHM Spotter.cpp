@@ -257,8 +257,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && transY < longitudinalDistance * 1.5) ||
-					(transY < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
+				if ((faster && abs(transY) < longitudinalDistance * 1.5) ||
+					(abs(transY) < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
 					if (transX < 0)
 						carBehindRight = true;
 					else

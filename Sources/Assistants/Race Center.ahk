@@ -61,8 +61,8 @@ global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
-											, "Position.Start", "Position.End", "Time.Start"]
-							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr"]
+											, "Position.Start", "Position.End", "Time.Start", "Driver.ID"]
+							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr", "ID"]
 							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 										  , "Weather", "Temperature.Air", "Temperature.Track"
 										  , "Fuel.Remaining", "Fuel.Consumption", "Damage", "Accident"
@@ -985,6 +985,9 @@ class RaceCenter extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 
+		if FileExist(kUserConfigDirectory . "Team Server.ini")
+			configuration := readConfiguration(kUserConfigDirectory . "Team Server.ini")
+
 		directory := getConfigurationValue(configuration, "Team Server", "Session.Folder", kTempDirectory . "Sessions")
 
 		if (!directory || (directory = ""))
@@ -994,8 +997,10 @@ class RaceCenter extends ConfigurationItem {
 
 		settings := this.RaceSettings
 
-		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "__INVALID__")
+		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL"
+														 , getConfigurationValue(configuration, "Team Server", "Server.URL", ""))
+		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token"
+														   , getConfigurationValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
 		this.iTeamName := getConfigurationValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getConfigurationValue(settings, "Team Settings", "Session.Name", "")
@@ -1017,7 +1022,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1334 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
+		Gui %window%:Add, Text, x608 YP+20 w134 cBlue Center gopenDashboardDocumentation, % translate("Race Center")
 
 		Gui %window%:Add, Text, x8 yp+30 w1350 0x10
 
@@ -1578,16 +1583,36 @@ class RaceCenter extends ConfigurationItem {
 		if !driver.HasKey("Nr")
 			driver["Nr"] := false
 
-		for ignore, candidate in this.Drivers
+		if !driver.HasKey("ID")
+			driver["ID"] := false
+
+		for ignore, candidate in this.Drivers {
+			found := false
+
 			if (this.SessionActive && (candidate.Identifier == driver.Identifier))
-				return candidate
-			else if ((candidate.Forname = driver.Forname) && (candidate.Surname = driver.Surname) && (candidate.Nickname = driver.Nickname))
-				return candidate
+				found := candidate
+			else if ((candidate.Forname = driver.Forname) && (candidate.Surname = driver.Surname))
+				found := candidate
+
+			if found {
+				if driver.ID {
+					found.ID := driver.ID
+
+					if this.Simulator
+						new SessionDatabase().registerDriverName(this.Simulator, driver.ID, found.FullName)
+				}
+
+				return found
+			}
+		}
 
 		driver.FullName := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 		driver.Laps := []
 		driver.Stints := []
 		driver.Accidents := 0
+
+		if (driver.ID && this.Simulator)
+			new SessionDatabase().registerDriverName(this.Simulator, driver.ID, driver.FullName)
 
 		this.Drivers.Push(driver)
 
@@ -3103,7 +3128,7 @@ class RaceCenter extends ConfigurationItem {
 				title := translate("Load Race Strategy...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
@@ -3121,7 +3146,7 @@ class RaceCenter extends ConfigurationItem {
 					fileName := (dirName . "\" . this.Strategy.Name . ".strategy")
 
 					Gui +OwnDialogs
-		
+
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
@@ -3876,6 +3901,16 @@ class RaceCenter extends ConfigurationItem {
 					else
 						newStint.Time := time
 
+					try {
+						newStint.ID := this.Connector.GetStintValue(identifier, "ID")
+
+						if (newStint.ID = "")
+							newStint.ID := false
+					}
+					catch exception {
+						newStint.ID := false
+					}
+
 					newStints.Push(newStint)
 				}
 
@@ -3884,7 +3919,10 @@ class RaceCenter extends ConfigurationItem {
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
 
-				driver := this.createDriver(parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier))))
+				driver := parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(identifier)))
+				driver["ID"] := stint.ID
+
+				driver := this.createDriver(driver)
 
 				message := (translate("Load stint (Stint: ") . stint.Nr . translate(", Driver: ") . driver.FullName . translate(")"))
 
@@ -4471,6 +4509,8 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 
 			while (lap <= lastLap) {
+				driverID := this.Laps[lap].Stint.ID
+
 				pitstop := false
 
 				if !this.Laps.HasKey(lap) {
@@ -4570,13 +4610,15 @@ class RaceCenter extends ConfigurationItem {
 					wear := [kNull, kNull, kNull, kNull]
 
 				telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9])
+											 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+											 , driverID)
 
 				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 									   , telemetryData[7], telemetryData[8], telemetryData[9]
-									   , wear[1], wear[2], wear[3], wear[4])
+									   , wear[1], wear[2], wear[3], wear[4]
+									   , driverID)
 
 				currentListView := A_DefaultListView
 
@@ -4676,6 +4718,8 @@ class RaceCenter extends ConfigurationItem {
 			flush := (Abs(lastLap - lap) <= 2)
 
 			while (lap <= lastLap) {
+				driverID := this.Laps[lap].Stint.ID
+
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
@@ -4730,7 +4774,7 @@ class RaceCenter extends ConfigurationItem {
 				hotPressures := map(hotPressures, kNull)
 
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush)
+										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush, driverID)
 
 				currentListView := A_DefaultListView
 
@@ -5158,6 +5202,7 @@ class RaceCenter extends ConfigurationItem {
 		static hadLastLap := false
 
 		if this.SessionActive {
+			session := this.SelectedSession[true]
 			window := this.Window
 
 			Gui %window%:Default
@@ -5169,7 +5214,7 @@ class RaceCenter extends ConfigurationItem {
 					logMessage(kLogInfo, translate("Syncing session"))
 
 				try {
-					lastLap := this.Connector.GetSessionLastLap(this.SelectedSession[true])
+					lastLap := this.Connector.GetSessionLastLap(session)
 
 					if lastLap {
 						lastLap := parseObject(this.Connector.GetLap(lastLap))
@@ -5189,6 +5234,22 @@ class RaceCenter extends ConfigurationItem {
 				}
 				else if lastLap
 					hadLastLap := true
+
+				if !this.Simulator
+					try {
+						this.iSimulator := this.Connector.GetSessionValue(session, "Simulator")
+						this.iCar := this.Connector.GetSessionValue(session, "Car")
+						this.iTrack := this.Connector.GetSessionValue(session, "Track")
+
+						if (this.iSimulator = "") {
+							this.iSimulator := false
+							this.iCar := false
+							this.iTrack := false
+						}
+					}
+					catch exception {
+						; ignore
+					}
 
 				this.syncSetups()
 				this.syncTeamDrivers()
@@ -5666,7 +5727,7 @@ class RaceCenter extends ConfigurationItem {
 			title := translate("Select target folder...")
 
 			Gui +OwnDialogs
-		
+
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 			FileSelectFolder folder, *%directory%, 0, %title%
 			OnMessage(0x44, "")
@@ -5685,7 +5746,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
 			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
 
-			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr})
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr, ID: driver.ID})
 		}
 	}
 
@@ -5694,11 +5755,11 @@ class RaceCenter extends ConfigurationItem {
 
 		for ignore, lap in this.SessionDatabase.Tables["Lap.Data"] {
 			newLap := {Nr: lap.Nr, Stint: lap.Stint, Laptime: lap["Lap.Time"], Position: lap.Position, Grip: lap.Grip
-						  , Map: lap.Map, TC: lap.TC, ABS: lap.ABS
-						  , Weather: lap.Weather, AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
-						  , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
-						  , Damage: lap.Damage, Accident: lap.Accident
-						  , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
+					 , Map: lap.Map, TC: lap.TC, ABS: lap.ABS
+					 , Weather: lap.Weather, AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
+					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
+					 , Damage: lap.Damage, Accident: lap.Accident
+					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
 
 			if (isNull(newLap.Map))
 				newLap.Map := "n/a"
@@ -5736,7 +5797,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iStints := []
 
 		for ignore, stint in this.SessionDatabase.Tables["Stint.Data"] {
-			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"]})
+			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint.ID})
 
 			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
 					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
@@ -6069,7 +6130,7 @@ class RaceCenter extends ConfigurationItem {
 		directory := (this.SessionLoaded ? this.SessionLoaded : this.iSessionDirectory)
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder folder, *%directory%, 0, %title%
 		OnMessage(0x44, "")
@@ -6990,7 +7051,7 @@ class RaceCenter extends ConfigurationItem {
 									, "Weather": stint.Weather, "Compound": stint.Compound, "Lap.Time.Average": null(stint.AvgLaptime), "Lap.Time.Best": null(stint.BestLapTime)
 									, "Fuel.Consumption": null(stint.FuelConsumption), "Accidents": stint.Accidents
 									, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)
-									, "Time.Start": stint.Time}
+									, "Time.Start": stint.Time, "Driver.ID": stint.ID}
 
 						sessionDB.add("Stint.Data", stintData)
 					}
@@ -7003,7 +7064,7 @@ class RaceCenter extends ConfigurationItem {
 				sessionDB.clear("Driver.Data")
 
 				for ignore, driver in this.Drivers
-					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname})
+					sessionDB.add("Driver.Data", {Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, ID: driver.ID})
 			}
 
 			sessionDB.flush()
@@ -9189,12 +9250,12 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s10 Bold, Arial
 
-		Gui TE:Add, Text, w368 Center gmoveTeamManager, % translate("Modular Simulator Controller System")
+		Gui TE:Add, Text, w392 Center gmoveTeamManager, % translate("Modular Simulator Controller System")
 
 		Gui TE:Font, s9 Norm, Arial
 		Gui TE:Font, Italic Underline, Arial
 
-		Gui TE:Add, Text, YP+20 w368 cBlue Center gopenTeamManagerDocumentation, % translate("Team Selection")
+		Gui TE:Add, Text, x148 YP+20 w112 cBlue Center gopenTeamManagerDocumentation, % translate("Team Selection")
 
 		Gui TE:Font, s8 Norm, Arial
 
@@ -9228,7 +9289,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s8 Norm, Arial
 
-		Gui TE:Add, Text, x8 ys+194 w384 0x10
+		Gui TE:Add, Text, x8 ys+194 w392 0x10
 
 		Gui TE:Add, Button, x120 yp+10 w80 h23 Default GacceptTeamManager, % translate("Ok")
 		Gui TE:Add, Button, x208 yp w80 h23 GcancelTeamManager, % translate("&Cancel")
@@ -9438,37 +9499,6 @@ parseObject(properties) {
 	}
 
 	return result
-}
-
-parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
-	if InStr(fullName, "(") {
-		fullname := StrSplit(fullName, "(", " `t", 2)
-
-		nickName := Trim(StrReplace(fullName[2], ")", ""))
-		fullName := fullName[1]
-	}
-	else
-		nickName := ""
-
-	fullName := StrSplit(fullName, A_Space, " `t", 2)
-
-	forName := fullName[1]
-	surName := fullName[2]
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 getKeys(map) {

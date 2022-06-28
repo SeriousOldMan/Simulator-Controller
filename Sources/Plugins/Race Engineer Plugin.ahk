@@ -344,10 +344,22 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		teamServer := this.TeamServer
 		session := this.TeamSession
 
-		if (teamServer && teamServer.Active && session)
+		if (teamServer && teamServer.Active && session) {
+			lastStint := false
+			driverID := kNull
+
 			Loop % teamServer.getCurrentLap(session)
 			{
 				try {
+					stint := teamServer.getLapStint(A_Index, session)
+					newStint := (stint != lastStint)
+
+					if newStint {
+						lastStint := stint
+
+						driverID := teamServer.getStintValue(stint, "ID", session)
+					}
+
 					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
 
 					if (!lapPressures || (lapPressures == ""))
@@ -355,9 +367,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 					lapPressures := string2Values(";", lapPressures)
 
+					if (newStint && driverID)
+						tyresDB.registerDriverName(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
+
 					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
-										  , string2Values(",", lapPressures[10]), false)
+										  , string2Values(",", lapPressures[10]), false, driverID)
 				}
 				catch exception {
 					break
@@ -366,6 +381,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					tyresDB.flush()
 				}
 			}
+		}
 		else
 			try {
 				for ignore, lapData in this.LapDatabase.Tables["Pressures"]

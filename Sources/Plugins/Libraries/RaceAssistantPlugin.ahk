@@ -971,6 +971,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.updatePositionsData(data)
 	}
 
+	runningSession(data) {
+		return getConfigurationValue(data, "Session Data", "Active", false)
+	}
+
 	activeSession(data) {
 		return (getDataSessionState(data) >= kSessionPractice)
 	}
@@ -1135,7 +1139,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 
-			if (dataLastLap == 0)
+			if (this.runningSession(data) && (this.iLastLap == 0))
 				prepareSessionDatabase(data)
 
 			if isDebug() {
@@ -1305,17 +1309,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)
 
 						if firstLap {
-							if this.connectTeamSession() {
-								teamServer := this.TeamServer
+							if this.connectTeamSession()
+								if this.driverActive(data) {
+									teamServer := this.TeamServer
 
-								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
-													 , getConfigurationValue(data, "Session Data", "Track")
-													 , dataLastLap
-													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
+									teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+														 , getConfigurationValue(data, "Session Data", "Car")
+														 , getConfigurationValue(data, "Session Data", "Track")
+														 , dataLastLap
+														 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
-								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
-								this.TeamServer.setSessionValue(this.Plugin . " State", "")
-							}
+									this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
+									this.TeamServer.setSessionValue(this.Plugin . " State", "")
+								}
+								else ; Wrong Driver - no team session
+									this.disconnectTeamSession()
 
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")
@@ -1325,7 +1333,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
 						}
 						else if joinedSession {
-							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+													  , getConfigurationValue(data, "Session Data", "Car")
 													  , getConfigurationValue(data, "Session Data", "Track")
 													  , dataLastLap)
 
@@ -1462,11 +1471,19 @@ prepareSessionDatabase(data) {
 		plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+		sessionDB := new SessionDatabase()
+
+		simulator := plugin.Simulator.runningSimulator()
 		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
-		if ((car != kUndefined) && (track && kUndefined))
-			new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
+		if ((car != kUndefined) && (track != kUndefined))
+			sessionDB.prepareDatabase(simulator, car, track)
+
+		sessionDB.registerDriverName(simulator, plugin.Controller.ID
+								   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
+													 , getConfigurationValue(data, "Stint Data", "DriverSurname")
+													 , getConfigurationValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 

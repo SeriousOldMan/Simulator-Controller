@@ -110,11 +110,25 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 ### Installation of Telemetry Providers
 
-Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In most cases these are already included in Simulator Controller and there is nothing to do, but for *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included. For *Automobilista 2*, you have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
+Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* a change in the settings is necessary.
+
+Please, note that all of this also applices to all other Virtual Race Assistants, but  you have to do it only once, of course.
+
+  1. *Assetto Corsa*
+  
+     Please copy the complete *SimlatorController* folder, which is located in the *Utilities\Plugins* folder of the Simulator Controller installation, to the Steam installation folder of *Assetto Corsa* and there into the *apps\python* folder. You will have to enable this plugin in the *Asseto Corsa* settings afterwards. This plugin uses code originally developed by *Sparten* which can be found at [GitHub](https://github.com/Sparten/ACInternalMemoryReader).
+  
+  2. *rFactor 2*
+  
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+
+  3. *Automobilista 2*
+  
+     You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
 
 ### Important preparation for the Pitstop MFD handling in *Assetto Corsa Competizione* and *RaceRoom Racing Experience*
 
-Jona can control the pitstop settings, as you have seen in the dialog transcript above. Generally, this can be handled in the different simulation games using an API integration, with the exception of *Assetto Corsa Competizione* and *RaceRoom Racing Experience*. In the later cases, a special procedure using image recognition has been developed. Please see the documentation for the required special preparation steps for [*Assetto Corsa Competizione*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
+Jona can control the pitstop settings, as you have seen in the dialog transcript above. Generally, this can be handled in the different simulation games using an API integration, with the exception of *Assetto Corsa Competizione* and *RaceRoom Racing Experience*. In the later cases, a special procedure using image recognition has been developed. Please see the documentation for the special preparation steps for [*Assetto Corsa Competizione*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1) that might be necessary.
 
 ## Interacting with Jona
 
@@ -170,13 +184,21 @@ I strongly recommed to memorize the phrases in the language you use to interact 
 
 ### Enabling and disabling specific warnings and announcements
 
-Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings by using a special voice command:
+Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings individually by using a special voice command:
 
 	[Please] No more *warning* [please]
 
 As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] Give me *warning* [please]
+
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
 
 ## Racing with Jona
 

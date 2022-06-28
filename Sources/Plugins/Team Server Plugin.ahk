@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -55,6 +62,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
+
 
 			base.__New(function, label, icon)
 		}
@@ -136,6 +144,12 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
+		}
+	}
+
+	ID[] {
+		Get {
+			return this.Controller.ID
 		}
 	}
 
@@ -463,6 +477,27 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.keepAlive()
 	}
 
+	getStintDriverName(stint, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if stint is Integer
+					stint := this.Connector.GetSessionStint(session, stint)
+
+				driver := this.parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(stint)))
+
+				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
+	}
+
 	getDriverForName() {
 		if (!this.iDriverForName && this.TeamServerActive) {
 			try {
@@ -497,7 +532,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
 
-	startSession(duration, car, track) {
+	startSession(simulator, car, track, duration) {
 		if this.SessionActive
 			this.leaveSession()
 
@@ -510,6 +545,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				this.Connector.StartSession(this.Session, duration, car, track)
 
+				this.Connector.SetSessionValue(this.Session, "Simulator", simulator)
+				this.Connector.SetSessionValue(this.Session, "Car", car)
+				this.Connector.SetSessionValue(this.Session, "Track", track)
 				this.Connector.SetSessionValue(this.Session, "Time", A_Now)
 
 				this.iSessionActive := true
@@ -551,14 +589,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iSessionActive := false
 	}
 
-	joinSession(car, track, lapNumber, duration := 0) {
+	joinSession(simulator, car, track, lapNumber, duration := 0) {
 		if this.TeamServerActive {
 			if !this.SessionActive {
 				if (lapNumber = 1) {
 					if isDebug()
 						showMessage("Creating team session: " . car . ", " . track)
 
-					this.startSession(duration, car, track)
+					this.startSession(simulator, car, track, duration)
 				}
 				else {
 					if isDebug()
@@ -666,7 +704,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if stint is integer
+				if stint is Integer
 					value := this.Connector.GetSessionStintValue(session, stint, name)
 				else
 					value := this.Connector.GetStintValue(stint, name)
@@ -697,13 +735,13 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if stint is integer
+					if stint is Integer
 						this.Connector.DeleteSessionStintValue(session, stint, name)
 					else
 						this.Connector.DeleteStintValue(stint, name, value)
 				}
 				else {
-					if stint is integer
+					if stint is Integer
 						this.Connector.SetSessionStintValue(session, stint, name, value)
 					else
 						this.Connector.SetStintValue(stint, name, value)
@@ -716,6 +754,25 @@ class TeamServerPlugin extends ControllerPlugin {
 				logMessage(kLogCritical, translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 			}
 		}
+	}
+
+	getStintSession(stint, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if stint is Integer
+					stint := this.Connector.GetSessionStint(session, stint)
+
+				return this.Connector.GetStintSession(stint)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
 	}
 
 	getCurrentLap(session := false) {
@@ -740,13 +797,32 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
+	getLapStint(lap, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if lap is Integer
+					lap := this.Connector.GetSessionLap(session, lap)
+
+				return this.Connector.GetLapStint(lap)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
+	}
+
 	getLapValue(lap, name, session := false) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
 		if session {
 			try {
-				if lap is integer
+				if lap is Integer
 					value := this.Connector.GetSessionLapValue(session, lap, name)
 				else
 					value := this.Connector.GetLapValue(lap, name)
@@ -777,7 +853,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if lap is integer
+					if lap is Integer
 						this.Connector.DeleteSessionLapValue(session, lap, name)
 					else
 						this.Connector.DeleteLapValue(lap, name, value)
@@ -786,7 +862,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						logMessage(kLogInfo, translate("Deleting lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(")"))
 				}
 				else {
-					if lap is integer
+					if lap is Integer
 						this.Connector.SetSessionLapValue(session, lap, name, value)
 					else
 						this.Connector.SetLapValue(lap, name, value)
@@ -814,6 +890,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				try {
 					this.Connector.SetStintValue(stint, "Time", A_Now)
+					this.Connector.SetStintValue(stint, "ID", this.ID)
 				}
 				catch exception {
 					; ignore
@@ -832,13 +909,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	addLap(lapNumber, telemetryData, positionsData) {
 		if this.TeamServerActive {
 			try {
-				if isDebug()
-					showMessage("Updating lap for team session: " . lapNumber)
+				driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
+				driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+				driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 
 				if isDebug() {
-					driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
-					driverSurName := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-					driverNickName := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
+					showMessage("Updating lap for team session: " . lapNumber)
 
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
 						Throw Exception("Driver inconsistency detected...")
@@ -847,10 +923,13 @@ class TeamServerPlugin extends ControllerPlugin {
 				stint := false
 
 				if !this.SessionActive {
+					simulator := getConfigurationValue(telemetryData, "Session Data", "Simulator", "Unknown")
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
 
-					stint := this.joinSession(car, track, lapNumber)
+					new SessionDatabase().registerDriverName(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+
+					stint := this.joinSession(simulator, car, track, lapNumber)
 				}
 				else if !this.DriverActive
 					stint := this.addStint(lapNumber)

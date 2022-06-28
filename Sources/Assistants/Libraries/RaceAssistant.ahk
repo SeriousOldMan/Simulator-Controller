@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Includes\Includes.ahk
+#Include ..\Libraries\JSON.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -18,6 +19,7 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceManager.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
@@ -52,6 +54,8 @@ class RaceAssistant extends ConfigurationItem {
 	iAssistantType := ""
 	iSettings := false
 	iVoiceManager := false
+
+	iMuted := false
 
 	iAnnouncements := false
 
@@ -209,9 +213,19 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Speaker[] {
+	Muted[]  {
 		Get {
-			return this.VoiceManager.Speaker
+			return this.VoiceManager.Muted
+		}
+
+		Set {
+			return (this.VoiceManager.Muted := value)
+		}
+	}
+
+	Speaker[muted := false] {
+		Get {
+			return this.VoiceManager.Speaker[muted]
 		}
 	}
 
@@ -473,6 +487,16 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
+			case "Activate":
+				this.clearContinuation()
+
+				this.activateRecognized(words)
+			case "Deactivate":
+				this.clearContinuation()
+
+				this.deactivateRecognized(words)
+			case "Joke":
+				this.jokeRecognized(words)
 			case "AnnouncementsOn":
 				this.clearContinuation()
 
@@ -560,6 +584,90 @@ class RaceAssistant extends ConfigurationItem {
 
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
+	}
+
+	activateRecognized(words) {
+		this.Muted := false
+
+		this.getSpeaker().speakPhrase("Roger")
+	}
+
+	deactivateRecognized(words) {
+		this.Muted := true
+
+		this.getSpeaker().speakPhrase("Okay")
+	}
+
+	jokeRecognized(words) {
+		Random rnd, 0, 4
+
+		hasJoke := (rnd > 1)
+
+		if hasJoke
+			if (this.VoiceManager.Language = "EN")
+				try {
+					URLDownloadToFile https://api.chucknorris.io/jokes/random, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					joke := JSON.parse(joke)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke.value)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else if (this.VoiceManager.Language = "DE")
+				try {
+					URLDownloadToFile http://www.hahaha.de/witze/zufallswitz.js.php, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					html := ComObjCreate("HtmlFile")
+
+					html.write(joke)
+
+					joke := html.documentElement.innerText
+
+					joke := StrReplace(StrReplace(StrReplace(joke, "document.writeln('", ""), "`n", " "), "\", "")
+
+					index := InStr(joke, "</div")
+
+					if index
+						joke := SubStr(joke, 1, index - 1)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else
+				hasJoke := false
+
+		if !hasJoke
+			this.getSpeaker().speakPhrase("NoJoke")
 	}
 
 	setContinuation(continuation) {
@@ -1089,21 +1197,6 @@ printNumber(number, precision) {
 	}
 	else
 		return number
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {

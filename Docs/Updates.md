@@ -1,6 +1,6 @@
 Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
 
-Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
+Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
 ***
 
@@ -42,6 +42,14 @@ The update procedure itself is handled by the application *Simulator Tools*. It 
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
+
+## Release 4.2.2
+
+Nothing to do regarding the configuration update, but a minor bug in 4.2.1 may have created unnecessary folders in the Session Database, when you have used AC and directly aftwards ACC. These folders will show up as cars from AC in the ACC collection and vice versa, for example in the "Strategy Workbench". Go to the [Documents]\Simulator Controller\User\ACC folder and simply delete these alien folders. Do the same for [Documents]\Simulator Controller\User\AC, if necessary.
+
+The Team Server has been updated to support the storage of owner IDs for all collected data. If you run your own Team Server, make sure to update the binaries, before connecting with any of the applications of the current release. The database structure is unchanged, therefore you can still use your current database file.
+
+***
 
 ## Release 4.2.1
 

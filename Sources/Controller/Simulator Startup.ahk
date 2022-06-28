@@ -465,12 +465,12 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s10 Bold, Arial
 
-		Gui LP:Add, Text, w590 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
+		Gui LP:Add, Text, w580 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
 
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 
-		Gui LP:Add, Text, YP+20 w590 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
+		Gui LP:Add, Text, x258 YP+20 w90 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
 
 		Gui LP:Font, s8 Norm, Arial
 
@@ -628,10 +628,15 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	if inList(A_Args, "-NoLaunchPad")
+	noLaunch := inList(A_Args, "-NoLaunchPad")
+
+	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 		startupSimulator()
 	else
 		launchPad()
+
+	if (!vStartupManager || vStartupManager.Finished)
+		ExitApp 0
 }
 
 playSong(songFile) {
@@ -652,6 +657,9 @@ exitStartup(sayGoodBye := false) {
 	}
 	else {
 		Hotkey Escape, Off
+
+		if vStartupManager
+			vStartupManager.cancelStartup()
 
 		fileName := (kTempDirectory . "Startup.semaphore")
 
@@ -709,6 +717,8 @@ try {
 		else {
 			if (vSimulatorControllerPID != 0)
 				raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
+
+			vStartupManager.hideSplashTheme()
 
 			exitStartup(true)
 		}

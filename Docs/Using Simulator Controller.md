@@ -6,7 +6,7 @@ Once you have configured everything for your simulation rig, there are two appli
 
 This window will give you access to all applications of Simulator Controller. You will get some information about a given application, when you hover with the mouse above the icon. Beside starting any of the applications and tools of Simulator Controller, you can continue the startup process of all the components you need, when running a simulation, by clicking on the top left icon. Depending on your concrete configuration, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller. Put a check mark in the check box in the lower left corner, when you want the launch window to be closed automatically, when you enter your simulation.
 
-Note: If you don't want to use the launch window and want *Simulator Startup* to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown.
+Note: If you don't want to use the launch window and want *Simulator Startup* to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running *Simulator Startup*. The other way around can also be used: If you press the Shift key while running *Simulator Startup* normally, no launch window will be shown and the startup process will run directly.
 
 ## Startup Process & Settings
 
@@ -30,11 +30,11 @@ In the next group, you can decide, how Simulator Controller will notify you abou
 
 ### Configuration of the Controller Mode automation
 
-If you click on then button "Controller Automation...", a neeew dialog will open up, where you can select predefined Modes for your connected hardware controller.
+If you click on then button "Controller Automation...", a new dialog will open up, where you can select predefined Modes for your connected hardware controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor.JPG)
 
-You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers  exclusively.
+You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers exclusively.
 
 ### Themes configuration
 

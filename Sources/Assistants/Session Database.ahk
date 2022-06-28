@@ -305,7 +305,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w664 cBlue Center gopenSessionDatabaseEditorDocumentation, % translate("Session Database")
+		Gui %window%:Add, Text, x258 YP+20 w164 cBlue Center gopenSessionDatabaseEditorDocumentation, % translate("Session Database")
 
 		Gui %window%:Add, Text, x8 yp+30 w670 0x10
 

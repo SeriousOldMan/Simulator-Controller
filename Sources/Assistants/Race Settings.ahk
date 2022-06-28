@@ -232,21 +232,6 @@ moveSettingsEditor() {
 	moveByMouse("RES")
 }
 
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
-}
-
 loadSettings() {
 	editSettings(kLoad)
 }
@@ -902,7 +887,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
+		Gui RES:Add, Text, x118 YP+20 w168 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
 

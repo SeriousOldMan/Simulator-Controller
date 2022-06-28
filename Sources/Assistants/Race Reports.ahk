@@ -180,7 +180,7 @@ class RaceReports extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenReportsDocumentation, % translate("Race Reports")
+		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenReportsDocumentation, % translate("Race Reports")
 
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
 
@@ -608,8 +608,24 @@ class RaceReports extends ConfigurationItem {
 				this.loadTrack(this.SelectedTrack, true)
 			else if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
 				this.loadCar(this.SelectedCar, true)
-			else
-				this.loadSimulator(this.SelectedSimulator, true)
+			else {
+				simulators := this.getSimulators()
+
+				if inList(simulators, this.SelectedSimulator)
+					this.loadSimulator(this.SelectedSimulator, true)
+				else {
+					window := this.Window
+
+					Gui %window%:Default
+
+					GuiControl, , simulatorDropDown, % ("|" . values2String("|", simulators*))
+
+					if (simulators.Length() > 0)
+						this.loadSimulator(simulators[1], true)
+					else
+						GuiControl Choose, simulatorDropDown, 0
+				}
+			}
 		}
 	}
 

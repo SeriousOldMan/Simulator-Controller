@@ -2,6 +2,10 @@
 
 Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simulator Controller. As a spotter, Elisa watches over your car and all the cars around you. Elisa will warn you about critical situations, for example, when a car appears in your blind spot, or when a car is chasing you from behind. Furthermore, Elisa will inform you periodically about other aspects of the traffic around you, for example, when one of the leading cars is closing in from behind and you are getting a blue flag.
 
+## Installation
+
+The installation procedure for Elisa is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that you are also well prepared to use the Spotter, if you have everything setup correctly for the Engineer.
+
 ## Alerts & Information
 
 The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:
@@ -81,24 +85,32 @@ As you might expect, the word "please" is optional. Available options for *annou
 
 	[Please] Give me *announcement* [please]
 
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Simulator Integration
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| ------------------------- | -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert              | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
-| Yellow Flag               | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Full Course Yellow        | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow             | Yes                        | No              | No      | Yes                        | Yes       |
-| Yellow Distance           | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                 | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Pit Window                | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
-| Start Performance Summary | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Delta Information         | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
-| Final Laps Announcement   | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Tactical Advices          | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
+| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
+| Side Alert                | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert              | Yes           | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       |
+| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       |
+| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        |
+| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
+| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Delta Information         | Yes           | Yes (2)                    | Yes             | Yes     | Yes                        | Yes       |
+| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 ##### Notes
 

@@ -994,7 +994,7 @@ class RaceStrategist extends RaceAssistant {
 		lastLap := lapNumber
 
 		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy) {
-			if this.Speaker {
+			if this.Speaker[false] {
 				this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "reportStrategy"))
@@ -1353,7 +1353,7 @@ class RaceStrategist extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Strategy && this.Speaker)
+		if (this.Strategy && this.Speaker[false])
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 		else
 			nextPitstop := false
@@ -1397,7 +1397,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1408,7 +1408,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if (this.Speaker && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -1435,7 +1435,7 @@ class RaceStrategist extends RaceAssistant {
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker()
 
 			if this.hasEnoughData(false) {

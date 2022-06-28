@@ -4,7 +4,7 @@
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
   5. [Target: 4.3.x][Strategy Workbench] Export / Import for telemetry data incl. support for team structures
-  6. [Target: 4.2.x][Race Center] Include tyre wear / damage as well as general damage info after a pitstop into "Race Center"
+  6. [Target: 4.2.x][Race Center] Include general damage info after a pitstop into "Race Center"
 
 #### Strategy Development
   1. [Target: V4.x] Enhancements for Race Strategist

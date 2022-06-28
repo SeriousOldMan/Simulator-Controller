@@ -255,10 +255,22 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		runningLap := 0
 
-		if (teamServer && teamServer.Active && session)
+		if (teamServer && teamServer.Active && session) {
+			lastStint := false
+			driverID := kNull
+
 			Loop % teamServer.getCurrentLap(session)
 			{
 				try {
+					stint := teamServer.getLapStint(A_Index, session)
+					newStint := (stint != lastStint)
+
+					if newStint {
+						lastStint := stint
+
+						driverID := teamServer.getStintValue(stint, "ID", session)
+					}
+
 					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
 
 					if (!telemetryData || (telemetryData == ""))
@@ -268,6 +280,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+
+					if (newStint && driverID)
+						telemetryDB.registerDriverName(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
 
 					pitstop := telemetryData[10]
 
@@ -283,19 +298,20 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-													 , telemetryData[9])
+													 , telemetryData[9], driverID)
 
 						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 											   , pressures[1], pressures[2], pressures[4], pressures[4]
 											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 											   , telemetryData[7], telemetryData[8], telemetryData[9]
-											   , wear[1], wear[2], wear[3], wear[4])
+											   , wear[1], wear[2], wear[3], wear[4], driverID)
 					}
 				}
 				catch exception {
 					break
 				}
 			}
+		}
 		else
 			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
 				if !telemetryDB

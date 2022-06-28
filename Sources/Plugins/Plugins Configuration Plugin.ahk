@@ -269,14 +269,16 @@ openPluginsModesDocumentation() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server
 		case "ACC":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4
-		case "IRC":
+		case "AC":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-5
-		case "RF2":
+		case "IRC":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6
-		case "R3E":
+		case "RF2":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7
-		case "AMS2":
+		case "R3E":
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8
+		case "AMS2":
+			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9
 		default:
 			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
 	}

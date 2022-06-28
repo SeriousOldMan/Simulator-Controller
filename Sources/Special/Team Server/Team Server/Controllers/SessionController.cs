@@ -233,6 +233,26 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/stint")]
+        public string GetStint([FromQuery(Name = "token")] string token, string identifier,
+                             [FromQuery(Name = "stint")] string stint) {
+            try {
+                Server.TeamServer.TokenIssuer.ValidateToken(token);
+
+                int stintNr = Int32.Parse(stint);
+
+                Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
+                    @"
+                        Select * From Stints Where SessionID In (Select ID From Sessions Where Identifier = ?) And Nr = ?
+                    ", identifier, stint).Result.FirstOrDefault<Stint>();
+
+                return (theStint != null) ? theStint.Identifier.ToString() : "Null";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/lap")]
         public string GetLap([FromQuery(Name = "token")] string token, string identifier,
                              [FromQuery(Name = "lap")] string lap) {
@@ -280,8 +300,8 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("{identifier}/stint")]
-        public string GetStint([FromQuery(Name = "token")] string token, string identifier) {
+        [HttpGet("{identifier}/currentstint")]
+        public string GetCurrentStint([FromQuery(Name = "token")] string token, string identifier) {
             try {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
@@ -430,6 +450,18 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/session")]
+        public string GetSession([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+				
+                return sessionManager.LookupStint(identifier).Session.Identifier.ToString();
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/driver")]
         public string GetDriver([FromQuery(Name = "token")] string token, string identifier) {
             try {
@@ -565,6 +597,18 @@ namespace TeamServer.Controllers {
                 Lap lap = sessionManager.LookupLap(identifier);
 
                 return ControllerUtils.SerializeObject(lap, new List<string>(new string[] { "Identifier", "Nr" }));
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}/stint")]
+        public string GetStint([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+				
+                return sessionManager.LookupLap(identifier).Stint.Identifier.ToString();
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

@@ -19,10 +19,6 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
-
-global kForegroundApps = ["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -812,6 +808,7 @@ checkForUpdates() {
 restartUpdate:
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
 			if !getConfigurationValue(updates, "Processed", target, false) {
+				/*
 				SoundPlay *32
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
@@ -852,6 +849,13 @@ restartUpdate:
 				{
 					break
 				}
+				*/
+
+				RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
+
+				loadSimulatorConfiguration()
+
+				break
 			}
 	}
 }

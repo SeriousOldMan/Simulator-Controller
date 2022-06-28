@@ -1,3 +1,25 @@
+## 4.2.2.0-release 07/01/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Dropped support for automatic updates prior to version 3.8.0.
+  4. Update procedures for local configuration database is now manadatory (no more questions asked).
+  5. When an update is installed, it is checked, whether there are still running processes of Simulator Controller.
+  6. Update manager now checks for active processes and asks for termination before running the update.
+  7. All Race Assistants can entertain you now you by telling some jokes. Try: "Can you tell me a joke?"
+  8. Reduced click area for window subtitles fixes the unwanted opening of a browser with context-sensitive documentation.
+  9. Minimum number of tyre laps and minimum amount of start fuel is set to 10 now.
+  10. Full support for the Spotter and Strategist in *Assetto Corsa*. You have to install a plugin in *Assetto Corsa* for the data acquisition. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers) for more information.
+  11. "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration".
+  12. Added installation support for all integration plugins to "Simulator Setup".
+  13. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again" or "You can talk again".
+  14. Added Owner column to all database tables to identify the driver who provided the data. Please note, that updating the local configuration database can take quite some time for this reorganization.
+  15. New version of the Team Server to support the data owner concept introduced above. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422) for more information.
+  16. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
+  17. New car models for "Setup Advisor":
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do and you may have to update your Team Server.
+
 ## 4.2.1.1-release 06/25/22
 
   1. Critical fix for unsupressed error message after a pitstop in IRC, AMS2, R3E and RF2.

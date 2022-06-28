@@ -448,6 +448,10 @@ namespace TeamServer {
 			return Get("lap/" + identifier);
 		}
 
+		public string GetLapStint(string identifier) {
+			return Get("lap/" + identifier + "/stint");
+		}
+
 		public string GetLapValue(string identifier, string name) {
 			return Get("lap/" + identifier + "/value",
 					   arguments: new Parameters() { { "name", name } });

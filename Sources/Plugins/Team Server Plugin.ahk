@@ -673,7 +673,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if stint is integer
+				if stint is Integer
 					value := this.Connector.GetSessionStintValue(session, stint, name)
 				else
 					value := this.Connector.GetStintValue(stint, name)
@@ -704,13 +704,13 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if stint is integer
+					if stint is Integer
 						this.Connector.DeleteSessionStintValue(session, stint, name)
 					else
 						this.Connector.DeleteStintValue(stint, name, value)
 				}
 				else {
-					if stint is integer
+					if stint is Integer
 						this.Connector.SetSessionStintValue(session, stint, name, value)
 					else
 						this.Connector.SetStintValue(stint, name, value)
@@ -747,13 +747,32 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
+	getLapStint(lap, session := false) {
+		if (!session && this.SessionActive)
+			session := this.Session
+
+		if session {
+			try {
+				if lap is Integer
+					lap := this.Connector.GetSessionLap(session, lap)
+
+				return this.Connector.GetLapStint(lap)
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+			}
+		}
+
+		return false
+	}
+
 	getLapValue(lap, name, session := false) {
 		if (!session && this.SessionActive)
 			session := this.Session
 
 		if session {
 			try {
-				if lap is integer
+				if lap is Integer
 					value := this.Connector.GetSessionLapValue(session, lap, name)
 				else
 					value := this.Connector.GetLapValue(lap, name)
@@ -784,7 +803,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if lap is integer
+					if lap is Integer
 						this.Connector.DeleteSessionLapValue(session, lap, name)
 					else
 						this.Connector.DeleteLapValue(lap, name, value)
@@ -793,7 +812,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						logMessage(kLogInfo, translate("Deleting lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(")"))
 				}
 				else {
-					if lap is integer
+					if lap is Integer
 						this.Connector.SetSessionLapValue(session, lap, name, value)
 					else
 						this.Connector.SetLapValue(lap, name, value)

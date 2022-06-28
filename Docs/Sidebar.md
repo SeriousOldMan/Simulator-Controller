@@ -90,6 +90,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation)
   - [Interacting with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona)
+    - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona)
     - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race)
     - [Pitstop Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop)
@@ -112,6 +113,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
   - [Interacting with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#interacting-with-cato)
+    - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
 	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
@@ -129,8 +131,10 @@
 [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#installation)
   - [Alerts & Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information)
     - [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information)
+	- [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements)
   - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)

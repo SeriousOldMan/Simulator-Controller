@@ -571,6 +571,18 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/stint")]
+        public string GetStint([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+				
+                return sessionManager.LookupLap(identifier).Stint.Identifier.ToString();
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}/value")]
         public string GetLapValue([FromQuery(Name = "token")] string token, string identifier,
                                   [FromQuery(Name = "name")] string name)

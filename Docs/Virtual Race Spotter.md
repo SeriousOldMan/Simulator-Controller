@@ -6,6 +6,36 @@ Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simula
 
 The installation procedure for Elisa is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that you are also well prepared to use the Spotter, if you have everything setup correctly for the Engineer.
 
+## Interacting with Elisa
+
+The same principles as [described for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona) apply here as well, since Elisa is based on the same technology as Jona.
+
+### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(DE))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
+
+### Enabling and disabling specific warnings and announcements
+
+As described in the next section, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:
+
+	[Please] No more *announcement* [please]
+
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
+
+	[Please] Give me *announcement* [please]
+
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Alerts & Information
 
 The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:

@@ -20,7 +20,7 @@
   18. Added "Strategy" and "DriverSwap" action to the "AMS2" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9) for more information.
   19. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
   20. All new documentation for the Assistant commands. See the [english version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) and the [german version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(DE)) for the Race Engineer as an example.
-  20. New car models for "Setup Advisor":
+  21. New car models for "Setup Advisor":
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do and you may have to update your Team Server.
 

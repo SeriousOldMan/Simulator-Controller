@@ -63,7 +63,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[{Hi, Hey} %name%, %name% hörst du mich, %name% ich brauche Dich, Hey %name% wo bist Du]
 
-	[Einverstanden, {Ja bitte, Ja mach weiter, Perfekt mach weiter, Mach weiter bitte, Okay weitermachen, Okay machen wir weiter}, Richtig]
+	[Einverstanden, Ja bitte, Ja mach weiter, Perfekt mach weiter, Mach weiter bitte, Okay weitermachen, Okay machen wir weiter, Richtig]
 
 	[Nein {danke, jetzt nicht, nicht jetzt, ich melde mich später}, Auf keinen Fall]
 

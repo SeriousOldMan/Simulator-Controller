@@ -15,11 +15,8 @@
   13. Assistants can be muted and unmuted with a voice command by saying: "Be quiet please" and "I can listen again" or "You can talk again".
   14. Added Owner column to all database tables to identify the driver who provided the data. Please note, that updating the local configuration database can take quite some time for this reorganization.
   15. New version of the Team Server to support the data owner concept introduced above. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422) for more information.
-  16. Fixed the Pitstop MFD handling for *Automobilista 2* to adhere to the new ICM.
-  17. Remove the controller action "TyreChange" from the "AMS2" plugin. It has been replaced by "TyreCompound". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9) for more information.
-  18. Added "Strategy" and "DriverSwap" action to the "AMS2" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9) for more information.
-  19. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
-  20. New car models for "Setup Advisor":
+  16. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
+  17. New car models for "Setup Advisor":
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do and you may have to update your Team Server.
 
@@ -806,7 +803,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. With the completion of the weather trend analysis, the capability to change tyre compounds depending on several conditions and almost 500 rules in the AI kernel, Jona is now feature complete and no longer considered to be in alpha stage. I still advise you to be cautious, especially during important races, and always double check Jonas recommendations, but I do use it during league races and the recommendations had been spot on so far. As always, take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) and especially on the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-engineer-settings) required for Jona
-  4. [A new plugin argument](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the *Assetto Corsa Competizione* plugin allows you to open the race engineer settings dialog from your hardware controller (moved to "Race Engineer" plugin in Release 2.8)
+  4. [A new plugin argument](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the *Assetto Corsa Competizione* plugin allows you to open the Race Engineer settings dialog from your hardware controller (moved to "Race Engineer" plugin in Release 2.8)
   5. The support for multiple Button Boxes has been extended
      - New capabilities in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) for Launchpad applications and chat messages
 	 - The Button Box [configuration file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) format has been extended to allow for the definition of several layout margin and filler options
@@ -893,7 +890,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Additional voice support for select driver in pitstop settings
-  4. First version of the hybrid rule engine, which will be used to implement the AI based race engineer
+  4. First version of the hybrid rule engine, which will be used to implement the AI based Race Engineer
 
 ## 2.0.2-release 01/10/21
 

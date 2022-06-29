@@ -6,7 +6,7 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 
@@ -18,7 +18,7 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 ### A typical dialog
 
-**Jona: "Hi, here is Jona, your race engineer today. You can call me anytime if you have questions. Good luck."**
+**Jona: "Hi, here is Jona, your Race Engineer today. You can call me anytime if you have questions. Good luck."**
 
 (You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a session. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
 
@@ -165,9 +165,9 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 	[Speaker Phrases]
 	// Conversation //
-	Greeting.1=Hi, I am %name%, your race engineer today. You can call me anytime if you have questions. Good luck.
-	Greeting.2=Here is %name%. I am your race engineer for this session. Call me anytime.
-	Greeting.3=Here is %name%, your race engineer. Have a great session.
+	Greeting.1=Hi, I am %name%, your Race Engineer today. You can call me anytime if you have questions. Good luck.
+	Greeting.2=Here is %name%. I am your Race Engineer for this session. Call me anytime.
+	Greeting.3=Here is %name%, your Race Engineer. Have a great session.
 	IHearYou.1=I am here. What can I do for you?
 	IHearYou.2=Yeah? Have you called me?
 	IHearYou.3=I hear you. Go on.

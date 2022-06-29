@@ -61,7 +61,7 @@ Announcements=weather warnings
 
 	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, Hey %name% where are you]
 
-	[{Yes please, Yes go on, Perfect go on, Go on please, Head on please, Okay let's go on}, I agree, Right]
+	[Yes please, Yes go on, Perfect go on, Go on please, Head on please, Okay let's go on, I agree, Right]
 
 	[No {thank you, not now, I will call you later}, Not at the moment]
 

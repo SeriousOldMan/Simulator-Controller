@@ -2611,17 +2611,21 @@ getApplicationDescriptor(application) {
 fadeOut() {
 	SoundGet masterVolume, MASTER
 
-	currentVolume := masterVolume
+	if GetKeyState("Ctrl")
+		SoundSet 0, MASTER
+	else {
+		currentVolume := masterVolume
 
-	Loop {
-		currentVolume -= 5
+		Loop {
+			currentVolume -= 5
 
-		if (currentVolume <= 0)
-			break
-		else {
-			SoundSet %currentVolume%, MASTER
+			if (currentVolume <= 0)
+				break
+			else {
+				SoundSet %currentVolume%, MASTER
 
-			Sleep 200
+				Sleep 200
+			}
 		}
 	}
 

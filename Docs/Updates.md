@@ -45,9 +45,13 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.2.2
 
-Nothing to do regarding the configuration update, but a minor bug in 4.2.1 may have created unnecessary folders in the Session Database, when you have used AC and directly aftwards ACC. These folders will show up as cars from AC in the ACC collection and vice versa, for example in the "Strategy Workbench". Go to the [Documents]\Simulator Controller\User\ACC folder and simply delete these alien folders. Do the same for [Documents]\Simulator Controller\User\AC, if necessary.
+Nothing to do regarding the configuration update, but:
 
-The Team Server has been updated to support the storage of owner IDs for all collected data. If you run your own Team Server, make sure to update the binaries, before connecting with any of the applications of the current release. The database structure is unchanged, therefore you can still use your current database file.
+  1. A minor bug in 4.2.1 may have created unnecessary folders in the Session Database, when you have used AC and directly aftwards ACC. These folders will show up as cars from AC in the ACC collection and vice versa, for example in the "Strategy Workbench". Go to the [Documents]\Simulator Controller\User\ACC folder and simply delete these alien folders. Do the same for [Documents]\Simulator Controller\User\AC, if necessary.
+
+  2. The Team Server has been updated to support the storage of owner IDs for all collected data. If you run your own Team Server, make sure to update the binaries, before connecting with any of the applications of the current release. The database structure is unchanged, therefore you can still use your current database file.
+
+  3. The action "TyreChange" is no longer available for the "AMS2" plugin. It has been replaced by "TyreCompound". Two more actions ("Strategy" and "DriverSwap") are available now. You may want to update your configuration and your controller bindings.
 
 ***
 

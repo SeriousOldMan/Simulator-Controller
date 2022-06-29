@@ -970,10 +970,12 @@ See the following table for the supported settings:
 
 | Setting | Description |
 | ------ | ------ |
+| Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
-| TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
+| TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. Only the first 3 positions are supported, typically 1. Slicks, 2. Intermediate or Wets and 3. Automatic |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| DriverSwap | Enables or disables driver swap for the upcoming pitstop. |
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
 
@@ -1004,4 +1006,4 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Before the first usage the ICM must be at the first page with the selection line at the bottom of the ICM. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.

@@ -206,11 +206,17 @@ class RaceEngineer extends RaceAssistant {
 			case "PitstopNoPressureChange":
 				this.clearContinuation()
 
-				this.pitstopAdjustNoPressureRecognized(words)
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopAdjustNoPressureRecognized(words)
 			case "PitstopNoTyreChange":
 				this.clearContinuation()
 
-				this.pitstopAdjustNoTyreRecognized(words)
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopAdjustNoTyreRecognized(words)
 			case "PitstopAdjustRepairSuspension":
 				this.clearContinuation()
 
@@ -249,7 +255,7 @@ class RaceEngineer extends RaceAssistant {
 
 		lap := knowledgeBase.getValue("Lap", 0)
 
-		if (laps == 0)
+		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
 			fuel := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0)

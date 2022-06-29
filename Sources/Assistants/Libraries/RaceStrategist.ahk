@@ -487,7 +487,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		car := knowledgeBase.getValue("Driver.Car")
-		lap := knowledgeBase.getValue("Lap")
+		lap := knowledgeBase.getValue("Lap", 0)
 		position := Round(knowledgeBase.getValue("Position"))
 		cars := Round(knowledgeBase.getValue("Car.Count"))
 

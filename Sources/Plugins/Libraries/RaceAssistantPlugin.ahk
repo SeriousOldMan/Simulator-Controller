@@ -1245,8 +1245,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if (!teamSessionActive || !this.TeamServer.Connected)
 									return ; No Team Server, no late join
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.iInPit := false
 
@@ -1255,8 +1258,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							else if (this.LastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.TeamServer.addStint(dataLastLap)
 
@@ -1322,8 +1328,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 									this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
 									this.TeamServer.setSessionValue(this.Plugin . " State", "")
 								}
-								else ; Wrong Driver - no team session
+								else {
+									; Wrong Driver - no team session
+
 									this.disconnectTeamSession()
+
+									logMessage(kLogWarn, translate("Cannot join the team session. Driver names in team session and in simulation do not match."))
+								}
 
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")

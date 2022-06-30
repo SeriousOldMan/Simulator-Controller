@@ -23,6 +23,10 @@
   19. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
   20. All new documentation for the Assistant commands. See the [english version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) and the [german version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(DE)) for the Race Engineer as an example.
   21. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - Abarth 500 Assetto Corse
+      - Assetto Corsa Competizione
+        - Chevrolet Camaro GT4.R
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-422), there is a small cleanup task for you to do and you may have to update your Team Server.
 

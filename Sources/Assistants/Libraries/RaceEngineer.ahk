@@ -404,7 +404,7 @@ class RaceEngineer extends RaceAssistant {
 			if litresPosition {
 				litres := words[litresPosition - 1]
 
-				if this.readNumber(litres, litres) {
+				if this.isNumber(litres, litres) {
 					speaker.speakPhrase("ConfirmFuelChange", {litres: litres}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", litres))
@@ -510,7 +510,7 @@ class RaceEngineer extends RaceAssistant {
 					psiValue := words[pointPosition - 1]
 					tenthPsiValue := words[pointPosition + 1]
 
-					found := (this.readNumber(psiValue, psiValue) && this.readNumber(tenthPsiValue, tenthPsiValue))
+					found := (this.isNumber(psiValue, psiValue) && this.isNumber(tenthPsiValue, tenthPsiValue))
 				}
 				else
 					for ignore, word in words {
@@ -528,7 +528,7 @@ class RaceEngineer extends RaceAssistant {
 
 							if startChar is Integer
 								if (StrLen(word) = 2) {
-									found := (this.readNumber(startChar, psiValue) && this.readNumber(SubStr(word, 2, 1), tenthPsiValue))
+									found := (this.isNumber(startChar, psiValue) && this.isNumber(SubStr(word, 2, 1), tenthPsiValue))
 
 									if found
 										break

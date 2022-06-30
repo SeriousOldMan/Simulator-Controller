@@ -298,7 +298,7 @@ class RaceStrategist extends RaceAssistant {
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 
-			if this.readNumber(lapDelta, lapDelta) {
+			if this.isNumber(lapDelta, lapDelta) {
 				currentLap := knowledgeBase.getValue("Lap")
 				lap := (currentLap + lapDelta)
 
@@ -307,33 +307,26 @@ class RaceStrategist extends RaceAssistant {
 				else {
 					car := knowledgeBase.getValue("Driver.Car")
 
-					speaker.startTalk()
+					speaker.speakPhrase("Confirm")
 
-					try {
-						speaker.speakPhrase("Confirm")
+					sendMessage()
 
-						sendMessage()
+					Loop 10
+						Sleep 500
 
-						Loop 10
-							Sleep 500
+					knowledgeBase.setFact("Standings.Extrapolate", lap)
 
-						knowledgeBase.setFact("Standings.Extrapolate", lap)
+					knowledgeBase.produce()
 
-						knowledgeBase.produce()
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
 
-						if this.Debug[kDebugKnowledgeBase]
-							this.dumpKnowledge(this.KnowledgeBase)
+					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 
-						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
-
-						if position
-							speaker.speakPhrase("FuturePosition", {position: position})
-						else
-							speaker.speakPhrase("NoFuturePosition")
-					}
-					finally {
-						speaker.finishTalk()
-					}
+					if position
+						speaker.speakPhrase("FuturePosition", {position: position})
+					else
+						speaker.speakPhrase("NoFuturePosition")
 				}
 
 				return
@@ -568,7 +561,7 @@ class RaceStrategist extends RaceAssistant {
 			if lapPosition {
 				lap := words[lapPosition + 1]
 
-				if !this.readNumber(lap, lap)
+				if !this.isNumber(lap, lap)
 					lap := false
 			}
 			else

@@ -670,7 +670,7 @@ class RaceAssistant extends ConfigurationItem {
 			this.getSpeaker().speakPhrase("NoJoke")
 	}
 
-	readNumber(word, ByRef number) {
+	isNumber(word, ByRef number) {
 		static numberFragmentsLookup := false
 
 		if word is Number
@@ -686,7 +686,7 @@ class RaceAssistant extends ConfigurationItem {
 				numberFragmentsLookup := {}
 
 				for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-					numberFragmentsLookup[fragments[fragment]] := index - 1
+					numberFragmentsLookup[fragment] := index - 1
 			}
 
 			if numberFragmentsLookup.HasKey(word) {

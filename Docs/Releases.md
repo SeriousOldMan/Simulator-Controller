@@ -22,7 +22,8 @@
   18. Added "Strategy" and "DriverSwap" action to the "AMS2" plugin. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9) for more information.
   19. Updated many Assistant commands to uniformly accept "Please", "Can you" and so on.
   20. All new documentation for the Assistant commands. See the [english version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) and the [german version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(DE)) for the Race Engineer as an example.
-  21. New car models for "Setup Advisor":
+  21. Added the new USA tracks to the track meta data for *Assetto Corsa Competizione*.
+  22. New car models for "Setup Advisor":
       - Assetto Corsa
         - Abarth 500 Assetto Corse
       - Assetto Corsa Competizione

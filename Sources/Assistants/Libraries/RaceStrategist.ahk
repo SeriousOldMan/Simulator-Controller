@@ -295,10 +295,9 @@ class RaceStrategist extends RaceAssistant {
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 
-			if lapDelta is number
-			{
+			if this.readNumber(lapDelta, lapDelta) {
 				currentLap := knowledgeBase.getValue("Lap")
-				lap := currentLap + lapDelta
+				lap := (currentLap + lapDelta)
 
 				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")
@@ -548,7 +547,7 @@ class RaceStrategist extends RaceAssistant {
 			if lapPosition {
 				lap := words[lapPosition + 1]
 
-				if lap is not number
+				if !this.readNumber(lap, lap)
 					lap := false
 			}
 			else

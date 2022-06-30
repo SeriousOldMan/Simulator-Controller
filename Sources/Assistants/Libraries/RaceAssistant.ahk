@@ -670,6 +670,35 @@ class RaceAssistant extends ConfigurationItem {
 			this.getSpeaker().speakPhrase("NoJoke")
 	}
 
+	readNumber(word, ByRef number) {
+		static numberFragmentsLookup := false
+
+		if word is Number
+		{
+			number := word
+
+			return true
+		}
+		else {
+			if !numberFragmentsLookup {
+				fragments := this.getSpeaker().Fragments
+
+				numberFragmentsLookup := {}
+
+				for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+					numberFragmentsLookup[fragments[fragment]] := index - 1
+			}
+
+			if numberFragmentsLookup.HasKey(word) {
+				number := numberFragmentsLookup[word]
+
+				return true
+			}
+			else
+				return false
+		}
+	}
+
 	setContinuation(continuation) {
 		if isInstance(continuation, VoiceManager.VoiceContinuation)
 			this.VoiceManager.setContinuation(continuation)

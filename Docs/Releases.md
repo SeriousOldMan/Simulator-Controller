@@ -1,5 +1,7 @@
 ## 4.2.2.0-release 07/01/22 (planned)
 
+**Important**: This update performs a major reorganization of the local database, where all the telemetry data and the tyre pressures, and so on, are stored. I tested everything thoroughly, but the devil is in the details. Please make sure to make a backup copy of your [Documents]\Simulator Controller folder and put it on the side for the next few weeks.
+
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Dropped support for automatic updates prior to version 3.8.0.

@@ -404,8 +404,7 @@ class RaceEngineer extends RaceAssistant {
 			if litresPosition {
 				litres := words[litresPosition - 1]
 
-				if litres is number
-				{
+				if this.readNumber(litres, litres) {
 					speaker.speakPhrase("ConfirmFuelChange", {litres: litres}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", litres))
@@ -460,18 +459,9 @@ class RaceEngineer extends RaceAssistant {
 		local action
 
 		static tyreTypeFragments := false
-		static numberFragmentsLookup := false
 
 		speaker := this.getSpeaker()
 		fragments := speaker.Fragments
-
-		if !tyreTypeFragments {
-			tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
-			numberFragmentsLookup := {}
-
-			for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-				numberFragmentsLookup[fragments[fragment]] := index - 1
-		}
 
 		if !this.hasPlannedPitstop() {
 			speaker.startTalk()
@@ -487,6 +477,9 @@ class RaceEngineer extends RaceAssistant {
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
+			if !tyreTypeFragments
+				tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
+
 			tyreType := false
 
 			if inList(words, fragments["Front"]) {
@@ -517,13 +510,7 @@ class RaceEngineer extends RaceAssistant {
 					psiValue := words[pointPosition - 1]
 					tenthPsiValue := words[pointPosition + 1]
 
-					if psiValue is not number
-					{
-						psiValue := numberFragmentsLookup[psiValue]
-						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
-					}
-
-					found := true
+					found := (this.readNumber(psiValue, psiValue) && this.readNumber(tenthPsiValue, tenthPsiValue))
 				}
 				else
 					for ignore, word in words {
@@ -541,15 +528,12 @@ class RaceEngineer extends RaceAssistant {
 
 							if startChar is Integer
 								if (StrLen(word) = 2) {
-									psiValue := (startChar + 0)
-									tenthPsiValue := (SubStr(word, 2, 1) + 0)
+									found := (this.readNumber(startChar, psiValue) && this.readNumber(SubStr(word, 2, 1), tenthPsiValue))
 
-									found := true
-
-									break
+									if found
+										break
 								}
 						}
-
 					}
 
 				if found {

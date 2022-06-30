@@ -12,11 +12,11 @@ Nachfolgend ist eine vollständige Liste aller von Elisa, dem virtuellen Rennbeo
    
 		Mary will ein Eis
 
-		(Sag mir deinen Namen?
+		(SagMir) deinen Namen?
 
 		Was ist { die, die aktuelle } Uhrzeit?
 
-   Das erste Beispiel ist ein einfacher Satz. Das zweite enthält alternative Teile, wie sie durch die Variable *TellMe* (siehe unten) definiert sind, und das dritte Beispiel verwendet eine lokale Liste von Alternativen und steht für "Wie ist die Uhrzeit?" und "Wie ist die aktuelle Uhrzeit?".
+   Das erste Beispiel ist ein einfacher Satz. Das zweite enthält alternative Teile, wie sie durch die Variable *SagMir* (siehe unten) definiert sind, und das dritte Beispiel verwendet eine lokale Liste von Alternativen und steht für "Wie ist die Uhrzeit?" und "Wie ist die aktuelle Uhrzeit?".
 
 
 3. Alternativen
@@ -27,15 +27,15 @@ Nachfolgend ist eine vollständige Liste aller von Elisa, dem virtuellen Rennbeo
 
    Wenn eine gegebene Liste alternative Teile in mehreren Phrasen verwendet wird, kann eine Variable dafür definiert werden und eine Variablenreferenz (der Name der Liste, eingeschlossen in **(** und **)**) kann anstelle einer expliziten Definition verwendet werden. Alle vordefinierten alternativen Listen sind im Abschnitt "[Choices]" der [Grammatikdatei](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Spotter.grammars.de) aufgeführt und sehen folgendermaßen aus:
 
-		GibMir=Gib mir, Gib mir bitte, Was sind, Wie sind, Sag mir
+		SagMir=Gib mir, Gib mir bitte, Sag mir
 
-   Auf diese vordefinierte Liste von Alternativen kann durch Verwendung von *(GibMir)* als Teil eines Satzes verwiesen werden.
+   Auf diese vordefinierte Liste von Alternativen kann durch Verwendung von *(SagMir)* als Teil eines Satzes verwiesen werden.
 
 4. Befehle
 
    Ein vollständiger Befehl ist entweder eine Phrase wie oben definiert oder eine Liste von Phrasen, die durch Kommas getrennt und in **[** und **]** eingeschlossen sind. Jeder dieser Phrasen kann den Befehl einzeln auslösen. Beispiele:
 
-		(GibMir) {die Reifendrücke, die Reifen Drücke, die aktuellen Reifendrücke, die aktuellen Reifen Drücke, die Drücke in den Reifen}
+		(SagMir) {die Reifendrücke, die Reifen Drücke, die aktuellen Reifendrücke, die aktuellen Reifen Drücke, die Drücke in den Reifen}
 		
 		[(KannstDu) (Mir) die Uhrzeit sagen, Wie viel Uhr ist es, Sag {mir bitte, mir} die Uhrzeit]
 

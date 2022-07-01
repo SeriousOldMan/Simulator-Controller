@@ -1,11 +1,11 @@
-## 4.2.2.0-release 07/01/22 (planned)
+## 4.2.2.0-release 07/01/22
 
 **Important**: This update includes a major reorganization of the local database, where all the telemetry data and the tyre pressures, and so on, are stored. I tested everything thoroughly, but the devil is in the details. Please make sure to make a backup copy of your [Documents]\Simulator Controller folder and put it on the side for the next few weeks.
 
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. Dropped support for automatic updates prior to version 3.8.0.
-  4. Update procedures for local configuration database is now manadatory (no more questions asked).
+  4. Update procedures for local configuration database is now mandatory and automatic (no more questions asked).
   5. When an update is installed, it is checked, whether there are still running processes of Simulator Controller.
   6. Update manager now checks for active processes and asks for termination before running the update.
   7. All Race Assistants can entertain you now you by telling some jokes. Try: "Can you tell me a joke?"

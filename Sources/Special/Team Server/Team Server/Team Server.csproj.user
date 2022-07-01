@@ -5,6 +5,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <ActiveDebugProfile>TeamServer</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>D:\Controller\Sources\Special\Team Server\Team Server\Properties\PublishProfiles\sc-teamserver-test - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>D:\Controller\Sources\Special\Team Server\Team Server\Properties\PublishProfiles\sc-teamserver - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

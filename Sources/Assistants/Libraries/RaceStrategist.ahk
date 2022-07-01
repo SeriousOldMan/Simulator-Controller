@@ -562,7 +562,10 @@ class RaceStrategist extends RaceAssistant {
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if !this.hasEnoughData()
+		if !this.hasEnoughData(false)
+			return
+
+		if (position == 0)
 			return
 
 		speaker := this.getSpeaker()

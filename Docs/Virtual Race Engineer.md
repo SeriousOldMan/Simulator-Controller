@@ -6,7 +6,7 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: Depending on the simulation, the race assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 
@@ -18,7 +18,7 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 ### A typical dialog
 
-**Jona: "Hi, here is Jona, your race engineer today. You can call me anytime if you have questions. Good luck."**
+**Jona: "Hi, here is Jona, your Race Engineer today. You can call me anytime if you have questions. Good luck."**
 
 (You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a session. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
 
@@ -165,9 +165,9 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 	[Speaker Phrases]
 	// Conversation //
-	Greeting.1=Hi, I am %name%, your race engineer today. You can call me anytime if you have questions. Good luck.
-	Greeting.2=Here is %name%. I am your race engineer for this session. Call me anytime.
-	Greeting.3=Here is %name%, your race engineer. Have a great session.
+	Greeting.1=Hi, I am %name%, your Race Engineer today. You can call me anytime if you have questions. Good luck.
+	Greeting.2=Here is %name%. I am your Race Engineer for this session. Call me anytime.
+	Greeting.3=Here is %name%, your Race Engineer. Have a great session.
 	IHearYou.1=I am here. What can I do for you?
 	IHearYou.2=Yeah? Have you called me?
 	IHearYou.3=I hear you. Go on.
@@ -180,7 +180,13 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 As you can see here, each phrase provides different alternative sentences. Variables may be used here as well.
 
-I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
+#### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(DE))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
 ### Enabling and disabling specific warnings and announcements
 
@@ -188,7 +194,7 @@ Jona will give you a lot of information about fuel level, damages after an accid
 
 	[Please] No more *warning* [please]
 
-As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the Assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] Give me *warning* [please]
 
@@ -432,7 +438,7 @@ With the dropdown menu in the lower left corner you can choose whether only your
 Important:
 
   1. If you change the scope using the dropdown menu mentioned above, this will affect only the behaviour and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values ​​by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
-  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the Assistants, simply running one lap is enough.
 
 Following you will find an overview about the different database topics:
 
@@ -444,7 +450,7 @@ The Virtual Race Assistants provide many settings, as you have seen above in the
 
 When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide setting values for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and *overwrite* them for a more specific configuration. Let's take a look at a specific example:
 
-The race assistants use several values from the race settings to calculate how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be identical for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
+The Race Assistants use several values from the race settings to calculate how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be identical for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
 
 | Settings for *all* cars and *all* tracks | Specific setting for *Hungaroring* |
 |------------------------------------------|------------------------------------|

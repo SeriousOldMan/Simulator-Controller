@@ -6,6 +6,36 @@ Elisa, the Virtual Race Spotter is a part of the Race Assistant family of Simula
 
 The installation procedure for Elisa is the same as the [installation procedure for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation), which means, that you are also well prepared to use the Spotter, if you have everything setup correctly for the Engineer.
 
+## Interacting with Elisa
+
+The same principles as [described for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona) apply here as well, since Elisa is based on the same technology as Jona.
+
+### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(DE))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
+
+### Enabling and disabling specific warnings and announcements
+
+As described in the next section, Elisa will give you a lot of warnings and announcements about traffic and the overall race situation. You may disable these announcements by using a special voice command:
+
+	[Please] No more *announcement* [please]
+
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
+
+	[Please] Give me *announcement* [please]
+
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Alerts & Information
 
 The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:
@@ -99,8 +129,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 | Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
 | ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert              | Yes           | Yes                        | Yes             | No (1)  | Yes                        | Yes       |
+| Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Behind Alert              | Yes           | Yes                        | Yes             | No (2)  | Yes                        | Yes       |
 | Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       |
 | Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       |
@@ -108,12 +138,14 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
 | Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Delta Information         | Yes           | Yes (2)                    | Yes             | Yes     | Yes                        | Yes       |
+| Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
 | Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 | Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
 
 ##### Notes
 
-(1) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
+(1) Due to the way the data acquisition for *Assetto Corsa* works, it is possible that alerts for cars on your side will be given for the wrong side from time to time. I am working on a heuristic to prevent that.
 
-(2) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
+(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
+
+(3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.

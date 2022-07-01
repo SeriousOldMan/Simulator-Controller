@@ -258,6 +258,9 @@ class RaceStrategist extends RaceAssistant {
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
+		if ((this.Session != kSessionRace) && !this.hasEnoughData())
+			return
+
 		speaker := this.getSpeaker()
 		position := Round(knowledgeBase.getValue("Position", 0))
 
@@ -295,43 +298,35 @@ class RaceStrategist extends RaceAssistant {
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 
-			if lapDelta is number
-			{
+			if this.isNumber(lapDelta, lapDelta) {
 				currentLap := knowledgeBase.getValue("Lap")
-				lap := currentLap + lapDelta
+				lap := (currentLap + lapDelta)
 
 				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")
 				else {
 					car := knowledgeBase.getValue("Driver.Car")
 
-					speaker.startTalk()
+					speaker.speakPhrase("Confirm")
 
-					try {
-						speaker.speakPhrase("Confirm")
+					sendMessage()
 
-						sendMessage()
+					Loop 10
+						Sleep 500
 
-						Loop 10
-							Sleep 500
+					knowledgeBase.setFact("Standings.Extrapolate", lap)
 
-						knowledgeBase.setFact("Standings.Extrapolate", lap)
+					knowledgeBase.produce()
 
-						knowledgeBase.produce()
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
 
-						if this.Debug[kDebugKnowledgeBase]
-							this.dumpKnowledge(this.KnowledgeBase)
+					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 
-						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
-
-						if position
-							speaker.speakPhrase("FuturePosition", {position: position})
-						else
-							speaker.speakPhrase("NoFuturePosition")
-					}
-					finally {
-						speaker.finishTalk()
-					}
+					if position
+						speaker.speakPhrase("FuturePosition", {position: position})
+					else
+						speaker.speakPhrase("NoFuturePosition")
 				}
 
 				return
@@ -461,6 +456,9 @@ class RaceStrategist extends RaceAssistant {
 	reportLapTime(phrase, driverLapTime, car) {
 		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
 
+		if !this.hasEnoughData()
+			return
+
 		if lapTime {
 			lapTime /= 1000
 
@@ -487,7 +485,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		car := knowledgeBase.getValue("Driver.Car")
-		lap := knowledgeBase.getValue("Lap")
+		lap := knowledgeBase.getValue("Lap", 0)
 		position := Round(knowledgeBase.getValue("Position"))
 		cars := Round(knowledgeBase.getValue("Car.Count"))
 
@@ -522,22 +520,37 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	strategyOverviewRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.reportStrategy()
 	}
 
 	cancelStrategyRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.cancelStrategy()
 	}
 
 	nextPitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.reportStrategy({NextPitstop: true})
 	}
 
 	recommendPitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.pitstopLapRecognized(words)
 	}
 
 	simulatePitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.pitstopLapRecognized(words, true)
 	}
 
@@ -548,7 +561,7 @@ class RaceStrategist extends RaceAssistant {
 			if lapPosition {
 				lap := words[lapPosition + 1]
 
-				if lap is not number
+				if !this.isNumber(lap, lap)
 					lap := false
 			}
 			else
@@ -562,10 +575,7 @@ class RaceStrategist extends RaceAssistant {
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if !this.hasEnoughData(false)
-			return
-
-		if (position == 0)
+		if ((this.Session != kSessionRace) || !this.hasEnoughData(false) || (position == 0))
 			return
 
 		speaker := this.getSpeaker()
@@ -1224,18 +1234,26 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact
 
-		if (this.Speaker && confirm) {
-			this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+		hasStrategy := knowledgeBase.getValue("Strategy.Name", false)
 
-			this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+		if (this.Speaker && confirm) {
+			if hasStrategy {
+				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+
+				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+			}
+			else
+				speaker.speakPhrase("NoStrategy")
 
 			return
 		}
 
-		this.clearStrategy()
+		if hasStrategy {
+			this.clearStrategy()
 
-		if this.Speaker
-			this.getSpeaker().speakPhrase("StrategyCanceled")
+			if this.Speaker
+				this.getSpeaker().speakPhrase("StrategyCanceled")
+		}
 	}
 
 	clearStrategy() {

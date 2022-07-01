@@ -938,7 +938,7 @@ class VoiceServer extends ConfigurationItem {
 
 	voiceCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . values2String(A_Space, words*), false, "Information.png", 5000)
+			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
 		descriptor := voiceClient.VoiceCommands[grammar]
 

@@ -391,7 +391,7 @@ bool checkFlagState(const SharedMemory* sharedData) {
 
 void checkPitWindow(const SharedMemory* sharedData) {
 	if (sharedData->mEnforcedPitStopLap > 0)
-		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted + 1) &&
 			!pitWindowOpenReported) {
 			pitWindowOpenReported = true;
 			pitWindowClosedReported = false;
@@ -417,20 +417,15 @@ int main(int argc, char* argv[]) {
 	if (fileHandle != NULL) {
 		sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
 		localCopy = new SharedMemory;
-	
+
 		if (sharedData == NULL) {
 			CloseHandle(fileHandle);
 
 			fileHandle = NULL;
 		}
-		/*
-		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
-			CloseHandle(fileHandle);
+	}
 
-			fileHandle = NULL;
-		}
-		*/
-
+	if (sharedData != NULL) {
 		//------------------------------------------------------------------------------
 		// TEST DISPLAY CODE
 		//------------------------------------------------------------------------------
@@ -439,7 +434,7 @@ int main(int argc, char* argv[]) {
 
 		bool running = false;
 
-		int countdown = 4000;
+		int countdown = 400;
 
 		while (true)
 		{
@@ -484,9 +479,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	//------------------------------------------------------------------------------
-
-	// Cleanup
 	UnmapViewOfFile(sharedData);
 	CloseHandle(fileHandle);
 	delete localCopy;

@@ -297,9 +297,8 @@ priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
-updatePitstopStrategy(!Lap) <= !, lapAvgFuel(!Lap, ?avgFuel), safetyFuel(?avgFuel, ?safetyFuel),
-							   ?safetyLaps = ?safetyFuel / ?avgFuel, ?temp1 = !Lap.Remaining - ?safetyLaps,
-							   ?temp2 = ?temp1 - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp2, ?targetLap),
+updatePitstopStrategy(!Lap) <= !, lapAvgFuel(!Lap, ?avgFuel),
+							   ?temp = !Lap.Remaining - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
 							   ?targetLap != !Lap, updatePitstopStrategy(?targetLap)
 updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,
 							   updatePitstopStrategy(?lap, ?remainingLaps)

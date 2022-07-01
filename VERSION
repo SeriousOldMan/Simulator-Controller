@@ -1,16 +1,16 @@
 [Development]
-Version=4.2.2.0-dev
+Version=4.2.2.0-release
 Target=4.2.2.0-release
-Date=06/28/2022
-Download=
-Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Update manager now checks for active processes, Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command, Update manager now checks for active processes, Added owner column to all database tables, Data from team races are stored for each owner seperately, Reworked many Assistant commands
+Date=07/01/2022
+Download=https://cntr.click/yTkY9tb
+Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Update manager now checks for active processes, Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command, Update manager now checks for active processes, Added owner column to all database tables, Data from team races are stored for each owner seperately, Overhaul of "AMS2" pitstop handling, Reworked many Assistant commands, New documentation for voice commands, Added ACC USA tracks to track meta data, More car models for "Setup Advisor"
 [Release]
-Version=4.2.1.0-release
-Date=06/24/2022
-Download=https://cntr.click/Z8F2q6t
-Changes=New ACC Pitstop MFD learning algorithm, Fixed pitstop window calculation for ACC in Spotter, More precise delta calculation for the Spotter, Select driver remote from "Race Center", Post pitstop report in "Race Center" incl. used tyre data, Tyre wear data for "Strategy Workbench" and "Race Center", Race Engineer supports a voice command to request the current tyre wear, New InformationRequest action "TyreWear" for the "Race Engineer" plugin, New "Launch Pad" in "Simulator Startup", New car models for "Setup Advisor"
+Version=4.2.2.0-release
+Date=07/01/2022
+Download=https://cntr.click/yTkY9tb
+Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Update manager now checks for active processes, Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command, Update manager now checks for active processes, Added owner column to all database tables, Data from team races are stored for each owner seperately, Overhaul of "AMS2" pitstop handling, Reworked many Assistant commands, New documentation for voice commands, Added ACC USA tracks to track meta data, More car models for "Setup Advisor"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.2.1.0-release
-Development=4.2.2.0-dev
+Release=4.2.2.0-release
+Development=4.2.2.0-release

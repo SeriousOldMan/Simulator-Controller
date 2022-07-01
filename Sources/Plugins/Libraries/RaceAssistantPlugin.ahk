@@ -1245,8 +1245,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if (!teamSessionActive || !this.TeamServer.Connected)
 									return ; No Team Server, no late join
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.iInPit := false
 
@@ -1255,8 +1258,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							else if (this.LastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.TeamServer.addStint(dataLastLap)
 
@@ -1309,18 +1315,26 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						writeConfiguration(newDataFile, data)
 
 						if firstLap {
-							if this.connectTeamSession() {
-								teamServer := this.TeamServer
+							if this.connectTeamSession()
+								if this.driverActive(data) {
+									teamServer := this.TeamServer
 
-								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
-													 , getConfigurationValue(data, "Session Data", "Car")
-													 , getConfigurationValue(data, "Session Data", "Track")
-													 , dataLastLap
-													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
+									teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+														 , getConfigurationValue(data, "Session Data", "Car")
+														 , getConfigurationValue(data, "Session Data", "Track")
+														 , dataLastLap
+														 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
-								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
-								this.TeamServer.setSessionValue(this.Plugin . " State", "")
-							}
+									this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
+									this.TeamServer.setSessionValue(this.Plugin . " State", "")
+								}
+								else {
+									; Wrong Driver - no team session
+
+									this.disconnectTeamSession()
+
+									logMessage(kLogWarn, translate("Cannot join the team session. Driver names in team session and in simulation do not match."))
+								}
 
 							settings := this.prepareSettings(data)
 							settingsFile := (kTempDirectory . this.Plugin . ".settings")

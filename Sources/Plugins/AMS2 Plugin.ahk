@@ -85,7 +85,9 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreCompound: "Tyre Compound"
+					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"
+					 , DriverSwap: "Swap Driver"}
 		selectActions := []
 	}
 
@@ -136,25 +138,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD(option := false) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Change Tyres")
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-			}
-			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
-					this.sendPitstopCommand(this.PreviousOptionHotkey)
-			}
-
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-		}
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.sendPitstopCommand(this.PreviousChoiceHotkey)
 	}
 
 	requirePitstopMFD() {
@@ -163,42 +148,58 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
 			this.sendPitstopCommand(this.NextChoiceHotkey)
 
-			if (option = "Change Tyres") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
+			steps := false
 
-				return true
+			if (option = "Strategy")
+				steps := 6
+			else if (option = "Tyre Compound")
+				steps := 5
+			else if (option = "Refuel")
+				steps := 4
+			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
+				steps := 3
+			else if (option = "Swap Driver")
+				steps := 2
+			else if (option = "Request Pitstop")
+				steps := 1
+
+			if steps {
+				Loop %steps%
+					this.sendPitstopCommand(this.PreviousOptionHotkey)
+
+					return true
 			}
-			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
-
-				return true
-			}
-			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
-					this.sendPitstopCommand(this.NextOptionHotkey)
-
-				return true
-			}
-			else {
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-
+			else
 				return false
-			}
 		}
 		else
 			return false
+	}
+
+	deselectPitstopOption(option) {
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			steps := false
+
+			if (option = "Strategy")
+				steps := 6
+			else if (option = "Tyre Compound")
+				steps := 5
+			else if (option = "Refuel")
+				steps := 4
+			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
+				steps := 3
+			else if (option = "Swap Driver")
+				steps := 2
+			else if (option = "Request Pitstop")
+				steps := 1
+
+			Loop %steps%
+				this.sendPitstopCommand(this.NextOptionHotkey)
+
+			this.sendPitstopCommand(this.NextChoiceHotkey)
+		}
 	}
 
 	dialPitstopOption(option, action, steps := 1) {
@@ -217,30 +218,26 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	changePitstopOption(option, action := "Increase", steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Refuel") {
-				this.dialPitstopOption("Refuel", action, steps)
+			if inList(["Strategy", "Refuel", "Swap Driver"], option) {
+				this.dialPitstopOption(option, action, steps)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Refuel")
+				this.deselectPitstopOption(option)
 			}
-			else if (option = "Change Tyres") {
+			else if (option = "Tyre Compound") {
 				this.iChangeTyresChosen += 1
 
-				if (this.iChangeTyresChosen > 2)
+				if (this.iChangeTyresChosen > 3)
 					this.iChangeTyresChosen := 0
 
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
 				if this.iChangeTyresChosen
-					this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+					this.dialPitstopOption("Tyre Compound", "Increase", this.iChangeTyresChosen)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Change Tyres")
+				this.deselectPitstopOption("Tyre Compound")
 			}
 			else if (option = "Repair Bodywork") {
-				this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
+				this.dialPitstopOption("Repair All", "Decrease", 4)
 
 				this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 
@@ -251,12 +248,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				else if this.iRepairSuspensionChosen
 					this.dialPitstopOption("Repair Suspension", "Increase", 2)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Repair Bodywork")
+				this.deselectPitstopOption("Repair All")
 			}
 			else if (option = "Repair Suspension") {
-				this.dialPitstopOption("Repair Suspension", "Decrease", 4)
+				this.dialPitstopOption("Repair All", "Decrease", 4)
 
 				this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
 
@@ -267,9 +262,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				else if this.iRepairSuspensionChosen
 					this.dialPitstopOption("Repair Suspension", "Increase", 2)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Repair Suspension")
+				this.deselectPitstopOption("Repair All")
 			}
 			else
 				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
@@ -284,9 +277,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.dialPitstopOption("Refuel", "Decrease", 200)
 				this.dialPitstopOption("Refuel", "Increase", Round(litres))
 
-				Sleep 2000
-
-				this.closePitstopMFD("Refuel")
+				this.deselectPitstopOption("Refuel")
 			}
 		}
 	}
@@ -295,8 +286,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
-			if this.selectPitstopOption("Change Tyres") {
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+			if this.selectPitstopOption("Tyre Compound") {
+				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
 				if (compound = "Dry")
 					this.iChangeTyresChosen := 1
@@ -305,11 +296,9 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				else
 					this.iChangeTyresChosen := 0
 
-				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+				this.dialPitstopOption("Tyre Compound", "Increase", this.iChangeTyresChosen)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Change Tyres")
+				this.deselectPitstopOption("Tyre Compound")
 			}
 		}
 	}
@@ -332,6 +321,16 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	finishPitstopSetup(pitstopNumber) {
+		this.requirePitstopMFD()
+
+		if this.selectPitstopOption("Request Pitstop") {
+			this.dialPitstopOption("Request Pitstop")
+
+			this.deselectPitstopOption("Request Pitstop")
+		}
+	}
+
 	updateSessionState(sessionState) {
 		base.updateSessionState(sessionState)
 
@@ -344,7 +343,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
-		
+
 		standings := readSimulatorData(this.Code, "-Standings")
 
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))

@@ -387,11 +387,19 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				case "Accept":
 					this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				case "Increase":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						keys .= this.NextChoiceHotkey
+					
+					this.sendPitstopCommand(keys)
 				case "Decrease":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						keys .= this.PreviousChoiceHotkey
+					
+					this.sendPitstopCommand(keys)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 			}

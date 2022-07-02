@@ -169,7 +169,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				Loop %steps%
 					this.sendPitstopCommand(this.PreviousOptionHotkey)
 
-					return true
+				return true
 			}
 			else
 				return false
@@ -206,11 +206,19 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						keys .= this.NextChoiceHotkey
+						
+					this.sendPitstopCommand(keys)
 				case "Decrease":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						keys .= this.PreviousChoiceHotkey
+						
+					this.sendPitstopCommand(keys)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}

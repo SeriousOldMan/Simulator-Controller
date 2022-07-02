@@ -785,24 +785,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				targetSelectedOption += delta
 
+				this.activateACCWindow()
+
 				if (targetSelectedOption > this.iPSSelectedOption)
 					Loop % targetSelectedOption - this.iPSSelectedOption
-					{
-						this.activateACCWindow()
-
 						this.sendPitstopCommand("{Down}")
-
-						Sleep 50
-					}
 				else
 					Loop % this.iPSSelectedOption - targetSelectedOption
-					{
-						this.activateACCWindow()
-
 						this.sendPitstopCommand("{Up}")
-
-						Sleep 50
-					}
 
 				this.iPSSelectedOption := targetSelectedOption
 
@@ -819,21 +809,27 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch direction {
 				case "Increase":
-					Loop % steps {
-						this.activateACCWindow()
+					keys := ""
 
-						this.sendPitstopCommand("{Right}")
+					Loop % steps
+						keys .= "{Right}"
 
-						Sleep 50
-					}
+					this.activateACCWindow()
+
+					this.sendPitstopCommand(keys)
+
+					Sleep 50
 				case "Decrease":
-					Loop % steps {
-						this.activateACCWindow()
+					keys := ""
 
-						this.sendPitstopCommand("{Left}")
+					Loop % steps
+						keys .= "{Left}"
 
-						Sleep 50
-					}
+					this.activateACCWindow()
+
+					this.sendPitstopCommand(keys)
+
+					Sleep 50
 				default:
 					Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 			}

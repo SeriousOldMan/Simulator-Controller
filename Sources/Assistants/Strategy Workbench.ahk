@@ -2183,13 +2183,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.showComparisonChart(html)
 	}
 
-	createStrategy(nameOrConfiguration := false) {
+	createStrategy(nameOrConfiguration, driver := false) {
 		name := nameOrConfiguration
 
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := new Strategy(this, nameOrConfiguration)
+		theStrategy := new Strategy(this, nameOrConfiguration, driver)
 
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -2467,6 +2467,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		initialFuelVariation := simInitialFuelVariation
 		tyreUsageVariation := simTyreUsageVariation
 		tyreCompoundVariationVariation := simtyreCompoundVariation
+	}
+
+	startStint(stintNumber, ByRef stintDriver) {
+		stintDriver := false
+
+		return true
 	}
 
 	runSimulation() {

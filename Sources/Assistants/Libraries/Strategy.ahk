@@ -286,8 +286,8 @@ class StrategySimulation {
 			return true
 	}
 
-	createStrategy(nameOrConfiguration := false) {
-		local strategy := this.StrategyManager.createStrategy(nameOrConfiguration)
+	createStrategy(nameOrConfiguration, driver := false) {
+		local strategy := this.StrategyManager.createStrategy(nameOrConfiguration, driver)
 
 		strategy.setStrategyManager(this)
 
@@ -323,6 +323,10 @@ class StrategySimulation {
 
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		return this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
+	}
+
+	startStint(stintNumber, ByRef stintDriver) {
+		return this.StrategyManager.startStint(stintNumber, stintDriver)
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -708,7 +712,11 @@ class VariationSimulation extends StrategySimulation {
 								this.setFixedLapTime(avgLapTime)
 
 								try {
-									strategy := this.createStrategy(name)
+									driver := false
+
+									this.startStint(1, driver)
+
+									strategy := this.createStrategy(name, driver)
 
 									currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
@@ -755,8 +763,11 @@ class VariationSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
 									name := (translate("Telemetry - Map ") . scenarioMap)
+									driver := false
 
-									strategy := this.createStrategy(name)
+									this.startStint(1, driver)
+
+									strategy := this.createStrategy(name, driver)
 
 									currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 
@@ -879,12 +890,16 @@ class Strategy extends ConfigurationItem {
 	iTyreUsageVariation := 0
 	iTyreCompoundVariation := 0
 
+	iDriver := false
+
 	iPitstops := []
 
 	class Pitstop extends ConfigurationItem {
 		iStrategy := false
 		iID := false
 		iLap := 0
+
+		iDriver := false
 
 		iTime := 0
 		iDuration := 0
@@ -920,6 +935,12 @@ class Strategy extends ConfigurationItem {
 		Lap[]  {
 			Get {
 				return this.iLap
+			}
+		}
+
+		Driver[]  {
+			Get {
+				return this.iDriver
 			}
 		}
 
@@ -1013,10 +1034,11 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		__New(strategy, id, lap, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		__New(strategy, id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
 			this.iStrategy := strategy
 			this.iID := id
 			this.iLap := lap
+			this.iDriver := driver
 
 			base.__New(configuration)
 
@@ -1136,6 +1158,8 @@ class Strategy extends ConfigurationItem {
 
 			lap := this.Lap
 
+			this.iDriver := getConfigurationValue(configuration, "Pitstop", "Driver." . lap, false)
+
 			this.iTime := getConfigurationValue(configuration, "Pitstop", "Time." . lap, 0)
 			this.iDuration := getConfigurationValue(configuration, "Pitstop", "Duration." . lap, 0)
 			this.iRefuelAmount := getConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, 0)
@@ -1162,6 +1186,8 @@ class Strategy extends ConfigurationItem {
 			base.saveToConfiguration(configuration)
 
 			lap := this.Lap
+
+			setConfigurationValue(configuration, "Pitstop", "Driver." . lap, this.Driver)
 
 			setConfigurationValue(configuration, "Pitstop", "Time." . lap, this.Time)
 			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
@@ -1511,6 +1537,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	Driver[] {
+		Get {
+			return this.iDriver
+		}
+	}
+
 	Pitstops[index := false] {
 		Get {
 			return (index ? this.iPitstops[index] : this.iPitstops)
@@ -1561,8 +1593,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	__New(strategyManager, configuration := false) {
+	__New(strategyManager, configuration := false, driver := false) {
 		this.iStrategyManager := strategyManager
+		this.iDriver := driver
 
 		base.__New(configuration)
 
@@ -1755,8 +1788,10 @@ class Strategy extends ConfigurationItem {
 		this.iAvgLapTime := getConfigurationValue(configuration, "Strategy", "AvgLapTime", 0)
 		this.iFuelConsumption := getConfigurationValue(configuration, "Strategy", "FuelConsumption", 0)
 
+		this.iDriver := getConfigurationValue(configuration, "Strategy", "Driver", false)
+
 		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
-			this.Pitstops.Push(this.createPitstop(A_Index, lap, this.TyreCompound, this.TyreCompoundColor, configuration))
+			this.Pitstops.Push(this.createPitstop(A_Index, lap, this.Driver, this.TyreCompound, this.TyreCompoundColor, configuration))
 
 		this.iUseInitialConditions := getConfigurationValue(configuration, "Simulation", "UseInitialConditions", true)
 		this.iUseTelemetryData := getConfigurationValue(configuration, "Simulation", "UseTelemetryData", true)
@@ -1837,6 +1872,8 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Strategy", "AvgLapTime", this.AvgLapTime)
 		setConfigurationValue(configuration, "Strategy", "FuelConsumption", this.FuelConsumption)
 
+		setConfigurationValue(configuration, "Strategy", "Driver", this.Driver)
+
 		pitstops := []
 
 		for ignore, pitstop in this.Pitstops {
@@ -1885,8 +1922,8 @@ class Strategy extends ConfigurationItem {
 		this.AvailableTyreSets := availableTyreSets
 	}
 
-	createPitstop(id, lap, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		return new this.Pitstop(this, id, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
+	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		return new this.Pitstop(this, id, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
 	}
 
 	setName(name) {
@@ -2179,7 +2216,11 @@ class Strategy extends ConfigurationItem {
 					tyreCompound := false
 			}
 
-			pitstop := this.createPitstop(A_Index, pitstopLap, tyreCompound, tyreCompoundColor, false, adjustments)
+			driver := false
+
+			this.StrategyManager.startStint(A_Index + 1, driver)
+
+			pitstop := this.createPitstop(A_Index, pitstopLap, driver, tyreCompound, tyreCompoundColor, false, adjustments)
 
 			if (this.SessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)

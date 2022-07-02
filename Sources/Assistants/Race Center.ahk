@@ -533,10 +533,6 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		__New(strategyManager, configuration := false) {
-			base.__New(strategyManager, configuration)
-		}
-
 		setVersion(version) {
 			this.iVersion := (version . "")
 		}
@@ -3464,13 +3460,14 @@ class RaceCenter extends ConfigurationItem {
 		this.iTasks.Push(task)
 	}
 
-	createStrategy(nameOrConfiguration := false) {
+	createStrategy(nameOrConfiguration, driver := false) {
 		name := nameOrConfiguration
 
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration) : new this.SessionStrategy(this, nameOrConfiguration))
+		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration, driver)
+										: new this.SessionStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -3741,6 +3738,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else
 			return false
+	}
+
+	startStint(stintNumber, ByRef stintDriver) {
+		stintDriver := false
+
+		return true
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -8813,8 +8816,8 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 		}
 	}
 
-	createPitstop(id, lap, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		pitstop := new this.TrafficPitstop(this, id, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
+	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		pitstop := new this.TrafficPitstop(this, id, driver, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
 
 		if ((id == 1) && !this.TrafficScenario)
 			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
@@ -9090,11 +9093,14 @@ class TrafficSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
 									name := (translate("Initial Conditions - Map ") . map)
+									driver := false
+
+									this.startStint(1, driver)
 
 									this.setFixedLapTime(avgLapTime)
 
 									try {
-										strategy := this.createStrategy(name)
+										strategy := this.createStrategy(name, driver)
 
 										currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
@@ -9141,8 +9147,11 @@ class TrafficSimulation extends StrategySimulation {
 										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
 										name := (translate("Telemetry - Map ") . scenarioMap)
+										driver := false
 
-										strategy := this.createStrategy(name)
+										this.startStint(1, driver)
+
+										strategy := this.createStrategy(name, driver)
 
 										currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 

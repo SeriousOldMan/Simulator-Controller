@@ -929,7 +929,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 All this will be achieved using the following plugin arguments:
 
 	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
-	pitstopCommands: Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+	pitstopCommands: Refuel Dial.2 5, TyreCompound Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
 
 ### Mode *Assistant*
 

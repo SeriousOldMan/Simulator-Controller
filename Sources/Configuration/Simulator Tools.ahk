@@ -1635,6 +1635,27 @@ clearWearFields(database, table, id) {
 	}
 }
 
+
+updateConfigurationForV423() {
+	if FileExist(kUserConfigDirectory . "Session Database.ini") {
+		sessionDB := new SessionDatabase()
+		sessionDBConfig := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		for key, drivers in getConfigurationSectionValues(sessionDBConfig, "Drivers", Object()) {
+			key := StrSplit(key, ".", " `t", 2)
+			simulator := key[1]
+			id := key[2]
+
+			for ignore, driver in string2Values("###", drivers)
+				sessionDB.registerDriverName(simulator, id, driver)
+		}
+
+		removeConfigurationSection(sessionDBConfig, "Drivers")
+
+		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
+	}
+}
+
 updateConfigurationForV422() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)

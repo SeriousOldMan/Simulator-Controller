@@ -26,7 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Owner"]
+										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"]
 						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
 								  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
@@ -34,7 +34,7 @@ global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Tempera
 								  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
 								  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 								  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-								  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Owner"]}
+								  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,13 +42,24 @@ global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Tempera
 ;;;-------------------------------------------------------------------------;;;
 
 class TelemetryDatabase extends SessionDatabase {
+	iDatabase := false
+	iDrivers := false
+
 	Database[] {
 		Get {
 			return this.iDatabase
 		}
 	}
 
-	__New(simulator := false, car := false, track := false) {
+	Drivers[] {
+		Get {
+			return this.iDrivers
+		}
+	}
+
+	__New(simulator := false, car := false, track := false, drivers := false) {
+		this.iDrivers := drivers
+
 		base.__New()
 
 		if (simulator && car && track) {
@@ -87,242 +98,133 @@ class TelemetryDatabase extends SessionDatabase {
 		return schema
 	}
 
-	getElectronicEntries(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Electronics", {Transform: "removeInvalidLaps", Where: where})
-		else
-			return []
-	}
-
-	getTyreEntries(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
-											   , Where: where})
-		else
-			return []
-	}
-
-	getMapsCount(weather, owner := "__Undefined__") {
-		where := {Weather: weather}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
-													 , Transform: "removeInvalidLaps"
-													 , Where: where})
-		else
-			return []
-	}
-
-	getMapData(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
-													 , By: "Map", Transform: "removeInvalidLaps"
-													 , Where: where})
-		else
-			return []
-	}
-
-	getTyreData(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
-											   , Transform: "removeInvalidLaps"
-											   , Where: where})
-		else
-			return []
-	}
-
-	getTyreCompoundColors(weather, compound, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Tyres", {Select: ["Tyre.Compound.Color"], By: "Tyre.Compound.Color"
-											   , Transform: "removeInvalidLaps"
-											   , Where: where})
-		else
-			return []
-	}
-
-	getMapLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
-													 , Transform: "removeInvalidLaps"
-													 , Where: where})
-		else
-			return []
-	}
-
-	getTyreLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
-											   , Transform: "removeInvalidLaps"
-											   , Where: where})
-		else
-			return []
-	}
-
-	getFuelLapTimes(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database
-			return this.Database.query("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
-											   , Transform: "removeInvalidLaps"
-											   , Where: where})
-		else
-			return []
-	}
-
-	getPressuresCount(weather, owner := "__Undefined__") {
-		where := {Weather: weather}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
+	combineResults(table, query, drivers := "__Undefined__") {
+		if (drivers = kUndefined)
+			drivers := this.Drivers
 
 		if this.Database {
-			return this.Database.query("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
-											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: where})
+			if (drivers == false)
+				return this.Database.query(table, query)
+			else {
+				if (drivers == true)
+					drivers := [this.ID]
+				else if !IsObject(drivers)
+					drivers := [drivers]
+
+				return this.Database.combine(table, query, "Driver", drivers)
+			}
 		}
 		else
 			return []
 	}
 
-	getLapTimePressures(weather, compound, compoundColor, owner := "__Undefined__") {
-		where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-		if ((owner != kUndefined) && owner) {
-			if (owner == true)
-				owner := this.ID
-
-			where["Owner"] := owner
-		}
-
-		if this.Database {
-			return this.Database.query("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
-													   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
-													   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
-													   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
-											   , Transform: combine("removeInvalidLaps", "computePressures")
-											   , Where: where})
-		}
-		else
-			return []
+	getElectronicEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Electronics", {Transform: "removeInvalidLaps"
+												 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}}
+												, drivers)
 	}
 
-	cleanupData(weather, compound, compoundColor, owner := "__Undefined__") {
+	getTyreEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
+										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}}
+										  , drivers)
+	}
+
+	getMapsCount(weather, drivers := "__Undefined__") {
+		return this.combineResults("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
+												 , Transform: "removeInvalidLaps"
+												 , Where: {Weather: weather}},
+												, drivers)
+	}
+
+	getMapData(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
+												 , By: "Map", Transform: "removeInvalidLaps"
+												 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+												, drivers)
+	}
+
+	getTyreData(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
+										   , Transform: "removeInvalidLaps"
+										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+										  , drivers)
+	}
+
+	getTyreCompoundColors(weather, compound, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Select: ["Tyre.Compound.Color"], By: "Tyre.Compound.Color"
+										   , Transform: "removeInvalidLaps"
+										   , Where: {Weather: weather, "Tyre.Compound": compound}},
+										  , drivers)
+	}
+
+	getMapLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
+												 , Transform: "removeInvalidLaps"
+												 , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+												, drivers)
+	}
+
+	getTyreLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
+										   , Transform: "removeInvalidLaps"
+										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+										  , drivers)
+	}
+
+	getFuelLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
+										   , Transform: "removeInvalidLaps"
+										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+										  , drivers)
+	}
+
+	getPressuresCount(weather, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
+										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Where: {Weather: weather}},
+										  , drivers)
+	}
+
+	getLapTimePressures(weather, compound, compoundColor, drivers := "__Undefined__") {
+		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
+												   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
+												   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
+												   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
+										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
+										  , drivers)
+	}
+
+	cleanupData(weather, compound, compoundColor, drivers := "__Undefined__") {
 		if this.Database {
 			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
-
-			if ((owner != kUndefined) && owner) {
-				if (owner == true)
-					owner := this.ID
-
-				where["Owner"] := owner
-			}
 
 			ltAvg := false
 			ltStdDev := false
 			cAvg := false
 			cStdDev := false
 
-			rows := this.Database.query("Electronics", {Where: where})
+			rows := this.combineResults("Electronics", {Where: where}, drivers)
 
 			computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
 
-			this.Database.remove("Electronics", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev), true)
+			this.Database.remove("Electronics", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers), true)
 
-			rows := this.Database.query("Tyres", {Where: where})
+			rows := this.combineResults("Tyres", {Where: where}, drivers)
 
 			computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
 
-			this.Database.remove("Tyres", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev), true)
+			this.Database.remove("Tyres", where, Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers), true)
 		}
 	}
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime, owner := false) {
-		if !owner
-			owner := this.ID
+					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime, driver := false) {
+		if !driver
+			driver := this.ID
 
-		this.Database.add("Electronics", {Owner: owner, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.Database.add("Electronics", {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 										, "Fuel.Remaining": valueOrNull(fuelRemaining)
 										, "Fuel.Consumption": valueOrNull(fuelConsumption)
@@ -332,11 +234,11 @@ class TelemetryDatabase extends SessionDatabase {
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-			   , fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, owner := false) {
-		if !owner
-			owner := this.ID
+			   , fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, driver := false) {
+		if !driver
+			driver := this.ID
 
-		this.Database.add("Tyres", {Owner: owner, Weather: weather
+		this.Database.add("Tyres", {Driver: driver, Weather: weather
 								  , "Temperature.Air": valueOrNull(airTemperature), "Temperature.Track": valueOrNull(trackTemperature)
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 								  , "Fuel.Remaining": valueOrNull(fuelRemaining)
@@ -467,8 +369,14 @@ validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
 	return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
 }
 
-invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
-	return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
+invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
+	if ((drivers = kUndefined)
+	 || (IsObject(drivers) && inList(drivers, row.Driver))
+	 || ((drivers == true) && (row.Driver = this.ID))
+	 || (drivers = row.Driver))
+		return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
+	else
+		return false
 }
 
 removeInvalidLaps(rows) {

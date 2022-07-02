@@ -21,6 +21,7 @@ Release 4.1.6=Release 4.1.4 -> updateTranslations, updatePhraseGrammars
 Release 4.1.7=Release 4.1.6 -> updateTranslations, updatePhraseGrammars
 Release 4.2.0=Release 4.1.7 -> updateConfigurationForV420
 Release 4.2.2=Release 4.2.0 -> updateConfigurationForV422
+Release 4.2.3=Release 4.2.2 -> updateConfigurationForV423
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

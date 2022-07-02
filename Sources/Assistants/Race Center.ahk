@@ -270,14 +270,37 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedReport := false
 	iSelectedChartType := false
 
+	iSelectedDrivers := false
+
 	iSelectedDetailReport := false
 
 	iStrategyViewer := false
 
 	iTasks := []
 
-	class SessionTelemetryDatabase extends TelemetryDatabase {
+	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
+
+		RaceCenter[] {
+			Get {
+				return this.iRaceCenter
+			}
+		}
+
+		Drivers[] {
+			Get {
+				return this.RaceCenter.SelectedDrivers
+			}
+		}
+
+		__New(raceCenter, simulator := false, car := false, track := false) {
+			this.iRaceCenter := raceCenter
+
+			base.__New(simulator, car, track)
+		}
+	}
+
+	class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
 		iTelemetryDatabase := false
 
 		__New(raceCenter, simulator := false, car := false, track := false) {
@@ -288,16 +311,16 @@ class RaceCenter extends ConfigurationItem {
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
-				this.iTelemetryDatabase := new TelemetryDatabase(simulator, car, track)
+				this.iTelemetryDatabase := new RaceCenter.RaceCenterTelemetryDatabase(simulator, car, track)
 		}
 
 		getMapData(weather, compound, compoundColor) {
 			entries := []
 
-			if this.iRaceCenter.UseSessionData
+			if this.RaceCenter.UseSessionData
 				entries := base.getMapData(weather, compound, compoundColor)
 
-			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
+			if (this.RaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.iTelemetryDatabase.getMapData(weather, compound, compoundColor) {
@@ -946,6 +969,12 @@ class RaceCenter extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+
+	SelectedDrivers[] {
+		Get {
+			return this.iSelectedDrivers
 		}
 	}
 
@@ -3426,7 +3455,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	runSimulationAsync(sessionType) {
-
 		if this.UseTraffic
 			new TrafficSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
 		else

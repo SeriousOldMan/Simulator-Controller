@@ -156,6 +156,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iSelectedDataType := "Electronics"
 	iSelectedChartType := "Scatter"
+	iSelectedDrivers := false
 
 	iSelectedValidator := false
 
@@ -242,6 +243,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+
+	SelectedDrivers[] {
+		Get {
+			return this.iSelectedDrivers
 		}
 	}
 
@@ -1251,7 +1258,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iSelectedDataType := dataType
 
-			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+											   , this.SelectedTrack, this.SelectedDrivers)
 
 			Gui ListView, % this.DataListView
 
@@ -1309,7 +1317,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				GuiControl, , dataY3DropDown, |
 			}
 			else if !reload {
-				schema := filterSchema(new TelemetryDatabase().getSchema(dataType, true))
+				schema := filterSchema(telemetryDB.getSchema(dataType, true))
 
 				GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
 				GuiControl, , dataY1DropDown, % "|" . values2String("|", map(schema, "translate")*)
@@ -1375,15 +1383,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		GuiControl Choose, chartTypeDropDown, % inList(["Scatter", "Bar", "Bubble", "Line"], chartType)
 
-		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-		weather := this.SelectedWeather
-		compound := this.SelectedCompound
-		compoundColor := this.SelectedCompoundColor
+		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+										   , this.SelectedTrack, this.SelectedDrivers)
 
 		if (this.SelectedDataType = "Electronics")
-			records := telemetryDB.getElectronicEntries(weather, compound, compoundColor)
+			records := telemetryDB.getElectronicEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 		else if (this.SelectedDataType = "Tyres")
-			records := telemetryDB.getTyreEntries(weather, compound, compoundColor)
+			records := telemetryDB.getTyreEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)
 		else
 			records := []
 
@@ -1392,7 +1398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet dataY2DropDown
 		GuiControlGet dataY3DropDown
 
-		schema := filterSchema(new TelemetryDatabase().getSchema(this.SelectedDataType, true))
+		schema := filterSchema(telemetryDB.getSchema(this.SelectedDataType, true))
 
 		xAxis := schema[dataXDropDown]
 		yAxises := Array(schema[dataY1DropDown])
@@ -1558,8 +1564,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				if (simulator && car && track) {
 					if GetKeyState("Ctrl", "P") {
-						telemetryDB := new TelemetryDatabase(simulator, car, track)
-						simulatorCode := telemetryDB.getSimulatorCode(simulator)
+						simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
 
 						dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Settings
 
@@ -1689,11 +1694,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 6: ; "Update from Telemetry..."
 				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
-					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+													   , this.SelectedTrack, this.SelectedDrivers)
 
 					fastestLapTime := false
 
-					for ignore, row in telemetryDB.getMapData(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor) {
+					for ignore, row in telemetryDB.getMapData(this.SelectedWeather
+															, this.SelectedCompound
+															, this.SelectedCompoundColor) {
 						lapTime := row["Lap.Time"]
 
 						if (!fastestLapTime || (lapTime < fastestLapTime)) {
@@ -1851,8 +1859,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		track := this.SelectedTrack
 
 		if (simulator && car && track) {
-			telemetryDB := new TelemetryDatabase(simulator, car, track)
-			simulatorCode := telemetryDB.getSimulatorCode(simulator)
+			simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
 
 			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
 
@@ -2156,7 +2163,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		tyrePressures := false
 
-		telemetryDB := new TelemetryDatabase(simulator, car, track)
+		telemetryDB := new TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
 		lowestLapTime := false
 
 		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
@@ -2198,7 +2205,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		b := false
 
 		if (simInputDropDown > 1) {
-			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+											   , this.SelectedTrack, this.SelectedDrivers)
 
 			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
 			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
@@ -2393,7 +2401,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	runSimulation() {
 		new VariationSimulation(this, this.SelectedSessionType
-							  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)).runSimulation(true)
+							  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+													, this.SelectedTrack, this.SelectedDrivers)).runSimulation(true)
 	}
 
 	chooseScenario(strategy) {
@@ -2716,9 +2725,13 @@ chooseDataType() {
 
 			IfMsgBox Yes
 			{
-				new TelemetryDatabase(workbench.SelectedSimulator, workbench.SelectedCar
-									, workbench.SelectedTrack).cleanupData(workbench.SelectedWeather
-																		 , workbench.SelectedCompound, workbench.SelectedCompoundColor)
+				new TelemetryDatabase(workbench.SelectedSimulator
+									, workbench.SelectedCar
+									, workbench.SelectedTrack
+									, workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather
+																		   , workbench.SelectedCompound
+																		   , workbench.SelectedCompoundColor
+																		   , workbench.SelectedDrivers)
 
 				workbench.loadDataType(workbench.SelectedDataType, true, true)
 

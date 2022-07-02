@@ -306,9 +306,7 @@ class RaceCenter extends ConfigurationItem {
 		iTelemetryDatabase := false
 
 		__New(raceCenter, simulator := false, car := false, track := false) {
-			this.iRaceCenter := raceCenter
-
-			base.__New()
+			base.__New(raceCenter)
 
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
@@ -1617,14 +1615,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	selectDriver(driver, force := false) {
-		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
-				  || (this.SelectedDrivers && !inList(this.SelectedDrivers, driver))) {
+		if (force || (this.SelectedDrivers && !inList(this.SelectedDrivers, driver))
+				  || (!this.SelectedDrivers && ((driver != true) && (driver != false)))) {
 			window := this.Window
 
 			Gui %window%:Default
 
 			if driver {
-				GuiControl Choose, driverDropDown, % ((driver = 1) ? false : (inList(this.AvailableDrivers, driver) + 1))
+				GuiControl Choose, driverDropDown, % (((driver = true) || (driver = false)) ? 1 : (inList(this.AvailableDrivers, driver) + 1))
 
 				this.iSelectedDrivers := ((driver == true) ? false : [driver])
 			}
@@ -1676,8 +1674,13 @@ class RaceCenter extends ConfigurationItem {
 		driver.Stints := []
 		driver.Accidents := 0
 
-		if (driver.ID && this.Simulator)
-			new SessionDatabase().registerDriverName(this.Simulator, driver.ID, driver.FullName)
+		if driver.ID {
+			if !inList(this.iAvailableDrivers, driver.ID)
+				this.iAvailableDrivers.Push(driver.ID)
+
+			if this.Simulator
+				new SessionDatabase().registerDriverName(this.Simulator, driver.ID, driver.FullName)
+		}
 
 		this.Drivers.Push(driver)
 
@@ -6418,6 +6421,10 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, values in data {
 			if (laps && !laps.HasKey(A_Index))
 				continue
+
+			if this.SelectedDrivers
+				if !inList(this.SelectedDrivers, this.Stints[values.Stint].Driver.ID)
+					continue
 
 			if !first
 				drawChartFunction .= ",`n"

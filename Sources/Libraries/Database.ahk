@@ -167,7 +167,7 @@ class Database {
 		for ignore, value in values {
 			query.Where[field] := value
 
-			for ignore, result in this.Database.query(table, query)
+			for ignore, result in this.query(table, query)
 				results.Push(result)
 		}
 

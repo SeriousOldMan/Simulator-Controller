@@ -108,6 +108,30 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
+	getAllDrivers(simulator, names := false) {
+		if simulator {
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+			ids := sessionDB.query("Drivers", {Select: ["ID"], By: "ID"})
+
+			for index, row in ids
+				ids[index] := row.ID
+
+			if names {
+				names := []
+
+				for ignore, id in ids
+					names.Push(this.getDriverNames(simulator, id))
+
+				return names
+			}
+			else
+				return ids
+		}
+		else
+			return []
+	}
+
 	registerDriverName(simulator, id, name) {
 		if (simulator && id && name) {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)

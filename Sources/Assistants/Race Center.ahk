@@ -126,6 +126,7 @@ global detailsViewer
 
 global reportsListView
 
+global driverDropDown
 global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
@@ -270,6 +271,7 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedReport := false
 	iSelectedChartType := false
 
+	iAvailableDrivers := []
 	iSelectedDrivers := false
 
 	iSelectedDetailReport := false
@@ -972,6 +974,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	AvailableDrivers[index := false] {
+		Get {
+			return (index ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
+		}
+	}
+
 	SelectedDrivers[] {
 		Get {
 			return this.iSelectedDrivers
@@ -1099,7 +1107,10 @@ class RaceCenter extends ConfigurationItem {
 
 		LV_ModifyCol(1, "AutoHdr")
 
-		Gui %window%:Add, Text, x141 yp+2 w70 h23 +0x200, % translate("X-Axis")
+		Gui %window%:Add, Text, x141 yp+2 w70 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit gchooseDriver vdriverDropDown
+
+		Gui %window%:Add, Text, x141 yp+24 w70 h23 +0x200, % translate("X-Axis")
 
 		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataXDropDown gchooseAxis
 
@@ -1571,6 +1582,19 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSessionDrivers := drivers
 
+		this.iAvailableDrivers := []
+		driverNames := []
+
+		for name, driver in drivers
+			if (driver && driver.HasKey("ID")) {
+				driverNames.Push(name)
+
+				this.iAvailableDrivers.Push(driver.ID)
+			}
+
+		GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), driverNames*)
+		GuiControl Choose, driverDropDown, 0
+
 		names := getKeys(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
@@ -1603,6 +1627,28 @@ class RaceCenter extends ConfigurationItem {
 		this.loadSessionDrivers()
 
 		syncSession()
+	}
+
+	selectDriver(driver, force := false) {
+		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
+				  || !inList(this.SelectedDrivers, driver)) {
+			window := this.Window
+
+			Gui %window%:Default
+
+			if driver {
+				GuiControl Choose, driverDropDown, % ((driver = 1) ? false : (inList(this.AvailableDrivers, driver) + 1))
+
+				this.iSelectedDrivers := ((driver == true) ? false : [driver])
+			}
+			else {
+				GuiControl Choose, driverDropDown, 0
+
+				this.iSelectedDrivers := false
+			}
+
+			this.updateReports()
+		}
 	}
 
 	createDriver(driver) {
@@ -1670,6 +1716,8 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Disable, pitstopPressureRREdit
 		}
 
+		GuiControl Disable, driverDropDown
+
 		GuiControl Disable, dataXDropDown
 		GuiControl Disable, dataY1DropDown
 		GuiControl Disable, dataY2DropDown
@@ -1686,6 +1734,8 @@ class RaceCenter extends ConfigurationItem {
 
 			if inList(["Pressures", "Temperatures", "Free"], this.SelectedReport) {
 				GuiControl Enable, chartTypeDropDown
+
+				GuiControl Enable, driverDropDown
 
 				GuiControl Enable, dataXDropDown
 				GuiControl Enable, dataY1DropDown
@@ -1704,6 +1754,8 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iSelectedChartType := false
 
+				GuiControl Choose, driverDropDown, 0
+
 				GuiControl Choose, dataXDropDown, 0
 				GuiControl Choose, dataY1DropDown, 0
 				GuiControl Choose, dataY2DropDown, 0
@@ -1715,6 +1767,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			GuiControl Disable, reportSettingsButton
+
+			GuiControl Choose, driverDropDown, 0
 
 			GuiControl Choose, dataXDropDown, 0
 			GuiControl Choose, dataY1DropDown, 0
@@ -3847,6 +3901,9 @@ class RaceCenter extends ConfigurationItem {
 			Gui ListView, % this.PitstopsListView
 
 			LV_Delete()
+
+			GuiControl, , driverDropDown, |
+			GuiControl Choose, driverDropDown, 0
 
 			if this.SessionActive
 				this.loadSessionDrivers()
@@ -6841,6 +6898,13 @@ class RaceCenter extends ConfigurationItem {
 				dataY5DropDown := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
 				dataY6DropDown := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
+
+			if !this.Simulator
+				GuiControl Choose, driverDropDown, 0
+			else if !this.SelectedDrivers
+				GuiControl Choose, driverDropDown, 1
+			else
+				GuiControl Choose, driverDropDown, % (inList(this.AvailableDrivers, this.SelectedDrivers[1]) + 1)
 
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
 			GuiControl Choose, dataY1DropDown, %dataY1DropDown%
@@ -10229,6 +10293,18 @@ chooseReport() {
 	finally {
 		Gui ListView, %currentListView%
 	}
+}
+
+chooseDriver() {
+	rCenter := RaceCenter.Instance
+	window := rCenter.Window
+
+	Gui %window%:Default
+
+	GuiControlGet driverDropDown
+
+	rCenter.withExceptionHandler(ObjBindMethod(rCenter, "selectDriver"
+							   , (driverDropDown = 1) ? true : rCenter.AvailableDrivers[driverDropDown - 1]))
 }
 
 chooseAxis() {

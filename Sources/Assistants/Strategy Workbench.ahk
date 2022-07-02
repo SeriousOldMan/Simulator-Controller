@@ -66,6 +66,7 @@ global trackDropDown
 global weatherDropDown
 global airTemperatureEdit
 global trackTemperatureEdit
+global driverDropDown
 global compoundDropDown
 global dataTypeDropDown
 global dataXDropDown
@@ -156,6 +157,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iSelectedDataType := "Electronics"
 	iSelectedChartType := "Scatter"
+
+	iAvailableDrivers := []
 	iSelectedDrivers := false
 
 	iSelectedValidator := false
@@ -210,6 +213,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedWeather[] {
 		Get {
 			return this.iSelectedWeather
+		}
+	}
+
+	AvailableDrivers[index := false] {
+		Get {
+			return (index ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
 		}
 	}
 
@@ -418,6 +427,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.iDataListView := dataListView
 
+		Gui %window%:Add, Text, x195 yp w70 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit gchooseDriver vdriverDropDown
+
 		compound := this.SelectedCompound[true]
 		choices := map(kQualifiedTyreCompounds, "translate")
 		chosen := inList(kQualifiedTyreCompounds, compound)
@@ -427,7 +439,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		Gui %window%:Add, Text, x195 yp w70 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, Text, x195 yp+24 w70 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit Choose%chosen% gchooseCompound vcompoundDropDown, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x195 yp+28 w70 h23 +0x200, % translate("X-Axis")
@@ -488,7 +500,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Simulation", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Stints", "Simulation", "Strategy"], "translate")*)
 
 		Gui %window%:Tab, 1
 
@@ -618,7 +630,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
 
-		Gui %window%:Tab, 3
+		Gui %window%:Tab, 4
 
 		x := 32
 		x0 := x - 4
@@ -734,7 +746,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimSessionResultResult, %simSessionResultResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20 VsimSessionResultLabel, % translate("Laps")
 
-		Gui %window%:Tab, 4
+		Gui %window%:Tab, 5
 
 		x := 32
 		x0 := x - 4
@@ -1180,6 +1192,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			sessionDB := new SessionDatabase()
 
+			driverNames := sessionDB.getAllDrivers(simulator, true)
+
+			for index, names in driverNames
+				driverNames[index] := values2String(", ", names*)
+
+			this.iAvailableDrivers := sessionDB.getAllDrivers(simulator)
+
+			GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), driverNames*)
+			GuiControl Choose, driverDropDown, 1
+
+			this.iSelectedDrivers := false
+
 			cars := this.getCars(simulator)
 			carNames := cars.Clone()
 
@@ -1340,6 +1364,29 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 
 			this.loadCompound((availableCompounds.Length() > 0) ? availableCompounds[1] : false, true)
+		}
+	}
+
+	loadDriver(driver, force := false) {
+		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
+				  || !inList(this.SelectedDrivers, driver)) {
+			window := this.Window
+
+			Gui %window%:Default
+
+			if driver {
+				GuiControl Choose, driverDropDown, % ((driver = true) ? 1 : (inList(this.AvailableDrivers, driver) + 1))
+
+				this.iSelectedDrivers := ((driver == true) ? false : [driver])
+			}
+			else {
+				GuiControl Choose, driverDropDown, 0
+
+				this.iSelectedDrivers := false
+			}
+
+			if this.SelectedCompound
+				this.loadChart(this.SelectedChartType)
 		}
 	}
 
@@ -2695,6 +2742,17 @@ updateTemperatures() {
 	GuiControlGet trackTemperatureEdit
 
 	workbench.setTemperatures(airTemperatureEdit, trackTemperatureEdit)
+}
+
+chooseDriver() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+
+	Gui %window%:Default
+
+	GuiControlGet driverDropDown
+
+	workbench.loadDriver((driverDropDown = 1) ? true : workbench.AvailableDrivers[driverDropDown - 1])
 }
 
 chooseCompound() {

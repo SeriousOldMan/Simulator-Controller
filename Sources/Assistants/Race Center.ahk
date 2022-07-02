@@ -1582,19 +1582,6 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSessionDrivers := drivers
 
-		this.iAvailableDrivers := []
-		driverNames := []
-
-		for name, driver in drivers
-			if (driver && driver.HasKey("ID")) {
-				driverNames.Push(name)
-
-				this.iAvailableDrivers.Push(driver.ID)
-			}
-
-		GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), driverNames*)
-		GuiControl Choose, driverDropDown, 0
-
 		names := getKeys(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
@@ -1631,7 +1618,7 @@ class RaceCenter extends ConfigurationItem {
 
 	selectDriver(driver, force := false) {
 		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
-				  || !inList(this.SelectedDrivers, driver)) {
+				  || (this.SelectedDrivers && !inList(this.SelectedDrivers, driver))) {
 			window := this.Window
 
 			Gui %window%:Default
@@ -1672,6 +1659,9 @@ class RaceCenter extends ConfigurationItem {
 			if found {
 				if driver.ID {
 					found.ID := driver.ID
+
+					if !inList(this.iAvailableDrivers, driver.ID)
+						this.iAvailableDrivers.Push(driver.ID)
 
 					if this.Simulator
 						new SessionDatabase().registerDriverName(this.Simulator, driver.ID, found.FullName)
@@ -3509,10 +3499,21 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	runSimulationAsync(sessionType) {
-		if this.UseTraffic
-			new TrafficSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
-		else
-			new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+		oldSelectedDrivers := this.SelectedDrivers
+
+		try {
+			this.iSelectedDrivers := false
+
+			simulationClass := (this.UseTraffic ? TrafficSimulation : VariationSimulation)
+
+			new %simulationClass%(this, sessionType
+								, new this.SessionTelemetryDatabase(this, this.Simulator
+																		, this.Car
+																		, this.Track)).runSimulation(true)
+		}
+		finally {
+			this.iSelectedDrivers := oldSelectedDrivers
+		}
 	}
 
 	getPreviousLap(lap) {
@@ -3904,6 +3905,9 @@ class RaceCenter extends ConfigurationItem {
 
 			GuiControl, , driverDropDown, |
 			GuiControl Choose, driverDropDown, 0
+
+			this.iAvailableDrivers := []
+			this.iSelectedDrivers := false
 
 			if this.SessionActive
 				this.loadSessionDrivers()
@@ -5828,11 +5832,10 @@ class RaceCenter extends ConfigurationItem {
 	loadDrivers() {
 		this.iDrivers := []
 
-		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
-			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
-
-			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr, ID: driver.ID})
-		}
+		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"]
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname
+							 , Fullname: computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+							 , Nr: driver.Nr, ID: driver.ID})
 	}
 
 	loadLaps() {
@@ -6899,12 +6902,41 @@ class RaceCenter extends ConfigurationItem {
 				dataY6DropDown := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
 
-			if !this.Simulator
-				GuiControl Choose, driverDropDown, 0
-			else if !this.SelectedDrivers
-				GuiControl Choose, driverDropDown, 1
-			else
-				GuiControl Choose, driverDropDown, % (inList(this.AvailableDrivers, this.SelectedDrivers[1]) + 1)
+			sessionDB := new SessionDatabase()
+			selected := false
+			names := []
+
+			if this.SelectedDrivers
+				selected := this.SelectedDrivers[1]
+
+			for index, id in this.AvailableDrivers {
+				found := false
+
+				for ignore, driver in this.Drivers
+					if (driver.ID = id) {
+						names.Push(driver.Fullname)
+
+						found := true
+
+						break
+					}
+
+				if !found
+					names.Push(values2String(", ", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
+
+				if (id = selected)
+					selected := A_Index
+			}
+
+			if selected is not Integer
+			{
+				selected := false
+
+				this.iSelectedDrivers := false
+			}
+
+			GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), names*)
+			GuiControl Choose, driverDropDown, % (selected + 1)
 
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
 			GuiControl Choose, dataY1DropDown, %dataY1DropDown%

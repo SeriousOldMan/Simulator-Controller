@@ -158,6 +158,8 @@ class SessionDatabase extends ConfigurationItem {
 
 			return ((drivers.Length() = 0) ? ["John Doe (JD)"] : drivers)
 		}
+		else
+			return ["John Doe (JD)"]
 	}
 
 	prepareDatabase(simulator, car, track) {

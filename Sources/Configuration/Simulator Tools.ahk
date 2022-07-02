@@ -1635,7 +1635,6 @@ clearWearFields(database, table, id) {
 	}
 }
 
-
 updateConfigurationForV423() {
 	if FileExist(kUserConfigDirectory . "Session Database.ini") {
 		sessionDB := new SessionDatabase()

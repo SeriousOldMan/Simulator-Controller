@@ -1192,15 +1192,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			sessionDB := new SessionDatabase()
 
-			driverNames := sessionDB.getAllDrivers(simulator, true)
-
-			for index, names in driverNames
-				driverNames[index] := values2String(", ", names*)
-
 			this.iAvailableDrivers := sessionDB.getAllDrivers(simulator)
 
-			GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), driverNames*)
-			GuiControl Choose, driverDropDown, 1
+			GuiControl, , driverDropDown, |
+			GuiControl Choose, driverDropDown, 0
 
 			this.iSelectedDrivers := false
 
@@ -1281,6 +1276,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			Gui %window%:Default
 
 			this.iSelectedDataType := dataType
+			this.iSelectedDrivers := false
 
 			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
 											   , this.SelectedTrack, this.SelectedDrivers)
@@ -1335,12 +1331,39 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl, , compoundDropDown, % "|" . values2String("|", map(availableCompounds, "translate")*)
 
 			if (availableCompounds.Length() == 0) {
+				GuiControl, , driverDropDown, |
 				GuiControl, , dataXDropDown, |
 				GuiControl, , dataY1DropDown, |
 				GuiControl, , dataY2DropDown, |
 				GuiControl, , dataY3DropDown, |
 			}
 			else if !reload {
+				sessionDB := new SessionDatabase()
+
+				driverNames := sessionDB.getAllDrivers(this.SelectedSimulator, true)
+				this.iAvailableDrivers := sessionDB.getAllDrivers(this.SelectedSimulator)
+
+				for index, names in driverNames
+					driverNames[index] := values2String(", ", names*)
+
+				GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), driverNames*)
+
+				if this.SelectedDrivers {
+					index := inList(this.AvailableDrivers, this.SelectedDrivers[1])
+
+					if index
+						GuiControl Choose, driverDropDown, % (index + 1)
+					else {
+						GuiControl Choose, driverDropDown, 1
+
+						this.iSelectedDrivers := false
+					}
+				}
+				else
+					GuiControl Choose, driverDropDown, 1
+
+				this.iSelectedDrivers := false
+
 				schema := filterSchema(telemetryDB.getSchema(dataType, true))
 
 				GuiControl, , dataXDropDown, % "|" . values2String("|", map(schema, "translate")*)
@@ -2447,9 +2470,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	runSimulation() {
-		new VariationSimulation(this, this.SelectedSessionType
-							  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-													, this.SelectedTrack, this.SelectedDrivers)).runSimulation(true)
+		oldSelectedDrivers := this.SelectedDrivers
+
+		try {
+			this.iSelectedDrivers := false
+
+			new VariationSimulation(this, this.SelectedSessionType
+								  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
+														, this.SelectedTrack, this.SelectedDrivers)).runSimulation(true)
+		}
+		finally {
+			this.iSelectedDrivers := oldSelectedDrivers
+		}
 	}
 
 	chooseScenario(strategy) {
@@ -2666,7 +2698,7 @@ filterSchema(schema) {
 	newSchema := []
 
 	for ignore, column in schema
-		if !inList(["Owner", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
+		if !inList(["Driver", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
 			newSchema.Push(column)
 
 	return newSchema

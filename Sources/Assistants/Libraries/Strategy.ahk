@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -906,6 +907,7 @@ class Strategy extends ConfigurationItem {
 	iTyreCompoundVariation := 0
 
 	iDriver := false
+	iDriverName := "John Doe (JD)"
 
 	iPitstops := []
 
@@ -915,6 +917,7 @@ class Strategy extends ConfigurationItem {
 		iLap := 0
 
 		iDriver := false
+		iDriverName := "John Doe (JD)"
 
 		iTime := 0
 		iDuration := 0
@@ -956,6 +959,12 @@ class Strategy extends ConfigurationItem {
 		Driver[]  {
 			Get {
 				return this.iDriver
+			}
+		}
+
+		DriverName[]  {
+			Get {
+				return this.iDriverName
 			}
 		}
 
@@ -1054,6 +1063,9 @@ class Strategy extends ConfigurationItem {
 			this.iNr := nr
 			this.iLap := lap
 			this.iDriver := driver
+
+			if driver
+				this.iDriverName := new SessionDatabase().getDriverName(strategy.Simulator, driver)
 
 			base.__New(configuration)
 
@@ -1174,6 +1186,7 @@ class Strategy extends ConfigurationItem {
 			lap := this.Lap
 
 			this.iDriver := getConfigurationValue(configuration, "Pitstop", "Driver." . lap, false)
+			this.iDriverName := getConfigurationValue(configuration, "Pitstop", "DriverName." . lap, "John Doe (JD)")
 
 			this.iTime := getConfigurationValue(configuration, "Pitstop", "Time." . lap, 0)
 			this.iDuration := getConfigurationValue(configuration, "Pitstop", "Duration." . lap, 0)
@@ -1203,6 +1216,7 @@ class Strategy extends ConfigurationItem {
 			lap := this.Lap
 
 			setConfigurationValue(configuration, "Pitstop", "Driver." . lap, this.Driver)
+			setConfigurationValue(configuration, "Pitstop", "DriverName." . lap, this.DriverName)
 
 			setConfigurationValue(configuration, "Pitstop", "Time." . lap, this.Time)
 			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
@@ -1564,6 +1578,12 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
+	DriverName[] {
+		Get {
+			return this.iDriverName
+		}
+	}
+
 	Pitstops[index := false] {
 		Get {
 			return (index ? this.iPitstops[index] : this.iPitstops)
@@ -1656,6 +1676,9 @@ class Strategy extends ConfigurationItem {
 			this.iTyrePressureFR := tyrePressures[2]
 			this.iTyrePressureRL := tyrePressures[3]
 			this.iTyrePressureRR := tyrePressures[4]
+
+			if driver
+				this.iDriverName := new SessionDatabase().getDriverName(simulator, driver)
 
 			stintLength := false
 			formationLap := false
@@ -1811,6 +1834,7 @@ class Strategy extends ConfigurationItem {
 		this.iFuelConsumption := getConfigurationValue(configuration, "Strategy", "FuelConsumption", 0)
 
 		this.iDriver := getConfigurationValue(configuration, "Strategy", "Driver", false)
+		this.iDriverName := getConfigurationValue(configuration, "Strategy", "DriverName", "John Doe (JD)")
 
 		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
 			this.Pitstops.Push(this.createPitstop(this.StartStint + A_Index - 1, lap, this.Driver
@@ -1897,6 +1921,7 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Strategy", "FuelConsumption", this.FuelConsumption)
 
 		setConfigurationValue(configuration, "Strategy", "Driver", this.Driver)
+		setConfigurationValue(configuration, "Strategy", "DriverName", this.DriverName)
 
 		pitstops := []
 

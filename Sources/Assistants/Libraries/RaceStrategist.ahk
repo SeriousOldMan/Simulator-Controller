@@ -836,7 +836,7 @@ class RaceStrategist extends RaceAssistant {
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
-									  , RaceReview: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", true)
+									  , RaceReview: (getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
@@ -854,7 +854,8 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
-			if (shutdown && review && (this.Session = kSessionRace) && this.RaceReview && this.hasEnoughData(false)) {
+			if (shutdown && review && this.RaceReview && (this.Session = kSessionRace)
+						 && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.finishSessionWithReview(shutdown)
 
 				return
@@ -867,7 +868,7 @@ class RaceStrategist extends RaceAssistant {
 			if (shutdown && !review && !ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
 				if this.Listener {

@@ -147,6 +147,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	getDriverName(simulator, id) {
+		return this.getDriverNames(simulator, id)[1]
+	}
+
 	getDriverNames(simulator, id) {
 		if (simulator && id) {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)

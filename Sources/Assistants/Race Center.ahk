@@ -240,6 +240,8 @@ class RaceCenter extends ConfigurationItem {
 
 	iStrategy := false
 
+	iStintDriver := false
+
 	iUseSessionData := true
 	iUseTelemetryDatabase := false
 	iUseCurrentMap := true
@@ -280,8 +282,25 @@ class RaceCenter extends ConfigurationItem {
 
 	iTasks := []
 
-	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
+	class SessionTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
+		iTelemetryDatabase := false
+
+		class StandardTelemetryDatabase extends TelemetryDatabase {
+			iRoot := false
+
+			Drivers[] {
+				Get {
+					return this.iRoot.Drivers
+				}
+			}
+
+			__New(root, simulator := false, car := false, track := false) {
+				this.iRoot := root
+
+				base.__New(simulator, car, track)
+			}
+		}
 
 		RaceCenter[] {
 			Get {
@@ -298,20 +317,12 @@ class RaceCenter extends ConfigurationItem {
 		__New(raceCenter, simulator := false, car := false, track := false) {
 			this.iRaceCenter := raceCenter
 
-			base.__New(simulator, car, track)
-		}
-	}
-
-	class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
-		iTelemetryDatabase := false
-
-		__New(raceCenter, simulator := false, car := false, track := false) {
 			base.__New(raceCenter)
 
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
-				this.iTelemetryDatabase := new RaceCenter.RaceCenterTelemetryDatabase(simulator, car, track)
+				this.iTelemetryDatabase := new this.StandardTelemetryDatabase(this, simulator, car, track)
 		}
 
 		getMapData(weather, compound, compoundColor) {
@@ -462,6 +473,14 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			return entries
+		}
+	}
+
+	class SimulationTelemetryDatabase extends RaceCenter.SessionTelemetryDatabase {
+		Drivers[] {
+			Get {
+				return this.RaceCenter.StintDriver
+			}
 		}
 	}
 
@@ -794,6 +813,12 @@ class RaceCenter extends ConfigurationItem {
 	Strategy[] {
 		Get {
 			return this.iStrategy
+		}
+	}
+
+	StintDriver[] {
+		Get {
+			return this.iStintDriver
 		}
 	}
 
@@ -3288,7 +3313,7 @@ class RaceCenter extends ConfigurationItem {
 						this.updateState()
 					}
 
-					this.runSimulation(getConfigurationValue(this.Strategy, "Session", "SessionType"))
+					this.runSimulation(this.Strategy.SessionType)
 				}
 				else {
 					title := translate("Information")
@@ -3494,25 +3519,42 @@ class RaceCenter extends ConfigurationItem {
 			}
 	}
 
+	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
+		driver := this.getStintDriver(stintNumber)
+
+		if (driver && driver.ID) {
+			driverID := driver.ID
+			driverName := driver.Fullname
+		}
+		else {
+			driverID := false
+			driverName := translate("All")
+		}
+
+		this.iStintDriver := driverID
+
+		return true
+	}
+
 	runSimulation(sessionType) {
 		this.pushTask(ObjBindMethod(this, "runSimulationAsync", sessionType))
 	}
 
 	runSimulationAsync(sessionType) {
-		oldSelectedDrivers := this.SelectedDrivers
+		oldStintDriver := this.StintDriver
 
 		try {
-			this.iSelectedDrivers := false
+			this.iStintDriver := false
 
-			simulationClass := (this.UseTraffic ? TrafficSimulation : VariationSimulation)
+			telemetryDB := new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
-			new %simulationClass%(this, sessionType
-								, new this.SessionTelemetryDatabase(this, this.Simulator
-																		, this.Car
-																		, this.Track)).runSimulation(true)
+			if this.UseTraffic
+				new TrafficSimulation(this, sessionType, telemetryDB).runSimulation(true)
+			else
+				new VariationSimulation(this, sessionType, telemetryDB).runSimulation(true)
 		}
 		finally {
-			this.iSelectedDrivers := oldSelectedDrivers
+			this.iStintDriver := oldStintDriver
 		}
 	}
 
@@ -3634,11 +3676,13 @@ class RaceCenter extends ConfigurationItem {
 		consideredTraffic := trafficConsideredEdit
 	}
 
-	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		this.syncSessionDatabase()
 
 		lastLap := this.LastLap
+
+		initialStint := 1
 		initialLap := 0
 		initialStintTime := 0
 		initialTyreLaps := 0
@@ -3650,7 +3694,8 @@ class RaceCenter extends ConfigurationItem {
 		if lastLap {
 			telemetryDB := this.TelemetryDatabase
 
-			initialLap := lastLap.Nr + 1
+			initialStint := lastLap.Stint.Nr
+			initialLap := lastLap.Nr
 			initialFuelAmount := lastLap.FuelRemaining
 			initialMap := lastLap.Map
 			initialFuelConsumption := lastLap.FuelConsumption
@@ -3738,12 +3783,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else
 			return false
-	}
-
-	startStint(stintNumber, ByRef stintDriver) {
-		stintDriver := false
-
-		return true
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -9006,6 +9045,7 @@ class TrafficSimulation extends StrategySimulation {
 							  , useLapTimeVariation, useDriverErrors, usePitstops
 							  , overTakeDelta, consideredTraffic)
 
+		initialStint := false
 		initialLap := false
 		initialStintTime := false
 		initialTyreLaps := false
@@ -9014,7 +9054,7 @@ class TrafficSimulation extends StrategySimulation {
 		fuelConsumption := false
 		avgLapTime := false
 
-		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 
 		if initialLap
 			formationLap := false
@@ -9119,7 +9159,7 @@ class TrafficSimulation extends StrategySimulation {
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 
-										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 														, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
 									}
 									finally {
@@ -9170,7 +9210,7 @@ class TrafficSimulation extends StrategySimulation {
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 
-										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 														, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 
 										scenarios[name . translate(":") . variation] := strategy

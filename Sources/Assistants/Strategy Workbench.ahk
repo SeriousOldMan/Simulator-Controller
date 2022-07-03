@@ -2426,7 +2426,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 
-	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		window := this.Window
 
@@ -2438,6 +2438,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet simFuelConsumptionEdit
 		GuiControlGet simAvgLapTimeEdit
 
+		initialStint := 1
 		initialLap := 0
 		initialStintTime := 0
 		initialTyreLaps := 0
@@ -2469,8 +2470,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		tyreCompoundVariationVariation := simtyreCompoundVariation
 	}
 
-	startStint(stintNumber, ByRef stintDriver) {
-		stintDriver := false
+	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
+		driverID := false
+		driverName := translate("All")
 
 		return true
 	}

@@ -9132,15 +9132,16 @@ class TrafficSimulation extends StrategySimulation {
 
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-									name := (translate("Initial Conditions - Map ") . map)
-									driver := false
+									name := (translate("Initial Conditions - Map ") . map)									
+									driverID := false
+									driverName := false
 
-									this.startStint(1, driver)
+									this.simulateStint(initialStint, driverID, driverName)
 
 									this.setFixedLapTime(avgLapTime)
 
 									try {
-										strategy := this.createStrategy(name, driver)
+										strategy := this.createStrategy(name, driverID)
 
 										currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
@@ -9186,12 +9187,13 @@ class TrafficSimulation extends StrategySimulation {
 
 										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
-										name := (translate("Telemetry - Map ") . scenarioMap)
-										driver := false
+										name := (translate("Telemetry - Map ") . scenarioMap)										
+										driverID := false
+										driverName := false
 
-										this.startStint(1, driver)
+										this.simulateStint(initialStint, driverID, driverName)
 
-										strategy := this.createStrategy(name, driver)
+										strategy := this.createStrategy(name, driverID)
 
 										currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 

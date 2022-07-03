@@ -325,8 +325,8 @@ class StrategySimulation {
 		return this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 	}
 
-	startStint(stintNumber, ByRef stintDriver) {
-		return this.StrategyManager.startStint(stintNumber, stintDriver)
+	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
+		return this.StrategyManager.simulateStint(stintNumber, driverID, driverName)
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -723,11 +723,12 @@ class VariationSimulation extends StrategySimulation {
 								this.setFixedLapTime(avgLapTime)
 
 								try {
-									driver := false
+									driverID := false
+									driverName := false
 
-									this.startStint(1, driver)
+									this.simulateStint(initialStint, driverID, driverName)
 
-									strategy := this.createStrategy(name, driver)
+									strategy := this.createStrategy(name, driverID)
 
 									currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
@@ -774,11 +775,13 @@ class VariationSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
 									name := (translate("Telemetry - Map ") . scenarioMap)
-									driver := false
+									
+									driverID := false
+									driverName := false
 
-									this.startStint(1, driver)
+									this.simulateStint(initialStint, driverID, driverName)
 
-									strategy := this.createStrategy(name, driver)
+									strategy := this.createStrategy(name, driverID)
 
 									currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 
@@ -2240,11 +2243,12 @@ class Strategy extends ConfigurationItem {
 					tyreCompound := false
 			}
 
-			driver := false
+			driverID := false
+			driverName := false
 
-			this.StrategyManager.startStint(pitstopNr + 1, driver)
+			this.StrategyManager.simulateStint(pitstopNr + 1, driverID, driverName)
 
-			pitstop := this.createPitstop(pitstopNr, pitstopLap, driver, tyreCompound, tyreCompoundColor, false, adjustments)
+			pitstop := this.createPitstop(pitstopNr, pitstopLap, driverID, tyreCompound, tyreCompoundColor, false, adjustments)
 
 			if (this.SessionType = "Duration") {
 				if (pitStop.RemainingTime <= 0)

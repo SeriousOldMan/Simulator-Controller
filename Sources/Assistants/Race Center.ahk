@@ -310,7 +310,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Drivers[] {
 			Get {
-				return this.RaceCenter.SelectedDrivers
+				return (this.RaceCenter.StintDriver ? [this.RaceCenter.StintDriver] : false)
 			}
 		}
 
@@ -7167,10 +7167,10 @@ class RaceCenter extends ConfigurationItem {
 												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
 												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
 												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
-						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Front"
-												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Car")
-												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Delta") / 1000, 2)
-												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Distance"), 2)})
 						sessionDB.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
 												   , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
 												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
@@ -7179,10 +7179,10 @@ class RaceCenter extends ConfigurationItem {
 												   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
 												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
 												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
-						sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Front"
-												   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
-												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
-												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
+						sessionDB.add("Delta.Data", {Lap: lap, Type: "Track.Ahead"
+												   , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Car")
+												   , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Delta") / 1000, 2)
+												   , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Distance"), 2)})
 
 						prefix := ("Standings.Lap." . lap . ".Car.")
 
@@ -7590,7 +7590,8 @@ class RaceCenter extends ConfigurationItem {
 
 		label := [translate("Leader"), translate("Standings (Front)"), translate("Standings (Behind)")
 				, translate("Track (Front)"), translate("Track (Behind)")]
-		rowIndex := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Behind": 3, "Track.Front": 4, "Track.Behind": 5}
+		rowIndex := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Ahead": 2, "Standings.Behind": 3
+										  , "Track.Front": 4, "Track.Ahead": 4, "Track.Behind": 5}
 
 		telemetryDB := this.TelemetryDatabase
 
@@ -9132,7 +9133,7 @@ class TrafficSimulation extends StrategySimulation {
 
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-									name := (translate("Initial Conditions - Map ") . map)									
+									name := (translate("Initial Conditions - Map ") . map)
 									driverID := false
 									driverName := false
 
@@ -9187,7 +9188,7 @@ class TrafficSimulation extends StrategySimulation {
 
 										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
-										name := (translate("Telemetry - Map ") . scenarioMap)										
+										name := (translate("Telemetry - Map ") . scenarioMap)
 										driverID := false
 										driverName := false
 

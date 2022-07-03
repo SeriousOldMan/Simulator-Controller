@@ -111,9 +111,6 @@ class StrategyViewer {
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]
 
-		sessionDB := new SessionDatabase()
-		simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
-
 		startStint := strategy.StartStint
 
 		html := ""
@@ -121,8 +118,7 @@ class StrategyViewer {
 		if !strategy.LastPitstop {
 			html .= "<table class=""table-std"">"
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">"
-														 . sessionDB.getDriverName(simulator, strategy.Driver) . "</td></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
@@ -145,7 +141,7 @@ class StrategyViewer {
 			refuels := []
 			tyreChanges := []
 
-			lastDriver := sessionDB.getDriverName(simulator, strategy.Driver)
+			lastDriver := strategy.DriverName
 			lastMap := strategy.Map
 			lastLap := strategy.StartLap
 			lastLapTime := strategy.AvgLapTime
@@ -173,7 +169,7 @@ class StrategyViewer {
 				fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
 				tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
 
-				lastDriver := sessionDB.getDriverName(simulator, pitstop.Driver)
+				lastDriver := pitstop.DriverName
 				lastMap := pitstop.Map
 				lastLap := pitstop.Lap
 				lastFuelConsumption := pitstop.FuelConsumption

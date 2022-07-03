@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.3.0-dev
 Target=4.2.3.0-release
-Date=07/02/2022
+Date=07/03/2022
 Download=
-Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center"
+Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC and AMS2
 [Release]
 Version=4.2.2.0-release
 Date=07/01/2022

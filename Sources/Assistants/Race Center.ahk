@@ -310,7 +310,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Drivers[] {
 			Get {
-				return this.RaceCenter.SelectedDrivers
+				return (this.RaceCenter.StintDriver ? [this.RaceCenter.StintDriver] : false)
 			}
 		}
 
@@ -9132,7 +9132,7 @@ class TrafficSimulation extends StrategySimulation {
 
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
-									name := (translate("Initial Conditions - Map ") . map)									
+									name := (translate("Initial Conditions - Map ") . map)
 									driverID := false
 									driverName := false
 
@@ -9187,7 +9187,7 @@ class TrafficSimulation extends StrategySimulation {
 
 										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
-										name := (translate("Telemetry - Map ") . scenarioMap)										
+										name := (translate("Telemetry - Map ") . scenarioMap)
 										driverID := false
 										driverName := false
 

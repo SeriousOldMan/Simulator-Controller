@@ -447,21 +447,21 @@ class StrategySimulation {
 	}
 
 	validScenario(strategy) {
-		/*
+		valid := false
+
 		remainingFuel := strategy.RemainingFuel[true]
 		remainingLaps := strategy.RemainingLaps[true]
 		fuelConsumption := strategy.FuelConsumption[true]
 
-		return (((remainingFuel - (remainingLaps * fuelConsumption)) > 0) && this.scenarioValid(strategy, strategy.Validator))
-		*/
+		valid := ((remainingFuel - (remainingLaps * fuelConsumption)) > 0)
 
-		remainingFuel := strategy.RemainingFuel[true]
-		fuelConsumption := strategy.FuelConsumption[true]
-		remainingLaps := (remainingFuel / fuelConsumption)
-		remainingTime := (remainingLaps * strategy.AvgLapTime[true])
+		if !valid {
+			remainingLaps := (remainingFuel / fuelConsumption)
 
-		return ((strategy.RemainingTime[true] < remainingTime)
-			 && this.scenarioValid(strategy, strategy.Validator))
+			valid := (strategy.RemainingTime[true] < (remainingLaps * strategy.AvgLapTime[true]))
+		}
+
+		return (valid && this.scenarioValid(strategy, strategy.Validator))
 	}
 
 	compareScenarios(scenario1, scenario2) {
@@ -775,7 +775,7 @@ class VariationSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
 									name := (translate("Telemetry - Map ") . scenarioMap)
-									
+
 									driverID := false
 									driverName := false
 

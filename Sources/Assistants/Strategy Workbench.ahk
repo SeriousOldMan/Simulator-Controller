@@ -1650,6 +1650,30 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						LV_ModifyCol()
 
+						Gui ListView, % this.DriversListView
+
+						sessionDB := new SessionDatabase()
+
+						LV_Delete()
+
+						this.iStintDrivers := []
+
+						numPitstops := strategy.Pitstops.Length()
+
+						name := sessionDB.getDriverName(simulator, strategy.Driver)
+
+						LV_Add("", (numPitstops = 0) ? "1+" : 1, name)
+
+						this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+
+						for ignore, pitstop in strategy.Pitstops {
+							name := sessionDB.getDriverName(simulator, pitstop.Driver)
+
+							LV_Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
+
+							this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+						}
+
 						if (strategy.SessionType = "Duration") {
 							GuiControl, , sessionTypeDropDown, 1
 							GuiControl, , sessionLengthlabel, % translate("Minutes")

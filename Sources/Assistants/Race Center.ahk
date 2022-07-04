@@ -158,7 +158,7 @@ global deleteSetupButton
 
 global sessionDateCal
 global sessionTimeEdit
-global planSetupDriverDropDownMenu
+global planDriverDropDownMenu
 global planTimeEdit
 global actTimeEdit
 global planLapEdit
@@ -1211,7 +1211,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPlanListView := listHandle
 
 		Gui %window%:Add, Text, x378 ys+68 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanSetupDriverDropDownMenu gupdatePlan
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanDriverDropDownMenu gupdatePlan
 
 		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (est. / act.)")
 		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit gupdatePlan 1, HH:mm
@@ -1604,7 +1604,7 @@ class RaceCenter extends ConfigurationItem {
 		names := getKeys(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
-		GuiControl, , planSetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
+		GuiControl, , planDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
 	}
 
 	selectSession(identifier) {
@@ -1868,7 +1868,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if selected {
-				GuiControl Enable, planSetupDriverDropDownMenu
+				GuiControl Enable, planDriverDropDownMenu
 				GuiControl Enable, planTimeEdit
 				GuiControl Enable, actTimeEdit
 				GuiControl Enable, deletePlanButton
@@ -1894,7 +1894,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else {
-				GuiControl Disable, planSetupDriverDropDownMenu
+				GuiControl Disable, planDriverDropDownMenu
 				GuiControl Disable, planTimeEdit
 				GuiControl Disable, actTimeEdit
 				GuiControl Disable, planLapEdit
@@ -1903,7 +1903,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, planTyreCompoundDropDown
 				GuiControl Disable, deletePlanButton
 
-				GuiControl Choose, planSetupDriverDropDownMenu, 0
+				GuiControl Choose, planDriverDropDownMenu, 0
 				GuiControl, , planTimeEdit, 20200101000000
 				GuiControl, , actTimeEdit, 20200101000000
 				GuiControl, , planLapEdit, % ""
@@ -2306,6 +2306,35 @@ class RaceCenter extends ConfigurationItem {
 						EnvAdd currentTime, time, Seconds
 						FormatTime time, %currentTime%, HH:mm
 
+						driver := pitstop.DriverName
+
+						forName := false
+						surName := false
+						nickName := false
+
+						parseDriverName(driver, forName, surName, nickName)
+
+						found := false
+
+						for ignore, candidate in getKeys(this.SessionDrivers) {
+							sForName := false
+							sSurName := false
+							sNickName := false
+
+							parseDriverName(candidate, sForName, sSurName, sNickName)
+
+							if ((sForName = forName) && (sSurName = surName)) {
+								found := true
+								driver := candidate
+
+								break
+							}
+						}
+
+						if !found
+							driver := "-"
+
+						LV_Modify(A_Index, "Col2", driver)
 						LV_Modify(A_Index, "Col3", time)
 						LV_Modify(A_Index, "Col5", pitstop.Lap)
 						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : pitstop.RefuelAmount)
@@ -2481,7 +2510,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedPlanStint := LV_GetCount()
 			}
 
-			GuiControl Choose, planSetupDriverDropDownMenu, 1
+			GuiControl Choose, planDriverDropDownMenu, 1
 			GuiControl, , planTimeEdit, 20200101000000
 			GuiControl, , actTimeEdit, 20200101000000
 			GuiControl, , planLapEdit, % ""
@@ -3958,7 +3987,7 @@ class RaceCenter extends ConfigurationItem {
 				this.loadSessionDrivers()
 			else {
 				GuiControl, , setupDriverDropDownMenu, % "|"
-				GuiControl, , planSetupDriverDropDownMenu, % "|"
+				GuiControl, , planDriverDropDownMenu, % "|"
 			}
 
 			GuiControl, , pitstopDriverDropDownMenu, % "|"
@@ -10127,7 +10156,7 @@ choosePlan() {
 
 			timeActual := currentTime
 
-			GuiControl Choose, planSetupDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
+			GuiControl Choose, planDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
 			GuiControl, , planTimeEdit, %timePlanned%
 			GuiControl, , actTimeEdit, %timeActual%
 			GuiControl, , planLapEdit, %lapPlanned%
@@ -10169,7 +10198,7 @@ updatePlanAsync() {
 		}
 
 		if (row > 0) {
-			GuiControlGet planSetupDriverDropDownMenu
+			GuiControlGet planDriverDropDownMenu
 			GuiControlGet planTimeEdit
 			GuiControlGet actTimeEdit
 			GuiControlGet planLapEdit
@@ -10177,10 +10206,10 @@ updatePlanAsync() {
 			GuiControlGet planRefuelEdit
 			GuiControlGet planTyreCompoundDropDown
 
-			if (planSetupDriverDropDownMenu = 1)
+			if (planDriverDropDownMenu = 1)
 				LV_Modify(row, "Col2", "")
 			else
-				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planSetupDriverDropDownMenu - 1])
+				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planDriverDropDownMenu - 1])
 
 			FormatTime time, %planTimeEdit%, HH:mm
 

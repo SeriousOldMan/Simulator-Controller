@@ -271,6 +271,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		Get {
 			return (index ? this.iStintDrivers[index] : this.iStintDrivers)
 		}
+
+		Set {
+			return (index ? (this.iStintDrivers[index] := value) : (this.iStintDrivers := value))
+		}
 	}
 
 	SelectedValidator[] {

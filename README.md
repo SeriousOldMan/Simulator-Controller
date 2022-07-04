@@ -73,6 +73,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 8. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
 
+9. [Working with the Setup Advisor](https://youtu.be/TqkMvOB0UWI) - The Setup Advisor is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
+
 This list will be extended with one new video per week.
 
 ### Discord Community

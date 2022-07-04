@@ -3089,6 +3089,9 @@ runStrategyWorkbench() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Strategy Workbench
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	simulator := "Assetto Corsa Competizione"
 	car := false
 	track := false
@@ -3149,6 +3152,11 @@ runStrategyWorkbench() {
 	finally {
 		fixIE(current)
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

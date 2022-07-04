@@ -628,6 +628,9 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 
 	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
@@ -637,6 +640,11 @@ startSimulator() {
 
 	if (!vStartupManager || vStartupManager.Finished)
 		ExitApp 0
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 playSong(songFile) {

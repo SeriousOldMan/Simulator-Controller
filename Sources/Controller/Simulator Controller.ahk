@@ -1879,6 +1879,14 @@ initializeSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	SetKeyDelay 5, 25
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	settings := readConfiguration(kSimulatorSettingsFile)
 
 	updateTrayMessageState(settings)
@@ -1912,6 +1920,11 @@ initializeSimulatorController() {
 
 	registerEventHandler("Controller", "functionEventHandler")
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 startupSimulatorController() {
@@ -2053,5 +2066,5 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
-setDebug(false)
+
 startupSimulatorController()

@@ -10484,6 +10484,9 @@ startupRaceCenter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	current := fixIE(11)
 
 	try {
@@ -10506,6 +10509,11 @@ startupRaceCenter() {
 	finally {
 		fixIE(current)
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

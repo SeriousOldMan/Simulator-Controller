@@ -2411,6 +2411,9 @@ showSessionDatabaseEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Session Database
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	simulator := false
 	car := false
 	track := false
@@ -2474,6 +2477,11 @@ showSessionDatabaseEditor() {
 	finally {
 		protectionOff()
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

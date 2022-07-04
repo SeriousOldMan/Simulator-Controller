@@ -861,6 +861,9 @@ runRaceReports() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Reports
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 
 	if !reportsDirectory {
@@ -891,6 +894,11 @@ runRaceReports() {
 	finally {
 		fixIE(current)
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

@@ -2474,6 +2474,9 @@ startSimulatorTools() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 
 	if (A_Args.Length() > 0)
@@ -2539,6 +2542,9 @@ startSimulatorTools() {
 			hideSplashTheme()
 	}
 
+	ExitApp 0
+
+Exit:
 	ExitApp 0
 }
 

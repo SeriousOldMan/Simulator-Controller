@@ -1714,10 +1714,29 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger) {
+	static pending := false
+
 	protectionOn(true, true)
 
 	try {
-		function.Controller.fireActions(function, trigger)
+		if pending
+			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
+		else {
+			pending := []
+
+			try {
+				function.Controller.fireActions(function, trigger)
+
+				while (pending.Length() > 0) {
+					callable := pending.RemoveAt(1)
+
+					%callable%()
+				}
+			}
+			finally {
+				pending := false
+			}
+		}
 	}
 	finally {
 		protectionOff(true, true)

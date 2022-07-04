@@ -202,7 +202,7 @@ class StrategyViewer {
 
 			html .= "<table class=""table-std"">"
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Drivers") . "</th>" . values2String("", drivers*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th>" . values2String("", drivers*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", map(lapTimes, ObjBindMethod(this, "lapTimeDisplayValue"))*) . "</tr>")

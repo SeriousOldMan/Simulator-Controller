@@ -244,6 +244,8 @@ Loading of settings is supported for:
 	   - Service Rules
 	   - Fuel Capacity
 	   - Safety Fuel
+	 - Drivers
+	   - The complete list of drivers, as long as known in the current telemetry database), will be restored
 	 - Simulation
 	   - Tyre Compound
 	   - Tyre Compound Color

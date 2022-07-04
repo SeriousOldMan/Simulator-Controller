@@ -951,7 +951,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
 
-					new SessionDatabase().registerDriverName(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+					new SessionDatabase().registerDriver(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
 
 					stint := this.joinSession(simulator, car, track, lapNumber)
 				}

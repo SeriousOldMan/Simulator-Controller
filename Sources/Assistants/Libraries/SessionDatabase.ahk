@@ -132,8 +132,8 @@ class SessionDatabase extends ConfigurationItem {
 			return []
 	}
 
-	registerDriverName(simulator, id, name) {
-		if (simulator && id && name) {
+	registerDriver(simulator, id, name) {
+		if (simulator && id && name && (name != "John Doe (JD)")) {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			forName := false
@@ -147,8 +147,35 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	getDriverID(simulator, name) {
+		ids := this.getDriverIDs(simulator, name)
+
+		return ((ids.Length() > 0) ? ids[1] : false)
+	}
+
 	getDriverName(simulator, id) {
 		return this.getDriverNames(simulator, id)[1]
+	}
+
+	getDriverIDs(simulator, name) {
+		if (simulator && name) {
+			forName := false
+			surName := false
+			nickName := false
+
+			parseDriverName(name, forName, surName, nickName)
+
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+			ids := []
+
+			for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
+				ids.Push(entry.ID)
+
+			return ids
+		}
+		else
+			return false
 	}
 
 	getDriverNames(simulator, id) {

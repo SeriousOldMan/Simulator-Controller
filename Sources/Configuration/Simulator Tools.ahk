@@ -1646,7 +1646,7 @@ updateConfigurationForV423() {
 			id := key[2]
 
 			for ignore, driver in string2Values("###", drivers)
-				sessionDB.registerDriverName(simulator, id, driver)
+				sessionDB.registerDriver(simulator, id, driver)
 		}
 
 		removeConfigurationSection(sessionDBConfig, "Drivers")

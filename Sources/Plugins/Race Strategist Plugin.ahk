@@ -282,7 +282,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
 					if (newStint && driverID)
-						telemetryDB.registerDriverName(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
+						telemetryDB.registerDriver(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
 
 					pitstop := telemetryData[10]
 

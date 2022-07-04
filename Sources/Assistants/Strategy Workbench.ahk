@@ -111,6 +111,10 @@ global pitstopServiceDropDown
 global fuelCapacityEdit = 125
 global safetyFuelEdit = 5
 
+global simDriverDropDown
+global addDriverButton
+global deleteDriverButton
+
 global simCompoundDropDown
 global simMaxTyreLapsEdit = 40
 global simInitialFuelAmountEdit = 90
@@ -160,6 +164,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iAvailableDrivers := []
 	iSelectedDrivers := false
+	iStintDrivers := []
 
 	iSelectedValidator := false
 
@@ -176,6 +181,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iDriversListView := false
 	iPitstopListView := false
 
 	iStrategyViewer := false
@@ -255,9 +261,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	SelectedDrivers[] {
+	SelectedDrivers[index := false] {
 		Get {
-			return this.iSelectedDrivers
+			return (index ? this.iSelectedDrivers[index] : this.iSelectedDrivers)
+		}
+	}
+
+	StintDrivers[index := false] {
+		Get {
+			return (index ? this.iStintDrivers[index] : this.iStintDrivers)
 		}
 	}
 
@@ -288,6 +300,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedStrategy[] {
 		Get {
 			return this.iSelectedStrategy
+		}
+	}
+
+	DriversListView[] {
+		Get {
+			return this.iDriversListView
 		}
 	}
 
@@ -500,7 +518,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Stints", "Simulation", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Drivers", "Simulation", "Strategy"], "translate")*)
 
 		Gui %window%:Tab, 1
 
@@ -629,6 +647,27 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
+
+		Gui %window%:Tab, 3
+
+		x := 32
+		x2 := x + 220
+		x3 := x2 + 100
+		w3 := 140
+		x4 := x3 + w3 - 50
+		x5 := x4 + 25
+
+		Gui %window%:Add, ListView, x24 ys+34 w216 h171 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdriversListView gchooseSimDriver, % values2String("|", map(["Stint", "Driver"], "translate")*)
+
+		this.iDriversListView := driversListView
+
+		Gui %window%:Add, Text, x%x2% ys+34 w90 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x%x3% yp w%w3% AltSubmit vsimDriverDropDown gupdateSimDriver
+
+		Gui %window%:Add, Button, x%x4% yp+30 w23 h23 Center +0x200 HWNDplusButton vaddDriverButton gaddSimDriver
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDminusButton vdeleteDriverButton gdeleteSimDriver
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Tab, 4
 
@@ -768,7 +807,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w179 h171, % translate("Electronics")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w143 h171, % translate("Electronics")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -784,7 +823,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit Disabled, %strategyStartABSEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartABSEdit%
 
-		x := 222
+		x := 186
 		x0 := x + 50
 		x1 := x + 70
 		x2 := x1 + 32
@@ -793,7 +832,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x214 ys+34 w174 h171, % translate("Tyres")
+		Gui %window%:Add, GroupBox, -Theme x178 ys+34 w174 h171, % translate("Tyres")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -827,7 +866,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit Disabled, %strategyPressureRREdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
 
-		x := 407
+		x := 371
 		x0 := x - 4
 		x1 := x + 84
 		x2 := x1 + 32
@@ -836,11 +875,11 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x399 ys+34 w197 h171, % translate("Pitstops")
+		Gui %window%:Add, GroupBox, -Theme x363 ys+34 w233 h171, % translate("Pitstops")
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+21 w180 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Fuel", "Tyres", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w216 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Driver", "Fuel", "Tyres", "Map"], "translate")*)
 
 		this.iPitstopListView := pitstopListView
 
@@ -1007,6 +1046,28 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			GuiControl Choose, tyreChangeRequirementsDropDown, % oldTChoice ? oldTChoice : 1
 			GuiControl Choose, refuelRequirementsDropDown, % oldFChoice ? oldFChoice : 1
+		}
+
+		Gui ListView, % this.DriversListView
+
+		if (this.AvailableDrivers.Length() > 0)
+			GuiControl Enable, addDriverButton
+		else
+			GuiControl Disable, addDriverButton
+
+		if (LV_GetNext(0) && (this.AvailableDrivers.Length() > 0)) {
+			if (this.AvailableDrivers.Length() > 1)
+				GuiControl Enable, deleteDriverButton
+			else
+				GuiControl Disable, deleteDriverButton
+
+			GuiControl Enable, simDriverDropDown
+		}
+		else {
+			GuiControl Disable, deleteDriverButton
+			GuiControl Disable, simDriverDropDown
+
+			GuiControl Choose, simDriverDropDown, 0
 		}
 	}
 
@@ -1194,10 +1255,30 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iAvailableDrivers := sessionDB.getAllDrivers(simulator)
 
+			drivers := []
+
+			for ignore, id in this.AvailableDrivers
+				drivers.Push(sessionDB.getDriverName(simulator, id))
+
+			GuiControl, , simDriverDropDown, % "|" . values2String("|", drivers*)
+			GuiControl Choose, simDriverDropDown, 0
+
 			GuiControl, , driverDropDown, |
 			GuiControl Choose, driverDropDown, 0
 
 			this.iSelectedDrivers := false
+
+			Gui ListView, % this.DriversListView
+
+			LV_Delete()
+
+			LV_Add("", "1+", sessionDB.getDriverName(simulator, sessionDB.ID))
+
+			LV_ModifyCol()
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
+
+			this.iStintDrivers := [sessionDB.ID]
 
 			cars := this.getCars(simulator)
 			carNames := cars.Clone()
@@ -1341,7 +1422,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				sessionDB := new SessionDatabase()
 
 				driverNames := sessionDB.getAllDrivers(this.SelectedSimulator, true)
-				this.iAvailableDrivers := sessionDB.getAllDrivers(this.SelectedSimulator)
 
 				for index, names in driverNames
 					driverNames[index] := values2String(", ", names*)
@@ -1410,6 +1490,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if this.SelectedCompound
 				this.loadChart(this.SelectedChartType)
+
+			this.updateState()
 		}
 	}
 
@@ -1439,6 +1521,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.iSelectedCompound := false
 				this.iSelectedCompoundColor := false
 			}
+
+			this.updateState()
 		}
 	}
 
@@ -1480,6 +1564,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			yAxises.Push(schema[dataY3DropDown - 1])
 
 		this.showDataPlot(records, xAxis, yAxises)
+
+		this.updateState()
 	}
 
 	selectSessionType(sessionType) {
@@ -2054,7 +2140,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		avgFuelConsumption := []
 
 		for ignore, pitstop in strategy.Pitstops {
-			LV_Add("", pitstop.Lap, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("x") : "-", pitstop.Map)
+			LV_Add("", pitstop.Lap, pitstop.DriverName, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("x") : "-", pitstop.Map)
 
 			avgLapTimes.Push(pitstop.AvgLapTime)
 			avgFuelConsumption.Push(pitstop.FuelConsumption)
@@ -2471,8 +2557,20 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
-		driverID := false
-		driverName := translate("All")
+		numDrivers := this.StintDrivers.Length()
+
+		if (numDrivers == 0) {
+			driverID := false
+			driverName := "John Doe (JD)"
+		}
+		else if (numDrivers >= stintNumber) {
+			driverID := this.StintDrivers[stintNumber]
+			driverName := new SessionDatabase().getDriverName(this.SelectedSimulator, driverID)
+		}
+		else {
+			driverID := this.StintDrivers[numDrivers]
+			driverName := new SessionDatabase().getDriverName(this.SelectedSimulator, driverID)
+		}
 
 		return true
 	}
@@ -2701,6 +2799,144 @@ validateSimFuelConsumption() {
 validatePitstopFuelService() {
 	validateNumber("pitstopFuelServiceEdit")
 }
+
+chooseSimDriver() {
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		workbench := StrategyWorkbench.Instance
+		window := workbench.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % workbench.DriversListView
+
+		LV_GetText(driver, A_EventInfo, 2)
+
+		sessionDB := new SessionDatabase()
+
+		for ignore, id in workbench.AvailableDrivers
+			if (sessionDB.getDriverName(workbench.SelectedSimulator, id) = driver) {
+				GuiControl Choose, simDriverDropDown, %A_Index%
+
+				break
+			}
+
+		workbench.updateState()
+	}
+}
+
+updateSimDriver() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.DriversListView
+
+	row := LV_GetNext(0)
+
+	if (row > 0) {
+		GuiControlGet simDriverDropDown
+
+		if ((simDriverDropDown == 0) || (simDriverDropDown > workbench.AvailableDrivers.Length()))
+			driver := false
+		else
+			driver := workbench.AvailableDrivers[simDriverDropDown]
+
+		LV_Modify(row, "Col2", new SessionDatabase().getDriverName(workbench.SelectedSimulator, driver))
+
+		if ((simDriverDropDown > 0) && driver)
+			if (workbench.StintDrivers.Length() >= row)
+				workbench.StintDrivers[row] := driver
+			else
+				workbench.StintDrivers.Push(driver)
+	}
+}
+
+addSimDriver() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.DriversListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		title := translate("Insert")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
+		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Cancel
+			return
+
+		IfMsgBox No
+			row += 1
+
+		LV_Insert(row, "Select Vis", "", "")
+	}
+	else {
+		LV_Add("Select Vis", "", "")
+
+		row := LV_GetCount()
+	}
+
+	numRows := LV_GetCount()
+
+	Loop %numRows%
+		LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
+
+	sessionDB := new SessionDatabase()
+	driver := workbench.AvailableDrivers[1]
+
+	if (row > workbench.StintDrivers.Length())
+		workbench.StintDrivers.Push(driver)
+	else
+		workbench.StintDrivers.InsertAt(row, driver)
+
+	LV_Modify(row, "Col2", sessionDB.getDriverName(workbench.SelectedSimulator, driver))
+
+	GuiControl Choose, simDriverDropDown, % inList(workbench.AvailableDrivers, driver)
+
+	workbench.updateState()
+}
+
+deleteSimDriver() {
+	workbench := StrategyWorkbench.Instance
+	window := workbench.Window
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.DriversListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		title := translate("Delete")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the selected driver?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+		{
+			LV_Delete(row)
+
+			workbench.StintDrivers.RemoveAt(row)
+
+			numRows := LV_GetCount()
+
+			Loop %numRows%
+				LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
+
+			workbench.updateState()
+		}
+	}
+}
+
+
 
 filterSchema(schema) {
 	newSchema := []

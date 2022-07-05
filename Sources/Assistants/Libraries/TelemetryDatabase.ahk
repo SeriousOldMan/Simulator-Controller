@@ -76,6 +76,10 @@ class TelemetryDatabase extends SessionDatabase {
 		this.iDatabase := database
 	}
 
+	setDrivers(drivers) {
+		this.iDrivers := drivers
+	}
+
 	getSchema(table, includeVirtualColumns := false) {
 		schema := kTelemetrySchemas[table].Clone()
 

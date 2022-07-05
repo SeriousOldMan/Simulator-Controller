@@ -2584,7 +2584,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		tyreCompoundVariationVariation := simtyreCompoundVariation
 	}
 
-	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
+	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {
 		numDrivers := this.StintDrivers.Length()
 
 		if (numDrivers == 0) {
@@ -2601,6 +2601,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		return true
+	}
+
+	setStintDriver(stintNumber, driverID) {
+		Throw "StrategyWorkbench.setStintDriver should never be called..."
 	}
 
 	runSimulation() {

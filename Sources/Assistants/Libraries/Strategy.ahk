@@ -326,8 +326,12 @@ class StrategySimulation {
 		return this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
 	}
 
-	simulateStint(stintNumber, ByRef driverID, ByRef driverName) {
-		return this.StrategyManager.simulateStint(stintNumber, driverID, driverName)
+	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {
+		return this.StrategyManager.getStintDriver(stintNumber, driverID, driverName)
+	}
+
+	setStintDriver(stintNumber, driverID) {
+		this.TelemetryDatabase.setDrivers(driverID)
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
@@ -350,7 +354,15 @@ class StrategySimulation {
 		this.iFixedLapTime := lapTime
 	}
 
-	acquireTelemetryData(ByRef electronicsData, ByRef tyreData, verbose, ByRef progress) {
+	acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
+		return this.TelemetryDatabase.getMapData(weather, tyreCompound, tyreCompoundColor)
+	}
+
+	acquireTyresData(weather, tyreCompound, tyreCompoundColor) {
+		return this.TelemetryDatabase.getTyresData(weather, tyreCompound, tyreCompoundColor)
+	}
+
+	acquireTelemetryData(ByRef electronicsData, ByRef tyresData, verbose, ByRef progress) {
 		telemetryDB := this.TelemetryDatabase
 
 		simulator := false
@@ -375,7 +387,7 @@ class StrategySimulation {
 			showProgress({progress: progress, message: message})
 		}
 
-		electronicsData := telemetryDB.getMapData(weather, tyreCompound, tyreCompoundColor)
+		electronicsData := this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor)
 
 		if verbose {
 			Sleep 200
@@ -385,7 +397,7 @@ class StrategySimulation {
 			showProgress({progress: progress, message: message})
 		}
 
-		tyreData := telemetryDB.getTyreData(weather, tyreCompound, tyreCompoundColor)
+		tyresData := this.acquireTyresData(weather, tyreCompound, tyreCompoundColor)
 
 		if verbose {
 			Sleep 200
@@ -394,7 +406,7 @@ class StrategySimulation {
 		}
 	}
 
-	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
 		Throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
 	}
 
@@ -548,9 +560,9 @@ class StrategySimulation {
 		progress := 0
 
 		electronicsData := false
-		tyreData := false
+		tyresData := false
 
-		this.acquireTelemetryData(electronicsData, tyreData, verbose, progress)
+		this.acquireTelemetryData(electronicsData, tyresData, verbose, progress)
 
 		if verbose {
 			message := translate("Creating Scenarios...")
@@ -560,7 +572,7 @@ class StrategySimulation {
 			Sleep 200
 		}
 
-		scenarios := this.createScenarios(electronicsData, tyreData, verbose, progress)
+		scenarios := this.createScenarios(electronicsData, tyresData, verbose, progress)
 
 		if verbose {
 			message := translate("Optimizing Scenarios...")
@@ -616,7 +628,7 @@ class StrategySimulation {
 }
 
 class VariationSimulation extends StrategySimulation {
-	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
 		local strategy
 
 		simulator := false
@@ -727,7 +739,9 @@ class VariationSimulation extends StrategySimulation {
 									driverID := false
 									driverName := false
 
-									this.simulateStint(initialStint, driverID, driverName)
+									this.getStintDriver(initialStint, driverID, driverName)
+
+									this.setStintDriver(initialStint, driverID)
 
 									strategy := this.createStrategy(name, driverID)
 
@@ -761,8 +775,19 @@ class VariationSimulation extends StrategySimulation {
 							}
 						}
 
-						if useTelemetryData
-							for ignore, mapData in electronicsData {
+						if useTelemetryData {
+							driverID := false
+							driverName := false
+
+							this.getStintDriver(initialStint, driverID, driverName)
+
+							this.setStintDriver(initialStint, driverID)
+
+							for ignore, mapData in this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
+								this.getStintDriver(initialStint, driverID, driverName)
+
+								this.setStintDriver(initialStint, driverID)
+
 								scenarioMap := mapData["Map"]
 								scenarioFuelConsumption := mapData["Fuel.Consumption"]
 								scenarioAvgLapTime := mapData["Lap.Time"]
@@ -776,11 +801,6 @@ class VariationSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
 
 									name := (translate("Telemetry - Map ") . scenarioMap)
-
-									driverID := false
-									driverName := false
-
-									this.simulateStint(initialStint, driverID, driverName)
 
 									strategy := this.createStrategy(name, driverID)
 
@@ -809,6 +829,7 @@ class VariationSimulation extends StrategySimulation {
 									progress += 1
 								}
 							}
+						}
 
 						if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
 							break
@@ -2271,7 +2292,9 @@ class Strategy extends ConfigurationItem {
 			driverID := false
 			driverName := false
 
-			this.StrategyManager.simulateStint(pitstopNr + 1, driverID, driverName)
+			this.StrategyManager.getStintDriver(pitstopNr + 1, driverID, driverName)
+
+			this.StrategyManager.setStintDriver(pitstopNr + 1, driverID)
 
 			pitstop := this.createPitstop(pitstopNr, pitstopLap, driverID, tyreCompound, tyreCompoundColor, false, adjustments)
 

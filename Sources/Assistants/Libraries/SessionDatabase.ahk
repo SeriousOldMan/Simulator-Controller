@@ -59,6 +59,19 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	DBID[] {
+		Get {
+			try {
+				FileRead id, %kDatabaseDirectory%ID
+
+				return id
+			}
+			catch exception {
+				return this.ID
+			}
+		}
+	}
+
 	ControllerConfiguration[] {
 		Get {
 			return this.iControllerConfiguration

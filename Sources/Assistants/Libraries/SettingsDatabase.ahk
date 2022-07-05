@@ -189,10 +189,6 @@ constraintSettings(constraints, row) {
 	return true
 }
 
-always(value, ignore*) {
-	return value
-}
-
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
 	result := []
 

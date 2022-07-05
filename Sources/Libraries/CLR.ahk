@@ -100,7 +100,7 @@ CLR_Start(Version = "") {
 	
 	if Version =
 		Loop % SystemRoot "\Microsoft.NET\Framework" (A_PtrSize = 8 ? "64" : "") "\*", 2
-			if (FileExist(A_LoopFileFullPath "\mscorlib.dll") && A_LoopFileName > Version)
+			if (FileExist(A_LoopFilePath "\mscorlib.dll") && A_LoopFileName > Version)
 				Version := A_LoopFileName
 	
 	if DllCall("mscoree\CorBindToRuntimeEx", "wstr", Version, "ptr", 0, "uint", 0

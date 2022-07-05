@@ -92,6 +92,8 @@ global settingValueCheck
 global addSettingButton
 global deleteSettingButton
 
+global entrySelectCheck
+
 global setupTypeDropDown
 global uploadSetupButton
 global downloadSetupButton
@@ -532,7 +534,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 4
 
-		Gui %window%:Add, ListView, x296 ys w360 h222 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HwndadministrationListViewHandle, % values2String("|", map(["Driver", "Car", "Track", "Type", "#"], "translate")*)
+		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 ventrySelectCheck gselectAllEntries
+
+		Gui %window%:Add, ListView, x314 ys w342 h222 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HwndadministrationListViewHandle gselectEntry, % values2String("|", map(["Driver", "Car", "Track", "Type", "#"], "translate")*)
 
 		this.iAdministrationListView := administrationListViewHandle
 
@@ -759,6 +763,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Disable, addSettingButton
 			else
 				GuiControl Enable, addSettingButton
+
+			Gui ListView, % this.AdministrationListView
+
+			selectedEntries := 0
+
+			row := LV_GetNext(0, "C")
+
+			while row {
+				selectedEntries += 1
+
+				row := LV_GetNext(row, "C")
+			}
+
+			if (selectedEntries = LV_GetCount())
+				GuiControl, , entrySelectCheck, 1
+			else if (selectedEntries > 0)
+				GuiControl, , entrySelectCheck, -1
+			else
+				GuiControl, , entrySelectCheck, 0
 		}
 		finally {
 			Gui ListView, %defaultListView%
@@ -1086,7 +1109,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									strategies += 1
 
 								if (strategies > 0)
-									LV_Add("", "-", carName, trackName, translate("Strategy"), strategies)
+									LV_Add("", "-", carName, trackName, translate("Strategies"), strategies)
 							}
 						}
 					}
@@ -1107,6 +1130,206 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 		finally {
 			Gui ListView, %defaultListView%
+		}
+	}
+
+	delete() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			simulator := this.SelectedSimulator
+
+			row := LV_GetNext(0, "C")
+
+			while row {
+				LV_GetText(driver, row, 1)
+				LV_GetText(car, row, 2)
+				LV_GetText(track, row, 3)
+				LV_GetText(type, row, 4)
+
+				driver := this.SessionDatabase.getDriverID(simulator, driver)
+				car := this.SessionDatabase.getCarName(simulator, car)
+				track := this.SessionDatabase.getTrackName(simulator, track)
+
+				switch type {
+					case translate("Telemetry"):
+						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
+
+						telemetryDB.remove("Electronics", {Driver: driver}, Func("always").Bind(true))
+						telemetryDB.remove("Tyres", {Driver: driver}, Func("always").Bind(true), true)
+					case translate("Pressures"):
+						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+						tyresDB.remove("Tyres.Pressures", {Driver: driver}, Func("always").Bind(true))
+						tyresDB.remove("Tyres.Pressures.Distribution", {Driver: driver}, Func("always").Bind(true), true)
+					case translate("Strategies"):
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F
+							try {
+								FileDelete %A_LoopFileLongPath%
+							}
+							catch exception {
+								; ignore
+							}
+				}
+
+				row := LV_GetNext(0, "C")
+			}
+
+			this.selectAdministration()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
+	export(directory) {
+		directory := normalizePath(path)
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			simulator := this.SelectedSimulator
+
+			row := LV_GetNext(0, "C")
+
+			drivers := {}
+
+			while row {
+				LV_GetText(driver, row, 1)
+				LV_GetText(car, row, 2)
+				LV_GetText(track, row, 3)
+				LV_GetText(type, row, 4)
+
+				id := this.SessionDatabase.getDriverID(simulator, driver)
+
+				drivers[id] := driver
+
+				driver := id
+
+				car := this.SessionDatabase.getCarName(simulator, car)
+				track := this.SessionDatabase.getTrackName(simulator, track)
+
+				switch type {
+					case translate("Telemetry"):
+						sourceDB := new TelemetryDatabase(simulator, car, track).Database
+						targetDB := new Database(directory . "\", kTelemetrySchemas)
+
+						for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}})
+							targetDB.add("Electronics", row, true)
+
+						for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}})
+							targetDB.add("Tyres", row, true)
+					case translate("Pressures"):
+						sourceDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+						targetDB := new Database(directory . "\", kTyresSchemas)
+
+						for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures", row, true)
+
+						for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures.Distribution", row, true)
+					case translate("Strategies"):
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F
+							try {
+								FileCopy %A_LoopFileLongPath%, %directory%\%car%\%track%\Race Strategies\%A_LoopFileName%
+							}
+							catch exception {
+								; ignore
+							}
+				}
+
+				row := LV_GetNext(0, "C")
+			}
+
+			info := newConfiguration()
+
+			setConfigurationValue(info, "General", "Simulator", simulator)
+			setConfigurationValue(info, "General", "Creator", this.SessionDatabase.ID)
+			setConfigurationValue(info, "General", "Origin", this.SessionDatabase.DBID)
+
+			for id, name in drivers
+				setConfigurationValue(info, "Driver", id, name)
+
+			writeConfiguration(directory . "Database.info", info)
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
+	import(directory) {
+		directory := normalizePath(path)
+
+		simulator := this.SelectedSimulator
+		info := readConfiguration(directory . "\Export.info")
+
+		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = selectedSimulator) {
+			for id, name in getConfigurationSectionValues(info, "Driver", Object())
+				this.SessionDatabase.registerDriver(simulator, id, name)
+
+			Loop Files, %directory%\*.*, D	; Car
+			{
+				car := A_LoopFileName
+
+				Loop Files, %directory%\%car%\*.*, D	; Track
+				{
+					track := A_LoopFileName
+
+					if FileExist(A_LoopFileDir . "\Electronics.CSV") {
+						sourceDB := new Database(A_LoopFileDir . "\", kTelemetrySchemas)
+						targetDB := new TelemetryDatabase(simulator, car, track).Database
+
+						for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}})
+							targetDB.add("Electronics", row, true)
+
+						for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}})
+							targetDB.add("Tyres", row, true)
+					}
+
+					if FileExist(A_LoopFileDir . "\TyresPressures.CSV") {
+						sourceDB := new Database(A_LoopFileDir . "\", kTyresSchemas)
+						targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+						for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures", row, true)
+
+						for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures.Distribution", row, true)
+					}
+
+					if FileExist(A_LoopFileDir . "\Race Strategies") {
+						targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+
+						Loop Files, %directory%\%car%\%track%\Race Strategies\*.*, F
+						{
+							fileName := A_LoopFileName
+							targetName := fileName
+
+							while FileExist(targetDirectory . targetName) {
+								SplitPath targetName, , , , name
+
+								targetName := (name . " (" . (A_Index + 1) . ").strategy")
+							}
+
+							FileCopy %A_LoopFilePath%, %targetDirectory%%targetName%
+						}
+					}
+				}
+			}
+
+			this.selectAdministration()
 		}
 	}
 
@@ -2527,6 +2750,45 @@ noSelect() {
 			Gui ListView, %defaultListView%
 		}
 	}
+}
+
+selectEntry() {
+	selected := 0
+
+	Gui ListView, % SessionDatabaseEditor.Instance.AdministrationListView
+
+	row := 0
+
+	Loop {
+		row := LV_GetNext(row, "C")
+
+		if row
+			selected += 1
+		else
+			break
+	}
+
+	if (selected == 0)
+		GuiControl, , entrySelectCheck, 0
+	else if (selected < LV_GetCount())
+		GuiControl, , entrySelectCheck, -1
+	else
+		GuiControl, , entrySelectCheck, 1
+}
+
+selectAllEntries() {
+	GuiControlGet entrySelectCheck
+
+	if (entrySelectCheck == -1) {
+		entrySelectCheck := 0
+
+		GuiControl, , entrySelectCheck, 0
+	}
+
+	Gui ListView, % SessionDatabaseEditor.Instance.AdministrationListView
+
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, entrySelectCheck ? "Check" : "-Check")
 }
 
 chooseTab1() {

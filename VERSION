@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.3.0-dev
 Target=4.2.3.0-release
-Date=07/04/2022
+Date=07/05/2022
 Download=
-Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or diable Team Server
+Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database"
 [Release]
 Version=4.2.2.0-release
 Date=07/01/2022

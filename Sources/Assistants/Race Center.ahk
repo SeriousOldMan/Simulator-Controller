@@ -494,7 +494,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		__New(rCenter) {
-			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresDataSchemas)
+			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresSchemas)
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {

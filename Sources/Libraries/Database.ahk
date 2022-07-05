@@ -255,6 +255,10 @@ valueOrNull(value) {
 	return ((value != "") ? value : kNull)
 }
 
+always(value, ignore*) {
+	return value
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;

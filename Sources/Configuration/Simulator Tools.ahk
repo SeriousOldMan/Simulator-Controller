@@ -123,7 +123,7 @@ installOptions(options) {
 
 				valid := false
 			}
-		else
+		else if (InStr(kHomeDirectory, directory) != 1)
 			Loop Files, %directory%\*.*, FD
 			{
 				empty := false
@@ -343,7 +343,7 @@ chooseInstallLocationPath() {
 
 				valid := false
 			}
-		else
+		else if (InStr(kHomeDirectory, directory) != 1)
 			Loop Files, %directory%\*.*, FD
 			{
 				empty := false

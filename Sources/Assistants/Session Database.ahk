@@ -1088,14 +1088,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					car := A_LoopFileName
 
 					if ((selectedCar == true) || (car = selectedCar)) {
-						carName := this.SessionDatabase.getCarName(selectedSimulator, car)
+						carName := this.getCarName(selectedSimulator, car)
 
 						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 						{
 							track := A_LoopFileName
 
 							if ((selectedTrack == true) || (track = selectedTrack)) {
-								trackName := this.SessionDatabase.getCarName(selectedSimulator, track)
+								trackName := this.getTrackName(selectedSimulator, track)
 								found := false
 
 								if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Electronics.CSV") {
@@ -1169,8 +1169,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				LV_GetText(type, row, 4)
 
 				driver := this.SessionDatabase.getDriverID(simulator, driver)
-				car := this.SessionDatabase.getCarName(simulator, car)
-				track := this.SessionDatabase.getTrackName(simulator, track)
+				car := this.getCarName(simulator, car)
+				track := this.getTrackName(simulator, track)
 
 				switch type {
 					case translate("Telemetry"):
@@ -1211,6 +1211,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		window := this.Window
 
 		Gui %window%:Default
+		Gui %window%:+Disabled
 
 		defaultListView := A_DefaultListView
 
@@ -1237,36 +1238,38 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					driver := id
 				}
 
-				car := this.SessionDatabase.getCarName(simulator, car)
-				track := this.SessionDatabase.getTrackName(simulator, track)
+				car := this.getCarName(simulator, car)
+				track := this.getTrackName(simulator, track)
+
+				targetDirectory := (directory . "\" . car . "\" . track . "\")
 
 				switch type {
 					case translate("Telemetry"):
 						sourceDB := new TelemetryDatabase(simulator, car, track).Database
-						targetDB := new Database(directory . "\", kTelemetrySchemas)
+						targetDB := new Database(targetDirectory, kTelemetrySchemas)
 
-						for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}})
-							targetDB.add("Electronics", row, true)
+						for ignore, entry in sourceDB.query("Electronics", {Where: {Driver: driver}})
+							targetDB.add("Electronics", entry, true)
 
-						for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}})
-							targetDB.add("Tyres", row, true)
+						for ignore, entry in sourceDB.query("Tyres", {Where: {Driver: driver}})
+							targetDB.add("Tyres", entry, true)
 					case translate("Pressures"):
 						sourceDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
-						targetDB := new Database(directory . "\", kTyresSchemas)
+						targetDB := new Database(targetDirectory, kTyresSchemas)
 
-						for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
-							targetDB.add("Tyres.Pressures", row, true)
+						for ignore, entry in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures", entry, true)
 
-						for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
-							targetDB.add("Tyres.Pressures.Distribution", row, true)
+						for ignore, entry in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures.Distribution", entry, true)
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						FileCreateDir %directory%\%car%\%track%\Race Strategies
+						FileCreateDir %targetDirectory%Race Strategies
 
 						Loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
 							try {
-								FileCopy %A_LoopFileLongPath%, %directory%\%car%\%track%\Race Strategies\%A_LoopFileName%
+								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
 							}
 							catch exception {
 								; ignore
@@ -1289,6 +1292,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 		finally {
 			Gui ListView, %defaultListView%
+			Gui %window%:-Disabled
 		}
 	}
 

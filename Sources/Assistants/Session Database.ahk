@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
@@ -75,9 +76,11 @@ global settingsTab
 global settingsImg1
 global settingsImg2
 global settingsImg3
+global settingsImg4
 global settingsTab1
 global settingsTab2
 global settingsTab3
+global settingsTab4
 
 global settingsListView
 
@@ -165,6 +168,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iDataListView := false
 	iSettingsListView := false
 	iSetupListView := false
+	iAdministrationListView := false
 
 	iSettings := []
 
@@ -269,6 +273,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SetupListView[] {
 		Get {
 			return this.iSetupListView
+		}
+	}
+
+	AdministrationListView[] {
+		Get {
+			return this.iAdministrationListView
 		}
 	}
 
@@ -399,11 +409,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
+		Gui %window%:Font, Norm
+		Gui %window%:Font, s10 Bold cGray, Arial
+
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Sensor.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Administration")
+
+		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
 		Gui %window%:Add, GroupBox, x280 ys-8 w390 h372
 
-		tabs := map(["Settings", "Setups", "Pressures"], "translate")
+		tabs := map(["Settings", "Setups", "Pressures", "Administration"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
@@ -512,11 +530,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if vRequestorPID
 			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
+		Gui Tab, 4
+
+		Gui %window%:Add, ListView, x296 ys w360 h222 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HwndadministrationListViewHandle, % values2String("|", map(["Driver", "Car", "Track", "Type", "#"], "translate")*)
+
+		this.iAdministrationListView := administrationListViewHandle
+
 		Gui Tab
 
-		Gui %window%:Add, Text, x16 ys+126 w120 h23 +0x200, % translate("Available Data")
+		Gui %window%:Add, Text, x16 ys+173 w120 h23 +0x200, % translate("Available Data")
 
-		Gui %window%:Add, ListView, x16 ys+150 w244 h198 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+197 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
 
 		this.iDataListView := listViewHandle
 
@@ -620,6 +644,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		GuiControl Font, settingsTab1
 
+		if this.moduleAvailable("Administration") {
+			GuiControl Enable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Sensor.ico
+			Gui Font, s10 Bold cGray, Arial
+		}
+		else {
+			GuiControl Disable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Sensor Gray.ico
+			Gui Font, s10 Bold cSilver, Arial
+		}
+
+		GuiControl Font, settingsTab4
+
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
 			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
@@ -658,6 +695,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			case "Pressures":
 				GuiControl Font, settingsTab3
 				GuiControl Choose, settingsTab, 3
+			case "Administration":
+				GuiControl Font, settingsTab4
+				GuiControl Choose, settingsTab, 4
 		}
 
 		defaultListView := A_DefaultListView
@@ -980,6 +1020,190 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	loadAdministration() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			LV_Delete()
+
+			selectedSimulator := this.SelectedSimulator
+			selectedCar := this.SelectedCar
+			selectedTrack := this.SelectedTrack
+
+			if selectedSimulator {
+				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
+				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
+
+					if ((selectedCar == true) || (car = selectedCar)) {
+						carName := this.SessionDatabase.getCarName(selectedSimulator, car)
+
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+						{
+							track := A_LoopFileName
+
+							if ((selectedTrack == true) || (track = selectedTrack)) {
+								trackName := this.SessionDatabase.getCarName(selectedSimulator, track)
+								found := false
+
+								if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Electronics.CSV") {
+									telemetryDB := new TelemetryDatabase(simulator, car, track)
+
+									for ignore, driver in drivers {
+										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+
+										if (count > 0)
+											LV_Add("", this.SessionDatabase.getDriverName(selectedSimulator, driver)
+													 , carName, trackName, translate("Telemetry"), count)
+									}
+								}
+
+								if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.CSV") {
+									tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+									for ignore, driver in drivers {
+										count := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+																				 , Where: {Driver: driver}}).Length()
+
+										if (count > 0)
+											LV_Add("", this.SessionDatabase.getDriverName(selectedSimulator, driver)
+													 , carName, trackName, translate("Pressures"), count)
+									}
+								}
+
+								strategies := 0
+
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									strategies += 1
+
+								if (strategies > 0)
+									LV_Add("", "-", carName, trackName, translate("Strategy"), strategies)
+							}
+						}
+					}
+				}
+
+				LV_ModifyCol()
+
+				Loop 5
+					LV_ModifyCol(A_Index, "AutoHdr")
+			}
+
+			LV_ModifyCol()
+
+			Loop 3
+				LV_ModifyCol(A_Index, "AutoHdr")
+
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
+	selectAdministration(load := true) {
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.DataListView
+
+			LV_Delete()
+
+			while LV_DeleteCol(1)
+				ignore := 1
+
+			for ignore, column in map(["Type", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
+
+			selectedSimulator := this.SelectedSimulator
+			selectedCar := this.SelectedCar
+			selectedTrack := this.SelectedTrack
+
+			if selectedSimulator {
+				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
+				cars := []
+				tracks := []
+				telemetry := 0
+				pressures := 0
+				strategies := 0
+
+				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
+
+					if ((selectedCar == true) || (car = selectedCar))
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+						{
+							track := A_LoopFileName
+
+							if ((selectedTrack == true) || (track = selectedTrack)) {
+								found := false
+
+								if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Electronics.CSV") {
+									found := true
+
+									telemetry += 1
+								}
+
+								if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.CSV") {
+									found := true
+
+									pressures += 1
+								}
+
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+								{
+									found := true
+
+									strategies += 1
+								}
+
+								if found {
+									if !inList(cars, car)
+										cars.Push(car)
+
+									if !inList(tracks, track)
+										tracks.Push(track)
+								}
+							}
+						}
+				}
+
+				LV_Add("", translate("Drivers"), drivers.Length())
+				LV_Add("", translate("Cars"), cars.Length())
+				LV_Add("", translate("Tracks"), tracks.Length())
+				LV_Add("", translate("Telemetry"), telemetry)
+				LV_Add("", translate("Pressures"), pressures)
+				LV_Add("", translate("Strategies"), strategies)
+
+				LV_ModifyCol()
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+			}
+
+			if load
+				this.loadAdministration()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
 	selectSetups() {
 		window := this.Window
 
@@ -1063,6 +1287,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if simulator {
 			this.iAvailableModules["Settings"] := true
+			this.iAvailableModules["Administration"] := true
 
 			if ((car && (car != true)) && (track && (track != true))) {
 				this.iAvailableModules["Setups"] := true
@@ -1075,6 +1300,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 		else {
 			this.iAvailableModules["Settings"] := false
+			this.iAvailableModules["Administration"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
 		}
@@ -1090,6 +1316,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				switch module {
 					case "Settings":
 						this.selectSettings()
+					case "Administration":
+						this.selectAdministration()
 					case "Setups":
 						this.selectSetups()
 					case "Pressures":
@@ -1441,7 +1669,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		title := translate("Upload Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, , %title%
 		OnMessage(0x44, "")
@@ -1470,7 +1698,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		title := translate("Download Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 		FileSelectFile fileName, S16, %setupName%, %title%
 		OnMessage(0x44, "")
@@ -1654,7 +1882,7 @@ chooseDatabasePath() {
 
 	try {
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
 		OnMessage(0x44, "")
@@ -2320,6 +2548,13 @@ chooseTab3() {
 
 	if editor.moduleAvailable("Pressures")
 		editor.selectModule("Pressures")
+}
+
+chooseTab4() {
+	editor := SessionDatabaseEditor.Instance
+
+	if editor.moduleAvailable("Administration")
+		editor.selectModule("Administration")
 }
 
 chooseDatabaseScope() {

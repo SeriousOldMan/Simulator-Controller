@@ -29,9 +29,9 @@ global kTyresDataSchemas := {"Tyres.Pressures": ["Weather", "Temperature.Air", "
 											   , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											   , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 											   , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
-											   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Owner"]
+											   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"]
 						   , "Tyres.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-															, "Type", "Tyre", "Pressure", "Count", "Owner"]}
+															, "Type", "Tyre", "Pressure", "Count", "Driver"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -100,12 +100,12 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
-						   , ByRef distributions, owner := "__Undefined__") {
+						   , ByRef distributions, driver := "__Undefined__") {
 		where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 				, Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
 
-		if ((owner != kUndefined) && owner)
-			where["Owner"] := owner
+		if ((driver != kUndefined) && driver)
+			where["Driver"] := driver
 
 		if (weather != true)
 			where["Weather"] := weather
@@ -121,18 +121,18 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
-	getConditions(simulator, car, track, owner := "__Undefined__") {
+	getConditions(simulator, car, track, driver := "__Undefined__") {
 		local database
 		local condition
 		local compound
 
-		if ((owner = kUndefined) || !owner)
+		if ((driver = kUndefined) || !driver)
 			where := {Type: "Cold"}
 		else {
-			if (owner == true)
-				owner := this.ID
+			if (driver == true)
+				driver := this.ID
 
-			where := {Owner: owner, Type: "Cold"}
+			where := {Driver: driver, Type: "Cold"}
 		}
 
 		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
@@ -164,7 +164,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature
-			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, owner := "__Undefined__") {
+			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, driver := "__Undefined__") {
 		local condition
 
 		simulator := this.getSimulatorName(simulator)
@@ -174,7 +174,7 @@ class TyresDatabase extends SessionDatabase {
 			visited := []
 			compounds := []
 
-			for ignore, condition in this.getConditions(simulator, car, track, owner) {
+			for ignore, condition in this.getConditions(simulator, car, track, driver) {
 				theCompound := (condition[4] . "." . condition[5])
 
 				conditionIndex := inList(kWeatherOptions, condition[1])
@@ -207,7 +207,7 @@ class TyresDatabase extends SessionDatabase {
 			theCompoundColor := compoundInfo[2]
 
 			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, airTemperature, trackTemperature
-														, theCompound, theCompoundColor, owner) {
+														, theCompound, theCompoundColor, driver) {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
 
@@ -229,16 +229,16 @@ class TyresDatabase extends SessionDatabase {
 		return false
 	}
 
-	getPressureInfo(simulator, car, track, weather, owner := "__Undefined__") {
+	getPressureInfo(simulator, car, track, weather, driver := "__Undefined__") {
 		local database
 
-		if ((owner = kUndefined) || !owner)
+		if ((driver = kUndefined) || !driver)
 			where := {}
 		else {
-			if (owner == true)
-				owner := this.ID
+			if (driver == true)
+				driver := this.ID
 
-			where := {Owner: owner}
+			where := {Driver: driver}
 		}
 
 		info := []
@@ -263,9 +263,9 @@ class TyresDatabase extends SessionDatabase {
 		return info
 	}
 
-	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, owner := false) {
-		if !owner
-			owner := this.ID
+	getPressures(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, driver := false) {
+		if !driver
+			driver := this.ID
 
 		if (weather != true) {
 			weatherBaseIndex := inList(kWeatherOptions, weather)
@@ -294,7 +294,7 @@ class TyresDatabase extends SessionDatabase {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 
 					this.getPressureDistributions(localTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
-												, compound, compoundColor, distributions, owner)
+												, compound, compoundColor, distributions, driver)
 
 					if this.UseCommunity
 						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
@@ -332,16 +332,16 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-				  , compound, compoundColor, coldPressures, hotPressures, flush := true, owner := false) {
-		if !owner
-			owner := this.ID
+				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false) {
+		if !driver
+			driver := this.ID
 
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 
 		this.requireDatabase(simulator, car, track)
 
-		this.iDatabase.add("Tyres.Pressures", {Owner: owner, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.iDatabase.add("Tyres.Pressures", {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , Compound: compound, "Compound.Color": compoundColor
 											 , "Tyre.Pressure.Cold.Front.Left": coldPressures[1], "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
 											 , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3], "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
@@ -354,16 +354,16 @@ class TyresDatabase extends SessionDatabase {
 		for typeIndex, tPressures in [coldPressures, hotPressures]
 			for tyreIndex, pressure in tPressures
 				this.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", owner)
+								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver)
 
 		if flush
 			this.flush()
 	}
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", owner := false) {
-		if !owner
-			owner := this.ID
+				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false) {
+		if !driver
+			driver := this.ID
 
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
@@ -372,7 +372,7 @@ class TyresDatabase extends SessionDatabase {
 			this.requireDatabase(simulator, car, track, scope)
 
 		rows := this.iDatabase.query("Tyres.Pressures.Distribution"
-								   , {Where: {Owner: owner, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+								   , {Where: {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											, Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 
 		if (rows.Length() > 0) {
@@ -385,7 +385,7 @@ class TyresDatabase extends SessionDatabase {
 		}
 		else
 			this.iDatabase.add("Tyres.Pressures.Distribution"
-							 , {Owner: owner, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+							 , {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 							  , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 	}
 

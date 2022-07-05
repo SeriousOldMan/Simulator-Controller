@@ -123,17 +123,19 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getElectronicsCount(drivers := "__Undefined__") {
-		return this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
-												 , Transform: "removeInvalidLaps"
-												 , Where: {}}
-												, drivers).Length()
+		result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
+													, Transform: "removeInvalidLaps"
+													, Where: {}}, drivers)
+
+		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
 
 	getTyresCount(drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
-										   , Transform: "removeInvalidLaps"
-										   , Where: {}}
-										  , drivers).Length()
+		result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
+											  , Transform: "removeInvalidLaps"
+											  , Where: {}}, drivers)
+
+		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
 
 	getElectronicEntries(weather, compound, compoundColor, drivers := "__Undefined__") {

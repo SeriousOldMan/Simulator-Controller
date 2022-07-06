@@ -267,6 +267,8 @@ class RaceCenter extends ConfigurationItem {
 	iTelemetryDatabase := false
 	iPressuresDatabase := false
 
+	iSimulationTelemetryDatabase := false
+
 	iReportViewer := false
 	iSelectedReport := false
 	iSelectedChartType := false
@@ -283,6 +285,17 @@ class RaceCenter extends ConfigurationItem {
 	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
 		iTelemetryDatabase := false
+
+		class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+			Drivers[] {
+				Get {
+					return this.RaceCenter.SelectedDrivers
+				}
+			}
+		}
+
+		class SimulationTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+		}
 
 		RaceCenter[] {
 			Get {
@@ -463,17 +476,6 @@ class RaceCenter extends ConfigurationItem {
 
 			return entries
 		}
-	}
-
-	class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
-		Drivers[] {
-			Get {
-				return this.RaceCenter.SelectedDrivers
-			}
-		}
-	}
-
-	class SimulationTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
 	}
 
 	class SessionPressuresDatabase {
@@ -946,9 +948,15 @@ class RaceCenter extends ConfigurationItem {
 	TelemetryDatabase[] {
 		Get {
 			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := new this.SessionTelemetryDatabase(this)
+				this.iTelemetryDatabase := new this.RaceCenterTelemetryDatabase.SessionTelemetryDatabase(this)
 
 			return this.iTelemetryDatabase
+		}
+	}
+
+	SimulationTelemetryDatabase[] {
+		Get {
+			return (this.iSimulationTelemetryDatabase ? this.iSimulationTelemetryDatabase : this.TelemetryDatabase)
 		}
 	}
 
@@ -3564,12 +3572,21 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	runSimulationAsync(sessionType) {
-		telemetryDB := new this.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+		this.saveSession()
 
-		if this.UseTraffic
-			new TrafficSimulation(this, sessionType, telemetryDB).runSimulation(true)
-		else
-			new VariationSimulation(this, sessionType, telemetryDB).runSimulation(true)
+		telemetryDB := new this.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+
+		this.iSimulationTelemetryDatabase := telemetryDB
+
+		try {
+			if this.UseTraffic
+				new TrafficSimulation(this, sessionType, telemetryDB).runSimulation(true)
+			else
+				new VariationSimulation(this, sessionType, telemetryDB).runSimulation(true)
+		}
+		finally {
+			this.iSimulationTelemetryDatabase := false
+		}
 	}
 
 	getPreviousLap(lap) {
@@ -3706,7 +3723,7 @@ class RaceCenter extends ConfigurationItem {
 		initialAvgLapTime := 0.0
 
 		if lastLap {
-			telemetryDB := this.TelemetryDatabase
+			telemetryDB := this.SimulationTelemetryDatabase
 
 			initialStint := lastLap.Stint.Nr
 			initialLap := lastLap.Nr
@@ -3800,8 +3817,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		lapTimes := this.TelemetryDatabase.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
-		tyreLapTimes := this.TelemetryDatabase.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		telemetryDB := this.SimulationTelemetryDatabase
+
+		lapTimes := telemetryDB.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		tyreLapTimes := telemetryDB.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
 
 		a := false
 		b := false

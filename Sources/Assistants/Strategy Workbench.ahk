@@ -186,6 +186,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iStrategyViewer := false
 
+	iTelemetryDatabase := false
+
 	Window[] {
 		Get {
 			return "Workbench"
@@ -334,6 +336,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	TrackTemperature[] {
 		Get {
 			return this.iTrackTemperature
+		}
+	}
+
+	TelemetryDatabase[] {
+		Get {
+			return this.iTelemetryDatabase
 		}
 	}
 
@@ -2347,7 +2355,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		tyrePressures := false
 
-		telemetryDB := new TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
+		telemetryDB := this.TelemetryDatabase
 		lowestLapTime := false
 
 		for ignore, row in telemetryDB.getLapTimePressures(weather, tyreCompound, tyreCompoundColor) {
@@ -2389,8 +2397,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		b := false
 
 		if (simInputDropDown > 1) {
-			telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-											   , this.SelectedTrack, this.SelectedDrivers)
+			telemetryDB := this.TelemetryDatabase
 
 			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
 			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
@@ -2608,17 +2615,15 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	runSimulation() {
-		oldSelectedDrivers := this.SelectedDrivers
+		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+
+		this.iTelemetryDatabase := telemetryDB
 
 		try {
-			this.iSelectedDrivers := false
-
-			new VariationSimulation(this, this.SelectedSessionType
-								  , new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-														, this.SelectedTrack, this.SelectedDrivers)).runSimulation(true)
+			new VariationSimulation(this, this.SelectedSessionType, telemetryDB).runSimulation(true)
 		}
 		finally {
-			this.iSelectedDrivers := oldSelectedDrivers
+			this.iTelemetryDatabase := false
 		}
 	}
 

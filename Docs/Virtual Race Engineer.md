@@ -504,7 +504,23 @@ Notes:
   1. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
 
   2. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
-  
+
+#### Administration
+
+Here you can browse all available data in your session database. Data can be deleted by request and you can export data, so that it can be imported by one of your team mates or vice versa. The driver, who originally created the corresponding data will be preserved. Data of multiple drivers can be used in the strategy development using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development). When running team races using the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), data of your team mates will be stored to your database as well.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2010.jpg)
+
+You can restrict the scope of the data in the browser using the menus in the topleft corner of the window, thereby making it possible to work with the all the available data of a given simulator or only for a single car on a single track, for example. The window above shows a list of all available cars and tracks for *Assetto Corsa Competizione* with the *Honda NSX Evo* / *Hungaroring* combination selected either for export or even for deletion.
+
+When you export data by clicking on "Export...", you will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.
+
+If you click on "Import..." you will be requested to locate this export directory. When you located a valid export directory, a window opens where you can select all data or only a fraction of the data available in the export package to be imported.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2011.jpg)
+
+Here only the *McLaren 720s* data for the *Mount Panorama* and the *Nürburgring* will be imported, when you click on "Ok".
+
 #### Choosing the Database location
 
 Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a gear in the upper right corner of the *Session Database* window. A file chooser will open up and allow you to select a different folder as the new database location. You will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that once you have changed the database location, you have to restart all applications.

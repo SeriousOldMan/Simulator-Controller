@@ -43,9 +43,9 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
-## Release 4.2.2
+## Release 4.2.3
 
-Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings.
+Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings. If you have used the icon set preset for Stream Deck, remove it from the preset list and reassign it, so that the modified request action names come into effect.
 
 ***
 

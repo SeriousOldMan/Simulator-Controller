@@ -1653,6 +1653,39 @@ updateConfigurationForV423() {
 
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
 	}
+
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+
+		if (simulator = "ACC")
+			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			{
+				car := A_LoopFileName
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+				{
+					track := A_LoopFileName
+
+					empty := true
+
+					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
+					{
+						empty := false
+
+						break
+					}
+
+					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track)))
+						try {
+							FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%
+						}
+						catch exception {
+							; ignore
+						}
+				}
+			}
+	}
 }
 
 updateConfigurationForV422() {

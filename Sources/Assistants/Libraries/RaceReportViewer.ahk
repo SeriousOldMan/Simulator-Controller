@@ -1054,12 +1054,12 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Font, s10 Bold, Arial
 
-		Gui RRS:Add, Text, w344 Center gmoveSettings, % translate("Modular Simulator Controller System")
+		Gui RRS:Add, Text, w351 Center gmoveSettings, % translate("Modular Simulator Controller System")
 
 		Gui RRS:Font, s9 Norm, Arial
 		Gui RRS:Font, Italic Underline, Arial
 
-		Gui RRS:Add, Text, x128 YP+20 w104 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
+		Gui RRS:Add, Text, x136 YP+20 w104 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
 
 		Gui RRS:Font, s8 Norm, Arial
 

@@ -304,7 +304,7 @@ Example:
 
 	assistantCommands: ...,
 					   InformationRequest Position Button.1,
-					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToAhead Track Button.2,
 					   InformationRequest GapToRear Track Button.3,
 					   ...
 	
@@ -317,7 +317,7 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
@@ -361,7 +361,7 @@ Example:
 
 	assistantCommands: ...,
 					   InformationRequest Position Button.1,
-					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToAhead Track Button.2,
 					   InformationRequest GapToRear Track Button.3,
 					   ...
 	
@@ -372,7 +372,7 @@ Please see the following table for available information commands.
 | Time | You will be told the current time of your local computer. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
 
@@ -423,7 +423,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -652,7 +652,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -745,7 +745,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -837,7 +837,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -941,7 +941,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.

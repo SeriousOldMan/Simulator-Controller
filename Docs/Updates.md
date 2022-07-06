@@ -45,6 +45,12 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.2.2
 
+Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings.
+
+***
+
+## Release 4.2.2
+
 Nothing to do regarding the configuration update, but:
 
   1. A minor bug in 4.2.1 may have created unnecessary folders in the Session Database, when you have used AC and directly aftwards ACC. These folders will show up as cars from AC in the ACC collection and vice versa, for example in the "Strategy Workbench". Go to the [Documents]\Simulator Controller\User\ACC folder and simply delete these alien folders. Do the same for [Documents]\Simulator Controller\User\AC, if necessary.

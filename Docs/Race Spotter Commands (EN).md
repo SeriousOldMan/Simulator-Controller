@@ -81,7 +81,7 @@ Announcements=delta information, tactical advice, side alerts, rear alerts, blue
 
 	[(WhatIs) {my, my race, my current race} position, (TellMe) {my, my race, my current race} position]
 
-	[(TellMe) the gap to the {car in front, position in front, next car}, (WhatIs) the gap to the {car in front, position in front, next car}, How big is the gap to the {car in front, position in front, next car}]
+	[(TellMe) the gap to the {car in front, car ahead, position in front, position ahead, next car}, (WhatIs) the gap to the {car in front, car ahead, position in front, position ahead, next car}, How big is the gap to the {car in front, car ahead, position in front, position ahead, next car}]
 
 	[(TellMe) the gap to {the car behind me, the position behind me, the previous car}, (WhatIs) the gap to {the car behind me, the position behind me, the previous car}, How big is the gap to the {car behind me, position behind me, previous car}]
 

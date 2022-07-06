@@ -189,8 +189,8 @@ class RaceStrategist extends RaceAssistant {
 				this.lapTimesRecognized(words)
 			case "FuturePosition":
 				this.futurePositionRecognized(words)
-			case "GapToFront":
-				this.gapToFrontRecognized(words)
+			case "GapToAhead", "GapToFront":
+				this.gapToAheadRecognized(words)
 			case "GapToBehind":
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
@@ -336,19 +336,19 @@ class RaceStrategist extends RaceAssistant {
 		speaker.speakPhrase("Repeat")
 	}
 
-	gapToFrontRecognized(words) {
+	gapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if !this.hasEnoughData()
 			return
 
 		if inList(words, this.getSpeaker().Fragments["Car"])
-			this.trackGapToFrontRecognized(words)
+			this.trackGapToAheadRecognized(words)
 		else
-			this.standingsGapToFrontRecognized(words)
+			this.standingsGapToAheadRecognized(words)
 	}
 
-	trackGapToFrontRecognized(words) {
+	trackGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
@@ -358,7 +358,7 @@ class RaceStrategist extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -375,15 +375,15 @@ class RaceStrategist extends RaceAssistant {
 			speaker.speakPhrase("NoTrackGap")
 	}
 
-	standingsGapToFrontRecognized(words) {
+	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: printNumber(delta, 1)})
+			this.getSpeaker().speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -445,7 +445,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000)
 
@@ -1154,12 +1154,12 @@ class RaceStrategist extends RaceAssistant {
 				this.positionRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
-			case "GapToFrontStandings":
-				this.gapToFrontRecognized([])
-			case "GapToFrontTrack":
-				this.gapToFrontRecognized(Array(this.getSpeaker().Fragments["Car"]))
-			case "GapToFront":
-				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToAheadStandings", "GapToFrontStandings":
+				this.gapToAheadRecognized([])
+			case "GapToAheadTrack", "GapToFrontTrack":
+				this.gapToAheadRecognized(Array(this.getSpeaker().Fragments["Car"]))
+			case "GapToAhead", "GapToAhead":
+				this.gapToAheadRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToBehindStandings":
 				this.gapToBehindRecognized([])
 			case "GapToBehindTrack":

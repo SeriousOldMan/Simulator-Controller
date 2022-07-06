@@ -1683,8 +1683,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							LV_Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
 
-							this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+							this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
 						}
+
+						LV_ModifyCol()
 
 						if (strategy.SessionType = "Duration") {
 							GuiControl, , sessionTypeDropDown, 1
@@ -1724,7 +1726,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						if (strategy.UseInitialConditions && strategy.UseTelemetryData)
 							simInputDropDown := 3
-						else if strategy.UseTelemetry
+						else if strategy.UseTelemetryData
 							simInputDropDown := 2
 						else
 							simInputDropDown := 1

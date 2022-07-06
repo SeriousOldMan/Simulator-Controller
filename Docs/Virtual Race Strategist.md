@@ -215,7 +215,11 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector.JPG)
 
-Each group provide data sets for all tyre compounds which have been used in the seelected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+
+If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers yusing the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector%202.JPG)
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 
@@ -244,6 +248,8 @@ Loading of settings is supported for:
 	   - Service Rules
 	   - Fuel Capacity
 	   - Safety Fuel
+	 - Drivers
+	   - The complete list of drivers, as long as known in the current telemetry database), will be restored
 	 - Simulation
 	   - Tyre Compound
 	   - Tyre Compound Color
@@ -416,6 +422,14 @@ Once you have created a set of validation rules similar to the examples above, y
 In this tab you have to enter the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of Pitstop Delta, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on. As you can see, this is very similar to the settings in the [*Strategy* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy) in the Race Settings described above. In fact, the values you enter here will be used later on, if you export the strategy to be used for the upcoming race.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
+
+### Drivers
+
+Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not the grand average of all available data is used instead.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
+
+Note: If you import the strategy into the "Race Center", the driver information may be used to populate the stint plan for the session in "Race Center".
 
 ### Simulation
 

@@ -956,6 +956,9 @@ initializeVoiceServer() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	debug := false
 
 	index := 1
@@ -976,6 +979,11 @@ initializeVoiceServer() {
 	new VoiceServer(kSimulatorConfiguration)
 
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

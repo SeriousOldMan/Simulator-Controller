@@ -2387,6 +2387,9 @@ initializeSimulatorSetup() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	FileCreateDir %kUserHomeDirectory%Setup
 
 	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
@@ -2412,6 +2415,11 @@ initializeSimulatorSetup() {
 
 	wizard.registerStepWizard(new StartStepWizard(wizard, "Start", kSimulatorConfiguration))
 	wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 startupSimulatorSetup() {

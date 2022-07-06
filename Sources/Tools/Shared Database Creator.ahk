@@ -146,7 +146,7 @@ class DatabaseCreator {
 								FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
 							
 							if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
-								this.loadPressures(simulator, car, track, new Database(directory, kTyresDataSchemas))
+								this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 							
 							Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
 							{

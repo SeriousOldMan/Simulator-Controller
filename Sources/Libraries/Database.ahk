@@ -161,6 +161,19 @@ class Database {
 			this.iTableChanged[name] := true
 	}
 
+	combine(table, query, field, values) {
+		results := []
+
+		for ignore, value in values {
+			query.Where[field] := value
+
+			for ignore, result in this.query(table, query)
+				results.Push(result)
+		}
+
+		return results
+	}
+
 	remove(name, where, predicate := false, flush := false) {
 		rows := []
 
@@ -240,6 +253,10 @@ class Database {
 
 valueOrNull(value) {
 	return ((value != "") ? value : kNull)
+}
+
+always(value, ignore*) {
+	return value
 }
 
 

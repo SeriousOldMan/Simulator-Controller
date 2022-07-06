@@ -1034,7 +1034,7 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false)) {
+			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData)

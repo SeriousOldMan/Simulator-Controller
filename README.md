@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.2.3.0-beta](https://www.dropbox.com/s/8q5cbw8jrrgc9gv/Simulator%20Controller%204.2.3.0-beta.zip?dl=1) (Test version for 4.2.3. New features: Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import for telemetry data in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020". Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-423) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -72,6 +74,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 7. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the Race Assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
 
 8. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
+
+9. [Working with the Setup Advisor](https://youtu.be/TqkMvOB0UWI) - The Setup Advisor is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
 
 This list will be extended with one new video per week.
 

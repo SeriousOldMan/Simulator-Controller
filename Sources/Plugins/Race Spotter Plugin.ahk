@@ -53,7 +53,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 	
 	requestInformation(arguments*) {
-		if (this.RaceSpotter && inList(["Time", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader"], arguments[1])) {
+		if (this.RaceSpotter && inList(["Time", "Position", "LapTimes", "GapToAhead", "GapToFront", "GapToBehind"
+									  , "GapToAheadStandings", "GapToFrontStandings", "GapToBehindStandings", "GapToAheadTrack"
+									  , "GapToBehindTrack", "GapToLeader"], arguments[1])) {
 			this.RaceSpotter.requestInformation(arguments*)
 		
 			return true

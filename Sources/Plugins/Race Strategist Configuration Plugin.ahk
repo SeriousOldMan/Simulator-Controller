@@ -180,6 +180,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Strategist Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
+			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveTelemetry", simulatorConfiguration["SaveTelemetry"])
 			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".RaceReview", simulatorConfiguration["RaceReview"])
 		}
 	}

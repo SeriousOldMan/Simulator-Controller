@@ -1714,10 +1714,29 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger) {
+	static pending := false
+
 	protectionOn(true, true)
 
 	try {
-		function.Controller.fireActions(function, trigger)
+		if pending
+			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
+		else {
+			pending := []
+
+			try {
+				function.Controller.fireActions(function, trigger)
+
+				while (pending.Length() > 0) {
+					callable := pending.RemoveAt(1)
+
+					%callable%()
+				}
+			}
+			finally {
+				pending := false
+			}
+		}
 	}
 	finally {
 		protectionOff(true, true)
@@ -1860,6 +1879,14 @@ initializeSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	SetKeyDelay 5, 25
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	settings := readConfiguration(kSimulatorSettingsFile)
 
 	updateTrayMessageState(settings)
@@ -1893,6 +1920,11 @@ initializeSimulatorController() {
 
 	registerEventHandler("Controller", "functionEventHandler")
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 startupSimulatorController() {

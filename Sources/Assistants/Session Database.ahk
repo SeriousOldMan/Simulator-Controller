@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
@@ -43,6 +44,8 @@ ListLines Off					; Disable execution history
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kOk = "Ok"
+global kCancel = "Cancel"
 global kClose = "Close"
 
 global kSetupNames = {DQ: "Qualification (Dry)", DR: "Race (Dry)", WQ: "Qualification (Wet)", WR: "Race (Wet)"}
@@ -75,9 +78,11 @@ global settingsTab
 global settingsImg1
 global settingsImg2
 global settingsImg3
+global settingsImg4
 global settingsTab1
 global settingsTab2
 global settingsTab3
+global settingsTab4
 
 global settingsListView
 
@@ -88,6 +93,12 @@ global settingValueCheck
 
 global addSettingButton
 global deleteSettingButton
+
+global dataSelectCheck
+
+global exportDataButton
+global importDataButton
+global deleteDataButton
 
 global setupTypeDropDown
 global uploadSetupButton
@@ -165,6 +176,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iDataListView := false
 	iSettingsListView := false
 	iSetupListView := false
+	iAdministrationListView := false
 
 	iSettings := []
 
@@ -269,6 +281,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SetupListView[] {
 		Get {
 			return this.iSetupListView
+		}
+	}
+
+	AdministrationListView[] {
+		Get {
+			return this.iAdministrationListView
 		}
 	}
 
@@ -399,11 +417,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
+		Gui %window%:Font, Norm
+		Gui %window%:Font, s10 Bold cGray, Arial
+
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Sensor.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Administration")
+
+		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
 		Gui %window%:Add, GroupBox, x280 ys-8 w390 h372
 
-		tabs := map(["Settings", "Setups", "Pressures"], "translate")
+		tabs := map(["Settings", "Setups", "Pressures", "Data"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
@@ -512,11 +538,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if vRequestorPID
 			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
+		Gui Tab, 4
+
+		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
+
+		Gui %window%:Add, ListView, x314 ys w342 h300 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Car", "Track", "Driver", "Type", "#"], "translate")*) ; NoSort NoSortHdr
+
+		this.iAdministrationListView := administrationListViewHandle
+
+		Gui %window%:Add, Button, x314 yp+315 w90 h23 vexportDataButton gexportData, % translate("Export...")
+		Gui %window%:Add, Button, xp+95 yp w90 h23 vimportDataButton gimportData, % translate("Import...")
+
+		Gui %window%:Add, Button, x566 yp w90 h23 vdeleteDataButton gdeleteData, % translate("Delete...")
+
 		Gui Tab
 
-		Gui %window%:Add, Text, x16 ys+126 w120 h23 +0x200, % translate("Available Data")
+		Gui %window%:Add, Text, x16 ys+173 w120 h23 +0x200, % translate("Available Data")
 
-		Gui %window%:Add, ListView, x16 ys+150 w244 h198 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+197 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
 
 		this.iDataListView := listViewHandle
 
@@ -620,6 +659,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		GuiControl Font, settingsTab1
 
+		if this.moduleAvailable("Data") {
+			GuiControl Enable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Sensor.ico
+			Gui Font, s10 Bold cGray, Arial
+		}
+		else {
+			GuiControl Disable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Sensor Gray.ico
+			Gui Font, s10 Bold cSilver, Arial
+		}
+
+		GuiControl Font, settingsTab4
+
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
 			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
@@ -658,6 +710,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			case "Pressures":
 				GuiControl Font, settingsTab3
 				GuiControl Choose, settingsTab, 3
+			case "Data":
+				GuiControl Font, settingsTab4
+				GuiControl Choose, settingsTab, 4
 		}
 
 		defaultListView := A_DefaultListView
@@ -719,6 +774,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Disable, addSettingButton
 			else
 				GuiControl Enable, addSettingButton
+
+			Gui ListView, % this.AdministrationListView
+
+			selectedEntries := 0
+
+			row := LV_GetNext(0, "C")
+
+			while row {
+				selectedEntries += 1
+
+				row := LV_GetNext(row, "C")
+			}
+
+			GuiControl Enable, importDataButton
+
+			if (selectedEntries > 0) {
+				GuiControl Enable, exportDataButton
+				GuiControl Enable, deleteDataButton
+			}
+			else {
+				GuiControl Disable, exportDataButton
+				GuiControl Disable, deleteDataButton
+			}
+
+			if (selectedEntries = LV_GetCount())
+				GuiControl, , dataSelectCheck, 1
+			else if (selectedEntries > 0)
+				GuiControl, , dataSelectCheck, -1
+			else
+				GuiControl, , dataSelectCheck, 0
 		}
 		finally {
 			Gui ListView, %defaultListView%
@@ -980,6 +1065,525 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	deleteData() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+
+		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Deleting Data")})
+
+		Gui %progressWindow%:+Owner%window%
+		Gui %window%:Default
+		Gui %window%:+Disabled
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			simulator := this.SelectedSimulator
+
+			count := 1
+
+			row := LV_GetNext(0, "C")
+
+			while (row := LV_GetNext(row, "C"))
+				count += 1
+
+			row := LV_GetNext(0, "C")
+			progress := 0
+
+			while row {
+				progress += 1
+
+				LV_GetText(car, row, 1)
+				LV_GetText(track, row, 2)
+				LV_GetText(driver, row, 3)
+				LV_GetText(type, row, 4)
+
+				showProgress({progress: Round((progress / count) * 100)
+							, message: translate("Car: ") . car . translate(", Track: ") . track})
+
+				driver := this.SessionDatabase.getDriverID(simulator, driver)
+				car := this.getCarName(simulator, car)
+				track := this.getTrackName(simulator, track)
+
+				switch type {
+					case translate("Telemetry"):
+						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
+
+						telemetryDB.remove("Electronics", {Driver: driver}, Func("always").Bind(true))
+						telemetryDB.remove("Tyres", {Driver: driver}, Func("always").Bind(true))
+
+						telemetryDB.flush()
+					case translate("Pressures"):
+						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+						tyresDB.remove("Tyres.Pressures", {Driver: driver}, Func("always").Bind(true))
+						tyresDB.remove("Tyres.Pressures.Distribution", {Driver: driver}, Func("always").Bind(true))
+
+						tyresDB.flush()
+					case translate("Strategies"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						Loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
+							try {
+								FileDelete %A_LoopFileLongPath%
+							}
+							catch exception {
+								; ignore
+							}
+				}
+
+				Gui %window%:Default
+				Gui ListView, % this.AdministrationListView
+
+				row := LV_GetNext(row, "C")
+			}
+		}
+		finally {
+			Gui ListView, %defaultListView%
+			Gui %window%:-Disabled
+
+			hideProgress()
+		}
+
+		this.selectData()
+	}
+
+	exportData(directory) {
+		directory := normalizePath(directory)
+
+		window := this.Window
+
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+
+		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Exporting Data")})
+
+		Gui %progressWindow%:+Owner%window%
+		Gui %window%:Default
+		Gui %window%:+Disabled
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			simulator := this.SelectedSimulator
+
+			count := 1
+
+			row := LV_GetNext(0, "C")
+
+			while (row := LV_GetNext(row, "C"))
+				count += 1
+
+			row := LV_GetNext(0, "C")
+
+			drivers := {}
+			progress := 0
+
+			while row {
+				progress += 1
+
+				LV_GetText(car, row, 1)
+				LV_GetText(track, row, 2)
+				LV_GetText(driver, row, 3)
+				LV_GetText(type, row, 4)
+
+				id := this.SessionDatabase.getDriverID(simulator, driver)
+
+				showProgress({progress: Round((progress / count) * 100)
+							, message: translate("Car: ") . car . translate(", Track: ") . track})
+
+				if id {
+					drivers[id] := driver
+
+					driver := id
+				}
+
+				car := this.getCarName(simulator, car)
+				track := this.getTrackName(simulator, track)
+
+				targetDirectory := (directory . "\" . car . "\" . track . "\")
+
+				switch type {
+					case translate("Telemetry"):
+						sourceDB := new TelemetryDatabase(simulator, car, track).Database
+						targetDB := new Database(targetDirectory, kTelemetrySchemas)
+
+						for ignore, entry in sourceDB.query("Electronics", {Where: {Driver: driver}})
+							targetDB.add("Electronics", entry, true)
+
+						for ignore, entry in sourceDB.query("Tyres", {Where: {Driver: driver}})
+							targetDB.add("Tyres", entry, true)
+					case translate("Pressures"):
+						sourceDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+						targetDB := new Database(targetDirectory, kTyresSchemas)
+
+						for ignore, entry in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures", entry, true)
+
+						for ignore, entry in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
+							targetDB.add("Tyres.Pressures.Distribution", entry, true)
+					case translate("Strategies"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						FileCreateDir %targetDirectory%Race Strategies
+
+						Loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
+							try {
+								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
+							}
+							catch exception {
+								; ignore
+							}
+				}
+
+				Gui %window%:Default
+				Gui ListView, % this.AdministrationListView
+
+				row := LV_GetNext(row, "C")
+			}
+
+			info := newConfiguration()
+
+			setConfigurationValue(info, "General", "Simulator", simulator)
+			setConfigurationValue(info, "General", "Creator", this.SessionDatabase.ID)
+			setConfigurationValue(info, "General", "Origin", this.SessionDatabase.DBID)
+
+			for id, name in drivers
+				setConfigurationValue(info, "Driver", id, name)
+
+			writeConfiguration(directory . "\Export.info", info)
+		}
+		finally {
+			Gui ListView, %defaultListView%
+			Gui %window%:-Disabled
+
+			hideProgress()
+		}
+	}
+
+	importData(directory, selection) {
+		directory := normalizePath(directory)
+
+		window := this.Window
+
+		simulator := this.SelectedSimulator
+		info := readConfiguration(directory . "\Export.info")
+
+		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
+			x := Round((A_ScreenWidth - 300) / 2)
+			y := A_ScreenHeight - 150
+
+			progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Importing Data")})
+
+			Gui %progressWindow%:+Owner%window%
+			Gui %window%:Default
+			Gui %window%:+Disabled
+
+			try {
+				for id, name in getConfigurationSectionValues(info, "Driver", Object())
+					this.SessionDatabase.registerDriver(simulator, id, name)
+
+				progress := 0
+
+				Loop Files, %directory%\*.*, D	; Car
+				{
+					car := A_LoopFileName
+					carName := this.getCarName(simulator, car)
+
+					Loop Files, %directory%\%car%\*.*, D	; Track
+					{
+						track := A_LoopFileName
+						trackName := this.getTrackName(simulator, track)
+
+						key := (car . "." . track . ".")
+
+						showProgress({progress: ++progress
+									, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+
+						if (progress >= 100)
+							progress := 0
+
+						sourceDirectory := (A_LoopFileDir . "\" . track)
+
+						if selection.HasKey(key . "Telemetry") {
+							driver := selection[key . "Telemetry"]
+
+							sourceDB := new Database(sourceDirectory . "\", kTelemetrySchemas)
+							targetDB := new TelemetryDatabase(simulator, car, track).Database
+
+							for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}})
+								targetDB.add("Electronics", row, true)
+
+							for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}})
+								targetDB.add("Tyres", row, true)
+						}
+
+						if selection.HasKey(key . "Pressures") {
+							driver := selection[key . "Pressures"]
+
+							sourceDB := new Database(sourceDirectory . "\", kTyresSchemas)
+							targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+							for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
+								targetDB.add("Tyres.Pressures", row, true)
+
+							for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
+								targetDB.add("Tyres.Pressures.Distribution", row, true)
+						}
+
+						if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
+							code := this.SessionDatabase.getSimulatorCode(simulator)
+
+							targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies")
+
+							FileCreateDir %targetDirectory%
+
+							Loop Files, %sourceDirectory%\Race Strategies\*.*, F
+							{
+								fileName := A_LoopFileName
+								targetName := fileName
+
+								while FileExist(targetDirectory . "\" . targetName) {
+									SplitPath targetName, , , , name
+
+									targetName := (name . " (" . (A_Index + 1) . ").strategy")
+								}
+
+								FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+							}
+						}
+					}
+				}
+			}
+			finally {
+				Gui %window%:-Disabled
+
+				hideProgress()
+			}
+
+			this.selectData()
+		}
+	}
+
+	loadData() {
+		window := this.Window
+
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+
+		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+
+		Gui %progressWindow%:+Owner%window%
+		Gui %window%:Default
+		Gui %window%:+Disabled
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.AdministrationListView
+
+			LV_Delete()
+
+			selectedSimulator := this.SelectedSimulator
+			selectedCar := this.SelectedCar
+			selectedTrack := this.SelectedTrack
+
+			if selectedSimulator {
+				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
+				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
+
+				progress := 0
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
+
+					if ((selectedCar == true) || (car = selectedCar)) {
+						carName := this.getCarName(selectedSimulator, car)
+
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+						{
+							track := A_LoopFileName
+
+							if ((selectedTrack == true) || (track = selectedTrack)) {
+								trackName := this.getTrackName(selectedSimulator, track)
+								found := false
+
+								showProgress({progress: ++progress
+											, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+
+								if (progress >= 100)
+									progress := 0
+
+								Gui %window%:Default
+								Gui ListView, % this.AdministrationListView
+
+								targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+
+								telemetryDB := new TelemetryDatabase(simulator, car, track)
+
+								for ignore, driver in drivers {
+									count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+
+									if (count > 0)
+										LV_Add("", carName, trackName
+												 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
+												 , translate("Telemetry"), count)
+								}
+
+								tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+								for ignore, driver in drivers {
+									result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+																			  , Where: {Driver: driver}})
+
+									count := ((result.Length() > 0) ? result[1].Count : 0)
+
+									result := tyresDB.query("Tyres.Pressures.Distribution"
+														  , {Group: [["Driver", "count", "Count"]]
+														   , Where: {Driver: driver}})
+
+									count += ((result.Length() > 0) ? result[1].Count : 0)
+
+									if (count > 0)
+										LV_Add("", carName, trackName
+												 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
+												 , translate("Pressures"), count)
+								}
+
+								strategies := 0
+
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									strategies += 1
+
+								if (strategies > 0)
+									LV_Add("", carName, trackName, "-", translate("Strategies"), strategies)
+							}
+						}
+					}
+				}
+			}
+
+			LV_ModifyCol()
+
+			Loop 5
+				LV_ModifyCol(A_Index, "AutoHdr")
+
+			this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+			Gui %window%:-Disabled
+
+			hideProgress()
+		}
+	}
+
+	selectData(load := true) {
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.DataListView
+
+			LV_Delete()
+
+			while LV_DeleteCol(1)
+				ignore := 1
+
+			for ignore, column in map(["Type", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
+
+			selectedSimulator := this.SelectedSimulator
+			selectedCar := this.SelectedCar
+			selectedTrack := this.SelectedTrack
+
+			if selectedSimulator {
+				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
+				cars := []
+				tracks := []
+				telemetry := 0
+				pressures := 0
+				strategies := 0
+
+				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
+
+					if ((selectedCar == true) || (car = selectedCar))
+						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+						{
+							track := A_LoopFileName
+
+							if ((selectedTrack == true) || (track = selectedTrack)) {
+								found := false
+
+								targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+
+								if (FileExist(targetDirectory . "Electronics.CSV") || FileExist(targetDirectory . "Tyres.CSV")) {
+									found := true
+
+									telemetry += 1
+								}
+
+								if (FileExist(targetDirectory . "Tyres.Pressures.CSV")
+								 || FileExist(targetDirectory . "Tyres.Pressures.Distribution.CSV")) {
+									found := true
+
+									pressures += 1
+								}
+
+								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+								{
+									found := true
+
+									strategies += 1
+								}
+
+								if found {
+									if !inList(cars, car)
+										cars.Push(car)
+
+									if !inList(tracks, track)
+										tracks.Push(track)
+								}
+							}
+						}
+				}
+
+				LV_Add("", translate("Drivers"), drivers.Length())
+				LV_Add("", translate("Cars"), cars.Length())
+				LV_Add("", translate("Tracks"), tracks.Length())
+				LV_Add("", translate("Telemetry"), telemetry)
+				LV_Add("", translate("Pressures"), pressures)
+				LV_Add("", translate("Strategies"), strategies)
+
+				LV_ModifyCol()
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+			}
+
+			if load
+				this.loadData()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
 	selectSetups() {
 		window := this.Window
 
@@ -1063,6 +1667,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if simulator {
 			this.iAvailableModules["Settings"] := true
+			this.iAvailableModules["Data"] := true
 
 			if ((car && (car != true)) && (track && (track != true))) {
 				this.iAvailableModules["Setups"] := true
@@ -1075,6 +1680,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 		else {
 			this.iAvailableModules["Settings"] := false
+			this.iAvailableModules["Data"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
 		}
@@ -1090,6 +1696,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				switch module {
 					case "Settings":
 						this.selectSettings()
+					case "Data":
+						this.selectData()
 					case "Setups":
 						this.selectSetups()
 					case "Pressures":
@@ -1441,7 +2049,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		title := translate("Upload Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, , %title%
 		OnMessage(0x44, "")
@@ -1470,7 +2078,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		title := translate("Download Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 		FileSelectFile fileName, S16, %setupName%, %title%
 		OnMessage(0x44, "")
@@ -1583,8 +2191,257 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
+global importSelectCheck
+
+selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
+	static importListViewHandle := false
+	static result := false
+
+	if (sessionDatabaseEditorOrCommand = kCancel)
+		result := kCancel
+	else if (sessionDatabaseEditorOrCommand = kOk)
+		result := kOk
+	else {
+		result := false
+
+		Gui IDS:Default
+
+		Gui IDS:-Border ; -Caption
+		Gui IDS:Color, D0D0D0, D8D8D8
+
+		Gui IDS:Font, s10 Bold, Arial
+
+		Gui IDS:Add, Text, w394 Center gmoveImport, % translate("Modular Simulator Controller System")
+
+		Gui IDS:Font, s9 Norm, Arial
+		Gui IDS:Font, Italic Underline, Arial
+
+		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenImportDocumentation, % translate("Import Data")
+
+		Gui IDS:Font, s8 Norm, Arial
+
+		Gui IDS:Add, Text, x8 yp+30 w410 0x10
+
+		Gui IDS:Add, CheckBox, +Theme Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries
+
+		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Car", "Track", "Driver", "Type", "#"], "translate")*) ; NoSort NoSortHdr
+
+		directory := normalizePath(directory)
+		editor := sessionDatabaseEditorOrCommand
+		owner := editor.Window
+
+		simulator := editor.SelectedSimulator
+		code := editor.SessionDatabase.getSimulatorCode(simulator)
+
+		info := readConfiguration(directory . "\Export.info")
+
+		drivers := {}
+
+		for id, name in getConfigurationSectionValues(info, "Driver", Object()) {
+			drivers[id] := name
+			drivers[name] := id
+		}
+
+		x := Round((A_ScreenWidth - 300) / 2)
+		y := A_ScreenHeight - 150
+
+		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+
+		Gui %progressWindow%:+Owner%owner%
+		Gui %owner%:+Disabled
+
+		try {
+			progress := 0
+
+			Loop Files, %directory%\*.*, D	; Car
+			{
+				car := A_LoopFileName
+				carName := editor.getCarName(simulator, car)
+
+				Loop Files, %directory%\%car%\*.*, D	; Track
+				{
+					track := A_LoopFileName
+					trackName := editor.getTrackName(simulator, track)
+
+					showProgress({progress: ++progress
+								, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+
+					if (progress >= 100)
+						progress := 0
+
+					Gui IDS:Default
+					Gui ListView, %importListViewHandle%
+
+					sourceDirectory := (A_LoopFileDir . "\" . track)
+
+					found := false
+
+					telemetryDB := new TelemetryDatabase()
+
+					telemetryDB.setDatabase(new Database(sourceDirectory . "\", kTelemetrySchemas))
+
+					for driver, driverName in drivers {
+						count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+
+						if (count > 0)
+							LV_Add("Check", carName, trackName, driverName, translate("Telemetry"), count)
+					}
+
+					tyresDB := new Database(sourceDirectory . "\", kTyresSchemas)
+
+					for driver, driverName in drivers {
+						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+																, Where: {Driver: driver}})
+
+						count := ((rows.Length() > 0) ? rows[1].Count : 0)
+
+						rows := tyresDB.query("Tyres.Pressures.Distribution"
+											, {Group: [["Driver", "count", "Count"]]
+											 , Where: {Driver: driver}})
+
+						count += ((rows.Length() > 0) ? rows[1].Count : 0)
+
+						if (count > 0)
+							LV_Add("Check", carName, trackName, driverName, translate("Pressures"), count)
+					}
+
+					strategies := 0
+
+					Loop Files, %sourceDirectory%\Race Strategies\*.*, F		; Strategies
+						strategies += 1
+
+					if (strategies > 0)
+						LV_Add("Check", carName, trackName, "-", translate("Strategies"), strategies)
+				}
+			}
+		}
+		finally {
+			Gui %owner%:+Disabled
+
+			hideProgress()
+		}
+
+		Gui IDS:Default
+		Gui ListView, %importListViewHandle%
+
+		GuiControl, , importSelectCheck, % ((LV_GetCount() > 0) ? 1 : 0)
+
+		LV_ModifyCol()
+
+		Loop 5
+			LV_ModifyCol(A_Index, "AutoHdr")
+
+		Gui IDS:Font, s8 Norm, Arial
+
+		Gui IDS:Add, Text, x8 yp+410 w410 0x10
+
+		Gui IDS:Add, Button, x123 yp+10 w80 h23 Default GacceptImport, % translate("Ok")
+		Gui IDS:Add, Button, x226 yp w80 h23 GcancelImport, % translate("&Cancel")
+
+		Gui IDS:+Owner%owner%
+		Gui %owner%:+Disabled
+
+		try {
+			Gui IDS:Show
+
+			Loop
+				Sleep 100
+			Until result
+		}
+		finally {
+			Gui %owner%:-Disabled
+		}
+
+		if (result = kOk) {
+			Gui ListView, %importListViewHandle%
+
+			row := 0
+
+			selection := {}
+
+			while (row := LV_GetNext(row, "C")) {
+				LV_GetText(car, row, 1)
+				LV_GetText(track, row, 2)
+				LV_GetText(driver, row, 3)
+				LV_GetText(type, row, 4)
+
+				switch type {
+					case translate("Telemetry"):
+						type := "Telemetry"
+					case translate("Pressures"):
+						type := "Pressures"
+					case translate("Strategies"):
+						type := "Strategies"
+				}
+
+				selection[editor.getCarName(simulator, car) . "."
+						. editor.getTrackName(simulator, track) . "." . type] := drivers[driver]
+			}
+
+			result := selection
+		}
+		else
+			result := false
+
+		Gui IDS:Destroy
+
+		return result
+	}
+}
+
+acceptImport() {
+	selectImportData(kOk)
+}
+
+cancelImport() {
+	selectImportData(kCancel)
+}
+
+selectAllImportEntries() {
+	GuiControlGet importSelectCheck
+
+	if (importSelectCheck == -1) {
+		importSelectCheck := 0
+
+		GuiControl, , importSelectCheck, 0
+	}
+
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, importSelectCheck ? "Check" : "-Check")
+}
+
+selectImportEntry() {
+	selected := 0
+
+	row := 0
+
+	Loop {
+		row := LV_GetNext(row, "C")
+
+		if row
+			selected += 1
+		else
+			break
+	}
+
+	if (selected == 0)
+		GuiControl, , importSelectCheck, 0
+	else if (selected < LV_GetCount())
+		GuiControl, , importSelectCheck, -1
+	else
+		GuiControl, , importSelectCheck, 1
+}
+
+moveImport() {
+	moveByMouse("IDS")
+}
+
+openImportDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
+}
+
 moveSessionDatabaseEditor() {
-	moveByMouse("SDE")
+	moveByMouse(SessionDatabaseEditor.Instance.Window)
 }
 
 closeSessionDatabaseEditor() {
@@ -1654,7 +2511,7 @@ chooseDatabasePath() {
 
 	try {
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
 		OnMessage(0x44, "")
@@ -2301,6 +3158,86 @@ noSelect() {
 	}
 }
 
+selectData() {
+	SessionDatabaseEditor.Instance.updateState()
+}
+
+selectAllData() {
+	GuiControlGet dataSelectCheck
+
+	if (dataSelectCheck == -1) {
+		dataSelectCheck := 0
+
+		GuiControl, , dataSelectCheck, 0
+	}
+
+	Gui ListView, % SessionDatabaseEditor.Instance.AdministrationListView
+
+	Loop % LV_GetCount()
+		LV_Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
+
+	SessionDatabaseEditor.Instance.updateState()
+}
+
+exportData() {
+	title := translate("Select target folder...")
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder folder, *%kDatabaseDirectory%, 0, %title%
+	OnMessage(0x44, "")
+
+	if (folder != "")
+		SessionDatabaseEditor.Instance.exportData(folder . "\Export_" . A_Now)
+}
+
+importData() {
+	title := translate("Select export folder...")
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+	FileSelectFolder folder, *%kDatabaseDirectory%, 0, %title%
+	OnMessage(0x44, "")
+
+	if (folder != "")
+		if FileExist(folder . "\Export.info") {
+			info := readConfiguration(folder . "\Export.info")
+
+			if (getConfigurationValue(info, "General", "Simulator") = SessionDatabaseEditor.Instance.SelectedSimulator) {
+				selection := selectImportData(SessionDatabaseEditor.Instance, folder)
+
+				if selection
+					SessionDatabaseEditor.Instance.importData(folder, selection)
+			}
+			else {
+				title := translate("Error")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % translate("The data has not been exported for the currently selected simulator.")
+				OnMessage(0x44, "")
+			}
+		}
+		else {
+			title := translate("Error")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % translate("This is not a valid folder with exported data.")
+			OnMessage(0x44, "")
+		}
+}
+
+deleteData() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Delete")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected data?")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		SessionDatabaseEditor.Instance.deleteData()
+}
+
 chooseTab1() {
 	editor := SessionDatabaseEditor.Instance
 
@@ -2320,6 +3257,13 @@ chooseTab3() {
 
 	if editor.moduleAvailable("Pressures")
 		editor.selectModule("Pressures")
+}
+
+chooseTab4() {
+	editor := SessionDatabaseEditor.Instance
+
+	if editor.moduleAvailable("Data")
+		editor.selectModule("Data")
 }
 
 chooseDatabaseScope() {
@@ -2411,6 +3355,9 @@ showSessionDatabaseEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Session Database
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	simulator := false
 	car := false
 	track := false
@@ -2474,6 +3421,11 @@ showSessionDatabaseEditor() {
 	finally {
 		protectionOff()
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

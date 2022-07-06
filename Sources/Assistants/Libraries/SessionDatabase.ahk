@@ -31,6 +31,8 @@ global kWetRaceSetup = "WR"
 
 global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
+global kSessionSchemas = {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Variables Section                       ;;;
@@ -54,6 +56,19 @@ class SessionDatabase extends ConfigurationItem {
 	ID[] {
 		Get {
 			return this.iID
+		}
+	}
+
+	DBID[] {
+		Get {
+			try {
+				FileRead id, %kDatabaseDirectory%ID
+
+				return id
+			}
+			catch exception {
+				return this.ID
+			}
 		}
 	}
 
@@ -106,55 +121,89 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
-	registerDriverName(simulator, id, name := false) {
-		if (simulator && id)
-			id := (this.getSimulatorName(simulator) . "." . id)
-		else
-			return
+	getAllDrivers(simulator, names := false) {
+		if simulator {
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-		anonymous := false
+			ids := sessionDB.query("Drivers", {Select: ["ID"], By: "ID"})
 
-		if !name {
-			name := translate("User")
+			for index, row in ids
+				ids[index] := row.ID
 
-			anonymous := true
+			if names {
+				names := []
+
+				for ignore, id in ids
+					names.Push(this.getDriverNames(simulator, id))
+
+				return names
+			}
+			else
+				return ids
 		}
+		else
+			return []
+	}
 
-		if (name != this.sDriver) {
-			this.sDriver := name
+	registerDriver(simulator, id, name) {
+		if (simulator && id && name && (name != "John Doe (JD)")) {
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			forName := false
+			surname := false
+			nickName := false
 
-			names := string2Values("###", getConfigurationValue(configuration, "Drivers", id, ""))
+			parseDriverName(name, forName, surName, nickName)
 
-			if (names.Length() == 0) {
-				setConfigurationValue(configuration, "Drivers", id, name)
-
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-			}
-			else if (!anonymous && !inList(names, name)) {
-				index := inList(names, translate("User"))
-
-				if index
-					names.RemoveAt(index)
-
-				names.Push(name)
-
-				setConfigurationValue(configuration, "Drivers", id, values2String("###", names*))
-
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-			}
+			if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length() = 0)
+				sessionDB.add("Drivers", {ID: id, Forname: forName, Surname: surName, Nickname: nickName}, true)
 		}
 	}
 
-	getDriverNames(simulator, id) {
-		if (simulator && id)
-			names := string2Values("###", getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
-															  , "Drivers", (this.getSimulatorName(simulator) . "." . id), ""))
-		else
-			names := []
+	getDriverID(simulator, name) {
+		ids := this.getDriverIDs(simulator, name)
 
-		return ((names.Length() > 0) ? names : [translate("Unknown")])
+		return ((ids.Length() > 0) ? ids[1] : false)
+	}
+
+	getDriverName(simulator, id) {
+		return this.getDriverNames(simulator, id)[1]
+	}
+
+	getDriverIDs(simulator, name) {
+		if (simulator && name) {
+			forName := false
+			surName := false
+			nickName := false
+
+			parseDriverName(name, forName, surName, nickName)
+
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+			ids := []
+
+			for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
+				ids.Push(entry.ID)
+
+			return ids
+		}
+		else
+			return false
+	}
+
+	getDriverNames(simulator, id) {
+		if (simulator && id) {
+			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+			drivers := []
+
+			for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
+				drivers.Push(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
+
+			return ((drivers.Length() = 0) ? ["John Doe (JD)"] : drivers)
+		}
+		else
+			return ["John Doe (JD)"]
 	}
 
 	prepareDatabase(simulator, car, track) {

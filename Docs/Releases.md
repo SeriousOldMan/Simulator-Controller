@@ -1,3 +1,21 @@
+## 4.2.3.0-release 07/08/22 (planned)
+
+**Important**: The new database administration tool and especially the new possibility to ex- and import telemetry data has been tested thoroughly, but there are a couple of data constellation dependent edge cases. So, as always, make a fresh backup copy of your local *Simulator Controller* folder, which resides in your user *Documents* folder, before you play with the new stuff. Just in case.
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. Support driver filters for telemetry in "Strategy Workbench" and "Race Center". You can now select a driver, for which the data in various reports and charts should be displayed. See the updated documentation for ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development) and ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information.
+  4. The strategy simulation in "Race Center" has been extended to support more edge cases regarding the current traffic situation.
+  5. When simulating a strategy in "Strategy Workbench", it is now possible to preselect drivers for the various stints. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers) for more information.
+  6. When a stint plan is created from a strategy in "Race Center", the drivers are preselected, if the strategy has been created with driver information.
+  7. Optimized Pitstop MFD handling in ACC, almost twice as fast now.
+  8. It is now possible to enable/disable the Team Server connection in Simulator Controller tray menu. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session) for more information.
+  9. All new database maintenance page in "Session Database", where you can browse all available data categories. Data can be deleted, exported and imported even from other drivers, with the driver identity preserved for the imported data. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) for more information.
+  10. The information request action "GapToFront" (which was a misnomer) has been renamed to "GapToAhead". See the update notes, if you have used this action in your configuration.
+  11. Fixed a couple of glitches in the ACC car models for the "BMW M4 GT3" and the "AMG GT3 2020".
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-423), if you have used the information request action "GapToFront" in your controller configuration.
+
 ## 4.2.2.0-release 07/01/22
 
 **Important**: This update includes a major reorganization of the local database, where all the telemetry data and the tyre pressures, and so on, are stored. I tested everything thoroughly, but the devil is in the details. Please make sure to make a backup copy of your [Documents]\Simulator Controller folder and put it on the side for the next few weeks.

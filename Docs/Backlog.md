@@ -3,8 +3,7 @@
   2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
-  5. [Target: 4.3.x][Strategy Workbench] Export / Import for telemetry data incl. support for team structures
-
+  
 #### Strategy Development
   1. [Target: V4.x] Enhancements for Race Strategist
      - Automatically adjust pitstop strategy depending on upcoming weather conditions

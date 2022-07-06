@@ -3134,6 +3134,9 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	simulator := false
 	car := false
 	track := false
@@ -3196,6 +3199,11 @@ runSetupAdvisor() {
 	finally {
 		; fixIE(current)
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

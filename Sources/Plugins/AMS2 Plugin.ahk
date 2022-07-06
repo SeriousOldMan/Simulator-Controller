@@ -80,8 +80,6 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")
 		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "G")
 		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "J")
-
-		SetKeyDelay 5, 15
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -169,7 +167,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				Loop %steps%
 					this.sendPitstopCommand(this.PreviousOptionHotkey)
 
-					return true
+				return true
 			}
 			else
 				return false

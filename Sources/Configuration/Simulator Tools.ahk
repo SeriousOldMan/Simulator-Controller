@@ -1635,6 +1635,59 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV423() {
+	if FileExist(kUserConfigDirectory . "Session Database.ini") {
+		sessionDB := new SessionDatabase()
+		sessionDBConfig := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		for key, drivers in getConfigurationSectionValues(sessionDBConfig, "Drivers", Object()) {
+			key := StrSplit(key, ".", " `t", 2)
+			simulator := key[1]
+			id := key[2]
+
+			for ignore, driver in string2Values("###", drivers)
+				sessionDB.registerDriver(simulator, id, driver)
+		}
+
+		removeConfigurationSection(sessionDBConfig, "Drivers")
+
+		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
+	}
+
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+
+		if (simulator = "ACC")
+			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			{
+				car := A_LoopFileName
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+				{
+					track := A_LoopFileName
+
+					empty := true
+
+					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
+					{
+						empty := false
+
+						break
+					}
+
+					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track)))
+						try {
+							FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%
+						}
+						catch exception {
+							; ignore
+						}
+				}
+			}
+	}
+}
+
 updateConfigurationForV422() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -2454,6 +2507,9 @@ startSimulatorTools() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 
 	if (A_Args.Length() > 0)
@@ -2519,6 +2575,9 @@ startSimulatorTools() {
 			hideSplashTheme()
 	}
 
+	ExitApp 0
+
+Exit:
 	ExitApp 0
 }
 

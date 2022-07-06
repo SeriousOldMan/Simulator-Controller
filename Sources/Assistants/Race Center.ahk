@@ -126,6 +126,7 @@ global detailsViewer
 
 global reportsListView
 
+global driverDropDown
 global dataXDropDown
 global dataY1DropDown
 global dataY2DropDown
@@ -157,7 +158,7 @@ global deleteSetupButton
 
 global sessionDateCal
 global sessionTimeEdit
-global planSetupDriverDropDownMenu
+global planDriverDropDownMenu
 global planTimeEdit
 global actTimeEdit
 global planLapEdit
@@ -266,9 +267,14 @@ class RaceCenter extends ConfigurationItem {
 	iTelemetryDatabase := false
 	iPressuresDatabase := false
 
+	iSimulationTelemetryDatabase := false
+
 	iReportViewer := false
 	iSelectedReport := false
 	iSelectedChartType := false
+
+	iAvailableDrivers := []
+	iSelectedDrivers := false
 
 	iSelectedDetailReport := false
 
@@ -276,31 +282,61 @@ class RaceCenter extends ConfigurationItem {
 
 	iTasks := []
 
-	class SessionTelemetryDatabase extends TelemetryDatabase {
+	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
 		iTelemetryDatabase := false
+
+		class SessionTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+			Drivers[] {
+				Get {
+					return this.RaceCenter.SelectedDrivers
+				}
+			}
+		}
+
+		class SimulationTelemetryDatabase extends RaceCenter.RaceCenterTelemetryDatabase {
+		}
+
+		RaceCenter[] {
+			Get {
+				return this.iRaceCenter
+			}
+		}
+
+		TelemetryDatabase[] {
+			Get {
+				return this.iTelemetryDatabase
+			}
+		}
 
 		__New(raceCenter, simulator := false, car := false, track := false) {
 			this.iRaceCenter := raceCenter
 
-			base.__New()
+			base.__New(raceCenter)
 
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
-				this.iTelemetryDatabase := new TelemetryDatabase(simulator, car, track)
+				this.iTelemetryDatabase := new this.TelemetryDatabase(this, simulator, car, track)
+		}
+
+		setDrivers(drivers) {
+			base.setDrivers(drivers)
+
+			if this.TelemetryDatabase
+				this.TelemetryDatabase.setDrivers(drivers)
 		}
 
 		getMapData(weather, compound, compoundColor) {
 			entries := []
 
-			if this.iRaceCenter.UseSessionData
+			if this.RaceCenter.UseSessionData
 				entries := base.getMapData(weather, compound, compoundColor)
 
-			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
+			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.iTelemetryDatabase.getMapData(weather, compound, compoundColor) {
+				for ignore, entry in this.TelemetryDatabase.getMapData(weather, compound, compoundColor) {
 					found := false
 
 					for ignore, candidate in entries
@@ -319,7 +355,7 @@ class RaceCenter extends ConfigurationItem {
 					entries.Push(entry)
 			}
 
-			if this.iRaceCenter.UseCurrentMap {
+			if this.RaceCenter.UseCurrentMap {
 				lastLap := this.iRaceCenter.LastLap
 
 				if lastLap {
@@ -339,13 +375,13 @@ class RaceCenter extends ConfigurationItem {
 		getTyreData(weather, compound, compoundColor) {
 			entries := []
 
-			if this.iRaceCenter.UseSessionData
+			if this.RaceCenter.UseSessionData
 				entries := base.getTyreData(weather, compound, compoundColor)
 
-			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
+			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.iTelemetryDatabase.getTyreData(weather, compound, compoundColor) {
+				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, compound, compoundColor) {
 					found := false
 
 					for ignore, candidate in entries
@@ -369,13 +405,13 @@ class RaceCenter extends ConfigurationItem {
 		getMapLapTimes(weather, compound, compoundColor) {
 			entries := []
 
-			if this.iRaceCenter.UseSessionData
+			if this.RaceCenter.UseSessionData
 				entries := base.getMapLapTimes(weather, compound, compoundColor)
 
-			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
+			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.iTelemetryDatabase.getMapLapTimes(weather, compound, compoundColor) {
+				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, compound, compoundColor) {
 					found := false
 
 					for ignore, candidate in entries
@@ -414,10 +450,10 @@ class RaceCenter extends ConfigurationItem {
 		getTyreLapTimes(weather, compound, compoundColor) {
 			entries := []
 
-			if this.iRaceCenter.UseSessionData
+			if this.RaceCenter.UseSessionData
 				entries := base.getTyreLapTimes(weather, compound, compoundColor)
 
-			if (this.iRaceCenter.UseTelemetryDatabase && this.iTelemetryDatabase) {
+			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.iTelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
@@ -452,7 +488,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		__New(rCenter) {
-			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresDataSchemas)
+			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresSchemas)
 		}
 
 		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
@@ -508,10 +544,6 @@ class RaceCenter extends ConfigurationItem {
 			Get {
 				return this.iVersion
 			}
-		}
-
-		__New(strategyManager, configuration := false) {
-			base.__New(strategyManager, configuration)
 		}
 
 		setVersion(version) {
@@ -778,6 +810,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	StintDriver[] {
+		Get {
+			return this.iStintDriver
+		}
+	}
+
 	UseSessionData[] {
 		Get {
 			return this.iUseSessionData
@@ -910,9 +948,15 @@ class RaceCenter extends ConfigurationItem {
 	TelemetryDatabase[] {
 		Get {
 			if !this.iTelemetryDatabase
-				this.iTelemetryDatabase := new this.SessionTelemetryDatabase(this)
+				this.iTelemetryDatabase := new this.RaceCenterTelemetryDatabase.SessionTelemetryDatabase(this)
 
 			return this.iTelemetryDatabase
+		}
+	}
+
+	SimulationTelemetryDatabase[] {
+		Get {
+			return (this.iSimulationTelemetryDatabase ? this.iSimulationTelemetryDatabase : this.TelemetryDatabase)
 		}
 	}
 
@@ -946,6 +990,18 @@ class RaceCenter extends ConfigurationItem {
 	SelectedChartType[] {
 		Get {
 			return this.iSelectedChartType
+		}
+	}
+
+	AvailableDrivers[index := false] {
+		Get {
+			return (index ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
+		}
+	}
+
+	SelectedDrivers[] {
+		Get {
+			return this.iSelectedDrivers
 		}
 	}
 
@@ -1070,7 +1126,10 @@ class RaceCenter extends ConfigurationItem {
 
 		LV_ModifyCol(1, "AutoHdr")
 
-		Gui %window%:Add, Text, x141 yp+2 w70 h23 +0x200, % translate("X-Axis")
+		Gui %window%:Add, Text, x141 yp+2 w70 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit gchooseDriver vdriverDropDown
+
+		Gui %window%:Add, Text, x141 yp+24 w70 h23 +0x200, % translate("X-Axis")
 
 		Gui %window%:Add, DropDownList, x195 yp w191 AltSubmit vdataXDropDown gchooseAxis
 
@@ -1152,7 +1211,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPlanListView := listHandle
 
 		Gui %window%:Add, Text, x378 ys+68 w90 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanSetupDriverDropDownMenu gupdatePlan
+		Gui %window%:Add, DropDownList, x474 yp w126 AltSubmit vplanDriverDropDownMenu gupdatePlan
 
 		Gui %window%:Add, Text, x378 yp+28 w90 h23 +0x200, % translate("Time (est. / act.)")
 		Gui %window%:Add, DateTime, x474 yp w50 h23 vplanTimeEdit gupdatePlan 1, HH:mm
@@ -1545,7 +1604,7 @@ class RaceCenter extends ConfigurationItem {
 		names := getKeys(drivers)
 
 		GuiControl, , setupDriverDropDownMenu, % ("|" . values2String("|", names*))
-		GuiControl, , planSetupDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
+		GuiControl, , planDriverDropDownMenu, % ("|" . values2String("|", translate("-"), names*))
 	}
 
 	selectSession(identifier) {
@@ -1576,6 +1635,28 @@ class RaceCenter extends ConfigurationItem {
 		syncSession()
 	}
 
+	selectDriver(driver, force := false) {
+		if (force || (this.SelectedDrivers && !inList(this.SelectedDrivers, driver))
+				  || (!this.SelectedDrivers && ((driver != true) && (driver != false)))) {
+			window := this.Window
+
+			Gui %window%:Default
+
+			if driver {
+				GuiControl Choose, driverDropDown, % (((driver = true) || (driver = false)) ? 1 : (inList(this.AvailableDrivers, driver) + 1))
+
+				this.iSelectedDrivers := ((driver == true) ? false : [driver])
+			}
+			else {
+				GuiControl Choose, driverDropDown, 0
+
+				this.iSelectedDrivers := false
+			}
+
+			this.updateReports()
+		}
+	}
+
 	createDriver(driver) {
 		if !driver.HasKey("Identifier")
 			driver["Identifier"] := false
@@ -1598,8 +1679,11 @@ class RaceCenter extends ConfigurationItem {
 				if driver.ID {
 					found.ID := driver.ID
 
+					if !inList(this.iAvailableDrivers, driver.ID)
+						this.iAvailableDrivers.Push(driver.ID)
+
 					if this.Simulator
-						new SessionDatabase().registerDriverName(this.Simulator, driver.ID, found.FullName)
+						new SessionDatabase().registerDriver(this.Simulator, driver.ID, found.FullName)
 				}
 
 				return found
@@ -1611,8 +1695,13 @@ class RaceCenter extends ConfigurationItem {
 		driver.Stints := []
 		driver.Accidents := 0
 
-		if (driver.ID && this.Simulator)
-			new SessionDatabase().registerDriverName(this.Simulator, driver.ID, driver.FullName)
+		if driver.ID {
+			if !inList(this.iAvailableDrivers, driver.ID)
+				this.iAvailableDrivers.Push(driver.ID)
+
+			if this.Simulator
+				new SessionDatabase().registerDriver(this.Simulator, driver.ID, driver.FullName)
+		}
 
 		this.Drivers.Push(driver)
 
@@ -1641,6 +1730,8 @@ class RaceCenter extends ConfigurationItem {
 			GuiControl Disable, pitstopPressureRREdit
 		}
 
+		GuiControl Disable, driverDropDown
+
 		GuiControl Disable, dataXDropDown
 		GuiControl Disable, dataY1DropDown
 		GuiControl Disable, dataY2DropDown
@@ -1657,6 +1748,8 @@ class RaceCenter extends ConfigurationItem {
 
 			if inList(["Pressures", "Temperatures", "Free"], this.SelectedReport) {
 				GuiControl Enable, chartTypeDropDown
+
+				GuiControl Enable, driverDropDown
 
 				GuiControl Enable, dataXDropDown
 				GuiControl Enable, dataY1DropDown
@@ -1675,6 +1768,8 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iSelectedChartType := false
 
+				GuiControl Choose, driverDropDown, 0
+
 				GuiControl Choose, dataXDropDown, 0
 				GuiControl Choose, dataY1DropDown, 0
 				GuiControl Choose, dataY2DropDown, 0
@@ -1686,6 +1781,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 		else {
 			GuiControl Disable, reportSettingsButton
+
+			GuiControl Choose, driverDropDown, 0
 
 			GuiControl Choose, dataXDropDown, 0
 			GuiControl Choose, dataY1DropDown, 0
@@ -1771,7 +1868,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if selected {
-				GuiControl Enable, planSetupDriverDropDownMenu
+				GuiControl Enable, planDriverDropDownMenu
 				GuiControl Enable, planTimeEdit
 				GuiControl Enable, actTimeEdit
 				GuiControl Enable, deletePlanButton
@@ -1797,7 +1894,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else {
-				GuiControl Disable, planSetupDriverDropDownMenu
+				GuiControl Disable, planDriverDropDownMenu
 				GuiControl Disable, planTimeEdit
 				GuiControl Disable, actTimeEdit
 				GuiControl Disable, planLapEdit
@@ -1806,7 +1903,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, planTyreCompoundDropDown
 				GuiControl Disable, deletePlanButton
 
-				GuiControl Choose, planSetupDriverDropDownMenu, 0
+				GuiControl Choose, planDriverDropDownMenu, 0
 				GuiControl, , planTimeEdit, 20200101000000
 				GuiControl, , actTimeEdit, 20200101000000
 				GuiControl, , planLapEdit, % ""
@@ -2209,6 +2306,35 @@ class RaceCenter extends ConfigurationItem {
 						EnvAdd currentTime, time, Seconds
 						FormatTime time, %currentTime%, HH:mm
 
+						driver := pitstop.DriverName
+
+						forName := false
+						surName := false
+						nickName := false
+
+						parseDriverName(driver, forName, surName, nickName)
+
+						found := false
+
+						for ignore, candidate in getKeys(this.SessionDrivers) {
+							sForName := false
+							sSurName := false
+							sNickName := false
+
+							parseDriverName(candidate, sForName, sSurName, sNickName)
+
+							if ((sForName = forName) && (sSurName = surName)) {
+								found := true
+								driver := candidate
+
+								break
+							}
+						}
+
+						if !found
+							driver := "-"
+
+						LV_Modify(A_Index, "Col2", driver)
 						LV_Modify(A_Index, "Col3", time)
 						LV_Modify(A_Index, "Col5", pitstop.Lap)
 						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : pitstop.RefuelAmount)
@@ -2384,7 +2510,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedPlanStint := LV_GetCount()
 			}
 
-			GuiControl Choose, planSetupDriverDropDownMenu, 1
+			GuiControl Choose, planDriverDropDownMenu, 1
 			GuiControl, , planTimeEdit, 20200101000000
 			GuiControl, , actTimeEdit, 20200101000000
 			GuiControl, , planLapEdit, % ""
@@ -2601,7 +2727,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	getStintDriver(stintNr) {
+	getDriver(stintNr) {
 		window := this.Window
 
 		Gui %window%:Default
@@ -2800,7 +2926,7 @@ class RaceCenter extends ConfigurationItem {
 	adjustPitstopTyrePressures(tyrePressureMode, weather, airTemperature, trackTemperature, compound, compoundColor
 							 , ByRef flPressure, ByRef frPressure, ByRef rlPressure, ByRef rrPressure) {
 		currentDriver := (this.CurrentStint ? this.CurrentStint.Driver : false)
-		nextDriver := (this.CurrentStint ? this.getStintDriver(this.CurrentStint.Nr + 1) : false)
+		nextDriver := (this.CurrentStint ? this.getDriver(this.CurrentStint.Nr + 1) : false)
 
 		if (currentDriver && nextDriver) {
 			if (tyrePressureMode = "Reference") {
@@ -3216,7 +3342,7 @@ class RaceCenter extends ConfigurationItem {
 						this.updateState()
 					}
 
-					this.runSimulation(getConfigurationValue(this.Strategy, "Session", "SessionType"))
+					this.runSimulation(this.Strategy.SessionType)
 				}
 				else {
 					title := translate("Information")
@@ -3388,13 +3514,14 @@ class RaceCenter extends ConfigurationItem {
 		this.iTasks.Push(task)
 	}
 
-	createStrategy(nameOrConfiguration := false) {
+	createStrategy(nameOrConfiguration, driver := false) {
 		name := nameOrConfiguration
 
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration) : new this.SessionStrategy(this, nameOrConfiguration))
+		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration, driver)
+										: new this.SessionStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -3421,16 +3548,45 @@ class RaceCenter extends ConfigurationItem {
 			}
 	}
 
+	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {
+		driver := this.getDriver(stintNumber)
+
+		if (driver && driver.ID) {
+			driverID := driver.ID
+			driverName := driver.Fullname
+		}
+		else {
+			driverID := false
+			driverName := "John Doe (JD)"
+		}
+
+		return true
+	}
+
+	setStintDriver(stintNumber, driverID) {
+		Throw "RaceCenter.setStintDriver should never be called..."
+	}
+
 	runSimulation(sessionType) {
 		this.pushTask(ObjBindMethod(this, "runSimulationAsync", sessionType))
 	}
 
 	runSimulationAsync(sessionType) {
+		this.saveSession()
 
-		if this.UseTraffic
-			new TrafficSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
-		else
-			new VariationSimulation(this, sessionType, new this.SessionTelemetryDatabase(this, this.Simulator, this.Car, this.Track)).runSimulation(true)
+		telemetryDB := new this.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
+
+		this.iSimulationTelemetryDatabase := telemetryDB
+
+		try {
+			if this.UseTraffic
+				new TrafficSimulation(this, sessionType, telemetryDB).runSimulation(true)
+			else
+				new VariationSimulation(this, sessionType, telemetryDB).runSimulation(true)
+		}
+		finally {
+			this.iSimulationTelemetryDatabase := false
+		}
 	}
 
 	getPreviousLap(lap) {
@@ -3551,11 +3707,13 @@ class RaceCenter extends ConfigurationItem {
 		consideredTraffic := trafficConsideredEdit
 	}
 
-	getStartConditions(ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		this.syncSessionDatabase()
 
 		lastLap := this.LastLap
+
+		initialStint := 1
 		initialLap := 0
 		initialStintTime := 0
 		initialTyreLaps := 0
@@ -3565,9 +3723,10 @@ class RaceCenter extends ConfigurationItem {
 		initialAvgLapTime := 0.0
 
 		if lastLap {
-			telemetryDB := this.TelemetryDatabase
+			telemetryDB := this.SimulationTelemetryDatabase
 
-			initialLap := lastLap.Nr + 1
+			initialStint := lastLap.Stint.Nr
+			initialLap := lastLap.Nr
 			initialFuelAmount := lastLap.FuelRemaining
 			initialMap := lastLap.Map
 			initialFuelConsumption := lastLap.FuelConsumption
@@ -3658,8 +3817,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		lapTimes := this.TelemetryDatabase.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
-		tyreLapTimes := this.TelemetryDatabase.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		telemetryDB := this.SimulationTelemetryDatabase
+
+		lapTimes := telemetryDB.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		tyreLapTimes := telemetryDB.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
 
 		a := false
 		b := false
@@ -3820,11 +3981,17 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_Delete()
 
+			GuiControl, , driverDropDown, |
+			GuiControl Choose, driverDropDown, 0
+
+			this.iAvailableDrivers := []
+			this.iSelectedDrivers := false
+
 			if this.SessionActive
 				this.loadSessionDrivers()
 			else {
 				GuiControl, , setupDriverDropDownMenu, % "|"
-				GuiControl, , planSetupDriverDropDownMenu, % "|"
+				GuiControl, , planDriverDropDownMenu, % "|"
 			}
 
 			GuiControl, , pitstopDriverDropDownMenu, % "|"
@@ -5743,11 +5910,10 @@ class RaceCenter extends ConfigurationItem {
 	loadDrivers() {
 		this.iDrivers := []
 
-		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"] {
-			name := computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
-
-			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname, Fullname: name, Nr: driver.Nr, ID: driver.ID})
-		}
+		for ignore, driver in this.SessionDatabase.Tables["Driver.Data"]
+			this.createDriver({Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname
+							 , Fullname: computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+							 , Nr: driver.Nr, ID: driver.ID})
 	}
 
 	loadLaps() {
@@ -6331,6 +6497,10 @@ class RaceCenter extends ConfigurationItem {
 			if (laps && !laps.HasKey(A_Index))
 				continue
 
+			if this.SelectedDrivers
+				if !inList(this.SelectedDrivers, this.Stints[values.Stint].Driver.ID)
+					continue
+
 			if !first
 				drawChartFunction .= ",`n"
 
@@ -6813,6 +6983,42 @@ class RaceCenter extends ConfigurationItem {
 				dataY5DropDown := inList(y5Choices, "Tyre.Pressure.Cold.Average") + 1
 				dataY6DropDown := inList(y6Choices, "Tyre.Pressure.Hot.Average") + 1
 			}
+
+			sessionDB := new SessionDatabase()
+			selected := false
+			names := []
+
+			if this.SelectedDrivers
+				selected := this.SelectedDrivers[1]
+
+			for index, id in this.AvailableDrivers {
+				found := false
+
+				for ignore, driver in this.Drivers
+					if (driver.ID = id) {
+						names.Push(driver.Fullname)
+
+						found := true
+
+						break
+					}
+
+				if !found
+					names.Push(values2String(", ", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
+
+				if (id = selected)
+					selected := A_Index
+			}
+
+			if selected is not Integer
+			{
+				selected := false
+
+				this.iSelectedDrivers := false
+			}
+
+			GuiControl, , driverDropDown, % "|" . values2String("|", translate("All"), names*)
+			GuiControl Choose, driverDropDown, % (selected + 1)
 
 			GuiControl Choose, dataXDropDown, %dataXDropDown%
 			GuiControl Choose, dataY1DropDown, %dataY1DropDown%
@@ -8682,8 +8888,8 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 		}
 	}
 
-	createPitstop(id, lap, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		pitstop := new this.TrafficPitstop(this, id, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
+	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		pitstop := new this.TrafficPitstop(this, id, driver, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
 
 		if ((id == 1) && !this.TrafficScenario)
 			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
@@ -8822,7 +9028,7 @@ class TrafficSimulation extends StrategySimulation {
 			return base.compareScenarios(scenario1, scenario2)
 	}
 
-	createScenarios(electronicsData, tyreData, verbose, ByRef progress) {
+	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
 		local strategy
 
 		simulator := false
@@ -8872,6 +9078,7 @@ class TrafficSimulation extends StrategySimulation {
 							  , useLapTimeVariation, useDriverErrors, usePitstops
 							  , overTakeDelta, consideredTraffic)
 
+		initialStint := false
 		initialLap := false
 		initialStintTime := false
 		initialTyreLaps := false
@@ -8880,7 +9087,7 @@ class TrafficSimulation extends StrategySimulation {
 		fuelConsumption := false
 		avgLapTime := false
 
-		this.getStartConditions(initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 
 		if initialLap
 			formationLap := false
@@ -8959,11 +9166,17 @@ class TrafficSimulation extends StrategySimulation {
 									stintLaps := Floor((stintLength * 60) / avgLapTime)
 
 									name := (translate("Initial Conditions - Map ") . map)
+									driverID := false
+									driverName := false
+
+									this.getStintDriver(initialStint, driverID, driverName)
+
+									this.setStintDriver(initialStint, driverID)
 
 									this.setFixedLapTime(avgLapTime)
 
 									try {
-										strategy := this.createStrategy(name)
+										strategy := this.createStrategy(name, driverID)
 
 										currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
 
@@ -8982,7 +9195,7 @@ class TrafficSimulation extends StrategySimulation {
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 
-										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 														, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
 									}
 									finally {
@@ -8995,8 +9208,19 @@ class TrafficSimulation extends StrategySimulation {
 								}
 							}
 
-							if useTelemetryData
-								for ignore, mapData in electronicsData {
+							if useTelemetryData {
+								driverID := false
+								driverName := false
+
+								this.getStintDriver(initialStint, driverID, driverName)
+
+								this.setStintDriver(initialStint, driverID)
+
+								for ignore, mapData in this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
+									this.getStintDriver(initialStint, driverID, driverName)
+
+									this.setStintDriver(initialStint, driverID)
+
 									scenarioMap := mapData["Map"]
 									scenarioFuelConsumption := mapData["Fuel.Consumption"]
 									scenarioAvgLapTime := mapData["Lap.Time"]
@@ -9011,7 +9235,7 @@ class TrafficSimulation extends StrategySimulation {
 
 										name := (translate("Telemetry - Map ") . scenarioMap)
 
-										strategy := this.createStrategy(name)
+										strategy := this.createStrategy(name, driverID)
 
 										currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
 
@@ -9030,7 +9254,7 @@ class TrafficSimulation extends StrategySimulation {
 										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
 
-										this.createStints(strategy, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
 														, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
 
 										scenarios[name . translate(":") . variation] := strategy
@@ -9038,6 +9262,7 @@ class TrafficSimulation extends StrategySimulation {
 										progress += 1
 									}
 								}
+							}
 
 							if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
 								break
@@ -9945,7 +10170,7 @@ choosePlan() {
 
 			timeActual := currentTime
 
-			GuiControl Choose, planSetupDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
+			GuiControl Choose, planDriverDropDownMenu, % (inList(getKeys(rCenter.SessionDrivers), driver) + 1)
 			GuiControl, , planTimeEdit, %timePlanned%
 			GuiControl, , actTimeEdit, %timeActual%
 			GuiControl, , planLapEdit, %lapPlanned%
@@ -9987,7 +10212,7 @@ updatePlanAsync() {
 		}
 
 		if (row > 0) {
-			GuiControlGet planSetupDriverDropDownMenu
+			GuiControlGet planDriverDropDownMenu
 			GuiControlGet planTimeEdit
 			GuiControlGet actTimeEdit
 			GuiControlGet planLapEdit
@@ -9995,10 +10220,10 @@ updatePlanAsync() {
 			GuiControlGet planRefuelEdit
 			GuiControlGet planTyreCompoundDropDown
 
-			if (planSetupDriverDropDownMenu = 1)
+			if (planDriverDropDownMenu = 1)
 				LV_Modify(row, "Col2", "")
 			else
-				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planSetupDriverDropDownMenu - 1])
+				LV_Modify(row, "Col2", getKeys(rCenter.SessionDrivers)[planDriverDropDownMenu - 1])
 
 			FormatTime time, %planTimeEdit%, HH:mm
 
@@ -10201,6 +10426,18 @@ chooseReport() {
 	finally {
 		Gui ListView, %currentListView%
 	}
+}
+
+chooseDriver() {
+	rCenter := RaceCenter.Instance
+	window := rCenter.Window
+
+	Gui %window%:Default
+
+	GuiControlGet driverDropDown
+
+	rCenter.withExceptionHandler(ObjBindMethod(rCenter, "selectDriver"
+							   , (driverDropDown = 1) ? true : rCenter.AvailableDrivers[driverDropDown - 1]))
 }
 
 chooseAxis() {

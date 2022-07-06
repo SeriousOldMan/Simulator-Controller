@@ -348,12 +348,36 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 	}
 
+	toggleTeamServer() {
+		if this.TeamServerEnabled
+			this.disableTeamServer()
+		else
+			this.enableTeamServer()
+	}
+
 	updateTrayLabel(enabled) {
+		static hasTrayMenu := false
+
+		label := translate("Team Server")
+
+		if !hasTrayMenu {
+			callback := ObjBindMethod(this, "toggleTeamServer")
+
+			Menu Tray, Insert, 1&
+			Menu Tray, Insert, 1&, %label%, %callback%
+
+			hasTrayMenu := true
+		}
+
 		if enabled {
+			Menu Tray, Check, %label%
+
 			if !InStr(A_IconTip, translate(" (Team)"))
 				Menu Tray, Tip, % A_IconTip . translate(" (Team)")
 		}
 		else {
+			Menu Tray, Uncheck, %label%
+
 			index := InStr(A_IconTip, translate(" (Team)"))
 
 			if index
@@ -927,7 +951,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					car := getConfigurationValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getConfigurationValue(telemetryData, "Session Data", "Track", "Unknown")
 
-					new SessionDatabase().registerDriverName(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+					new SessionDatabase().registerDriver(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
 
 					stint := this.joinSession(simulator, car, track, lapNumber)
 				}

@@ -344,11 +344,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						keys .= this.NextChoiceHotkey
+						
+					this.sendPitstopCommand(keys)
 				case "Decrease":
+					keys := ""
+					
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						keys .= this.PreviousChoiceHotkey
+						
+					this.sendPitstopCommand(keys)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
 			}

@@ -101,6 +101,9 @@ startRaceSpotter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	remotePID := 0
 	spotterName := "Elisa"
 	spotterLogo := false
@@ -193,6 +196,11 @@ startRaceSpotter() {
 
 		SetTimer checkRemoteProcessAlive, 10000
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

@@ -13,6 +13,7 @@
   9. All new database maintenance page in "Session Database", where you can browse all available data categories. Data can be deleted, exported and imported even from other drivers, with the driver identity preserved for the imported data. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration) for more information.
   10. The information request action "GapToFront" (which was a misnomer) has been renamed to "GapToAhead". See the update notes, if you have used this action in your configuration.
   11. Fixed a couple of glitches in the ACC car models for the "BMW M4 GT3" and the "AMG GT3 2020".
+  12. Added required windows language runtimes to the installation pages of "Simulator Setup".
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-423), if you have used the information request action "GapToFront" in your controller configuration.
 

@@ -74,6 +74,7 @@ Setup Configuration.9=%kResourcesDirectory%Setup\Presets\Stream Deck XL Configur
 Setup Configuration.10=%kResourcesDirectory%Setup\Presets\ACCFullHDTripleNoHDREN\ACC\ <- %kResourcesDirectory%\Screen Images\ACC\*.*
 Setup Configuration.11=%kResourcesDirectory%Setup\Presets\R3EFullHDTripleNoHDREN\R3E\ <- %kResourcesDirectory%\Screen Images\R3E\*.*
 Setup Configuration.12=%kResourcesDirectory%Setup\Plugins <- %kHomeDirectory%Utilities\Plugins
+Setup Configuration.13=%kResourcesDirectory%Setup\Windows Runtimes <- %kHomeDirectory%Utilities\3rd Party\Windows Runtimes
 Build Targets.1=%kConfigDirectory%Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Translations.1=%kTranslationsDirectory%Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en
 Translations.2=%kResourcesDirectory%Templates\Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en

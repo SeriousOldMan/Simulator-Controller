@@ -3,7 +3,7 @@ Version=4.2.3.0-beta
 Target=4.2.3.0-release
 Date=07/06/2022
 Download=https://www.dropbox.com/s/8q5cbw8jrrgc9gv/Simulator%20Controller%204.2.3.0-beta.zip?dl=1
-Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup"
+Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup", New car models for "Setup Advisor"
 [Release]
 Version=4.2.2.0-release
 Date=07/01/2022

@@ -14,6 +14,13 @@
   10. The information request action "GapToFront" (which was a misnomer) has been renamed to "GapToAhead". See the update notes, if you have used this action in your configuration.
   11. Fixed a couple of glitches in the ACC car models for the "BMW M4 GT3" and the "AMG GT3 2020".
   12. Added required windows language runtimes to the installation pages of "Simulator Setup".
+  13. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - Ferrari LaFerrari
+        - Ferrari F2004
+      - Assetto Corsa Competizione
+        - Porsche 911II GT3 Cup
+        - Reiter R-EX GT3
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-423), if you have used the information request action "GapToFront" in your controller configuration.
 

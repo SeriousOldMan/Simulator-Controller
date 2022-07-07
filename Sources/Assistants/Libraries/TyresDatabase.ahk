@@ -341,12 +341,17 @@ class TyresDatabase extends SessionDatabase {
 
 		this.requireDatabase(simulator, car, track)
 
-		this.iDatabase.add("Tyres.Pressures", {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.iDatabase.add("Tyres.Pressures", {Driver: driver, Weather: weather
+											 , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , Compound: compound, "Compound.Color": compoundColor
-											 , "Tyre.Pressure.Cold.Front.Left": coldPressures[1], "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
-											 , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3], "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
-											 , "Tyre.Pressure.Hot.Front.Left": hotPressures[1], "Tyre.Pressure.Hot.Front.Right": hotPressures[2]
-											 , "Tyre.Pressure.Hot.Rear.Left": hotPressures[3], "Tyre.Pressure.Hot.Rear.Right": hotPressures[4]}, flush)
+											 , "Tyre.Pressure.Cold.Front.Left": coldPressures[1]
+											 , "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
+											 , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3]
+											 , "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
+											 , "Tyre.Pressure.Hot.Front.Left": hotPressures[1]
+											 , "Tyre.Pressure.Hot.Front.Right": hotPressures[2]
+											 , "Tyre.Pressure.Hot.Rear.Left": hotPressures[3]
+											 , "Tyre.Pressure.Hot.Rear.Right": hotPressures[4]}, flush)
 
 		tyres := ["FL", "FR", "RL", "RR"]
 		types := ["Cold", "Hot"]

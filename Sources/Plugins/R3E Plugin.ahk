@@ -717,7 +717,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startR3E() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kR3EPlugin).Simulator, "Simulator Splash Images\R3E Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kR3EPlugin).Simulator
+													 , "Simulator Splash Images\R3E Splash.jpg")
 }
 
 

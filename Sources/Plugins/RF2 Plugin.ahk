@@ -292,7 +292,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startRF2() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).Simulator, "Simulator Splash Images\RF2 Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).Simulator
+													 , "Simulator Splash Images\RF2 Splash.jpg")
 }
 
 

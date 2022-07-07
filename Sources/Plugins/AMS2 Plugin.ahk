@@ -354,7 +354,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startAMS2() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kAMS2Plugin).Simulator, "Simulator Splash Images\AMS2 Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kAMS2Plugin).Simulator
+													 , "Simulator Splash Images\AMS2 Splash.jpg")
 }
 
 

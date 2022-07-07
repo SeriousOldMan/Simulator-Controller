@@ -24,4 +24,5 @@
 #Include ..\Plugins\IRC Plugin.ahk
 #Include ..\Plugins\R3E Plugin.ahk
 #Include ..\Plugins\RF2 Plugin.ahk
+#Include ..\Plugins\PCARS2 Plugin.ahk
 #Include ..\Plugins\RST Plugin.ahk

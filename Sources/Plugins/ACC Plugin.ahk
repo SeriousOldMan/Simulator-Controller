@@ -1827,7 +1827,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startACC() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACCPlugin).Simulator, "Simulator Splash Images\ACC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACCPlugin).Simulator
+													 , "Simulator Splash Images\ACC Splash.jpg")
 }
 
 stopACC() {

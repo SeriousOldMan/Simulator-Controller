@@ -262,7 +262,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startIRC() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator, "Simulator Splash Images\IRC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator
+													 , "Simulator Splash Images\IRC Splash.jpg")
 }
 
 

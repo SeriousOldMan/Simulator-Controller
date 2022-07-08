@@ -35,7 +35,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
-	iChangeTyresChosen := 0
+	iTyreCompoundChosen := 0
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
@@ -222,15 +222,15 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.deselectPitstopOption(option)
 			}
 			else if (option = "Tyre Compound") {
-				this.iChangeTyresChosen += 1
+				this.iTyreCompoundChosen += 1
 
-				if (this.iChangeTyresChosen > 3)
-					this.iChangeTyresChosen := 0
+				if (this.iTyreCompoundChosen > 3)
+					this.iTyreCompoundChosen := 0
 
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				if this.iChangeTyresChosen
-					this.dialPitstopOption("Tyre Compound", "Increase", this.iChangeTyresChosen)
+				if this.iTyreCompoundChosen
+					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
 				this.deselectPitstopOption("Tyre Compound")
 			}
@@ -288,13 +288,13 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
 				if (compound = "Dry")
-					this.iChangeTyresChosen := 1
+					this.iTyreCompoundChosen := 1
 				else if (compound = "Wet")
-					this.iChangeTyresChosen := 2
+					this.iTyreCompoundChosen := 2
 				else
-					this.iChangeTyresChosen := 0
+					this.iTyreCompoundChosen := 0
 
-				this.dialPitstopOption("Tyre Compound", "Increase", this.iChangeTyresChosen)
+				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
 				this.deselectPitstopOption("Tyre Compound")
 			}
@@ -333,7 +333,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		base.updateSessionState(sessionState)
 
 		if (sessionState == kSessionFinished) {
-			this.iChangeTyresChosen := 0
+			this.iTyreCompoundChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}

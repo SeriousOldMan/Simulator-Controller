@@ -35,7 +35,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
-	iChangeTyresChosen := 0
+	iTyreCompoundChosen := 0
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
@@ -85,7 +85,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
 
@@ -137,7 +137,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	closePitstopMFD(option := false) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if (option = "Change Tyres")
+			if (option = "Tyre Compound")
 				this.sendPitstopCommand(this.PreviousOptionHotkey)
 			else if (option = "Refuel") {
 				this.sendPitstopCommand(this.PreviousOptionHotkey)
@@ -169,7 +169,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.sendPitstopCommand(this.NextOptionHotkey)
 			this.sendPitstopCommand(this.NextChoiceHotkey)
 
-			if (option = "Change Tyres") {
+			if (option = "Tyre Compound") {
 				this.sendPitstopCommand(this.NextOptionHotkey)
 
 				return true
@@ -224,20 +224,20 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 				this.closePitstopMFD("Refuel")
 			}
-			else if (option = "Change Tyres") {
-				this.iChangeTyresChosen += 1
+			else if (option = "Tyre Compound") {
+				this.iTyreCompoundChosen += 1
 
-				if (this.iChangeTyresChosen > 2)
-					this.iChangeTyresChosen := 0
+				if (this.iTyreCompoundChosen > 3)
+					this.iTyreCompoundChosen := 0
 
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				if this.iChangeTyresChosen
-					this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+				if this.iTyreCompoundChosen
+					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
 				Sleep 2000
 
-				this.closePitstopMFD("Change Tyres")
+				this.closePitstopMFD("Tyre Compound")
 			}
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", "Decrease", 4)
@@ -295,21 +295,21 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
-			if this.selectPitstopOption("Change Tyres") {
-				this.dialPitstopOption("Change Tyres", "Decrease", 10)
+			if this.selectPitstopOption("Tyre Compound") {
+				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
 				if (compound = "Dry")
-					this.iChangeTyresChosen := 1
+					this.iTyreCompoundChosen := 1
 				else if (compound = "Wet")
-					this.iChangeTyresChosen := 2
+					this.iTyreCompoundChosen := 2
 				else
-					this.iChangeTyresChosen := 0
+					this.iTyreCompoundChosen := 0
 
-				this.dialPitstopOption("Change Tyres", "Increase", this.iChangeTyresChosen)
+				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
 				Sleep 2000
 
-				this.closePitstopMFD("Change Tyres")
+				this.closePitstopMFD("Tyre Compound")
 			}
 		}
 	}
@@ -336,7 +336,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		base.updateSessionState(sessionState)
 
 		if (sessionState == kSessionFinished) {
-			this.iChangeTyresChosen := 0
+			this.iTyreCompoundChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}

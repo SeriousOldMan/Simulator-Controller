@@ -1023,7 +1023,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
-		if this.KnowledgeBase {
+		local knowledgeBase := this.KnowledgeBase
+
+		if knowledgeBase {
 			if (this.Session == kSessionRace) {
 				Process Exist, Race Strategist.exe
 

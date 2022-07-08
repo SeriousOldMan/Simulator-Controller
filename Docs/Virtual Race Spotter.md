@@ -109,20 +109,20 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 |
-| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- |
-| Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Behind Alert              | Yes           | Yes                        | Yes             | No (2)  | Yes                        | Yes       |
-| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       |
-| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       |
-| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        |
-| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        |
-| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       |
-| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
-| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       |
+| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
+| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
+| Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Behind Alert              | Yes           | Yes                        | Yes             | No (2)  | Yes                        | Yes       | Yes            |
+| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        | No             |
+| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
+| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 
 ##### Notes
 

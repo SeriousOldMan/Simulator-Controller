@@ -242,7 +242,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else {
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
 				if ((simulatorCode = name) || (simulatorCode = code))
 					return name
 
@@ -264,7 +264,7 @@ class SessionDatabase extends ConfigurationItem {
 						return simulatorName
 
 				for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-								 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+								 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
 					if ((simulatorName = name) || (simulatorName = code))
 						return code
 
@@ -281,7 +281,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (simulators.Length() = 0)
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2"}
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
 				if FileExist(kDatabaseDirectory . "User\" . code)
 					simulators.Push(name)
 

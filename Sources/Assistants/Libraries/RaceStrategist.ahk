@@ -854,8 +854,10 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
+			lastLap := knowledgeBase.getValue("Lap", 0)
+
 			if (shutdown && review && this.RaceReview && (this.Session = kSessionRace)
-						 && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+						 && (lastLap > this.LearningLaps)) {
 				this.finishSessionWithReview(shutdown)
 
 				return
@@ -868,7 +870,7 @@ class RaceStrategist extends RaceAssistant {
 			if (shutdown && !review && !ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+			if (shutdown && (lastLap > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
 				if this.Listener {

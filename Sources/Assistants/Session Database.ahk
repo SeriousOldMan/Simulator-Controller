@@ -1185,6 +1185,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			row := LV_GetNext(0, "C")
 
 			drivers := {}
+			schemas := {}
 			progress := 0
 
 			while row {
@@ -1216,6 +1217,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						sourceDB := new TelemetryDatabase(simulator, car, track).Database
 						targetDB := new Database(targetDirectory, kTelemetrySchemas)
 
+						schemas["Electronics"] := kTelemetrySchemas["ELectronics"]
+						schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+
 						for ignore, entry in sourceDB.query("Electronics", {Where: {Driver: driver}})
 							targetDB.add("Electronics", entry, true)
 
@@ -1224,6 +1228,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Pressures"):
 						sourceDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
 						targetDB := new Database(targetDirectory, kTyresSchemas)
+
+						schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
+						schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
 
 						for ignore, entry in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
 							targetDB.add("Tyres.Pressures", entry, true)
@@ -1259,6 +1266,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			for id, name in drivers
 				setConfigurationValue(info, "Driver", id, name)
 
+			for schema, fields in schemas
+				setConfigurationValue(info, "Schema", schema, values2String(",", fields*))
+
 			writeConfiguration(directory . "\Export.info", info)
 		}
 		finally {
@@ -1286,6 +1296,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %progressWindow%:+Owner%window%
 			Gui %window%:Default
 			Gui %window%:+Disabled
+
+			schemas := {}
+
+			schemas["Electronics"] := kTelemetrySchemas["Electronics"]
+			schemas["Tyres"] := kTelemetrySchemas["Tyres"]
+			schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
+			schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
+
+			for schema, fields in getConfigurationSectionValues(info, "Schema", Object())
+				schemas[schema] := string2Values(",", fields)
 
 			try {
 				for id, name in getConfigurationSectionValues(info, "Driver", Object())
@@ -1316,27 +1336,51 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if selection.HasKey(key . "Telemetry") {
 							driver := selection[key . "Telemetry"]
 
-							sourceDB := new Database(sourceDirectory . "\", kTelemetrySchemas)
+							sourceDB := new Database(sourceDirectory . "\", schemas)
 							targetDB := new TelemetryDatabase(simulator, car, track).Database
 
-							for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}})
-								targetDB.add("Electronics", row, true)
+							for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
+								data := Object()
 
-							for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}})
-								targetDB.add("Tyres", row, true)
+								for ignore, field in schemas["Electronics"]
+									data[field] := row[field]
+
+								targetDB.add("Electronics", data, true)
+							}
+
+							for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
+								data := Object()
+
+								for ignore, field in schemas["Tyres"]
+									data[field] := row[field]
+
+								targetDB.add("Tyres", data, true)
+							}
 						}
 
 						if selection.HasKey(key . "Pressures") {
 							driver := selection[key . "Pressures"]
 
-							sourceDB := new Database(sourceDirectory . "\", kTyresSchemas)
+							sourceDB := new Database(sourceDirectory . "\", schemas)
 							targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
 
-							for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}})
-								targetDB.add("Tyres.Pressures", row, true)
+							for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
+								data := Object()
 
-							for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}})
-								targetDB.add("Tyres.Pressures.Distribution", row, true)
+								for ignore, field in schemas["Tyres.Pressures"]
+									data[field] := row[field]
+
+								targetDB.add("Tyres.Pressures", data, true)
+							}
+
+							for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
+								data := Object()
+
+								for ignore, field in schemas["Tyres.Pressures.Distribution"]
+									data[field] := row[field]
+
+								targetDB.add("Tyres.Pressures.Distribution", data, true)
+							}
 						}
 
 						if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {

@@ -342,7 +342,10 @@ namespace ACSHMProvider
 
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
             Console.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
-            
+
+            for (int id = 0; id < cars.numVehicles; id++)
+                Console.WriteLine((id + 1) + "=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+
             Console.WriteLine("[Weather Data]");
 
             Console.WriteLine("Temperature=" + physics.AirTemp);

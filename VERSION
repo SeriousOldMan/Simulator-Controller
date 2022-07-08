@@ -3,7 +3,7 @@ Version=4.2.4.0-dev
 Target=4.2.4.0-release
 Date=07/08/2022
 Download=
-Changes=Full integration of Project CARS 2, Schema specifiers for data import / export, Preset for configuration patch in "Simulator Setup"
+Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup"
 [Release]
 Version=4.2.3.0-release
 Date=07/08/2022

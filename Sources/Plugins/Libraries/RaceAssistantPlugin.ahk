@@ -1099,6 +1099,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		data := readSimulatorData(code)
 
+		sessionDB := new SessionDatabase()
+		simulator := this.Simulator.Code
+		track := getConfigurationValue(data, "Session Data", "Track")
+
+		if !sessionDB.hasTrackMap(simulator, track)
+			Loop {
+				coordinates := getConfigurationValue(data, "Track Data", A_Index, false)
+
+				if !coordinates
+					break
+				else
+					sessionDB.updateTrackMap(simulator, track, string2Values(",", coordinates))
+			}
+
+
 		this.updateSessionData(data)
 
 		if telemetryData

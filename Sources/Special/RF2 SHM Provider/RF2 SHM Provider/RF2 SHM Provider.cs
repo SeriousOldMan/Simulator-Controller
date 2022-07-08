@@ -247,9 +247,16 @@ namespace RF2SHMProvider {
 
 			Console.WriteLine("[Track Data]");
 
-			if (connected) {
+			if (connected)
+			{
 				Console.WriteLine("Grip=Optimum");
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
+
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
+					var vehicle = scoring.mVehicles[i];
+
+					Console.WriteLine((i + 1) + "=" + vehicle.mPos.x + "," + vehicle.mPos.z);
+				}
 			}
 
 			Console.WriteLine("[Weather Data]");

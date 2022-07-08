@@ -1095,24 +1095,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		static sessionDB := false
+
 		code := this.Simulator.Code
 
 		data := readSimulatorData(code)
-
-		sessionDB := new SessionDatabase()
-		simulator := this.Simulator.Code
-		track := getConfigurationValue(data, "Session Data", "Track")
-
-		if !sessionDB.hasTrackMap(simulator, track)
-			Loop {
-				coordinates := getConfigurationValue(data, "Track Data", A_Index, false)
-
-				if !coordinates
-					break
-				else
-					sessionDB.updateTrackMap(simulator, track, string2Values(",", coordinates))
-			}
-
 
 		this.updateSessionData(data)
 
@@ -1125,6 +1112,23 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if (positionsData && !IsObject(positionsData))
 			positionsData := newConfiguration()
+
+		if (getConfigurationValue(data, "Session Data", "Active", false) && !getConfigurationValue(data, "Session Data", "Paused", true)) {
+			track := getConfigurationValue(data, "Session Data", "Track")
+
+			if !sessionDB
+				sessionDB := new SessionDatabase()
+
+			if !sessionDB.hasTrackMap(code, track)
+				Loop {
+					coordinates := getConfigurationValue(data, "Track Data", A_Index, false)
+
+					if !coordinates
+						break
+					else
+						sessionDB.updateTrackMap(code, track, string2Values(",", coordinates)*)
+				}
+		}
 
 		return data
 	}

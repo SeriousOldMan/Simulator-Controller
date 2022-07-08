@@ -122,17 +122,17 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	hasTrackMap(simulator, track) {
-		return false
+		return FileExist(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
 	}
 
 	updateTrackMap(simulator, track, coordinateX, coordinateY) {
-		directory := (kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks")
+		directory := (kTempDirectory . "Tracks\" . this.getSimulatorCode(simulator))
 
 		FileCreateDir %directory%
 
-		text := (Round(coordinateX, 3) . "," . Round(coordinateY, 3))
+		coordinates := (Round(coordinateX, 3) . "," . Round(coordinateY, 3) . "`n")
 
-		FileAppend %text%, %directory%\%track%.map
+		FileAppend %coordinates%, %directory%\%track%.data
 	}
 
 	getAllDrivers(simulator, names := false) {

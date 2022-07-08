@@ -621,7 +621,37 @@ namespace ACSHMSpotter {
 			// No support by Assetto Corsa
 		}
 
-		public void Run()
+		float initialX = 0.0f;
+		float initialY = 0.0f;
+		int coordCount = 0;
+
+		bool writeCoordinates() {
+			double velocityX = physics.LocalVelocity[0];
+			double velocityY = physics.LocalVelocity[2];
+			double velocityZ = physics.LocalVelocity[1];
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			{
+				int carID = 0;
+
+				float coordinateX = cars.cars[carID].worldPosition.x;
+				float coordinateY = cars.cars[carID].worldPosition.z;
+
+				Console.WriteLine(coordinateX + "," + coordinateY);
+
+				if (initialX == 0.0)
+				{
+					initialX = coordinateX;
+					initialY = coordinateY;
+				}
+				else if (coordCount++ > 1000 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+					return false;
+			}
+
+			return true;
+		}
+
+		public void Run(bool mapTrack)
 		{
 			bool running = false;
 
@@ -632,44 +662,52 @@ namespace ACSHMSpotter {
 
 			while (true)
 			{
-				physics = ReadPhysics();
-				graphics = ReadGraphics();
-				staticInfo = ReadStaticInfo();
-				cars = ReadCars();
-
-				if (!running)
-					running = ((lastTime != graphics.SessionTimeLeft) || (countdown-- <= 0) || (physics.SpeedKmh >= 200));
-
-				if (running)
+				if (mapTrack)
 				{
-					if (physics.SpeedKmh > 120)
-						safety = 200;
-
-					if ((safety-- <= 0) && (waitYellowFlagState > 0))
-						running = false;
+					if (!writeCoordinates())
+						break;
 				}
-				else if ((safety <= 0) && (physics.SpeedKmh > 120))
+				else
 				{
-					running = true;
-					safety = 200;
-				}
+					physics = ReadPhysics();
+					graphics = ReadGraphics();
+					staticInfo = ReadStaticInfo();
+					cars = ReadCars();
 
-				if (running)
-				{
-					if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
+					if (!running)
+						running = ((lastTime != graphics.SessionTimeLeft) || (countdown-- <= 0) || (physics.SpeedKmh >= 200));
+
+					if (running)
 					{
-						if (!checkFlagState() && !checkPositions())
-							checkPitWindow();
+						if (physics.SpeedKmh > 120)
+							safety = 200;
+
+						if ((safety-- <= 0) && (waitYellowFlagState > 0))
+							running = false;
 					}
-					else
+					else if ((safety <= 0) && (physics.SpeedKmh > 120))
 					{
-						lastSituation = CLEAR;
-						carBehind = false;
-						carBehindLeft = false;
-						carBehindRight = false;
-						carBehindReported = false;
+						running = true;
+						safety = 200;
+					}
 
-						lastFlagState = 0;
+					if (running)
+					{
+						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
+						{
+							if (!checkFlagState() && !checkPositions())
+								checkPitWindow();
+						}
+						else
+						{
+							lastSituation = CLEAR;
+							carBehind = false;
+							carBehindLeft = false;
+							carBehindRight = false;
+							carBehindReported = false;
+
+							lastFlagState = 0;
+						}
 					}
 				}
 

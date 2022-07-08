@@ -1558,6 +1558,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	supportsTrackMap() {
+		return true
+	}
+
 	supportsSetupImport() {
 		return true
 	}

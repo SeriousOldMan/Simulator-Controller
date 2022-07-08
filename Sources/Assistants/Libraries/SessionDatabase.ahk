@@ -121,6 +121,15 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
+	prepareDatabase(simulator, car, track) {
+		if (simulator && car && track) {
+			simulatorCode := this.getSimulatorCode(simulator)
+
+			if (simulatorCode && (car != true) && (track != true))
+				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		}
+	}
+
 	getAllDrivers(simulator, names := false) {
 		if simulator {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
@@ -206,13 +215,15 @@ class SessionDatabase extends ConfigurationItem {
 			return ["John Doe (JD)"]
 	}
 
-	prepareDatabase(simulator, car, track) {
-		if (simulator && car && track) {
-			simulatorCode := this.getSimulatorCode(simulator)
+	hasTrackMap(simulator, track) {
+		return FileExist(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
+	}
 
-			if (simulatorCode && (car != true) && (track != true))
-				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
-		}
+	getTrackMap(simulator, track) {
+		if this.hasTrackMap(simulator, track)
+			return readConfiguration((kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map"))
+		else
+			return false
 	}
 
 	getEntries(filter := "*.*", option := "D") {

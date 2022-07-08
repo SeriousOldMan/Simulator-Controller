@@ -663,6 +663,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
+	supportsTrackMap() {
+		return false
+	}
+
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return

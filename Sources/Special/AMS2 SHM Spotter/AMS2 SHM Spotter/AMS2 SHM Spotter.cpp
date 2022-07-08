@@ -407,12 +407,46 @@ void checkPitWindow(const SharedMemory* sharedData) {
 		}
 }
 
+float initialX = 0.0;
+float initialY = 0.0;
+int coordCount = 0;
+
+bool writeCoordinates(const SharedMemory* sharedData) {
+	float velocityX = sharedData->mWorldVelocity[VEC_X];
+	float velocityY = sharedData->mWorldVelocity[VEC_Z];
+	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		float angle = vectorAngle(velocityX, velocityY);
+
+		int carID = sharedData->mViewedParticipantIndex;
+
+		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
+		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+
+		printf("%f,%f\n", coordinateX, coordinateY);
+
+		if (initialX == 0.0) {
+			initialX = coordinateX;
+			initialY = coordinateY;
+		}
+		else if (coordCount++ > 1000 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+			return false;
+	}
+
+	return true;
+}
+
 int main(int argc, char* argv[]) {
 	// Open the memory-mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
 
 	const SharedMemory* sharedData = NULL;
 	SharedMemory* localCopy = NULL;
+	bool mapTrack = false;
+
+	if (argc > 1 && argv[1] == "-Map")
+		mapTrack = true;
 
 	if (fileHandle != NULL) {
 		sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
@@ -433,7 +467,6 @@ int main(int argc, char* argv[]) {
 		unsigned int indexChange(0);
 
 		bool running = false;
-
 		int countdown = 400;
 
 		while (true)
@@ -456,22 +489,28 @@ int main(int argc, char* argv[]) {
 				continue;
 			}
 			
-			if (!running)
-				running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
+			if (mapTrack) {
+				if (!writeCoordinates(sharedData))
+					break;
+			}
+			else {
+				if (!running)
+					running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
 
-			if (running) {
-				if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-					if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-						checkPitWindow(localCopy);
-				}
-				else {
-					lastSituation = CLEAR;
-					carBehind = false;
-					carBehindLeft = false;
-					carBehindRight = false;
-					carBehindReported = false;
+				if (running) {
+					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
+						if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+							checkPitWindow(localCopy);
+					}
+					else {
+						lastSituation = CLEAR;
+						carBehind = false;
+						carBehindLeft = false;
+						carBehindRight = false;
+						carBehindReported = false;
 
-					lastFlagState = 0;
+						lastFlagState = 0;
+					}
 				}
 			}
 

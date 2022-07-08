@@ -563,6 +563,8 @@ bool writeCoordinates() {
 
 		float coordinateX = gf->carCoordinates[carID][0];
 		float coordinateY = gf->carCoordinates[carID][2];
+		
+		cout << coordinateX << "," << coordinateY << endl;
 
 		if (initialX == 0.0) {
 			initialX = coordinateX;
@@ -570,11 +572,9 @@ bool writeCoordinates() {
 		}
 		else if (coordCount++ > 1000 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
-
-		cout << coordinateX << "," << coordinateY << endl;
-
-		return true;
 	}
+
+	return true;
 }
 
 int main(int argc, char* argv[])
@@ -597,27 +597,27 @@ int main(int argc, char* argv[])
 	int safety = 200;
 
 	while (true) {
-		if (!running)
-			running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
-
-		if (running) {
-			if (pf->speedKmh > 120)
-				safety = 200;
-
-			if ((safety-- <= 0) && !waitYellowFlagState)
-				running = false;
+		if (mapTrack) {
+			if (!writeCoordinates())
+				break;
 		}
-		else if ((safety <= 0) && (pf->speedKmh > 120)) {
-			running = true;
-			safety = 200;
-		}
+		else {
+			if (!running)
+				running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
 
-		if (running) {
-			if (mapTrack) {
-				if (!writeCoordinates())
-					return 0;
+			if (running) {
+				if (pf->speedKmh > 120)
+					safety = 200;
+
+				if ((safety-- <= 0) && !waitYellowFlagState)
+					running = false;
 			}
-			else {
+			else if ((safety <= 0) && (pf->speedKmh > 120)) {
+				running = true;
+				safety = 200;
+			}
+
+			if (running) {
 				if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
 					sessionDuration = gf->sessionTimeLeft;
 

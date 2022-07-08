@@ -617,7 +617,52 @@ namespace RF2SHMSpotter {
 			// No support by rFactor 2
 		}
 
-		public void Run() {
+		double initialX = 0.0d;
+		double initialY = 0.0d;
+		int coordCount = 0;
+
+		bool writeCoordinates(ref rF2VehicleScoring playerScoring)
+		{
+			double lVelocityX = playerScoring.mLocalVel.x;
+			double lVelocityY = playerScoring.mLocalVel.y;
+			double lVelocityZ = playerScoring.mLocalVel.z;
+
+			int carID = 0;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (scoring.mVehicles[i].mIsPlayer != 0)
+				{
+					carID = i;
+
+					break;
+				}
+
+			var ori = playerScoring.mOri;
+
+			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			{
+				double coordinateX = playerScoring.mPos.x;
+				double coordinateY = playerScoring.mPos.y;
+				
+				Console.WriteLine(coordinateX + "," + coordinateY);
+
+				if (initialX == 0.0)
+				{
+					initialX = coordinateX;
+					initialY = coordinateY;
+				}
+				else if (coordCount++ > 1000 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+					return false;
+			}
+
+			return true;
+		}
+
+		public void Run(bool mapTrack) {
 			bool running = false;
 			int countdown = 4000;
 
@@ -638,27 +683,35 @@ namespace RF2SHMSpotter {
 					}
 
 					if (connected) {
-						if (!running)
-							if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
-								running = true;
+						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
-						if (running)
+						if (mapTrack)
 						{
-							rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+							if (!writeCoordinates(ref playerScoring))
+								break;
+						}
+						else
+						{
+							if (!running)
+								if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
+									running = true;
 
-							if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-								playerScoring.mPitState < (byte)Entering)
+							if (running)
 							{
-								if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-									checkPitWindow(ref playerScoring);
-							}
-							else
-							{
-								lastSituation = CLEAR;
-								carBehind = false;
-								carBehindReported = false;
+								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+									playerScoring.mPitState < (byte)Entering)
+								{
+									if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+										checkPitWindow(ref playerScoring);
+								}
+								else
+								{
+									lastSituation = CLEAR;
+									carBehind = false;
+									carBehindReported = false;
 
-								lastFlagState = 0;
+									lastFlagState = 0;
+								}
 							}
 						}
 

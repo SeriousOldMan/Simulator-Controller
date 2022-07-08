@@ -19,7 +19,7 @@ namespace RF2SHMSpotter {
         static void Main(string[] args) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            new SHMSpotter().Run();
+            new SHMSpotter().Run(args.Length > 0 && args[0] == "-Map");
         }
     }
 }

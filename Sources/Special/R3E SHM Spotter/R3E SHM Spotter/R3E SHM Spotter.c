@@ -548,12 +548,51 @@ void checkPitWindow() {
 	}
 }
 
-int main()
+float initialX = 0.0;
+float initialY = 0.0;
+int coordCount = 0;
+
+BOOL writeCoordinates(int playerID) {
+	r3e_float64 velocityX = map_buffer->player.velocity.x;
+	r3e_float64 velocityY = map_buffer->player.velocity.z;
+	r3e_float64 velocityZ = map_buffer->player.velocity.y;
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int index = 0;
+
+		for (int id = 0; id < map_buffer->num_cars; id++)
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+				index = id;
+
+				break;
+			}
+
+		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
+		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+
+		printf("%f,%f\n", coordinateX, coordinateY);
+
+		if (initialX == 0.0) {
+			initialX = coordinateX;
+			initialY = coordinateY;
+		}
+		else if (coordCount++ > 1000 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+int main(int argc, char* argv[])
 {
     BOOL mapped_r3e = FALSE;
 	int playerID = 0;
 	BOOL running = FALSE;
 	int countdown = 4000;
+	BOOL mapTrack = FALSE;
+
+	if (argc > 1 && strcmp(argv[1], "-Map") == 0)
+		mapTrack = TRUE;
 
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
@@ -563,22 +602,30 @@ int main()
 				playerID = getPlayerID();
 			}
 
-		if (mapped_r3e && !running)
-			running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));
-
-		if (running) {
-			if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-				if (!checkFlagState() && !checkPositions(playerID))
-					checkPitWindow();
+		if (mapped_r3e) {
+			if (mapTrack) {
+				if (!writeCoordinates(playerID))
+					break;
 			}
 			else {
-				lastSituation = CLEAR;
-				carBehind = FALSE;
-				carBehindLeft = FALSE;
-				carBehindRight = FALSE;
-				carBehindReported = FALSE;
+				if (!running)
+					running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));
 
-				lastFlagState = 0;
+				if (running) {
+					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
+						if (!checkFlagState() && !checkPositions(playerID))
+							checkPitWindow();
+					}
+					else {
+						lastSituation = CLEAR;
+						carBehind = FALSE;
+						carBehindLeft = FALSE;
+						carBehindRight = FALSE;
+						carBehindReported = FALSE;
+
+						lastFlagState = 0;
+					}
+				}
 			}
 		}
         

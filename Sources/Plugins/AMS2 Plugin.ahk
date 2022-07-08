@@ -93,6 +93,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	supportsTrackMap() {
+		return true
+	}
+
 	sendPitstopCommand(command) {
 		switch this.iCommandMode {
 			case "Event":

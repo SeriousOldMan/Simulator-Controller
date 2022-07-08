@@ -200,6 +200,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	supportsTrackMap() {
+		return true
+	}
+
 	supportsSetupImport() {
 		return true
 	}

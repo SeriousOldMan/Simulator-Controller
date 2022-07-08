@@ -541,6 +541,7 @@ void checkPitWindow() {
 
 float initialX = 0.0;
 float initialY = 0.0;
+int coordCount = 0;
 
 bool writeCoordinates() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -567,7 +568,7 @@ bool writeCoordinates() {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (coordCount++ > 1000 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
 
 		cout << coordinateX << "," << coordinateY << endl;

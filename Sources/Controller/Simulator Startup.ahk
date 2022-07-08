@@ -369,6 +369,7 @@ launchPad(command := false, arguments*) {
 
 	static toolTips
 	static executables
+	static icons
 
 	static Startup
 	static RaceReports
@@ -414,7 +415,7 @@ launchPad(command := false, arguments*) {
 		Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-			ExitApp 0
+		 	ExitApp 0
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
@@ -430,6 +431,7 @@ launchPad(command := false, arguments*) {
 		result := false
 		toolTips := {}
 		executables := {}
+		icons := {}
 
 		toolTips["Startup"] := "Startup: Launches all components to be ready for the track."
 
@@ -457,6 +459,19 @@ launchPad(command := false, arguments*) {
 		executables["RaceSettings"] := "Race Settings.exe"
 		executables["SessionDatabase"] := "Session Database.exe"
 		executables["SetupAdvisor"] := "Setup Advisor.exe"
+
+		icons["Startup"] := kIconsDirectory . "Startup.ico"
+		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
+		icons["StrategyWorkbench"] := kIconsDirectory . "Dashboard.ico"
+		icons["RaceCenter"] := kIconsDirectory . "Console.ico"
+		icons["ServerAdministration"] := kIconsDirectory . "Server Administration.ico"
+		icons["SimulatorSetup"] := kIconsDirectory . "Configuration Wand.ico"
+		icons["SimulatorConfiguration"] := kIconsDirectory . "Configuration.ico"
+		icons["SimulatorDownload"] := kIconsDirectory . "Installer.ico"
+		icons["SimulatorSettings"] := kIconsDirectory . "Settings.ico"
+		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
+		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
+		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
 
 		Gui LP:Default
 
@@ -555,8 +570,7 @@ openLaunchPadDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
 }
 
-WM_MOUSEMOVE()
-{
+WM_MOUSEMOVE() {
     static CurrControl
 	static PrevControl := false
 
@@ -564,7 +578,7 @@ WM_MOUSEMOVE()
 
 	if ((CurrControl != PrevControl) && !InStr(CurrControl, " "))
     {
-        ToolTip  ; Turn off any previous tooltip.
+		ToolTip
 
 		SetTimer RemoveToolTip, Off
         SetTimer DisplayToolTip, 1000
@@ -580,7 +594,7 @@ WM_MOUSEMOVE()
 		text := launchPad("ToolTip", CurrControl)
 
 		if text {
-			ToolTip %text%  ; The leading percent sign tell it to use an expression.
+			ToolTip %text%
 
 			SetTimer RemoveToolTip, 10000
 		}

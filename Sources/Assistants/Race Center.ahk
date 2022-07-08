@@ -2295,6 +2295,37 @@ class RaceCenter extends ConfigurationItem {
 				lastTime := 0
 
 				Loop % LV_GetCount()
+				{
+					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index -1].DriverName)
+
+					forName := false
+					surName := false
+					nickName := false
+
+					parseDriverName(driver, forName, surName, nickName)
+
+					found := false
+
+					for ignore, candidate in getKeys(this.SessionDrivers) {
+						sForName := false
+						sSurName := false
+						sNickName := false
+
+						parseDriverName(candidate, sForName, sSurName, sNickName)
+
+						if ((sForName = forName) && (sSurName = surName)) {
+							found := true
+							driver := candidate
+
+							break
+						}
+					}
+
+					if !found
+						driver := "-"
+
+					LV_Modify(A_Index, "Col2", driver)
+
 					if (A_Index > 1) {
 						pitstop := pitstops[A_Index - 1]
 
@@ -2306,40 +2337,17 @@ class RaceCenter extends ConfigurationItem {
 						EnvAdd currentTime, time, Seconds
 						FormatTime time, %currentTime%, HH:mm
 
-						driver := pitstop.DriverName
-
-						forName := false
-						surName := false
-						nickName := false
-
-						parseDriverName(driver, forName, surName, nickName)
-
-						found := false
-
-						for ignore, candidate in getKeys(this.SessionDrivers) {
-							sForName := false
-							sSurName := false
-							sNickName := false
-
-							parseDriverName(candidate, sForName, sSurName, sNickName)
-
-							if ((sForName = forName) && (sSurName = surName)) {
-								found := true
-								driver := candidate
-
-								break
-							}
-						}
-
-						if !found
-							driver := "-"
-
-						LV_Modify(A_Index, "Col2", driver)
 						LV_Modify(A_Index, "Col3", time)
 						LV_Modify(A_Index, "Col5", pitstop.Lap)
 						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : pitstop.RefuelAmount)
 						LV_Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 					}
+				}
+
+				LV_ModifyCol()
+
+				Loop 8
+					LV_ModifyCol(A_Index, "AutoHdr")
 
 				if (this.SelectedDetailReport = "Plan")
 					this.showPlanDetails()

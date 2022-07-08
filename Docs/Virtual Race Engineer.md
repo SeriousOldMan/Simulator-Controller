@@ -521,6 +521,35 @@ If you click on "Import..." you will be requested to locate this export director
 
 Here only the *McLaren 720s* data for the *Mount Panorama* and the *Nürburgring* will be imported, when you click on "Ok".
 
+##### Importing data from other sources
+
+You can import data from foreign sources, for example telemetry information from a real car, in order to use this data in "Strategy Workbench" or in other tools of Simulator Controller, as long as the structure follows the rules:
+
+1. For the moment you have to choose one of the simulators as the home for your imported data. A future release might provide a special place for foreign data.
+2. You have to create a folder with the data to be imported.
+3. You must create a subfolder for each car and therein a subfolder for each track. The names of the cars and the names of the tracks can be chosen as you like, but it is preferred to not interfere with the names of the chosen simulator, so that the data will not be used in conjunction with already present data.
+4. Create a CSV file for each of the telemetry data type you want to import ("Electronics", "Tyres", "Tyres.Pressures", "Tyres.Pressures.Distribution"). Please take a look at a sample export for the naming conventions and the content for these files. But you may omit columns in the CSV files, if the corresponding data is not available (see next point).
+5. At the root of the export folder, you must create a "Export.info" file with the meta data. Here is an example:
+
+	[Driver]
+	123.456.789=Oliver Juwig (OJU)
+	[General]
+	Creator=123.456.789
+	Origin=123.456.789
+	Simulator=Assetto Corsa Competizione
+	[Schema]	Electronics=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Map,TC,ABS,Driver	Tyres=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Tyre.Laps,Tyre.Pressure.Front.Left,Tyre.Pressure.Front.Right,Tyre.Pressure.Rear.Left,Tyre.Pressure.Rear.Right,Tyre.Temperature.Front.Left,Tyre.Temperature.Front.Right,Tyre.Temperature.Rear.Left,Tyre.Temperature.Rear.Right,Tyre.Wear.Front.Left,Tyre.Wear.Front.Right,Tyre.Wear.Rear.Left,Tyre.Wear.Rear.Right,Driver	Tyres.Pressures=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Tyre.Pressure.Cold.Front.Left,Tyre.Pressure.Cold.Front.Right,Tyre.Pressure.Cold.Rear.Left,Tyre.Pressure.Cold.Rear.Right,Tyre.Pressure.Hot.Front.Left,Tyre.Pressure.Hot.Front.Right,Tyre.Pressure.Hot.Rear.Left,Tyre.Pressure.Hot.Rear.Right,Driver
+	Tyres.Pressures.Distribution=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Type,Tyre,Pressure,Count,Driver
+
+Here is what you have to do:
+
+- For each driver, for whom you have data sets available, create a line in the "[Driver]" section. You may choose the driver id randomly, as long as the identifier follows the 3-dot scheme and is unique acroos all your drivers.
+
+- Identify the simulator, where you want the data to be imported in the "[General]" section. You can omit the *Creator* and *Origin* settings.
+
+- Describe the contents of each of your CSV file in the "[Schema]" section. As mentioned above, you can omit fields, for example the *Temperature.Track*, if not available. The values will be set to *Null* during the import, but whether you can work with this data afterwards, is not guaranted. You must provide the *Driver* field, though, otherwise the import will fail.
+
+Then start the "Session Database", select the target simulator and run the import as described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration).
+
 #### Choosing the Database location
 
 Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a gear in the upper right corner of the *Session Database* window. A file chooser will open up and allow you to select a different folder as the new database location. You will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that once you have changed the database location, you have to restart all applications.

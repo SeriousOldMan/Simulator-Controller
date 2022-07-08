@@ -121,20 +121,6 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
-	hasTrackMap(simulator, track) {
-		return FileExist(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
-	}
-
-	updateTrackMap(simulator, track, coordinateX, coordinateY) {
-		directory := (kTempDirectory . "Tracks\" . this.getSimulatorCode(simulator))
-
-		FileCreateDir %directory%
-
-		coordinates := (Round(coordinateX, 3) . "," . Round(coordinateY, 3) . "`n")
-
-		FileAppend %coordinates%, %directory%\%track%.data
-	}
-
 	getAllDrivers(simulator, names := false) {
 		if simulator {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)

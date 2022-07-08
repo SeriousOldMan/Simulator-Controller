@@ -539,6 +539,43 @@ void checkPitWindow() {
 	}
 }
 
+float initialX = 0.0;
+float initialY = 0.0;
+
+bool writeCoordinates() {
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float velocityX = pf->velocity[0];
+	float velocityY = pf->velocity[2];
+	float velocityZ = pf->velocity[1];
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int carID = gf->playerCarID;
+
+		for (int i = 0; i < gf->activeCars; i++)
+			if (gf->carID[i] == carID) {
+				carID = i;
+
+				break;
+			}
+
+		float coordinateX = gf->carCoordinates[carID][0];
+		float coordinateY = gf->carCoordinates[carID][2];
+
+		if (initialX == 0.0) {
+			initialX = coordinateX;
+			initialY = coordinateY;
+		}
+		else if (fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+			return false;
+
+		cout << coordinateX << "," << coordinateY << endl;
+
+		return true;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
@@ -546,6 +583,10 @@ int main(int argc, char* argv[])
 	initStatic();
 	
 	bool running = false;
+	bool mapTrack = false;
+
+	if (argc > 1)
+		mapTrack = (strcmp(argv[1], "-Map") == 0);
 
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -571,21 +612,27 @@ int main(int argc, char* argv[])
 		}
 
 		if (running) {
-			if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
-				sessionDuration = gf->sessionTimeLeft;
-
-			if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-				if (!checkFlagState() && !checkPositions())
-					checkPitWindow();
+			if (mapTrack) {
+				if (!writeCoordinates())
+					return 0;
 			}
 			else {
-				lastSituation = CLEAR;
-				carBehind = false;
-				carBehindLeft = false;
-				carBehindRight = false;
-				carBehindReported = false;
+				if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
+					sessionDuration = gf->sessionTimeLeft;
 
-				lastFlagState = 0;
+				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+					if (!checkFlagState() && !checkPositions())
+						checkPitWindow();
+				}
+				else {
+					lastSituation = CLEAR;
+					carBehind = false;
+					carBehindLeft = false;
+					carBehindRight = false;
+					carBehindReported = false;
+
+					lastFlagState = 0;
+				}
 			}
 		}
 

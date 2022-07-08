@@ -323,10 +323,10 @@ int main(int argc, char* argv[])
 		wprintf_s(L"Temperature=26\n");
 		wprintf_s(L"Grip=Optimum\n");
 
-		for (int id = 0; id < map_buffer->num_cars; id++)
-			wprintf_s(L"%d=%f,%f\n", id + 1,
-								     map_buffer->all_drivers_data_1[id].position.x,
-								     map_buffer->all_drivers_data_1[id].position.z);
+		//for (int id = 0; id < map_buffer->num_cars; id++)
+		//	wprintf_s(L"%d=%f,%f\n", id + 1,
+		//						     map_buffer->all_drivers_data_1[id].position.x,
+		//						     map_buffer->all_drivers_data_1[id].position.z);
 
 		wprintf_s(L"[Weather Data]\n");
 		wprintf_s(L"Temperature=24\n");

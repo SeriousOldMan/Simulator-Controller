@@ -1,16 +1,16 @@
 [Development]
-Version=4.2.3.0-rc1
+Version=4.2.3.0-release
 Target=4.2.3.0-release
-Date=07/07/2022
-Download=https://www.dropbox.com/s/lvhsd9jtyrf6fgx/Simulator%20Controller%204.2.3.0-rc1.zip?dl=1
-Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup", New car models for "Setup Advisor"
+Date=07/08/2022
+Download=https://cntr.click/zWZ8Wq4
+Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup", New car models for "Setup Advisor", Fixed rear toe calculation in "Setup Advisor"
 [Release]
-Version=4.2.2.0-release
-Date=07/01/2022
-Download=https://cntr.click/yTkY9tb
-Changes=No support for automatic updates for versions prior to 3.8.0, Update procedures for local configuration database is now manadatory (no questions asked), Update manager now checks for active processes, Race Assistants can entertain you now you by telling some jokes, Reduced click area for window subtitles, Minimum # tyre laps and minimum amount of start fuel is set to 10 now, Full support for the Spotter in AC, Full support for the Strategist in AC, "Simulator Setup" no longer overwrites the Team Server settings in "Simulator Configuration", Added installation support for all integration plugins to "Simulator Setup", Assistants can be muted and unmuted with a voice command, Update manager now checks for active processes, Added owner column to all database tables, Data from team races are stored for each owner seperately, Overhaul of "AMS2" pitstop handling, Reworked many Assistant commands, New documentation for voice commands, Added ACC USA tracks to track meta data, More car models for "Setup Advisor"
+Version=4.2.3.0-release
+Date=07/08/2022
+Download=https://cntr.click/zWZ8Wq4
+Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup", New car models for "Setup Advisor", Fixed rear toe calculation in "Setup Advisor"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.2.2.0-release
-Development=4.2.3.0-rc1
+Release=4.2.3.0-release
+Development=4.2.3.0-release

@@ -1935,6 +1935,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							prefix := "RF2"
 						case "iRacing":
 							prefix := "IRC"
+						case "Project CARS 2":
+							prefix := "PCARS2"
 						default:
 							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 							title := translate("Warning")

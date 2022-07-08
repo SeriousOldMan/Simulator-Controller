@@ -75,6 +75,9 @@
   - [AMS2 - Automobilista 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ams2)
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-5)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-5)
+  - [PCARS2 - Project CARS 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2)
+    - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-6)
+    - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-6)
 
 [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
 ------

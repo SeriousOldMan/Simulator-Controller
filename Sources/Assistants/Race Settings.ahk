@@ -1500,7 +1500,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 
-				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
+				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
 
 					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
@@ -1539,7 +1539,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 
-				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
+				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
 
 					showMessage(message . translate("; ")

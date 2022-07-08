@@ -96,49 +96,48 @@ int main(int argc, char* argv[]) {
 
 			fileHandle = NULL;
 		}
-		/*
-		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
-			CloseHandle(fileHandle);
+		else {
+			unsigned int updateIndex(0);
+			unsigned int indexChange(0);
 
-			fileHandle = NULL;
-		}
-		*/
-
-		//------------------------------------------------------------------------------
-		// TEST DISPLAY CODE
-		//------------------------------------------------------------------------------
-		unsigned int updateIndex(0);
-		unsigned int indexChange(0);
-
-		while (true)
-		{
-			if (sharedData->mSequenceNumber % 2)
+			while (true)
 			{
-				// Odd sequence number indicates, that write into the shared memory is just happening
-				continue;
+				if (sharedData->mSequenceNumber % 2)
+				{
+					// Odd sequence number indicates, that write into the shared memory is just happening
+					continue;
+				}
+
+				indexChange = sharedData->mSequenceNumber - updateIndex;
+				updateIndex = sharedData->mSequenceNumber;
+
+				//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
+				memcpy(localCopy, sharedData, sizeof(SharedMemory));
+
+				if (localCopy->mSequenceNumber != updateIndex)
+				{
+					// More writes had happened during the read. Should be rare, but can happen.
+					continue;
+				}
+
+				break;
 			}
-
-			indexChange = sharedData->mSequenceNumber - updateIndex;
-			updateIndex = sharedData->mSequenceNumber;
-
-			//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
-			memcpy(localCopy, sharedData, sizeof(SharedMemory));
-
-			if (localCopy->mSequenceNumber != updateIndex)
-			{
-				// More writes had happened during the read. Should be rare, but can happen.
-				continue;
-			}
-
-			break;
 		}
 	}
 
 	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
 		printf("[Position Data]\n");
 
-		if (fileHandle == NULL)
+		if (fileHandle == NULL) {
+			printf("Active=false\n");
+
+			return 1;
+		}
+
+		if (fileHandle == NULL) {
 			printf("Car.Count=0\n");
+			printf("Driver.Car=0\n");
+		}
 		else {
 			printf("Car.Count=%d\n", localCopy->mNumParticipants);
 			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);

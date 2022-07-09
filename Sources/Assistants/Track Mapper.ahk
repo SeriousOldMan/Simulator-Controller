@@ -20,7 +20,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Track Mapper.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Track.ico
 ;@Ahk2Exe-ExeName Track Mapper.exe
 
 
@@ -63,9 +63,9 @@ createTrackMap(simulator, track, fileName) {
 		}
 		else {
 			xMin := Min(xMin, coordinates[1])
-			xMax := Max(coordinates[1])
-			yMin := Min(coordinates[2])
-			yMax := Max(coordinates[2])
+			xMax := Max(xMax, coordinates[1])
+			yMin := Min(yMin, coordinates[2])
+			yMax := Max(yMax, coordinates[2])
 		}
 
 		points += 1
@@ -81,6 +81,7 @@ createTrackMap(simulator, track, fileName) {
 	setConfigurationValue(data, "General", "Simulator", sessionDB.getSimulatorName(simulator))
 	setConfigurationValue(data, "General", "Track", sessionDB.getTrackName(simulator, track))
 
+	setConfigurationValue(data, "Map", "Points", points)
 	setConfigurationValue(data, "Map", "Width", Ceil(xMax) - Floor(xMin))
 	setConfigurationValue(data, "Map", "Height", Ceil(yMax) - Floor(yMin))
 	setConfigurationValue(data, "Map", "X.Min", Round(xMin, 3))
@@ -92,7 +93,7 @@ createTrackMap(simulator, track, fileName) {
 }
 
 startTrackMapper() {
-	icon := kIconsDirectory . "Track Mapper.ico"
+	icon := kIconsDirectory . "Track.ico"
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Database Synchronizer

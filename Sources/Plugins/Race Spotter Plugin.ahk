@@ -25,6 +25,9 @@ global kRaceSpotterPlugin = "Race Spotter"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceSpotterPlugin extends RaceAssistantPlugin  {
+	iMapperPID := false
+	iMapped := []
+
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			base.__New(plugin, "Race Spotter", remotePID)
@@ -66,6 +69,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		if !telemetryData
+			telemetryData := true
+
 		data := base.acquireSessionData(telemetryData, positionsData)
 
 		this.updatePositionsData(data)
@@ -81,25 +87,31 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
-		if (this.RaceAssistant && (this.Simulator && this.Simulator.supportsTrackMap())) {
+		if (this.RaceAssistant && !this.iMapperPID && (this.Simulator && this.Simulator.supportsTrackMap())) {
 			if !sessionDB
 				sessionDB := new SessionDatabase()
 
-			simulator := getConfigurationValue(telemetryData, "Session Data", "Simulator", false)
-			simulatorName := settingsDB.getSimulatorName(simulator)
+			simulator := this.Simulator.Simulator[true]
+			simulatorName := sessionDB.getSimulatorName(simulator)
 
-			if (lapNumber > getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
-				track := getConfigurationValue(telemetryData, "Session Data", "Track", false)
+			learning := getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 
-				if !sessionDB.hasTrackMap(simulator, track) {
-					code := settingsDB.getSimulatorCode(simulator)
-					dataFile := (kTempDirectory . simulator . " Data\" . track . ".data")
+			if (lapNumber > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+				track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
+
+				if (!sessionDB.hasTrackMap(simulator, track) && !inList(this.iMapped, track)) {
+					code := sessionDB.getSimulatorCode(simulator)
+					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
+
+					this.iMapped.Push(track)
 
 					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
 					if FileExist(exePath) {
 						try {
 							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, mapperPID
+
+							this.iMapperPID := mapperPID
 						}
 						catch exception {
 							logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -110,10 +122,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 							showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
 														  , {exePath: exePath, simulator: code, protocol: "SHM"})
 									  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+							this.iMapperPID := false
 						}
 
-						if ((ErrorLevel != "Error") && mapperPID) {
-							callback := ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile, mapperPID)
+						if ((ErrorLevel != "Error") && this.iMapperPID) {
+							callback := ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile)
 
 							SetTimer %callback%, -120000
 						}
@@ -123,23 +137,29 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	createTrackMap(simulator, track, dataFile, mapperPID) {
-		Process Exist, %mapperPID%
+	createTrackMap(simulator, track, dataFile) {
+		mapperPID := this.iMapperPID
 
-		if ErrorLevel {
-			callback := ObjBindMethod(this, "createTrackMap", simulator, track, dataFile, mapperPID)
+		if mapperPID {
+			Process Exist, %mapperPID%
 
-			SetTimer %callback%, -10000
-		}
-		else {
-			try {
-				Run %kBinariesDirectory%Track Mapper.exe -Simulator ""%simulator%"" -Track ""track"" -Data ""%datafile%""
+			if ErrorLevel {
+				callback := ObjBindMethod(this, "createTrackMap", simulator, track, dataFile)
+
+				SetTimer %callback%, -10000
 			}
-			catch exception {
-				logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
+			else {
+				try {
+					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, Hide
 
-				showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					this.iMapperPID := false
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
+
+					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 	}

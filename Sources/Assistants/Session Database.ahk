@@ -542,7 +542,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
 
-		Gui %window%:Add, ListView, x314 ys w342 h300 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Car", "Track", "Driver", "Type", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui %window%:Add, ListView, x314 ys w342 h300 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		this.iAdministrationListView := administrationListViewHandle
 
@@ -1099,10 +1099,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while row {
 				progress += 1
 
-				LV_GetText(car, row, 1)
-				LV_GetText(track, row, 2)
+				LV_GetText(type, row, 1)
+				LV_GetText(data, row, 2)
+
+				if InStr(data, " / ") {
+					data := string2Values(" / ", data)
+
+					car := data[1]
+					track := data[2]
+				}
+				else {
+					car := "-"
+					track := "-"
+				}
+
 				LV_GetText(driver, row, 3)
-				LV_GetText(type, row, 4)
 
 				showProgress({progress: Round((progress / count) * 100)
 							, message: translate("Car: ") . car . translate(", Track: ") . track})
@@ -1201,10 +1212,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while row {
 				progress += 1
 
-				LV_GetText(car, row, 1)
-				LV_GetText(track, row, 2)
+				LV_GetText(type, row, 1)
+				LV_GetText(data, row, 2)
+
+				if InStr(data, " / ") {
+					data := string2Values(" / ", data)
+
+					car := data[1]
+					track := data[2]
+				}
+				else {
+					car := "-"
+					track := "-"
+				}
+
 				LV_GetText(driver, row, 3)
-				LV_GetText(type, row, 4)
 
 				id := this.SessionDatabase.getDriverID(simulator, driver)
 
@@ -1266,7 +1288,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
 							try {
-								FileCopy %A_LoopFileLongPath%, %directory%\Tracks\%code%\%A_LoopFileName%
+								FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%code%\%A_LoopFileName%
 							}
 							catch exception {
 								; ignore
@@ -1335,14 +1357,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				progress := 0
 
-				if (selection.HasKey("Tracks") && FileExist(directory . "\.Tracks")) {
+				if (selection.HasKey("-.-.Tracks") && FileExist(directory . "\.Tracks")) {
 					code := this.SessionDatabase.getSimulatorCode(simulator)
 
 					targetDirectory := (kDatabaseDirectory . "User\Tracks\" . code)
 
 					FileCreateDir %targetDirectory%
 
-					Loop Files, %directory%\.Tracks\*.*, F
+					Loop Files, %directory%\.Tracks\%code%\*.*, F
 						FileCopy %A_LoopFilePath%, %targetDirectory%\%A_LoopFileName%, 1
 				}
 
@@ -1485,7 +1507,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					tracks += 1
 
 				if (tracks > 0)
-					LV_Add("", "-", "-", "-", translate("Tracks"), tracks)
+					LV_Add("", translate("Tracks"), "-", "-", tracks)
 
 				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
@@ -1519,9 +1541,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 										if (count > 0)
-											LV_Add("", carName, trackName
+											LV_Add("", translate("Telemetry"), (carName . " / " . trackName)
 													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-													 , translate("Telemetry"), count)
+													 , count)
 									}
 
 									tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
@@ -1539,9 +1561,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										count += ((result.Length() > 0) ? result[1].Count : 0)
 
 										if (count > 0)
-											LV_Add("", carName, trackName
+											LV_Add("", translate("Pressures"), (carName . " / " . trackName)
 													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-													 , translate("Pressures"), count)
+													 , count)
 									}
 
 									strategies := 0
@@ -1550,7 +1572,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										strategies += 1
 
 									if (strategies > 0)
-										LV_Add("", carName, trackName, "-", translate("Strategies"), strategies)
+										LV_Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 								}
 							}
 						}
@@ -1559,7 +1581,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 5
+			Loop 4
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
@@ -2307,7 +2329,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		Gui IDS:Add, CheckBox, +Theme Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries
 
-		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Car", "Track", "Driver", "Type", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		directory := normalizePath(directory)
 		editor := sessionDatabaseEditorOrCommand
@@ -2336,11 +2358,14 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		try {
 			tracks := 0
 
-			Loop Files, %directory%\Tracks\%code%\*.*, F		; Strategies
+			Loop Files, %directory%\.Tracks\%code%\*.*, F		; Strategies
 				tracks += 1
 
+			Gui IDS:Default
+			Gui ListView, %importListViewHandle%
+
 			if (tracks > 0)
-				LV_Add("Check", "-", "-", "-", translate("Tracks"), tracks)
+				LV_Add("Check", translate("Tracks"), "-", "-", tracks)
 
 			progress := 0
 
@@ -2375,7 +2400,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 						if (count > 0)
-							LV_Add("Check", carName, trackName, driverName, translate("Telemetry"), count)
+							LV_Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, count)
 					}
 
 					tyresDB := new Database(sourceDirectory . "\", kTyresSchemas)
@@ -2393,7 +2418,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						count += ((rows.Length() > 0) ? rows[1].Count : 0)
 
 						if (count > 0)
-							LV_Add("Check", carName, trackName, driverName, translate("Pressures"), count)
+							LV_Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, count)
 					}
 
 					strategies := 0
@@ -2402,7 +2427,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						strategies += 1
 
 					if (strategies > 0)
-						LV_Add("Check", carName, trackName, "-", translate("Strategies"), strategies)
+						LV_Add("Check", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 				}
 			}
 		}
@@ -2419,7 +2444,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		LV_ModifyCol()
 
-		Loop 5
+		Loop 4
 			LV_ModifyCol(A_Index, "AutoHdr")
 
 		Gui IDS:Font, s8 Norm, Arial
@@ -2451,10 +2476,21 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 			selection := {}
 
 			while (row := LV_GetNext(row, "C")) {
-				LV_GetText(car, row, 1)
-				LV_GetText(track, row, 2)
+				LV_GetText(type, row, 1)
+				LV_GetText(data, row, 2)
+
+				if InStr(data, " / ") {
+					data := string2Values(" / ", data)
+
+					car := data[1]
+					track := data[2]
+				}
+				else {
+					car := "-"
+					track := "-"
+				}
+
 				LV_GetText(driver, row, 3)
-				LV_GetText(type, row, 4)
 
 				switch type {
 					case translate("Tracks"):

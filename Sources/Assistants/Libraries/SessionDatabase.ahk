@@ -216,16 +216,16 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	hasTrackMap(simulator, track) {
-		return FileExist(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
+		return FileExist(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
 	}
 
 	updateTrackMap(simulator, track, data) {
-		writeConfiguration(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map", data)
+		writeConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map", data)
 	}
 
 	getTrackMap(simulator, track) {
 		if this.hasTrackMap(simulator, track)
-			return readConfiguration(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
+			return readConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
 		else
 			return false
 	}
@@ -234,12 +234,12 @@ class SessionDatabase extends ConfigurationItem {
 		result := []
 
 		Loop Files, %kDatabaseDirectory%User\%filter%, %option%
-			if (A_LoopFileName != "1")
+			if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1))
 				result.Push(A_LoopFileName)
 
 		if this.UseCommunity
 			Loop Files, %kDatabaseDirectory%Community\%filter%, %option%
-				if ((A_LoopFileName != "1") && !inList(result, A_LoopFileName))
+				if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1) && !inList(result, A_LoopFileName))
 					result.Push(A_LoopFileName)
 
 		return result

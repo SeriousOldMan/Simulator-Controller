@@ -1136,6 +1136,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							catch exception {
 								; ignore
 							}
+					case translate("Tracks"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
+							try {
+								FileDelete %A_LoopFileLongPath%
+							}
+							catch exception {
+								; ignore
+							}
 				}
 
 				Gui %window%:Default
@@ -1249,6 +1259,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							catch exception {
 								; ignore
 							}
+					case translate("Tracks"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						FileCreateDir %directory%\.Tracks\%code%
+
+						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
+							try {
+								FileCopy %A_LoopFileLongPath%, %directory%\Tracks\%code%\%A_LoopFileName%
+							}
+							catch exception {
+								; ignore
+							}
 				}
 
 				Gui %window%:Default
@@ -1313,99 +1335,110 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				progress := 0
 
+				if (selection.HasKey("Tracks") && FileExist(directory . "\.Tracks")) {
+					code := this.SessionDatabase.getSimulatorCode(simulator)
+
+					targetDirectory := (kDatabaseDirectory . "User\Tracks\" . code)
+
+					FileCreateDir %targetDirectory%
+
+					Loop Files, %directory%\.Tracks\*.*, F
+						FileCopy %A_LoopFilePath%, %targetDirectory%\%A_LoopFileName%, 1
+				}
+
 				Loop Files, %directory%\*.*, D	; Car
-				{
-					car := A_LoopFileName
-					carName := this.getCarName(simulator, car)
+					if (InStr(A_LoopFileName, ".") != 1) {
+						car := A_LoopFileName
+						carName := this.getCarName(simulator, car)
 
-					Loop Files, %directory%\%car%\*.*, D	; Track
-					{
-						track := A_LoopFileName
-						trackName := this.getTrackName(simulator, track)
+						Loop Files, %directory%\%car%\*.*, D	; Track
+						{
+							track := A_LoopFileName
+							trackName := this.getTrackName(simulator, track)
 
-						key := (car . "." . track . ".")
+							key := (car . "." . track . ".")
 
-						showProgress({progress: ++progress
-									, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+							showProgress({progress: ++progress
+										, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
 
-						if (progress >= 100)
-							progress := 0
+							if (progress >= 100)
+								progress := 0
 
-						sourceDirectory := (A_LoopFileDir . "\" . track)
+							sourceDirectory := (A_LoopFileDir . "\" . track)
 
-						if selection.HasKey(key . "Telemetry") {
-							driver := selection[key . "Telemetry"]
+							if selection.HasKey(key . "Telemetry") {
+								driver := selection[key . "Telemetry"]
 
-							sourceDB := new Database(sourceDirectory . "\", schemas)
-							targetDB := new TelemetryDatabase(simulator, car, track).Database
+								sourceDB := new Database(sourceDirectory . "\", schemas)
+								targetDB := new TelemetryDatabase(simulator, car, track).Database
 
-							for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
-								data := Object()
+								for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
+									data := Object()
 
-								for ignore, field in schemas["Electronics"]
-									data[field] := row[field]
+									for ignore, field in schemas["Electronics"]
+										data[field] := row[field]
 
-								targetDB.add("Electronics", data, true)
-							}
-
-							for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
-								data := Object()
-
-								for ignore, field in schemas["Tyres"]
-									data[field] := row[field]
-
-								targetDB.add("Tyres", data, true)
-							}
-						}
-
-						if selection.HasKey(key . "Pressures") {
-							driver := selection[key . "Pressures"]
-
-							sourceDB := new Database(sourceDirectory . "\", schemas)
-							targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
-
-							for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
-								data := Object()
-
-								for ignore, field in schemas["Tyres.Pressures"]
-									data[field] := row[field]
-
-								targetDB.add("Tyres.Pressures", data, true)
-							}
-
-							for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-								data := Object()
-
-								for ignore, field in schemas["Tyres.Pressures.Distribution"]
-									data[field] := row[field]
-
-								targetDB.add("Tyres.Pressures.Distribution", data, true)
-							}
-						}
-
-						if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
-							code := this.SessionDatabase.getSimulatorCode(simulator)
-
-							targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies")
-
-							FileCreateDir %targetDirectory%
-
-							Loop Files, %sourceDirectory%\Race Strategies\*.*, F
-							{
-								fileName := A_LoopFileName
-								targetName := fileName
-
-								while FileExist(targetDirectory . "\" . targetName) {
-									SplitPath targetName, , , , name
-
-									targetName := (name . " (" . (A_Index + 1) . ").strategy")
+									targetDB.add("Electronics", data, true)
 								}
 
-								FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+								for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
+									data := Object()
+
+									for ignore, field in schemas["Tyres"]
+										data[field] := row[field]
+
+									targetDB.add("Tyres", data, true)
+								}
+							}
+
+							if selection.HasKey(key . "Pressures") {
+								driver := selection[key . "Pressures"]
+
+								sourceDB := new Database(sourceDirectory . "\", schemas)
+								targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+								for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
+									data := Object()
+
+									for ignore, field in schemas["Tyres.Pressures"]
+										data[field] := row[field]
+
+									targetDB.add("Tyres.Pressures", data, true)
+								}
+
+								for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
+									data := Object()
+
+									for ignore, field in schemas["Tyres.Pressures.Distribution"]
+										data[field] := row[field]
+
+									targetDB.add("Tyres.Pressures.Distribution", data, true)
+								}
+							}
+
+							if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
+								code := this.SessionDatabase.getSimulatorCode(simulator)
+
+								targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies")
+
+								FileCreateDir %targetDirectory%
+
+								Loop Files, %sourceDirectory%\Race Strategies\*.*, F
+								{
+									fileName := A_LoopFileName
+									targetName := fileName
+
+									while FileExist(targetDirectory . "\" . targetName) {
+										SplitPath targetName, , , , name
+
+										targetName := (name . " (" . (A_Index + 1) . ").strategy")
+									}
+
+									FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+								}
 							}
 						}
 					}
-				}
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -1446,74 +1479,82 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				progress := 0
 
+				tracks := 0
+
+				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Tracks
+					tracks += 1
+
+				if (tracks > 0)
+					LV_Add("", "-", "-", "-", translate("Tracks"), tracks)
+
 				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
-				{
-					car := A_LoopFileName
+					if (InStr(A_LoopFileName, ".") != 1) {
+						car := A_LoopFileName
 
-					if ((selectedCar == true) || (car = selectedCar)) {
-						carName := this.getCarName(selectedSimulator, car)
+						if ((selectedCar == true) || (car = selectedCar)) {
+							carName := this.getCarName(selectedSimulator, car)
 
-						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
-						{
-							track := A_LoopFileName
+							Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+							{
+								track := A_LoopFileName
 
-							if ((selectedTrack == true) || (track = selectedTrack)) {
-								trackName := this.getTrackName(selectedSimulator, track)
-								found := false
+								if ((selectedTrack == true) || (track = selectedTrack)) {
+									trackName := this.getTrackName(selectedSimulator, track)
+									found := false
 
-								showProgress({progress: ++progress
-											, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+									showProgress({progress: ++progress
+												, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
 
-								if (progress >= 100)
-									progress := 0
+									if (progress >= 100)
+										progress := 0
 
-								Gui %window%:Default
-								Gui ListView, % this.AdministrationListView
+									Gui %window%:Default
+									Gui ListView, % this.AdministrationListView
 
-								targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
-								telemetryDB := new TelemetryDatabase(simulator, car, track)
+									telemetryDB := new TelemetryDatabase(simulator, car, track)
 
-								for ignore, driver in drivers {
-									count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+									for ignore, driver in drivers {
+										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
-									if (count > 0)
-										LV_Add("", carName, trackName
-												 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-												 , translate("Telemetry"), count)
+										if (count > 0)
+											LV_Add("", carName, trackName
+													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
+													 , translate("Telemetry"), count)
+									}
+
+									tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+
+									for ignore, driver in drivers {
+										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+																				  , Where: {Driver: driver}})
+
+										count := ((result.Length() > 0) ? result[1].Count : 0)
+
+										result := tyresDB.query("Tyres.Pressures.Distribution"
+															  , {Group: [["Driver", "count", "Count"]]
+															   , Where: {Driver: driver}})
+
+										count += ((result.Length() > 0) ? result[1].Count : 0)
+
+										if (count > 0)
+											LV_Add("", carName, trackName
+													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
+													 , translate("Pressures"), count)
+									}
+
+									strategies := 0
+
+									Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+										strategies += 1
+
+									if (strategies > 0)
+										LV_Add("", carName, trackName, "-", translate("Strategies"), strategies)
 								}
-
-								tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
-
-								for ignore, driver in drivers {
-									result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
-																			  , Where: {Driver: driver}})
-
-									count := ((result.Length() > 0) ? result[1].Count : 0)
-
-									result := tyresDB.query("Tyres.Pressures.Distribution"
-														  , {Group: [["Driver", "count", "Count"]]
-														   , Where: {Driver: driver}})
-
-									count += ((result.Length() > 0) ? result[1].Count : 0)
-
-									if (count > 0)
-										LV_Add("", carName, trackName
-												 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-												 , translate("Pressures"), count)
-								}
-
-								strategies := 0
-
-								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
-									strategies += 1
-
-								if (strategies > 0)
-									LV_Add("", carName, trackName, "-", translate("Strategies"), strategies)
 							}
 						}
 					}
-				}
 			}
 
 			LV_ModifyCol()
@@ -1556,61 +1597,59 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if selectedSimulator {
 				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
 				cars := []
-				tracks := []
 				telemetry := 0
 				pressures := 0
 				strategies := 0
+				tracks := 0
 
 				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
 
+				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Strategies
+					tracks += 1
+
 				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
-				{
-					car := A_LoopFileName
+					if (InStr(A_LoopFileName, ".") != 1) {
+						car := A_LoopFileName
 
-					if ((selectedCar == true) || (car = selectedCar))
-						Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
-						{
-							track := A_LoopFileName
+						if ((selectedCar == true) || (car = selectedCar))
+							Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+							{
+								track := A_LoopFileName
 
-							if ((selectedTrack == true) || (track = selectedTrack)) {
-								found := false
+								if ((selectedTrack == true) || (track = selectedTrack)) {
+									found := false
 
-								targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
-								if (FileExist(targetDirectory . "Electronics.CSV") || FileExist(targetDirectory . "Tyres.CSV")) {
-									found := true
+									if (FileExist(targetDirectory . "Electronics.CSV") || FileExist(targetDirectory . "Tyres.CSV")) {
+										found := true
 
-									telemetry += 1
-								}
+										telemetry += 1
+									}
 
-								if (FileExist(targetDirectory . "Tyres.Pressures.CSV")
-								 || FileExist(targetDirectory . "Tyres.Pressures.Distribution.CSV")) {
-									found := true
+									if (FileExist(targetDirectory . "Tyres.Pressures.CSV")
+									 || FileExist(targetDirectory . "Tyres.Pressures.Distribution.CSV")) {
+										found := true
 
-									pressures += 1
-								}
+										pressures += 1
+									}
 
-								Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
-								{
-									found := true
+									Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									{
+										found := true
 
-									strategies += 1
-								}
+										strategies += 1
+									}
 
-								if found {
-									if !inList(cars, car)
+									if (found && !inList(cars, car))
 										cars.Push(car)
-
-									if !inList(tracks, track)
-										tracks.Push(track)
 								}
 							}
-						}
 				}
 
+				LV_Add("", translate("Tracks"), tracks)
 				LV_Add("", translate("Drivers"), drivers.Length())
 				LV_Add("", translate("Cars"), cars.Length())
-				LV_Add("", translate("Tracks"), tracks.Length())
 				LV_Add("", translate("Telemetry"), telemetry)
 				LV_Add("", translate("Pressures"), pressures)
 				LV_Add("", translate("Strategies"), strategies)
@@ -2295,6 +2334,14 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		Gui %owner%:+Disabled
 
 		try {
+			tracks := 0
+
+			Loop Files, %directory%\Tracks\%code%\*.*, F		; Strategies
+				tracks += 1
+
+			if (tracks > 0)
+				LV_Add("Check", "-", "-", "-", translate("Tracks"), tracks)
+
 			progress := 0
 
 			Loop Files, %directory%\*.*, D	; Car
@@ -2410,6 +2457,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 				LV_GetText(type, row, 4)
 
 				switch type {
+					case translate("Tracks"):
+						type := "Tracks"
 					case translate("Telemetry"):
 						type := "Telemetry"
 					case translate("Pressures"):
@@ -2418,8 +2467,11 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						type := "Strategies"
 				}
 
-				selection[editor.getCarName(simulator, car) . "."
-						. editor.getTrackName(simulator, track) . "." . type] := drivers[driver]
+				if ((car = "-") && (track = "-"))
+					selection["-.-." . type] := drivers[driver]
+				else
+					selection[editor.getCarName(simulator, car) . "."
+							. editor.getTrackName(simulator, track) . "." . type] := drivers[driver]
 			}
 
 			result := selection

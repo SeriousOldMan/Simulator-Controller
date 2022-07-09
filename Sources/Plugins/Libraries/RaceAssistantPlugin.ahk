@@ -1427,9 +1427,10 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
-												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-												   . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+												   , {simulator: simulator, protocol: protocol})
+							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+							   . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 									  , {exePath: exePath, simulator: simulator, protocol: protocol})

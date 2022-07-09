@@ -219,9 +219,13 @@ class SessionDatabase extends ConfigurationItem {
 		return FileExist(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
 	}
 
+	updateTrackMap(simulator, track, data) {
+		writeConfiguration(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map", data)
+	}
+
 	getTrackMap(simulator, track) {
 		if this.hasTrackMap(simulator, track)
-			return readConfiguration((kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map"))
+			return readConfiguration(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\Tracks\" . track . ".map")
 		else
 			return false
 	}

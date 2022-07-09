@@ -659,7 +659,7 @@ shareSessionDatabase() {
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-					showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
+					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}

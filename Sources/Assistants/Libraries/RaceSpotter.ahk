@@ -1551,7 +1551,19 @@ class RaceSpotter extends RaceAssistant {
 			if FileExist(exePath) {
 				this.shutdownSpotter()
 
-				Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				try {
+					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				}
+				catch exception {
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 
 				if ((ErrorLevel != "Error") && spotterPID)
 					this.iSpotterPID := spotterPID

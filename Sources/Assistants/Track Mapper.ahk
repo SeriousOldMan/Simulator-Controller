@@ -79,7 +79,7 @@ createTrackMap(simulator, track, fileName) {
 	sessionDB := new SessionDatabase()
 
 	setConfigurationValue(data, "General", "Simulator", sessionDB.getSimulatorName(simulator))
-	setConfigurationValue(data, "General", "Track", sessionDB.getTrackName(simulator, track))
+	setConfigurationValue(data, "General", "Track", track)
 
 	setConfigurationValue(data, "Map", "Points", points)
 	setConfigurationValue(data, "Map", "Width", Ceil(xMax) - Floor(xMin))

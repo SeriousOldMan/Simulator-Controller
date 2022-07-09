@@ -1185,8 +1185,9 @@ restart:
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
 
+
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
-		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
+		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x126 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
@@ -1249,7 +1250,7 @@ restart:
 					dirName := kRaceSettingsFile
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
@@ -1280,7 +1281,7 @@ restart:
 				title := translate("Save Race Settings...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")

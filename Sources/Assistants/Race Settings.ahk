@@ -1066,7 +1066,7 @@ restart:
 
 		spSetupTyreCompoundDropDown := inList(kQualifiedTyreCompounds, spSetupTyreCompoundDropDown)
 
-		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
+		Gui RES:Add, DropDownList, x106 yp w110 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Add, Text, x16 yp+26 w90 h20, % translate("Start Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%

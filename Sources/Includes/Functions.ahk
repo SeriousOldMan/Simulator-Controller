@@ -1013,6 +1013,7 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Translations
 	FileCreateDir %kUserHomeDirectory%Grammars
+	FileCreateDir %kUserHomeDirectory%Simulator Data
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kDatabaseDirectory%Community
 	FileCreateDir %kDatabaseDirectory%User

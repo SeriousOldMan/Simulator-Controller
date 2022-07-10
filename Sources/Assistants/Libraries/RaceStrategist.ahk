@@ -575,62 +575,61 @@ class RaceStrategist extends RaceAssistant {
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if ((this.Session != kSessionRace) || !this.hasEnoughData(false) || (position == 0))
-			return
+		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
+			speaker := this.getSpeaker()
 
-		speaker := this.getSpeaker()
+			speaker.startTalk()
 
-		speaker.startTalk()
+			try {
+				if (position <= (cars / 5))
+					speaker.speakPhrase("GreatRace", {position: position})
+				else if (position <= ((cars / 5) * 3))
+					speaker.speakPhrase("MediocreRace", {position: position})
+				else
+					speaker.speakPhrase("CatastrophicRace", {position: position})
 
-		try {
-			if (position <= (cars / 5))
-				speaker.speakPhrase("GreatRace", {position: position})
-			else if (position <= ((cars / 5) * 3))
-				speaker.speakPhrase("MediocreRace", {position: position})
-			else
-				speaker.speakPhrase("CatastrophicRace", {position: position})
+				if (position > 1) {
+					only := ""
 
-			if (position > 1) {
-				only := ""
+					if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
+						only := speaker.Fragments["Only"]
 
-				if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
-					only := speaker.Fragments["Only"]
+					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 
-				speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
+					driver := knowledgeBase.getValue("Driver.Car")
 
-				driver := knowledgeBase.getValue("Driver.Car")
+					if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
+					 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
+						speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
 
-				if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
-				 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
-					speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
+					if (position <= (cars / 3))
+						speaker.speakPhrase("PositiveSummary")
 
-				if (position <= (cars / 3))
-					speaker.speakPhrase("PositiveSummary")
+					if (driverMinLapTime && driverLapTimeStdDev) {
+						goodPace := false
 
-				if (driverMinLapTime && driverLapTimeStdDev) {
-					goodPace := false
+						if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
+							speaker.speakPhrase("GoodPace")
 
-					if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
-						speaker.speakPhrase("GoodPace")
+							goodPace := true
+						}
+						else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
+							speaker.speakPhrase("MediocrePace")
+						else
+							speaker.speakPhrase("BadPace")
 
-						goodPace := true
+						if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
+							speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
+						else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
+							speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
+						else
+							speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 					}
-					else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
-						speaker.speakPhrase("MediocrePace")
-					else
-						speaker.speakPhrase("BadPace")
-
-					if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
-						speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-					else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
-						speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
-					else
-						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				}
 			}
-		}
-		finally {
-			speaker.finishTalk()
+			finally {
+				speaker.finishTalk()
+			}
 		}
 
 		continuation := this.Continuation

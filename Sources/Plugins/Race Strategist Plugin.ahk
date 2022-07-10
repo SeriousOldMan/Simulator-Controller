@@ -653,49 +653,54 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		this.createRaceReport(report)
 
 		try {
-			reader := new RaceReportReader(report)
+			try {
+				reader := new RaceReportReader(report)
 
-			raceData := true
-			drivers := true
-			positions := true
-			times := true
+				raceData := true
+				drivers := true
+				positions := true
+				times := true
 
-			reader.loadData(false, raceData, drivers, positions, times)
+				reader.loadData(false, raceData, drivers, positions, times)
 
-			cars := getConfigurationValue(raceData, "Cars", "Count", 0)
-			driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
-			laps := getConfigurationValue(raceData, "Laps", "Count", 0)
+				cars := getConfigurationValue(raceData, "Cars", "Count", 0)
+				driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
+				laps := getConfigurationValue(raceData, "Laps", "Count", 0)
 
-			if laps
-				position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
-			else
-				position := cars
+				if laps
+					position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
+				else
+					position := cars
 
-			leader := 0
+				leader := 0
 
-			for car, candidate in positions[laps]
-				if (candidate = 1) {
-					leader := car
+				for car, candidate in positions[laps]
+					if (candidate = 1) {
+						leader := car
 
-					break
-				}
+						break
+					}
 
-			min := false
-			max := false
-			leaderAvgLapTime := false
-			stdDev := false
+				min := false
+				max := false
+				leaderAvgLapTime := false
+				stdDev := false
 
-			reader.getDriverPace(raceData, times, leader, min, max, leaderAvgLapTime, stdDev)
+				reader.getDriverPace(raceData, times, leader, min, max, leaderAvgLapTime, stdDev)
 
-			driverMinLapTime := false
-			driverMaxLapTime := false
-			driverAvgLapTime := false
-			driverLapTimeStdDev := false
+				driverMinLapTime := false
+				driverMaxLapTime := false
+				driverAvgLapTime := false
+				driverLapTimeStdDev := false
 
-			reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
+				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-			this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
-											  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
+												  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+			}
+			catch exception {
+				this.RaceAssistant[true].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
+			}
 		}
 		finally {
 			try {

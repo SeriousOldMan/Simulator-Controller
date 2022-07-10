@@ -317,14 +317,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	RaceAssistant[zombie := false] {
 		Get {
 			if (!this.iRaceAssistant && zombie) {
-				if !this.iWaitForShutdown {
-					wasZombie := (this.iRaceAssistantZombie != false)
-
-					this.iRaceAssistantZombie := false
-
-					if wasZombie
-						this.updateActions(kSessionFinished)
-				}
+				if (!this.iWaitForShutdown && this.iRaceAssistantZombie)
+					this.updateActions(kSessionFinished)
 
 				return this.iRaceAssistantZombie
 			}

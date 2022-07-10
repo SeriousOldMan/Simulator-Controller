@@ -89,6 +89,7 @@ global settingsListView
 global settingDropDown
 global settingValueDropDown
 global settingValueEdit
+global settingValueText
 global settingValueCheck
 
 global addSettingButton
@@ -445,6 +446,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
 		Gui %window%:Add, DropDownList, xp+90 yp w180 vsettingValueDropDown gchangeSetting
 		Gui %window%:Add, Edit, xp yp w50 vsettingValueEdit gchangeSetting
+		Gui %window%:Add, Edit, xp yp w210 h57 vsettingValueText gchangeSetting
 		Gui %window%:Add, CheckBox, xp yp+4 vsettingValueCheck gchangeSetting
 
 		Gui %window%:Add, Button, x606 yp+30 w23 h23 HWNDaddSettingButtonHandle gaddSetting vaddSettingButton
@@ -625,8 +627,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		return this.SessionDatabase.getCarName(simulator, car)
 	}
 
+	getCarCode(simulator, car) {
+		return this.SessionDatabase.getCarCode(simulator, car)
+	}
+
 	getTrackName(simulator, track) {
 		return this.SessionDatabase.getTrackName(simulator, track, false)
+	}
+
+	getTrackCode(simulator, track) {
+		return this.SessionDatabase.getTrackCode(simulator, track)
 	}
 
 	updateState() {
@@ -751,6 +761,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Enable, settingDropDown
 				GuiControl Enable, settingValueDropDown
 				GuiControl Enable, settingValueEdit
+				GuiControl Enable, settingValueText
 				GuiControl Enable, settingValueCheck
 			}
 			else {
@@ -760,6 +771,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Disable, settingValueDropDown
 				GuiControl Hide, settingValueCheck
 				GuiControl Disable, settingValueCheck
+				GuiControl Hide, settingValueText
+				GuiControl Disable, settingValueText
 				GuiControl Show, settingValueEdit
 				GuiControl Disable, settingValueEdit
 
@@ -1119,8 +1132,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							, message: translate("Car: ") . car . translate(", Track: ") . track})
 
 				driver := this.SessionDatabase.getDriverID(simulator, driver)
-				car := this.getCarName(simulator, car)
-				track := this.getTrackName(simulator, track)
+				car := this.getCarCode(simulator, car)
+				track := this.getTrackCode(simulator, track)
 
 				switch type {
 					case translate("Telemetry"):
@@ -1239,8 +1252,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					driver := id
 				}
 
-				car := this.getCarName(simulator, car)
-				track := this.getTrackName(simulator, track)
+				car := this.getCarCode(simulator, car)
+				track := this.getTrackCode(simulator, track)
 
 				targetDirectory := (directory . "\" . car . "\" . track . "\")
 
@@ -2506,8 +2519,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 				if ((car = "-") && (track = "-"))
 					selection["-.-." . type] := drivers[driver]
 				else
-					selection[editor.getCarName(simulator, car) . "."
-							. editor.getTrackName(simulator, track) . "." . type] := drivers[driver]
+					selection[editor.getCarCode(simulator, car) . "."
+							. editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
 			}
 
 			result := selection
@@ -2849,6 +2862,7 @@ chooseSetting() {
 
 			if IsObject(type) {
 				GuiControl Hide, settingValueEdit
+				GuiControl Hide, settingValueText
 				GuiControl Hide, settingValueCheck
 				GuiControl Show, settingValueDropDown
 				GuiControl Enable, settingValueDropDown
@@ -2861,6 +2875,7 @@ chooseSetting() {
 			else if (type = "Boolean") {
 				GuiControl Hide, settingValueDropDown
 				GuiControl Hide, settingValueEdit
+				GuiControl Hide, settingValueText
 				GuiControl Show, settingValueCheck
 				GuiControl Enable, settingValueCheck
 
@@ -2869,9 +2884,25 @@ chooseSetting() {
 				if (settingValueCheck != value)
 					GuiControl, , settingValueCheck, % (value = "x") ? true : false
 			}
+			else if (type = "Text") {
+				GuiControl Hide, settingValueDropDown
+				GuiControl Hide, settingValueCheck
+				GuiControl Hide, settingValueEdit
+				GuiControl Show, settingValueText
+				GuiControl Enable, settingValueText
+
+				GuiControlGet settingValueText
+
+				if (settingValueText != value) {
+					settingValueText := value
+
+					GuiControl, , settingValueText, %value%
+				}
+			}
 			else {
 				GuiControl Hide, settingValueDropDown
 				GuiControl Hide, settingValueCheck
+				GuiControl Hide, settingValueText
 				GuiControl Show, settingValueEdit
 				GuiControl Enable, settingValueEdit
 
@@ -2918,6 +2949,7 @@ addSetting() {
 
 		if IsObject(type) {
 			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
 			GuiControl Hide, settingValueCheck
 			GuiControl Show, settingValueDropDown
 			GuiControl Enable, settingValueDropDown
@@ -2932,6 +2964,7 @@ addSetting() {
 		else if (type = "Boolean") {
 			GuiControl Hide, settingValueDropDown
 			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
 			GuiControl Show, settingValueCheck
 			GuiControl Enable, settingValueCheck
 
@@ -2939,9 +2972,21 @@ addSetting() {
 
 			value := default
 		}
+		else if (type = "Text") {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueCheck
+			GuiControl Hide, settingValueEdit
+			GuiControl Show, settingValueText
+			GuiControl Enable, settingValueText
+
+			GuiControl, , settingValueText, %default%
+
+			value := default
+		}
 		else {
 			GuiControl Hide, settingValueDropDown
 			GuiControl Hide, settingValueCheck
+			GuiControl Hide, settingValueText
 			GuiControl Show, settingValueEdit
 			GuiControl Enable, settingValueEdit
 
@@ -3040,6 +3085,7 @@ selectSetting() {
 
 		if IsObject(type) {
 			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
 			GuiControl Hide, settingValueCheck
 			GuiControl Show, settingValueDropDown
 			GuiControl Enable, settingValueDropDown
@@ -3054,6 +3100,7 @@ selectSetting() {
 		else if (type = "Boolean") {
 			GuiControl Hide, settingValueDropDown
 			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
 			GuiControl Show, settingValueCheck
 			GuiControl Enable, settingValueCheck
 
@@ -3061,9 +3108,21 @@ selectSetting() {
 
 			value := default
 		}
+		else if (type = "Text") {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueCheck
+			GuiControl Show, settingValueText
+			GuiControl Enable, settingValueText
+
+			GuiControl, , settingValueText, %default%
+
+			value := default
+		}
 		else {
 			GuiControl Hide, settingValueDropDown
 			GuiControl Hide, settingValueCheck
+			GuiControl Hide, settingValueText
 			GuiControl Show, settingValueEdit
 			GuiControl Enable, settingValueEdit
 
@@ -3133,6 +3192,11 @@ changeSetting() {
 				GuiControlGet settingValueCheck
 
 				value := settingValueCheck
+			}
+			else if (type = "Text") {
+				GuiControlGet settingValueText
+
+				value := settingValueText
 			}
 			else {
 				oldValue := settingValueEdit

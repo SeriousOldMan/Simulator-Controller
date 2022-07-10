@@ -21,8 +21,16 @@ global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRai
 global kTyreCompounds = ["Dry", "Intermediate", "Wet"]
 global kTyreCompoundColors = ["Black", "Red", "Yellow", "White", "Green", "Blue", "Soft", "Medium", "Hard"]
 
-global kQualifiedTyreCompounds = ["Wet", "Intermediate", "Dry", "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)", "Dry (Soft)", "Dry (Medium)", "Dry (Hard)"]
-global kQualifiedTyreCompoundColors = ["Black", "Black", "Black", "Red", "Yellow", "White", "Green", "Blue", "Soft", "Medium", "Hard"]
+global kQualifiedTyreCompounds = ["Wet", "Intermediate", "Dry"
+								, "Wet (Soft)", "Wet (Medium)", "Wet (Hard)"
+								, "Intermediate (Soft)", "Intermediate (Medium)", "Intermediate (Hard)"
+								, "Dry (Soft)", "Dry (Medium)", "Dry (Hard)"
+								, "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
+global kQualifiedTyreCompoundColors = ["Black", "Black", "Black"
+									 , "Soft", "Medium", "Hard"
+									 , "Soft", "Medium", "Hard"
+									 , "Soft", "Medium", "Hard"
+									 , "Red", "Yellow", "White", "Green", "Blue"]
 
 global kDryQualificationSetup = "DQ"
 global kDryRaceSetup = "DR"
@@ -35,27 +43,26 @@ global kSessionSchemas = {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Private Variables Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vUserID = false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class SessionDatabase extends ConfigurationItem {
+	static sACCCarData := false
+	static sACCarData := false
+
+	static sACCTrackData := false
+	static sACTrackData := false
+
+	static sID := false
 	static sDriver := false
 
-	iID := false
 	iControllerConfiguration := false
 
 	iUseCommunity := false
 
 	ID[] {
 		Get {
-			return this.iID
+			return this.sID
 		}
 	}
 
@@ -99,13 +106,11 @@ class SessionDatabase extends ConfigurationItem {
 	__New(controllerConfiguration := false) {
 		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
 
-		if !vUserID {
+		if !this.sID {
 			FileRead identifier, % kUserConfigDirectory . "ID"
 
-			vUserID := identifier
+			this.sID := identifier
 		}
-
-		this.iID := vUserID
 
 		if !controllerConfiguration {
 			controllerConfiguration := getControllerConfiguration()
@@ -325,57 +330,117 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarName(simulator, car) {
-		static accCarNames := false
-		static acCarNames := false
-
 		code := this.getSimulatorCode(simulator)
 
 		if (code == "ACC") {
-			if !accCarNames
-				accCarNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Names")
+			if !this.sACCCarData
+				this.sACCCarData := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
 
-			carName := (accCarNames.HasKey(car) ? accCarNames[car] : car)
+			name := getConfigurationValue(this.sACCCarData, "Car Names", car, car)
 		}
 		else if (code == "AC") {
-			if !acCarNames
-				acCarNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Car Names")
+			if !this.sACCarData
+				this.sACCarData := readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
 
-			carName := (acCarNames.HasKey(car) ? acCarNames[car] : car)
+			name := getConfigurationValue(this.sACCarData, "Car Names", car, car)
 		}
 		else
-			carName := car
+			name := car
 
-		if (carName = "")
-			carName := car
+		if (name = "")
+			name := car
 
-		return carName
+		return name
+	}
+
+	getCarCode(simulator, car) {
+		code := this.getSimulatorCode(simulator)
+
+		if (code == "ACC") {
+			if !this.sACCCarData
+				this.sACCCarData := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+
+			code := getConfigurationValue(this.sACCCarData, "Car Codes", car, car)
+		}
+		else if (code == "AC") {
+			if !this.sACCarData
+				this.sACCarData := readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+
+			code := getConfigurationValue(this.sACCarData, "Car Codes", car, car)
+		}
+		else
+			code := car
+
+		if (code = "")
+			code := car
+
+		return code
 	}
 
 	getTrackName(simulator, track, long := true) {
-		static accTrackNames := false
-		static acTrackNames := false
-
 		code := this.getSimulatorCode(simulator)
 
 		if (code == "ACC") {
-			if !accTrackNames
-				accTrackNames := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Data.ini")
+			if !this.sACCTrackData
+				this.sACCTrackData := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Data.ini")
 
-			trackName := getConfigurationValue(accTrackNames, long ? "Track Names Long" : "Track Names Short", track, track)
+			name := getConfigurationValue(this.sACCTrackData, long ? "Track Names Long" : "Track Names Short", track, track)
 		}
 		else if (code == "AC") {
-			if !acTrackNames
-				acTrackNames := readConfiguration(kResourcesDirectory . "Simulator Data\AC\Track Data.ini")
+			if !this.sACTrackData
+				this.sACTrackData := readConfiguration(kResourcesDirectory . "Simulator Data\AC\Track Data.ini")
 
-			trackName := getConfigurationValue(acTrackNames, long ? "Track Names Long" : "Track Names Short", track, track)
+			name := getConfigurationValue(this.sACTrackData, long ? "Track Names Long" : "Track Names Short", track, track)
 		}
 		else
-			trackName := track
+			name := car
 
-		if (trackName = "")
-			trackName := track
+		if (name = "")
+			name := car
 
-		return trackName
+		return name
+	}
+
+	getTrackCode(simulator, track) {
+		code := this.getSimulatorCode(simulator)
+
+		if (code == "ACC") {
+			if !this.sACCTrackData
+				this.sACCTrackData := readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Track Data.ini")
+
+			code := getConfigurationValue(this.sACCTrackData, "Track Codes", track, track)
+		}
+		else if (code == "AC") {
+			if !this.sACTrackData
+				this.sACTrackData := readConfiguration(kResourcesDirectory . "Simulator Data\AC\Track Data.ini")
+
+			code := getConfigurationValue(this.sACTrackData, "Track Codes", track, track)
+		}
+		else
+			code := car
+
+		if (code = "")
+			code := car
+
+		return code
+	}
+
+	getTyreCompoundName(simulator, car, track, compound) {
+		if (this.getSimulatorName(simulator) = "Assetto Corsa Competizione")
+			return {Dry: "Dry", Wet: "Wet"}[compound]
+		else
+			return compound
+	}
+
+	getTyreCompoundCode(simulator, car, track, compound) {
+		if (this.getSimulatorName(simulator) = "Assetto Corsa Competizione")
+			return {Dry: "Dry", Wet: "Wet"}[compound]
+		else
+			return compound
+	}
+
+	getTyreCompounds(simulator, car, track) {
+		; wie geht das?
 	}
 
 	readNotes(simulator, car, track) {

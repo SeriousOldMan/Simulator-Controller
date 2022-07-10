@@ -671,9 +671,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 		if (setupOnly) {
 			printf("[Setup Data]\n");
 
-			printf("TyreCompound=Dry\n");
-			printf("TyreCompoundColor=Black\n");
-			printf("TyreSet=1\n");
+			// printf("TyreCompound=Dry\n");
+			// printf("TyreCompoundColor=Black\n");
+			// printf("TyreSet=1\n");
 
 			float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
 			float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));

@@ -136,7 +136,7 @@ cleanupTyrePressures() {
 				compound := condition[4]
 				
 				if (((compound = "Dry") && (dryCorrection != 0)) || ((compound = "Wet") && (wetCorrection != 0)))
-					for ignore, qualifiedCompound in kQualifiedTyreCompounds
+					for ignore, qualifiedCompound in kTyreCompounds
 						adjustPressureDistributions(tyresDB.getSimulatorCode("Assetto Corsa Competizione"), car, track, qualifiedCompound, weather
 												  , airTemperature, trackTemperature, (compound = "Dry") ? dryCorrection : wetCorrection, progress)
 			}

@@ -228,40 +228,40 @@ cancelLogin() {
 	loginDialog(kCancel)
 }
 
-moveSettingsEditor() {
+moveRaceSettingsEditor() {
 	moveByMouse("RES")
 }
 
-loadSettings() {
-	editSettings(kLoad)
+loadRaceSettings() {
+	editRaceSettings(kLoad)
 }
 
-saveSettings() {
-	editSettings(kSave)
+saveRaceSettings() {
+	editRaceSettings(kSave)
 }
 
-acceptSettings() {
-	editSettings(kOk)
+acceptRaceSettings() {
+	editRaceSettings(kOk)
 }
 
-cancelSettings() {
-	editSettings(kCancel)
+cancelRaceSettings() {
+	editRaceSettings(kCancel)
 }
 
 connectServer() {
-	editSettings(kConnect)
+	editRaceSettings(kConnect)
 }
 
 chooseTeam() {
-	editSettings(kUpdate, "Team")
+	editRaceSettings(kUpdate, "Team")
 }
 
 chooseDriver() {
-	editSettings(kUpdate, "Driver")
+	editRaceSettings(kUpdate, "Driver")
 }
 
 chooseSession() {
-	editSettings(kUpdate, "Session")
+	editRaceSettings(kUpdate, "Session")
 }
 
 openSettingsDocumentation() {
@@ -500,7 +500,7 @@ getValues(map) {
 	return values
 }
 
-editSettings(ByRef settingsOrCommand, arguments*) {
+editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	static result
 	static newSettings
 
@@ -677,7 +677,7 @@ restart:
 
 					connected := true
 
-					editSettings(kUpdate, "Team")
+					editRaceSettings(kUpdate, "Team")
 
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
@@ -748,14 +748,10 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
 
-		if (spSetupTyreCompoundDropDown == 1) {
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Wet")
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", "Black")
-		}
-		else {
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry")
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", kQualifiedTyreCompoundColors[spSetupTyreCompoundDropDown])
-		}
+		splitCompound(kTyreCompounds[spSetupTyreCompoundDropDown], compound, compoundColor)
+		
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", compound)
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
@@ -882,7 +878,7 @@ restart:
 
 		Gui RES:Font, Bold, Arial
 
-		Gui RES:Add, Text, w388 Center gmoveSettingsEditor, % translate("Modular Simulator Controller System")
+		Gui RES:Add, Text, w388 Center gmoveRaceSettingsEditor, % translate("Modular Simulator Controller System")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
@@ -892,14 +888,14 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		if !vTestMode {
-			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptRaceSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y450 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
 			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelSettings, % translate("Close")
 
-		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x8 y450 w77 h23 gloadRaceSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y450 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
 			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
@@ -1062,9 +1058,9 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 
-		choices := map(kQualifiedTyreCompounds, "translate")
+		choices := map(kTyreCompounds, "translate")
 
-		spSetupTyreCompoundDropDown := inList(kQualifiedTyreCompounds, spSetupTyreCompoundDropDown)
+		spSetupTyreCompoundDropDown := inList(kTyreCompounds, spSetupTyreCompoundDropDown)
 
 		Gui RES:Add, DropDownList, x106 yp w110 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
 
@@ -1513,9 +1509,9 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				if (compoundColor = "Black")
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kTyreCompounds, compound)
 				else
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
 
 				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
@@ -1552,9 +1548,9 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				if (compoundColor = "Black")
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kTyreCompounds, compound)
 				else
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
+					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
 
 				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
 				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
@@ -1653,7 +1649,7 @@ showRaceSettingsEditor() {
 	else {
 		registerEventHandler("Setup", "functionEventHandler")
 
-		if (editSettings(settings) = kOk) {
+		if (editRaceSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
 
 			ExitApp 0

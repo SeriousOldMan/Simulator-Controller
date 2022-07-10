@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2015,7 +2016,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	pressures := false
 	certainty := 1.0
 
-	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
+	if !inList(kTyreCompounds, compound(compound, compoundColor)) {
 		compound := false
 		compoundColor := false
 	}

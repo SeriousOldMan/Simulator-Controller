@@ -224,8 +224,8 @@ int main(int argc, char* argv[]) {
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
 
-		printf("TyreCompound=Dry\n");
-		printf("TyreCompoundColor=Black\n");
+		// printf("TyreCompound=Dry\n");
+		// printf("TyreCompoundColor=Black\n");
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
 			localCopy->mTyreTemp[TYRE_FRONT_RIGHT],

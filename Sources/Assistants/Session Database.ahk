@@ -484,8 +484,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (this.iTyreCompoundColor != "Black")
 			compound := (compound . " (" . this.iTyreCompoundColor . ")")
 
-		choices := map(kQualifiedTyreCompounds, "translate")
-		chosen := inList(kQualifiedTyreCompounds, compound)
+		choices := map(kTyreCompounds, "translate")
+		chosen := inList(kTyreCompounds, compound)
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
 			chosen := 1
@@ -2087,7 +2087,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControlGet trackTemperatureEdit
 				GuiControlGet tyreCompoundDropDown
 
-				compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
+				compound := string2Values(A_Space, kTyreCompounds[tyreCompoundDropDown])
 
 				if (compound.Length() == 1)
 					compoundColor := "Black"
@@ -3500,7 +3500,7 @@ transferPressures() {
 	GuiControlGet tyreCompoundDropDown
 
 	tyrePressures := []
-	compound := string2Values(A_Space, kQualifiedTyreCompounds[tyreCompoundDropDown])
+	compound := string2Values(A_Space, kTyreCompounds[tyreCompoundDropDown])
 
 	if (compound.Length() == 1)
 		compoundColor := "Black"

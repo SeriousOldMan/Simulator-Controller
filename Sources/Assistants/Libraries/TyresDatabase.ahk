@@ -249,7 +249,7 @@ class TyresDatabase extends SessionDatabase {
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 																		 , Where: where})
 			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-					 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+					 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
 
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
@@ -257,7 +257,7 @@ class TyresDatabase extends SessionDatabase {
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-						 , Compound: this.qualifiedCompound(row.Compound, row["Compound.Color"]), Count: row.Count})
+						 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
 		}
 
 		return info
@@ -400,44 +400,5 @@ class TyresDatabase extends SessionDatabase {
 
 			this.iDatabase := false
 		}
-	}
-
-	qualifiedCompound(compound, compoundColor) {
-		if (compound= "Dry") {
-			if (compoundColor = "Black")
-				return "Dry"
-			else
-				return ("Dry (" . compoundColor . ")")
-		}
-		else if (compoundColor = "Black")
-			return "Wet"
-		else
-			return ("Wet (" . compoundColor . ")")
-	}
-
-	translateQualifiedCompound(compound, compoundColor) {
-		if (compound= "Dry") {
-			if (compoundColor = "Black")
-				return translate("Dry")
-			else
-				return (translate("Dry") . translate(" (") . translate(compoundColor) . translate(")"))
-		}
-		else if (compoundColor = "Black")
-			return translate("Wet")
-		else
-			return (translate("Wet") . translate(" (") . translate(compoundColor) . translate(")"))
-	}
-
-	splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
-		compoundColor := "Black"
-
-		index := inList(kQualifiedTyreCompounds, qualifiedCompound)
-
-		if (index == 1)
-			compound := "Wet"
-		else
-			compound := "Dry"
-
-		compoundColor := kQualifiedTyreCompoundColors[index]
 	}
 }

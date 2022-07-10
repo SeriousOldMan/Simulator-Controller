@@ -409,23 +409,3 @@ correctEmptyValues(table, default := "__Undefined__") {
 
 	return table
 }
-
-compound(compound, color := false) {
-	if color {
-		if (color = "Black")
-			return compound
-		else
-			return (compound . " (" . color . ")")
-	}
-	else
-		return string2Values(A_Space, compound)[1]
-}
-
-compoundColor(compound) {
-	compound := string2Values(A_Space, compound)
-
-	if (compound.Length() == 1)
-		return "Black"
-	else
-		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
-}

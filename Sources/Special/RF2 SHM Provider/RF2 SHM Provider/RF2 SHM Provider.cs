@@ -219,7 +219,10 @@ namespace RF2SHMProvider {
 					Console.WriteLine("0,0,0,0");
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
-
+			
+				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
+				
+				/*
 				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
 
 				if (compound.Contains("Red"))
@@ -240,6 +243,7 @@ namespace RF2SHMProvider {
 					Console.WriteLine("TyreCompoundColor=Hard");
 				else
 					Console.WriteLine("TyreCompoundColor=Black");
+				*/
 
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");

@@ -579,7 +579,7 @@ class RaceCenter extends ConfigurationItem {
 				Gui ListView, % rCenter.PitstopsListView
 
 				availableTyreSets := this.AvailableTyreSets
-				translatedCompounds := map(kQualifiedTyreCompounds, "translate")
+				translatedCompounds := map(kTyreCompounds, "translate")
 
 				Loop % LV_GetCount()
 				{
@@ -588,7 +588,7 @@ class RaceCenter extends ConfigurationItem {
 					index := inList(translatedCompounds, compound)
 
 					if index {
-						compound := kQualifiedTyreCompounds[index]
+						compound := kTyreCompounds[index]
 
 						if availableTyreSets.HasKey(compound) {
 							count := (availableTyreSets[compound] - 1)
@@ -1348,7 +1348,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x523 yp w18 h20
 		Gui %window%:Add, Text, x563 yp w35 h23 +0x200, % translate("A / T")
 
-		choices := map(kQualifiedTyreCompounds, "translate")
+		choices := map(kTyreCompounds, "translate")
 
 		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu gupdateSetup, % values2String("|", choices*)
@@ -1393,7 +1393,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
-		choices := map(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), "translate")
+		choices := map(concatenate(["No Tyre Change"], kTyreCompounds), "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x24 yp+26 w85 h20, % translate("Tyre Set")
@@ -1995,7 +1995,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Choose, setupWeatherDropDownMenu, % inList(kWeatherOptions, "Dry")
 				GuiControl, , setupAirTemperatureEdit, %setupAirTemperatureEdit%
 				GuiControl, , setupTrackTemperatureEdit, %setupTrackTemperatureEdit%
-				GuiControl Choose, setupCompoundDropDownMenu, % inList(kQualifiedTyreCompounds, "Dry")
+				GuiControl Choose, setupCompoundDropDownMenu, % inList(kTyreCompounds, "Dry")
 
 				GuiControl, , setupBasePressureFLEdit, %setupBasePressureFLEdit%
 				GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
@@ -2977,13 +2977,13 @@ class RaceCenter extends ConfigurationItem {
 
 		if compound {
 			if (compoundColor != "Black")
-				compound := (compound . " (" . compoundColor . ")")
+				compound := compound(compound, compoundColor)
 
 			if this.TyrePressureMode
 				this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 											  , compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
 
-			chosen := inList(concatenate(["No Tyre Change"], kQualifiedTyreCompounds), compound)
+			chosen := inList(concatenate(["No Tyre Change"], kTyreCompounds), compound)
 
 			GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 
@@ -3101,8 +3101,11 @@ class RaceCenter extends ConfigurationItem {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
-				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", (pitstopTyreCompoundDropDown = 2) ? "Wet" : "Dry")
-				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", kQualifiedTyreCompoundColors[pitstopTyreCompoundDropDown - 1])
+				
+				splitCompound(kQualifiedTyreCompoundColors[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
+				
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", compound)
+				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
 									, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
@@ -5810,8 +5813,8 @@ class RaceCenter extends ConfigurationItem {
 
 				compoundColor := false
 
-				splitQualifiedCompound(kQualifiedTyreCompounds[inList(map(kQualifiedTyreCompounds, "translate"), compound)]
-									 , compound, compoundColor)
+				splitCompound(kTyreCompounds[inList(map(kTyreCompounds, "translate"), compound)]
+							, compound, compoundColor)
 
 				pressures := string2Values(",", pressures)
 
@@ -6145,7 +6148,7 @@ class RaceCenter extends ConfigurationItem {
 							 . translate("(") . translate(setup["Temperature.Air"]) . ", " . translate(setup["Temperature.Track"]) . translate(")"))
 
 				LV_Add("", setup.Driver, conditions
-						 , translateQualifiedCompound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"])
+						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
 						 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
 											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"]))
 			}
@@ -10043,7 +10046,7 @@ chooseSetup() {
 			GuiControl Choose, setupDriverDropDownMenu, % inList(getKeys(rCenter.SessionDrivers), driver)
 
 			GuiControl Choose, setupWeatherDropDownMenu, % inList(map(kWeatherOptions, "translate"), conditions[1])
-			GuiControl Choose, setupCompoundDropDownMenu, % inList(map(kQualifiedTyreCompounds, "translate"), compound)
+			GuiControl Choose, setupCompoundDropDownMenu, % inList(map(kTyreCompounds, "translate"), compound)
 
 			GuiControl, , setupAirTemperatureEdit, %setupAirTemperatureEdit%
 			GuiControl, , setupTrackTemperatureEdit, %setupTrackTemperatureEdit%
@@ -10120,7 +10123,7 @@ updateSetupAsync() {
 
 			LV_Modify(row, "", getKeys(rCenter.SessionDrivers)[setupDriverDropDownMenu]
 							 , translate(kWeatherOptions[setupWeatherDropDownMenu]) . A_Space . translate("(") . setupAirTemperatureEdit . ", " . setupTrackTemperatureEdit . translate(")")
-							 , translate(kQualifiedTyreCompounds[setupCompoundDropDownMenu])
+							 , translate(kTyreCompounds[setupCompoundDropDownMenu])
 							 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
 		}
 

@@ -13,24 +13,23 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
-global kTyreCompounds = ["Dry", "Intermediate", "Wet"]
-global kTyreCompoundColors = ["Black", "Red", "Yellow", "White", "Green", "Blue", "Soft", "Medium", "Hard"]
-
-global kQualifiedTyreCompounds = ["Wet", "Intermediate", "Dry"
-								, "Wet (Soft)", "Wet (Medium)", "Wet (Hard)"
-								, "Intermediate (Soft)", "Intermediate (Medium)", "Intermediate (Hard)"
-								, "Dry (Soft)", "Dry (Medium)", "Dry (Hard)"
-								, "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
-global kQualifiedTyreCompoundColors = ["Black", "Black", "Black"
-									 , "Soft", "Medium", "Hard"
-									 , "Soft", "Medium", "Hard"
-									 , "Soft", "Medium", "Hard"
-									 , "Red", "Yellow", "White", "Green", "Blue"]
+global kTyreCompounds = ["Wet", "Intermediate", "Dry"
+					   , "Wet (Soft)", "Wet (Medium)", "Wet (Hard)"
+					   , "Intermediate (Soft)", "Intermediate (Medium)", "Intermediate (Hard)"
+					   , "Dry (Soft)", "Dry (Medium)", "Dry (Hard)"
+					   , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
 global kDryQualificationSetup = "DQ"
 global kDryRaceSetup = "DR"
@@ -393,7 +392,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	getTyreCompoundName(simulator, car, track, compound) {
 		name := getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
-									, "Tyre Names", compound, compound)
+									, "Compound Names", compound, compound)
 
 		if (!name || (name = ""))
 			name := compound
@@ -401,8 +400,13 @@ class SessionDatabase extends ConfigurationItem {
 		return name
 	}
 
-	getTyreCompoundCode(simulator, car, track, compound) {
-		code := getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
+	getTyreCompounds(simulator, car, track) {
+		code := this.getSimulatorCode(simulator)
+
+		if (code = "ACC")
+			return ["Dry", "Wet"]
+		else if (code = "R3E")
+		code := getConfigurationValue(this.loadData(this.sTyreData, , "Tyre Data.ini")
 									, "Tyre Codes", compound, compound)
 
 		if (!code || (code = ""))
@@ -579,6 +583,31 @@ class SessionDatabase extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+compound(compound, color := false) {
+	if color {
+		if (color = "Black")
+			return compound
+		else
+			return (compound . " (" . color . ")")
+	}
+	else
+		return string2Values(A_Space, compound)[1]
+}
+
+compoundColor(compound) {
+	compound := string2Values(A_Space, compound)
+
+	if (compound.Length() == 1)
+		return "Black"
+	else
+		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+}
+
+splitCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
+	compound := compound(qualifiedCompound)
+	compoundColor := compoundColor(qualifiedCompound)
+}
 
 parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
 	if InStr(fullName, "(") {

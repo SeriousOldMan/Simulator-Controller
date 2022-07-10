@@ -1976,7 +1976,7 @@ class Strategy extends ConfigurationItem {
 				tyreCompoundColors.Push(this.TyreCompoundColor)
 
 			for ignore, compoundColor in tyreCompoundColors
-				availableTyreSets[qualifiedCompound(tyreCompound, compoundColor)] := 99
+				availableTyreSets[compound(tyreCompound, compoundColor)] := 99
 		}
 		else
 			for ignore, descriptor in tyreSets {
@@ -1986,7 +1986,7 @@ class Strategy extends ConfigurationItem {
 					count -= 1
 
 				if (count > 0)
-					availableTyreSets[qualifiedCompound(descriptor[1], descriptor[2])] := count
+					availableTyreSets[compound(descriptor[1], descriptor[2])] := count
 			}
 
 		this.AvailableTyreSets := availableTyreSets
@@ -2132,7 +2132,7 @@ class Strategy extends ConfigurationItem {
 		if (pitstopNr <= pitstops.Length()) {
 			if pitstops[pitstopNr].TyreChange {
 				tyreCompoundColor := pitstops[pitstopNr].TyreCompoundColor
-				qualifiedCompound := qualifiedCompound(pitstops[pitstopNr].TyreCompound, tyreCompoundColor)
+				qualifiedCompound := compound(pitstops[pitstopNr].TyreCompound, tyreCompoundColor)
 
 				if this.AvailableTyreSets.HasKey(qualifiedCompound) {
 					count := (this.AvailableTyreSets[qualifiedCompound] - 1)
@@ -2153,7 +2153,7 @@ class Strategy extends ConfigurationItem {
 
 			if !chooseNext {
 				tyreCompoundColor := this.StrategyManager.TyreCompoundColor
-				qualifiedCompound := qualifiedCompound(tyreCompound, tyreCompoundColor)
+				qualifiedCompound := compound(tyreCompound, tyreCompoundColor)
 
 				if !this.AvailableTyreSets.HasKey(qualifiedCompound)
 					chooseNext := true
@@ -2180,7 +2180,7 @@ class Strategy extends ConfigurationItem {
 					Random rnd, 1, %numColors%
 
 					tyreCompoundColor := tyreCompoundColors[Round(rnd)]
-					qualifiedCompound := qualifiedCompound(tyreCompound, tyreCompoundColor)
+					qualifiedCompound := compound(tyreCompound, tyreCompoundColor)
 
 					if availableTyreSets.HasKey(qualifiedCompound) {
 						this.StrategyManager.TyreCompoundColor := tyreCompoundColor
@@ -2417,45 +2417,6 @@ class Strategy extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-qualifiedCompound(compound, compoundColor) {
-	if (compound= "Dry") {
-		if (compoundColor = "Black")
-			return "Dry"
-		else
-			return ("Dry (" . compoundColor . ")")
-	}
-	else if (compoundColor = "Black")
-		return "Wet"
-	else
-		return ("Wet (" . compoundColor . ")")
-}
-
-translateQualifiedCompound(compound, compoundColor) {
-	if (compound= "Dry") {
-		if (compoundColor = "Black")
-			return translate("Dry")
-		else
-			return (translate("Dry") . translate(" (") . translate(compoundColor) . translate(")"))
-	}
-	else if (compoundColor = "Black")
-		return translate("Wet")
-	else
-		return (translate("Wet") . translate(" (") . translate(compoundColor) . translate(")"))
-}
-
-splitQualifiedCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
-	compoundColor := "Black"
-
-	index := inList(kQualifiedTyreCompounds, qualifiedCompound)
-
-	if (index == 1)
-		compound := "Wet"
-	else
-		compound := "Dry"
-
-	compoundColor := kQualifiedTyreCompoundColors[index]
-}
 
 lookupLapTime(lapTimes, map, remainingFuel) {
 	selected := false

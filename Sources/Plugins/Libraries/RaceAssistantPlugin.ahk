@@ -317,8 +317,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	RaceAssistant[zombie := false] {
 		Get {
 			if (!this.iRaceAssistant && zombie) {
-				if (!this.iWaitForShutdown && this.iRaceAssistantZombie)
-					this.updateActions(kSessionFinished)
+				if !this.iWaitForShutdown {
+					wasZombie := (this.iRaceAssistantZombie != false)
+
+					this.iRaceAssistantZombie := false
+
+					if wasZombie
+						this.updateActions(kSessionFinished)
+				}
 
 				return this.iRaceAssistantZombie
 			}
@@ -950,13 +956,30 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if !settingsDB
 			settingsDB := new SettingsDatabase()
 
-		maxFuel := settingsDB.getSettingValue(getConfigurationValue(data, "Session Data", "Simulator")
-											, getConfigurationValue(data, "Session Data", "Car")
-											, getConfigurationValue(data, "Session Data", "Track")
+		simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		car := getConfigurationValue(data, "Session Data", "Car")
+		track := getConfigurationValue(data, "Session Data", "Track")
+
+		maxFuel := settingsDB.getSettingValue(simulator, car, track
 											, "*", "Session Settings", "Fuel.Amount", kUndefined)
 
 		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 			setConfigurationValue(data, "Session Data", "FuelAmount", maxFuel)
+
+		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+
+		if (compound != kUndefined) {
+			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, "Dry")
+			compoundColor := false
+
+			splitCompound(compound, compound, compoundColor)
+
+			setConfigurationValue(data, "Car Data", "TyreCompound", compound)
+			setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+
+			if !isDebug()
+				removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
+		}
 
 		this.Simulator.updateSessionData(data)
 	}

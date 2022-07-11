@@ -125,14 +125,31 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetStringFromBytes(vehicle.mVehicleName));
+				string carModel = GetStringFromBytes(vehicle.mVehicleName);
+				string[] parts = carModel.Split('#');
+
+				if (parts.Length > 1)
+				{
+					carModel = parts[0].Trim();
+
+					Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(int.Parse(parts[1]));
+				}
+				else
+				{
+					Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(vehicle.mID);
+				}
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
 				if (vehicle.mIsPlayer != 0)
-					Console.Write("Driver.Car="); Console.WriteLine(i);
+				{
+					Console.Write("Driver.Car=");
+					Console.WriteLine(i);
+				}
 			}
 		}
 
@@ -157,8 +174,14 @@ namespace RF2SHMProvider {
 					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
-				
-				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
+
+				string carModel = GetStringFromBytes(playerScoring.mVehicleName);
+				string[] parts = carModel.Split('#');
+
+				if (parts.Length > 1)
+					carModel = parts[0].Trim();
+
+				Console.Write("Car="); Console.WriteLine(carModel);
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));

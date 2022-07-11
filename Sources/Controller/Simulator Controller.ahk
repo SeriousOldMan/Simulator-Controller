@@ -1495,7 +1495,7 @@ class ControllerPlugin extends Plugin {
 
 	getLabel(descriptor, default := false) {
 		if !this.sLabelsDatabase
-			this.sLabelsDatabase := getControllerActionLabels()
+			ControllerPlugin.sLabelsDatabase := getControllerActionLabels()
 
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
 
@@ -1507,7 +1507,7 @@ class ControllerPlugin extends Plugin {
 
 	getIcon(descriptor, default := false) {
 		if !this.sIconsDatabase
-			this.sIconsDatabase := getControllerActionIcons()
+			ControllerPlugin.sIconsDatabase := getControllerActionIcons()
 
 		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
 
@@ -1883,9 +1883,6 @@ initializeSimulatorController() {
 	Menu Tray, Add, Exit, Exit
 
 	SetKeyDelay 5, 25
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
 
 	settings := readConfiguration(kSimulatorSettingsFile)
 

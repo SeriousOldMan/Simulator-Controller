@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
@@ -176,34 +177,9 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			setConfigurationValue(data, "Stint Data", "DriverNickname", "")
 		}
 
-		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", "Dry")
-
-		if (InStr(compound, "SemiSlick") = 1)
-			compoundColor := "Soft"
-		else if (InStr(compound, "Street") = 1)
-			compoundColor := "Hard"
-		else if (InStr(compound, "Slick") = 1) {
-			compoundColor := string2Values(A_Space, compound)
-
-			if (compoundColor.Length() > 1) {
-				compoundColor := compoundColor[2]
-
-				if !inList(["Hard", "Medium", "Soft"], compoundColor)
-					compoundColor := "Black"
-			}
-			else
-				compoundColor := "Black"
-		}
-		else
-			compoundColor := "Black"
-
-		setConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-		setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
-
 		if !isDebug() {
 			removeConfigurationValue(data, "Car Data", "TCRaw")
 			removeConfigurationValue(data, "Car Data", "ABSRaw")
-			removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
 			removeConfigurationValue(data, "Track Data", "GripRaw")
 		}
 
@@ -349,17 +325,17 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			switch action {
 				case "Increase":
 					keys := ""
-					
+
 					Loop %steps%
 						keys .= this.NextChoiceHotkey
-						
+
 					this.sendPitstopCommand(keys)
 				case "Decrease":
 					keys := ""
-					
+
 					Loop %steps%
 						keys .= this.PreviousChoiceHotkey
-						
+
 					this.sendPitstopCommand(keys)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."

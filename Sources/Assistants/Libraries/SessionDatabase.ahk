@@ -28,7 +28,7 @@ global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRai
 global kTyreCompounds = ["Wet", "Intermediate", "Dry"
 					   , "Wet (Soft)", "Wet (Medium)", "Wet (Hard)"
 					   , "Intermediate (Soft)", "Intermediate (Medium)", "Intermediate (Hard)"
-					   , "Dry (Soft)", "Dry (Medium)", "Dry (Hard)"
+					   , "Dry (SuperSoft)", "Dry (Soft)", "Dry (Medium)", "Dry (Hard)", "Dry (SuperHard)"
 					   , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
 global kDryQualificationSetup = "DQ"
@@ -51,7 +51,6 @@ class SessionDatabase extends ConfigurationItem {
 	static sTyreData := {}
 
 	static sID := false
-	static sDriver := false
 
 	iControllerConfiguration := false
 
@@ -103,10 +102,10 @@ class SessionDatabase extends ConfigurationItem {
 	__New(controllerConfiguration := false) {
 		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
 
-		if !this.sID {
+		if !this.ID {
 			FileRead identifier, % kUserConfigDirectory . "ID"
 
-			this.sID := identifier
+			SessionDatabase.sID := identifier
 		}
 
 		if !controllerConfiguration {
@@ -396,7 +395,7 @@ class SessionDatabase extends ConfigurationItem {
 		static sCodes := {}
 
 		code := this.getSimulatorCode(simulator)
-		cache := (names ? sNames : sCodes)
+		cache := (codes ? sCode : sNames)
 		key := (code . "." . car . "." . track)
 
 		if cache.HasKey(key)
@@ -409,18 +408,18 @@ class SessionDatabase extends ConfigurationItem {
 												   , "Session Settings", "Tyre.Compound.Choices"
 												   , kUndefined)
 
-			data := this.loadData(this.sTyreData, , "Tyre Data.ini")
+			data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
-			compounds := getConfigurationValue(data, "Car Compounds", car . "." . track, kUndefined)
-
-			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", car . ".*", kUndefined)
+			compounds := getConfigurationValue(data, "Car Compounds", car . ";" . track, kUndefined)
 
 			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", "*." . track, kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", car . ";*", kUndefined)
 
 			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", "*.*", kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", "*;" . track, kUndefined)
+
+			if (compounds == kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", "*;*", kUndefined)
 		}
 
 		if (compounds == kUndefined) {
@@ -440,12 +439,15 @@ class SessionDatabase extends ConfigurationItem {
 		return compounds
 	}
 
-	getTyreCompoundName(simulator, car, track, compound) {
+	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
 		name := getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
 									, "Compound Names", compound, compound)
 
 		if (!name || (name = ""))
-			name := compound
+			if (default = kUndefined)
+				name := compound
+			else
+				name := default
 
 		return name
 	}

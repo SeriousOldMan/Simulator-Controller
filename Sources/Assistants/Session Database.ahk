@@ -166,8 +166,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iAirTemperature := 23
 	iTrackTemperature := 27
-	iTyreCompound := "Dry"
-	iTyreCompoundColor := "Black"
+	iTyreCompound := false
+	iTyreCompoundColor := false
 
 	iAvailableModules := {Settings: false, Setups: false, Pressures: false}
 	iSelectedModule := false
@@ -478,20 +478,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui Tab, 3
 
 		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Compound")
-
-		compound := this.iTyreCompound
-
-		if (this.iTyreCompoundColor != "Black")
-			compound := (compound . " (" . this.iTyreCompoundColor . ")")
-
-		choices := map(kTyreCompounds, "translate")
-		chosen := inList(kTyreCompounds, compound)
-		if (!chosen && (choices.Length() > 0)) {
-			compound := choices[1]
-			chosen := 1
-		}
-
-		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit Choose%chosen%  gloadPressures vtyreCompoundDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
 		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20, % this.iAirTemperature
@@ -2073,6 +2060,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
+		static lastSimulator := false
+		static lastCar := false
+		static lastTrack := false
+
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
 		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
@@ -2087,17 +2078,42 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControlGet trackTemperatureEdit
 				GuiControlGet tyreCompoundDropDown
 
-				compound := string2Values(A_Space, kTyreCompounds[tyreCompoundDropDown])
+				compounds := this.SessionDatabase.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-				if (compound.Length() == 1)
-					compoundColor := "Black"
+				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", map(compounds, "translate")*))
+
+				chosen := 0
+
+				if ((this.SelectedSimulator = lastSimulator) && (this.SelectedCar = lastCar) && (this.SelectedTrack = lastTrack))
+					chosen := tyreCompoundDropDown
+				else if this.iTyreCompound
+					chosen := inList(compounds, compound(this.iTyreCompound, this.iTyreCompoundColor))
+
+				if ((chosen == 0) && (compounds.Length() > 0))
+					chosen := 1
+
+				GuiControl Choose, tyreCompoundDropDown, %chosen%
+
+				lastSimulator := this.SelectedSimulator
+				lastCar := this.SelectedCar
+				lastTrack := this.SelectedTrack
+
+				if chosen {
+					compound := false
+					compoundColor := false
+
+					splitCompound(compounds[chosen], compound, compoundColor)
+
+					this.iTyreCompound := compound
+					this.iTyreCompoundColor := compoundColor
+
+					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+																			   , this.SelectedTrack, this.SelectedWeather
+																			   , airTemperatureEdit, trackTemperatureEdit
+																			   , compound, compoundColor)
+				}
 				else
-					compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
-
-				pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
-																		   , this.SelectedTrack, this.SelectedWeather
-																		   , airTemperatureEdit, trackTemperatureEdit
-																		   , compound[1], compoundColor)
+					pressureInfos := []
 
 				if (pressureInfos.Count() == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
@@ -3500,14 +3516,13 @@ transferPressures() {
 	GuiControlGet tyreCompoundDropDown
 
 	tyrePressures := []
-	compound := string2Values(A_Space, kTyreCompounds[tyreCompoundDropDown])
 
-	if (compound.Length() == 1)
-		compoundColor := "Black"
-	else
-		compoundColor := SubStr(compound[2], 2, StrLen(compound[2]) - 2)
+	compounds := editor.SessionDatabase.getTyreCompounds(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack)
 
-	compound := compound[1]
+	compound := false
+	compoundColor := false
+
+	splitCompound(compounds[tyreCompoundDropDown], compound, compoundColor)
 
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather
@@ -3560,8 +3575,8 @@ showSessionDatabaseEditor() {
 	weather := false
 	airTemperature := 23
 	trackTemperature:= 27
-	compound := "Dry"
-	compoundColor := "Black"
+	compound := false
+	compoundColor := false
 
 	index := 1
 

@@ -4111,7 +4111,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 
 				GuiControl, , pitstopTyreCompoundDropDown, % ("|" . values2String("|", map(concatenate(["No Tyre Change"], compounds), "translate")*))
-				GuiControl Choose, pitstopTyreCompoundDropDown, % ((compounds.Length() > 0) ? 1 : 0)
+				GuiControl Choose, pitstopTyreCompoundDropDown, 1
 			}
 		}
 	}

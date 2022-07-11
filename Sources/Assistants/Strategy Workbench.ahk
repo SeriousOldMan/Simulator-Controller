@@ -1956,6 +1956,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 7: ; "Import from Simulation..."
 				simulator := this.SelectedSimulator
+				car := this.SelectedCar
+				track := this.SelectedTrack
 
 				if simulator {
 					switch simulator {
@@ -1999,6 +2001,19 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						compound := getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined)
 						compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
+
+						if (compound = kUndefined) {
+							compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+
+							if (compound != kUndefined) {
+								compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, false)
+
+								if compound
+									splitCompound(compound, compound, compoundColor)
+								else
+									compound := kUndefined
+							}
+						}
 
 						if ((compound != kUndefined) && (compoundColor != kUndefined))
 							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))

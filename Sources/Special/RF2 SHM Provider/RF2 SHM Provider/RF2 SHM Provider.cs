@@ -523,45 +523,20 @@ namespace RF2SHMProvider {
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 		}
 
-		private void ExecuteSetTyreCompoundCommand(string[] tyreCompoundArgument) {
-			string compound = tyreCompoundArgument[0];
-
-			if (tyreCompoundArgument[0] == "None") {
+		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
+			if (tyreCompound == "None") {
 				Console.WriteLine("Adjusting Tyre Compound: No Change");
 
-				compound = "No Change";
+				tyreCompound = "No Change";
 			}
 			else {
 				Console.Write("Adjusting Tyre Compound: ");
-				Console.Write(compound); Console.Write(" ");
-				Console.WriteLine(tyreCompoundArgument[1]);
-
-				if (compound == "Wet")
-					compound = "Rain";
-				else
-					switch (tyreCompoundArgument[1]) {
-						case "Red":
-							compound = "Soft";
-
-							break;
-						case "White":
-							compound = "Medium";
-
-							break;
-						case "Blue":
-							compound = "Hard";
-
-							break;
-						default:
-							compound = "";
-
-							break;
-					}
+				Console.WriteLine(tyreCompound);
 			}
 
 			void selectAxleTyreCompound(string category) {
 				if (SelectPitstopCategory(category))
-					SelectPitstopOption(compound, "+");
+					SelectPitstopOption(tyreCompound, "+");
 			}
 
 			selectAxleTyreCompound("F TIRES:");
@@ -687,7 +662,7 @@ namespace RF2SHMProvider {
 					ExecuteSetRefuelCommand(arguments[0]);
 					break;
 				case "Tyre Compound":
-					ExecuteSetTyreCompoundCommand(arguments);
+					ExecuteSetTyreCompoundCommand(arguments[0]);
 					break;
 				case "Tyre Set":
 					ExecuteSetTyreSetCommand(arguments[0]);
@@ -800,6 +775,7 @@ namespace RF2SHMProvider {
 
 		public void ReadSetup() {
 			Console.WriteLine("[Setup Data]");
+			
 			if (connected) {
 				if (!SelectPitstopCategory("FUEL:"))
 					return;
@@ -813,23 +789,8 @@ namespace RF2SHMProvider {
 
 				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				if (compound.Contains("Rain")) {
-					Console.WriteLine("Wet");
-					Console.WriteLine("TyreCompoundColor=Black");
-				}
-				else {
-					Console.WriteLine("Dry");
-
-					if (compound.Contains("Soft"))
-						Console.WriteLine("TyreCompoundColor=Red");
-					else if (compound.Contains("Medium"))
-						Console.WriteLine("TyreCompoundColor=White");
-					else if (compound.Contains("Hard"))
-						Console.WriteLine("TyreCompoundColor=Blue");
-					else
-						Console.WriteLine("TyreCompoundColor=Black");
-				}
-
+				Console.WriteLine("TyreCompoundRaw=" + compound);
+				
 				void writePressure(string category, string key) {
 					if (!SelectPitstopCategory(category))
 						return;

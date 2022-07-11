@@ -3554,6 +3554,9 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iStrategy := strategy
 
+		if strategy
+			this.initializeSimulator(strategy.Simulator, strategy.Car, strategy.Track)
+
 		if (show || (this.SelectedDetailReport = "Strategy") || !this.SelectedDetailReport)
 			if strategy {
 				this.StrategyViewer.showStrategyInfo(this.Strategy)
@@ -4065,31 +4068,51 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	initializeSimulator(simulator, car, track) {
-		this.iSimulator := simulator
-		this.iCar := car
-		this.iTrack := track
+	initializeSimulator(simulator, car, track, force := true) {
+		if (force || !this.Simulator) {
+			this.iSimulator := simulator
+			this.iCar := car
+			this.iTrack := track
 
-		if (this.Simulator = "") {
-			this.iSimulator := false
-			this.iCar := false
-			this.iTrack := false
-		}
+			if (this.Simulator = "") {
+				this.iSimulator := false
+				this.iCar := false
+				this.iTrack := false
+			}
 
-		if this.Simulator {
-			window := this.Window
+			if this.Simulator {
+				window := this.Window
 
-			Gui %window%:Default
+				Gui %window%:Default
 
-			compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
+				compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
 
-			this.iTyreCompounds := compounds
+				this.iTyreCompounds := compounds
 
-			GuiControl, , setupCompoundDropDownMenu, % ("|" . values2String("|", map(compounds, "translate")*))
-			GuiControl Choose, setupCompoundDropDownMenu, % ((compounds.Length() > 0) ? 1 : 0)
+				GuiControl, , setupCompoundDropDownMenu, % ("|" . values2String("|", map(compounds, "translate")*))
 
-			GuiControl, , pitstopTyreCompoundDropDown, % ("|" . values2String("|", map(concatenate(["No Tyre Change"], compounds), "translate")*))
-			GuiControl Choose, pitstopTyreCompoundDropDown, % ((compounds.Length() > 0) ? 1 : 0)
+				currentListView := A_DefaultListView
+
+				try {
+					Gui ListView, % this.SetupsListView
+
+					row := LV_GetNext(0)
+
+					if row {
+						LV_GetText(compound, row, 3)
+
+						GuiControl Choose, setupCompoundDropDownMenu, % inList(map(this.TyreCompounds, "translate"), compound)
+					}
+					else
+						GuiControl Choose, setupCompoundDropDownMenu, % ((compounds.Length() > 0) ? 1 : 0)
+				}
+				finally {
+					Gui ListView, %currentListView%
+				}
+
+				GuiControl, , pitstopTyreCompoundDropDown, % ("|" . values2String("|", map(concatenate(["No Tyre Change"], compounds), "translate")*))
+				GuiControl Choose, pitstopTyreCompoundDropDown, % ((compounds.Length() > 0) ? 1 : 0)
+			}
 		}
 	}
 
@@ -4975,7 +4998,7 @@ class RaceCenter extends ConfigurationItem {
 
 				lapPressures := string2Values(";", lapPressures)
 
-				if (!this.iSimulator && (lapPressures[1] != "-"))
+				if (lapPressures[1] != "-")
 					this.initializeSimulator(lapPressures[1], lapPressures[2], lapPressures[3])
 
 				coldPressures := string2Values(",", lapPressures[9])
@@ -5219,7 +5242,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			session := this.SelectedSession[true]
 
-			version := this.Connector.getSessionValue(session, "Race Strategy Version")
+			version := this.Connector.GetSessionValue(session, "Race Strategy Version")
 
 			if (version && (version != "")) {
 				this.showMessage(translate("Syncing session strategy"))
@@ -5228,7 +5251,7 @@ class RaceCenter extends ConfigurationItem {
 					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
 				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
-					strategy := this.Connector.getSessionValue(session, "Race Strategy")
+					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))
 
@@ -5258,7 +5281,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			session := this.SelectedSession[true]
 
-			version := this.Connector.getSessionValue(session, "Setups Version")
+			version := this.Connector.GetSessionValue(session, "Setups Version")
 
 			if (version && (version != "")) {
 				this.showMessage(translate("Syncing setups"))
@@ -5276,8 +5299,8 @@ class RaceCenter extends ConfigurationItem {
 					Gui ListView, % this.SetupsListView
 
 					if (!this.SetupsVersion || (this.SetupsVersion < version)) {
-						info := this.Connector.getSessionValue(session, "Setups Info")
-						setups := this.Connector.getSessionValue(session, "Setups")
+						info := this.Connector.GetSessionValue(session, "Setups Info")
+						setups := this.Connector.GetSessionValue(session, "Setups")
 
 						if (setups = "CLEAR") {
 							if (this.SetupsVersion && (LV_GetCount() > 0)) {
@@ -5315,7 +5338,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			session := this.SelectedSession[true]
 
-			version := this.Connector.getSessionValue(session, "Team Drivers Version")
+			version := this.Connector.GetSessionValue(session, "Team Drivers Version")
 
 			if (version && (version != "")) {
 				this.showMessage(translate("Syncing team drivers"))
@@ -5354,7 +5377,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			session := this.SelectedSession[true]
 
-			version := this.Connector.getSessionValue(session, "Stint Plan Version")
+			version := this.Connector.GetSessionValue(session, "Stint Plan Version")
 
 			if (version && (version != "")) {
 				this.showMessage(translate("Syncing stint plan"))
@@ -5372,8 +5395,8 @@ class RaceCenter extends ConfigurationItem {
 					Gui ListView, % this.PlanListView
 
 					if (!this.PlanVersion || (this.PlanVersion < version)) {
-						info := this.Connector.getSessionValue(session, "Stint Plan Info")
-						plan := this.Connector.getSessionValue(session, "Stint Plan")
+						info := this.Connector.GetSessionValue(session, "Stint Plan Info")
+						plan := this.Connector.GetSessionValue(session, "Stint Plan")
 
 						if (plan = "CLEAR") {
 							if (this.PlanVersion && (LV_GetCount() > 0)) {
@@ -5446,11 +5469,13 @@ class RaceCenter extends ConfigurationItem {
 				else if lastLap
 					hadLastLap := true
 
-				if !this.Simulator
+				simulator := this.Connector.GetSessionValue(session, "Simulator")
+				car := this.Connector.GetSessionValue(session, "Car")
+				track := this.Connector.GetSessionValue(session, "Track")
+
+				if (simulator && (simulator != ""))
 					try {
-						this.initializeSimulator(this.Connector.GetSessionValue(session, "Simulator")
-											   , this.Connector.GetSessionValue(session, "Car")
-											   , this.Connector.GetSessionValue(session, "Track"))
+						this.initializeSimulator(simulator, car, track, true)
 					}
 					catch exception {
 						; ignore
@@ -6402,11 +6427,9 @@ class RaceCenter extends ConfigurationItem {
 
 				this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
 
-				if !this.Simulator {
-					this.initializeSimulator(getConfigurationValue(raceData, "Session", "Simulator", false)
-										   , getConfigurationValue(raceData, "Session", "Car")
-										   , getConfigurationValue(raceData, "Session", "Track"))
-				}
+				this.initializeSimulator(getConfigurationValue(raceData, "Session", "Simulator", false)
+									   , getConfigurationValue(raceData, "Session", "Car")
+									   , getConfigurationValue(raceData, "Session", "Track"))
 
 				if !this.Weather {
 					lastLap := this.LastLap

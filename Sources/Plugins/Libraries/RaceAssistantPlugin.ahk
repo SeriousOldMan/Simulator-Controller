@@ -1060,7 +1060,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	getSessionSettings() {
+	createSessionSettings() {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
@@ -1079,7 +1079,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			return false
 	}
 
-	getSessionState() {
+	createSessionState() {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
@@ -1124,8 +1124,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if isDebug()
 					showMessage("Restoring session state for " . this.RaceAssistantName)
 
-				sessionSettings := this.getSessionSettings()
-				sessionState := this.getSessionState()
+				sessionSettings := this.createSessionSettings()
+				sessionState := this.createSessionState()
 
 				if (sessionSettings || sessionState)
 					this.Simulator.restoreSessionState(sessionSettings, sessionState)

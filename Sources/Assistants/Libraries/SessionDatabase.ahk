@@ -390,6 +390,56 @@ class SessionDatabase extends ConfigurationItem {
 		return code
 	}
 
+	getTyreCompounds(simulator, car, track, codes := false) {
+		static settingsDB := false
+		static sNames := {}
+		static sCodes := {}
+
+		code := this.getSimulatorCode(simulator)
+		cache := (names ? sNames : sCodes)
+		key := (code . "." . car . "." . track)
+
+		if cache.HasKey(key)
+			return cache[key]
+		else {
+			if !settingsDB
+				settingsDB := new SettingsDatabase()
+
+			compounds := settingsDB.readSettingValue(simulator, car, track, "*"
+												   , "Session Settings", "Tyre.Compound.Choices"
+												   , kUndefined)
+
+			data := this.loadData(this.sTyreData, , "Tyre Data.ini")
+
+			compounds := getConfigurationValue(data, "Car Compounds", car . "." . track, kUndefined)
+
+			if (compounds == kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", car . ".*", kUndefined)
+
+			if (compounds == kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", "*." . track, kUndefined)
+
+			if (compounds == kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", "*.*", kUndefined)
+		}
+
+		if (compounds == kUndefined) {
+			if (code = "ACC")
+				compounds := ["Dry", "Wet"]
+			else
+				compounds := []
+		}
+		else
+			compounds := string2Values(";", compounds)
+
+		if !codes
+			compounds := map(compounds, ObjBindMethod(this, "getTyreCompoundName", simulator, car, track))
+
+		cache[key] := compounds
+
+		return compounds
+	}
+
 	getTyreCompoundName(simulator, car, track, compound) {
 		name := getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
 									, "Compound Names", compound, compound)
@@ -400,19 +450,12 @@ class SessionDatabase extends ConfigurationItem {
 		return name
 	}
 
-	getTyreCompounds(simulator, car, track) {
-		code := this.getSimulatorCode(simulator)
+	getTyreCompoundCode(simulator, car, track, compound) {
+		for ignore, name in this.getTyreCompounds(simulator, car, track, "*", false)
+			if (name = compound)
+				return this.getTyreCompounds(simulator, car, track, "*", true)[A_Index]
 
-		if (code = "ACC")
-			return ["Dry", "Wet"]
-		else if (code = "R3E")
-		code := getConfigurationValue(this.loadData(this.sTyreData, , "Tyre Data.ini")
-									, "Tyre Codes", compound, compound)
-
-		if (!code || (code = ""))
-			code := compound
-
-		return code
+		return "Dry"
 	}
 
 	readNotes(simulator, car, track) {

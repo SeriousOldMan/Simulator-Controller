@@ -149,6 +149,49 @@ class SettingsDatabase extends SessionDatabase {
 		return settings
 	}
 
+	readSettingValue(simulator, car, track, weather, section, key
+				   , default := false, inherited := true, community := "__Undefined__") {
+		if (community = kUndefined)
+			community := this.UseCommunity
+
+		id := this.ID
+
+		value := readSetting(this, simulator, result, id, true, community
+						   , car, track, weather, section, key, kUndefined)
+
+		if inherited {
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , "*", track, weather, section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , car, "*", weather, section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , car, track, "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , "*", "*", weather, section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , "*", track, "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , car, "*", "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, result, id, true, community
+								   , "*", "*", "*", section, key, kUndefined)
+		}
+
+		return ((value == kUndefined) ? default : value)
+	}
+
 	getSettingValue(simulator, car, track, weather, section, key, default := false) {
 		rows := this.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Owner: this.ID
 																					 , Car: car, Track: track, Weather: weather
@@ -187,6 +230,29 @@ constraintSettings(constraints, row) {
 			return false
 
 	return true
+}
+
+readSetting(database, simulator, settings, owner, user, community, car, track, weather
+		  , section, key, default := false) {
+	if user {
+		rows := database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
+																						 , Weather: weather
+																						 , Section: section, Key: key
+																						 , Owner: owner}})
+
+		if (rows.Length() > 0)
+			return rows[1].Value
+	}
+
+	if community
+		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
+																					, {Where: {Car: car, Track: track
+																							 , Weather: weather
+																							 , Section: section, Key: key}})
+			if (row.Owner != owner)
+				return rows[1].Value
+
+	return default
 }
 
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {

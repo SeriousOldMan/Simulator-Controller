@@ -154,7 +154,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedTrack := false
 	iSelectedWeather := "Dry"
 
-	iAvailableCompounds := kTyreCompounds
+	iTyreCompounds := ["Dry"]
+
+	iAvailableCompounds := ["Dry"]
 
 	iSelectedCompound := "Dry"
 	iSelectedCompoundColor := "Black"
@@ -221,6 +223,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedWeather[] {
 		Get {
 			return this.iSelectedWeather
+		}
+	}
+
+	TyreCompounds[key := false] {
+		Get {
+			return (key ? this.iTyreCompounds[key] : this.iTyreCompounds)
 		}
 	}
 
@@ -461,8 +469,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit gchooseDriver vdriverDropDown
 
 		compound := this.SelectedCompound[true]
-		choices := map(kTyreCompounds, "translate")
-		chosen := inList(kTyreCompounds, compound)
+		choices := map(["Dry"], "translate")
+		chosen := inList(["Dry"], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -604,7 +612,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x13 := (x7 + w12 + 5)
 
-		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map(kTyreCompounds, "translate")*)
+		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map(["Dry"], "translate")*)
 
 		Gui %window%:Add, Edit, x%x13% yp+24 w40 h20 Limit2 Number vtyreSetCountEdit gupdateTyreSet
 		Gui %window%:Add, UpDown, x%x13% yp w18 h20 0x80
@@ -700,8 +708,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Compound")
 
 		compound := this.SelectedCompound[true]
-		choices := map(kTyreCompounds, "translate")
-		chosen := inList(kTyreCompounds, compound)
+		choices := map(["Dry"], "translate")
+		chosen := inList(["Dry"], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -851,8 +859,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w65 h23 +0x200, % translate("Compound")
 
 		compound := this.SelectedCompound[true]
-		choices := map(kTyreCompounds, "translate")
-		chosen := inList(kTyreCompounds, compound)
+		choices := map(["Dry"], "translate")
+		chosen := inList(["Dry"], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -1335,6 +1343,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, car), track)
 
+			this.loadTyreCompounds(simulator, car, track)
+
 			this.loadWeather(this.SelectedWeather, true)
 		}
 	}
@@ -1505,6 +1515,32 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.updateState()
 		}
+	}
+
+	loadTyreCompounds(simulator, car, track) {
+		window := this.Window
+
+		Gui %window%:Default
+
+		compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
+
+		this.iTyreCompounds := compounds
+
+		translatedCompounds := map(compounds, "translate")
+		choices := ("|" . values2String("|", translatedCompounds*))
+
+		GuiControl, , tyreSetDropDown, %choices%
+		GuiControl, , simCompoundDropDown, %choices%
+		GuiControl, , strategyCompoundDropDown, %choices%
+
+		index := inList(compounds, this.SelectedCompound[true])
+
+		if ((index == 0) && (compounds.Length() > 0))
+			index := 1
+
+		GuiControl Choose, tyreSetDropDown, %index%
+		GuiControl Choose, simCompoundDropDown, %index%
+		GuiControl Choose, strategyCompoundDropDown, %index%
 	}
 
 	loadCompound(compound, force := false) {
@@ -1706,7 +1742,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						compound := strategy.TyreCompound
 						compoundColor := strategy.TyreCompoundColor
 
-						GuiControl Choose, simCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
+						GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 
 						simAvgLapTimeEdit := Round(strategy.AvgLapTime, 1)
 						GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
@@ -1797,7 +1833,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-							GuiControl Choose, simCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
+							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 
 							simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
 							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
@@ -1863,7 +1899,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound")
 							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color")
 
-							GuiControl Choose, simCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
+							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 						}
 
 						if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined) {
@@ -1965,7 +2001,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 
 						if ((compound != kUndefined) && (compoundColor != kUndefined))
-							GuiControl Choose, simCompoundDropDown, % inList(kTyreCompounds, compound(compound, compoundColor))
+							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 
 						map := getConfigurationValue(data, "Car Data", "Map", kUndefined)
 
@@ -2196,7 +2232,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControl Text, strategyStartABSEdit, % strategy.ABS
 
 		compound := compound(strategy.TyreCompound, strategy.TyreCompoundColor)
-		GuiControl Choose, strategyCompoundDropDown, % inList(kTyreCompounds, compound)
+		GuiControl Choose, strategyCompoundDropDown, % inList(this.TyreCompounds, compound)
 
 		GuiControl, , strategyPressureFLEdit, % strategy.TyrePressureFL
 		GuiControl, , strategyPressureFREdit, % strategy.TyrePressureFR
@@ -2350,7 +2386,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		compound := false
 		compoundColor := false
 
-		splitCompound(kTyreCompounds[simCompoundDropDown], compound, compoundColor)
+		splitCompound(this.TyreCompounds[simCompoundDropDown], compound, compoundColor)
 
 		tyreCompound := compound
 		tyreCompoundColor := compoundColor
@@ -2507,7 +2543,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui ListView, % this.TyreSetListView
 
-		translatedCompounds := map(kTyreCompounds, "translate")
+		translatedCompounds := map(this.TyreCompounds, "translate")
 		tyreSets := []
 
 		Loop % LV_GetCount()
@@ -2515,7 +2551,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			LV_GetText(compound, A_Index, 1)
 			LV_GetText(count, A_Index, 2)
 
-			splitCompound(kTyreCompounds[inList(translatedCompounds, compound)], compound, compoundColor)
+			splitCompound(this.TyreCompounds[inList(translatedCompounds, compound)], compound, compoundColor)
 
 			tyreSets.Push(Array(compound, compoundColor, count))
 		}
@@ -3190,7 +3226,7 @@ chooseTyreSet() {
 		LV_GetText(compound, A_EventInfo, 1)
 		LV_GetText(count, A_EventInfo, 2)
 
-		GuiControl Choose, tyreSetDropDown, % inList(map(kTyreCompounds, "translate"), compound)
+		GuiControl Choose, tyreSetDropDown, % inList(map(workbench.TyreCompounds, "translate"), compound)
 		GuiControl, , tyreSetCountEdit, %count%
 
 		workbench.updateState()
@@ -3212,7 +3248,7 @@ updateTyreSet() {
 		GuiControlGet tyreSetDropDown
 		GuiControlGet tyreSetCountEdit
 
-		LV_Modify(row, "", map(kTyreCompounds, "translate")[tyreSetDropDown], tyreSetCountEdit)
+		LV_Modify(row, "", map(workbench.TyreCompounds, "translate")[tyreSetDropDown], tyreSetCountEdit)
 
 		LV_ModifyCol()
 	}
@@ -3227,12 +3263,12 @@ addTyreSet() {
 
 	Gui ListView, % workbench.TyreSetListView
 
-	index := inList(kTyreCompounds, "Dry")
+	index := inList(workbench.TyreCompounds, "Dry")
 
 	if !index
 		index := 1
 
-	LV_Add("", map(kTyreCompounds, "translate")[index], 99)
+	LV_Add("", map(workbench.TyreCompounds, "translate")[index], 99)
 
 	LV_Modify(LV_GetCount(), "Select Vis")
 

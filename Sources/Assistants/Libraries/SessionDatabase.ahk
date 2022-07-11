@@ -426,7 +426,7 @@ class SessionDatabase extends ConfigurationItem {
 			if (code = "ACC")
 				compounds := ["Dry", "Wet"]
 			else
-				compounds := []
+				compounds := ["Dry"]
 		}
 		else
 			compounds := string2Values(";", compounds)

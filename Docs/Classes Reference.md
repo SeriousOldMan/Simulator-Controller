@@ -845,22 +845,25 @@ If this method returns *true*, this plugin supports loading setup information fr
 After the pitstop has been sucessfully carried out and the driver is back on the track, this method is called. The default method does nothing here.
 
 #### *startPitstopSetup(pitstopNumber :: Integer)*
-Called at the beginning of the pitstop preparation process, this method might activated the pitstop data input widget on the simulation user interface for example or might call a special API, to tell the simulation, that a pitstop is requested. The default method does nothing here.
+Called at the beginning of the pitstop preparation process, this method might activated the pitstop data input widget on the simulation user interface for example or might call a special API, to tell the simulation, that a pitstop is requested. The default method handles internal state change.
 
 #### *finishPitstopSetup(pitstopNumber :: Integer)*
-Called at the end of the pitstop preparation process. The implementation might close a special pitstop widget on the simulator user interface, when this has been opened by *startPitstopSetup*. The default method does nothing here.
+Called at the end of the pitstop preparation process. The implementation might close a special pitstop widget on the simulator user interface, when this has been opened by *startPitstopSetup*. The default method handles internal state change.
 
 #### *setPitstopRefuelAmount(pitstopNumber :: Integer, litres :: Float)*
-The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel the given number of litres at the next pitstop. The default method does nothing here.
+The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel the given number of litres at the next pitstop. The default method handles internal state change.
 
 #### *setPitstopTyreSet(pitstopNumber :: Integer, compound :: OneOf("Dry", "Wet", *false*), compoundColor :: OneOf("Red", "White", "Blue", "Black") := false, set :: Integer := false)*
-Requests new tyres at the given pitstop. *compound* will define the tyre category and *compoundColor* the compound mixture, wich will always be "Black" for "Wet" tyres. If a specific tyre set is requested, this will be passed for the last optional parameter. If *false* has been passed for *compound*, this means that no tyre change is requested. Both *compoundColor* and *set* will be ommitted in this case. The default method does nothing here.
+Requests new tyres at the given pitstop. *compound* will define the tyre category and *compoundColor* the compound mixture, wich will always be "Black" for "Wet" tyres. If a specific tyre set is requested, this will be passed for the last optional parameter. If *false* has been passed for *compound*, this means that no tyre change is requested. Both *compoundColor* and *set* will be ommitted in this case. The default method handles internal state change.
 
 #### *setPitstopTyrePressures(pitstopNumber :: Integer, pressureFL :: Float, pressureFR :: Float, pressureRL :: Float, pressureRR :: Float)*
-Dials the pressures in PSI, that has been selected previously by *setPitstopTyreSet*. The default method does nothing here.
+Dials the pressures in PSI, that has been selected previously by *setPitstopTyreSet*. The default method handles internal state change.
 
-#### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean)*
-This is the last method of the pitstop preparation cycle. It requests repairs for the different parts of the car at the pitstop. The default method does nothing here.
+#### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean, repairEngine :: Boolean := false)*
+This method requests repairs for the different parts of the car at the pitstop. The default method handles internal state change.
+
+#### *requestPitstopDriver(pitstopNumber :: Integer, driver :: String)*
+This is the last method of the pitstop preparation cycle. It requests the next driver when swapping drivers in a team race. The default method handles internal state change.
 
 #### *updatePositionsData(data :: ConfigurationMap)*
 *updatePositionsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the Virtual Race Strategist. The implementation of *updatePositionsData* must add the position and timing information for all cars to the data object. See the documentation for the Virtual Race Strategist for more information about a [description of the corrsponding data fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition).

@@ -216,32 +216,45 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 	
 	startPitstopSetup(pitstopNumber) {
+		base.startPitstopSetup()
+		
 		openPitstopMFD()
 	}
 	
 	finishPitstopSetup(pitstopNumber) {
+		base.finishPitstopSetup()
+		
 		closePitstopMFD()
 	}
 	
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+		
 		this.openPitstopMFD("Fuel")
 		
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
 	
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		
 		this.openPitstopMFD("Tyre")
 		
 		this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		
 		this.openPitstopMFD("Tyre")
 		
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		
 		this.openPitstopMFD("Fuel")
 		
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")

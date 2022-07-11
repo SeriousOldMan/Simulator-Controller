@@ -113,7 +113,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		saveSessionState(arguments*) {
-			this.callRemote("saveSessionState", arguments*)
+			this.callRemote("callSaveSessionState", arguments*)
 		}
 	}
 

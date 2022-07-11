@@ -493,6 +493,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
+		base.startPitstopSetup()
+		
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
@@ -502,6 +504,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
+		base.finishPitstopSetup()
+		
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateR3EWindow()
 
@@ -513,6 +517,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+		
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
 				if this.optionChosen("Refuel")
@@ -528,6 +534,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Change Front Tyres")
 				if (compound && !this.chosenOption("Change Front Tyres"))
@@ -544,9 +552,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Repair Suspension")
 				if (repairSuspension != this.chosenOption("Repair Suspension"))

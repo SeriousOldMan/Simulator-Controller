@@ -241,10 +241,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+		
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		
 		if compound {
 			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound, compoundColor)
 
@@ -256,10 +260,15 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		
 		if (repairBodywork && repairSuspension)
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
 		else if repairSuspension
@@ -271,6 +280,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		base.requestPitstopDriver(pitstopNumber, driver)
+		
 		if driver {
 			driver := string2Values("|", driver)
 

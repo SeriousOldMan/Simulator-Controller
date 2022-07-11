@@ -1614,10 +1614,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
+		base.startPitstopSetup()
+		
 		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
 	}
 
 	finishPitstopSetup(pitstopNumber) {
+		base.finishPitstopSetup()
+		
 		closePitstopMFD()
 	}
 
@@ -1741,6 +1745,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+		
 		litresIncrement := Round(litres - this.getPitstopOptionValues("Refuel")[1])
 
 		if (litresIncrement != 0)
@@ -1748,6 +1754,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		
 		if compound {
 			if (this.getPitstopOptionValues("Tyre Compound") != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
@@ -1764,6 +1772,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		
 		pressures := this.getPitstopOptionValues("Tyre Pressures")
 
 		pressureFLIncrement := Round(pressureFL - pressures[1], 1)
@@ -1781,7 +1791,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			changePitstopTyrePressure("Rear Right", (pressureRRIncrement > 0) ? "Increase" : "Decrease", Abs(Round(pressureRRIncrement * 10)))
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		
 		if (repairSuspension != this.iRepairSuspensionChosen)
 			this.toggleActivity("Repair Suspension")
 
@@ -1790,6 +1802,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		base.requestPitstopDriver(pitstopNumber, driver)
+		
 		if driver {
 			driver := string2Values("|", driver)
 

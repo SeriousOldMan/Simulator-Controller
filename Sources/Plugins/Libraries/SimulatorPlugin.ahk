@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -507,6 +514,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iRaceStrategist := false
 	iRaceSpotter := false
 
+	iCurrentTyreCompound := false
+	iRequestedTyreCompound := false
+
 	RaceEngineer[] {
 		Get {
 			return this.iRaceEngineer
@@ -522,6 +532,26 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	RaceSpotter[] {
 		Get {
 			return this.iRaceSpotter
+		}
+	}
+
+	CurrentTyreCompound[] {
+		Get {
+			return this.iCurrentTyreCompound
+		}
+
+		Set {
+			return (this.iCurrentTyreCompound := value)
+		}
+	}
+
+	RequestedTyreCompound[] {
+		Get {
+			return this.iRequestedTyreCompound
+		}
+
+		Set {
+			return (this.iRequestedTyreCompound := value)
 		}
 	}
 
@@ -667,6 +697,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+
+		if (sessionState = kSessionFinished)
+			this.iTyreCompound := false
+	}
+
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return
@@ -692,6 +729,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceStrategist.reject()
 		else if this.RaceSpotter
 			this.RaceSpotter.reject()
+	}
+
+	startSession(settings, data) {
+		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+
+		this.CurrentTyreCompound := compound(compound, compoundColor)
 	}
 
 	recommendPitstop() {
@@ -721,6 +765,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	pitstopFinished(pitstopNumber) {
+		if this.RequestedTyreCompound {
+			this.CurrentTyreCompound := this.RequestedTyreCompound
+			this.RequestedTyreCompound := false
+		}
 	}
 
 	startPitstopSetup(pitstopNumber) {
@@ -733,12 +781,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		if compound
+			this.RequestedTyreCompound := compound(compound, compoundColor)
+		else
+			this.RequestedTyreCompound := false
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
@@ -748,13 +800,65 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateSessionData(data) {
+		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
+		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
+			if this.CurrentTyreCompound {
+				compound := "Dry"
+				compoundColor := "Black"
+
+				splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+
+				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
+				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+			}
+		}
+
 		if (this.SessionState != kSessionFinished) {
 			this.iCar := getConfigurationValue(data, "Session Data", "Car")
 			this.iTrack := getConfigurationValue(data, "Session Data", "Track")
 		}
 	}
 
-	restoreSessionState(sessionSettings, sessionState) {
+	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
+		if !sessionSettings
+			sessionSettings := newConfiguration()
+
+		if this.CurrentTyreCompound {
+			compound := "Dry"
+			compoundColor := "Black"
+
+			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Current", compoundColor)
+		}
+
+		if this.RequestedTyreCompound {
+			compound := "Dry"
+			compoundColor := "Black"
+
+			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
+
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Requested", compoundColor)
+		}
+	}
+
+	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
+		this.CurrentTyreCompound := false
+		this.RequestedTyreCompound := false
+
+		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", false)
+
+		if compound
+			this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																			   , "Simulator Settings", "Tyre.Compound.Color.Current"))
+
+		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", false)
+
+		if compound
+			this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																				 , "Simulator Settings", "Tyre.Compound.Color.Requested"))
 	}
 }
 

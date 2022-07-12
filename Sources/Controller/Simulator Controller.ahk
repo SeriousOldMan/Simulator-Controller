@@ -2063,5 +2063,5 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
-
+setDebug(false)
 startupSimulatorController()

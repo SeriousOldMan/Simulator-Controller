@@ -258,8 +258,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
-			compound := new SessionDatabase().getTyreCompoundCode(this.Simulator[true], this.Car, this.Track
-																, compound(compound, compoundColor))
+			compound := this.tyreCompoundCode(compound, compoundColor)
 
 			if compound {
 				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
@@ -303,6 +302,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			Loop % Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
 		}
+	}
+
+	updateSessionData(data) {
+		base.updateSessionData(data)
+
+		if !getConfigurationValue(data, "Stint Data", "InPit", false)
+			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 
 	updatePositionsData(data) {

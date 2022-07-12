@@ -210,6 +210,17 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	activateACWindow() {
+		window := this.Simulator.WindowTitle
+
+		if !WinExist(window)
+			if isDebug()
+				showMessage("AC not found...")
+
+		if !WinActive(window)
+			WinActivate %window%
+	}
+
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
@@ -226,6 +237,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 
+		this.activateACWindow()
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
 
@@ -241,6 +254,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	requirePitstopMFD() {
 		if (A_TickCount < this.iPitstopAutoClose) {
 			this.iPitstopAutoClose := (A_TickCount + 4000)
+
+			this.activateACWindow()
 
 			return true
 		}

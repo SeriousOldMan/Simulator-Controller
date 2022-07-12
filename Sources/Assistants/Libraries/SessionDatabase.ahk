@@ -395,7 +395,7 @@ class SessionDatabase extends ConfigurationItem {
 		static sCodes := {}
 
 		code := this.getSimulatorCode(simulator)
-		cache := (codes ? sCode : sNames)
+		cache := (codes ? sCodes : sNames)
 		key := (code . "." . car . "." . track)
 
 		if cache.HasKey(key)

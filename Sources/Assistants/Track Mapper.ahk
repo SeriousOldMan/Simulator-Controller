@@ -217,4 +217,11 @@ Exit:
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+sessionDB := new SessionDatabase()
+
+trackMap := sessionDB.getTrackMap("Assetto Corsa Competizione", "cota")
+fileName := createTrackImage(trackMap)
+
+sessionDB.updateTrackMap("Assetto Corsa Competizione", "cota", trackMap, fileName)
+
 startTrackMapper()

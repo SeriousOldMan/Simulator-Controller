@@ -4119,6 +4119,21 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	initializeReports() {
+		if !this.Simulator {
+			raceData := true
+			drivers := false
+			positions := false
+			times := false
+
+			this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
+
+			this.initializeSimulator(getConfigurationValue(raceData, "Session", "Simulator", false)
+								   , getConfigurationValue(raceData, "Session", "Car")
+								   , getConfigurationValue(raceData, "Session", "Track"))
+		}
+	}
+
 	loadNewStints(currentStint) {
 		session := this.SelectedSession[true]
 		newStints := []
@@ -6441,16 +6456,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.ReportViewer.setReport(folder . "Race Report")
 
-				raceData := true
-				drivers := false
-				positions := false
-				times := false
-
-				this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
-
-				this.initializeSimulator(getConfigurationValue(raceData, "Session", "Simulator", false)
-									   , getConfigurationValue(raceData, "Session", "Car")
-									   , getConfigurationValue(raceData, "Session", "Track"))
+				this.initializeReports()
 
 				if !this.Weather {
 					lastLap := this.LastLap
@@ -6815,6 +6821,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showTrackMap() {
+		this.initializeReport()
+
 		html := false
 
 		lastLap := this.LastLap
@@ -6826,17 +6834,6 @@ class RaceCenter extends ConfigurationItem {
 			fileName := sessionDB.getTrackImage(this.Simulator, this.Track)
 
 			if (trackMap && fileName) {
-				width := (chartViewer.Width - 20)
-				height := (chartViewer.Height - 20)
-
-				imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-				imgHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-				scale := Min(width / imgWidth, height / imgHeight)
-
-				imgWidth := Floor(imgWidth * scale)
-				imgHeight := Floor(imgHeight * scale)
-
 				if (this.SessionActive && lastLap) {
 					telemetry := (lastLap.Track ? lastLap.Track : lastLap.Telemetry)
 					positions := lastLap.Positions
@@ -6912,8 +6909,12 @@ class RaceCenter extends ConfigurationItem {
 
 				scale := Min(width / imgWidth, height / imgHeight)
 
-				imgWidth := Floor(imgWidth * scale)
-				imgHeight := Floor(imgHeight * scale)
+				while (imgWidth > (width / 2)) {
+					imgWidth := Floor(imgWidth * scale)
+					imgHeight := Floor(imgHeight * scale)
+
+					scale := 0.99
+				}
 
 				html := ("<div class=""lbox""><p style=""text-align: center;""><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></p></div>")
 			}
@@ -6926,10 +6927,10 @@ class RaceCenter extends ConfigurationItem {
 
 			html .= "<div class=""rbox"">"
 
-			; html .= ("<br><br><div style=""text-align: left;"" id=""header""><i>" . translate("Deltas") . "</i></div>")
-			; html .= ("<br>" . this.createLapDeltas(lastLap))
-			html .= ("<br><div style=""text-align: left;"" id=""header""><i>" . translate("Standings") . "</i></div>")
-			html .= ("<br>" . this.createLapStandings(lastLap))
+			html .= ("<br><br><br><br><br><br><div style=""text-align: left;"" id=""header""><i>" . translate("Deltas") . "</i></div>")
+			html .= ("<br>" . this.createLapDeltas(lastLap))
+			; html .= ("<br><div style=""text-align: left;"" id=""header""><i>" . translate("Standings") . "</i></div>")
+			; html .= ("<br>" . this.createLapStandings(lastLap))
 
 			html .= "</div>"
 
@@ -7959,18 +7960,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showLapDetailsAsync(lap) {
-		if !this.Simulator {
-			raceData := true
-			drivers := false
-			positions := false
-			times := false
-
-			this.ReportViewer.loadReportData(false, raceData, drivers, positions, times)
-
-			this.initializeSimulator(getConfigurationValue(raceData, "Session", "Simulator", false)
-								   , getConfigurationValue(raceData, "Session", "Car")
-								   , getConfigurationValue(raceData, "Session", "Track"))
-		}
+		this.initializeReports()
 
 		html := ("<div id=""header""><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 

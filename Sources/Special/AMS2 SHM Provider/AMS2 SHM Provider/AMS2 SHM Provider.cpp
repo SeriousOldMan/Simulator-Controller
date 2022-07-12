@@ -289,10 +289,10 @@ int main(int argc, char* argv[]) {
 		printf("Temperature=%f\n", localCopy->mTrackTemperature);
 		printf("Grip=Optimum\n");
 
-		//for (int id = 0; id < sharedData->mNumParticipants; id++)
-		//	printf("%d=%f,%f\n", id + 1,
-		//						 sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-		//						 sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
+		for (int id = 0; id < sharedData->mNumParticipants; id++)
+			printf("Car.%d.Position=%f,%f\n", id + 1,
+											  sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+											  sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
 
 		char* weather = getWeather(localCopy);
 

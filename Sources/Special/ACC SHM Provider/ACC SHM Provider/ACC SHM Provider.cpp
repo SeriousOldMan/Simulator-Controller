@@ -221,7 +221,6 @@ int main(int argc, char* argv[])
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
-		// printData("TyreCompoundRaw", tyreCompound);
 		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 		wcout << "TyreCompoundColor=Black" << endl;
 		printData("TyreSet", gf->currentTyreSet);
@@ -271,8 +270,8 @@ int main(int argc, char* argv[])
 		printData("Temperature", pf->roadTemp);
 		printData("Grip", getGrip(gf->trackGripStatus));
 
-		//for (int id = 0; id < gf->activeCars; id++)
-		//	wcout << id + 1 << "=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+		for (int id = 0; id < gf->activeCars; id++)
+			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
 	}
 	
 	if ((argc == 1) || (argv[1][0] == 'W'))

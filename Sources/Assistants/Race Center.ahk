@@ -39,6 +39,7 @@ ListLines Off					; Disable execution history
 
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
+#Include ..\Libraries\GDIP.ahk
 #Include Libraries\SessionDatabase.ahk
 #Include Libraries\SettingsDatabase.ahk
 #Include Libraries\TyresDatabase.ahk
@@ -4258,6 +4259,7 @@ class RaceCenter extends ConfigurationItem {
 			data := parseConfiguration(rawData)
 
 			lap.Telemetry := rawData
+			lap.Track := false
 
 			damage := 0
 
@@ -6801,6 +6803,80 @@ class RaceCenter extends ConfigurationItem {
 			trackMap := new SessionDatabase().getTrackMap(this.Simulator, this.Track, fileName)
 
 			if (trackMap && fileName) {
+				width := (chartViewer.Width - 20)
+				height := (chartViewer.Height - 20)
+
+				imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+				imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+				scale := Min(width / imgWidth, height / imgHeight)
+
+				imgWidth := Floor(imgWidth * scale)
+				imgHeight := Floor(imgHeight * scale)
+
+				lastLap := this.LastLap
+
+				if (this.SessionActive && lastLap) {
+					telemetry := lastLap.Telemetry
+					positions := lastLap.Positions
+
+					if (telemetry && positions) {
+						mapWidth := getConfigurationValue(trackMap, "Map", "Width")
+						mapHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+						xMin := getConfigurationValue(trackMap, "Map", "X.Min")
+						yMin := getConfigurationValue(trackMap, "Map", "Y.Min")
+
+						scale := 1.0
+
+						offsetX := (- xMin) + (mapWidth * 0.1)
+						offsetY := (- yMin) + (mapHeight * 0.1)
+
+						scaleX := (scale * 0.8)
+						scaleY := (scale * 0.8)
+
+						telemetry := parseConfiguration(telemetry)
+						positions := parseConfiguration(positions)
+
+						token := Gdip_Startup()
+
+						bitmap := Gdip_CreateBitmapFromFile(fileName)
+
+						graphics := Gdip_GraphicsFromImage(bitmap)
+
+						Gdip_SetSmoothingMode(graphics, 4)
+
+						brushGray := Gdip_BrushCreateSolid(0xffaaaaaa)
+						brushBlack := Gdip_BrushCreateSolid(0xff000000)
+
+						driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
+
+						Loop % getConfigurationValue(positions, "Position Data", "Car.Count", 0)
+						{
+							position := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
+
+							if position {
+								position := string2Values(",", position)
+
+								x := Round((offsetX + position[1]) * scaleX)
+								y := Round((offsetY + position[2]) * scaleY)
+
+								Gdip_FillEllipse(graphics, (A_Index = driver) ? brushBlack : brushGray, x - 3, y - 3, 6, 6)
+							}
+						}
+
+						fileName := (kTempDirectory . "TrackMap.png")
+
+						Gdip_SaveBitmapToFile(bitmap, fileName)
+
+						Gdip_DisposeImage(bitmap)
+
+						Gdip_DeleteGraphics(graphics)
+
+						Gdip_Shutdown(token)
+					}
+				}
+
 				width := (chartViewer.Width - 20)
 				height := (chartViewer.Height - 20)
 

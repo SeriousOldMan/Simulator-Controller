@@ -224,8 +224,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			if (option = "Refuel") {
 				this.dialPitstopOption("Refuel", action, steps)
 
-				Sleep 2000
-
 				this.closePitstopMFD("Refuel")
 			}
 			else if (option = "Tyre Compound") {
@@ -241,8 +239,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				if this.iTyreCompoundChosen
 					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
-				Sleep 2000
-
 				this.closePitstopMFD("Tyre Compound")
 			}
 			else if (option = "Repair Bodywork") {
@@ -257,8 +253,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				else if this.iRepairSuspensionChosen
 					this.dialPitstopOption("Repair Suspension", "Increase", 2)
 
-				Sleep 2000
-
 				this.closePitstopMFD("Repair Bodywork")
 			}
 			else if (option = "Repair Suspension") {
@@ -272,8 +266,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 					this.dialPitstopOption("Repair Bodywork", "Increase", 1)
 				else if this.iRepairSuspensionChosen
 					this.dialPitstopOption("Repair Suspension", "Increase", 2)
-
-				Sleep 2000
 
 				this.closePitstopMFD("Repair Suspension")
 			}
@@ -292,8 +284,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.dialPitstopOption("Refuel", "Decrease", 200)
 				this.dialPitstopOption("Refuel", "Increase", Round(litres))
 
-				Sleep 2000
-
 				this.closePitstopMFD("Refuel")
 			}
 		}
@@ -303,18 +293,20 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.requirePitstopMFD()
+			delta := this.tyreCompoundIndex(compound, compoundColor)
+			
+			if (!compound || delta) {
+				this.requirePitstopMFD()
 
-			if this.selectPitstopOption("Tyre Compound") {
-				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
+				if this.selectPitstopOption("Tyre Compound") {
+					this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				this.iTyreCompoundChosen := this.tyreCompoundIndex(compound, compoundColor)
+					this.iTyreCompoundChosen := delta
 
-				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
+					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
-				Sleep 2000
-
-				this.closePitstopMFD("Tyre Compound")
+					this.closePitstopMFD("Tyre Compound")
+				}
 			}
 		}
 	}

@@ -292,16 +292,20 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.requirePitstopMFD()
+			delta := this.tyreCompoundIndex(compound, compoundColor)
+			
+			if (!compound || delta) {
+				this.requirePitstopMFD()
 
-			if this.selectPitstopOption("Tyre Compound") {
-				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
+				if this.selectPitstopOption("Tyre Compound") {
+					this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				this.iTyreCompoundChosen := this.tyreCompoundIndex(compound, compoundColor)
+					this.iTyreCompoundChosen := delta
 
-				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
+					this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
-				this.deselectPitstopOption("Tyre Compound")
+					this.deselectPitstopOption("Tyre Compound")
+				}
 			}
 		}
 	}

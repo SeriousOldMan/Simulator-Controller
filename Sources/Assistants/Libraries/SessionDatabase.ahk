@@ -220,13 +220,29 @@ class SessionDatabase extends ConfigurationItem {
 		return FileExist(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
 	}
 
-	updateTrackMap(simulator, track, data) {
-		writeConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map", data)
+	updateTrackMap(simulator, track, data, imageFileName) {
+		directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
+
+		writeConfiguration(directory . track . ".map", data)
+
+		SplitPath imageFileName, , , extension
+
+		FileCopy %imageFileName%, %directory%%track%.%extension%, 1
 	}
 
-	getTrackMap(simulator, track) {
-		if this.hasTrackMap(simulator, track)
-			return readConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
+	getTrackMap(simulator, track, ByRef imageFileName) {
+		if this.hasTrackMap(simulator, track) {
+			directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
+
+			if FileExist(directory . track . ".png")
+				imageFileName := (directory . track . ".png")
+			else if FileExist(directory . track . ".jpg")
+				imageFileName := (directory . track . ".jpg")
+			else if FileExist(directory . track . ".gif")
+				imageFileName := (directory . track . ".gif")
+
+			return readConfiguration(directory . track . ".map")
+		}
 		else
 			return false
 	}

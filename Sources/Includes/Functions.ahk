@@ -1890,6 +1890,24 @@ removeDuplicates(list) {
 	return result
 }
 
+getKeys(map) {
+	keys := []
+
+	for key, ignore in map
+		keys.Push(key)
+
+	return keys
+}
+
+getValues(map) {
+	values := []
+
+	for ignore, value in map
+		values.Push(value)
+
+	return values
+}
+
 greaterComparator(a, b) {
 	return (a > b)
 }

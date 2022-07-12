@@ -484,24 +484,6 @@ loadSessions(connector, team) {
 	return sessions
 }
 
-getKeys(map) {
-	keys := []
-
-	for key, ignore in map
-		keys.Push(key)
-
-	return keys
-}
-
-getValues(map) {
-	values := []
-
-	for ignore, value in map
-		values.Push(value)
-
-	return values
-}
-
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	static result
 	static newSettings
@@ -1002,7 +984,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet / Intermediate Tyres")
 
 		Gui RES:Font, Norm, Arial
 
@@ -1123,7 +1105,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet / Intermediate Tyres")
 
 		Gui RES:Font, Norm, Arial
 

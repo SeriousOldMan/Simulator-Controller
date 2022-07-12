@@ -9787,24 +9787,6 @@ parseObject(properties) {
 	return result
 }
 
-getKeys(map) {
-	keys := []
-
-	for key, ignore in map
-		keys.Push(key)
-
-	return keys
-}
-
-getValues(map) {
-	values := []
-
-	for ignore, value in map
-		values.Push(value)
-
-	return values
-}
-
 loadTeams(connector) {
 	teams := {}
 

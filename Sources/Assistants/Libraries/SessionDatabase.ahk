@@ -26,9 +26,9 @@
 global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
 global kTyreCompounds = ["Wet", "Intermediate", "Dry"
-					   , "Wet (Soft)", "Wet (Medium)", "Wet (Hard)"
-					   , "Intermediate (Soft)", "Intermediate (Medium)", "Intermediate (Hard)"
-					   , "Dry (SuperSoft)", "Dry (Soft)", "Dry (Medium)", "Dry (Hard)", "Dry (SuperHard)"
+					   , "Wet (S)", "Wet (M)", "Wet (H)"
+					   , "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
+					   , "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
 					   , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
 global kDryQualificationSetup = "DQ"
@@ -408,56 +408,72 @@ class SessionDatabase extends ConfigurationItem {
 												   , "Session Settings", "Tyre.Compound.Choices"
 												   , kUndefined)
 
-			data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
+			if (compounds == kUndefined) {
+				data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
-			compounds := getConfigurationValue(data, "Car Compounds", car . ";" . track, kUndefined)
+				compounds := getConfigurationValue(data, "Car Compounds", car . ";" . track, kUndefined)
 
-			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", car . ";*", kUndefined)
+				if (compounds == kUndefined)
+					compounds := getConfigurationValue(data, "Car Compounds", car . ";*", kUndefined)
 
-			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", "*;" . track, kUndefined)
+				if (compounds == kUndefined)
+					compounds := getConfigurationValue(data, "Car Compounds", "*;" . track, kUndefined)
 
-			if (compounds == kUndefined)
-				compounds := getConfigurationValue(data, "Car Compounds", "*;*", kUndefined)
-		}
+				if (compounds == kUndefined)
+					compounds := getConfigurationValue(data, "Car Compounds", "*;*", kUndefined)
+			}
 
-		if (compounds == kUndefined) {
-			if (code = "ACC")
-				compounds := ["Dry", "Wet"]
+			if (compounds == kUndefined) {
+				if (code = "ACC")
+					compounds := ["Dry->Dry", "Wet->Wet"]
+				else
+					compounds := ["*->Dry"]
+			}
+			else {
+				candidate := getConfigurationValue(data, "Tyre Compounds", compounds, false)
+
+				if candidate
+					compounds := candidate
+			}
+
+			cds := []
+			nms := []
+
+			for ignore, tyre in string2Values(";", compounds) {
+				tyre := string2Values("->", tyre)
+
+				cds.Push(tyre[1])
+				nms.Push(tyre[2])
+			}
+
+			if codes
+				compounds := cds
 			else
-				compounds := ["Dry"]
+				compounds := nms
+
+			cache[key] := compounds
+
+			return compounds
 		}
-		else
-			compounds := string2Values(";", compounds)
-
-		if !codes
-			compounds := map(compounds, ObjBindMethod(this, "getTyreCompoundName", simulator, car, track))
-
-		cache[key] := compounds
-
-		return compounds
 	}
 
 	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
-		name := getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
-									, "Compound Names", compound, compound)
+		for index, code in this.getTyreCompounds(simulator, car, track, true)
+			if (code = compound)
+				return this.getTyreCompounds(simulator, car, track)[index]
 
-		if (!name || (name = ""))
-			if (default = kUndefined)
-				name := compound
-			else
-				name := default
-
-		return name
+		return ((default = kUndefined) ? compound : default)
 	}
 
-	getTyreCompoundCode(simulator, car, track, compound) {
-		for ignore, name in this.getTyreCompounds(simulator, car, track, "*", false)
-			if (name = compound)
-				return this.getTyreCompounds(simulator, car, track, "*", true)[A_Index]
+	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
+		for index, name in this.getTyreCompounds(simulator, car, track)
+			if (name = compound) {
+				code := this.getTyreCompounds(simulator, car, track, true)[index]
 
-		return "Dry"
+				return ((code != "*") ? code : false)
+			}
+
+		return default
 	}
 
 	readNotes(simulator, car, track) {

@@ -771,6 +771,34 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
+	tyreCompoundIndex(compound, compoundColor := false) {
+		if compound {
+			compounds := new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
+			index := inList(compounds, compound(compound, compoundColor))
+
+			if index
+				return index
+			else
+				for index, candidate in compounds
+					if (InStr(candidate, compound) == 1)
+						return index
+
+			return false
+		}
+		else
+			return false
+	}
+
+	tyreCompoundCode(compound, compoundColor := false) {
+		if compound {
+			index := this.tyreCompoundIndex(compound, compoundColor)
+
+			return (index ? sessionDB.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+		}
+		else
+			return false
+	}
+
 	startPitstopSetup(pitstopNumber) {
 	}
 

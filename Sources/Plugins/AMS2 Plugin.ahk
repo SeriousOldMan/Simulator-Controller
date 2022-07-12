@@ -228,7 +228,9 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Tyre Compound") {
 				this.iTyreCompoundChosen += 1
 
-				if (this.iTyreCompoundChosen > 3)
+				if (this.iTyreCompoundChosen > new SessionDatabase().getTyreCompounds(this.Simulator[true]
+																					, this.Car
+																					, this.Track).Length())
 					this.iTyreCompoundChosen := 0
 
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
@@ -273,7 +275,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		base.setPitstopRefuelAmount(pitstopNumber, litres)
-		
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
@@ -288,19 +290,14 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
-		
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Tyre Compound") {
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
 
-				if (compound = "Dry")
-					this.iTyreCompoundChosen := 1
-				else if (compound = "Wet")
-					this.iTyreCompoundChosen := 2
-				else
-					this.iTyreCompoundChosen := 0
+				this.iTyreCompoundChosen := this.tyreCompoundIndex(compound, compoundColor)
 
 				this.dialPitstopOption("Tyre Compound", "Increase", this.iTyreCompoundChosen)
 
@@ -311,7 +308,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
-		
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {
 				this.requirePitstopMFD()
@@ -331,7 +328,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	finishPitstopSetup(pitstopNumber) {
 		base.finishPitstopSetup()
-		
+
 		this.requirePitstopMFD()
 
 		if this.selectPitstopOption("Request Pitstop") {

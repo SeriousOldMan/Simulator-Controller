@@ -261,10 +261,12 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			compound := new SessionDatabase().getTyreCompoundCode(this.Simulator[true], this.Car, this.Track
 																, compound(compound, compoundColor))
 
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+			if compound {
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
 
-			if set
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+				if set
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+			}
 		}
 		else
 			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")

@@ -1484,6 +1484,9 @@ class RaceCenter extends ConfigurationItem {
 		SetTimer syncSession, Off
 
 		try {
+			if (!this.ServerToken || (this.ServerToken = ""))
+				Throw "Invalid token detected..."
+
 			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
 
 			this.iConnected := true
@@ -6814,6 +6817,8 @@ class RaceCenter extends ConfigurationItem {
 	showTrackMap() {
 		html := false
 
+		lastLap := this.LastLap
+
 		if this.Simulator {
 			sessionDB := new SessionDatabase()
 
@@ -6831,8 +6836,6 @@ class RaceCenter extends ConfigurationItem {
 
 				imgWidth := Floor(imgWidth * scale)
 				imgHeight := Floor(imgHeight * scale)
-
-				lastLap := this.LastLap
 
 				if (this.SessionActive && lastLap) {
 					telemetry := (lastLap.Track ? lastLap.Track : lastLap.Telemetry)
@@ -6912,7 +6915,7 @@ class RaceCenter extends ConfigurationItem {
 				imgWidth := Floor(imgWidth * scale)
 				imgHeight := Floor(imgHeight * scale)
 
-				html := ("<div style=""width: " . width . "px; height: " . height . "px;""><p style=""text-align: center;""><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></p></div>")
+				html := ("<div class=""lbox""><p style=""text-align: center;""><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></p></div>")
 			}
 		}
 
@@ -6921,7 +6924,33 @@ class RaceCenter extends ConfigurationItem {
 		if html {
 			this.selectReport("Track")
 
-			html := ("<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>")
+			html .= "<div class=""rbox"">"
+
+			; html .= ("<br><br><div style=""text-align: left;"" id=""header""><i>" . translate("Deltas") . "</i></div>")
+			; html .= ("<br>" . this.createLapDeltas(lastLap))
+			html .= ("<br><div style=""text-align: left;"" id=""header""><i>" . translate("Standings") . "</i></div>")
+			html .= ("<br>" . this.createLapStandings(lastLap))
+
+			html .= "</div>"
+
+			tableCSS := getTableCSS()
+
+			script =
+			(
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.lbox { float: left; box-sizing: border-box; }
+						.rbox { float: right; box-sizing: border-box; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						%tableCSS%
+					</style>
+				</head>
+			)
+
+			html := ("<html>" . script . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 			chartViewer.Document.Write(html)
 		}

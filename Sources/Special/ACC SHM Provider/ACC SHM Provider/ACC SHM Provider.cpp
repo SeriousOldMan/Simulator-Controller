@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
 		printData("Grip", getGrip(gf->trackGripStatus));
 
 		for (int id = 0; id < gf->activeCars; id++)
-			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+			wcout << "Car." << gf->carID[id] + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
 	}
 	
 	if ((argc == 1) || (argv[1][0] == 'W'))

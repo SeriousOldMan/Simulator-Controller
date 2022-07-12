@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 				int carNr = vehicle.driver_info.slot_id + 1;
 				int position = vehicle.place;
 
-				wprintf_s(L"Car.%d.Nr=%d\n", carNr, carNr);
+				wprintf_s(L"Car.%d.Nr=%d\n", carNr, vehicle.driver_info.car_number);
 				wprintf_s(L"Car.%d.Position=%d\n", carNr, position);
 				wprintf_s(L"Car.%d.Lap=%d\n", carNr, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", carNr, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
@@ -327,10 +327,11 @@ int main(int argc, char* argv[])
 		wprintf_s(L"Temperature=26\n");
 		wprintf_s(L"Grip=Optimum\n");
 
-		for (int id = 0; id < map_buffer->num_cars; id++)
-			wprintf_s(L"Car.%d.Position=%f,%f\n", id + 1,
-												  map_buffer->all_drivers_data_1[id].position.x,
-												  map_buffer->all_drivers_data_1[id].position.z);
+		for (int id = 0; id < map_buffer->num_cars; id++) {
+			r3e_driver_data vehicle = map_buffer->all_drivers_data_1[id];
+			
+			wprintf_s(L"Car.%d.Position=%f,%f\n", vehicle.driver_info.slot_id + 1, vehicle.position.x, vehicle.position.z);
+		}
 
 		wprintf_s(L"[Weather Data]\n");
 		wprintf_s(L"Temperature=24\n");

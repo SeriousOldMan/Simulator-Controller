@@ -230,18 +230,25 @@ class SessionDatabase extends ConfigurationItem {
 		FileCopy %imageFileName%, %directory%%track%.%extension%, 1
 	}
 
-	getTrackMap(simulator, track, ByRef imageFileName) {
+	getTrackMap(simulator, track) {
+		if this.hasTrackMap(simulator, track)
+			return readConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
+		else
+			return false
+	}
+
+	getTrackImage(simulator, track) {
 		if this.hasTrackMap(simulator, track) {
 			directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
 
 			if FileExist(directory . track . ".png")
-				imageFileName := (directory . track . ".png")
+				return (directory . track . ".png")
 			else if FileExist(directory . track . ".jpg")
-				imageFileName := (directory . track . ".jpg")
+				return (directory . track . ".jpg")
 			else if FileExist(directory . track . ".gif")
-				imageFileName := (directory . track . ".gif")
-
-			return readConfiguration(directory . track . ".map")
+				return (directory . track . ".gif")
+			else
+				return false
 		}
 		else
 			return false

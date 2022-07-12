@@ -43,69 +43,65 @@ ListLines Off					; Disable execution history
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-createTrackImage(simulator, track, trackMap) {
-	trackMap := new SessionDatabase().getTrackMap(simulator, track)
+createTrackImage(trackMap) {
+	mapWidth := getConfigurationValue(trackMap, "Map", "Width")
+	mapHeight := getConfigurationValue(trackMap, "Map", "Height")
 
-	if trackMap {
-		mapWidth := getConfigurationValue(trackMap, "Map", "Width")
-		mapHeight := getConfigurationValue(trackMap, "Map", "Height")
+	xMin := getConfigurationValue(trackMap, "Map", "X.Min")
+	yMin := getConfigurationValue(trackMap, "Map", "Y.Min")
 
-		xMin := getConfigurationValue(trackMap, "Map", "X.Min")
-		yMin := getConfigurationValue(trackMap, "Map", "Y.Min")
+	token := Gdip_Startup()
 
-		token := Gdip_Startup()
+	bitmap := Gdip_CreateBitmap(mapWidth, mapHeight)
 
-		bitmap := Gdip_CreateBitmap(mapWidth, mapHeight)
+	graphics := Gdip_GraphicsFromImage(bitmap)
 
-		graphics := Gdip_GraphicsFromImage(bitmap)
+	Gdip_SetSmoothingMode(graphics, 4)
 
-		Gdip_SetSmoothingMode(graphics, 4)
+	pen := Gdip_CreatePen(0xbb000000, 3)
 
-		pen := Gdip_CreatePen(0xbb000000, 3)
+	scale := 1.0
 
-		scale := 1.0
+	offsetX := (- xMin) + (mapWidth * 0.1)
+	offsetY := (- yMin) + (mapHeight * 0.1)
 
-		offsetX := (- xMin) + (mapWidth * 0.1)
-		offsetY := (- yMin) + (mapHeight * 0.1)
+	scaleX := (scale * 0.8)
+	scaleY := (scale * 0.8)
 
-		scaleX := (scale * 0.8)
-		scaleY := (scale * 0.8)
+	firstX := 0
+	firstY := 0
+	lastX := 0
+	lastY := 0
 
-		firstX := 0
-		firstY := 0
-		lastX := 0
-		lastY := 0
+	Loop % getConfigurationValue(trackMap, "Map", "Points")
+	{
+		x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scaleX)
+		y := Round((offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scaleY)
 
-		Loop % getConfigurationValue(trackMap, "Map", "Points")
-		{
-			x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scaleX)
-			y := Round((offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scaleY)
-
-			if (A_Index = 1) {
-				firstX := x
-				firstY := y
-			}
-			else
-				Gdip_DrawLine(graphics, pen, lastX, lastY, x, y)
-
-			lastX := x
-			lastY := y
+		if (A_Index = 1) {
+			firstX := x
+			firstY := y
 		}
+		else
+			Gdip_DrawLine(graphics, pen, lastX, lastY, x, y)
 
-		Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
-
-		Gdip_DeletePen(pen)
-
-		Gdip_SaveBitmapToFile(bitmap, kTempDirectory . "TrackMap.png")
-
-		Gdip_DisposeImage(bitmap)
-
-		Gdip_DeleteGraphics(graphics)
-
-		Gdip_Shutdown(token)
-
-		return (kTempDirectory . "TrackMap.png")
+		lastX := x
+		lastY := y
 	}
+
+	Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
+
+	Gdip_DeletePen(pen)
+
+	Gdip_SaveBitmapToFile(bitmap, kTempDirectory . "TrackMap.png")
+
+	Gdip_DisposeImage(bitmap)
+
+	Gdip_DeleteGraphics(graphics)
+
+	Gdip_Shutdown(token)
+
+	return (kTempDirectory . "TrackMap.png")
 }
 
 createTrackMap(simulator, track, fileName) {
@@ -144,7 +140,9 @@ createTrackMap(simulator, track, fileName) {
 
 	sessionDB := new SessionDatabase()
 
-	setConfigurationValue(trackMap, "General", "Simulator", sessionDB.getSimulatorName(simulator))
+	simulator := sessionDB.getSimulatorName(simulator)
+
+	setConfigurationValue(trackMap, "General", "Simulator", simulator)
 	setConfigurationValue(trackMap, "General", "Track", track)
 
 	setConfigurationValue(trackMap, "Map", "Points", points)
@@ -155,7 +153,7 @@ createTrackMap(simulator, track, fileName) {
 	setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
 	setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
 
-	fileName := createTrackImage(simulator, track, trackMap)
+	fileName := createTrackImage(trackMap)
 
 	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
 

@@ -344,7 +344,7 @@ namespace ACSHMProvider
             Console.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 
             for (int id = 0; id < cars.numVehicles; id++)
-				Console.WriteLine("Car." + (id + 1) + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+                Console.WriteLine("Car." + (id + 1) + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
 
             Console.WriteLine("[Weather Data]");
 

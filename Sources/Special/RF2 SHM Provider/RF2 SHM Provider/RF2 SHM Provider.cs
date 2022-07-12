@@ -244,29 +244,6 @@ namespace RF2SHMProvider {
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 			
 				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
-				
-				/*
-				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
-
-				if (compound.Contains("Red"))
-					Console.WriteLine("TyreCompoundColor=Red");
-				else if (compound.Contains("Yellow"))
-					Console.WriteLine("TyreCompoundColor=Yellow");
-				else if (compound.Contains("White"))
-					Console.WriteLine("TyreCompoundColor=White");
-				else if (compound.Contains("Green"))
-					Console.WriteLine("TyreCompoundColor=Green");
-				else if (compound.Contains("Blue"))
-					Console.WriteLine("TyreCompoundColor=Blue");
-				else if (compound.Contains("Soft"))
-					Console.WriteLine("TyreCompoundColor=Soft");
-				else if (compound.Contains("Medium"))
-					Console.WriteLine("TyreCompoundColor=Medium");
-				else if (compound.Contains("Hard"))
-					Console.WriteLine("TyreCompoundColor=Hard");
-				else
-					Console.WriteLine("TyreCompoundColor=Black");
-				*/
 
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");

@@ -137,6 +137,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
+	updateLap(lapNumber, dataFile) {
+		base.updateLap(lapNumber, dataFile)
+
+		if this.TeamSessionActive {
+			FileRead data, %dataFile%
+
+			this.TeamServer.setLapValue(lapNumber, "Track Data", data)
+		}
+	}
+
 	createTrackMap(simulator, track, dataFile) {
 		mapperPID := this.iMapperPID
 

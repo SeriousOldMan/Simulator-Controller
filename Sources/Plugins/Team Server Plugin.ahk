@@ -962,7 +962,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				lap := this.Connector.CreateLap(stint, lapNumber)
 
-				if (telemetryData && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
+				if (telemetryData && (telemetryData.Count() > 0) && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
 					telemetryData := printConfiguration(telemetryData)
 
 					if isDebug()
@@ -973,7 +973,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.iLapData["Telemetry"][lapNumber] := true
 				}
 
-				if (positionsData && !this.iLapData["Positions"].HasKey(lapNumber)) {
+				if (positionsData && (positionsData.Count() > 0) && !this.iLapData["Positions"].HasKey(lapNumber)) {
 					positionsData := printConfiguration(positionsData)
 
 					if isDebug()

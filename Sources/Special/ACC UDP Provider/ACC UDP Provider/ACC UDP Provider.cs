@@ -293,9 +293,9 @@ namespace ACCUDPProvider {
 
 								outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
-								int index = 1;
-
 								foreach (CarData car in Cars) {
+                                    int index = car.CarIndex + 1;
+
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
@@ -339,8 +339,6 @@ namespace ACCUDPProvider {
 										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
 										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
 									}
-
-									index += 1;
 								}
 
 								outStream.Close();

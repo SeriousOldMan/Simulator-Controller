@@ -4714,6 +4714,20 @@ class RaceCenter extends ConfigurationItem {
 		return newData
 	}
 
+	syncTrackMap() {
+		if this.LastLap {
+			rawData := this.Connector.GetLapValue(this.LastLap.Identifier, "Track Data")
+
+			if (rawData && (rawData != "")) {
+				this.LastLap.Track := rawData
+
+				return true
+			}
+		}
+
+		return false
+	}
+
 	syncTelemetry(load := false) {
 		lastLap := this.LastLap
 
@@ -5502,12 +5516,15 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if newLaps
-					if this.syncPitstops()
-						newData := true
+				if (newLaps && this.syncPitstops())
+					newData := true
 
 				if this.syncPitstopsDetails()
 					newData := true
+
+				if (this.LastLap && (this.SelectedReport == "Track"))
+					if this.syncTrackMap()
+						newData := true
 
 				if (newData || newLaps)
 					this.updateReports()
@@ -6798,9 +6815,10 @@ class RaceCenter extends ConfigurationItem {
 		html := false
 
 		if this.Simulator {
-			fileName := false
+			sessionDB := new SessionDatabase()
 
-			trackMap := new SessionDatabase().getTrackMap(this.Simulator, this.Track, fileName)
+			trackMap := sessionDB.getTrackMap(this.Simulator, this.Track)
+			fileName := sessionDB.getTrackImage(this.Simulator, this.Track)
 
 			if (trackMap && fileName) {
 				width := (chartViewer.Width - 20)
@@ -6817,10 +6835,10 @@ class RaceCenter extends ConfigurationItem {
 				lastLap := this.LastLap
 
 				if (this.SessionActive && lastLap) {
-					telemetry := lastLap.Telemetry
+					telemetry := (lastLap.Track ? lastLap.Track : lastLap.Telemetry)
 					positions := lastLap.Positions
 
-					if (telemetry && positions) {
+					if telemetry {
 						mapWidth := getConfigurationValue(trackMap, "Map", "Width")
 						mapHeight := getConfigurationValue(trackMap, "Map", "Height")
 
@@ -6836,7 +6854,9 @@ class RaceCenter extends ConfigurationItem {
 						scaleY := (scale * 0.8)
 
 						telemetry := parseConfiguration(telemetry)
-						positions := parseConfiguration(positions)
+
+						if positions
+							positions := parseConfiguration(positions)
 
 						token := Gdip_Startup()
 
@@ -6846,13 +6866,15 @@ class RaceCenter extends ConfigurationItem {
 
 						Gdip_SetSmoothingMode(graphics, 4)
 
-						brushGray := Gdip_BrushCreateSolid(0xffaaaaaa)
-						brushBlack := Gdip_BrushCreateSolid(0xff000000)
+						brushGreen := Gdip_BrushCreateSolid(0xff006400)
+						brushGray := Gdip_BrushCreateSolid(0xff666666)
 
-						driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
+						if positions
+							driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
+						else
+							driver := false
 
-						Loop % getConfigurationValue(positions, "Position Data", "Car.Count", 0)
-						{
+						Loop {
 							position := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
 							if position {
@@ -6861,8 +6883,10 @@ class RaceCenter extends ConfigurationItem {
 								x := Round((offsetX + position[1]) * scaleX)
 								y := Round((offsetY + position[2]) * scaleY)
 
-								Gdip_FillEllipse(graphics, (A_Index = driver) ? brushBlack : brushGray, x - 3, y - 3, 6, 6)
+								Gdip_FillEllipse(graphics, (A_Index = driver) ? brushGreen : brushGray, x - 15, y - 15, 30, 30)
 							}
+							else
+								break
 						}
 
 						fileName := (kTempDirectory . "TrackMap.png")

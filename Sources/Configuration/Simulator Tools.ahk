@@ -1643,86 +1643,86 @@ updateConfigurationForV424() {
 	simulator := "rFactor 2"
 
 	Loop Files, %kDatabaseDirectory%User\RF2\*.*, D
-	{
-		car := string2Values("#", A_LoopFileName)[1]
+		if InStr(A_LoopFileName, "#") {
+			car := string2Values("#", A_LoopFileName)[1]
 
-		if !FileExist(kDatabaseDirectory "User\RF2\" . car)
-			FileMoveDir %kDatabaseDirectory%User\RF2\%A_LoopFileName%, %kDatabaseDirectory%User\RF2\%car%, R
-		else {
-			oldCar := A_LoopFileName
+			if !FileExist(kDatabaseDirectory "User\RF2\" . car)
+				FileMoveDir %kDatabaseDirectory%User\RF2\%A_LoopFileName%, %kDatabaseDirectory%User\RF2\%car%, R
+			else {
+				oldCar := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
-			{
-				track := A_LoopFileName
-
-				sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
-
-				sourceDB := new Database(sourceDirectory, kTelemetrySchemas)
-				targetDB := new TelemetryDatabase(simulator, car, track).Database
-
-				for ignore, row in sourceDB.Tables["Electronics"] {
-					data := Object()
-
-					for ignore, field in kTelemetrySchemas["Electronics"]
-						data[field] := row[field]
-
-					targetDB.add("Electronics", data, true)
-				}
-
-				for ignore, row in sourceDB.Tables["Tyres"] {
-					data := Object()
-
-					for ignore, field in kTelemetrySchemas["Tyres"]
-						data[field] := row[field]
-
-					targetDB.add("Tyres", data, true)
-				}
-
-				tyresDB := new TyresDatabase()
-				sourceDB := new Database(sourceDirectory, kTyresSchemas)
-				targetDB := tyresDB.getTyresDatabase(simulator, car, track)
-
-				for ignore, row in sourceDB.Tables["Tyres.Pressures"] {
-					data := Object()
-
-					for ignore, field in kTyresSchemas["Tyres.Pressures"]
-						data[field] := row[field]
-
-					targetDB.add("Tyres.Pressures", data, true)
-				}
-
-				for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"] {
-					tyresDB.updatePressure(simulator, car, track
-										 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
-										 , row.Compound, row["Compound.Color"]
-										 , row.Type, row.Tyre, row.Pressure, row.Count
-										 , false, true, "User", row.Driver)
-				}
-
-				tyresDB.flush()
-
-				targetDirectory := (kDatabaseDirectory . "User\RF2\" . car . "\" . track . "\Race Strategies")
-
-				FileCreateDir %targetDirectory%
-
-				Loop Files, %sourceDirectory%Race Strategies\*.*, F
+				Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
 				{
-					fileName := A_LoopFileName
-					targetName := fileName
+					track := A_LoopFileName
 
-					while FileExist(targetDirectory . "\" . targetName) {
-						SplitPath targetName, , , , name
+					sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
 
-						targetName := (name . " (" . (A_Index + 1) . ").strategy")
+					sourceDB := new Database(sourceDirectory, kTelemetrySchemas)
+					targetDB := new TelemetryDatabase(simulator, car, track).Database
+
+					for ignore, row in sourceDB.Tables["Electronics"] {
+						data := Object()
+
+						for ignore, field in kTelemetrySchemas["Electronics"]
+							data[field] := row[field]
+
+						targetDB.add("Electronics", data, true)
 					}
 
-					FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
-				}
-			}
+					for ignore, row in sourceDB.Tables["Tyres"] {
+						data := Object()
 
-			FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+						for ignore, field in kTelemetrySchemas["Tyres"]
+							data[field] := row[field]
+
+						targetDB.add("Tyres", data, true)
+					}
+
+					tyresDB := new TyresDatabase()
+					sourceDB := new Database(sourceDirectory, kTyresSchemas)
+					targetDB := tyresDB.getTyresDatabase(simulator, car, track)
+
+					for ignore, row in sourceDB.Tables["Tyres.Pressures"] {
+						data := Object()
+
+						for ignore, field in kTyresSchemas["Tyres.Pressures"]
+							data[field] := row[field]
+
+						targetDB.add("Tyres.Pressures", data, true)
+					}
+
+					for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"] {
+						tyresDB.updatePressure(simulator, car, track
+											 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+											 , row.Compound, row["Compound.Color"]
+											 , row.Type, row.Tyre, row.Pressure, row.Count
+											 , false, true, "User", row.Driver)
+					}
+
+					tyresDB.flush()
+
+					targetDirectory := (kDatabaseDirectory . "User\RF2\" . car . "\" . track . "\Race Strategies")
+
+					FileCreateDir %targetDirectory%
+
+					Loop Files, %sourceDirectory%Race Strategies\*.*, F
+					{
+						fileName := A_LoopFileName
+						targetName := fileName
+
+						while FileExist(targetDirectory . "\" . targetName) {
+							SplitPath targetName, , , , name
+
+							targetName := (name . " (" . (A_Index + 1) . ").strategy")
+						}
+
+						FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+					}
+				}
+
+				FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+			}
 		}
-	}
 }
 
 updateConfigurationForV423() {

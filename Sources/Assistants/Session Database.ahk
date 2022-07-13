@@ -1108,6 +1108,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					car := data[1]
 					track := data[2]
 				}
+				else if (type = translate("Tracks")) {
+					car := "-"
+					track := data
+				}
 				else {
 					car := "-"
 					track := "-"
@@ -1151,12 +1155,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
-							try {
-								FileDelete %A_LoopFileLongPath%
-							}
-							catch exception {
-								; ignore
-							}
+						{
+							SplitPath A_LoopFileName, , , , candidate
+
+							if (candidate = track)
+								try {
+									FileDelete %A_LoopFileLongPath%
+								}
+								catch exception {
+									; ignore
+								}
+						}
 				}
 
 				Gui %window%:Default
@@ -1221,6 +1230,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					car := data[1]
 					track := data[2]
 				}
+				else if (type = translate("Tracks")) {
+					car := "-"
+					track := data
+				}
 				else {
 					car := "-"
 					track := "-"
@@ -1284,15 +1297,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						FileCreateDir %directory%\.Tracks\%code%
+						FileCreateDir %directory%\.Tracks
 
 						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
-							try {
-								FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%code%\%A_LoopFileName%
-							}
-							catch exception {
-								; ignore
-							}
+						{
+							SplitPath A_LoopFileName, , , , candidate
+
+							if (candidate = track)
+								try {
+									FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%A_LoopFileName%
+								}
+								catch exception {
+									; ignore
+								}
+						}
 				}
 
 				Gui %window%:Default
@@ -1357,15 +1375,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				progress := 0
 
-				if (selection.HasKey("-.-.Tracks") && FileExist(directory . "\.Tracks")) {
+				if FileExist(directory . "\.Tracks") {
+					tracks := []
+
 					code := this.SessionDatabase.getSimulatorCode(simulator)
 
-					targetDirectory := (kDatabaseDirectory . "User\Tracks\" . code)
+					Loop Files, %directory%\.Tracks\*.*, F	; Track
+					{
+						SplitPath A_LoopFileName, , , , track
 
-					FileCreateDir %targetDirectory%
+						if !inList(tracks, track)
+							tracks.Push(track)
+					}
 
-					Loop Files, %directory%\.Tracks\%code%\*.*, F
-						FileCopy %A_LoopFilePath%, %targetDirectory%\%A_LoopFileName%, 1
+					for ignore, track in tracks
+						if selection.HasKey("-." . track . ".Tracks") {
+							targetDirectory := (kDatabaseDirectory . "User\Tracks\" . code)
+
+							FileCreateDir %targetDirectory%
+
+							FileCopy %directory%\.Tracks\%track%.*, %targetDirectory%, 1
+						}
 				}
 
 				Loop Files, %directory%\*.*, D	; Car
@@ -1501,13 +1531,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				progress := 0
 
-				tracks := 0
+				tracks := []
 
 				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Tracks
-					tracks += 1
+				{
+					SplitPath A_LoopFileName, , , , track
 
-				if (tracks > 0)
-					LV_Add("", translate("Tracks"), "-", "-", tracks)
+					if !inList(tracks, track) {
+						LV_Add("", translate("Tracks"), this.SessionDatabase.getTrackName(selectedSimulator, track, true)
+							 , "-", 1)
+
+						tracks.Push(track)
+					}
+				}
 
 				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
@@ -1626,8 +1662,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
 
+				tracks := []
+
 				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Strategies
-					tracks += 1
+				{
+					SplitPath A_LoopFileName, , , , track
+
+					if !inList(tracks, track)
+						tracks.Push(track)
+				}
 
 				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
@@ -1669,7 +1712,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							}
 				}
 
-				LV_Add("", translate("Tracks"), tracks)
+				LV_Add("", translate("Tracks"), tracks.Length())
 				LV_Add("", translate("Drivers"), drivers.Length())
 				LV_Add("", translate("Cars"), cars.Length())
 				LV_Add("", translate("Telemetry"), telemetry)
@@ -2387,14 +2430,21 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		try {
 			tracks := 0
 
-			Loop Files, %directory%\.Tracks\%code%\*.*, F		; Strategies
-				tracks += 1
-
 			Gui IDS:Default
 			Gui ListView, %importListViewHandle%
 
-			if (tracks > 0)
-				LV_Add("Check", translate("Tracks"), "-", "-", tracks)
+			tracks := []
+
+			Loop Files, %directory%\.Tracks\*.*, F
+			{
+				SplitPath A_LoopFileName, , , , track
+
+				if !inList(tracks, track) {
+					LV_Add("Check", translate("Tracks"), editor.SessionDatabase.getTrackName(simulator, track), "-", 1)
+
+					tracks.Push(track)
+				}
+			}
 
 			progress := 0
 
@@ -2514,6 +2564,10 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 					car := data[1]
 					track := data[2]
 				}
+				else if (type = translate("Tracks")) {
+					car := "-"
+					track := data
+				}
 				else {
 					car := "-"
 					track := "-"
@@ -2534,6 +2588,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 				if ((car = "-") && (track = "-"))
 					selection["-.-." . type] := drivers[driver]
+				else if (car = "-")
+					selection["-." . editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
 				else
 					selection[editor.getCarCode(simulator, car) . "."
 							. editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]

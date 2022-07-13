@@ -220,6 +220,43 @@ class SessionDatabase extends ConfigurationItem {
 		return FileExist(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
 	}
 
+	availableTrackMaps(simulator) {
+		sessionDB := new SessionDatabase()
+
+		code := sessionDB.getSimulatorCode(simulator)
+
+		tracks := []
+
+		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		{
+			SplitPath A_LoopFileName, , , , track
+
+			tracks.Push(track)
+		}
+
+		return tracks
+	}
+
+	availableTrackImages(simulator) {
+		sessionDB := new SessionDatabase()
+
+		code := sessionDB.getSimulatorCode(simulator)
+
+		directory := (kDatabaseDirectory . "User\Tracks\" . code . "\")
+		tracks := []
+
+		Loop Files, %directory%*.map, F		; Track
+		{
+			SplitPath A_LoopFileName, , , , track
+
+			if (FileExist(directory . track . ".png") || FileExist(directory . track . ".jpg")
+													  || FileExist(directory . track . ".gif"))
+				tracks.Push(track)
+		}
+
+		return tracks
+	}
+
 	updateTrackMap(simulator, track, data, imageFileName) {
 		directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
 

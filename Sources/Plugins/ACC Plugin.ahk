@@ -367,6 +367,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 
 			driverCar := false
+			driverCarCandidate := false
 
 			Loop {
 				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
@@ -381,7 +382,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", car)
 
-					if !driverCar {
+					if !driverCar
 						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
 						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
@@ -389,13 +390,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							lastDriverCar := driverCar
 						}
 						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCar := A_index
-					}
+							driverCarCandiate := A_Index
 				}
 			}
 
 			if !driverCar
-				driverCar := lastDriverCar
+				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
 
 			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
 			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
@@ -1615,13 +1615,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	startPitstopSetup(pitstopNumber) {
 		base.startPitstopSetup()
-		
+
 		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
 	}
 
 	finishPitstopSetup(pitstopNumber) {
 		base.finishPitstopSetup()
-		
+
 		closePitstopMFD()
 	}
 
@@ -1746,7 +1746,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
 		base.setPitstopRefuelAmount(pitstopNumber, litres)
-		
+
 		litresIncrement := Round(litres - this.getPitstopOptionValues("Refuel")[1])
 
 		if (litresIncrement != 0)
@@ -1755,7 +1755,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
-		
+
 		if compound {
 			if (this.getPitstopOptionValues("Tyre Compound") != compound)
 				changePitstopTyreCompound((compound = "Wet") ? "Increase" : "Decrease")
@@ -1773,7 +1773,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
-		
+
 		pressures := this.getPitstopOptionValues("Tyre Pressures")
 
 		pressureFLIncrement := Round(pressureFL - pressures[1], 1)
@@ -1793,7 +1793,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
-		
+
 		if (repairSuspension != this.iRepairSuspensionChosen)
 			this.toggleActivity("Repair Suspension")
 
@@ -1803,7 +1803,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	requestPitstopDriver(pitstopNumber, driver) {
 		base.requestPitstopDriver(pitstopNumber, driver)
-		
+
 		if driver {
 			driver := string2Values("|", driver)
 

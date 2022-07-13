@@ -6826,6 +6826,8 @@ class RaceCenter extends ConfigurationItem {
 		html := false
 
 		lastLap := this.LastLap
+
+		hasLeader := false
 		hasAhead := false
 		hasBehind := false
 
@@ -6859,50 +6861,64 @@ class RaceCenter extends ConfigurationItem {
 
 						Gdip_SetSmoothingMode(graphics, 4)
 
-						brushWhite := Gdip_BrushCreateSolid(0xffffffff)
-						brushGray := Gdip_BrushCreateSolid(0xff666666)
+						brushCar := Gdip_BrushCreateSolid(0xff000000)
+						brushGray := Gdip_BrushCreateSolid(0xffBBBBBB)
 
 						if positions {
 							driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
-							position := getConfigurationValue(positions, "Position Data", "Car." . driver . ".Position", 0)
+							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driver . ".Position", 0)
 
+							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
 							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
 							behindBrush := Gdip_BrushCreateSolid(0xffff0000)
 						}
 						else {
 							driver := false
-							position := false
+							driverPosition := false
 						}
 
 						Loop {
-							position := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
+							coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
-							if position {
-								position := string2Values(",", position)
+							if coordinates {
+								coordinates := string2Values(",", coordinates)
 
-								x := Round((offsetX + position[1]) * scale)
-								y := Round((offsetY + position[2]) * scale)
+								x := Round((offsetX + coordinates[1]) * scale)
+								y := Round((offsetY + coordinates[2]) * scale)
 
 								brush := brushGray
 
 								if (A_Index = driver)
-									brush = brushWhitebrush
-								else if (positions && position && !hasAhead) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+									brush := brushCar
+								else {
+									if (positions && driverPosition && !hasAhead) {
+										carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
 
-									if ((carPosition - 1) = position) {
-										brush := aheadBrush
+										if ((carPosition == 1) && (driverPosition != 1)) {
+											brush := leaderBrush
 
-										hasAhead := true
+											hasLeader := true
+										}
 									}
-								}
-								else if (positions && position && !hasBehind) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
 
-									if ((carPosition + 1) = position) {
-										brush := behindBrush
+									if (positions && driverPosition && !hasAhead) {
+										carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
 
-										hasBehind := true
+										if ((carPosition + 1) = driverPosition) {
+											brush := aheadBrush
+
+											hasAhead := true
+										}
+									}
+
+									if (positions && driverPosition && !hasBehind) {
+										carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+
+										if ((carPosition - 1) = driverPosition) {
+											brush := behindBrush
+
+											hasBehind := true
+										}
 									}
 								}
 
@@ -6913,9 +6929,10 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 						Gdip_DeleteBrush(brushGray)
-						Gdip_DeleteBrush(brushWhite)
+						Gdip_DeleteBrush(brushCar)
 
-						if position {
+						if driverPosition {
+							Gdip_DeleteBrush(leaderBrush)
 							Gdip_DeleteBrush(aheadBrush)
 							Gdip_DeleteBrush(behindBrush)
 						}
@@ -6959,7 +6976,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= "<div class=""rbox"">"
 
 			html .= ("<br><br><br><br><br><br><div style=""text-align: left;"" id=""header""><i>" . translate("Deltas") . "</i></div>")
-			html .= ("<br>" . this.createLapDeltas(lastLap, hasAhead ? "006400" : false, hasBehind ? "ff0000" : false))
+			html .= ("<br>" . this.createLapDeltas(lastLap, hasLeader ? "0000ff" : false, hasAhead ? "006400" : false, hasBehind ? "ff0000" : false))
 
 			html .= "</div>"
 
@@ -7874,7 +7891,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	createLapDeltas(lap, aheadColor := false, behindColor := false) {
+	createLapDeltas(lap, leaderColor := false, aheadColor := false, behindColor := false) {
 		sessionStore := this.SessionStore
 
 		html := "<table class=""table-std"">"
@@ -7887,7 +7904,7 @@ class RaceCenter extends ConfigurationItem {
 			   . "</tr>")
 
 		labels := [translate("Leader"), translate("Standings (Ahead)"), translate("Standings (Behind)")
-				 , translate("Track (Front)"), translate("Track (Behind)")]
+				 , translate("Track (Ahead)"), translate("Track (Behind)")]
 		rowIndices := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Ahead": 2, "Standings.Behind": 3
 					 , "Track.Front": 4, "Track.Ahead": 4, "Track.Behind": 5}
 
@@ -7918,7 +7935,9 @@ class RaceCenter extends ConfigurationItem {
 
 				index := rowIndices[entryType]
 
-				if (aheadColor && ((entryType = "Standings.Front") || (entryType = "Standings.Ahead")))
+				if (leaderColor && (entryType = "Standings.Leader"))
+					label := ("<p style=""color:#" . leaderColor . """;>" . labels[index] . "</p>")
+				else if (aheadColor && ((entryType = "Standings.Front") || (entryType = "Standings.Ahead")))
 					label := ("<p style=""color:#" . aheadColor . """;>" . labels[index] . "</p>")
 				else if (behindColor && (entryType = "Standings.Behind"))
 					label := ("<p style=""color:#" . behindColor . """;>" . labels[index] . "</p>")

@@ -6826,6 +6826,8 @@ class RaceCenter extends ConfigurationItem {
 		html := false
 
 		lastLap := this.LastLap
+		hasAhead := false
+		hasBehind := false
 
 		if this.Simulator {
 			sessionDB := new SessionDatabase()
@@ -6850,8 +6852,7 @@ class RaceCenter extends ConfigurationItem {
 						offsetX := (- xMin) + (mapWidth * 0.1)
 						offsetY := (- yMin) + (mapHeight * 0.1)
 
-						scaleX := (scale * 0.8)
-						scaleY := (scale * 0.8)
+						scale := (scale * 0.9)
 
 						telemetry := parseConfiguration(telemetry)
 
@@ -6866,13 +6867,20 @@ class RaceCenter extends ConfigurationItem {
 
 						Gdip_SetSmoothingMode(graphics, 4)
 
-						brushGreen := Gdip_BrushCreateSolid(0xff006400)
+						brushWhite := Gdip_BrushCreateSolid(0xffffffff)
 						brushGray := Gdip_BrushCreateSolid(0xff666666)
 
-						if positions
+						if positions {
 							driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
-						else
+							position := getConfigurationValue(positions, "Position Data", "Car." . driver . ".Position", 0)
+
+							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
+							behindBrush := Gdip_BrushCreateSolid(0xffff0000)
+						}
+						else {
 							driver := false
+							position := false
+						}
 
 						Loop {
 							position := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
@@ -6880,13 +6888,44 @@ class RaceCenter extends ConfigurationItem {
 							if position {
 								position := string2Values(",", position)
 
-								x := Round((offsetX + position[1]) * scaleX)
-								y := Round((offsetY + position[2]) * scaleY)
+								x := Round((offsetX + position[1]) * scale)
+								y := Round((offsetY + position[2]) * scale)
 
-								Gdip_FillEllipse(graphics, (A_Index = driver) ? brushGreen : brushGray, x - 15, y - 15, 30, 30)
+								brush := brushGray
+
+								if (A_Index = driver)
+									brush = brushWhitebrush
+								else if (positions && position && !hasAhead) {
+									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+
+									if ((carPosition - 1) = position) {
+										brush := aheadBrush
+
+										hasAhead := true
+									}
+								}
+								else if (positions && position && !hasBehind) {
+									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+
+									if ((carPosition + 1) = position) {
+										brush := behindBrush
+
+										hasBehind := true
+									}
+								}
+
+								Gdip_FillEllipse(graphics, brush, x - 15, y - 15, 30, 30)
 							}
 							else
 								break
+						}
+
+						Gdip_DeleteBrush(brushGray)
+						Gdip_DeleteBrush(brushWhite)
+
+						if position {
+							Gdip_DeleteBrush(aheadBrush)
+							Gdip_DeleteBrush(behindBrush)
 						}
 
 						fileName := (kTempDirectory . "TrackMap.png")
@@ -6909,7 +6948,7 @@ class RaceCenter extends ConfigurationItem {
 
 				scale := Min(width / imgWidth, height / imgHeight)
 
-				while (imgWidth > (width / 2)) {
+				while (imgWidth > (width / 3)) {
 					imgWidth := Floor(imgWidth * scale)
 					imgHeight := Floor(imgHeight * scale)
 
@@ -6928,9 +6967,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= "<div class=""rbox"">"
 
 			html .= ("<br><br><br><br><br><br><div style=""text-align: left;"" id=""header""><i>" . translate("Deltas") . "</i></div>")
-			html .= ("<br>" . this.createLapDeltas(lastLap))
-			; html .= ("<br><div style=""text-align: left;"" id=""header""><i>" . translate("Standings") . "</i></div>")
-			; html .= ("<br>" . this.createLapStandings(lastLap))
+			html .= ("<br>" . this.createLapDeltas(lastLap, hasAhead ? "006400" : false, hasBehind ? "ff0000" : false))
 
 			html .= "</div>"
 
@@ -6941,7 +6978,7 @@ class RaceCenter extends ConfigurationItem {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.lbox { float: left; box-sizing: border-box; }
+						.lbox { box-sizing: border-box; margin: auto; }
 						.rbox { float: right; box-sizing: border-box; }
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
 						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
@@ -7434,10 +7471,10 @@ class RaceCenter extends ConfigurationItem {
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
 													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Front"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Front.Distance"), 2)})
+						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
+													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Car")
+													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Delta") / 1000, 2)
+													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
@@ -7446,10 +7483,10 @@ class RaceCenter extends ConfigurationItem {
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
 													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Front"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Front.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Front.Distance"), 2)})
+						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Ahead"
+													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Car")
+													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Delta") / 1000, 2)
+													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Distance"), 2)})
 
 						prefix := ("Standings.Lap." . lap . ".Car.")
 
@@ -7845,7 +7882,7 @@ class RaceCenter extends ConfigurationItem {
 		return html
 	}
 
-	createLapDeltas(lap) {
+	createLapDeltas(lap, aheadColor := false, behindColor := false) {
 		sessionStore := this.SessionStore
 
 		html := "<table class=""table-std"">"
@@ -7857,9 +7894,10 @@ class RaceCenter extends ConfigurationItem {
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
 			   . "</tr>")
 
-		label := [translate("Leader"), translate("Standings (Front)"), translate("Standings (Behind)")
-				, translate("Track (Front)"), translate("Track (Behind)")]
-		rowIndex := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Behind": 3, "Track.Front": 4, "Track.Behind": 5}
+		labels := [translate("Leader"), translate("Standings (Ahead)"), translate("Standings (Behind)")
+				 , translate("Track (Front)"), translate("Track (Behind)")]
+		rowIndices := {"Standings.Leader": 1, "Standings.Front": 2, "Standings.Ahead": 2, "Standings.Behind": 3
+					 , "Track.Front": 4, "Track.Ahead": 4, "Track.Behind": 5}
 
 		telemetryDB := this.TelemetryDatabase
 
@@ -7884,9 +7922,18 @@ class RaceCenter extends ConfigurationItem {
 					delta := entry.Delta
 				}
 
-				index := rowIndex[entry.Type]
+				entryType := entry.Type
 
-				rows[index] := ("<tr><th class=""th-std th-left"">" . label[index] . "</th>"
+				index := rowIndices[entryType]
+
+				if (aheadColor && ((entryType = "Standings.Front") || (entryType = "Standings.Ahead")))
+					label := ("<p style=""color:#" . aheadColor . """;>" . labels[index] . "</p>")
+				else if (behindColor && (entryType = "Standings.Behind"))
+					label := ("<p style=""color:#" . behindColor . """;>" . labels[index] . "</p>")
+				else
+					label := labels[index]
+
+				rows[index] := ("<tr><th class=""th-std th-left"">" . label . "</th>"
 							  . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">" , carNumber, driverFullname, telemetryDB.getCarName(this.Simulator, carName), delta)
 							  . "</td></tr>")
 			}

@@ -65,8 +65,7 @@ createTrackImage(trackMap) {
 	offsetX := (- xMin) + (mapWidth * 0.1)
 	offsetY := (- yMin) + (mapHeight * 0.1)
 
-	scaleX := (scale * 0.8)
-	scaleY := (scale * 0.8)
+	scale := (scale * 0.9)
 
 	firstX := 0
 	firstY := 0
@@ -75,8 +74,8 @@ createTrackImage(trackMap) {
 
 	Loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
-		x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scaleX)
-		y := Round((offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scaleY)
+		x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
+		y := Round((offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
 
 		if (A_Index = 1) {
 			firstX := x
@@ -102,6 +101,15 @@ createTrackImage(trackMap) {
 	Gdip_Shutdown(token)
 
 	return (kTempDirectory . "TrackMap.png")
+}
+
+recreateTrackMap(simulator, track) {
+	sessionDB := new SessionDatabase()
+
+	trackMap := sessionDB.getTrackMap(simulator, track)
+	fileName := createTrackImage(trackMap)
+
+	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
 }
 
 createTrackMap(simulator, track, fileName) {
@@ -216,12 +224,5 @@ Exit:
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-sessionDB := new SessionDatabase()
-
-trackMap := sessionDB.getTrackMap("Assetto Corsa Competizione", "cota")
-fileName := createTrackImage(trackMap)
-
-sessionDB.updateTrackMap("Assetto Corsa Competizione", "cota", trackMap, fileName)
 
 startTrackMapper()

@@ -1446,8 +1446,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							if selection.HasKey(key . "Pressures") {
 								driver := selection[key . "Pressures"]
 
+								tyresDB := new TyresDatabase()
 								sourceDB := new Database(sourceDirectory . "\", schemas)
-								targetDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+								targetDB := tyresDB.getTyresDatabase(simulator, car, track)
 
 								for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
 									data := Object()
@@ -1459,13 +1460,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 
 								for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-									data := Object()
-
-									for ignore, field in schemas["Tyres.Pressures.Distribution"]
-										data[field] := row[field]
-
-									targetDB.add("Tyres.Pressures.Distribution", data, true)
+									tyresDB.updatePressure(simulator, car, track
+														 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+														 , row.Compound, row["Compound.Color"]
+														 , row.Type, row.Tyre, row.Pressure, row.Count
+														 , false, true, "User", driver)
 								}
+
+								tyresDB.flush()
 							}
 
 							if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
@@ -2071,6 +2073,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				display := translate(value)
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
+			else if (type = "Text")
+				display := StrReplace(value, "`n", A_Space)
 			else
 				display := value
 
@@ -3062,15 +3066,6 @@ addSetting() {
 			GuiControl Show, settingValueEdit
 			GuiControl Enable, settingValueEdit
 
-			/*
-			if (type = "Float")
-				value := 0.0
-			else if (type = "Integer")
-				value := 0
-			else if (type = "Text")
-				value := ""
-			*/
-
 			value := default
 
 			settingValueEdit := value
@@ -3198,15 +3193,6 @@ selectSetting() {
 			GuiControl Show, settingValueEdit
 			GuiControl Enable, settingValueEdit
 
-			/*
-			if (type = "Float")
-				value := 0.0
-			else if (type = "Integer")
-				value := 0
-			else if (type = "Text")
-				value := ""
-			*/
-
 			value := default
 
 			settingValueEdit := value
@@ -3267,6 +3253,12 @@ changeSetting() {
 			}
 			else if (type = "Text") {
 				GuiControlGet settingValueText
+
+				if InStr(settingValueText, "`n") {
+					settingValueText := StrReplace(settingValueText, "`n", A_Space)
+
+					GuiControl, , settingValueText, %settingValueText%
+				}
 
 				value := settingValueText
 			}

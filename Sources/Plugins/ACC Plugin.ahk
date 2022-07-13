@@ -24,12 +24,6 @@ global kACCApplication = "Assetto Corsa Competizione"
 global kACCPlugin = "ACC"
 global kChatMode = "Chat"
 
-global kFront = 0
-global kRear = 1
-global kLeft = 2
-global kRight = 3
-global kCenter = 4
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Constant Section                        ;;;
@@ -50,6 +44,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
+
+	iKeyDelay := kUndefined
+	iImageSearch := kUndefined
 
 	iNoImageSearch := false
 	iNextPitstopMFDOptionsUpdate := false
@@ -112,6 +109,32 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			Send %message%
 			Sleep 100
 			Send {Enter}
+		}
+	}
+
+	Car[] {
+		Get {
+			return base.Car
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+			this.iImageSearch := kUndefined
+
+			return (base.Car := value)
+		}
+	}
+
+	Track[] {
+		Get {
+			return base.Track
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+			this.iImageSearch := kUndefined
+
+			return (base.Track := value)
 		}
 	}
 
@@ -435,23 +458,31 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				Send %command%
 		}
 
-		Sleep 20
-	}
-
-	openPitstopMFD(descriptor := false, update := "__Undefined__") {
-		static reported := false
-		static imageSearch := "__Undefined__"
-
-		if (imageSearch = kUndefined) {
+		if (this.iKeyDelay = kUndefined) {
 			car := (this.Car ? this.Car : "*")
 			track := (this.Track ? this.Track : "*")
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			imageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", false)
+			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.KeyDelay", 0)
 		}
 
-		imgSearch := (imageSearch && !this.iNoImageSearch)
+		Sleep % this.iKeyDelay
+	}
+
+	openPitstopMFD(descriptor := false, update := "__Undefined__") {
+		static reported := false
+
+		if (this.iImageSearch = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
+
+			this.iImageSearch := getConfigurationValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", false)
+		}
+
+		imgSearch := (this.iImageSearch && !this.iNoImageSearch)
 
 		if (update = kUndefined)
 			if imgSearch
@@ -809,27 +840,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch direction {
 				case "Increase":
-					keys := ""
-
-					Loop % steps
-						keys .= "{Right}"
-
 					this.activateACCWindow()
 
-					this.sendPitstopCommand(keys)
-
-					Sleep 50
+					Loop %steps%
+						this.sendPitstopCommand("{Right}")
 				case "Decrease":
-					keys := ""
-
-					Loop % steps
-						keys .= "{Left}"
-
 					this.activateACCWindow()
 
-					this.sendPitstopCommand(keys)
-
-					Sleep 50
+					Loop %steps%
+						this.sendPitstopCommand("{Left}")
 				default:
 					Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 			}

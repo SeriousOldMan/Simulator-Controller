@@ -37,6 +37,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
+	iKeyDelay := kUndefined
+
 	iRepairSuspensionChosen := false
 	iRepairBodyworkChosen := false
 	iRepairEngineChosen := false
@@ -45,6 +47,30 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSettingsDatabase := false
 	iCarMetaData := {}
+
+	Car[] {
+		Get {
+			return base.Car
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+
+			return (base.Car := value)
+		}
+	}
+
+	Track[] {
+		Get {
+			return base.Track
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+
+			return (base.Track := value)
+		}
+	}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -138,7 +164,16 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				Send %command%
 		}
 
-		Sleep 20
+		if (this.iKeyDelay = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
+
+			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Automobilista 2", "Pitstop.KeyDelay", 0)
+		}
+
+		Sleep % this.iKeyDelay
 	}
 
 	updateSessionState(sessionState) {
@@ -339,19 +374,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
-					keys := ""
+					this.activateACWindow()
 
 					Loop %steps%
-						keys .= this.NextChoiceHotkey
-
-					this.sendPitstopCommand(keys)
+						this.sendPitstopCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					keys := ""
+					this.activateACWindow()
 
 					Loop %steps%
-						keys .= this.PreviousChoiceHotkey
-
-					this.sendPitstopCommand(keys)
+						this.sendPitstopCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
 			}
@@ -406,7 +437,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
-			
+
 			if (!compound || delta) {
 				this.requirePitstopMFD()
 

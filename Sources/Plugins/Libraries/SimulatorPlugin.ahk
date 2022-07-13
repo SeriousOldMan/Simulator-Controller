@@ -222,11 +222,19 @@ class SimulatorPlugin extends ControllerPlugin {
 		Get {
 			return this.iCar
 		}
+
+		Set {
+			return (this.iCar := value)
+		}
 	}
 
 	Track[] {
 		Get {
 			return this.iTrack
+		}
+
+		Set {
+			return (this.iTrack := value)
 		}
 	}
 
@@ -383,8 +391,8 @@ class SimulatorPlugin extends ControllerPlugin {
 			this.iSessionState := sessionState
 
 			if (sessionState == kSessionFinished) {
-				this.iCar := false
-				this.iTrack := false
+				this.Car := false
+				this.Track := false
 
 				this.Controller.setModes()
 			}
@@ -793,7 +801,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		if compound {
 			index := this.tyreCompoundIndex(compound, compoundColor)
 
-			return (index ? new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+			return (index ? sessionDB.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
 		}
 		else
 			return false
@@ -842,8 +850,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 
 		if (this.SessionState != kSessionFinished) {
-			this.iCar := getConfigurationValue(data, "Session Data", "Car")
-			this.iTrack := getConfigurationValue(data, "Session Data", "Track")
+			this.Car := getConfigurationValue(data, "Session Data", "Car")
+			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}
 	}
 

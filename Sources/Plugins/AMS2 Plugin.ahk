@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -35,9 +36,35 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
+	iKeyDelay := kUndefined
+
 	iTyreCompoundChosen := 0
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
+
+	Car[] {
+		Get {
+			return base.Car
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+
+			return (base.Car := value)
+		}
+	}
+
+	Track[] {
+		Get {
+			return base.Track
+		}
+
+		Set {
+			this.iKeyDelay := kUndefined
+
+			return (base.Track := value)
+		}
+	}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -111,7 +138,16 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				Send %command%
 		}
 
-		Sleep 20
+		if (this.iKeyDelay = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
+
+			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Automobilista 2", "Pitstop.KeyDelay", 0)
+		}
+
+		Sleep % this.iKeyDelay
 	}
 
 	openPitstopMFD(descriptor := false) {
@@ -293,7 +329,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
-			
+
 			if (!compound || delta) {
 				this.requirePitstopMFD()
 

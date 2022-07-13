@@ -6841,18 +6841,10 @@ class RaceCenter extends ConfigurationItem {
 					positions := lastLap.Positions
 
 					if telemetry {
-						mapWidth := getConfigurationValue(trackMap, "Map", "Width")
-						mapHeight := getConfigurationValue(trackMap, "Map", "Height")
+						scale := getConfigurationValue(trackMap, "Map", "Scale")
 
-						xMin := getConfigurationValue(trackMap, "Map", "X.Min")
-						yMin := getConfigurationValue(trackMap, "Map", "Y.Min")
-
-						scale := 1.0
-
-						offsetX := (- xMin) + (mapWidth * 0.1)
-						offsetY := (- yMin) + (mapHeight * 0.1)
-
-						scale := (scale * 0.9)
+						offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+						offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
 
 						telemetry := parseConfiguration(telemetry)
 
@@ -6941,14 +6933,14 @@ class RaceCenter extends ConfigurationItem {
 				}
 
 				width := (chartViewer.Width - 20)
-				height := (chartViewer.Height - 20)
+				height := (chartViewer.Height - 25)
 
 				imgWidth := getConfigurationValue(trackMap, "Map", "Width")
 				imgHeight := getConfigurationValue(trackMap, "Map", "Height")
 
 				scale := Min(width / imgWidth, height / imgHeight)
 
-				while (imgWidth > (width / 3)) {
+				while (imgWidth > (width / 2)) {
 					imgWidth := Floor(imgWidth * scale)
 					imgHeight := Floor(imgHeight * scale)
 
@@ -6978,7 +6970,7 @@ class RaceCenter extends ConfigurationItem {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.lbox { box-sizing: border-box; margin: auto; }
+						.lbox { float: left; box-sizing: border-box; margin: auto; }
 						.rbox { float: right; box-sizing: border-box; }
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
 						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }

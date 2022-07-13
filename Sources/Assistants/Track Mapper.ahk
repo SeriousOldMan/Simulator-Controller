@@ -62,8 +62,8 @@ createTrackImage(trackMap) {
 
 	scale := 1.0
 
-	offsetX := (- xMin) + (mapWidth * 0.1)
-	offsetY := (- yMin) + (mapHeight * 0.1)
+	offsetX := (- xMin) + (mapWidth * 0.05)
+	offsetY := (- yMin) + (mapHeight * 0.05)
 
 	scale := (scale * 0.9)
 
@@ -71,6 +71,11 @@ createTrackImage(trackMap) {
 	firstY := 0
 	lastX := 0
 	lastY := 0
+
+	setConfigurationValue(trackMap, "Map", "Offset.X", offsetX)
+	setConfigurationValue(trackMap, "Map", "Offset.Y", offsetY)
+
+	setConfigurationValue(trackMap, "Map", "Scale", scale)
 
 	Loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
@@ -100,16 +105,12 @@ createTrackImage(trackMap) {
 
 	Gdip_Shutdown(token)
 
+	setConfigurationValue(trackMap, "Map", "Offset.X", offsetX)
+	setConfigurationValue(trackMap, "Map", "Offset.Y", offsetY)
+
+	setConfigurationValue(trackMap, "Map", "Scale", scale)
+
 	return (kTempDirectory . "TrackMap.png")
-}
-
-recreateTrackMap(simulator, track) {
-	sessionDB := new SessionDatabase()
-
-	trackMap := sessionDB.getTrackMap(simulator, track)
-	fileName := createTrackImage(trackMap)
-
-	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
 }
 
 createTrackMap(simulator, track, fileName) {
@@ -173,6 +174,33 @@ createTrackMap(simulator, track, fileName) {
 	}
 }
 
+recreateTrackMap(simulator, track) {
+	sessionDB := new SessionDatabase()
+
+	trackMap := sessionDB.getTrackMap(simulator, track)
+	fileName := createTrackImage(trackMap)
+
+	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
+}
+
+recreateTrackMaps() {
+	sessionDB := new SessionDatabase()
+
+	Loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
+	{
+		code := A_LoopFileName
+
+		simulator := sessionDB.getSimulatorName(code)
+
+		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		{
+			SplitPath A_LoopFileName, , , , track
+
+			recreateTrackMap(simulator, track)
+		}
+	}
+}
+
 startTrackMapper() {
 	icon := kIconsDirectory . "Track.ico"
 
@@ -185,6 +213,7 @@ startTrackMapper() {
 	simulator := false
 	track := false
 	data := false
+	recreate := false
 
 	index := 1
 
@@ -199,6 +228,9 @@ startTrackMapper() {
 			case "-Data":
 				data := A_Args[index + 1]
 				index += 2
+			case "-All":
+				recreate := true
+				index += 1
 			default:
 				index += 1
 		}
@@ -214,6 +246,9 @@ startTrackMapper() {
 			; ignore
 		}
 	}
+
+	if recreate
+		recreateTrackMaps()
 
 	ExitApp 0
 

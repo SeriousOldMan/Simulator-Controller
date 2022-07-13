@@ -35,6 +35,8 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Database.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
@@ -1635,6 +1637,94 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV424() {
+	tyresDB := new TyresDatabase()
+
+	simulator := "rFactor 2"
+
+	Loop Files, %kDatabaseDirectory%User\RF2\*.*, D
+	{
+		car := string2Values("#", A_LoopFileName)[1]
+
+		if !FileExist(kDatabaseDirectory "User\RF2\" . car)
+			FileMoveDir %kDatabaseDirectory%User\RF2\%A_LoopFileName%, %kDatabaseDirectory%User\RF2\%car%, R
+		else {
+			oldCar := A_LoopFileName
+
+			Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
+			{
+				track := A_LoopFileName
+
+				sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
+
+				sourceDB := new Database(sourceDirectory, kTelemetrySchemas)
+				targetDB := new TelemetryDatabase(simulator, car, track).Database
+
+				for ignore, row in sourceDB.Tables["Electronics"] {
+					data := Object()
+
+					for ignore, field in kTelemetrySchemas["Electronics"]
+						data[field] := row[field]
+
+					targetDB.add("Electronics", data, true)
+				}
+
+				for ignore, row in sourceDB.Tables["Tyres"] {
+					data := Object()
+
+					for ignore, field in kTelemetrySchemas["Tyres"]
+						data[field] := row[field]
+
+					targetDB.add("Tyres", data, true)
+				}
+
+				tyresDB := new TyresDatabase()
+				sourceDB := new Database(sourceDirectory, kTyresSchemas)
+				targetDB := tyresDB.getTyresDatabase(simulator, car, track)
+
+				for ignore, row in sourceDB.Tables["Tyres.Pressures"] {
+					data := Object()
+
+					for ignore, field in kTyresSchemas["Tyres.Pressures"]
+						data[field] := row[field]
+
+					targetDB.add("Tyres.Pressures", data, true)
+				}
+
+				for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"] {
+					tyresDB.updatePressure(simulator, car, track
+										 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+										 , row.Compound, row["Compound.Color"]
+										 , row.Type, row.Tyre, row.Pressure, row.Count
+										 , false, true, "User", row.Driver)
+				}
+
+				tyresDB.flush()
+
+				targetDirectory := (kDatabaseDirectory . "User\RF2\" . car . "\" . track . "\Race Strategies")
+
+				FileCreateDir %targetDirectory%
+
+				Loop Files, %sourceDirectory%Race Strategies\*.*, F
+				{
+					fileName := A_LoopFileName
+					targetName := fileName
+
+					while FileExist(targetDirectory . "\" . targetName) {
+						SplitPath targetName, , , , name
+
+						targetName := (name . " (" . (A_Index + 1) . ").strategy")
+					}
+
+					FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+				}
+			}
+
+			FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+		}
+	}
+}
+
 updateConfigurationForV423() {
 	if FileExist(kUserConfigDirectory . "Session Database.ini") {
 		sessionDB := new SessionDatabase()
@@ -1853,6 +1943,21 @@ updateConfigurationForV398() {
 	}
 }
 
+updatePluginsForV424() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
+			pcars2 := new Plugin("Project CARS 2", false, false, "", "")
+
+			pcars2.saveToConfiguration(userConfiguration)
+
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
 updateConfigurationForV394() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1869,8 +1974,6 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	setupDB := new TyresDatabase()
-
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName

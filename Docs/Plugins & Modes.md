@@ -1045,7 +1045,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Project CARS 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Project CARS 2*, since the standard bindings are undefined in the current distribution of *Project CARS 2*.
+First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Project CARS 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Project CARS 2*. You need to change these bindings in *Project CARS 2*, since the standard bindings are undefined in the current distribution of *Project CARS 2*.
 
 	openPitstopMFD: *openHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default;

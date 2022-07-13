@@ -43,6 +43,14 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 4.2.4
+
+Configuration updates are automatic, including a complete and time-cosuming reconfiguration of all data for *rFactor 2*. This release brings a new integration for *Project CARS 2*. A corresponding plugin will be added as disabled to your configuration, but you still have to create the application entry in "Simulator Configuration" and you must enable the plugin. See the [plugin documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2) for more details. Although, if you are still using "Simulator Setup", rerun it and everything will be configured automatically.
+
+The other major change in this release is the introduction of a tyre compound meta model for all simulators except *Assetto Corsa Competizione* (only *Dry* and *Wet* tyres available there, so the choice is easy). Please read the all new [documentation](*) carefully. It contains instructions, what to do, if you want to use this feature.
+
+***
+
 ## Release 4.2.3
 
 Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings. If you have used the icon set preset for Stream Deck, remove it from the preset list and reassign it, so that the modified request action names come into effect.

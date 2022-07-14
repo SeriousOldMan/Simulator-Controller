@@ -989,9 +989,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			setConfigurationValue(data, "Car Data", "TyreCompound", compound)
 			setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
-
-			if !isDebug()
-				removeConfigurationValue(data, "Car Data", "TyreCompoundRaw")
 		}
 
 		this.Simulator.updateSessionData(data)

@@ -3,6 +3,9 @@
   2. [Target: V4.x][ACC Plugin] Hot switching between different sets of ABS and TC settings using voice commands
   3. [Target: V4.x][RF2 Plugin] Better integration with the weather forecast data of *rFactor 2*
   4. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
+
+#### Data Handling
+  1. [Target: V4.7] Implement a server for the session database, which can be shared by multiple drivers.
   
 #### Strategy Development
   1. [Target: V4.x] Enhancements for Race Strategist

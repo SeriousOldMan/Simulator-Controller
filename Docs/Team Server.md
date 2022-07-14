@@ -138,7 +138,13 @@ The reports at the top of the list are the well known report, wich are also avai
 
 Last but not least, using the small button with the gear icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
-Beside that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
+A very special report is the live track view, which is available for all race simulators, which support track ccordinates. The track maps will be created automatically when you have driven a couple of laps on a given track with the Race Spotter active. See the [corresponding documentation](*) for more information. If a track map is available, you can select the "Track" report from the reports list to open the live view of the current race situation.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2020.JPG)
+
+Your own car will be marked by a black dot, whereas most other cars will be displayed as gray dots on the map, except your direct opponents and the race leader, for which the positions will be color coded. All positions will be updated every couple of seconds.
+
+Beside all that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
   1. Strategy Summary
 

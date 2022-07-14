@@ -131,3 +131,34 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
+
+## Track Mapping
+
+Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except iRacing, where no coordinates are available through the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (typically between 1000 and 1500 points for a typical race course).
+
+	[General]
+	Simulator=Assetto Corsa Competizione
+	Track=Circuit Zandvoort
+	[Map]
+	Height=828
+	Offset.X=394.799000
+	Offset.Y=426.871000
+	Points=1569
+	Scale=0.900000
+	Width=945
+	X.Max=596.604
+	X.Min=-347.549
+	Y.Max=441.796
+	Y.Min=-385.471
+	[Points]
+	1.X=-145.027
+	1.Y=-57.783
+	...
+
+The second file, which is generated using the way points from the meta data file, is a simple image file representing the outline of the track (typical a PNG file).
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.JPG)
+
+The track maps are generated using a 20 Hz resolution, which is compoarable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are generated in the first few laps, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
+
+For now track maps are used by the "Race Center" which uses the track map to provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation.

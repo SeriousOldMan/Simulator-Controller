@@ -11,6 +11,7 @@ copy "Plugins & Modes.md" "..\..\Controller.Wiki\Plugins-&-Modes.md"
 copy "Releases.md" ..\..\Controller.Wiki\Release-Notes.md
 copy "Sidebar.md" ..\..\Controller.Wiki\_Sidebar.md
 copy "Updates.md" ..\..\Controller.Wiki\Update-Notes.md
+copy "Tyre Compounds.md" ..\..\Controller.Wiki\Tyre-Compounds.md
 copy "Using Simulator Controller.md" ..\..\Controller.Wiki\Using-Simulator-Controller.md
 copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
 copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md

@@ -79,6 +79,12 @@
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-6)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-6)
 
+[Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#introduction)
+  - [Compound Rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#compound-rules)
+  - [Using Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds)
+  
 [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#introduction)
@@ -145,6 +151,7 @@
   - [Alerts & Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information)
     - [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information)
   - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
+  - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

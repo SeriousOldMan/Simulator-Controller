@@ -6960,11 +6960,11 @@ class RaceCenter extends ConfigurationItem {
 				imgWidth *= scale
 				imgHeight *= scale
 
+				scale := 0.99
+
 				while (imgWidth > (width / 2)) {
 					imgWidth := Floor(imgWidth * scale)
 					imgHeight := Floor(imgHeight * scale)
-
-					scale := 0.99
 				}
 
 				html := ("<div class=""lbox""><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></div>")

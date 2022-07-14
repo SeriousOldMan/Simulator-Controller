@@ -1,8 +1,8 @@
 [Development]
-Version=4.2.4.0-rc1
+Version=4.2.4.0-rc2
 Target=4.2.4.0-release
 Date=07/14/2022
-Download=https://www.dropbox.com/s/ev7otiw4hdrc2ka/Simulator%20Controller%204.2.4.0-rc1.zip?dl=1
+Download=https://www.dropbox.com/s/908qkk654dpbnb5/Simulator%20Controller%204.2.4.0-rc2.zip?dl=1
 Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database", New "TyreCompound" action for *RaceRoom Racing Experience*
 [Release]
 Version=4.2.3.0-release
@@ -13,4 +13,4 @@ Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race C
 Type=Development
 [Version]
 Release=4.2.3.0-release
-Development=4.2.4.0-rc1
+Development=4.2.4.0-rc2

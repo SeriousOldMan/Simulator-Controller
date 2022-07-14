@@ -136,7 +136,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreChange: "Change Tyres", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreChange: "Change Tyres", TyreCompound: "Tyre Compound"
+					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
 
@@ -421,19 +422,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				case "Accept":
 					this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				case "Increase":
-					keys := ""
-
 					Loop %steps%
-						keys .= this.NextChoiceHotkey
-
-					this.sendPitstopCommand(keys)
+						this.sendPitstopCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					keys := ""
-
 					Loop %steps%
-						keys .= this.PreviousChoiceHotkey
-
-					this.sendPitstopCommand(keys)
+						this.sendPitstopCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 			}
@@ -444,7 +437,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Repair Bodywork")
 				return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
-			else if (option = "Change Tyres")
+			else if ((option = "Change Tyres") || (option = "Tyre Compound"))
 				return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
 			else {
 				this.activateR3EWindow()
@@ -480,6 +473,26 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Change Tyres") {
 				this.toggleActivity("Change Front Tyres", false, true)
 				this.toggleActivity("Change Rear Tyres", false, true)
+			}
+			else if (option = "Tyre Compound") {
+				changed := false
+
+				if !this.chosenOption("Change Front Tyres") {
+					this.toggleActivity("Change Front Tyres", false, true)
+
+					changed := true
+				}
+
+				if !this.chosenOption("Change Rear Tyres") {
+					this.toggleActivity("Change Rear Tyres", false, true)
+
+					changed := true
+				}
+
+				if changed
+					this.analyzePitstopMFD()
+
+				this.changeTyreCompound(action, steps, false)
 			}
 			else if (option = "Repair Bodywork") {
 				this.toggleActivity("Repair Bodywork", false, true)
@@ -517,6 +530,31 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					if accept
 						this.sendPitstopCommand(this.AcceptChoiceHotkey)
 				}
+		}
+	}
+
+	changeTyreCompound(direction, steps := 1, require := true, accept := true) {
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if (!require || this.requirePitstopMFD()) {
+				if (accept && this.selectPitstopOption("Change Front Tyres") && this.optionChosen("Change Front Tyres"))
+					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+
+				if (accept && this.selectPitstopOption("Change Rear Tyres") && this.optionChosen("Change Rear Tyres"))
+					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+
+				if this.selectPitstopOption("Change Front Tyres")
+					this.dialPitstopOption("Change Front Tyres", direction, steps)
+
+				if this.selectPitstopOption("Change Rear Tyres") {
+					this.dialPitstopOption("Change Rear Tyres", direction, steps)
+
+					if accept
+						this.sendPitstopCommand(this.AcceptChoiceHotkey)
+				}
+
+				if (accept && this.selectPitstopOption("Change Front Tyres"))
+					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+			}
 		}
 	}
 
@@ -572,19 +610,37 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
+		if (this.OpenPitstopMFDHotkey != "Off")
 			if this.optionAvailable("Change Front Tyres")
-				if (compound && !this.chosenOption("Change Front Tyres"))
-					this.toggleActivity("Change Front Tyres", false, true)
-				else if (!compound && this.chosenOption("Change Front Tyres"))
-					this.toggleActivity("Change Front Tyres", false, true)
+				if compound {
+					changed := false
 
-			if this.optionAvailable("Change Rear Tyres")
-				if (compound && !this.chosenOption("Change Rear Tyres"))
-					this.toggleActivity("Change Rear Tyres", false, true)
-				else if (!compound && this.chosenOption("Change Rear Tyres"))
-					this.toggleActivity("Change Rear Tyres", false, true)
-		}
+					if !this.chosenOption("Change Front Tyres") {
+						this.toggleActivity("Change Front Tyres", false, true)
+
+						changed := true
+					}
+
+					if !this.chosenOption("Change Rear Tyres") {
+						this.toggleActivity("Change Rear Tyres", false, true)
+
+						changed := true
+					}
+
+					if changed
+						this.analyzePitstopMFD()
+
+					this.changeTyreCompound("Decrease", 10, false)
+
+					this.changeTyreCompound("Increase", this.tyreCompoundIndex(compound, compoundColor), false)
+				}
+				else {
+					if this.chosenOption("Change Front Tyres")
+						this.toggleActivity("Change Front Tyres", false, true)
+
+					if this.chosenOption("Change Rear Tyres")
+						this.toggleActivity("Change Rear Tyres", false, true)
+				}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {

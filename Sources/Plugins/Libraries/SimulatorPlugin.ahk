@@ -744,6 +744,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
 		this.CurrentTyreCompound := compound(compound, compoundColor)
+
+		this.updateTyreCompound(data)
 	}
 
 	recommendPitstop() {
@@ -835,7 +837,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updatePositionsData(data) {
 	}
 
-	updateSessionData(data) {
+	updateTyreCompound(data) {
 		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
 		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
 			if this.CurrentTyreCompound {
@@ -853,6 +855,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.Car := getConfigurationValue(data, "Session Data", "Car")
 			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}
+	}
+
+	updateSessionData(data) {
+		this.updateTyreCompound(data)
 	}
 
 	saveSessionState(ByRef sessionSettings, ByRef sessionState) {

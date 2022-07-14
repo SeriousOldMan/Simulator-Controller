@@ -1615,8 +1615,8 @@ showRaceSettingsEditor() {
 		}
 	}
 
-	if (vSimulator && vCar && vTrack)
-		vTyreCompounds := new SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack)
+	if (vSimulator && vCar)
+		vTyreCompounds := new SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack ? vTrack : "*")
 
 	if (vAirTemperature <= 0)
 		vAirTemperature := 23

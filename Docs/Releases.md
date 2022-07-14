@@ -12,7 +12,7 @@
   8. A delay can now be configured in the "Session Database" for the keyboard commands used when dialing pitstop settings in the various simulators. This helps me to fix problems in rare cases, where the PC is quite old and unable to process the fast keyboard commands issued by Simulator Controller.
   9. A new "TyreCompound" action has been added to the "RaceRoom Racing Experience" plugin which allows you to change the tyre compound for the next pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8) for more information.
   
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-424). It contains instructions how to activate the new *Project CARS 2* integration.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-424). It contains, among other things, instructions how to activate the new *Project CARS 2* integration.
 
 ## 4.2.3.0-release 07/08/22
 

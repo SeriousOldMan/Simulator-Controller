@@ -168,7 +168,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			this.iKeyDelay := getConfigurationValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.KeyDelay", 0)
+			this.iKeyDelay := getConfigurationValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.KeyDelay", 20)
 		}
 
 		Sleep % this.iKeyDelay

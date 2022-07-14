@@ -116,6 +116,6 @@ The default tyre compouund is "Dry", when no dedicated information is available 
 
 As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every car has a "Dry" and a "Wet" compound to use. So nothing to do here.
 
-#### *Automobilista 2* and *Project CARS 2*
+### Special notes for *Automobilista 2* and *Project CARS 2*
 
 Unfortunately, these two simulators does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.

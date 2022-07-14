@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Configuration updates are automatic, including a complete and time-cosuming reconfiguration of all data for *rFactor 2*. This release brings a new integration for *Project CARS 2*. A corresponding plugin will be added as disabled to your configuration, but you still have to create the application entry in "Simulator Configuration" and you must enable the plugin. See the [plugin documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2) for more details. Although, if you are still using "Simulator Setup", rerun it and everything will be configured automatically.
 
-The other major change in this release is the introduction of a tyre compound meta model for all simulators except *Assetto Corsa Competizione* (only *Dry* and *Wet* tyres available there, so the choice is easy). Please read the all new [documentation](*) carefully. It contains instructions, what to do, if you want to use this feature.
+The other major change in this release is the introduction of a tyre compound meta model for all simulators except *Assetto Corsa Competizione* (only *Dry* and *Wet* tyres available there, so the choice is easy). Please read the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) carefully. It contains instructions, what to do, if you want to use this feature.
 
 ***
 

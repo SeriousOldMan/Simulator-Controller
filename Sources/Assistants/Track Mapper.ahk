@@ -72,11 +72,6 @@ createTrackImage(trackMap) {
 	lastX := 0
 	lastY := 0
 
-	setConfigurationValue(trackMap, "Map", "Offset.X", offsetX)
-	setConfigurationValue(trackMap, "Map", "Offset.Y", offsetY)
-
-	setConfigurationValue(trackMap, "Map", "Scale", scale)
-
 	Loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
 		x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
@@ -205,7 +200,7 @@ startTrackMapper() {
 	icon := kIconsDirectory . "Track.ico"
 
 	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Database Synchronizer
+	Menu Tray, Tip, Track Mapper
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit

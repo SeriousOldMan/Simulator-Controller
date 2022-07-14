@@ -417,8 +417,6 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		float angle = vectorAngle(velocityX, velocityY);
-
 		int carID = sharedData->mViewedParticipantIndex;
 
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
@@ -445,7 +443,7 @@ int main(int argc, char* argv[]) {
 	SharedMemory* localCopy = NULL;
 	bool mapTrack = false;
 
-	if (argc > 1 && argv[1] == "-Map")
+	if (argc > 1 && strcmp(argv[1], "-Map") == 0)
 		mapTrack = true;
 
 	if (fileHandle != NULL) {

@@ -217,7 +217,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	hasTrackMap(simulator, track) {
-		return FileExist(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
+		return (this.getTrackMap(simulator, track) && this.getTrackImage(simulator, track))
 	}
 
 	availableTrackMaps(simulator) {
@@ -258,32 +258,34 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	updateTrackMap(simulator, track, data, imageFileName) {
-		directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
 
-		writeConfiguration(directory . track . ".map", data)
+		writeConfiguration(prefix . ".map", data)
 
 		SplitPath imageFileName, , , extension
 
-		FileCopy %imageFileName%, %directory%%track%.%extension%, 1
+		FileCopy %imageFileName%, %prefix%.%extension%, 1
 	}
 
 	getTrackMap(simulator, track) {
-		if this.hasTrackMap(simulator, track)
-			return readConfiguration(kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track . ".map")
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
+
+		if FileExist(prefix . ".map")
+			return readConfiguration(prefix . ".map")
 		else
 			return false
 	}
 
 	getTrackImage(simulator, track) {
-		if this.hasTrackMap(simulator, track) {
-			directory := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\")
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
 
-			if FileExist(directory . track . ".png")
-				return (directory . track . ".png")
-			else if FileExist(directory . track . ".jpg")
-				return (directory . track . ".jpg")
-			else if FileExist(directory . track . ".gif")
-				return (directory . track . ".gif")
+		if FileExist(prefix . ".map") {
+			if FileExist(prefix . ".png")
+				return (prefix . ".png")
+			else if FileExist(prefix . ".jpg")
+				return (prefix . ".jpg")
+			else if FileExist(prefix . ".gif")
+				return (prefix . ".gif")
 			else
 				return false
 		}
@@ -485,9 +487,9 @@ class SessionDatabase extends ConfigurationItem {
 
 			if (compounds == kUndefined) {
 				if (code = "ACC")
-					compounds := ["Dry->Dry", "Wet->Wet"]
+					compounds := "Dry->Dry;Wet->Wet"
 				else
-					compounds := ["*->Dry"]
+					compounds := "*->Dry"
 			}
 			else {
 				candidate := getConfigurationValue(data, "Tyre Compounds", compounds, false)

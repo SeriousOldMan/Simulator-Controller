@@ -6967,7 +6967,7 @@ class RaceCenter extends ConfigurationItem {
 					scale := 0.99
 				}
 
-				html := ("<div class=""lbox""><center><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></center></div>")
+				html := ("<div class=""lbox""><img width=""" . imgWidth . """ height=""" . imgHeight . """ src=""" . fileName . """></div>")
 			}
 		}
 
@@ -6992,8 +6992,8 @@ class RaceCenter extends ConfigurationItem {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.lbox { float: left; box-sizing: border-box; width: %hWidth%; }
-						.rbox { float: right; box-sizing: border-box; }
+						.lbox { float: left; text-align: center; width: %hWidth%; }
+						.rbox { float: right; }
 						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
 						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
 						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }

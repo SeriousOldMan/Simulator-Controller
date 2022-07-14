@@ -473,16 +473,16 @@ class SessionDatabase extends ConfigurationItem {
 			if (compounds == kUndefined) {
 				data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
-				compounds := getConfigurationValue(data, "Car Compounds", car . ";" . track, kUndefined)
+				compounds := getConfigurationValue(data, "Cars", car . ";" . track, kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Car Compounds", car . ";*", kUndefined)
+					compounds := getConfigurationValue(data, "Cars", car . ";*", kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Car Compounds", "*;" . track, kUndefined)
+					compounds := getConfigurationValue(data, "Cars", "*;" . track, kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Car Compounds", "*;*", kUndefined)
+					compounds := getConfigurationValue(data, "Cars", "*;*", kUndefined)
 			}
 
 			if (compounds == kUndefined) {
@@ -492,7 +492,7 @@ class SessionDatabase extends ConfigurationItem {
 					compounds := "*->Dry"
 			}
 			else {
-				candidate := getConfigurationValue(data, "Tyre Compounds", compounds, false)
+				candidate := getConfigurationValue(data, "Compounds", compounds, false)
 
 				if candidate
 					compounds := candidate

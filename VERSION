@@ -3,7 +3,7 @@ Version=4.2.4.0-dev
 Target=4.2.4.0-release
 Date=07/14/2022
 Download=
-Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database"
+Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database", New "TyreCompound" action for *RaceRoom Racing Experience*
 [Release]
 Version=4.2.3.0-release
 Date=07/08/2022

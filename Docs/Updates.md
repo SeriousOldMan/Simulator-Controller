@@ -49,6 +49,8 @@ Configuration updates are automatic, including a complete and time-cosuming reco
 
 The other major change in this release is the introduction of a tyre compound meta model for all simulators except *Assetto Corsa Competizione* (only *Dry* and *Wet* tyres available there, so the choice is easy). Please read the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) carefully. It contains instructions, what to do, if you want to use this feature.
 
+A "TyreCompound" action has beend added to the *RaceRoom Racing Experience* plugin. You may want to add it to your configuration.
+
 ***
 
 ## Release 4.2.3

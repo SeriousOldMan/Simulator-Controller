@@ -79,12 +79,12 @@ global settingsImg1
 global settingsImg2
 global settingsImg3
 global settingsImg4
+global settingsImg5
 global settingsTab1
 global settingsTab2
 global settingsTab3
 global settingsTab4
-
-global settingsListView
+global settingsTab5
 
 global settingDropDown
 global settingValueDropDown
@@ -100,6 +100,12 @@ global dataSelectCheck
 global exportDataButton
 global importDataButton
 global deleteDataButton
+
+global trackEventsNameEdit
+global trackEventsInfoEdit
+global addTrackEventsButton
+global deleteTrackEventsButton
+global saveTrackEventsButton
 
 global setupTypeDropDown
 global uploadSetupButton
@@ -178,6 +184,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSettingsListView := false
 	iSetupListView := false
 	iAdministrationListView := false
+	iTrackEventsListView := false
+
+	iTrackEvents := false
+
+	iTrackMap := false
+	iTrackImage := false
+
+	iTrackDisplay := false
+	iTrackDisplayArea := false
 
 	iSettings := []
 
@@ -288,6 +303,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	AdministrationListView[] {
 		Get {
 			return this.iAdministrationListView
+		}
+	}
+
+	TrackEvents[key := false] {
+		Get {
+			return (key ? this.iTrackEvents[key] : this.iTrackEvents)
+		}
+
+		Set {
+			return (key ? (this.iTrackEvents[key] := value) : (this.iTrackEvents := value))
+		}
+	}
+
+	TrackMap[] {
+		Get {
+			return this.iTrackMap
+		}
+	}
+
+	TrackImage[] {
+		Get {
+			return this.iTrackImage
+		}
+	}
+
+	TrackEventsListView[] {
+		Get {
+			return this.iTrackEventsListView
 		}
 	}
 
@@ -421,26 +464,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Sensor.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Administration")
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Road.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Automation")
+
+		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+
+		Gui %window%:Font, Norm
+		Gui %window%:Font, s10 Bold cGray, Arial
+
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg5 gchooseTab5, %kIconsDirectory%Sensor.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Administration")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, GroupBox, x280 ys-8 w390 h372
+		Gui %window%:Add, GroupBox, x280 ys-8 w390 h429
 
-		tabs := map(["Settings", "Setups", "Pressures", "Data"], "translate")
+		tabs := map(["Settings", "Setups", "Pressures", "Automation", "Data"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
 		Gui Tab, 1
 
-		Gui %window%:Add, ListView, x296 ys w360 h222 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Value"], "translate")*)
+		Gui %window%:Add, ListView, x296 ys w360 h279 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Value"], "translate")*)
 
 		this.iSettingsListView := settingsListViewHandle
 
-		Gui %window%:Add, Text, x296 yp+228 w80 h23 +0x200, % translate("Setting")
+		Gui %window%:Add, Text, x296 yp+285 w80 h23 +0x200, % translate("Setting")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 vsettingDropDown gselectSetting
 
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
@@ -461,12 +512,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Purpose")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", map(["Qualification (Dry)", "Race (Dry)", "Qualification (Wet)", "Race (Wet)"], "translate")*)
 
-		Gui %window%:Add, ListView, x296 yp+24 w360 h198 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
+		Gui %window%:Add, ListView, x296 yp+24 w360 h255 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
 
 		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
 
-		Gui %window%:Add, Button, xp+260 yp+200 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
+		Gui %window%:Add, Button, xp+260 yp+257 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadSetupButtonHandle gdownloadSetup vdownloadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameSetupButtonHandle grenameSetup vrenameSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSetupButtonHandle gdeleteSetup vdeleteSetupButton
@@ -529,31 +580,57 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 4
 
+		this.iTrackDisplayArea:= [297, 239, 358, 303]
+
+		Gui %window%:Add, Picture, x296 y238 w360 h305 Border
+		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay gselectTrackEvent
+
+		this.iTrackDisplay := trackDisplay
+
+		Gui %window%:Add, ListView, x296 y550 w130 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackEventsListViewHandle, % values2String("|", map(["Name", "Events"], "translate")*)
+
+		this.iTrackEventsListView := trackEventsListViewHandle
+
+		Gui %window%:Add, Text, x435 yp w70 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, xp+70 yp w79 vtrackEventsNameEdit
+
+		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackEventsButtonHandle vaddTrackEventsButton gaddTrackEvents
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackEventsButtonHandle vdeleteTrackEventsButton gdeleteTrackEvents
+		Gui %window%:Add, Button, xp+25 yp w23 h23 Center +0x200 HWNDsaveTrackEventsButtonHandle vsaveTrackEventsButton gsaveTrackEvents
+		setButtonIcon(addTrackEventsButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteTrackEventsButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		setButtonIcon(saveTrackEventsButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
+
+		Gui %window%:Add, Text, x435 yp+24 w70 h23 +0x200, % translate("Events")
+		Gui %window%:Add, Edit, xp+70 yp w151 h61 ReadOnly vtrackEventsInfoEdit
+
+		Gui Tab, 5
+
 		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
 
-		Gui %window%:Add, ListView, x314 ys w342 h300 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui %window%:Add, ListView, x314 ys w342 h357 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		this.iAdministrationListView := administrationListViewHandle
 
-		Gui %window%:Add, Button, x314 yp+315 w90 h23 vexportDataButton gexportData, % translate("Export...")
+		Gui %window%:Add, Button, x314 yp+372 w90 h23 vexportDataButton gexportData, % translate("Export...")
 		Gui %window%:Add, Button, xp+95 yp w90 h23 vimportDataButton gimportData, % translate("Import...")
 
 		Gui %window%:Add, Button, x566 yp w90 h23 vdeleteDataButton gdeleteData, % translate("Delete...")
 
 		Gui Tab
 
-		Gui %window%:Add, Text, x16 ys+173 w120 h23 +0x200, % translate("Available Data")
+		Gui %window%:Add, Text, x16 ys+230 w120 h23 +0x200, % translate("Available Data")
 
-		Gui %window%:Add, ListView, x16 ys+197 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+254 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
 
 		this.iDataListView := listViewHandle
 
-		Gui %window%:Add, Text, x8 y596 w670 0x10
+		Gui %window%:Add, Text, x8 y653 w670 0x10
 
 		choices := ["Local", "Local & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		Gui %window%:Add, Text, x16 y604 w55 h23 +0x200, % translate("Scope")
+		Gui %window%:Add, Text, x16 y661 w55 h23 +0x200, % translate("Scope")
 		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
 
 		Gui %window%:Add, Button, x304 yp w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
@@ -656,19 +733,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		GuiControl Font, settingsTab1
 
-		if this.moduleAvailable("Data") {
-			GuiControl Enable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Sensor.ico
-			Gui Font, s10 Bold cGray, Arial
-		}
-		else {
-			GuiControl Disable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Sensor Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
-		}
-
-		GuiControl Font, settingsTab4
-
 		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg2
 			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
@@ -695,6 +759,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		GuiControl Font, settingsTab3
 
+		if this.moduleAvailable("Automation") {
+			GuiControl Enable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Road.ico
+			Gui Font, s10 Bold cGray, Arial
+		}
+		else {
+			GuiControl Disable, settingsImg4
+			GuiControl, , settingsImg4, %kIconsDirectory%Road Gray.ico
+			Gui Font, s10 Bold cSilver, Arial
+		}
+
+		GuiControl Font, settingsTab4
+
+		if this.moduleAvailable("Data") {
+			GuiControl Enable, settingsImg5
+			GuiControl, , settingsImg5, %kIconsDirectory%Sensor.ico
+			Gui Font, s10 Bold cGray, Arial
+		}
+		else {
+			GuiControl Disable, settingsImg5
+			GuiControl, , settingsImg5, %kIconsDirectory%Sensor Gray.ico
+			Gui Font, s10 Bold cSilver, Arial
+		}
+
+		GuiControl Font, settingsTab5
+
 		Gui Font, s10 Bold cBlack, Arial
 
 		switch this.SelectedModule {
@@ -707,9 +797,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			case "Pressures":
 				GuiControl Font, settingsTab3
 				GuiControl Choose, settingsTab, 3
-			case "Data":
+			case "Automation":
 				GuiControl Font, settingsTab4
 				GuiControl Choose, settingsTab, 4
+			case "Data":
+				GuiControl Font, settingsTab5
+				GuiControl Choose, settingsTab, 5
 		}
 
 		defaultListView := A_DefaultListView
@@ -804,6 +897,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl, , dataSelectCheck, -1
 			else
 				GuiControl, , dataSelectCheck, 0
+
+			Gui ListView, % this.TrackEventsListView
+
+			GuiControl Enable, addTrackEventsButton
+
+			if LV_GetNext(0) {
+				GuiControl Enable, trackEventsNameEdit
+				GuiControl Enable, deleteTrackEventsButton
+				GuiControl Enable, saveTrackEventsButton
+			}
+			else {
+				GuiControl Disable, trackEventsNameEdit
+				GuiControl Disable, deleteTrackEventsButton
+				GuiControl Disable, saveTrackEventsButton
+			}
 		}
 		finally {
 			Gui ListView, %defaultListView%
@@ -1063,6 +1171,126 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		finally {
 			Gui ListView, %defaultListView%
 		}
+	}
+
+	createTrackMap(trackEvents := false) {
+		trackMap := this.TrackMap
+		trackImage := this.TrackImage
+
+		width := this.iTrackDisplayArea[3]
+		height := this.iTrackDisplayArea[4]
+
+		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+		scale := Min(width / imgWidth, height / imgHeight)
+
+		imgWidth *= scale
+		imgHeight *= scale
+
+		trackDisplay := this.iTrackDisplay
+
+		GuiControl, , %trackDisplay%, *w%imgWidth% *h%imgHeight% %trackImage%
+	}
+
+	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, ByRef event := false, threshold := 20) {
+		trackMap := this.TrackMap
+		trackImage := this.TrackImage
+
+		scale := getConfigurationValue(trackMap, "Map", "Scale")
+
+		offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+		offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+
+		width := this.iTrackDisplayArea[3]
+		height := this.iTrackDisplayArea[4]
+
+		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+		imgScale := Min(width / imgWidth, height / imgHeight)
+
+		x := (x / imgScale)
+		y := (y / imgScale)
+
+		x := ((x / scale) - offsetX)
+		y := ((y / scale) - offsetY)
+
+		candidateX := false
+		candidateY := false
+		deltaX := false
+		deltaY := false
+
+		Loop % getConfigurationValue(trackMap, "Map", "Points")
+		{
+			coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
+			coordY := getConfigurationValue(trackMap, "Points", A_Index . ".Y")
+
+			dX := Abs(coordX - x)
+			dY := Abs(coordY - y)
+
+			if ((dX <= threshold) && (dY <= threshold) && (!candidateX || ((dX + dy) < (deltaX + deltaY)))) {
+				candidateX := coordX
+				candidateY := coordY
+				deltaX := dX
+				deltaY := dY
+			}
+		}
+
+		if candidateX {
+			coordinateX := candidateX
+			coordinateY := candidateY
+
+			return true
+		}
+		else
+			return false
+	}
+
+	trackClicked(x, y) {
+		MsgBox % x . " " . y
+	}
+
+	eventClicked(event) {
+	}
+
+	loadTrackMap(trackMap, trackImage) {
+		this.iTrackMap := trackMap
+		this.iTrackImage := trackImage
+
+		this.createTrackMap()
+	}
+
+	unloadTrackMap() {
+		display :=  this.iTrackDisplay
+
+		GuiControl, , %display%, % (kIconsDirectory . "Empty.png")
+
+		this.iTrackMap := false
+		this.iTrackImage := false
+	}
+
+	selectAutomation() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		if this.TrackMap
+			this.unloadTrackMap()
+
+		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
+						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+
+		Gui ListView, % this.DataListView
+
+		LV_Delete()
+
+		LV_Add("", translate("Track: "), 1)
+
+		LV_ModifyCol()
+
+		Loop 2
+			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 
 	deleteData() {
@@ -1539,7 +1767,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				{
 					SplitPath A_LoopFileName, , , , track
 
-					if !inList(tracks, track) {
+					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track)) {
 						LV_Add("", translate("Tracks"), this.SessionDatabase.getTrackName(selectedSimulator, track, true)
 							 , "-", 1)
 
@@ -1670,7 +1898,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				{
 					SplitPath A_LoopFileName, , , , track
 
-					if !inList(tracks, track)
+					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track))
 						tracks.Push(track)
 				}
 
@@ -1822,10 +2050,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if ((car && (car != true)) && (track && (track != true))) {
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
+				this.iAvailableModules["Automation"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
+				this.iAvailableModules["Automation"] := false
 			}
 		}
 		else {
@@ -1833,6 +2063,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Data"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
+			this.iAvailableModules["Automation"] := false
 		}
 
 		return this.iAvailableModules[module]
@@ -1843,6 +2074,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (force || (this.SelectedModule != module)) {
 				this.iSelectedModule := module
 
+				window := this.Window
+
+				Gui %window%:Default
+
+				if ((module != "Automation") && this.TrackMap)
+					this.unloadTrackMap()
+
+				if (module != "Pressures")
+					Gui %window%:Color, D0D0D0, D8D8D8
+
 				switch module {
 					case "Settings":
 						this.selectSettings()
@@ -1850,6 +2091,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectData()
 					case "Setups":
 						this.selectSetups()
+					case "Automation":
+						this.selectAutomation()
 					case "Pressures":
 						this.selectPressures()
 				}
@@ -3418,6 +3661,31 @@ noSelect() {
 	}
 }
 
+selectTrackEvent() {
+	MouseGetPos x, y
+
+	editor := SessionDatabaseEditor.Instance
+
+	coordinateX := false
+	coordinateY := false
+	event := false
+
+	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], coordinateX, coordinateY, event)
+		if event
+			editor.eventClicked(event)
+		else
+			editor.trackClicked(coordinateX, coordinateY)
+}
+
+addTrackEvents() {
+}
+
+deleteTrackEvents() {
+}
+
+saveTrackEvents() {
+}
+
 selectData() {
 	SessionDatabaseEditor.Instance.updateState()
 }
@@ -3520,6 +3788,13 @@ chooseTab3() {
 }
 
 chooseTab4() {
+	editor := SessionDatabaseEditor.Instance
+
+	if editor.moduleAvailable("Automation")
+		editor.selectModule("Automation")
+}
+
+chooseTab5() {
 	editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Data")

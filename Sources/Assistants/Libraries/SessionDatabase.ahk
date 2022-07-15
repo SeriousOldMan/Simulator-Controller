@@ -293,6 +293,30 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
+	hasTrackEvents(simulator, car, track) {
+		code := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		return FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events")
+	}
+
+	getTrackEvents(simulator, car, track) {
+		code := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		return readConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events")
+	}
+
+	setTrackEvents(simulator, car, track, trackEvents) {
+		code := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
+		track := this.getTrackCode(simulator, track)
+
+		writeConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events", trackEvents)
+	}
+
 	getEntries(filter := "*.*", option := "D") {
 		result := []
 

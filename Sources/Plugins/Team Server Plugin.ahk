@@ -298,6 +298,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if this.TeamServerEnabled
 			this.enableTeamServer()
+		else
+			this.disableTeamServer()
 
 		this.keepAlive()
 	}

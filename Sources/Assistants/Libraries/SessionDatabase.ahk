@@ -293,28 +293,28 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
-	hasTrackEvents(simulator, car, track) {
+	hasTrackAutomations(simulator, car, track) {
 		code := this.getSimulatorCode(simulator)
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events")
+		return FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
 	}
 
-	getTrackEvents(simulator, car, track) {
+	getTrackAutomations(simulator, car, track) {
 		code := this.getSimulatorCode(simulator)
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return readConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events")
+		return readConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
 	}
 
-	setTrackEvents(simulator, car, track, trackEvents) {
+	setTrackAutomations(simulator, car, track, trackAutomations) {
 		code := this.getSimulatorCode(simulator)
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		writeConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.events", trackEvents)
+		writeConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations", trackAutomations)
 	}
 
 	getEntries(filter := "*.*", option := "D") {

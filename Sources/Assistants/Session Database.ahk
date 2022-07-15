@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\GDIP.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
@@ -101,11 +102,11 @@ global exportDataButton
 global importDataButton
 global deleteDataButton
 
-global trackEventsNameEdit
-global trackEventsInfoEdit
-global addTrackEventsButton
-global deleteTrackEventsButton
-global saveTrackEventsButton
+global trackAutomationNameEdit
+global trackAutomationInfoEdit
+global addTrackAutomationButton
+global deleteTrackAutomationButton
+global saveTrackAutomationButton
 
 global setupTypeDropDown
 global uploadSetupButton
@@ -184,9 +185,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSettingsListView := false
 	iSetupListView := false
 	iAdministrationListView := false
-	iTrackEventsListView := false
+	iTrackAutomationsListView := false
 
-	iTrackEvents := false
+	iTrackAutomations := false
+	iSelectedTrackAutomation := false
 
 	iTrackMap := false
 	iTrackImage := false
@@ -306,13 +308,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	TrackEvents[key := false] {
+	TrackAutomations[key := false] {
 		Get {
-			return (key ? this.iTrackEvents[key] : this.iTrackEvents)
+			return (key ? this.iTrackAutomations[key] : this.iTrackAutomations)
 		}
 
 		Set {
-			return (key ? (this.iTrackEvents[key] := value) : (this.iTrackEvents := value))
+			return (key ? (this.iTrackAutomations[key] := value) : (this.iTrackAutomations := value))
+		}
+	}
+
+	SelectedTrackAutomation[] {
+		Get {
+			return this.iSelectedTrackAutomation
 		}
 	}
 
@@ -328,9 +336,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	TrackEventsListView[] {
+	TrackAutomationsListView[] {
 		Get {
-			return this.iTrackEventsListView
+			return this.iTrackAutomationsListView
 		}
 	}
 
@@ -583,26 +591,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackDisplayArea:= [297, 239, 358, 303]
 
 		Gui %window%:Add, Picture, x296 y238 w360 h305 Border
-		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay gselectTrackEvent
+		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay gselectTrackAction
 
 		this.iTrackDisplay := trackDisplay
 
-		Gui %window%:Add, ListView, x296 y550 w130 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackEventsListViewHandle, % values2String("|", map(["Name", "Events"], "translate")*)
+		Gui %window%:Add, ListView, x296 y550 w130 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "Actions"], "translate")*)
 
-		this.iTrackEventsListView := trackEventsListViewHandle
+		this.iTrackAutomationsListView := trackAutomationsListViewHandle
 
-		Gui %window%:Add, Text, x435 yp w70 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, xp+70 yp w79 vtrackEventsNameEdit
+		Gui %window%:Add, Text, x435 yp w60 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, xp+60 yp w89 vtrackAutomationNameEdit
 
-		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackEventsButtonHandle vaddTrackEventsButton gaddTrackEvents
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackEventsButtonHandle vdeleteTrackEventsButton gdeleteTrackEvents
-		Gui %window%:Add, Button, xp+25 yp w23 h23 Center +0x200 HWNDsaveTrackEventsButtonHandle vsaveTrackEventsButton gsaveTrackEvents
-		setButtonIcon(addTrackEventsButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteTrackEventsButtonHandle, kIconsDirectory . "Minus.ico", 1)
-		setButtonIcon(saveTrackEventsButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
+		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackAutomationButtonHandle vaddTrackAutomationButton gaddTrackAutomation
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackAutomationButtonHandle vdeleteTrackAutomationButton gdeleteTrackAutomation
+		Gui %window%:Add, Button, xp+25 yp w23 h23 Center +0x200 HWNDsaveTrackAutomationButtonHandle vsaveTrackAutomationButton gsaveTrackAutomation
+		setButtonIcon(addTrackAutomationButtonHandle, kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(deleteTrackAutomationButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		setButtonIcon(saveTrackAutomationButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		Gui %window%:Add, Text, x435 yp+24 w70 h23 +0x200, % translate("Events")
-		Gui %window%:Add, Edit, xp+70 yp w151 h61 ReadOnly vtrackEventsInfoEdit
+		Gui %window%:Add, Text, x435 yp+24 w60 h23 +0x200, % translate("Actions")
+		Gui %window%:Add, Edit, xp+60 yp w161 h61 ReadOnly vtrackAutomationInfoEdit
 
 		Gui Tab, 5
 
@@ -898,19 +906,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				GuiControl, , dataSelectCheck, 0
 
-			Gui ListView, % this.TrackEventsListView
+			GuiControl Enable, addTrackAutomationButton
 
-			GuiControl Enable, addTrackEventsButton
-
-			if LV_GetNext(0) {
-				GuiControl Enable, trackEventsNameEdit
-				GuiControl Enable, deleteTrackEventsButton
-				GuiControl Enable, saveTrackEventsButton
+			if this.SelectedTrackAutomation {
+				GuiControl Enable, trackAutomationNameEdit
+				GuiControl Enable, deleteTrackAutomationButton
+				GuiControl Enable, saveTrackAutomationButton
 			}
 			else {
-				GuiControl Disable, trackEventsNameEdit
-				GuiControl Disable, deleteTrackEventsButton
-				GuiControl Disable, saveTrackEventsButton
+				GuiControl Disable, trackAutomationNameEdit
+				GuiControl Disable, deleteTrackAutomationButton
+				GuiControl Disable, saveTrackAutomationButton
 			}
 		}
 		finally {
@@ -1173,9 +1179,335 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	createTrackMap(trackEvents := false) {
+	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, threshold := 20) {
 		trackMap := this.TrackMap
 		trackImage := this.TrackImage
+
+		if (this.SelectedTrackAutomation && trackMap && trackImage) {
+			scale := getConfigurationValue(trackMap, "Map", "Scale")
+
+			offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+			offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+
+			width := this.iTrackDisplayArea[3]
+			height := this.iTrackDisplayArea[4]
+
+			imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+			imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+			imgScale := Min(width / imgWidth, height / imgHeight)
+
+			x := (x / imgScale)
+			y := (y / imgScale)
+
+			x := ((x / scale) - offsetX)
+			y := ((y / scale) - offsetY)
+
+			candidateX := false
+			candidateY := false
+			deltaX := false
+			deltaY := false
+
+			Loop % getConfigurationValue(trackMap, "Map", "Points")
+			{
+				coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
+				coordY := getConfigurationValue(trackMap, "Points", A_Index . ".Y")
+
+				dX := Abs(coordX - x)
+				dY := Abs(coordY - y)
+
+				if ((dX <= threshold) && (dY <= threshold) && (!candidateX || ((dX + dy) < (deltaX + deltaY)))) {
+					candidateX := coordX
+					candidateY := coordY
+					deltaX := dX
+					deltaY := dY
+				}
+			}
+
+			if candidateX {
+				coordinateX := candidateX
+				coordinateY := candidateY
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			return false
+	}
+
+	findTrackAction(coordinateX, coordinateY, threshold := 20) {
+		candidate := false
+		deltaX := false
+		deltaY := false
+
+		for index, action in this.SelectedTrackAutomation.Actions {
+			dX := Abs(coordinateX - action.X)
+			dY := Abs(coordinateY - action.Y)
+
+			if ((dX <= threshold) && (dY <= threshold) && (!candidate || ((dX + dy) < (deltaX + deltaY)))) {
+				candidate := action
+
+				deltaX := dx
+				deltaY := dy
+			}
+		}
+
+		return candidate
+	}
+
+	trackClicked(coordinateX, coordinateY) {
+		oldCoordMode := A_CoordModeMouse
+
+		CoordMode Mouse, Screen
+
+		MouseGetPos x, y
+
+		CoordMode Mouse, %oldCoordMode%
+
+		action := actionDialog(x, y)
+
+		if action {
+			action.X := coordinateX
+			action.Y := coordinateY
+
+			this.addTrackAction(action)
+		}
+	}
+
+	actionClicked(coordinateX, coordinateY, action) {
+		oldCoordMode := A_CoordModeMouse
+
+		CoordMode Mouse, Screen
+
+		MouseGetPos x, y
+
+		CoordMode Mouse, %oldCoordMode%
+
+		action := actionDialog(x, y, action)
+
+		if action
+			this.updateTrackAction(action)
+	}
+
+	addTrackAction(action) {
+		this.SelectedTrackAutomation.Actions.Push(action)
+
+		this.updateTrackMap()
+		this.updateTrackAutomation()
+	}
+
+	updateTrackAction(action) {
+		for index, candidate in this.SelectedTrackAutomation.Actions
+			if ((action.X = candidate.X) && (action.Y = candidate.Y)) {
+				this.SelectedTrackAutomation.Actions[index] := action
+
+				this.updateTrackMap()
+				this.updateTrackAutomation()
+
+				break
+			}
+	}
+
+	deleteTrackAction(action) {
+		for index, candidate in this.SelectedTrackAutomation.Actions
+			if ((action.X = candidate.X) && (action.Y = candidate.Y)) {
+				this.SelectedTrackAutomation.Actions.RemoveAt(index)
+
+				this.updateTrackMap()
+				this.updateTrackAutomation()
+
+				break
+			}
+	}
+
+	addTrackAutomation() {
+		this.readTrackAutomations()
+
+		this.iSelectedTrackAutomation := {Name: "...", Actions: []}
+
+		this.updateState()
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		GuiControl, , trackAutomationNameEdit, % "..."
+	}
+
+	deleteTrackAutomation() {
+		if this.SelectedTrackAutomation.HasKey("Origin") {
+			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation))
+
+			this.writeTrackAutomations()
+		}
+		else {
+			this.clearTrackAutomationEditor()
+
+			this.iSelectedTrackAutomation := false
+
+			this.updateState()
+		}
+	}
+
+	saveTrackAutomation() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		GuiControlGet trackAutomationNameEdit
+
+		trackAutomation := this.SelectedTrackAutomation
+
+		trackAutomation.Name := trackAutomationNameEdit
+
+		if trackAutomation.HasKey("Origin") {
+			origin := this.SelectedTrackAutomation.Origin
+
+			origin.Name := trackAutomationNameEdit
+			origin.Actions := trackAutomation.Actions.Clone()
+		}
+		else {
+			newTrackAutomation := trackAutomation.Clone()
+			newTrackAutomation.Actions := trackAutomation.Actions.Clone()
+
+			trackAutomation.Origin := newTrackAutomation
+
+			this.TrackAutomations.Push(newTrackAutomation)
+
+			Gui ListView, % this.TrackAutomationsListView
+
+			LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
+
+			Loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+		}
+
+		this.writeTrackAutomations(false)
+	}
+
+	clearTrackAutomationEditor() {
+		window := this.Window
+
+		Gui %window%:Default
+
+		GuiControl, , trackAutomationNameEdit, % ""
+		GuiControl, , trackAutomationInfoEdit, % ""
+	}
+
+	readTrackAutomations() {
+		this.clearTrackAutomationEditor()
+
+		this.TrackAutomations := []
+		this.iSelectedTrackAutomation := false
+
+		Gui ListView, % this.TrackAutomationsListView
+
+		LV_Delete()
+
+		trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+
+		if trackAutomations
+			Loop % getConfigurationValue(trackAutomations, "Automations", "Count", 0)
+			{
+				id := A_Index
+				name := getConfigurationValue(trackAutomations, "Automations", id . ".Name", "")
+
+				actions := []
+
+				Loop % getConfigurationValue(trackAutomations, "Automations", id . ".Actions", 0)
+				{
+					coordX := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", 0)
+					coordY := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", 0)
+					type := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
+					action := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)
+
+					actions.Push({X: coordX, Y: coordY, Type: type, Action: action})
+				}
+
+				LV_Add("", name, actions.Length())
+
+				this.iTrackAutomations.Push({Name: name, Actions: actions})
+			}
+
+		LV_ModifyCol()
+
+		Loop 2
+			LV_ModifyCol(A_Index, "AutoHdr")
+
+		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
+						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+
+		this.updateState()
+	}
+
+	writeTrackAutomations(read := true) {
+		trackAutomations := newConfiguration()
+
+		for id, trackAutomation in this.TrackAutomations {
+			setConfigurationValue(trackAutomations, "Automations", A_Index . ".Name", trackAutomation.Name)
+			setConfigurationValue(trackAutomations, "Automations", A_Index . ".Actions", trackAutomation.Actions.Length())
+
+			for ignore, trackAction in trackAutomation.Actions {
+				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", trackAction.X)
+				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", trackAction.Y)
+				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", trackAction.Type)
+				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", trackAction.Action)
+			}
+		}
+
+		setConfigurationValue(trackAutomations, "Automations", "Count", this.TrackAutomations.Length())
+
+		this.SessionDatabase.setTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, trackAutomations)
+
+		if read
+			this.readTrackAutomations()
+	}
+
+	createTrackMap(actions := false) {
+		trackMap := this.TrackMap
+		trackImage := this.TrackImage
+
+		if actions {
+			scale := getConfigurationValue(trackMap, "Map", "Scale")
+
+			offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+			offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+
+			token := Gdip_Startup()
+
+			bitmap := Gdip_CreateBitmapFromFile(trackImage)
+
+			graphics := Gdip_GraphicsFromImage(bitmap)
+
+			Gdip_SetSmoothingMode(graphics, 4)
+
+			brushHotkey := Gdip_BrushCreateSolid(0xff00ff00)
+			brushCommand := Gdip_BrushCreateSolid(0xffff0000)
+
+			for ignore, action in actions {
+				x := Round((offsetX + action.X) * scale)
+				y := Round((offsetY + action.Y) * scale)
+
+				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, x - 15, y - 15, 30, 30)
+			}
+
+			Gdip_DeleteBrush(brushHotkey)
+			Gdip_DeleteBrush(brushCommand)
+
+			Random rnd, 1, 10000
+
+			trackImage := (kTempDirectory . "Track Images\TrackMap_" . rnd . ".png")
+
+			Gdip_SaveBitmapToFile(bitmap, trackImage)
+
+			Gdip_DisposeImage(bitmap)
+
+			Gdip_DeleteGraphics(graphics)
+
+			Gdip_Shutdown(token)
+		}
 
 		width := this.iTrackDisplayArea[3]
 		height := this.iTrackDisplayArea[4]
@@ -1190,71 +1522,46 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		trackDisplay := this.iTrackDisplay
 
+		window := this.Window
+
+		Gui %window%:Default
+
 		GuiControl, , %trackDisplay%, *w%imgWidth% *h%imgHeight% %trackImage%
 	}
 
-	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, ByRef event := false, threshold := 20) {
-		trackMap := this.TrackMap
-		trackImage := this.TrackImage
-
-		scale := getConfigurationValue(trackMap, "Map", "Scale")
-
-		offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-		offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-
-		width := this.iTrackDisplayArea[3]
-		height := this.iTrackDisplayArea[4]
-
-		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-		imgScale := Min(width / imgWidth, height / imgHeight)
-
-		x := (x / imgScale)
-		y := (y / imgScale)
-
-		x := ((x / scale) - offsetX)
-		y := ((y / scale) - offsetY)
-
-		candidateX := false
-		candidateY := false
-		deltaX := false
-		deltaY := false
-
-		Loop % getConfigurationValue(trackMap, "Map", "Points")
-		{
-			coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
-			coordY := getConfigurationValue(trackMap, "Points", A_Index . ".Y")
-
-			dX := Abs(coordX - x)
-			dY := Abs(coordY - y)
-
-			if ((dX <= threshold) && (dY <= threshold) && (!candidateX || ((dX + dy) < (deltaX + deltaY)))) {
-				candidateX := coordX
-				candidateY := coordY
-				deltaX := dX
-				deltaY := dY
-			}
-		}
-
-		if candidateX {
-			coordinateX := candidateX
-			coordinateY := candidateY
-
-			return true
-		}
-		else
-			return false
+	updateTrackMap() {
+		this.createTrackMap(this.SelectedTrackAutomation.Actions)
 	}
 
-	trackClicked(x, y) {
-		MsgBox % x . " " . y
-	}
+	updateTrackAutomation() {
+		window := this.Window
 
-	eventClicked(event) {
+		Gui %window%:Default
+
+		info := ""
+
+		for index, action in this.SelectedTrackAutomation.Actions {
+			if (index > 1)
+				info .= "`n"
+
+			info .= (index . translate(": ") . values2String(", ", Round(action.X), Round(action.Y)) . translate(" => ") . translate((action.Type = "Hotkey") ? "Hotkey(s)" : "Command"))
+		}
+
+		GuiControl, , trackAutomationInfoEdit, %info%
 	}
 
 	loadTrackMap(trackMap, trackImage) {
+		directory := kTempDirectory . "Track Images"
+
+		try {
+			FileRemoveDir %directory%, 1
+		}
+		catch exception {
+			; ignore
+		}
+
+		FileCreateDir %directory%
+
 		this.iTrackMap := trackMap
 		this.iTrackImage := trackImage
 
@@ -1278,14 +1585,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.TrackMap
 			this.unloadTrackMap()
 
-		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
-						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+		this.readTrackAutomations()
+
+		Gui ListView, % this.TrackAutomationsListView
+
+		count := LV_GetCount()
 
 		Gui ListView, % this.DataListView
 
 		LV_Delete()
 
 		LV_Add("", translate("Track: "), 1)
+		LV_Add("", translate("Automations: "), count)
 
 		LV_ModifyCol()
 
@@ -2615,6 +2926,128 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
+actionDialog(xOrCommand := false, y := false, action := false) {
+	static result := false
+
+	static actionTypeDropDown
+	static actionLabel
+	static actionEdit
+	static commandChooserButton
+
+	if (xOrCommand == kOk)
+		result := kOk
+	else if (xOrCommand == kCancel)
+		result := kCancel
+	else if (xOrCommand = "Type") {
+		GuiControl, , actionEdit, % ""
+
+		actionDialog("Update")
+	}
+	else if (xOrCommand = "Update") {
+		GuiControlGet actionTypeDropDown
+
+		GuiControl, , actionLabel, % translate((actionTypeDropDown = 1) ? "Hotkey(s)" : "Command")
+
+		if (actionTypeDropDown = 1)
+			GuiControl Disable, commandChooserButton
+		else
+			GuiControl Enable, commandChooserButton
+	}
+	else if (xOrCommand = "Command") {
+		GuiControlGet actionEdit
+
+		title := translate("Select executable file...")
+
+		Gui +OwnDialogs
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+		FileSelectFile fileName, 1, %actionEdit%, %title%, Script (*.*)
+		OnMessage(0x44, "")
+
+		if fileName
+			GuiControl, , actionEdit, %fileName%
+	}
+	else {
+		result := false
+		window := "EE"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x16 y16 w70 h23 +0x200, % translate("Action")
+
+		if action {
+			chosen := inList(["Hotkey", "Command"], action.Type)
+			actionEdit := action.Action
+		}
+		else {
+			chosen := 1
+			actionEdit := ""
+		}
+
+		Gui %window%:Add, DropDownList, x90 yp+1 w180 AltSubmit Choose%chosen% VactionTypeDropDown gchooseActionType, % values2String("|", map(["Hotkey(s)", "Command"], "translate")*)
+
+		Gui %window%:Add, Text, x16 yp+23 w70 h23 +0x200 vactionLabel, % translate("Hotkey(s)")
+		Gui %window%:Add, Edit, x90 yp+1 w155 h21 VactionEdit, %actionEdit%
+		Gui %window%:Add, Button, x247 yp w23 h23 vcommandChooserButton gchooseActionCommand, % translate("...")
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptAction, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelAction, % translate("&Cancel")
+
+		x := (xOrCommand - 150)
+		y := (y - 35)
+
+		actionDialog("Update")
+
+		Gui %window%:Show, x%x% y%y% AutoSize
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk) {
+			GuiControlGet actionTypeDropDown
+			GuiControlGet actionEdit
+
+			if action
+				action := action.Clone()
+			else
+				action := Object()
+
+			action.Type := ["Hotkey", "Command"][actionTypeDropDown]
+			action.Action := actionEdit
+
+			return action
+		}
+	}
+}
+
+chooseActionType() {
+	actionDialog("Type")
+}
+
+chooseActionCommand() {
+	actionDialog("Command")
+}
+
+acceptAction() {
+	actionDialog(kOk)
+}
+
+cancelAction() {
+	actionDialog(kCancel)
+}
+
 global importSelectCheck
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
@@ -3661,29 +4094,75 @@ noSelect() {
 	}
 }
 
-selectTrackEvent() {
+selectTrackAction() {
 	MouseGetPos x, y
 
 	editor := SessionDatabaseEditor.Instance
 
 	coordinateX := false
 	coordinateY := false
-	event := false
+	action := false
 
-	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], coordinateX, coordinateY, event)
-		if event
-			editor.eventClicked(event)
+	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], coordinateX, coordinateY) {
+		action := editor.findTrackAction(coordinateX, coordinateY)
+
+		if action {
+			if GetKeyState("Ctrl", "P") {
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Delete")
+				MsgBox 262436, %title%, % translate("Do you really want to delete the selected action?")
+				OnMessage(0x44, "")
+
+				IfMsgBox Yes
+					editor.deleteTrackAction(action)
+			}
+			else
+				editor.actionClicked(coordinateX, coordinateY, action)
+		}
 		else
 			editor.trackClicked(coordinateX, coordinateY)
+	}
 }
 
-addTrackEvents() {
+selectTrackAutomation() {
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		editor := SessionDatabaseEditor.Instance
+		window := editor.Window
+
+		Gui %window%:Default
+
+		trackAutomation := editor.TrackAutomations[A_EventInfo].Clone()
+		trackAutomation.Actions := trackAutomation.Actions.Clone()
+		trackAutomation.Origin := editor.TrackAutomations[A_EventInfo]
+
+		editor.iSelectedTrackAutomation := trackAutomation
+
+		GuiControl, , trackAutomationNameEdit, % trackAutomation.Name
+
+		editor.updateTrackAutomation()
+
+		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
+
+		editor.updateState()
+	}
 }
 
-deleteTrackEvents() {
+addTrackAutomation() {
+	SessionDatabaseEditor.Instance.addTrackAutomation()
 }
 
-saveTrackEvents() {
+deleteTrackAutomation() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Delete")
+	MsgBox 262436, %title%, % translate("Do you really want to delete the selected automation?")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		SessionDatabaseEditor.Instance.deleteTrackAutomation()
+}
+
+saveTrackAutomation() {
+	SessionDatabaseEditor.Instance.saveTrackAutomation()
 }
 
 selectData() {

@@ -187,7 +187,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iAdministrationListView := false
 	iTrackAutomationsListView := false
 
-	iTrackAutomations := false
+	iTrackAutomations := []
 	iSelectedTrackAutomation := false
 
 	iTrackMap := false
@@ -595,12 +595,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackDisplay := trackDisplay
 
-		Gui %window%:Add, ListView, x296 y550 w130 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "Actions"], "translate")*)
+		Gui %window%:Add, ListView, x296 y550 w110 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "Actions"], "translate")*)
 
 		this.iTrackAutomationsListView := trackAutomationsListViewHandle
 
-		Gui %window%:Add, Text, x435 yp w60 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, xp+60 yp w89 vtrackAutomationNameEdit
+		Gui %window%:Add, Text, x415 yp w60 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, xp+60 yp w109 vtrackAutomationNameEdit
 
 		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackAutomationButtonHandle vaddTrackAutomationButton gaddTrackAutomation
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackAutomationButtonHandle vdeleteTrackAutomationButton gdeleteTrackAutomation
@@ -609,8 +609,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(deleteTrackAutomationButtonHandle, kIconsDirectory . "Minus.ico", 1)
 		setButtonIcon(saveTrackAutomationButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		Gui %window%:Add, Text, x435 yp+24 w60 h23 +0x200, % translate("Actions")
-		Gui %window%:Add, Edit, xp+60 yp w161 h61 ReadOnly vtrackAutomationInfoEdit
+		Gui %window%:Add, Text, x415 yp+24 w60 h23 +0x200, % translate("Actions")
+		Gui %window%:Add, Edit, xp+60 yp w181 h61 ReadOnly vtrackAutomationInfoEdit
 
 		Gui Tab, 5
 
@@ -1338,7 +1338,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	deleteTrackAutomation() {
 		if this.SelectedTrackAutomation.HasKey("Origin") {
-			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation))
+			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation.Origin))
 
 			this.writeTrackAutomations()
 		}
@@ -1346,6 +1346,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.clearTrackAutomationEditor()
 
 			this.iSelectedTrackAutomation := false
+
+			this.createTrackMap()
 
 			this.updateState()
 		}
@@ -1376,12 +1378,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.TrackAutomations.Push(newTrackAutomation)
 
-			Gui ListView, % this.TrackAutomationsListView
+			defaultListView := A_DefaultListView
 
-			LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
+			try {
+				Gui ListView, % this.TrackAutomationsListView
 
-			Loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
+				LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
+
+				Loop 2
+					LV_ModifyCol(A_Index, "AutoHdr")
+			}
+			finally {
+				Gui ListView, %defaultListView%
+			}
 		}
 
 		this.writeTrackAutomations(false)
@@ -1402,39 +1411,46 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.TrackAutomations := []
 		this.iSelectedTrackAutomation := false
 
-		Gui ListView, % this.TrackAutomationsListView
+		defaultListView := A_DefaultListView
 
-		LV_Delete()
+		try {
+			Gui ListView, % this.TrackAutomationsListView
 
-		trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+			LV_Delete()
 
-		if trackAutomations
-			Loop % getConfigurationValue(trackAutomations, "Automations", "Count", 0)
-			{
-				id := A_Index
-				name := getConfigurationValue(trackAutomations, "Automations", id . ".Name", "")
+			trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-				actions := []
-
-				Loop % getConfigurationValue(trackAutomations, "Automations", id . ".Actions", 0)
+			if trackAutomations
+				Loop % getConfigurationValue(trackAutomations, "Automations", "Count", 0)
 				{
-					coordX := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", 0)
-					coordY := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", 0)
-					type := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
-					action := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)
+					id := A_Index
+					name := getConfigurationValue(trackAutomations, "Automations", id . ".Name", "")
 
-					actions.Push({X: coordX, Y: coordY, Type: type, Action: action})
+					actions := []
+
+					Loop % getConfigurationValue(trackAutomations, "Automations", id . ".Actions", 0)
+					{
+						coordX := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", 0)
+						coordY := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", 0)
+						type := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
+						action := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)
+
+						actions.Push({X: coordX, Y: coordY, Type: type, Action: action})
+					}
+
+					LV_Add("", name, actions.Length())
+
+					this.iTrackAutomations.Push({Name: name, Actions: actions})
 				}
 
-				LV_Add("", name, actions.Length())
+			LV_ModifyCol()
 
-				this.iTrackAutomations.Push({Name: name, Actions: actions})
-			}
-
-		LV_ModifyCol()
-
-		Loop 2
-			LV_ModifyCol(A_Index, "AutoHdr")
+			Loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 
 		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
 						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
@@ -1446,8 +1462,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		trackAutomations := newConfiguration()
 
 		for id, trackAutomation in this.TrackAutomations {
-			setConfigurationValue(trackAutomations, "Automations", A_Index . ".Name", trackAutomation.Name)
-			setConfigurationValue(trackAutomations, "Automations", A_Index . ".Actions", trackAutomation.Actions.Length())
+			setConfigurationValue(trackAutomations, "Automations", id . ".Name", trackAutomation.Name)
+			setConfigurationValue(trackAutomations, "Automations", id . ".Actions", trackAutomation.Actions.Length())
 
 			for ignore, trackAction in trackAutomation.Actions {
 				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", trackAction.X)
@@ -1578,30 +1594,39 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectAutomation() {
-		window := this.Window
-
-		Gui %window%:Default
-
 		if this.TrackMap
 			this.unloadTrackMap()
 
 		this.readTrackAutomations()
 
-		Gui ListView, % this.TrackAutomationsListView
+		window := this.Window
 
-		count := LV_GetCount()
+		Gui %window%:Default
 
-		Gui ListView, % this.DataListView
+		defaultListView := A_DefaultListView
 
-		LV_Delete()
+		try {
+			Gui ListView, % this.DataListView
 
-		LV_Add("", translate("Track: "), 1)
-		LV_Add("", translate("Automations: "), count)
+			while LV_DeleteCol(1)
+				ignore := 1
 
-		LV_ModifyCol()
+			for ignore, column in map(["Type", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
 
-		Loop 2
-			LV_ModifyCol(A_Index, "AutoHdr")
+			LV_Delete()
+
+			LV_Add("", translate("Track: "), 1)
+			LV_Add("", translate("Automations: "), this.TrackAutomations.Length())
+
+			LV_ModifyCol()
+
+			Loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
 	}
 
 	deleteData() {

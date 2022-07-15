@@ -1,16 +1,16 @@
 [Development]
-Version=4.2.4.0-dev
+Version=4.2.4.0-release
 Target=4.2.4.0-release
-Date=07/13/2022
-Download=
-Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database"
+Date=07/15/2022
+Download=https://cntr.click/n19kmL2
+Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database", New "TyreCompound" action for *RaceRoom Racing Experience*, New car models for "Setup Advisor"
 [Release]
-Version=4.2.3.0-release
-Date=07/08/2022
-Download=https://cntr.click/zWZ8Wq4
-Changes=Support driver filters for telemetry in "Strategy Workbench" and "Race Center", Support for more edge cases in "Race Center" strategy simulation, Introduced stint driver in strategy simulation, Optimized Pitstop MFD handling in ACC, Added item to the Simulator Controller tray menu to enable or disable Team Server, Database maintenance incl. ex- and import in "Session Database", Renamed information request action "GapToFront" to "GapToAhead", Fixed a couple of glitches in the ACC car models for "BMW M4 GT3" and "AMG GT3 2020", Added windows language runtimes to "Simulator Setup", New car models for "Setup Advisor", Fixed rear toe calculation in "Setup Advisor"
+Version=4.2.4.0-release
+Date=07/15/2022
+Download=https://cntr.click/n19kmL2
+Changes=Full integration of Project CARS 2, Schema specifiers for import / export of foreign data, Preset for configuration patch in "Simulator Setup", Spotter collects position data and creates track maps, Support for track maps ex-/import in "Session Database", Display of track maps in "Race Center", Re-implementation of tyre compound handling in all simulators, Configurable key delay for all simulators in "Session Database", New "TyreCompound" action for *RaceRoom Racing Experience*, New car models for "Setup Advisor"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.2.3.0-release
-Development=4.2.4.0-dev
+Release=4.2.4.0-release
+Development=4.2.4.0-release

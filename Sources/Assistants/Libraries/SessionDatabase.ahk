@@ -125,6 +125,7 @@ class SessionDatabase extends ConfigurationItem {
 	prepareDatabase(simulator, car, track) {
 		if (simulator && car && track) {
 			simulatorCode := this.getSimulatorCode(simulator)
+			car := this.getCarCode(simulator, car)
 
 			if (simulatorCode && (car != true) && (track != true))
 				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
@@ -258,7 +259,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	updateTrackMap(simulator, track, data, imageFileName) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
 		writeConfiguration(prefix . ".map", data)
 
@@ -268,7 +269,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackMap(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
 		if FileExist(prefix . ".map")
 			return readConfiguration(prefix . ".map")
@@ -277,7 +278,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackImage(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . track)
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
 		if FileExist(prefix . ".map") {
 			if FileExist(prefix . ".png")
@@ -405,7 +406,7 @@ class SessionDatabase extends ConfigurationItem {
 		if code {
 			tracks := this.getEntries(code . "\" . car . "\*.*")
 
-			return ((tracks.Length() > 0) ? tracks : this.getEntries(code . "\" . this.getCarName(simulator, car) . "\*.*"))
+			return ((tracks.Length() > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 		}
 		else
 			return []
@@ -479,6 +480,8 @@ class SessionDatabase extends ConfigurationItem {
 		static settingsDB := false
 		static sNames := {}
 		static sCodes := {}
+
+		car := this.getCarCode(simulator, car)
 
 		code := this.getSimulatorCode(simulator)
 		cache := (codes ? sCodes : sNames)
@@ -564,6 +567,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	readNotes(simulator, car, track) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		try {
 			if (track && (track != true))
@@ -582,6 +586,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeNotes(simulator, car, track, notes) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		try {
 			if (car && (car != true)) {
@@ -618,6 +623,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	getSetupNames(simulator, car, track, ByRef userSetups, ByRef communitySetups) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		if userSetups {
 			userSetups := {}
@@ -656,6 +662,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	readSetup(simulator, car, track, type, name, ByRef size) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		data := false
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
@@ -682,6 +689,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeSetup(simulator, car, track, type, name, setup, size) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		try {
 			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
@@ -705,6 +713,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		try {
 			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
@@ -716,6 +725,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	removeSetup(simulator, car, track, type, name) {
 		simulatorCode := this.getSimulatorCode(simulator)
+		car := this.getCarCode(simulator, car)
 
 		try {
 			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%

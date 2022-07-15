@@ -170,7 +170,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
 
-			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Automobilista 2", "Pitstop.KeyDelay", 0)
+			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Automobilista 2", "Pitstop.KeyDelay", 20)
 		}
 
 		Sleep % this.iKeyDelay

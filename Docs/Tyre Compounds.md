@@ -42,6 +42,14 @@ As you can see, the different tyre compounds are separated by a ";". The first e
 
 Once a set of tyre compound mappings has been defined, these can be used to describe the available tyre compounds for agiven car. There are several ways to do this.
 
+### Simulator specific Tyre Compound identifiers
+
+A word about the tyre compound identifiers used by the different simulators:
+
+Normally, you can use exactly the name, which is visible in the user interface of the given simulator. If a tyre compound is named "Hypercar Road (HR)" in *Assetto Corsa*, for example, you must use this as internal identifier as well. If this doesn't work as expected, you can take a look in the *.data files you find in the *Simulator Controller\Temp\[Simulator]* folder in your user *Documents* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. Search for "TyreCompoundRaw". This field will contain the internal tyre compound identifier used by the given simulator.
+
+A special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
+
 ### *Tyre Data* files
 
 A special meta data file can be created for each simulator, which contains the tyre compound mappings for a set of cars. Files are provided with the Simulator Controller distribution. These files, which are named "Tyre Data.ini", reside in the *Resources\Simulator Data\[Simulator]* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. They contain a growing list of car and compound definitions, but they will never be complete, since the list of available cars is simply to large. Here is an example of such a file (in this case for *Assetto Corsa*):
@@ -116,6 +124,6 @@ The default tyre compouund is "Dry", when no dedicated information is available 
 
 As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every car has a "Dry" and a "Wet" compound to use. So nothing to do here.
 
-#### *Automobilista 2* and *Project CARS 2*
+### Special notes for *Automobilista 2* and *Project CARS 2*
 
 Unfortunately, these two simulators does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.

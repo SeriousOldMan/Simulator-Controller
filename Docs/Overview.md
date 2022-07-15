@@ -24,6 +24,10 @@ Welcome to the Simulator Controller documentation. Here you will find everything
   - [Plugin & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 
     Reference information for all the builtin plugins and modes.
+	
+  - [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds)
+
+    Gives you detailed information, how to configure and manage all available tyre compounds for a specific car in a given simulator.
 
   - [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
 

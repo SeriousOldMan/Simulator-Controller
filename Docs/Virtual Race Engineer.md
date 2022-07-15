@@ -531,14 +531,17 @@ You can import data from foreign sources, for example telemetry information from
 4. Create a CSV file for each of the telemetry data type you want to import ("Electronics", "Tyres", "Tyres.Pressures", "Tyres.Pressures.Distribution"). Please take a look at a sample export for the naming conventions and the content for these files. But you may omit columns in the CSV files, if the corresponding data is not available (see next point).
 5. At the root of the export folder, you must create a "Export.info" file with the meta data. Here is an example:
 
-	[Driver]
-	123.456.789=Oliver Juwig (OJU)
-	[General]
-	Creator=123.456.789
-	Origin=123.456.789
-	Simulator=Assetto Corsa Competizione
-	[Schema]	Electronics=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Map,TC,ABS,Driver	Tyres=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Tyre.Laps,Tyre.Pressure.Front.Left,Tyre.Pressure.Front.Right,Tyre.Pressure.Rear.Left,Tyre.Pressure.Rear.Right,Tyre.Temperature.Front.Left,Tyre.Temperature.Front.Right,Tyre.Temperature.Rear.Left,Tyre.Temperature.Rear.Right,Tyre.Wear.Front.Left,Tyre.Wear.Front.Right,Tyre.Wear.Rear.Left,Tyre.Wear.Rear.Right,Driver	Tyres.Pressures=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Tyre.Pressure.Cold.Front.Left,Tyre.Pressure.Cold.Front.Right,Tyre.Pressure.Cold.Rear.Left,Tyre.Pressure.Cold.Rear.Right,Tyre.Pressure.Hot.Front.Left,Tyre.Pressure.Hot.Front.Right,Tyre.Pressure.Hot.Rear.Left,Tyre.Pressure.Hot.Rear.Right,Driver
-	Tyres.Pressures.Distribution=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Type,Tyre,Pressure,Count,Driver
+		[Driver]
+		123.456.789=Oliver Juwig (OJU)
+		[General]
+		Creator=123.456.789
+		Origin=123.456.789
+		Simulator=Assetto Corsa Competizione
+		[Schema]
+		Electronics=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Map,TC,ABS,Driver
+		Tyres=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Tyre.Laps,Tyre.Pressure.Front.Left,Tyre.Pressure.Front.Right,Tyre.Pressure.Rear.Left,Tyre.Pressure.Rear.Right,Tyre.Temperature.Front.Left,Tyre.Temperature.Front.Right,Tyre.Temperature.Rear.Left,Tyre.Temperature.Rear.Right,Tyre.Wear.Front.Left,Tyre.Wear.Front.Right,Tyre.Wear.Rear.Left,Tyre.Wear.Rear.Right,Driver
+		Tyres.Pressures=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Tyre.Pressure.Cold.Front.Left,Tyre.Pressure.Cold.Front.Right,Tyre.Pressure.Cold.Rear.Left,Tyre.Pressure.Cold.Rear.Right,Tyre.Pressure.Hot.Front.Left,Tyre.Pressure.Hot.Front.Right,Tyre.Pressure.Hot.Rear.Left,Tyre.Pressure.Hot.Rear.Right,Driver
+		Tyres.Pressures.Distribution=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Type,Tyre,Pressure,Count,Driver
 
 Here is what you have to do:
 

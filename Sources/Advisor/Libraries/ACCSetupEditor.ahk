@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\JSON.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -129,17 +130,14 @@ class ACCSetupEditor extends FileSetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		static carNames := false
-
-		if !carNames
-			carNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Names")
+		sessionDB := new SessionDatabase()
 
 		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		car := this.Advisor.SelectedCar[false]
-		track := this.Advisor.SelectedTrack[false]
+		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
 
 		if (car && (car != true))
-			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
+			directory .= ("\" . car)
 
 		if (track && (track != true))
 			directory .= ("\" . track)
@@ -147,7 +145,7 @@ class ACCSetupEditor extends FileSetupEditor {
 		title := translate("Load ACC Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")
@@ -175,7 +173,7 @@ class ACCSetupEditor extends FileSetupEditor {
 		title := translate("Save ACC Setup File...")
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 		FileSelectFile fileName, S17, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")
@@ -206,17 +204,14 @@ class ACCSetupEditor extends FileSetupEditor {
 
 class ACCSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		static carNames := false
-
-		if !carNames
-			carNames := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Names")
+		sessionDB := new SessionDatabase()
 
 		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		car := this.Editor.Advisor.SelectedCar[false]
-		track := this.Editor.Advisor.SelectedTrack[false]
+		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
 
 		if (car && (car != true))
-			directory .= ("\" . (carNames.HasKey(car) ? carNames[car] : car))
+			directory .= ("\" . car)
 
 		if (track && (track != true))
 			directory .= ("\" . track)
@@ -224,7 +219,7 @@ class ACCSetupComparator extends FileSetupComparator {
 		title := (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File..."))
 
 		Gui +OwnDialogs
-		
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
 		OnMessage(0x44, "")

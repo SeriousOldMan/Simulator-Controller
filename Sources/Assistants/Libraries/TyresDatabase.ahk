@@ -67,6 +67,9 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getTyresDatabase(simulator, car, track, scope := "User") {
+		car := this.getCarCode(simulator, car)
+		track := this.getCarCode(simulator, track)
+
 		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
 
 		FileCreateDir %directory%
@@ -76,6 +79,8 @@ class TyresDatabase extends SessionDatabase {
 
 	requireDatabase(simulator, car, track, scope := "User") {
 		simulator := this.getSimulatorName(simulator)
+		car := this.getCarCode(simulator, car)
+		track := this.getCarCode(simulator, track)
 
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
 							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
@@ -125,6 +130,9 @@ class TyresDatabase extends SessionDatabase {
 		local database
 		local condition
 		local compound
+
+		car := this.getCarCode(simulator, car)
+		track := this.getCarCode(simulator, track)
 
 		if ((driver = kUndefined) || !driver)
 			where := {Type: "Cold"}

@@ -1,4 +1,4 @@
-## 4.2.4.0-release 07/15/22 (planned)
+## 4.2.4.0-release 07/15/22
 
 **Important**: Once again we have a major reorganisation of the telemetry database, this time for all the data of *rFactor 2*. Please do not interrupt the reorganisation. It will take some time.
 

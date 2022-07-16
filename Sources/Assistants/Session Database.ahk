@@ -1420,28 +1420,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-			if trackAutomations
-				Loop % getConfigurationValue(trackAutomations, "Automations", "Count", 0)
-				{
-					id := A_Index
-					name := getConfigurationValue(trackAutomations, "Automations", id . ".Name", "")
+			this.iTrackAutomations := trackAutomations
 
-					actions := []
-
-					Loop % getConfigurationValue(trackAutomations, "Automations", id . ".Actions", 0)
-					{
-						coordX := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", 0)
-						coordY := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", 0)
-						type := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
-						action := getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)
-
-						actions.Push({X: coordX, Y: coordY, Type: type, Action: action})
-					}
-
-					LV_Add("", name, actions.Length())
-
-					this.iTrackAutomations.Push({Name: name, Actions: actions})
-				}
+			for ignore, trackAutomation in trackAutomations
+				LV_Add("", trackAutomation.Name, trackAutomation.Actions.Length())
 
 			LV_ModifyCol()
 
@@ -1459,23 +1441,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	writeTrackAutomations(read := true) {
-		trackAutomations := newConfiguration()
-
-		for id, trackAutomation in this.TrackAutomations {
-			setConfigurationValue(trackAutomations, "Automations", id . ".Name", trackAutomation.Name)
-			setConfigurationValue(trackAutomations, "Automations", id . ".Actions", trackAutomation.Actions.Length())
-
-			for ignore, trackAction in trackAutomation.Actions {
-				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", trackAction.X)
-				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", trackAction.Y)
-				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", trackAction.Type)
-				setConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", trackAction.Action)
-			}
-		}
-
-		setConfigurationValue(trackAutomations, "Automations", "Count", this.TrackAutomations.Length())
-
-		this.SessionDatabase.setTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, trackAutomations)
+		this.SessionDatabase.setTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.TrackAutomations)
 
 		if read
 			this.readTrackAutomations()

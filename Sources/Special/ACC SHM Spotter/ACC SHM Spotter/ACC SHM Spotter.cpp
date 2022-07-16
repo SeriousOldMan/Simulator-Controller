@@ -107,10 +107,10 @@ void sendAutomationMessage(string message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
+		winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
 
 	if (winHandle != 0)
-		sendStringMessage(winHandle, 0, "Track Automation:" + message);
+		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
 #define PI 3.14159265

@@ -60,13 +60,13 @@ void sendAutomationMessage(char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
+		winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
 
 	if (winHandle != 0) {
 		char buffer[128];
 
-		strcpy_s(buffer, 128, "Track Automation:");
-		strcpy_s(buffer + strlen("Track Automation:"), 128 - strlen("Track Automation:"), message);
+		strcpy_s(buffer, 128, "Race Spotter:");
+		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}

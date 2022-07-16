@@ -307,7 +307,33 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return readConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		trackAutomations := readConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		result := []
+
+		Loop % getConfigurationValue(trackAutomations, "Automations", "Count", 0)
+		{
+			id := A_Index
+
+			actions := []
+
+			Loop % getConfigurationValue(trackAutomations, "Automations", id . ".Actions", 0)
+				actions.Push({X: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".X", 0)
+							, Y: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Y", 0)
+							, Type: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
+							, Action: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)})
+
+			result.Push({Name: getConfigurationValue(trackAutomations, "Automations", id . ".Name", ""), Actions: actions})
+		}
+
+		return result
+	}
+
+	getTrackAutomation(simulator, car, track, name) {
+		for ignore, trackAutomation in this.getTrackAutomations(simulator, car, track)
+			if (trackAutomation.Name = name)
+				return trackAutomation
+
+		return false
 	}
 
 	setTrackAutomations(simulator, car, track, trackAutomations) {
@@ -315,7 +341,23 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		writeConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations", trackAutomations)
+		data := newConfiguration()
+
+		for id, trackAutomation in trackAutomations {
+			setConfigurationValue(data, "Automations", id . ".Name", trackAutomation.Name)
+			setConfigurationValue(data, "Automations", id . ".Actions", trackAutomation.Actions.Length())
+
+			for ignore, trackAction in trackAutomation.Actions {
+				setConfigurationValue(data, "Actions", id . "." . A_Index . ".X", trackAction.X)
+				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Y", trackAction.Y)
+				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Type", trackAction.Type)
+				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Action", trackAction.Action)
+			}
+		}
+
+		setConfigurationValue(data, "Automations", "Count", trackAutomations.Length())
+
+		writeConfiguration(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations", data)
 	}
 
 	getEntries(filter := "*.*", option := "D") {

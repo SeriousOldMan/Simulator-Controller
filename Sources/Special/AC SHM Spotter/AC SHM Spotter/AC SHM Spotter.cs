@@ -250,10 +250,10 @@ namespace ACSHMSpotter {
 			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
 
 			if (winHandle == 0)
-				FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+				winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
 
 			if (winHandle != 0)
-				SendStringMessage(winHandle, 0, "Track Automation:" + message);
+				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
 		}
 
 		const double PI = 3.14159265;

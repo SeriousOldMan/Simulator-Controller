@@ -25,6 +25,8 @@ global kRaceSpotterPlugin = "Race Spotter"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceSpotterPlugin extends RaceAssistantPlugin  {
+	iAutomationPID := false
+
 	iMapperPID := false
 	iMapped := []
 
@@ -82,12 +84,86 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return data
 	}
 
+	startupAutomation() {
+		if !this.iAutomationPID && this.Simulator {
+			trackAutomation := this.Simulator.TrackAutomation
+
+			if trackAutomation {
+				positions := ""
+
+				for ignore, action in trackAutomation.Actions
+					positions .= (A_Space . action.X . A_Space . action.Y)
+
+				code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
+
+				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+
+				if FileExist(exePath) {
+					this.shutdownAutomation()
+
+					try {
+						Run %ComSpec% /c ""%exePath%" -Trigger %positions%", %kBinariesDirectory%, Hide UseErrorLevel, automationPID
+					}
+					catch exception {
+						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+																   , {simulator: code, protocol: "SHM"})
+											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+											   . kBinariesDirectory . translate(")"))
+
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					}
+
+					if ((ErrorLevel != "Error") && automationPID)
+						this.iAutomationPID := automationPID
+				}
+			}
+		}
+	}
+
+	shutdownAutomation(force := false) {
+		automationPID := this.iAutomationPID
+
+		if automationPID {
+			Process Close, %automationPID%
+
+			Sleep 500
+
+			Process Exist, %automationPID%
+
+			if (force && ErrorLevel) {
+				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+
+				tries := 5
+
+				while (tries-- > 0) {
+					Process Exist, %processName%
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						Sleep 500
+					}
+					else
+						break
+				}
+			}
+		}
+	}
+
+	finishSession(arguments*) {
+		base.finishSession(arguments*)
+
+		this.shutdownAutomation(true)
+	}
+
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
 		static sessionDB := false
 
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
-		if (this.RaceAssistant && !this.iMapperPID && (this.Simulator && this.Simulator.supportsTrackMap())) {
+		if (this.RaceAssistant && !this.iMapperPID && this.Simulator && this.Simulator.supportsTrackMap()) {
 			if !sessionDB
 				sessionDB := new SessionDatabase()
 
@@ -135,6 +211,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
+		else
+			this.startupAutomation()
 	}
 
 	updateLap(lapNumber, dataFile) {
@@ -172,6 +250,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
+	}
+
+	positionTrigger(actionNr, positionX, positionY) {
+		if this.Simulator
+			this.Simulator.triggerAction(actionNr, positionX, positionY)
 	}
 }
 

@@ -1542,14 +1542,14 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	startupSpotter() {
+	startupSpotter(forceShutdown := false) {
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
 			exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
 			if FileExist(exePath) {
-				this.shutdownSpotter()
+				this.shutdownSpotter(forceShutdown)
 
 				try {
 					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
@@ -1571,32 +1571,36 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	shutdownSpotter() {
-		if this.iSpotterPID {
-			spotterPID := this.iSpotterPID
+	shutdownSpotter(force := false) {
+		spotterPID := this.iSpotterPID
 
+		if spotterPID {
 			Process Close, %spotterPID%
-		}
 
-		processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+			Sleep 500
 
-		tries := 5
+			Process Exist, %spotterPID%
 
-		while (tries-- > 0) {
-			Process Exist, %processName%
+			if (force && ErrorLevel) {
+				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
-			if ErrorLevel {
-				Process Close, %ErrorLevel%
+				tries := 5
 
-				Sleep 500
+				while (tries-- > 0) {
+					Process Exist, %processName%
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						Sleep 500
+					}
+					else
+						break
+				}
 			}
-			else
-				break
 		}
 
 		this.iSpotterPID := false
-
-		return false
 	}
 
 	createSession(settings, data) {
@@ -1668,7 +1672,7 @@ class RaceSpotter extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
 
-		callback := ObjBindMethod(this, "startupSpotter")
+		callback := ObjBindMethod(this, "startupSpotter", true)
 
 		SetTimer %callback%, -10000
 	}
@@ -1776,7 +1780,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			this.shutdownSpotter()
+			this.shutdownSpotter(true)
 
 			this.updateDynamicValues({KnowledgeBase: false})
 		}

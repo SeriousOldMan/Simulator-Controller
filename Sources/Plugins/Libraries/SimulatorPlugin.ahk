@@ -210,6 +210,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	iCar := false
 	iTrack := false
 
+	iTrackAutomation := false
+
 	Code[] {
 		Get {
 			return this.Plugin
@@ -260,6 +262,9 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
+			if (value != this.iCar)
+				this.iTrackAutomation := false
+
 			this.iCommandDelay := kUndefined
 
 			return (this.iCar := value)
@@ -272,9 +277,22 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
+			if (value != this.iTrack)
+				this.iTrackAutomation := false
+
 			this.iCommandDelay := kUndefined
 
 			return (this.iTrack := value)
+		}
+	}
+
+	TrackAutomation[] {
+		Get {
+			return this.iTrackAutomation
+		}
+
+		Set {
+			return (this.iTrackAutomation := value)
 		}
 	}
 
@@ -411,17 +429,22 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	sendCommand(command) {
-		switch this.CommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
+		try {
+			switch this.CommandMode {
+				case "Event":
+					SendEvent %command%
+				case "Input":
+					SendInput %command%
+				case "Play":
+					SendPlay %command%
+				case "Raw":
+					SendRaw %command%
+				default:
+					Send %command%
+			}
+		}
+		catch exception {
+			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
 		}
 
 		delay := this.CommandDelay
@@ -816,6 +839,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
+		simulator := this.Simulator[true]
+		car := this.Car
+		track := this.Track
+
+		trackAutomation := getConfigurationValue(settings, "Automation Settings", simulator . "." . car . "." . track, false)
+
+		if trackAutomation
+			trackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track, trackAutomation)
+
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
 		this.updateTyreCompound(data)
@@ -882,6 +914,23 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return false
 	}
 
+	positionTrigger(actionNr, positionX, positionY) {
+		if this.TrackAutomation {
+			action := this.TrackAutomation.Actions[actionNr]
+
+			try {
+				if (action.Type = "Hotkey") {
+					for ignore, theHotkey in string2Values("|", action.Action)
+						this.sendCommand(theHotKey)
+				}
+				else if (action.Type = "Command")
+					execute(action.Action)
+			}
+			catch exception {
+			}
+		}
+	}
+
 	startPitstopSetup(pitstopNumber) {
 	}
 
@@ -923,15 +972,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
 			}
 		}
+	}
+
+	updateSessionData(data) {
+		this.updateTyreCompound(data)
 
 		if (this.SessionState != kSessionFinished) {
 			this.Car := getConfigurationValue(data, "Session Data", "Car")
 			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}
-	}
-
-	updateSessionData(data) {
-		this.updateTyreCompound(data)
 	}
 
 	saveSessionState(ByRef sessionSettings, ByRef sessionState) {

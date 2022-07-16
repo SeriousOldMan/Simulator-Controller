@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -200,6 +201,9 @@ class PitstopToggleAction extends PitstopAction {
 }
 
 class SimulatorPlugin extends ControllerPlugin {
+	iCommandMode := "Event"
+	iCommandDelay := kUndefined
+
 	iSimulator := false
 	iSessionState := kSessionFinished
 
@@ -209,6 +213,38 @@ class SimulatorPlugin extends ControllerPlugin {
 	Code[] {
 		Get {
 			return this.Plugin
+		}
+	}
+
+	CommandMode[] {
+		Get {
+			return this.iCommandMode
+		}
+
+		Set {
+			return (this.iCommandMode := value)
+		}
+	}
+
+	CommandDelay[] {
+		Get {
+			if (this.iCommandDelay = kUndefined) {
+				simulator := this.Simulator[true]
+				car := (this.Car ? this.Car : "*")
+				track := (this.Track ? this.Track : "*")
+
+				settings := new SettingsDatabase().loadSettings(simulator, car, track, "*")
+
+				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 20)
+
+				this.iCommandDelay := getConfigurationValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
+			}
+
+			return this.iCommandDelay
+		}
+
+		Set {
+			return (this.iCommandDelay := value)
 		}
 	}
 
@@ -224,6 +260,8 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
+			this.iCommandDelay := kUndefined
+
 			return (this.iCar := value)
 		}
 	}
@@ -234,6 +272,8 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 
 		Set {
+			this.iCommandDelay := kUndefined
+
 			return (this.iTrack := value)
 		}
 	}
@@ -266,6 +306,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		if (!this.Active && !isDebug())
 			return
+
+		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
 		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
 			arguments := string2Values(A_Space, theAction)
@@ -355,6 +397,37 @@ class SimulatorPlugin extends ControllerPlugin {
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {}
 		selectActions := []
+	}
+
+	activateWindow() {
+		window := this.Simulator.WindowTitle
+
+		if !WinExist(window)
+			if isDebug()
+				showMessage(this.Simulator[true] . " not found...")
+
+		if !WinActive(window)
+			WinActivate %window%
+	}
+
+	sendCommand(command) {
+		switch this.CommandMode {
+			case "Event":
+				SendEvent %command%
+			case "Input":
+				SendInput %command%
+			case "Play":
+				SendPlay %command%
+			case "Raw":
+				SendRaw %command%
+			default:
+				Send %command%
+		}
+
+		delay := this.CommandDelay
+
+		if delay
+			Sleep %delay%
 	}
 
 	runningSimulator() {

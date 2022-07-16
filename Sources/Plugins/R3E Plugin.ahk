@@ -37,8 +37,6 @@ global kUseImageRecognition = true
 ;;;-------------------------------------------------------------------------;;;
 
 class R3EPlugin extends RaceAssistantSimulatorPlugin {
-	iCommandMode := "Event"
-
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
@@ -48,35 +46,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iNextChoiceHotkey := false
 	iAcceptChoiceHotkey := false
 
-	iKeyDelay := kUndefined
-
 	iPSImageSearchArea := false
 	iPitstopOptions := []
 	iPitstopOptionStates := []
-
-	Car[] {
-		Get {
-			return base.Car
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Car := value)
-		}
-	}
-
-	Track[] {
-		Get {
-			return base.Track
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Track := value)
-		}
-	}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -123,8 +95,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
-
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
@@ -141,42 +111,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	activateR3EWindow() {
-		window := this.Simulator.WindowTitle
-
-		if !WinActive(window)
-			WinActivate %window%
-	}
-
-	sendPitstopCommand(command) {
-		switch this.iCommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
-		}
-
-		if (this.iKeyDelay = kUndefined) {
-			car := (this.Car ? this.Car : "*")
-			track := (this.Track ? this.Track : "*")
-
-			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
-
-			this.iKeyDelay := getConfigurationValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.KeyDelay", 20)
-		}
-
-		Sleep % this.iKeyDelay
-	}
-
 	pitstopMFDIsOpen() {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.activateR3EWindow()
+			this.activateWindow()
 
 			return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
 		}
@@ -202,15 +139,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.activateR3EWindow()
+			this.activateWindow()
 
 			secondTry := false
 
 			if first
-				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+				this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			if !this.pitstopMFDIsOpen() {
-				this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+				this.sendCommand(this.OpenPitstopMFDHotkey)
 
 				secondTry := true
 			}
@@ -229,11 +166,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	closePitstopMFD() {
 		static reported := false
 
-		this.activateR3EWindow()
+		this.activateWindow()
 
 		if this.pitstopMFDIsOpen() {
 			if this.ClosePitstopMFDHotkey {
-				this.sendPitstopCommand(this.ClosePitstopMFDHotkey)
+				this.sendCommand(this.ClosePitstopMFDHotkey)
 
 				Sleep 50
 			}
@@ -265,10 +202,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		this.iPitstopOptions := []
 		this.iPitstopOptionStates := []
 
-		this.activateR3EWindow()
+		this.activateWindow()
 
 		Loop 15
-			this.sendPitstopCommand(this.NextOptionHotkey)
+			this.sendCommand(this.NextOptionHotkey)
 
 		if kUseImageRecognition {
 			if this.searchMFDImage("Strategy") {
@@ -416,17 +353,17 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.activateR3EWindow()
+			this.activateWindow()
 
 			switch action {
 				case "Accept":
-					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+					this.sendCommand(this.AcceptChoiceHotkey)
 				case "Increase":
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 			}
@@ -440,21 +377,21 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else if ((option = "Change Tyres") || (option = "Tyre Compound"))
 				return (this.optionAvailable("Change Front Tyres") || this.optionAvailable("Change Rear Tyres"))
 			else {
-				this.activateR3EWindow()
+				this.activateWindow()
 
 				index := this.optionIndex(option)
 
 				if index {
-					this.activateR3EWindow()
+					this.activateWindow()
 
 					Loop 15
-						this.sendPitstopCommand(this.PreviousOptionHotkey)
+						this.sendCommand(this.PreviousOptionHotkey)
 
 					index -= 1
 
 					if index
 						Loop %index%
-							this.sendPitstopCommand(this.NextOptionHotkey)
+							this.sendCommand(this.NextOptionHotkey)
 
 					return true
 				}
@@ -523,12 +460,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if (!require || this.requirePitstopMFD())
 				if (!select || this.selectPitstopOption("Refuel")) {
 					if (accept && this.optionChosen("Refuel"))
-						this.sendPitstopCommand(this.AcceptChoiceHotkey)
+						this.sendCommand(this.AcceptChoiceHotkey)
 
 					this.dialPitstopOption("Refuel", direction, litres)
 
 					if accept
-						this.sendPitstopCommand(this.AcceptChoiceHotkey)
+						this.sendCommand(this.AcceptChoiceHotkey)
 				}
 		}
 	}
@@ -537,10 +474,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (!require || this.requirePitstopMFD()) {
 				if (accept && this.selectPitstopOption("Change Front Tyres") && this.optionChosen("Change Front Tyres"))
-					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+					this.sendCommand(this.AcceptChoiceHotkey)
 
 				if (accept && this.selectPitstopOption("Change Rear Tyres") && this.optionChosen("Change Rear Tyres"))
-					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+					this.sendCommand(this.AcceptChoiceHotkey)
 
 				if this.selectPitstopOption("Change Front Tyres")
 					this.dialPitstopOption("Change Front Tyres", direction, steps)
@@ -549,11 +486,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					this.dialPitstopOption("Change Rear Tyres", direction, steps)
 
 					if accept
-						this.sendPitstopCommand(this.AcceptChoiceHotkey)
+						this.sendCommand(this.AcceptChoiceHotkey)
 				}
 
 				if (accept && this.selectPitstopOption("Change Front Tyres"))
-					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+					this.sendCommand(this.AcceptChoiceHotkey)
 			}
 		}
 	}
@@ -581,12 +518,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		base.finishPitstopSetup()
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.activateR3EWindow()
+			this.activateWindow()
 
 			Loop 10
-				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
 
-			this.sendPitstopCommand(this.AcceptChoiceHotkey)
+			this.sendCommand(this.AcceptChoiceHotkey)
 		}
 	}
 
@@ -596,13 +533,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
 				if this.optionChosen("Refuel")
-					this.sendPitstopCommand(this.AcceptChoiceHotkey)
+					this.sendCommand(this.AcceptChoiceHotkey)
 
 				this.changeFuelAmount("Decrease", 120, false, true, false)
 
 				this.changeFuelAmount("Increase", litres + 3, false, false, false)
 
-				this.sendPitstopCommand(this.AcceptChoiceHotkey)
+				this.sendCommand(this.AcceptChoiceHotkey)
 			}
 		}
 	}
@@ -769,7 +706,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			imageName := imageNames[A_Index]
 			pitstopImages := this.getImageFileNames(imageName)
 
-			this.activateR3EWindow()
+			this.activateWindow()
 
 			curTickCount := A_TickCount
 

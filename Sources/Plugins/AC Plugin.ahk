@@ -28,16 +28,12 @@ global kACPlugin = "AC"
 ;;;-------------------------------------------------------------------------;;;
 
 class ACPlugin extends RaceAssistantSimulatorPlugin {
-	iCommandMode := "Event"
-
 	iOpenPitstopMFDHotkey := false
 
 	iPreviousOptionHotkey := false
 	iNextOptionHotkey := false
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
-
-	iKeyDelay := kUndefined
 
 	iRepairSuspensionChosen := false
 	iRepairBodyworkChosen := false
@@ -47,30 +43,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSettingsDatabase := false
 	iCarMetaData := {}
-
-	Car[] {
-		Get {
-			return base.Car
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Car := value)
-		}
-	}
-
-	Track[] {
-		Get {
-			return base.Track
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Track := value)
-		}
-	}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -125,8 +97,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
-
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
 
 		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "{Up}")
@@ -148,32 +118,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	supportsTrackMap() {
 		return true
-	}
-
-	sendPitstopCommand(command) {
-		switch this.iCommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
-		}
-
-		if (this.iKeyDelay = kUndefined) {
-			car := (this.Car ? this.Car : "*")
-			track := (this.Track ? this.Track : "*")
-
-			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
-
-			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Automobilista 2", "Pitstop.KeyDelay", 20)
-		}
-
-		Sleep % this.iKeyDelay
 	}
 
 	updateSessionState(sessionState) {
@@ -245,17 +189,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	activateACWindow() {
-		window := this.Simulator.WindowTitle
-
-		if !WinExist(window)
-			if isDebug()
-				showMessage("AC not found...")
-
-		if !WinActive(window)
-			WinActivate %window%
-	}
-
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
@@ -272,10 +205,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 		}
 
-		this.activateACWindow()
+		this.activateWindow()
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			return true
 		}
@@ -290,7 +223,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (A_TickCount < this.iPitstopAutoClose) {
 			this.iPitstopAutoClose := (A_TickCount + 4000)
 
-			this.activateACWindow()
+			this.activateWindow()
 
 			return true
 		}
@@ -306,60 +239,60 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			Loop 20
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
 
 			if ((option = "Strategy") || (option = "All Around"))
 				return true
 			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Tyre Compound") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Front Left") {
 				Loop 3
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Front Right") {
 				Loop 4
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Rear Left") {
 				Loop 5
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Rear Right") {
 				Loop 6
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Bodywork") {
 				Loop % 7 + this.getCarMetaData("CarSettings")
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
 				Loop % 8 + this.getCarMetaData("CarSettings")
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
 				Loop % 9 + this.getCarMetaData("CarSettings")
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
@@ -374,15 +307,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
-					this.activateACWindow()
+					this.activateWindow()
 
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					this.activateACWindow()
+					this.activateWindow()
 
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
 			}

@@ -27,8 +27,6 @@ global kPCARS2Plugin = "PCARS2"
 ;;;-------------------------------------------------------------------------;;;
 
 class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
-	iCommandMode := "Event"
-
 	iOpenPitstopMFDHotkey := false
 
 	iPreviousOptionHotkey := false
@@ -36,35 +34,9 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	iPreviousChoiceHotkey := false
 	iNextChoiceHotkey := false
 
-	iKeyDelay := kUndefined
-
 	iTyreCompoundChosen := 0
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
-
-	Car[] {
-		Get {
-			return base.Car
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Car := value)
-		}
-	}
-
-	Track[] {
-		Get {
-			return base.Track
-		}
-
-		Set {
-			this.iKeyDelay := kUndefined
-
-			return (base.Track := value)
-		}
-	}
 
 	OpenPitstopMFDHotkey[] {
 		Get {
@@ -99,8 +71,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
-
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
 
 		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
@@ -124,32 +94,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
-	sendPitstopCommand(command) {
-		switch this.iCommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
-		}
-
-		if (this.iKeyDelay = kUndefined) {
-			car := (this.Car ? this.Car : "*")
-			track := (this.Track ? this.Track : "*")
-
-			settings := new SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
-
-			this.iKeyDelay := getConfigurationValue(settings, "Simulator.Project CARS 2", "Pitstop.KeyDelay", 20)
-		}
-
-		Sleep % this.iKeyDelay
-	}
-
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
@@ -167,7 +111,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendPitstopCommand(this.OpenPitstopMFDHotkey)
+			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			return true
 		}
@@ -178,22 +122,22 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	closePitstopMFD(option := false) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Tyre Compound")
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
 			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
 				Loop 3
-					this.sendPitstopCommand(this.PreviousOptionHotkey)
+					this.sendCommand(this.PreviousOptionHotkey)
 			}
 
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
+			this.sendCommand(this.NextChoiceHotkey)
+			this.sendCommand(this.PreviousOptionHotkey)
+			this.sendCommand(this.PreviousOptionHotkey)
+			this.sendCommand(this.NextChoiceHotkey)
+			this.sendCommand(this.NextOptionHotkey)
+			this.sendCommand(this.NextChoiceHotkey)
 		}
 	}
 
@@ -203,36 +147,36 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.sendPitstopCommand(this.PreviousOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextOptionHotkey)
-			this.sendPitstopCommand(this.NextChoiceHotkey)
+			this.sendCommand(this.PreviousOptionHotkey)
+			this.sendCommand(this.NextChoiceHotkey)
+			this.sendCommand(this.NextOptionHotkey)
+			this.sendCommand(this.NextOptionHotkey)
+			this.sendCommand(this.NextChoiceHotkey)
 
 			if (option = "Tyre Compound") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Refuel") {
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
 				Loop 3
-					this.sendPitstopCommand(this.NextOptionHotkey)
+					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else {
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.PreviousOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
-				this.sendPitstopCommand(this.NextOptionHotkey)
-				this.sendPitstopCommand(this.NextChoiceHotkey)
+				this.sendCommand(this.NextChoiceHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
+				this.sendCommand(this.NextChoiceHotkey)
+				this.sendCommand(this.NextOptionHotkey)
+				this.sendCommand(this.NextChoiceHotkey)
 
 				return false
 			}
@@ -246,10 +190,10 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			switch action {
 				case "Increase":
 					Loop %steps%
-						this.sendPitstopCommand(this.NextChoiceHotkey)
+						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					Loop %steps%
-						this.sendPitstopCommand(this.PreviousChoiceHotkey)
+						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
 					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}

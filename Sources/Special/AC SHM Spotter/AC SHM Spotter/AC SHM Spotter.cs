@@ -234,7 +234,7 @@ namespace ACSHMSpotter {
 			return result;
 		}
 
-		void SendMessage(string message)
+		void SendSpotterMessage(string message)
 		{
 			int winHandle = FindWindowEx(0, 0, null, "Race Spotter.exe");
 
@@ -243,6 +243,17 @@ namespace ACSHMSpotter {
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
+		}
+
+		void SendAutomationMessage(string message)
+		{
+			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+
+			if (winHandle == 0)
+				FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+
+			if (winHandle != 0)
+				SendStringMessage(winHandle, 0, "Track Automation:" + message);
 		}
 
 		const double PI = 3.14159265;
@@ -502,7 +513,7 @@ namespace ACSHMSpotter {
 					if (alert != "Hold")
 						carBehindReported = false;
 
-					SendMessage("proximityAlert:" + alert);
+					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
@@ -512,8 +523,8 @@ namespace ACSHMSpotter {
 					{
 						carBehindReported = true;
 
-						SendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+														   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
 					}
@@ -546,7 +557,7 @@ namespace ACSHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW) != 0)
 					{
-						SendMessage("yellowFlag:Ahead");
+						SendSpotterMessage("yellowFlag:Ahead");
 
 						waitYellowFlagState &= ~YELLOW;
 
@@ -561,7 +572,7 @@ namespace ACSHMSpotter {
 			{
 				if ((lastFlagState & BLUE) == 0)
 				{
-					SendMessage("blueFlag");
+					SendSpotterMessage("blueFlag");
 
 					lastFlagState |= BLUE;
 
@@ -586,7 +597,7 @@ namespace ACSHMSpotter {
 				if ((lastFlagState & YELLOW) == 0)
 				{
 					/*
-					sendMessage("yellowFlag:Sector;1");
+					SendSpotterMessage("yellowFlag:Sector;1");
 
 					lastFlagState |= YELLOW_SECTOR_1;
 
@@ -603,7 +614,7 @@ namespace ACSHMSpotter {
 				if ((lastFlagState & YELLOW) != 0)
 				{
 					if (waitYellowFlagState != lastFlagState)
-						SendMessage("yellowFlag:Clear");
+						SendSpotterMessage("yellowFlag:Clear");
 
 					lastFlagState &= ~YELLOW;
 					waitYellowFlagState &= ~YELLOW;
@@ -651,7 +662,47 @@ namespace ACSHMSpotter {
 			return true;
 		}
 
-		public void Run(bool mapTrack)
+		float[] xCoordinates = new float[60];
+		float[] yCoordinates = new float[60];
+		int numCoordinates = 0;
+
+		void checkCoordinates()
+		{
+			double velocityX = physics.LocalVelocity[0];
+			double velocityY = physics.LocalVelocity[2];
+			double velocityZ = physics.LocalVelocity[1];
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			{
+				int carID = 0;
+
+				float coordinateX = cars.cars[carID].worldPosition.x;
+				float coordinateY = cars.cars[carID].worldPosition.z;
+
+				for (int i = 0; i < numCoordinates; i += 2)
+				{
+					if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
+					{
+						SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+
+						break;
+					}
+				}
+			}
+		}
+
+		public void initializeTrigger(string[] args)
+		{
+			for (int i = 1; i < (args.Length - 1); i += 2)
+			{
+				xCoordinates[numCoordinates] = float.Parse(args[i]);
+				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+
+				numCoordinates += 1;
+			}
+		}
+
+		public void Run(bool mapTrack, bool positionTrigger)
 		{
 			bool running = false;
 
@@ -667,6 +718,8 @@ namespace ACSHMSpotter {
 					if (!writeCoordinates())
 						break;
 				}
+				else if (positionTrigger)
+					checkCoordinates();
 				else
 				{
 					physics = ReadPhysics();

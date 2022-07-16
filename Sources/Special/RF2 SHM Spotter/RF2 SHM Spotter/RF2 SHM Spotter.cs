@@ -140,7 +140,7 @@ namespace RF2SHMSpotter {
 			return result;
 		}
 
-		void SendMessage(string message)
+		void SendSpotterMessage(string message)
 		{
 			int winHandle = FindWindowEx(0, 0, null, "Race Spotter.exe");
 
@@ -149,6 +149,17 @@ namespace RF2SHMSpotter {
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
+		}
+
+		void SendAutomationMessage(string message)
+		{
+			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+
+			if (winHandle == 0)
+				FindWindowEx(0, 0, null, "Simulator Controller.ahk");
+
+			if (winHandle != 0)
+				SendStringMessage(winHandle, 0, "Track Automation:" + message);
 		}
 
 		const double PI = 3.14159265;
@@ -430,7 +441,7 @@ namespace RF2SHMSpotter {
 					if (alert != "Hold")
 						carBehindReported = false;
 
-					SendMessage("proximityAlert:" + alert);
+					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
@@ -440,7 +451,7 @@ namespace RF2SHMSpotter {
 					{
 						carBehindReported = true;
 
-						SendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
@@ -478,7 +489,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0)
 					{
-						SendMessage("yellowFlag:Sector;1");
+						SendSpotterMessage("yellowFlag:Sector;1");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -487,7 +498,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0)
 					{
-						SendMessage("yellowFlag:Sector;2");
+						SendSpotterMessage("yellowFlag:Sector;2");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
@@ -496,7 +507,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0)
 					{
-						SendMessage("yellowFlag:Sector;3");
+						SendSpotterMessage("yellowFlag:Sector;3");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_3;
 
@@ -511,7 +522,7 @@ namespace RF2SHMSpotter {
 			{
 				if ((lastFlagState & BLUE) == 0)
 				{
-					SendMessage("blueFlag");
+					SendSpotterMessage("blueFlag");
 
 					lastFlagState |= BLUE;
 
@@ -535,7 +546,7 @@ namespace RF2SHMSpotter {
 			{
 				if ((lastFlagState & YELLOW_FULL) == 0)
 				{
-					SendMessage("yellowFlag:Full");
+					SendSpotterMessage("yellowFlag:Full");
 
 					lastFlagState |= YELLOW_FULL;
 
@@ -547,7 +558,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;1");
+					SendSpotterMessage("yellowFlag:Sector;1");
 
 					lastFlagState |= YELLOW_SECTOR_1;
 
@@ -564,7 +575,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_2) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;2");
+					SendSpotterMessage("yellowFlag:Sector;2");
 
 					lastFlagState |= YELLOW_SECTOR_2;
 
@@ -581,7 +592,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_3) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;3");
+					SendSpotterMessage("yellowFlag:Sector;3");
 
 					lastFlagState |= YELLOW_SECTOR_3;
 
@@ -599,7 +610,7 @@ namespace RF2SHMSpotter {
 					(lastFlagState & YELLOW_SECTOR_3) != 0)
 				{
 					if (waitYellowFlagState != lastFlagState)
-						SendMessage("yellowFlag:Clear");
+						SendSpotterMessage("yellowFlag:Clear");
 
 					lastFlagState &= ~YELLOW_FULL;
 					waitYellowFlagState &= ~YELLOW_FULL;
@@ -662,7 +673,61 @@ namespace RF2SHMSpotter {
 			return true;
 		}
 
-		public void Run(bool mapTrack) {
+		float[] xCoordinates = new float[60];
+		float[] yCoordinates = new float[60];
+		int numCoordinates = 0;
+
+		void checkCoordinates(ref rF2VehicleScoring playerScoring)
+		{
+			double lVelocityX = playerScoring.mLocalVel.x;
+			double lVelocityY = playerScoring.mLocalVel.y;
+			double lVelocityZ = playerScoring.mLocalVel.z;
+
+			int carID = 0;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (scoring.mVehicles[i].mIsPlayer != 0)
+				{
+					carID = i;
+
+					break;
+				}
+
+			var ori = playerScoring.mOri;
+
+			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			{
+				double coordinateX = playerScoring.mPos.x;
+				double coordinateY = playerScoring.mPos.y;
+
+				for (int i = 0; i < numCoordinates; i += 2)
+				{
+					if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
+					{
+						SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+
+						break;
+					}
+				}
+			}
+		}
+
+		public void initializeTrigger(string[] args)
+        {
+			for (int i = 1; i < (args.Length - 1); i += 2)
+			{
+				xCoordinates[numCoordinates] = float.Parse(args[i]);
+				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+
+				numCoordinates += 1;
+			}
+		}
+
+		public void Run(bool mapTrack, bool positionTrigger) {
 			bool running = false;
 			int countdown = 4000;
 
@@ -690,6 +755,8 @@ namespace RF2SHMSpotter {
 							if (!writeCoordinates(ref playerScoring))
 								break;
 						}
+						else if (positionTrigger)
+							checkCoordinates(ref playerScoring);
 						else
 						{
 							if (!running)

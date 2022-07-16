@@ -82,7 +82,7 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 	return result;
 }
 
-void sendMessage(char* message) {
+void sendSpotterMessage(char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
 
 	if (winHandle == 0)
@@ -93,6 +93,22 @@ void sendMessage(char* message) {
 
 		strcpy_s(buffer, 128, "Race Spotter:");
 		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
+void sendAutomationMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
+
+	if (winHandle == 0)
+		FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Track Automation:");
+		strcpy_s(buffer + strlen("Track Automation:"), 128 - strlen("Track Automation:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -342,7 +358,7 @@ BOOL checkPositions(int playerID) {
 			strcpy_s(buffer, 128, "proximityAlert:");
 			strcpy_s(buffer + strlen("proximityAlert:"), 128 - strlen("proximityAlert:"), alert);
 
-			sendMessage(buffer);
+			sendSpotterMessage(buffer);
 
 			return TRUE;
 		}
@@ -350,8 +366,8 @@ BOOL checkPositions(int playerID) {
 			if (!carBehindReported) {
 				carBehindReported = FALSE;
 
-				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return TRUE;
 			}
@@ -411,7 +427,7 @@ BOOL checkFlagState() {
 	if (!sector)
 		if (map_buffer->flags.blue == 1) {
 			if ((lastFlagState & BLUE) == 0) {
-				sendMessage("blueFlag");
+				sendSpotterMessage("blueFlag");
 
 				lastFlagState |= BLUE;
 
@@ -442,7 +458,7 @@ BOOL checkFlagState() {
 			map_buffer->flags.sector_yellow[1] == 1 &&
 			map_buffer->flags.sector_yellow[2] == 1) {
 			if ((lastFlagState & YELLOW_FULL) == 0) {
-				sendMessage("yellowFlag:Full");
+				sendSpotterMessage("yellowFlag:Full");
 
 				lastFlagState |= YELLOW_FULL;
 
@@ -492,7 +508,7 @@ BOOL checkFlagState() {
 			if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
 				(lastFlagState & YELLOW_SECTOR_3) != 0) {
 				if (waitYellowFlagState != lastFlagState)
-					sendMessage("yellowFlag:Clear");
+					sendSpotterMessage("yellowFlag:Clear");
 
 				lastFlagState &= ~YELLOW_FULL;
 				waitYellowFlagState &= ~YELLOW_FULL;
@@ -525,7 +541,7 @@ BOOL checkFlagState() {
 			strcpy_s(buffer + offset, 128 - offset, buffer2);
 		}
 		
-		sendMessage(buffer);
+		sendSpotterMessage(buffer);
 
 		return TRUE;
 	}
@@ -538,13 +554,13 @@ void checkPitWindow() {
 		pitWindowOpenReported = TRUE;
 		pitWindowClosedReported = FALSE;
 
-		sendMessage("pitWindow:Open");
+		sendSpotterMessage("pitWindow:Open");
 	}
 	else if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_CLOSED) && !pitWindowClosedReported) {
 		pitWindowClosedReported = TRUE;
 		pitWindowOpenReported = FALSE;
 
-		sendMessage("pitWindow:Closed");
+		sendSpotterMessage("pitWindow:Closed");
 	}
 }
 
@@ -583,6 +599,51 @@ BOOL writeCoordinates(int playerID) {
 	return TRUE;
 }
 
+float xCoordinates[60];
+float yCoordinates[60];
+int numCoordinates = 0;
+
+void checkCoordinates(int playerID) {
+	r3e_float64 velocityX = map_buffer->player.velocity.x;
+	r3e_float64 velocityY = map_buffer->player.velocity.z;
+	r3e_float64 velocityZ = map_buffer->player.velocity.y;
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int index = 0;
+
+		for (int id = 0; id < map_buffer->num_cars; id++)
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+				index = id;
+
+				break;
+			}
+
+		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
+		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+
+		for (int i = 0; i < numCoordinates; i += 2) {
+			if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
+				char buffer[60] = "";
+				char numBuffer[60];
+
+				strcat_s(buffer, 60, "positionTrigger:");
+				_itoa_s(i + 1, numBuffer, 60, 10);
+				strcat_s(buffer, 60, numBuffer);
+				strcat_s(buffer, 60, ";");
+				sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
+				strcat_s(buffer, 60, numBuffer);
+				strcat_s(buffer, 60, ";");
+				sprintf_s(numBuffer, 60, "%f", yCoordinates[i]);
+				strcat_s(buffer, 60, numBuffer);
+
+				sendAutomationMessage(buffer);
+
+				break;
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
     BOOL mapped_r3e = FALSE;
@@ -590,9 +651,20 @@ int main(int argc, char* argv[])
 	BOOL running = FALSE;
 	int countdown = 4000;
 	BOOL mapTrack = FALSE;
+	BOOL positionTrigger = FALSE;
 
-	if (argc > 1 && strcmp(argv[1], "-Map") == 0)
-		mapTrack = TRUE;
+	if (argc > 1) {
+		mapTrack = (strcmp(argv[1], "-Map") == 0);
+
+		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		for (int i = 2; i < (argc - 1); i = i + 2) {
+			xCoordinates[numCoordinates] = (float)atof(argv[i]);
+			yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+
+			numCoordinates += 1;
+		}
+	}
 
 	while (TRUE) {
 		if (!mapped_r3e && map_exists())
@@ -607,6 +679,8 @@ int main(int argc, char* argv[])
 				if (!writeCoordinates(playerID))
 					break;
 			}
+			else if (positionTrigger)
+				checkCoordinates(playerID);
 			else {
 				if (!running)
 					running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));

@@ -763,8 +763,20 @@ This class may be used for simple simulator plugins which will NOT support the V
 #### *Code[]*
 This property returns a three letter short name for the plugin, which is used as a descriminator in several functions of Simulator Controller. The default implementation simply returns the name of the plugin (for example "AC", "ACC", "RF2", ...).
 
-#### *Simulator[]*
-The *Application* object representing the simulation game.
+#### *CommandMode[}*
+Returns the event mode used to communicate with the simulation game. Returns one of "Event", "Input", "Play" or "Raw".
+
+#### *CommandDelay[}*
+Returns the delay in ms, which is used between each command send to the simulation game.
+
+#### *Simulator[name :: Boolean := false]*
+The *Application* object representing the simulation game. If you supply *true* for *name* the actual name of the simulator is returned.
+
+#### *Car[]*
+The name of the car, if the player is currently on the track.
+
+#### *Track[]*
+The name of the track, if the player is currently on the track.
 
 #### *SessionState[asText :: Boolean := false]*
 The current seesion state of an active simulation. Will be one of [kSessionFinished, kSessionPaused, kSessionOther, kSessionPractice, kSessionQualification or kSessionRace](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#simulation-session-types-simulatorpluginahk) or a corresponding textual representation, when *true* has been supplied for the optional parameter *asText*.
@@ -782,6 +794,12 @@ This factory method will be called for each supplied action identifier for the [
 
 #### *getPitstopActions(ByRef allActions :: Map(String => String), ByRef selectActions :: Array)*
 Whenever a simulator plugin can provide functionality to handle the pitstop settings automatically, this method must be overriden. All methods below (*openPitstopMFD*, *selectPitstopOption*, and so on) will only be called, if at least one pitstop action has been defined and initialized by a value for the plugin [*pitstopCommands* parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4). The first result parameter *allActions* must map all external action identifier used by *pitstopCommands* to internal option identifiers, which are used internally and may be shared with external code (for example, a telemetry plugin for the corresponding simulation game). Example: *TyreFrontLeft* => *FL PRESS:* (for *rFactor 2*). For each provided action, an instance of one of the subclasses of [PitstopAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-pitstopaction-extends-controlleraction-simulatorpluginahk) is created and registered for the ["Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopmode-extends-controllermode-simulatorpluginahk), which is also created automatically. In *selectActions* a list of all action identifiers, for which an instance of [PitstopSelectAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopselectaction-extends-pitstopchangeaction-simulatorpluginahk) should be created, when only one controller function has been provided, for all other actions with one supplied controller functions, an instance of [PitstopToggleAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstoptoggleaction-extends-pitstopaction-simulatorpluginahk) will be created. When two controller functions has been supplied, two instances of [PitstopChangeAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#pitstopchangeaction-extends-pitstopaction-simulatorpluginahk) will be created.
+
+#### *activateWindow()*
+Brings the window of the simulation game to the front and activates it.
+
+#### *sendCommand(command :: String)*
+Sends the given command, actually a [hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys), to the simulation game.
 
 #### [Abstract] *openPitstopMFD()*
 The implementation of *openPitstopMFD*, which must be provided by a subclass, must open the pitstop settings dialog in order to automatically apply the necessary value changes using the methods below. *openPitstopMFD* must return *true*, when the pitstop settings dialog has been opened successfully.

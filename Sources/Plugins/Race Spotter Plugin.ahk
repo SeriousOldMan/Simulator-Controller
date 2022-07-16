@@ -63,7 +63,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.disableTrackAutomation()
+				plugin.enableTrackAutomation()
 
 				trayMessage(plugin.actionLabel(this), translate("State: On"))
 
@@ -99,7 +99,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				arguments := ["On"]
 
 			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "On")
+				arguments.InsertAt(1, "Off")
 
 			this.iTrackAutomationEnabled := (arguments[1] = "On")
 
@@ -115,8 +115,33 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			SetTimer updateRaceSpotterSessionState, 5000
 	}
 
+	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
+		local function
+
+		function := controller.findFunction(actionFunction)
+
+		if ((function != false) && (action = "TrackAutomation")) {
+			descriptor := ConfigurationItem.descriptor(action, "Toggle")
+
+			this.registerAction(new this.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+		}
+		else
+			base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
+	}
+
 	createRaceAssistant(pid) {
 		return new this.RemoteRaceSpotter(this, pid)
+	}
+
+	updateActions(sessionState) {
+		base.updateActions(sessionState)
+
+		for ignore, theAction in this.Actions
+			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
+				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackAutomationEnabled ? "Green" : "Black")
+
+				theAction.Function.enable(kAllTrigger, theAction)
+			}
 	}
 
 	requestInformation(arguments*) {

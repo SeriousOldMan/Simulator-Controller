@@ -615,7 +615,7 @@ void checkCoordinates() {
 		for (int i = 0; i < numCoordinates; i += 2) {
 			if (abs(xCoordinates[i] - coordinateX) < 10 && abs(yCoordinates[i] - coordinateY) < 10) {
 				char buffer[60] = "";
-				char numBuffer[60];
+				char numBuffer[60] = "";
 
 				strcat_s(buffer, "positionTrigger:");
 				_itoa_s(i + 1, numBuffer, 10);

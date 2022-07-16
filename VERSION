@@ -3,7 +3,7 @@ Version=4.2.5.0-dev
 Target=4.2.5.0-release
 Date=07/15/2022
 Download=
-Changes=Editor for track automation in "Session Database"
+Changes=Editor for track automation in "Session Database", New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench"
 [Release]
 Version=4.2.4.0-release
 Date=07/15/2022

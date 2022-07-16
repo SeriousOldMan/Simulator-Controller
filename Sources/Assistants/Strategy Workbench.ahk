@@ -597,10 +597,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w75 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Always", "Disallowed"], "translate")*)
 
 		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel, % translate("Tyre Change")
-		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Always", "Disallowed"], "translate")*)
 
 		Gui %window%:Add, Text, x%x5% yp+26 w75 h23 +0x200, % translate("Tyre Sets")
 
@@ -1044,25 +1044,25 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControlGet tyreChangeRequirementsDropDown
 		GuiControlGet refuelRequirementsDropDown
 
-		oldTChoice := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
-		oldFChoice := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
+		oldTChoice := ["Optional", "Required", "Always", "Disallowed"][tyreChangeRequirementsDropDown]
+		oldFChoice := ["Optional", "Required", "Always", "Disallowed"][refuelRequirementsDropDown]
 
 		if (pitstopRequirementsDropDown = 1) {
-			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
-			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Disallowed"], "translate")*)
+			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Always", "Disallowed"], "translate")*)
+			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Always", "Disallowed"], "translate")*)
 
-			oldTChoice := inList(["Optional", "Disallowed"], oldTChoice)
-			oldFChoice := inList(["Optional", "Disallowed"], oldFChoice)
+			oldTChoice := inList(["Optional", "Always", "Disallowed"], oldTChoice)
+			oldFChoice := inList(["Optional", "Always", "Disallowed"], oldFChoice)
 
 			GuiControl Choose, tyreChangeRequirementsDropDown, % oldTChoice ? oldTChoice : 1
 			GuiControl Choose, refuelRequirementsDropDown, % oldFChoice ? oldFChoice : 1
 		}
 		else {
-			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
-			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Disallowed"], "translate")*)
+			GuiControl, , tyreChangeRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Always", "Disallowed"], "translate")*)
+			GuiControl, , refuelRequirementsDropDown, % "|" . values2String("|", map(["Optional", "Required", "Always", "Disallowed"], "translate")*)
 
-			oldTChoice := inList(["Optional", "Required", "Disallowed"], oldTChoice)
-			oldFChoice := inList(["Optional", "Required", "Disallowed"], oldFChoice)
+			oldTChoice := inList(["Optional", "Required", "Always", "Disallowed"], oldTChoice)
+			oldFChoice := inList(["Optional", "Required", "Always", "Disallowed"], oldFChoice)
 
 			GuiControl Choose, tyreChangeRequirementsDropDown, % oldTChoice ? oldTChoice : 1
 			GuiControl Choose, refuelRequirementsDropDown, % oldFChoice ? oldFChoice : 1
@@ -1681,12 +1681,12 @@ class StrategyWorkbench extends ConfigurationItem {
 						choosePitstopRequirements()
 
 						if pitstopRule {
-							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Required", "Disallowed"], strategy.RefuelRule)
-							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Required", "Disallowed"], strategy.TyreChangeRule)
+							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule)
+							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule)
 						}
 						else {
-							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Disallowed"], strategy.RefuelRule)
-							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Disallowed"], strategy.TyreChangeRule)
+							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule)
+							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule)
 						}
 
 						Gui ListView, % this.TyreSetListView
@@ -2548,12 +2548,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		if (pitstopRequirementsDropDown > 1) {
-			refuelRule := ["Optional", "Required", "Disallowed"][refuelRequirementsDropDown]
-			tyreChangeRule := ["Optional", "Required", "Disallowed"][tyreChangeRequirementsDropDown]
+			refuelRule := ["Optional", "Required", "Always", "Disallowed"][refuelRequirementsDropDown]
+			tyreChangeRule := ["Optional", "Required", "Always", "Disallowed"][tyreChangeRequirementsDropDown]
 		}
 		else {
-			refuelRule := ["Optional", "Disallowed"][refuelRequirementsDropDown]
-			tyreChangeRule := ["Optional", "Disallowed"][tyreChangeRequirementsDropDown]
+			refuelRule := ["Optional", "Always", "Disallowed"][refuelRequirementsDropDown]
+			tyreChangeRule := ["Optional", "Always", "Disallowed"][tyreChangeRequirementsDropDown]
 		}
 
 		Gui ListView, % this.TyreSetListView

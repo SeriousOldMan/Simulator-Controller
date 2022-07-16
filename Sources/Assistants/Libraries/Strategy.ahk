@@ -206,6 +206,19 @@ class StrategySimulation {
 			if !valid
 				return false
 		}
+		else if (refuelRule = "Always") {
+			valid := true
+
+			for ignore, pitstop in strategy.Pitstops
+				if (pitstop.RefuelAmount <= 0) {
+					valid := false
+
+					break
+				}
+
+			if !valid
+				return false
+		}
 
 		tyreChangeRule := strategy.TyreChangeRule
 
@@ -220,6 +233,19 @@ class StrategySimulation {
 			for ignore, pitstop in strategy.Pitstops
 				if pitstop.TyreChange {
 					valid := true
+
+					break
+				}
+
+			if !valid
+				return false
+		}
+		else if (tyreChangeRule = "Always") {
+			valid := true
+
+			for ignore, pitstop in strategy.Pitstops
+				if !pitstop.TyreChange {
+					valid := false
 
 					break
 				}
@@ -1130,6 +1156,8 @@ class Strategy extends ConfigurationItem {
 
 				if ((nr == 1) && (refuelRule = "Required") && (refuelAmount <= 0))
 					refuelAmount := 1
+				else if ((refuelRule = "Always") && (refuelAmount <= 0))
+					refuelAmount := 1
 				else if (refuelAmount <= 0)
 					refuelAmount := 0
 
@@ -1144,7 +1172,12 @@ class Strategy extends ConfigurationItem {
 
 				freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
 
-				if (tyreChangeRule = "Disallowed") {
+
+				if (tyreChangeRule = "Always") {
+					this.iTyreChange := true
+					this.iRemainingTyreLaps := freshTyreLaps
+				}
+				else if (tyreChangeRule = "Disallowed") {
 					this.iTyreChange := false
 					this.iRemainingTyreLaps := remainingTyreLaps
 				}

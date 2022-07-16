@@ -290,10 +290,6 @@ class SimulatorPlugin extends ControllerPlugin {
 		Get {
 			return this.iTrackAutomation
 		}
-
-		Set {
-			return (this.iTrackAutomation := value)
-		}
 	}
 
 	SessionState[asText := false] {
@@ -843,10 +839,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		car := this.Car
 		track := this.Track
 
-		trackAutomation := getConfigurationValue(settings, "Automation Settings", simulator . "." . car . "." . track, false)
-
-		if trackAutomation
-			trackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track, trackAutomation)
+		this.iTrackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track)
 
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 

@@ -322,15 +322,17 @@ class SessionDatabase extends ConfigurationItem {
 							, Type: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Type", 0)
 							, Action: getConfigurationValue(trackAutomations, "Actions", id . "." . A_Index . ".Action", 0)})
 
-			result.Push({Name: getConfigurationValue(trackAutomations, "Automations", id . ".Name", ""), Actions: actions})
+			result.Push({Name: getConfigurationValue(trackAutomations, "Automations", id . ".Name", "")
+					   , Active: getConfigurationValue(trackAutomations, "Automations", id . ".Active", "")
+					   , Actions: actions})
 		}
 
 		return result
 	}
 
-	getTrackAutomation(simulator, car, track, name) {
+	getTrackAutomation(simulator, car, track, name := false) {
 		for ignore, trackAutomation in this.getTrackAutomations(simulator, car, track)
-			if (trackAutomation.Name = name)
+			if ((name && (trackAutomation.Name = name)) || trackAutomation.Active)
 				return trackAutomation
 
 		return false
@@ -345,6 +347,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		for id, trackAutomation in trackAutomations {
 			setConfigurationValue(data, "Automations", id . ".Name", trackAutomation.Name)
+			setConfigurationValue(data, "Automations", id . ".Active", trackAutomation.Active)
 			setConfigurationValue(data, "Automations", id . ".Actions", trackAutomation.Actions.Length())
 
 			for ignore, trackAction in trackAutomation.Actions {

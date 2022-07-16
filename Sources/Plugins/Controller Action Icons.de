@@ -467,6 +467,7 @@ Call.Activate=
 Accept.Activate=
 Reject.Activate=
 RaceAssistant.Toggle=
+TrackAutomation.Toggle=
 Time.Activate=
 Position.Activate=
 LapTimes.Activate=

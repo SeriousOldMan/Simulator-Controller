@@ -25,6 +25,7 @@ global kRaceSpotterPlugin = "Race Spotter"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceSpotterPlugin extends RaceAssistantPlugin  {
+	iTrackAutomationEnabled := false
 	iAutomationPID := false
 
 	iMapperPID := false
@@ -36,9 +37,50 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
+	class TrackAutomationToggleAction extends ControllerAction {
+		iPlugin := false
+
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
+
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+
+			base.__New(function, label, icon)
+		}
+
+		fireAction(function, trigger) {
+			local plugin := this.Plugin
+
+			if (plugin.TrackAutomationEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+				plugin.disableTrackAutomation()
+
+				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+
+				function.setLabel(plugin.actionLabel(this), "Black")
+			}
+			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
+				plugin.disableTrackAutomation()
+
+				trayMessage(plugin.actionLabel(this), translate("State: On"))
+
+				function.setLabel(plugin.actionLabel(this), "Green")
+			}
+		}
+	}
+
 	RaceSpotter[] {
 		Get {
 			return this.RaceAssistant
+		}
+	}
+
+	TrackAutomationEnabled[] {
+		Get {
+			return this.iTrackAutomationEnabled
 		}
 	}
 
@@ -47,6 +89,25 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		if (!this.Active && !isDebug())
 			return
+
+		trackAutomation := this.getArgumentValue("trackAutomation", false)
+
+		if trackAutomation {
+			arguments := string2Values(A_Space, trackAutomation)
+
+			if (arguments.Length() == 0)
+				arguments := ["On"]
+
+			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+				arguments.InsertAt(1, "On")
+
+			this.iTrackAutomationEnabled := (arguments[1] = "On")
+
+			if (arguments.Length() > 1)
+				this.createRaceAssistantAction(controller, "TrackAutomation", arguments[2])
+		}
+		else
+			this.iTrackAutomationEnabled := false
 
 		if (this.RaceAssistantName)
 			SetTimer collectRaceSpotterSessionData, 10000
@@ -82,6 +143,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
 
 		return data
+	}
+
+	enableTrackAutomation() {
+		this.iTrackAutomationEnabled := true
+	}
+
+	disableTrackAutomation() {
+		this.iTrackAutomationEnabled := false
 	}
 
 	startupAutomation() {
@@ -211,7 +280,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		else
+		else if !this.iAutomationPID
 			this.startupAutomation()
 	}
 
@@ -253,7 +322,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	positionTrigger(actionNr, positionX, positionY) {
-		if this.Simulator
+		if (this.TrackAutomationEnabled && this.Simulator)
 			this.Simulator.triggerAction(actionNr, positionX, positionY)
 	}
 }

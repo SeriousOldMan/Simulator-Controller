@@ -103,6 +103,7 @@ global importDataButton
 global deleteDataButton
 
 global trackAutomationNameEdit
+global trackAutomationNameHandle
 global trackAutomationInfoEdit
 global addTrackAutomationButton
 global deleteTrackAutomationButton
@@ -595,12 +596,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackDisplay := trackDisplay
 
-		Gui %window%:Add, ListView, x296 y550 w110 h85 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "Actions"], "translate")*)
+		Gui %window%:Add, ListView, x296 y550 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "#"], "translate")*)
 
 		this.iTrackAutomationsListView := trackAutomationsListViewHandle
 
 		Gui %window%:Add, Text, x415 yp w60 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, xp+60 yp w109 vtrackAutomationNameEdit
+		Gui %window%:Add, Edit, xp+60 yp w109 HWNDtrackAutomationNameHandle vtrackAutomationNameEdit
 
 		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackAutomationButtonHandle vaddTrackAutomationButton gaddTrackAutomation
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackAutomationButtonHandle vdeleteTrackAutomationButton gdeleteTrackAutomation
@@ -610,7 +611,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(saveTrackAutomationButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
 		Gui %window%:Add, Text, x415 yp+24 w60 h23 +0x200, % translate("Actions")
-		Gui %window%:Add, Edit, xp+60 yp w181 h61 ReadOnly vtrackAutomationInfoEdit
+		Gui %window%:Add, Edit, xp+60 yp w181 h61 ReadOnly -Wrap vtrackAutomationInfoEdit
 
 		Gui Tab, 5
 
@@ -1333,7 +1334,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Default
 
-		GuiControl, , trackAutomationNameEdit, % "..."
+		GuiControl, , trackAutomationNameEdit, % ""
+
+		ControlFocus, , ahk_id %trackAutomationNameHandle%
 	}
 
 	deleteTrackAutomation() {
@@ -1422,8 +1425,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.iTrackAutomations := trackAutomations
 
-			for ignore, trackAutomation in trackAutomations
-				LV_Add("", trackAutomation.Name, trackAutomation.Actions.Length())
+			for ignore, trackAutomation in trackAutomations {
+				option := (trackAutomation.Active ? "Check" : "")
+
+				LV_Add(option, trackAutomation.Name, trackAutomation.Actions.Length())
+			}
 
 			LV_ModifyCol()
 
@@ -1526,7 +1532,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (index > 1)
 				info .= "`n"
 
-			info .= (index . translate(": ") . values2String(", ", Round(action.X), Round(action.Y)) . translate(" => ") . translate((action.Type = "Hotkey") ? "Hotkey(s)" : "Command"))
+			info .= (index . translate(": ") . values2String(", ", Round(action.X), Round(action.Y)) . translate(" -> ") . translate((action.Type = "Hotkey") ? "H: " : "C: ") . action.Action)
 		}
 
 		GuiControl, , trackAutomationInfoEdit, %info%
@@ -4116,12 +4122,12 @@ selectTrackAction() {
 }
 
 selectTrackAutomation() {
+	editor := SessionDatabaseEditor.Instance
+	window := editor.Window
+
+	Gui %window%:Default
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		editor := SessionDatabaseEditor.Instance
-		window := editor.Window
-
-		Gui %window%:Default
-
 		trackAutomation := editor.TrackAutomations[A_EventInfo].Clone()
 		trackAutomation.Actions := trackAutomation.Actions.Clone()
 		trackAutomation.Origin := editor.TrackAutomations[A_EventInfo]
@@ -4135,6 +4141,56 @@ selectTrackAutomation() {
 		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
 
 		editor.updateState()
+	}
+
+	defaultListView := A_DefaultListView
+
+	try {
+		Gui ListView, % editor.TrackAutomationsListView
+
+		checkedRows := []
+		checked := LV_GetNext(0, "C")
+
+		while checked {
+			checkedRows.Push(checked)
+
+			checked := LV_GetNext(checked, "C")
+		}
+
+		changed := false
+
+		for index, trackAutomation in editor.TrackAutomations
+			if !inList(checkedRows, index)
+				if trackAutomation.Active {
+					trackAutomation.Active := false
+
+					changed := true
+				}
+
+		for index, row in checkedRows
+			if !editor.TrackAutomations[row].Active {
+				editor.TrackAutomations[row].Active := true
+
+				checkedRows.RemoveAt(index)
+
+				changed := true
+
+				break
+			}
+
+		if changed {
+			for ignore, row in checkedRows {
+				editor.TrackAutomations[row].Active := false
+
+				LV_Modify(row, "-Check")
+			}
+
+			editor.writeTrackAutomations(false)
+
+		}
+	}
+	finally {
+		Gui ListView, %defaultListView%
 	}
 }
 

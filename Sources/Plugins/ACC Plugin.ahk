@@ -150,19 +150,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iPitstopMode := this.findMode(kPitstopMode)
 
-		this.iPitstopMode := this.findMode(kPitstopMode)
+			if this.iChatMode
+				this.registerMode(this.iChatMode)
 
-		if this.iChatMode
-			this.registerMode(this.iChatMode)
+			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			this.iUDPConnection := this.getArgumentValue("udpConnection", false)
 
-		this.iUDPConnection := this.getArgumentValue("udpConnection", false)
+			controller.registerPlugin(this)
 
-		controller.registerPlugin(this)
+			return true
+		}
+		else
+			return false
 	}
 
 	loadFromConfiguration(configuration) {

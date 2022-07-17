@@ -44,10 +44,14 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
+			this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
 
-		this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
-		this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
+			return true
+		}
+		else
+			return false
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

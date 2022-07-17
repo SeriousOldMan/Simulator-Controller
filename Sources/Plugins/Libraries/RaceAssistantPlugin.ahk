@@ -425,114 +425,115 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		base.__New(controller, name, configuration, register)
+		if base.__New(controller, name, configuration, register) {
+			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
-		if (!this.Active && !isDebug())
-			return
-
-		teamServer := this.Controller.findPlugin(kTeamServerPlugin)
-
-		if (teamServer && this.Controller.isActive(teamServer))
-			this.iTeamServer := teamServer
-		else
-			teamServer := false
-
-		this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
-		this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
-		this.iRaceAssistantLanguage := this.getArgumentValue("raceAssistantLanguage", false)
-
-		raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
-
-		if raceAssistantToggle {
-			arguments := string2Values(A_Space, raceAssistantToggle)
-
-			if (arguments.Length() == 0)
-				arguments := ["On"]
-
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "On")
-
-			this.iRaceAssistantEnabled := (arguments[1] = "On")
-
-			if (arguments.Length() > 1)
-				this.createRaceAssistantAction(controller, "RaceAssistant", arguments[2])
-		}
-		else
-			this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
-
-		teamServerToggle := this.getArgumentValue("teamServer", false)
-
-		if (teamServerToggle && teamServer && teamServer.Active) {
-			arguments := string2Values(A_Space, teamServerToggle)
-
-			if (arguments.Length() == 0)
-				arguments := ["Off"]
-
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "Off")
-
-			if (arguments[1] = "On")
-				this.enableTeamServer()
+			if (teamServer && this.Controller.isActive(teamServer))
+				this.iTeamServer := teamServer
 			else
-				this.disableTeamServer()
+				teamServer := false
 
-			if (arguments.Length() > 1)
-				this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
+			this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
+			this.iRaceAssistantLanguage := this.getArgumentValue("raceAssistantLanguage", false)
+
+			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
+
+			if raceAssistantToggle {
+				arguments := string2Values(A_Space, raceAssistantToggle)
+
+				if (arguments.Length() == 0)
+					arguments := ["On"]
+
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "On")
+
+				this.iRaceAssistantEnabled := (arguments[1] = "On")
+
+				if (arguments.Length() > 1)
+					this.createRaceAssistantAction(controller, "RaceAssistant", arguments[2])
+			}
+			else
+				this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
+
+			teamServerToggle := this.getArgumentValue("teamServer", false)
+
+			if (teamServerToggle && teamServer && teamServer.Active) {
+				arguments := string2Values(A_Space, teamServerToggle)
+
+				if (arguments.Length() == 0)
+					arguments := ["Off"]
+
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "Off")
+
+				if (arguments[1] = "On")
+					this.enableTeamServer()
+				else
+					this.disableTeamServer()
+
+				if (arguments.Length() > 1)
+					this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+			}
+
+			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
+
+			if openRaceSettings
+				this.createRaceAssistantAction(controller, "RaceSettingsOpen", openRaceSettings)
+
+			importSetup := this.getArgumentValue("importSetup", false)
+
+			if importSetup
+				this.createRaceAssistantAction(controller, "SetupImport", importSetup)
+
+			openSessionDatabase := this.getArgumentValue("openSessionDatabase", false)
+
+			if openSessionDatabase
+				this.createRaceAssistantAction(controller, "SessionDatabaseOpen", openSessionDatabase)
+
+			openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
+
+			if openSetupAdvisor
+				this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
+
+			openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
+
+			if openStrategyWorkbench
+				this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
+
+			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+
+			if openRaceCenter
+				this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
+
+			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
+				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+
+			this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
+
+			assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
+
+			if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
+				this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
+
+				this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+
+				this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
+
+				assistantListener := this.getArgumentValue("raceAssistantListener", false)
+
+				if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
+					this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+			}
+
+			controller.registerPlugin(this)
+
+			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
+
+			return true
 		}
-
-		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
-
-		if openRaceSettings
-			this.createRaceAssistantAction(controller, "RaceSettingsOpen", openRaceSettings)
-
-		importSetup := this.getArgumentValue("importSetup", false)
-
-		if importSetup
-			this.createRaceAssistantAction(controller, "SetupImport", importSetup)
-
-		openSessionDatabase := this.getArgumentValue("openSessionDatabase", false)
-
-		if openSessionDatabase
-			this.createRaceAssistantAction(controller, "SessionDatabaseOpen", openSessionDatabase)
-
-		openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
-
-		if openSetupAdvisor
-			this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
-
-		openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
-
-		if openStrategyWorkbench
-			this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
-
-		openRaceCenter := this.getArgumentValue("openRaceCenter", false)
-
-		if openRaceCenter
-			this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
-
-		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
-
-		this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
-
-		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
-
-		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
-			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
-
-			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
-
-			this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
-
-			assistantListener := this.getArgumentValue("raceAssistantListener", false)
-
-			if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
-				this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
-		}
-
-		controller.registerPlugin(this)
-
-		registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
+		else
+			return false
 	}
 
 	handleRemoteCalls(event, data) {

@@ -95,14 +95,18 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
 
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
+			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "{Up}")
+			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")
+			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "{Left}")
+			this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "{Right}")
 
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "{Up}")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "{Down}")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "{Left}")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "{Right}")
+			return true
+		}
+		else
+			return false
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

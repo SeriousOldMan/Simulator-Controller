@@ -324,25 +324,26 @@ class SimulatorPlugin extends ControllerPlugin {
 	__New(controller, name, simulator, configuration := false, register := true) {
 		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
 
-		base.__New(controller, name, configuration, register)
+		if base.__New(controller, name, configuration, register) {
+			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
-		if (!this.Active && !isDebug())
-			return
+			for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
+				arguments := string2Values(A_Space, theAction)
 
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
+				theAction := arguments[1]
 
-		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
-			arguments := string2Values(A_Space, theAction)
+				if (inList(kAssistantAnswerActions, theAction) || inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
+					this.createRaceAssistantAction(controller, arguments*)
+				else
+					this.createPitstopAction(controller, arguments*)
+			}
 
-			theAction := arguments[1]
+			controller.registerPlugin(this)
 
-			if (inList(kAssistantAnswerActions, theAction) || inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
-				this.createRaceAssistantAction(controller, arguments*)
-			else
-				this.createPitstopAction(controller, arguments*)
+			return true
 		}
-
-		controller.registerPlugin(this)
+		else
+			return false
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
@@ -664,17 +665,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iActionMode := kAssistantMode
 
-		if (!this.Active && !isDebug())
-			return
+			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
+				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 
-		this.iActionMode := kAssistantMode
+			controller.registerPlugin(this)
 
-		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
-
-		controller.registerPlugin(this)
+			return true
+		}
+		else
+			return false
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {

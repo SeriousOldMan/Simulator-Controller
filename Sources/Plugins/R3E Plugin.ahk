@@ -93,16 +93,20 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
+			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
+			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
+			this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
+			this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
 
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
-		this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
+			return true
+		}
+		else
+			return false
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

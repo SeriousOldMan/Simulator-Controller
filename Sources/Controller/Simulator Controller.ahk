@@ -1417,8 +1417,14 @@ class ControllerPlugin extends Plugin {
 
 		base.__New(name, configuration)
 
-		if register
-			controller.registerPlugin(this)
+		if (!this.Active && !isDebug())
+			return false
+		else {
+			if register
+				controller.registerPlugin(this)
+
+			return true
+		}
 	}
 
 	findMode(name) {
@@ -2063,5 +2069,5 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
-setDebug(false)
+
 startupSimulatorController()

@@ -88,15 +88,16 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
+		if base.__New(controller, name, configuration) {
+			if (this.RaceAssistantName)
+				SetTimer collectRaceStrategistSessionData, 10000
+			else
+				SetTimer updateRaceStrategistSessionState, 5000
 
-		if (!this.Active && !isDebug())
-			return
-
-		if (this.RaceAssistantName)
-			SetTimer collectRaceStrategistSessionData, 10000
+			return true
+		}
 		else
-			SetTimer updateRaceStrategistSessionState, 5000
+			return false
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {

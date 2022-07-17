@@ -69,16 +69,18 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		if base.__New(controller, name, simulator, configuration) {
+			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
 
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
+			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
+			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")
+			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "G")
+			this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "J")
 
-		this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "Z")
-		this.iNextOptionHotkey := this.getArgumentValue("nextOption", "H")
-		this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "G")
-		this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "J")
-
-		SetKeyDelay 5, 15
+			return true
+		}
+		else
+			return false
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

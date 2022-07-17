@@ -85,37 +85,35 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
+		if base.__New(controller, name, configuration) {
+			trackAutomation := this.getArgumentValue("trackAutomation", false)
 
-		if (!this.Active && !isDebug())
-			return
+			if trackAutomation {
+				arguments := string2Values(A_Space, trackAutomation)
 
-		trackAutomation := this.getArgumentValue("trackAutomation", false)
+				if (arguments.Length() == 0)
+					arguments := ["On"]
 
-		if trackAutomation {
-			arguments := string2Values(A_Space, trackAutomation)
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "Off")
 
-			if (arguments.Length() == 0)
-				arguments := ["On"]
+				this.iTrackAutomationEnabled := (arguments[1] = "On")
 
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "Off")
+				if (arguments.Length() > 1)
+					this.createRaceAssistantAction(controller, "TrackAutomation", arguments[2])
+			}
+			else
+				this.iTrackAutomationEnabled := false
 
-			this.iTrackAutomationEnabled := (arguments[1] = "On")
+			if (this.RaceAssistantName)
+				SetTimer collectRaceSpotterSessionData, 10000
+			else
+				SetTimer updateRaceSpotterSessionState, 5000
 
-			if (arguments.Length() > 1)
-				this.createRaceAssistantAction(controller, "TrackAutomation", arguments[2])
+			return true
 		}
 		else
-			this.iTrackAutomationEnabled := false
-
-		if (this.RaceAssistantName)
-			SetTimer collectRaceSpotterSessionData, 10000
-		else
-			SetTimer updateRaceSpotterSessionState, 5000
-
-		OnExit(ObjBindMethod(this, "shutdownAutomation", true))
-		OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
+			return false
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -175,15 +173,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	enableTrackAutomation() {
 		this.iTrackAutomationEnabled := true
-
-		if this.SessionActive
-			this.startupAutomation()
 	}
 
 	disableTrackAutomation() {
 		this.iTrackAutomationEnabled := false
-
-		this.shutdownAutomation()
 	}
 
 	startupAutomation() {
@@ -196,7 +189,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				for ignore, action in trackAutomation.Actions
 					positions .= (A_Space . action.X . A_Space . action.Y)
 
-				code := new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true])
+				code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
@@ -235,7 +228,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %automationPID%
 
 			if (force && ErrorLevel) {
-				processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
 				tries := 5
 
@@ -255,9 +248,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	finishSession(arguments*) {
-		this.shutdownAutomation(true)
-
 		base.finishSession(arguments*)
+
+		this.shutdownAutomation(true)
 	}
 
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
@@ -313,7 +306,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		else
+		else if !this.iAutomationPID
 			this.startupAutomation()
 	}
 
@@ -349,38 +342,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-			}
-		}
-	}
-
-	shutdownTrackMapper(force := false) {
-		if this.iMapperPID {
-			mapperPID := this.iMapperPID
-
-			if mapperPID {
-				Process Close, %mapperPID%
-
-				Sleep 500
-
-				Process Exist, %mapperPID%
-
-				if (force && ErrorLevel) {
-					processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
-
-					tries := 5
-
-					while (tries-- > 0) {
-						Process Exist, %processName%
-
-						if ErrorLevel {
-							Process Close, %ErrorLevel%
-
-							Sleep 500
-						}
-						else
-							break
-					}
 				}
 			}
 		}

@@ -259,49 +259,50 @@ class TeamServerPlugin extends ControllerPlugin {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		base.__New(controller, name, configuration, false)
+		if base.__New(controller, name, configuration, false) {
+			teamServerToggle := this.getArgumentValue("teamServer", false)
 
-		if (!this.Active && !isDebug())
-			return
+			if teamServerToggle {
+				arguments := string2Values(A_Space, teamServerToggle)
 
-		teamServerToggle := this.getArgumentValue("teamServer", false)
+				if (arguments.Length() == 0)
+					arguments := ["On"]
 
-		if teamServerToggle {
-			arguments := string2Values(A_Space, teamServerToggle)
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "Off")
 
-			if (arguments.Length() == 0)
-				arguments := ["On"]
+				this.iTeamServerEnabled := (arguments[1] = "On")
 
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "Off")
+				if (arguments.Length() > 1)
+					this.createTeamServerAction(controller, "TeamServer", arguments[2])
+			}
+			else
+				this.iTeamServerEnabled := false
 
-			this.iTeamServerEnabled := (arguments[1] = "On")
+			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
 
-			if (arguments.Length() > 1)
-				this.createTeamServerAction(controller, "TeamServer", arguments[2])
+			if openRaceSettings
+				this.createTeamServerAction(controller, "RaceSettingsOpen", openRaceSettings)
+
+			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+
+			if openRaceCenter
+				this.createTeamServerAction(controller, "RaceCenterOpen", openRaceCenter)
+
+			if register
+				controller.registerPlugin(this)
+
+			if this.TeamServerEnabled
+				this.enableTeamServer()
+			else
+				this.disableTeamServer()
+
+			this.keepAlive()
+
+			return true
 		}
 		else
-			this.iTeamServerEnabled := false
-
-		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
-
-		if openRaceSettings
-			this.createTeamServerAction(controller, "RaceSettingsOpen", openRaceSettings)
-
-		openRaceCenter := this.getArgumentValue("openRaceCenter", false)
-
-		if openRaceCenter
-			this.createTeamServerAction(controller, "RaceCenterOpen", openRaceCenter)
-
-		if register
-			controller.registerPlugin(this)
-
-		if this.TeamServerEnabled
-			this.enableTeamServer()
-		else
-			this.disableTeamServer()
-
-		this.keepAlive()
+			return false
 	}
 
 	createTeamServerAction(controller, action, actionFunction, arguments*) {

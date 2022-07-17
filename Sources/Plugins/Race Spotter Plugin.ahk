@@ -113,6 +113,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			SetTimer collectRaceSpotterSessionData, 10000
 		else
 			SetTimer updateRaceSpotterSessionState, 5000
+
+		OnExit(ObjBindMethod(this, "shutdownAutomation", true))
+		OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -172,10 +175,15 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	enableTrackAutomation() {
 		this.iTrackAutomationEnabled := true
+
+		if this.SessionActive
+			this.startupAutomation()
 	}
 
 	disableTrackAutomation() {
 		this.iTrackAutomationEnabled := false
+
+		this.shutdownAutomation()
 	}
 
 	startupAutomation() {
@@ -188,7 +196,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				for ignore, action in trackAutomation.Actions
 					positions .= (A_Space . action.X . A_Space . action.Y)
 
-				code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
+				code := new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true])
 
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
@@ -227,7 +235,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %automationPID%
 
 			if (force && ErrorLevel) {
-				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+				processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
 				tries := 5
 
@@ -247,9 +255,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	finishSession(arguments*) {
-		base.finishSession(arguments*)
-
 		this.shutdownAutomation(true)
+
+		base.finishSession(arguments*)
 	}
 
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
@@ -305,7 +313,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		else if !this.iAutomationPID
+		else
 			this.startupAutomation()
 	}
 
@@ -341,6 +349,38 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+		}
+	}
+
+	shutdownTrackMapper(force := false) {
+		if this.iMapperPID {
+			mapperPID := this.iMapperPID
+
+			if mapperPID {
+				Process Close, %mapperPID%
+
+				Sleep 500
+
+				Process Exist, %mapperPID%
+
+				if (force && ErrorLevel) {
+					processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+
+					tries := 5
+
+					while (tries-- > 0) {
+						Process Exist, %processName%
+
+						if ErrorLevel {
+							Process Close, %ErrorLevel%
+
+							Sleep 500
+						}
+						else
+							break
+					}
 				}
 			}
 		}

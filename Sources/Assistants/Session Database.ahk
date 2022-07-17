@@ -1376,6 +1376,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			origin.Name := trackAutomationNameEdit
 			origin.Actions := trackAutomation.Actions.Clone()
+
+			defaultListView := A_DefaultListView
+
+			try {
+				Gui ListView, % this.TrackAutomationsListView
+
+				LV_Modify(LV_GetNext(0), "", trackAutomationNameEdit, trackAutomation.Actions.Length())
+
+				Loop 2
+					LV_ModifyCol(A_Index, "AutoHdr")
+			}
+			finally {
+				Gui ListView, %defaultListView%
+			}
 		}
 		else {
 			newTrackAutomation := trackAutomation.Clone()

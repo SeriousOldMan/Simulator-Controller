@@ -909,23 +909,23 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return false
 	}
 
-	positionTrigger(actionNr, positionX, positionY) {
-		if this.TrackAutomation {
-			action := this.TrackAutomation.Actions[actionNr]
+	triggerAction(actionNr, positionX, positionY) {
+		lastTrigger := false
 
-			try {
+		if (A_TickCount > (lastTrigger + 5000)) {
+			lastTrigger := A_TickCount
+
+			if this.TrackAutomation {
+				action := this.TrackAutomation.Actions[actionNr]
+
 				if (action.Type = "Hotkey") {
 					this.activateWindow()
 
 					for ignore, theHotkey in string2Values("|", action.Action)
-						showMessage("Hotkey: " . action.Action)
-						; this.sendCommand(theHotKey)
+						this.sendCommand(theHotKey)
 				}
 				else if (action.Type = "Command")
-					showMessage("Execute: " . action.Action)
-					; execute(action.Action)
-			}
-			catch exception {
+					execute(action.Action)
 			}
 		}
 	}

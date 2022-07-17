@@ -1298,7 +1298,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.SelectedTrackAutomation.Actions.Push(action)
 
 		this.updateTrackMap()
-		this.updateTrackAutomation()
+		this.updateTrackAutomationInfo()
 	}
 
 	updateTrackAction(action) {
@@ -1307,7 +1307,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.SelectedTrackAutomation.Actions[index] := action
 
 				this.updateTrackMap()
-				this.updateTrackAutomation()
+				this.updateTrackAutomationInfo()
 
 				break
 			}
@@ -1319,7 +1319,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				this.SelectedTrackAutomation.Actions.RemoveAt(index)
 
 				this.updateTrackMap()
-				this.updateTrackAutomation()
+				this.updateTrackAutomationInfo()
 
 				break
 			}
@@ -1540,7 +1540,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.createTrackMap(this.SelectedTrackAutomation.Actions)
 	}
 
-	updateTrackAutomation() {
+	updateTrackAutomationInfo() {
 		window := this.Window
 
 		Gui %window%:Default
@@ -1551,7 +1551,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (index > 1)
 				info .= "`n"
 
-			info .= (index . translate(": ") . values2String(", ", Round(action.X), Round(action.Y)) . translate(" -> ") . translate((action.Type = "Hotkey") ? "H: " : "C: ") . action.Action)
+			info .= (index . translate(" -> ")
+				   . translate((action.Type = "Hotkey") ? (InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ") : "Command: ")
+				   . action.Action)
 		}
 
 		GuiControl, , trackAutomationInfoEdit, %info%
@@ -4157,7 +4159,7 @@ selectTrackAutomation() {
 
 		GuiControl, , trackAutomationNameEdit, % trackAutomation.Name
 
-		editor.updateTrackAutomation()
+		editor.updateTrackAutomationInfo()
 
 		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
 

@@ -102,6 +102,8 @@ global exportDataButton
 global importDataButton
 global deleteDataButton
 
+global trackDisplay
+
 global trackAutomationNameEdit
 global trackAutomationNameHandle
 global trackAutomationInfoEdit
@@ -589,10 +591,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 4
 
-		this.iTrackDisplayArea:= [297, 239, 358, 303]
+		this.iTrackDisplayArea := [297, 239, 358, 303, 0, 0]
 
 		Gui %window%:Add, Picture, x296 y238 w360 h305 Border
-		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay gselectTrackAction
+		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay vtrackDisplay gselectTrackAction
 
 		this.iTrackDisplay := trackDisplay
 
@@ -1457,6 +1459,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		trackMap := this.TrackMap
 		trackImage := this.TrackImage
 
+		width := this.iTrackDisplayArea[3]
+		height := this.iTrackDisplayArea[4]
+
+		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+		imgScale := Min(width / imgWidth, height / imgHeight)
+
 		if actions {
 			scale := getConfigurationValue(trackMap, "Map", "Scale")
 
@@ -1474,11 +1484,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			brushHotkey := Gdip_BrushCreateSolid(0xff00ff00)
 			brushCommand := Gdip_BrushCreateSolid(0xffff0000)
 
+			r := Round(15 / (imgScale * 3))
+
 			for ignore, action in actions {
 				x := Round((offsetX + action.X) * scale)
 				y := Round((offsetY + action.Y) * scale)
 
-				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, x - 15, y - 15, 30, 30)
+				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, x - r, y - r, r * 2, r * 2)
 			}
 
 			Gdip_DeleteBrush(brushHotkey)
@@ -1497,16 +1509,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gdip_Shutdown(token)
 		}
 
-		width := this.iTrackDisplayArea[3]
-		height := this.iTrackDisplayArea[4]
-
-		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-		scale := Min(width / imgWidth, height / imgHeight)
-
-		imgWidth *= scale
-		imgHeight *= scale
+		imgWidth *= imgScale
+		imgHeight *= imgScale
 
 		trackDisplay := this.iTrackDisplay
 
@@ -1514,6 +1518,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Default
 
+		pictureX := this.iTrackDisplayArea[1]
+		pictureY := this.iTrackDisplayArea[2]
+		pictureW := this.iTrackDisplayArea[3]
+		pictureH := this.iTrackDisplayArea[4]
+
+		deltaX := ((this.iTrackDisplayArea[3] - imgWidth) / 2)
+		deltaY := ((this.iTrackDisplayArea[4] - imgHeight) / 2)
+
+		pictureX := Round(pictureX + deltaX)
+		pictureY := Round(pictureY + deltaY)
+
+		this.iTrackDisplayArea[5] := deltaX
+		this.iTrackDisplayArea[6] := deltaY
+
+		GuiControl Move, trackDisplay, x%pictureX%, y%pictureY%
 		GuiControl, , %trackDisplay%, *w%imgWidth% *h%imgHeight% %trackImage%
 	}
 
@@ -4100,7 +4119,9 @@ selectTrackAction() {
 	coordinateY := false
 	action := false
 
-	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], coordinateX, coordinateY) {
+	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
+								, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
+								, coordinateX, coordinateY) {
 		action := editor.findTrackAction(coordinateX, coordinateY)
 
 		if action {

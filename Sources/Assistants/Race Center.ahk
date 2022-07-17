@@ -6838,6 +6838,14 @@ class RaceCenter extends ConfigurationItem {
 			fileName := sessionDB.getTrackImage(this.Simulator, this.Track)
 
 			if (trackMap && fileName) {
+				width := chartViewer.Width
+				height := chartViewer.Height
+
+				imgWidth := getConfigurationValue(trackMap, "Map", "Width")
+				imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+
+				imgScale := Min(width / imgWidth, height / imgHeight)
+
 				if (this.SessionActive && lastLap) {
 					telemetry := (lastLap.Track ? lastLap.Track : lastLap.Telemetry)
 					positions := lastLap.Positions
@@ -6876,6 +6884,8 @@ class RaceCenter extends ConfigurationItem {
 							driver := false
 							driverPosition := false
 						}
+
+						r := Round(15 / (imgScale * 3))
 
 						Loop {
 							coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
@@ -6922,7 +6932,7 @@ class RaceCenter extends ConfigurationItem {
 									}
 								}
 
-								Gdip_FillEllipse(graphics, brush, x - 15, y - 15, 30, 30)
+								Gdip_FillEllipse(graphics, brush, x - r, y - r, r * 2, r * 2)
 							}
 							else
 								break
@@ -6949,16 +6959,8 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 
-				width := chartViewer.Width
-				height := chartViewer.Height
-
-				imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-				imgHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-				scale := Min(width / imgWidth, height / imgHeight)
-
-				imgWidth *= scale
-				imgHeight *= scale
+				imgWidth *= imgScale
+				imgHeight *= imgScale
 
 				scale := 0.99
 

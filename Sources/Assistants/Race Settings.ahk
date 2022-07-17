@@ -876,7 +876,7 @@ restart:
 			Gui RES:Add, Button, x316 y450 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
-			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelSettings, % translate("Close")
+			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelRaceSettings, % translate("Close")
 
 		Gui RES:Add, Button, x8 y450 w77 h23 gloadRaceSettings, % translate("&Load...")
 		Gui RES:Add, Button, x90 y450 w77 h23 gsaveRaceSettings, % translate("&Save...")

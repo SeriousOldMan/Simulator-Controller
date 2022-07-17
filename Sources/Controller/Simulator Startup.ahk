@@ -609,7 +609,6 @@ WM_MOUSEMOVE() {
 		return
 }
 
-
 watchStartupSemaphore() {
 	if (!vStartupStayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
 		exitStartup()

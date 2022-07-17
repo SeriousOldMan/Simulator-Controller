@@ -361,6 +361,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		base.__New(kSimulatorConfiguration)
 
 		SessionDatabaseEditor.Instance := this
+
+		OnMessage(0x0200, "WM_MOUSEMOVE")
 	}
 
 	createGui(configuration) {
@@ -2902,6 +2904,78 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+WM_MOUSEMOVE() {
+	static currentAction := false
+	static previousAction := false
+	static actionInfo := ""
+
+	editor := SessionDatabaseEditor.Instance
+
+	if (editor.SelectedModule = "Automation") {
+		window := editor.Window
+
+		Gui %window%:Default
+
+		MouseGetPos x, y
+
+		coordinateX := false
+		coordinateY := false
+
+		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
+									, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
+									, coordinateX, coordinateY) {
+			currentAction := editor.findTrackAction(coordinateX, coordinateY)
+
+			if (currentAction && (currentAction != previousAction)) {
+				ToolTip
+
+				actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
+																											: "Hotkey: ")
+																		: "Command: ")
+				actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(" -> ")
+							 . actionInfo . currentAction.Action)
+
+				SetTimer RemoveToolTip, Off
+				SetTimer DisplayToolTip, 1000
+
+				previousAction := currentAction
+			}
+			else if !currentAction {
+				ToolTip
+
+				SetTimer RemoveToolTip, Off
+
+				previousAction := false
+			}
+		}
+		else {
+			ToolTip
+
+			SetTimer RemoveToolTip, Off
+
+			previousAction := false
+		}
+	}
+
+	return
+
+    DisplayToolTip:
+		SetTimer DisplayToolTip, Off
+
+		ToolTip %actionInfo%
+
+		SetTimer RemoveToolTip, 10000
+
+		return
+
+    RemoveToolTip:
+		SetTimer RemoveToolTip, Off
+
+		ToolTip
+
+		return
+}
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;   Parameters:

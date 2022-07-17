@@ -210,7 +210,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	iCar := false
 	iTrack := false
 
-	iTrackAutomation := false
+	iTrackAutomation := kUndefined
 
 	Code[] {
 		Get {
@@ -263,7 +263,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iCar)
-				this.iTrackAutomation := false
+				this.iTrackAutomation := kUndefined
 
 			this.iCommandDelay := kUndefined
 
@@ -278,7 +278,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iTrack)
-				this.iTrackAutomation := false
+				this.iTrackAutomation := kUndefined
 
 			this.iCommandDelay := kUndefined
 
@@ -288,6 +288,14 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	TrackAutomation[] {
 		Get {
+			if (this.iTrackAutomation == kUndefined) {
+				simulator := this.Simulator[true]
+				car := this.Car
+				track := this.Track
+
+				this.iTrackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track)
+			}
+
 			return this.iTrackAutomation
 		}
 	}
@@ -835,12 +843,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-		simulator := this.Simulator[true]
-		car := this.Car
-		track := this.Track
-
-		this.iTrackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track)
-
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
 		this.updateTyreCompound(data)
@@ -913,11 +915,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			try {
 				if (action.Type = "Hotkey") {
+					this.activateWindow()
+
 					for ignore, theHotkey in string2Values("|", action.Action)
-						this.sendCommand(theHotKey)
+						showMessage("Hotkey: " . action.Action)
+						; this.sendCommand(theHotKey)
 				}
 				else if (action.Type = "Command")
-					execute(action.Action)
+					showMessage("Execute: " . action.Action)
+					; execute(action.Action)
 			}
 			catch exception {
 			}

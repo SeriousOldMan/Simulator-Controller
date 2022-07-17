@@ -1,9 +1,9 @@
 [Development]
 Version=4.2.5.0-dev
 Target=4.2.5.0-release
-Date=07/15/2022
+Date=07/17/2022
 Download=
-Changes=Editor for track automation in "Session Database", New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench"
+Changes=Editor for track automation in "Session Database", New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench", Automation of position specific events for all simulators which support track maps, New "TrackAutomation" action for Race Spotter to enable of disable track events, New icon in Stream Deck icon set for "TrackAutomation"
 [Release]
 Version=4.2.4.0-release
 Date=07/15/2022

@@ -1637,6 +1637,33 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV425() {
+	Loop Files, %kDatabaseDirectory%User\*.*, D
+		if FileExist(A_LoopFilePath . "\Settings.CSV") {
+			FileRead text, %A_LoopFilePath%\Settings.CSV
+
+			changed := false
+
+			if InStr(text, "Pitstop.KeyDelay") {
+				text := StrReplace(text, "Pitstop.KeyDelay", "Command.KeyDelay")
+
+				changed := true
+			}
+
+			if changed {
+				try {
+					FileDelete %A_LoopFilePath%\Settings.CSV
+				}
+				catch exception {
+					; ignore
+				}
+
+				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
+			}
+		}
+
+}
+
 updateConfigurationForV424() {
 	tyresDB := new TyresDatabase()
 

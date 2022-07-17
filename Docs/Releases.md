@@ -1,3 +1,13 @@
+## 4.2.5.0-release 07/22/22
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
+  4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track position.
+     - A new page has been added to "Session Database", which allows you to specify [position dependent actions](*) for a specific simulator / car / track combination.
+     - Added the ["TrackAutomation" action](*) to the "Race Spotter" plugin which let's you enable or disable position dependend actions when you are out on the track.
+     - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.
+	 
 ## 4.2.4.0-release 07/15/22
 
 **Important**: Once again we have a major reorganisation of the telemetry database, this time for all the data of *rFactor 2*. Please do not interrupt the reorganisation. It will take some time.

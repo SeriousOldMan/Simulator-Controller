@@ -52,7 +52,7 @@ createTrackImage(trackMap) {
 
 	token := Gdip_Startup()
 
-	bitmap := Gdip_CreateBitmap(mapWidth * scale, mapHeight * scale)
+	bitmap := Gdip_CreateBitmap(mapWidth, mapHeight)
 
 	graphics := Gdip_GraphicsFromImage(bitmap)
 
@@ -107,138 +107,156 @@ createTrackImage(trackMap) {
 }
 
 createTrackMap(simulator, track, fileName) {
-	xMin := kUndefined
-	xMax := kUndefined
-	yMin := kUndefined
-	yMax := kUndefined
-
 	trackMap := newConfiguration()
-	points := 0
-
-	running := false
+	coordinates := []
 
 	Loop Read, %fileName%
 	{
-		coordinates := string2Values(",", A_LoopReadLine)
+		coordinates.Push(string2Values(",", A_LoopReadLine))
 
-		if (coordinates.Length() = 2) {
-			if (xMin == kUndefined) {
-				xMin := coordinates[1]
-				xMax := coordinates[1]
-				yMin := coordinates[2]
-				yMax := coordinates[2]
-			}
-			else {
-				xMin := Min(xMin, coordinates[1])
-				xMax := Max(xMax, coordinates[1])
-				yMin := Min(yMin, coordinates[2])
-				yMax := Max(yMax, coordinates[2])
-			}
+		Sleep 1
+	}
+
+	if (coordinates.Length() > 0) {
+		if (coordinates[1].Length() = 2) {
+			exact := true
+
+			xIndex := 1
+			yIndex := 2
+		}
+		else {
+			exact := false
+
+			xIndex := 2
+			yIndex := 3
+		}
+
+		xMin := coordinates[1][xIndex]
+		xMax := coordinates[1][xIndex]
+		yMin := coordinates[1][yIndex]
+		yMax := coordinates[1][yIndex]
+
+		points := 0
+
+		for ignore, coordinate in coordinates {
+			xMin := Min(xMin, coordinate[xIndex])
+			xMax := Max(xMax, coordinate[xIndex])
+			yMin := Min(yMin, coordinate[yIndex])
+			yMax := Max(yMax, coordinate[yIndex])
 
 			points += 1
 
-			setConfigurationValue(trackMap, "Points", A_Index . ".X", Round(coordinates[1], 3))
-			setConfigurationValue(trackMap, "Points", A_Index . ".Y", Round(coordinates[2], 3))
+			Sleep 1
 		}
+
+		width := (Ceil(xMax) - Floor(xMin))
+		height := (Ceil(yMax) - Floor(yMin))
+
+		scale := Min(1000 / width, 1000 / height)
+
+		width := (width * scale)
+		height := (height * scale)
+		xMin := (xMin * scale)
+		xMax := (xMax * scale)
+		yMin := (yMin * scale)
+		yMax := (yMax * scale)
+
+		for ignore, coordinate in coordinates {
+			coordinate[xIndex] := (coordinate[xIndex] * scale)
+			coordinate[yIndex] := (coordinate[yIndex] * scale)
+
+			Sleep 1
+		}
+
+		if exact
+			trackData := false
 		else {
-			if (A_Index == 1) {
-				running := []
+			normalized := []
 
-				Loop 1000
-					running.Push(false)
+			Loop 1000
+				normalized.Push(false)
 
-				running[1] := [0.0, 0.0]
+			normalized[1] := [0.0, 0.0]
+
+			for ignore, coordinate in coordinates {
+				normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
+
+				Sleep 1
 			}
 
-			if (xMin == kUndefined) {
-				xMin := coordinates[2]
-				xMax := coordinates[2]
-				yMin := coordinates[3]
-				yMax := coordinates[3]
-			}
-			else {
-				xMin := Min(xMin, coordinates[2])
-				xMax := Max(xMax, coordinates[2])
-				yMin := Min(yMin, coordinates[3])
-				yMax := Max(yMax, coordinates[3])
+			trackData := ""
+
+			Loop 1000 {
+				coordinate := normalized[A_Index]
+
+				if !coordinate {
+					coordinate := normalized[A_Index - 1]
+
+					normalized[A_Index] := coordinate
+				}
+
+				if (A_Index > 1)
+					trackData .= "`n"
+
+				trackData .= (coordinate[1] . A_Space . coordinate[2])
+
+				Sleep 1
 			}
 
-			running[Round(coordinates[1] * 1000)] := [coordinates[2], coordinates[3]]
+			coordinates := normalized
+			points := 1000
 		}
 
-		; Sleep 50
-	}
+		sessionDB := new SessionDatabase()
 
-	sessionDB := new SessionDatabase()
+		simulator := sessionDB.getSimulatorName(simulator)
 
-	simulator := sessionDB.getSimulatorName(simulator)
+		setConfigurationValue(trackMap, "General", "Simulator", simulator)
+		setConfigurationValue(trackMap, "General", "Track", track)
 
-	setConfigurationValue(trackMap, "General", "Simulator", simulator)
-	setConfigurationValue(trackMap, "General", "Track", track)
+		setConfigurationValue(trackMap, "Map", "Width", Round(width))
+		setConfigurationValue(trackMap, "Map", "Height", Round(height))
+		setConfigurationValue(trackMap, "Map", "X.Min", Round(xMin, 3))
+		setConfigurationValue(trackMap, "Map", "X.Max", Round(xMax, 3))
+		setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
+		setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
 
-	setConfigurationValue(trackMap, "Map", "Width", Ceil(xMax) - Floor(xMin))
-	setConfigurationValue(trackMap, "Map", "Height", Ceil(yMax) - Floor(yMin))
-	setConfigurationValue(trackMap, "Map", "X.Min", Round(xMin, 3))
-	setConfigurationValue(trackMap, "Map", "X.Max", Round(xMax, 3))
-	setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
-	setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
+		setConfigurationValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
+		setConfigurationValue(trackMap, "Map", "Points", points)
 
-	trackData := false
+		Loop %points% {
+			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
+			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
-	if running {
-		setConfigurationValue(trackMap, "Map", "Type", "Estimated")
-		setConfigurationValue(trackMap, "Map", "Points", 1000)
+			Sleep 1
+		}
 
-		trackData := ""
-
-		Loop 1000 {
-			coordinates := running[A_Index]
-
-			if !coordinates {
-				coordinates := running[A_Index - 1]
-
-				running[A_Index] := coordinates
+		if trackData {
+			try {
+				FileDelete %kTempDirectory%%track%.data
+			}
+			catch exception {
+				; ignore
 			}
 
-			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[1])
-			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[2])
+			FileAppend %trackData%, %kTempDirectory%%track%.data
 
-			if (A_Index > 1)
-				trackData .= "`n"
-
-			trackData .= (coordinates[1] . A_Space . coordinates[2])
-
-			; Sleep 10
+			trackData := (kTempDirectory . track . ".data")
 		}
+
+		fileName := createTrackImage(trackMap)
+
+		sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
 
 		try {
-			FileDelete %kTempDirectory%%track%.data
+			FileDelete %fileName%
+
+			if trackData
+				FileDelete %trackData%
 		}
 		catch exception {
 			; ignore
 		}
-
-		FileAppend %trackData%, %kTempDirectory%%track%.data
-
-		trackData := (kTempDirectory . track . ".data")
-	}
-	else {
-		setConfigurationValue(trackMap, "Map", "Type", "Exact")
-		setConfigurationValue(trackMap, "Map", "Points", points)
-	}
-
-	fileName := createTrackImage(trackMap)
-
-	sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
-
-	try {
-		FileDelete %fileName%
-
-		if trackData
-			FileDelete %trackData%
-	}
-	catch exception {
-		; ignore
 	}
 }
 
@@ -278,9 +296,9 @@ startTrackMapper() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
-	simulator := "iRacing"
-	track := "oulton international"
-	data := "D:\Dateien\Dokumente\Simulator Controller\Temp\IRC Data\oulton international.data"
+	simulator := false
+	track := false
+	data := false
 	recreate := false
 
 	index := 1

@@ -240,7 +240,7 @@ namespace ACSHMSpotter {
 			int winHandle = FindWindowEx(0, 0, null, "Race Spotter.exe");
 
 			if (winHandle == 0)
-				FindWindowEx(0, 0, null, "Race Spotter.ahk");
+				windHandle = FindWindowEx(0, 0, null, "Race Spotter.ahk");
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
@@ -656,7 +656,7 @@ namespace ACSHMSpotter {
 					initialX = coordinateX;
 					initialY = coordinateY;
 				}
-				else if (coordCount++ > 1000 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+				else if (coordCount++ > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 					return false;
 			}
 

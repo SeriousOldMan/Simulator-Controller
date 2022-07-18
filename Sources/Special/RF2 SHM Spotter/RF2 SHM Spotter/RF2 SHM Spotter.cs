@@ -666,7 +666,7 @@ namespace RF2SHMSpotter {
 					initialX = coordinateX;
 					initialY = coordinateY;
 				}
-				else if (coordCount++ > 1000 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+				else if (coordCount++ > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 					return false;
 			}
 

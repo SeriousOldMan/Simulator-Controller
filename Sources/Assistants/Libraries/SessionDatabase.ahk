@@ -258,14 +258,17 @@ class SessionDatabase extends ConfigurationItem {
 		return tracks
 	}
 
-	updateTrackMap(simulator, track, data, imageFileName) {
+	updateTrackMap(simulator, track, map, imageFileName, dataFileName := false) {
 		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
-		writeConfiguration(prefix . ".map", data)
+		writeConfiguration(prefix . ".map", map)
 
 		SplitPath imageFileName, , , extension
 
 		FileCopy %imageFileName%, %prefix%.%extension%, 1
+
+		if dataFileName
+			FileCopy %dataFileName%, %prefix%.data, 1
 	}
 
 	getTrackMap(simulator, track) {
@@ -290,6 +293,15 @@ class SessionDatabase extends ConfigurationItem {
 			else
 				return false
 		}
+		else
+			return false
+	}
+
+	getTrackData(simulator, track) {
+		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+
+		if FileExist(prefix . ".data")
+			return (prefix . ".data")
 		else
 			return false
 	}

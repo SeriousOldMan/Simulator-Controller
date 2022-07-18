@@ -592,7 +592,7 @@ BOOL writeCoordinates(int playerID) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount++ > 1000 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (coordCount++ > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return FALSE;
 	}
 

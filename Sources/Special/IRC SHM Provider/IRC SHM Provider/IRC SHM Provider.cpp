@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "irsdk_defines.h"
 #include "yaml_parser.h"
+#include <fstream>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -714,7 +715,6 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				paused = "true";
 
-
 			printf("Active=true\n");
 			printf("Paused=%s\n", paused);
 
@@ -932,8 +932,35 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 	}
 }
 
+float rXCoordinates[1000];
+float rYCoordinates[1000];
+bool hasTrackCoordinates = false;
+
+void loadTrackCoordinates(char* fileName) {
+	std::ifstream infile(fileName);
+	int index = 0;
+
+	float x, y;
+
+	while (infile >> x >> y) {
+		rXCoordinates[index] = x;
+		rYCoordinates[index] = y;
+
+		if (++index > 999)
+			break;
+	}
+}
+
 int main(int argc, char* argv[])
 {
+	if (argc > 1) {
+		if (strcmp(argv[1], "-Map") == 0) {
+			loadTrackCoordinates(argv[2]);
+
+			hasTrackCoordinates = true;
+		}
+	}
+
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 

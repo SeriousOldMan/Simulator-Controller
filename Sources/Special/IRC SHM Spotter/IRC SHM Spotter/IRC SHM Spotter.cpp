@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "irsdk_defines.h"
 #include "yaml_parser.h"
+#include <cmath>
+#include <fstream>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -211,11 +213,27 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 	return result;
 }
 
-void sendMessage(char* message) {
+void sendSpotterMessage(char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, "Race Spotter.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, "Race Spotter.ahk");
+		winHandle = FindWindowEx(0, 0, 0, "Race Spotter.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Race Spotter:");
+		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
+void sendAutomationMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, "Simulator Controller.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, "Simulator Controller.ahk");
 
 	if (winHandle != 0) {
 		char buffer[128];
@@ -352,7 +370,7 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 		offset = strlen("proximityAlert:");
 		strcpy_s(buffer2 + offset, 128 - offset, alert);
 
-		sendMessage(buffer2);
+		sendSpotterMessage(buffer2);
 
 		return true;
 	}
@@ -387,7 +405,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 			yellowCount = 0;
 
 			if ((waitYellowFlagState & YELLOW) != 0) {
-				sendMessage("yellowFlag:Ahead");
+				sendSpotterMessage("yellowFlag:Ahead");
 
 				waitYellowFlagState &= ~YELLOW;
 
@@ -400,7 +418,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 	if (laps > 0 && (flags & irsdk_blue) != 0) {
 		if ((lastFlagState & BLUE) == 0) {
-			sendMessage("blueFlag");
+			sendSpotterMessage("blueFlag");
 
 			lastFlagState |= BLUE;
 
@@ -421,7 +439,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 	if ((flags & irsdk_yellow) != 0 || (flags & irsdk_yellowWaving) != 0) {
 		if ((lastFlagState & YELLOW) == 0) {
 			/*
-			sendMessage("yellowFlag:Ahead");
+			sendSpotterMessage("yellowFlag:Ahead");
 
 			lastFlagState |= YELLOW;
 
@@ -435,7 +453,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 	}
 	else if ((lastFlagState & YELLOW) != 0) {
 		if (waitYellowFlagState != lastFlagState)
-			sendMessage("yellowFlag:Clear");
+			sendSpotterMessage("yellowFlag:Clear");
 
 		lastFlagState &= ~YELLOW;
 		waitYellowFlagState &= ~YELLOW;
@@ -451,6 +469,155 @@ void checkPitWindow(const irsdk_header* header, const char* data) {
 	// No support in iRacing
 }
 
+float initialX = 0.0;
+float initialY = 0.0;
+float lastX = 0.0;
+float lastY = 0.0;
+int coordCount = 0;
+int lastLap = 0;
+bool recording = false;
+
+bool writeCoordinates(const irsdk_header* header, const char* data) {
+	char buffer[60];
+
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char playerCarIdx[10] = "";
+	char sessionID[10] = "";
+
+	getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	int laps = 0;
+
+	if (getYamlValue(buffer, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+		laps = atoi(buffer);
+
+	if (lastLap == 0)
+		lastLap = laps;
+	else if (!recording) {
+		if (laps != lastLap) {
+			printf("0.0;0.0;0.0\n");
+
+			recording = true;
+		}
+	}
+	else {
+		int carIdx = atoi(playerCarIdx);
+
+		char* trackPositions;
+		float running = 0.0;
+
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+			running = ((float*)trackPositions)[carIdx];
+
+		getDataValue(buffer, header, data, "Yaw");
+
+		float yaw = atof(buffer);
+
+		getDataValue(buffer, header, data, "VelocityX");
+
+		float velocityX = atof(buffer) * 3.6;
+
+		float dx = velocityX * sin(yaw);
+		float dy = velocityX * cos(yaw);
+
+		lastX += dx;
+		lastY += dy;
+
+		printf("%f;%f;%f\n", running, lastX, lastY);
+
+		if (coordCount++ > 100 && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+			return false;
+	}
+
+	return true;
+}
+
+float rXCoordinates[1000];
+float rYCoordinates[1000];
+
+float xCoordinates[60];
+float yCoordinates[60];
+int numCoordinates = 0;
+time_t lastUpdate = 0;
+
+void loadTrackCoordinates(char* fileName) {
+	std::ifstream infile(fileName);
+	int index = 0;
+
+	float x, y;
+
+	while (infile >> x >> y) {
+		rXCoordinates[index] = x;
+		rYCoordinates[index] = y;
+
+		if (++index > 999)
+			break;
+	}
+}
+
+void checkCoordinates(const irsdk_header* header, const char* data) {
+	if (time(NULL) > (lastUpdate + 2)) {
+		char buffer[60];
+
+		const char* sessionInfo = irsdk_getSessionInfoStr();
+		char playerCarIdx[10] = "";
+		char sessionID[10] = "";
+
+		getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+		itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+		int carIdx = atoi(playerCarIdx);
+
+		char* trackPositions;
+		float running = 0.0;
+
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+			running = ((float*)trackPositions)[carIdx];
+
+		getDataValue(buffer, header, data, "Yaw");
+
+		float yaw = atof(buffer);
+
+		getDataValue(buffer, header, data, "VelocityX");
+
+		float velocityX = atof(buffer) * 3.6;
+
+		float dx = velocityX * sin(yaw);
+		float dy = velocityX * cos(yaw);
+
+		if ((dx > 0) || (dy > 0)) {
+			running = max(floor(running * 1000), 999);
+
+			float coordinateX = rXCoordinates[(int)running];
+			float coordinateY = rYCoordinates[(int)running];
+
+			for (int i = 0; i < numCoordinates; i++) {
+				if (abs(xCoordinates[i] - coordinateX) < 20.0 && abs(yCoordinates[i] - coordinateY) < 20.0) {
+					char buffer[60] = "";
+					char numBuffer[60] = "";
+
+					strcat_s(buffer, "positionTrigger:");
+					_itoa_s(i + 1, numBuffer, 10);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", xCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", yCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+
+					sendAutomationMessage(buffer);
+
+					lastUpdate = time(NULL);
+
+					break;
+				}
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	// bump priority up so we get time from the sim
@@ -461,6 +628,25 @@ int main(int argc, char* argv[])
 
 	bool running = false;
 	int countdown = 4000;
+	bool mapTrack = false;
+	bool positionTrigger = false;
+
+	if (argc > 1) {
+		mapTrack = (strcmp(argv[1], "-Map") == 0);
+
+		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		if (positionTrigger) {
+			loadTrackCoordinates(argv[2]);
+
+			for (int i = 3; i < (argc - 2); i = i + 2) {
+				xCoordinates[numCoordinates] = (float)atof(argv[i]);
+				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+
+				numCoordinates += 1;
+			}
+		}
+	}
 
 	while (true) {
 		g_data = NULL;
@@ -483,78 +669,89 @@ int main(int argc, char* argv[])
 					else
 						tries = 0;
 
-					if (!running) {
-						getDataValue(result, pHeader, g_data, "SessionFlags");
-
-						int flags = atoi(result);
-
-						running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown-- <= 0));
+					if (mapTrack) {
+						if (!writeCoordinates(pHeader, g_data))
+							break;
 					}
+					else if (positionTrigger)
+						checkCoordinates(pHeader, g_data);
+					else {
+						if (!running) {
+							getDataValue(result, pHeader, g_data, "SessionFlags");
 
-					if (running) {
-						bool onTrack = true;
+							int flags = atoi(result);
 
-						getDataValue(result, pHeader, g_data, "IsInGarage");
-						if (atoi(result))
-							onTrack = false;
-
-						getDataValue(result, pHeader, g_data, "IsReplayPlaying");
-						if (atoi(result))
-							onTrack = false;
-
-						/*
-						getDataValue(result, pHeader, g_data, "IsOnTrack");
-						if (!atoi(result))
-							onTrack = false;
-
-						getDataValue(result, pHeader, g_data, "IsOnTrackCar");
-						if (atoi(result))
-							onTrack = true;
-						*/
-
-						bool inPit = false;
-
-						char* rawValue;
-						char playerCarIdx[10] = "";
-
-						getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
-						getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
-
-						if (((bool*)rawValue)[atoi(playerCarIdx)])
-							inPit = true;
-						/*
-						else {
-							getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
-
-							irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
-
-							inPit = (trkLoc & irsdk_InPitStall);
+							running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown-- <= 0));
 						}
-						*/
 
-						if (onTrack && !inPit) {
-							if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
-								checkPitWindow(pHeader, g_data);
+						if (running) {
+							bool onTrack = true;
 
-							continue;
-						}
-						else {
-							lastSituation = CLEAR;
-							carBehind = false;
-							carBehindReported = false;
+							getDataValue(result, pHeader, g_data, "IsInGarage");
+							if (atoi(result))
+								onTrack = false;
 
-							lastFlagState = 0;
+							getDataValue(result, pHeader, g_data, "IsReplayPlaying");
+							if (atoi(result))
+								onTrack = false;
 
-							Sleep(1000);
+							/*
+							getDataValue(result, pHeader, g_data, "IsOnTrack");
+							if (!atoi(result))
+								onTrack = false;
+
+							getDataValue(result, pHeader, g_data, "IsOnTrackCar");
+							if (atoi(result))
+								onTrack = true;
+							*/
+
+							bool inPit = false;
+
+							char* rawValue;
+							char playerCarIdx[10] = "";
+
+							getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+							getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
+
+							if (((bool*)rawValue)[atoi(playerCarIdx)])
+								inPit = true;
+							/*
+							else {
+								getRawDataValue(rawValue, pHeader, g_data, "CarIdxTrackSurface");
+
+								irsdk_TrkLoc trkLoc = ((irsdk_TrkLoc*)rawValue)[atoi(playerCarIdx)];
+
+								inPit = (trkLoc & irsdk_InPitStall);
+							}
+							*/
+
+							if (onTrack && !inPit) {
+								if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
+									checkPitWindow(pHeader, g_data);
+
+								continue;
+							}
+							else {
+								lastSituation = CLEAR;
+								carBehind = false;
+								carBehindReported = false;
+
+								lastFlagState = 0;
+
+								Sleep(1000);
+							}
 						}
 					}
 				}
-				
-				Sleep(1000);
+				else
+					Sleep(1000);
 			}
 		}
 
-		Sleep(50);
+		if (positionTrigger)
+			Sleep(10);
+		else
+			Sleep(50);
 	}
 
 	irsdk_shutdown();

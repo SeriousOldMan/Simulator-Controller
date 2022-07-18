@@ -97,7 +97,7 @@ void sendSpotterMessage(string message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
+		winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
 
 	if (winHandle != 0)
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);

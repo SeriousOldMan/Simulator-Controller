@@ -52,7 +52,7 @@ createTrackImage(trackMap) {
 
 	token := Gdip_Startup()
 
-	bitmap := Gdip_CreateBitmap(mapWidth, mapHeight)
+	bitmap := Gdip_CreateBitmap(mapWidth * scale, mapHeight * scale)
 
 	graphics := Gdip_GraphicsFromImage(bitmap)
 
@@ -60,12 +60,10 @@ createTrackImage(trackMap) {
 
 	pen := Gdip_CreatePen(0xbb000000, 3)
 
-	scale := 1.0
-
 	offsetX := (- xMin) + (mapWidth * 0.05)
 	offsetY := (- yMin) + (mapHeight * 0.05)
 
-	scale := (scale * 0.9)
+	scale := 0.9
 
 	firstX := 0
 	firstY := 0
@@ -168,7 +166,7 @@ createTrackMap(simulator, track, fileName) {
 			running[Round(coordinates[1] * 1000)] := [coordinates[2], coordinates[3]]
 		}
 
-		Sleep 50
+		; Sleep 50
 	}
 
 	sessionDB := new SessionDatabase()
@@ -196,8 +194,11 @@ createTrackMap(simulator, track, fileName) {
 		Loop 1000 {
 			coordinates := running[A_Index]
 
-			if !coordinates
+			if !coordinates {
 				coordinates := running[A_Index - 1]
+
+				running[A_Index] := coordinates
+			}
 
 			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[1])
 			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[2])
@@ -207,7 +208,7 @@ createTrackMap(simulator, track, fileName) {
 
 			trackData .= (coordinates[1] . A_Space . coordinates[2])
 
-			Sleep 10
+			; Sleep 10
 		}
 
 		try {
@@ -277,9 +278,9 @@ startTrackMapper() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
-	simulator := false
-	track := false
-	data := false
+	simulator := "iRacing"
+	track := "oulton international"
+	data := "D:\Dateien\Dokumente\Simulator Controller\Temp\IRC Data\oulton international.data"
 	recreate := false
 
 	index := 1

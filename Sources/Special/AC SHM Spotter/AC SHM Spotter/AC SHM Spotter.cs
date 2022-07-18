@@ -240,7 +240,7 @@ namespace ACSHMSpotter {
 			int winHandle = FindWindowEx(0, 0, null, "Race Spotter.exe");
 
 			if (winHandle == 0)
-				windHandle = FindWindowEx(0, 0, null, "Race Spotter.ahk");
+				winHandle = FindWindowEx(0, 0, null, "Race Spotter.ahk");
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);

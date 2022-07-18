@@ -331,7 +331,9 @@ class RaceReportViewer extends RaceReportReader {
 
 				hasDNF := (hasDNF || (result = "DNF"))
 
-				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				nr := StrReplace(cars[A_Index][1], """", "")
+
+				rows.Push(Array(nr, "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 

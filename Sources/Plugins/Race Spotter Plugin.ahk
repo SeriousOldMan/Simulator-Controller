@@ -192,7 +192,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				for ignore, action in trackAutomation.Actions
 					positions .= (A_Space . action.X . A_Space . action.Y)
 
-				code := new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true])
+				simulator := this.Simulator.Simulator[true]
+				track := this.Simulator.Track
+
+				sessionDB := new SessionDatabase()
+
+				code := sessionDB.getSimulatorCode(simulator)
+				data := sessionDB.getTrackData(simulator, track)
 
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
@@ -200,7 +206,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					this.shutdownAutomation()
 
 					try {
-						Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, automationPID
+						if data
+							Run "%exePath%" -Trigger "%data%" %positions%, %kBinariesDirectory%, Hide, automationPID
+						else
+							Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, automationPID
 					}
 					catch exception {
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")

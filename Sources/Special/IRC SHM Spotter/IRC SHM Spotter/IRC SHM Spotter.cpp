@@ -475,6 +475,7 @@ float lastX = 0.0;
 float lastY = 0.0;
 int coordCount = 0;
 int lastLap = 0;
+float lastRunning = 0.0;
 bool recording = false;
 
 bool writeCoordinates(const irsdk_header* header, const char* data) {
@@ -510,13 +511,18 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			running = ((float*)trackPositions)[carIdx];
 
+		if (running < lastRunning)
+			return false;
+		else
+			lastRunning = running;
+
 		getDataValue(buffer, header, data, "Yaw");
 
 		float yaw = atof(buffer);
 
 		getDataValue(buffer, header, data, "VelocityX");
 
-		float velocityX = atof(buffer) * 3.6;
+		float velocityX = atof(buffer);
 
 		float dx = velocityX * sin(yaw);
 		float dy = velocityX * cos(yaw);
@@ -524,9 +530,9 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		lastX += dx;
 		lastY += dy;
 
-		printf("%f;%f;%f\n", running, lastX, lastY);
+		printf("%f,%f,%f\n", running, lastX, lastY);
 
-		if (coordCount++ > 100 && fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
+		if (fabs(lastX - initialX) < 10.0 && fabs(lastY - initialY) < 10.0)
 			return false;
 	}
 
@@ -648,7 +654,9 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	while (true) {
+	bool done = false;
+
+	while (!done) {
 		g_data = NULL;
 		int tries = 3;
 
@@ -670,8 +678,11 @@ int main(int argc, char* argv[])
 						tries = 0;
 
 					if (mapTrack) {
-						if (!writeCoordinates(pHeader, g_data))
+						if (!writeCoordinates(pHeader, g_data)) {
+							done = true;
+
 							break;
+						}
 					}
 					else if (positionTrigger)
 						checkCoordinates(pHeader, g_data);
@@ -748,7 +759,9 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		if (positionTrigger)
+		if (mapTrack)
+			Sleep(1);
+		else if (positionTrigger)
 			Sleep(10);
 		else
 			Sleep(50);

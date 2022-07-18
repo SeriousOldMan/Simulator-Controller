@@ -1603,7 +1603,7 @@ class RaceStrategist extends RaceAssistant {
 				grid := (raceInfo ? raceInfo["Grid"] : false)
 
 				Loop %carCount% {
-					carNr := (knowledgeBase.getValue("Car." . A_Index . ".Nr", kUndefined) . "")
+					carNr := StrReplace(knowledgeBase.getValue("Car." . A_Index . ".Nr", 0) . "", """", "")
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))

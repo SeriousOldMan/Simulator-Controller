@@ -324,7 +324,9 @@ class SimulatorPlugin extends ControllerPlugin {
 	__New(controller, name, simulator, configuration := false, register := true) {
 		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
 
-		if base.__New(controller, name, configuration, register) {
+		base.__New(controller, name, configuration, register)
+
+		if (this.Active || isDebug()) {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
@@ -339,11 +341,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 
 			controller.registerPlugin(this)
-
-			return true
 		}
-		else
-			return false
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
@@ -912,23 +910,17 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	triggerAction(actionNr, positionX, positionY) {
-		lastTrigger := false
+		if this.TrackAutomation {
+			action := this.TrackAutomation.Actions[actionNr]
 
-		if (A_TickCount > (lastTrigger + 5000)) {
-			lastTrigger := A_TickCount
+			if (action.Type = "Hotkey") {
+				this.activateWindow()
 
-			if this.TrackAutomation {
-				action := this.TrackAutomation.Actions[actionNr]
-
-				if (action.Type = "Hotkey") {
-					this.activateWindow()
-
-					for ignore, theHotkey in string2Values("|", action.Action)
-						this.sendCommand(theHotKey)
-				}
-				else if (action.Type = "Command")
-					execute(action.Action)
+				for ignore, theHotkey in string2Values("|", action.Action)
+					this.sendCommand(theHotKey)
 			}
+			else if (action.Type = "Command")
+				execute(action.Action)
 		}
 	}
 

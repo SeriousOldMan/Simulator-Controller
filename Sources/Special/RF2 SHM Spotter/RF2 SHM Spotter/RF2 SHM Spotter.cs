@@ -676,41 +676,47 @@ namespace RF2SHMSpotter {
 		float[] xCoordinates = new float[60];
 		float[] yCoordinates = new float[60];
 		int numCoordinates = 0;
+		long lastUpdate = 0;
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			double lVelocityX = playerScoring.mLocalVel.x;
-			double lVelocityY = playerScoring.mLocalVel.y;
-			double lVelocityZ = playerScoring.mLocalVel.z;
-
-			int carID = 0;
-
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-				if (scoring.mVehicles[i].mIsPlayer != 0)
-				{
-					carID = i;
-
-					break;
-				}
-
-			var ori = playerScoring.mOri;
-
-			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
-
-			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
-				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = playerScoring.mPos.y;
+				double lVelocityX = playerScoring.mLocalVel.x;
+				double lVelocityY = playerScoring.mLocalVel.y;
+				double lVelocityZ = playerScoring.mLocalVel.z;
 
-				for (int i = 0; i < numCoordinates; i += 2)
-				{
-					if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
+				int carID = 0;
+
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+					if (scoring.mVehicles[i].mIsPlayer != 0)
 					{
-						SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+						carID = i;
 
 						break;
+					}
+
+				var ori = playerScoring.mOri;
+
+				double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+				double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+				double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+				{
+					double coordinateX = playerScoring.mPos.x;
+					double coordinateY = playerScoring.mPos.y;
+
+					for (int i = 0; i < numCoordinates; i += 2)
+					{
+						if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
+						{
+							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+
+							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+							break;
+						}
 					}
 				}
 			}
@@ -782,7 +788,10 @@ namespace RF2SHMSpotter {
 							}
 						}
 
-						Thread.Sleep(50);
+						if (positionTrigger)
+							Thread.Sleep(10);
+						else
+							Thread.Sleep(50);
 					}
 					else
 						Thread.Sleep(1000);

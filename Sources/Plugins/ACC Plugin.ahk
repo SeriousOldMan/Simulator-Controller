@@ -150,7 +150,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		if base.__New(controller, name, simulator, configuration) {
+		base.__New(controller, name, simulator, configuration)
+
+		if (this.Active || isDebug()) {
 			this.iPitstopMode := this.findMode(kPitstopMode)
 
 			if this.iChatMode
@@ -163,10 +165,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			controller.registerPlugin(this)
 
-			return true
+			OnExit(ObjBindMethod(this, "shutdownUDPClient"))
 		}
-		else
-			return false
 	}
 
 	loadFromConfiguration(configuration) {
@@ -228,9 +228,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if this.UDPConnection
 					options := ("-Connect " . this.UDPConnection)
 
-				Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%", , Hide
+				Run "%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out" %options%, %kBinariesDirectory%, Hide, udpClient
 
-				OnExit(ObjBindMethod(this, "shutdownUDPClient"))
+				this.iUDPClient := udpClient
 			}
 			catch exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
@@ -240,6 +240,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+				this.iUDPClient := false
 			}
 		}
 	}

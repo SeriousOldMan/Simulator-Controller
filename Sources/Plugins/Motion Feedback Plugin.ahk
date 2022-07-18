@@ -384,7 +384,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local function
 
-		if base.__New(controller, name, configuration, false) {
+		base.__New(controller, name, configuration, false)
+
+		if (this.Active || isDebug()) {
 			this.iMotionApplication := new Application(this.getArgumentValue("controlApplication", kMotionFeedbackPlugin), configuration)
 
 			kSimFeedback := this.iMotionApplication.ExePath
@@ -526,11 +528,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				else if ((motionArguments[1] = "Off") && this.Application.isRunning())
 					this.stopMotion(true)
 			}
-
-			return true
 		}
-		else
-			return false
 	}
 
 	loadEffectStateFromSimFeedback(effect) {

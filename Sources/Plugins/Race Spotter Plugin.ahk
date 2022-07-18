@@ -29,7 +29,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	iAutomationPID := false
 
 	iMapperPID := false
-	iMapped := []
+	iHasTrackMap := false
 
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -85,7 +85,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	__New(controller, name, configuration := false) {
-		if base.__New(controller, name, configuration) {
+		base.__New(controller, name, configuration)
+
+		if (this.Active || isDebug()) {
 			trackAutomation := this.getArgumentValue("trackAutomation", false)
 
 			if trackAutomation {
@@ -110,10 +112,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else
 				SetTimer updateRaceSpotterSessionState, 5000
 
-			return true
+			OnExit(ObjBindMethod(this, "shutdownAutomation", true))
+			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 		}
-		else
-			return false
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -177,6 +178,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	disableTrackAutomation() {
 		this.iTrackAutomationEnabled := false
+
+		this.shutdownAutomation()
 	}
 
 	startupAutomation() {
@@ -189,7 +192,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				for ignore, action in trackAutomation.Actions
 					positions .= (A_Space . action.X . A_Space . action.Y)
 
-				code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
+				code := new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true])
 
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
@@ -197,7 +200,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					this.shutdownAutomation()
 
 					try {
-						Run %ComSpec% /c ""%exePath%" -Trigger %positions%", %kBinariesDirectory%, Hide UseErrorLevel, automationPID
+						Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, automationPID
 					}
 					catch exception {
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -228,7 +231,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %automationPID%
 
 			if (force && ErrorLevel) {
-				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+				processName := (new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 				tries := 5
 
@@ -248,33 +251,44 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	finishSession(arguments*) {
-		base.finishSession(arguments*)
-
+		this.iHasTrackMap := false
 		this.shutdownAutomation(true)
+
+		base.finishSession(arguments*)
 	}
 
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
 		static sessionDB := false
 
+		if !sessionDB
+			sessionDB := new SessionDatabase()
+
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
-		if (this.RaceAssistant && !this.iMapperPID && this.Simulator && this.Simulator.supportsTrackMap()) {
-			if !sessionDB
-				sessionDB := new SessionDatabase()
-
-			simulator := this.Simulator.Simulator[true]
-			simulatorName := sessionDB.getSimulatorName(simulator)
-
-			learning := getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
-
-			if (lapNumber > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+		if (this.RaceAssistant && this.Simulator) {
+			if this.iHasTrackMap
+				hasTrackMap := true
+			else {
+				simulator := this.Simulator.Simulator[true]
 				track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
 
-				if (!sessionDB.hasTrackMap(simulator, track) && !inList(this.iMapped, track)) {
+				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
+			}
+
+			if hasTrackMap {
+				this.iHasTrackMap := true
+
+				if (!this.iAutomationPID && this.TrackAutomationEnabled)
+					this.startupAutomation()
+			}
+			else if (!this.iMapperPID) {
+				simulatorName := sessionDB.getSimulatorName(simulator)
+
+				learning := getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+
+				if (lapNumber > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
 					code := sessionDB.getSimulatorCode(simulator)
 					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
-
-					this.iMapped.Push(track)
 
 					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
@@ -306,8 +320,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		else if !this.iAutomationPID
-			this.startupAutomation()
 	}
 
 	updateLap(lapNumber, dataFile) {
@@ -342,6 +354,38 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+		}
+	}
+
+	shutdownTrackMapper(force := false) {
+		if this.iMapperPID {
+			mapperPID := this.iMapperPID
+
+			if mapperPID {
+				Process Close, %mapperPID%
+
+				Sleep 500
+
+				Process Exist, %mapperPID%
+
+				if (force && ErrorLevel) {
+					processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+
+					tries := 5
+
+					while (tries-- > 0) {
+						Process Exist, %processName%
+
+						if ErrorLevel {
+							Process Close, %ErrorLevel%
+
+							Sleep 500
+						}
+						else
+							break
+					}
 				}
 			}
 		}

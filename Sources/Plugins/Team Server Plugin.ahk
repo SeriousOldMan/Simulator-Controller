@@ -259,7 +259,9 @@ class TeamServerPlugin extends ControllerPlugin {
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		if base.__New(controller, name, configuration, false) {
+		base.__New(controller, name, configuration, false)
+
+		if (this.Active || isDebug()) {
 			teamServerToggle := this.getArgumentValue("teamServer", false)
 
 			if teamServerToggle {
@@ -298,11 +300,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.disableTeamServer()
 
 			this.keepAlive()
-
-			return true
 		}
-		else
-			return false
 	}
 
 	createTeamServerAction(controller, action, actionFunction, arguments*) {

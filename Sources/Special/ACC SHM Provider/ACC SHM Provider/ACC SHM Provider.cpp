@@ -218,6 +218,8 @@ int main(int argc, char* argv[])
 		printNAData("TC", gf->TC);
 		printNAData("ABS", gf->ABS);
 
+		printData("Ignition", pf->ignitionOn ? "true" : "false");
+
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);

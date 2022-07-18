@@ -617,7 +617,7 @@ class RaceSpotter extends RaceAssistant {
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true, SideProximity: true, RearProximity: true
 		 											  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
 
-		OnExit(ObjBindMethod(this, "shutdownSpotter"))
+		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
 
 	createVoiceManager(name, options) {

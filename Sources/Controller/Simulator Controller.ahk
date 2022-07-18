@@ -1417,14 +1417,9 @@ class ControllerPlugin extends Plugin {
 
 		base.__New(name, configuration)
 
-		if (!this.Active && !isDebug())
-			return false
-		else {
+		if (this.Active || isDebug())
 			if register
 				controller.registerPlugin(this)
-
-			return true
-		}
 	}
 
 	findMode(name) {

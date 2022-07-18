@@ -2941,16 +2941,23 @@ WM_MOUSEMOVE() {
 									, coordinateX, coordinateY) {
 			currentAction := editor.findTrackAction(coordinateX, coordinateY)
 
+			if !currentAction
+				currentAction := (coordinateX . ";" . coordinateY)
+
 			if (currentAction && (currentAction != previousAction)) {
 				ToolTip
 
-				actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																											: "Hotkey: ")
-																		: "Command: ")
-				actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
-							 . Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3)
-							 . translate(" -> ")
-							 . actionInfo . currentAction.Action)
+				if IsObject(currentAction) {
+					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
+																												: "Hotkey: ")
+																			: "Command: ")
+					actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+								 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
+								 . translate(" -> ")
+								 . actionInfo . currentAction.Action)
+				}
+				else
+					actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
 
 				SetTimer RemoveToolTip, Off
 				SetTimer DisplayToolTip, 1000

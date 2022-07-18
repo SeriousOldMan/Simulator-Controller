@@ -602,43 +602,48 @@ BOOL writeCoordinates(int playerID) {
 float xCoordinates[60];
 float yCoordinates[60];
 int numCoordinates = 0;
+time_t lastUpdate = 0;
 
 void checkCoordinates(int playerID) {
-	r3e_float64 velocityX = map_buffer->player.velocity.x;
-	r3e_float64 velocityY = map_buffer->player.velocity.z;
-	r3e_float64 velocityZ = map_buffer->player.velocity.y;
+	if (time(NULL) > (lastUpdate + 2)) {
+		r3e_float64 velocityX = map_buffer->player.velocity.x;
+		r3e_float64 velocityY = map_buffer->player.velocity.z;
+		r3e_float64 velocityZ = map_buffer->player.velocity.y;
 
-	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		int index = 0;
+		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+			int index = 0;
 
-		for (int id = 0; id < map_buffer->num_cars; id++)
-			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
-				index = id;
+			for (int id = 0; id < map_buffer->num_cars; id++)
+				if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+					index = id;
 
-				break;
-			}
+					break;
+				}
 
-		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
-		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+			r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
+			r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
 
-		for (int i = 0; i < numCoordinates; i += 2) {
-			if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
-				char buffer[60] = "";
-				char numBuffer[60];
+			for (int i = 0; i < numCoordinates; i += 2) {
+				if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
+					char buffer[60] = "";
+					char numBuffer[60];
 
-				strcat_s(buffer, 60, "positionTrigger:");
-				_itoa_s(i + 1, numBuffer, 60, 10);
-				strcat_s(buffer, 60, numBuffer);
-				strcat_s(buffer, 60, ";");
-				sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
-				strcat_s(buffer, 60, numBuffer);
-				strcat_s(buffer, 60, ";");
-				sprintf_s(numBuffer, 60, "%f", yCoordinates[i]);
-				strcat_s(buffer, 60, numBuffer);
+					strcat_s(buffer, 60, "positionTrigger:");
+					_itoa_s(i + 1, numBuffer, 60, 10);
+					strcat_s(buffer, 60, numBuffer);
+					strcat_s(buffer, 60, ";");
+					sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
+					strcat_s(buffer, 60, numBuffer);
+					strcat_s(buffer, 60, ";");
+					sprintf_s(numBuffer, 60, "%f", yCoordinates[i]);
+					strcat_s(buffer, 60, numBuffer);
 
-				sendAutomationMessage(buffer);
+					sendAutomationMessage(buffer);
 
-				break;
+					lastUpdate = time(NULL);
+
+					break;
+				}
 			}
 		}
 	}
@@ -703,7 +708,10 @@ int main(int argc, char* argv[])
 			}
 		}
         
-		Sleep(50);
+		if (positionTrigger)
+			Sleep(10);
+		else
+			Sleep(50);
     }
 
     map_close();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
@@ -665,27 +666,33 @@ namespace ACSHMSpotter {
 		float[] xCoordinates = new float[60];
 		float[] yCoordinates = new float[60];
 		int numCoordinates = 0;
+		long lastUpdate = 0;
 
 		void checkCoordinates()
 		{
-			double velocityX = physics.LocalVelocity[0];
-			double velocityY = physics.LocalVelocity[2];
-			double velocityZ = physics.LocalVelocity[1];
-
-			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
-				int carID = 0;
+				double velocityX = physics.LocalVelocity[0];
+				double velocityY = physics.LocalVelocity[2];
+				double velocityZ = physics.LocalVelocity[1];
 
-				float coordinateX = cars.cars[carID].worldPosition.x;
-				float coordinateY = cars.cars[carID].worldPosition.z;
-
-				for (int i = 0; i < numCoordinates; i += 2)
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 				{
-					if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
-					{
-						SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+					int carID = 0;
 
-						break;
+					float coordinateX = cars.cars[carID].worldPosition.x;
+					float coordinateY = cars.cars[carID].worldPosition.z;
+
+					for (int i = 0; i < numCoordinates; i++)
+					{
+						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+						{
+							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+
+							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+							break;
+						}
 					}
 				}
 			}
@@ -764,7 +771,10 @@ namespace ACSHMSpotter {
 					}
 				}
 
-				Thread.Sleep(50);
+				if (positionTrigger)
+					Thread.Sleep(10);
+				else
+					Thread.Sleep(50);
 			}
 
 			Close();

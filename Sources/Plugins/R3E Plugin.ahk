@@ -93,7 +93,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		if base.__New(controller, name, simulator, configuration) {
+		base.__New(controller, name, simulator, configuration)
+
+		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
@@ -102,11 +104,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
 			this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
 			this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
-
-			return true
 		}
-		else
-			return false
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {

@@ -425,7 +425,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		if base.__New(controller, name, configuration, register) {
+		base.__New(controller, name, configuration, register)
+
+		if (this.Active || isDebug) {
 			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
 			if (teamServer && this.Controller.isActive(teamServer))
@@ -529,11 +531,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			controller.registerPlugin(this)
 
 			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
-
-			return true
 		}
-		else
-			return false
 	}
 
 	handleRemoteCalls(event, data) {

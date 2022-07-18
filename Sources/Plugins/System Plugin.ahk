@@ -209,7 +209,9 @@ class SystemPlugin extends ControllerPlugin {
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 
-		if base.__New(controller, name, configuration, false) {
+		base.__New(controller, name, configuration, false)
+
+		if (this.Active || isDebug()) {
 			for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
 				if (descriptor != false) {
 					function := controller.findFunction(descriptor)
@@ -265,11 +267,7 @@ class SystemPlugin extends ControllerPlugin {
 				controller.registerPlugin(this)
 
 			this.initializeBackgroundTasks()
-
-			return true
 		}
-		else
-			return false
 	}
 
 	loadFromConfiguration(configuration) {

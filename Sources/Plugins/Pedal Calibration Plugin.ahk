@@ -177,7 +177,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		if base.__New(controller, name, configuration, false) {
+		base.__New(controller, name, configuration, false)
+
+		if (this.Active || isDebug()) {
 			this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
 
 			smartCtrl := this.iSmartCtrlApplication.ExePath
@@ -198,11 +200,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 			if register
 				controller.registerPlugin(this)
-
-			return true
 		}
-		else
-			return false
 	}
 
 	createPedalCalibrationAction(controller, pedalAndShape, descriptor) {

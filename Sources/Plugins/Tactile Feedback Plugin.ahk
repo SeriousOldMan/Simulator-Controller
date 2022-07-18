@@ -178,7 +178,9 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		if base.__New(controller, name, configuration, false) {
+		base.__New(controller, name, configuration, false)
+
+		if (this.Active || isDebug()) {
 			simFeedbackApplication := new Application(this.getArgumentValue("controlApplication", kTactileFeedbackPlugin), configuration)
 
 			kSimHub := simFeedbackApplication.ExePath
@@ -228,11 +230,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 			if register
 				controller.registerPlugin(this)
-
-			return true
 		}
-		else
-			return false
 	}
 
 	createToggleAction(toggle, command, descriptor, initialState) {

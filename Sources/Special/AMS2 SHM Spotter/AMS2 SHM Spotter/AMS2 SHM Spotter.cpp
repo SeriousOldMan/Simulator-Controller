@@ -6,6 +6,7 @@
 // Used for this example
 #include <stdio.h>
 #include <conio.h>
+#include <time.h>
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
@@ -454,36 +455,41 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 float xCoordinates[60];
 float yCoordinates[60];
 int numCoordinates = 0;
+time_t lastUpdate = 0;
 
 void checkCoordinates(const SharedMemory* sharedData) {
-	float velocityX = sharedData->mWorldVelocity[VEC_X];
-	float velocityY = sharedData->mWorldVelocity[VEC_Z];
-	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
+	if (time(NULL) > (lastUpdate + 2)) {
+		float velocityX = sharedData->mWorldVelocity[VEC_X];
+		float velocityY = sharedData->mWorldVelocity[VEC_Z];
+		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
 
-	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		int carID = sharedData->mViewedParticipantIndex;
+		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+			int carID = sharedData->mViewedParticipantIndex;
 
-		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
-		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
+			float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 
-		for (int i = 0; i < numCoordinates; i += 2) {
-			if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
-				char buffer[60] = "";
-				char numBuffer[60];
+			for (int i = 0; i < numCoordinates; i += 2) {
+				if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
+					char buffer[60] = "";
+					char numBuffer[60];
 
-				strcat_s(buffer, "positionTrigger:");
-				_itoa_s(i + 1, numBuffer, 10);
-				strcat_s(buffer, numBuffer);
-				strcat_s(buffer, ";");
-				sprintf_s(numBuffer, "%f", xCoordinates[i]);
-				strcat_s(buffer, numBuffer);
-				strcat_s(buffer, ";");
-				sprintf_s(numBuffer, "%f", yCoordinates[i]);
-				strcat_s(buffer, numBuffer);
+					strcat_s(buffer, "positionTrigger:");
+					_itoa_s(i + 1, numBuffer, 10);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", xCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", yCoordinates[i]);
+					strcat_s(buffer, numBuffer);
 
-				sendAutomationMessage(buffer);
+					sendAutomationMessage(buffer);
 
-				break;
+					lastUpdate = time(NULL);
+
+					break;
+				}
 			}
 		}
 	}
@@ -579,7 +585,10 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			Sleep(50);
+			if (positionTrigger)
+				Sleep(10);
+			else
+				Sleep(50);
 		}
 	}
 

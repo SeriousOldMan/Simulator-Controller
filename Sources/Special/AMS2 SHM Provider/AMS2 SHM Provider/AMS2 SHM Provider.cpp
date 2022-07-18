@@ -208,8 +208,15 @@ int main(int argc, char* argv[]) {
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
 		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
-		printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
-		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+
+		if (localCopy->mSessionState == SESSION_PRACTICE) {
+			printf("SessionTimeRemaining=3600000\n");
+			printf("SessionLapsRemaining=30\n");
+		}
+		else {
+			printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
+			printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+		}
 
 		printf("[Car Data]\n");
 

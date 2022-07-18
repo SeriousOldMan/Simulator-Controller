@@ -2947,7 +2947,9 @@ WM_MOUSEMOVE() {
 				actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
 																											: "Hotkey: ")
 																		: "Command: ")
-				actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(" -> ")
+				actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+							 . Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3)
+							 . translate(" -> ")
 							 . actionInfo . currentAction.Action)
 
 				SetTimer RemoveToolTip, Off

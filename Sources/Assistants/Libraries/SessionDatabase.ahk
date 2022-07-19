@@ -506,6 +506,24 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	clearData(cache, simulator) {
+		cache.Delete(simulator)
+	}
+
+	registerCar(simulator, car, name) {
+		fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
+		carData := readConfiguration(fileName)
+
+		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
+			setConfigurationValue(carData, "Car Names", car, name)
+			setConfigurationValue(carData, "Car Codes", name, car)
+
+			writeConfiguration(fileName, carData)
+
+			this.clearCache(this.sCarData, this.getSimulatorCode(simulator))
+		}
+	}
+
 	getCarName(simulator, car) {
 		name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 									, "Car Names", car, car)
@@ -524,6 +542,22 @@ class SessionDatabase extends ConfigurationItem {
 			code := car
 
 		return code
+	}
+
+	registerTrack(simulator, track, shortName, longName) {
+		fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
+		trackData := readConfiguration(fileName)
+
+		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
+			setConfigurationValue(trackData, "Track Names Long", track, longName)
+			setConfigurationValue(trackData, "Track Names Short", track, shortName)
+			setConfigurationValue(trackData, "Track Codes", longName, track)
+			setConfigurationValue(trackData, "Track Codes", shortName, track)
+
+			writeConfiguration(fileName, trackData)
+
+			this.clearCache(this.sTrackData, this.getSimulatorCode(simulator))
+		}
 	}
 
 	getTrackName(simulator, track, long := true) {

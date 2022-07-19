@@ -709,7 +709,7 @@ namespace RF2SHMSpotter {
 
 					for (int i = 0; i < numCoordinates; i += 2)
 					{
-						if (Math.Abs(xCoordinates[i] - coordinateX) < 10 && Math.Abs(yCoordinates[i] - coordinateY) < 10)
+						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 						{
 							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
 

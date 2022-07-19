@@ -45,7 +45,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.2.5
 
-Updates are automatic. A "TrackAutomation" action has beend added to the "Race Spotter" plugin. You must add it to your configuration, if you want the new track events automation feature. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icon for the new "TrackAutomation" action will be available to you.
+Updates are automatic. Please note, that all recorded track images will be deleted, since the mapping information has changed for the new automation feature. They will be automatically recreated, after you have driven a few laps on each track.
+
+A "TrackAutomation" action has been added to the "Race Spotter" plugin. You must add it to your configuration, if you want the new track events automation feature. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icon for the new "TrackAutomation" action will be available to you.
 
 ***
 

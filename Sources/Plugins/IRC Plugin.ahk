@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -198,6 +199,15 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 	supportsSetupImport() {
 		return true
+	}
+
+	startSession(settings, data) {
+		base.startSession(settings, data)
+
+		new SessionDatabase().registerTrack(getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "Track", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "TrackShortName", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "TrackLongName", "Unknown"))
 	}
 
 	startPitstopSetup(pitstopNumber) {

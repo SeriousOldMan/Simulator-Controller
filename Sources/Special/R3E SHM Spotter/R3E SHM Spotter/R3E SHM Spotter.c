@@ -624,7 +624,7 @@ void checkCoordinates(int playerID) {
 			r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
 
 			for (int i = 0; i < numCoordinates; i += 2) {
-				if (fabs(xCoordinates[i] - coordinateX) < 10 && fabs(yCoordinates[i] - coordinateY) < 10) {
+				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
 					char buffer[60] = "";
 					char numBuffer[60];
 

@@ -747,6 +747,16 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				printf("Track=Unknown\n");
 
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayName:"))
+				printf("TrackLongName=%s\n", result);
+			else
+				printf("TrackLongName=Unknown\n");
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayShortName:"))
+				printf("TrackShortName=%s\n", result);
+			else
+				printf("TrackShortName=Unknown\n");
+
 			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
 				printf("Car=%s\n", result);
 			else

@@ -548,46 +548,26 @@ float rYCoordinates[1000];
 
 float xCoordinates[60];
 float yCoordinates[60];
+float trackDistances[60];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
-float threshold = 20.0;
 
 void loadTrackCoordinates(char* fileName) {
 	std::ifstream infile(fileName);
 	int index = 0;
 
 	float x, y;
-	float xMin, xMax, yMin, yMax;
-
+	
 	while (infile >> x >> y) {
 		rXCoordinates[index] = x;
 		rYCoordinates[index] = y;
 
-		if (index == 0) {
-			xMin = x;
-			xMax = x;
-			yMin = y;
-			yMax = y;
-		}
-		else {
-			xMin = min(xMin, x);
-			xMax = max(xMax, x);
-			yMin = min(yMin, y);
-			yMax = max(yMax, y);
-		}
-
 		if (++index > 999)
 			break;
 	}
-
-	int width = (int)(xMax - xMin);
-	int height = (int)(yMax - yMin);
-	float scale = min(1000 / width, 1000 / height);
-
-	threshold = threshold / scale;
 }
 
-void checkCoordinates(const irsdk_header* header, const char* data) {
+void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
 	if (time(NULL) > (lastUpdate + 2)) {
 		char buffer[60];
 
@@ -618,32 +598,37 @@ void checkCoordinates(const irsdk_header* header, const char* data) {
 		float dy = velocityX * cos(yaw);
 
 		if ((dx > 0) || (dy > 0)) {
-			running = min(floor(running * 1000), 999);
-
-			float coordinateX = rXCoordinates[(int)running];
-			float coordinateY = rYCoordinates[(int)running];
+			float distance;
+			int index = 0;
 
 			for (int i = 0; i < numCoordinates; i++) {
-				if (abs(xCoordinates[i] - coordinateX) < threshold && abs(yCoordinates[i] - coordinateY) < threshold) {
-					char buffer[60] = "";
-					char numBuffer[60] = "";
+				float cDistance = abs(trackDistances[i] - running);
 
-					strcat_s(buffer, "positionTrigger:");
-					_itoa_s(i + 1, numBuffer, 10);
-					strcat_s(buffer, numBuffer);
-					strcat_s(buffer, ";");
-					sprintf_s(numBuffer, "%f", xCoordinates[i]);
-					strcat_s(buffer, numBuffer);
-					strcat_s(buffer, ";");
-					sprintf_s(numBuffer, "%f", yCoordinates[i]);
-					strcat_s(buffer, numBuffer);
-
-					sendAutomationMessage(buffer);
-
-					lastUpdate = time(NULL);
-
-					break;
+				if (i == 0)
+					distance = cDistance;
+				else if (cDistance < distance) {
+					distance = cDistance;
+					index = i;
 				}
+			}
+
+			if (distance < (30 / trackLength)) {
+				char buffer[60] = "";
+				char numBuffer[60] = "";
+
+				strcat_s(buffer, "positionTrigger:");
+				_itoa_s(index + 1, numBuffer, 10);
+				strcat_s(buffer, numBuffer);
+				strcat_s(buffer, ";");
+				sprintf_s(numBuffer, "%f", xCoordinates[index]);
+				strcat_s(buffer, numBuffer);
+				strcat_s(buffer, ";");
+				sprintf_s(numBuffer, "%f", yCoordinates[index]);
+				strcat_s(buffer, numBuffer);
+
+				sendAutomationMessage(buffer);
+
+				lastUpdate = time(NULL);
 			}
 		}
 	}
@@ -671,14 +656,38 @@ int main(int argc, char* argv[])
 			loadTrackCoordinates(argv[2]);
 
 			for (int i = 3; i < (argc - 2); i = i + 2) {
-				xCoordinates[numCoordinates] = (float)atof(argv[i]);
-				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+				float x = (float)atof(argv[i]);
+				float y = (float)atof(argv[i + 1]);
 
+				xCoordinates[numCoordinates] = x;
+				yCoordinates[numCoordinates] = y;
+
+				int candidate;
+				float cDistance;
+
+				for (int c = 0; c < 999; c++) {
+					float cX = rXCoordinates[c];
+					float cY = rYCoordinates[c];
+
+					float distance = sqrt((cX - x) * (cX - x) + (cY - y) * (cY -y));
+
+					if (c == 0 || distance < cDistance) {
+						cDistance = distance;
+						candidate = c;
+					}
+				}
+
+				trackDistances[i] = ((float)candidate) / 1000.0;
+	
 				numCoordinates += 1;
 			}
+
+			if (numCoordinates == 0)
+				positionTrigger = false;
 		}
 	}
 
+	float trackLength = 0.0;
 	bool done = false;
 
 	while (!done) {
@@ -702,6 +711,14 @@ int main(int argc, char* argv[])
 					else
 						tries = 0;
 
+					if (trackLength == 0.0) {
+						char buffer[64];
+
+						getYamlValue(buffer, irsdk_getSessionInfoStr(), "WeekendInfo:TrackLength:");
+
+						trackLength = atof(buffer);
+					}
+
 					if (mapTrack) {
 						if (!writeCoordinates(pHeader, g_data)) {
 							done = true;
@@ -710,7 +727,7 @@ int main(int argc, char* argv[])
 						}
 					}
 					else if (positionTrigger)
-						checkCoordinates(pHeader, g_data);
+						checkCoordinates(pHeader, g_data, trackLength);
 					else {
 						if (!running) {
 							getDataValue(result, pHeader, g_data, "SessionFlags");

@@ -47,23 +47,31 @@ createTrackImage(trackMap) {
 	mapWidth := getConfigurationValue(trackMap, "Map", "Width")
 	mapHeight := getConfigurationValue(trackMap, "Map", "Height")
 
-	xMin := getConfigurationValue(trackMap, "Map", "X.Min")
-	yMin := getConfigurationValue(trackMap, "Map", "Y.Min")
+	offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+	offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+
+	marginX := (mapWidth / 20)
+	marginY := (mapHeight / 20)
+
+	setConfigurationValue(trackMap, "Map", "Margin.X", marginX)
+	setConfigurationValue(trackMap, "Map", "Margin.Y", marginY)
+
+	width := (mapWidth + 2 * marginX)
+	height := (mapHeight + 2 * marginY)
+
+	scale := Min(1000 / width, 1000 / height)
+
+	setConfigurationValue(trackMap, "Map", "Scale", scale)
 
 	token := Gdip_Startup()
 
-	bitmap := Gdip_CreateBitmap(mapWidth, mapHeight)
+	bitmap := Gdip_CreateBitmap(Round(width * scale), Round(height * scale))
 
 	graphics := Gdip_GraphicsFromImage(bitmap)
 
 	Gdip_SetSmoothingMode(graphics, 4)
 
-	pen := Gdip_CreatePen(0xbb000000, 3)
-
-	offsetX := (- xMin) + (mapWidth * 0.05)
-	offsetY := (- yMin) + (mapHeight * 0.05)
-
-	scale := 0.9
+	pen := Gdip_CreatePen(0xbb000000, 5)
 
 	firstX := 0
 	firstY := 0
@@ -72,8 +80,8 @@ createTrackImage(trackMap) {
 
 	Loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
-		x := Round((offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
-		y := Round((offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
+		x := Round((marginX + offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
+		y := Round((marginY + offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
 
 		if (A_Index = 1) {
 			firstX := x
@@ -98,17 +106,15 @@ createTrackImage(trackMap) {
 
 	Gdip_Shutdown(token)
 
-	setConfigurationValue(trackMap, "Map", "Offset.X", offsetX)
-	setConfigurationValue(trackMap, "Map", "Offset.Y", offsetY)
-
-	setConfigurationValue(trackMap, "Map", "Scale", scale)
-
 	return (kTempDirectory . "TrackMap.png")
 }
 
 createTrackMap(simulator, track, fileName) {
 	trackMap := newConfiguration()
 	coordinates := []
+
+	setConfigurationValue(trackMap, "General", "Simulator", simulator)
+	setConfigurationValue(trackMap, "General", "Track", track)
 
 	Loop Read, %fileName%
 	{
@@ -152,21 +158,16 @@ createTrackMap(simulator, track, fileName) {
 		width := (Ceil(xMax) - Floor(xMin))
 		height := (Ceil(yMax) - Floor(yMin))
 
-		scale := Min(1000 / width, 1000 / height)
+		setConfigurationValue(trackMap, "Map", "Width", Round(width))
 
-		width := (width * scale)
-		height := (height * scale)
-		xMin := (xMin * scale)
-		xMax := (xMax * scale)
-		yMin := (yMin * scale)
-		yMax := (yMax * scale)
+		setConfigurationValue(trackMap, "Map", "Height", Round(height))
+		setConfigurationValue(trackMap, "Map", "X.Min", Round(xMin, 3))
+		setConfigurationValue(trackMap, "Map", "X.Max", Round(xMax, 3))
+		setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
+		setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
 
-		for ignore, coordinate in coordinates {
-			coordinate[xIndex] := (coordinate[xIndex] * scale)
-			coordinate[yIndex] := (coordinate[yIndex] * scale)
-
-			Sleep 1
-		}
+		setConfigurationValue(trackMap, "Map", "Offset.X", - xMin)
+		setConfigurationValue(trackMap, "Map", "Offset.Y", - yMin)
 
 		if exact
 			trackData := false
@@ -210,16 +211,6 @@ createTrackMap(simulator, track, fileName) {
 		sessionDB := new SessionDatabase()
 
 		simulator := sessionDB.getSimulatorName(simulator)
-
-		setConfigurationValue(trackMap, "General", "Simulator", simulator)
-		setConfigurationValue(trackMap, "General", "Track", track)
-
-		setConfigurationValue(trackMap, "Map", "Width", Round(width))
-		setConfigurationValue(trackMap, "Map", "Height", Round(height))
-		setConfigurationValue(trackMap, "Map", "X.Min", Round(xMin, 3))
-		setConfigurationValue(trackMap, "Map", "X.Max", Round(xMax, 3))
-		setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
-		setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
 
 		setConfigurationValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
 		setConfigurationValue(trackMap, "Map", "Points", points)

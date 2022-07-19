@@ -1194,19 +1194,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
 			offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
 
+			marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
+			marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
+
 			width := this.iTrackDisplayArea[3]
 			height := this.iTrackDisplayArea[4]
 
-			imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-			imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+			imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+			imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 
 			imgScale := Min(width / imgWidth, height / imgHeight)
 
 			x := (x / imgScale)
 			y := (y / imgScale)
 
-			x := ((x / scale) - offsetX)
-			y := ((y / scale) - offsetY)
+			x := ((x / scale) - offsetX - marginX)
+			y := ((y / scale) - offsetY - marginY)
 
 			candidateX := false
 			candidateY := false
@@ -1475,20 +1478,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		trackMap := this.TrackMap
 		trackImage := this.TrackImage
 
+		scale := getConfigurationValue(trackMap, "Map", "Scale")
+
 		width := this.iTrackDisplayArea[3]
 		height := this.iTrackDisplayArea[4]
 
-		imgWidth := getConfigurationValue(trackMap, "Map", "Width")
-		imgHeight := getConfigurationValue(trackMap, "Map", "Height")
+		offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+		offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+		marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
+		marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
+
+		imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+		imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 
 		imgScale := Min(width / imgWidth, height / imgHeight)
 
 		if actions {
-			scale := getConfigurationValue(trackMap, "Map", "Scale")
-
-			offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-			offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-
 			token := Gdip_Startup()
 
 			bitmap := Gdip_CreateBitmapFromFile(trackImage)
@@ -1503,8 +1508,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			r := Round(15 / (imgScale * 3))
 
 			for ignore, action in actions {
-				x := Round((offsetX + action.X) * scale)
-				y := Round((offsetY + action.Y) * scale)
+				x := Round((marginX + offsetX + action.X) * scale)
+				y := Round((marginX + offsetY + action.Y) * scale)
 
 				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, x - r, y - r, r * 2, r * 2)
 			}

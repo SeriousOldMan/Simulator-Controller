@@ -1151,9 +1151,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
 		static sessionDB := false
 
-		code := this.Simulator.Code
+		if !sessionDB
+			sessionDB := new SessionDatabase()
 
-		data := readSimulatorData(code)
+		simulator := this.Simulator
+		code := simulator.Code
+
+		trackData := sessionDB.getTrackData(code, simulator.Car, simulator.Track)
+
+		data := (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
 
 		this.updateSessionData(data)
 
@@ -1532,9 +1538,9 @@ prepareSessionDatabase(data) {
 			sessionDB.prepareDatabase(simulator, car, track)
 
 		sessionDB.registerDriver(simulator, plugin.Controller.ID
-								   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
-													 , getConfigurationValue(data, "Stint Data", "DriverSurname")
-													 , getConfigurationValue(data, "Stint Data", "DriverNickname")))
+							   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
+												 , getConfigurationValue(data, "Stint Data", "DriverSurname")
+												 , getConfigurationValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 

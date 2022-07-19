@@ -157,12 +157,12 @@ namespace RF2SHMProvider {
 			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
+			string session = "";
+
 			Console.WriteLine("[Session Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
 				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
-
-				string session;
 
 				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
@@ -185,12 +185,21 @@ namespace RF2SHMProvider {
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
-				
-				long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
+				if (session == "Practice")
+				{
+					Console.WriteLine("SessionTimeRemaining=3600000");
 
-				Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+					Console.WriteLine("SessionLapsRemaining=30");
+				}
+				else
+				{
+					long time = GetRemainingTime(ref playerScoring);
+
+					Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
+
+					Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+				}
 			}
 
 			Console.WriteLine("[Stint Data]");
@@ -207,11 +216,18 @@ namespace RF2SHMProvider {
 				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
-				long time = GetRemainingTime(ref playerScoring);
+				if (session == "Practice")
+				{
+					Console.WriteLine("StintTimeRemaining=3600000");
+					Console.WriteLine("DriverTimeRemaining=3600000");
+				}
+				else
+				{
+					long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("StintTimeRemaining="); Console.WriteLine(time);
-				Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
-
+					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
+					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
+				}
 				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
 			}
 

@@ -285,8 +285,14 @@ int main(int argc, char* argv[]) {
 
 		long timeRemaining = getRemainingTime(localCopy);
 
-		printf("StintTimeRemaining=%ld\n", timeRemaining);
-		printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		if (localCopy->mSessionState == SESSION_PRACTICE) {
+			printf("StintTimeRemaining=3600000\n");
+			printf("DriverTimeRemaining=3600000\n");
+		}
+		else {
+			printf("StintTimeRemaining=%ld\n", timeRemaining);
+			printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		}
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");

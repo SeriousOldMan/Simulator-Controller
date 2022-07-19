@@ -205,6 +205,8 @@ int main(int argc, char* argv[])
 		}
 	}
 	else {
+		BOOL practice = FALSE;
+
 		wprintf_s(L"[Session Data]\n");
 		wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
 		if (mapped_r3e) {
@@ -213,8 +215,11 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				wprintf_s(L"Session=Race\n");
-			else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
+			else if (map_buffer->session_type == R3E_SESSION_PRACTICE) {
 				wprintf_s(L"Session=Practice\n");
+
+				practice = TRUE;
+			}
 			else
 				wprintf_s(L"Session=Other\n");
 			
@@ -227,11 +232,18 @@ int main(int argc, char* argv[])
 			wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
 			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
 
-			long timeRemaining = (getRemainingTime() * 1000);
+			if (practice) {
+				wprintf_s(L"SessionTimeRemaining=3600000\n");
 
-			wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"SessionLapsRemaining=30\n");
+			}
+			else {
+				long timeRemaining = (getRemainingTime() * 1000);
 
-			wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+				wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+
+				wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+			}
 		}
 
 		wprintf_s(L"[Car Data]\n");
@@ -316,10 +328,16 @@ int main(int argc, char* argv[])
 			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector));
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
-			long timeRemaining = (getRemainingTime() * 1000);
+			if (practice) {
+				wprintf_s(L"StintTimeRemaining=3600000\n");
+				wprintf_s(L"DriverTimeRemaining=3600000\n");
+			}
+			else {
+				long timeRemaining = (getRemainingTime() * 1000);
 
-			wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
-			wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
+			}
 			wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
 		}
 

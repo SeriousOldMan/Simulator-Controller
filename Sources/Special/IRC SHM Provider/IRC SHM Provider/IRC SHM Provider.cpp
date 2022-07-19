@@ -917,7 +917,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 							itoa(carIndex + 1, carIdx1, 10);
 
-							int index = max((int)round(((float*)trackPositions)[carIndex] * 1000), 999);
+							float percentage = ((float*)trackPositions)[carIndex];
+
+							int index = min((int)round(percentage * 1000), 999);
 
 							printf("Car.%s.Position=%f,%f\n", carIdx1, rXCoordinates[index], rYCoordinates[index]);
 						}
@@ -991,6 +993,8 @@ void loadTrackCoordinates(char* fileName) {
 
 int main(int argc, char* argv[])
 {
+	loadTrackCoordinates("D:\\Dateien\\Dokumente\\Simulator Controller\\Database\\User\\Tracks\\IRC\\oulton international.data");
+	hasTrackCoordinates = true;
 	if (argc > 1) {
 		if (strcmp(argv[1], "-Track") == 0) {
 			loadTrackCoordinates(argv[2]);

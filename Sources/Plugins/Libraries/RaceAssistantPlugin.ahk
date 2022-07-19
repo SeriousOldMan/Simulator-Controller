@@ -1157,7 +1157,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		simulator := this.Simulator
 		code := simulator.Code
 
-		trackData := sessionDB.getTrackData(code, simulator.Car, simulator.Track)
+		trackData := sessionDB.getTrackData(code, simulator.Track)
 
 		data := (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
 

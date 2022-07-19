@@ -29,6 +29,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	iAutomationPID := false
 
 	iMapperPID := false
+	iMapping := false
 	iHasTrackMap := false
 
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
@@ -283,6 +284,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	finishSession(arguments*) {
 		this.iHasTrackMap := false
+		this.iMapping := false
 		this.shutdownAutomation(true)
 
 		base.finishSession(arguments*)
@@ -296,7 +298,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
-		if (this.RaceAssistant && this.Simulator) {
+		if (this.RaceAssistant && this.Simulator && !this.iMapping) {
 			if this.iHasTrackMap
 				hasTrackMap := true
 			else {
@@ -313,6 +315,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					this.startupAutomation()
 			}
 			else if (!this.iMapperPID) {
+				this.iMapping := true
+
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
 				learning := getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)

@@ -1216,6 +1216,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			deltaX := false
 			deltaY := false
 
+			threshold := (threshold / scale)
+
 			Loop % getConfigurationValue(trackMap, "Map", "Points")
 			{
 				coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
@@ -1246,23 +1248,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	findTrackAction(coordinateX, coordinateY, threshold := 20) {
-		candidate := false
-		deltaX := false
-		deltaY := false
+		trackMap := this.TrackMap
+		trackImage := this.TrackImage
 
-		for index, action in this.SelectedTrackAutomation.Actions {
-			dX := Abs(coordinateX - action.X)
-			dY := Abs(coordinateY - action.Y)
+		if (this.SelectedTrackAutomation && trackMap && trackImage) {
+			candidate := false
+			deltaX := false
+			deltaY := false
 
-			if ((dX <= threshold) && (dY <= threshold) && (!candidate || ((dX + dy) < (deltaX + deltaY)))) {
-				candidate := action
+			threshold := (threshold / getConfigurationValue(trackMap, "Map", "Scale"))
 
-				deltaX := dx
-				deltaY := dy
+			for index, action in this.SelectedTrackAutomation.Actions {
+				dX := Abs(coordinateX - action.X)
+				dY := Abs(coordinateY - action.Y)
+
+				if ((dX <= threshold) && (dY <= threshold) && (!candidate || ((dX + dy) < (deltaX + deltaY)))) {
+					candidate := action
+
+					deltaX := dx
+					deltaY := dy
+				}
 			}
-		}
 
-		return candidate
+			return candidate
+		}
+		else
+			return false
 	}
 
 	trackClicked(coordinateX, coordinateY) {

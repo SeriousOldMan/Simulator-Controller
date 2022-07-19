@@ -499,7 +499,7 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		if (laps != lastLap) {
 			lastLap = laps;
 			
-			printf("0.0;0.0;0.0\n");
+			printf("0.0,0.0,0.0\n");
 
 			recording = true;
 		}
@@ -550,20 +550,41 @@ float xCoordinates[60];
 float yCoordinates[60];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
+float threshold = 20.0;
 
 void loadTrackCoordinates(char* fileName) {
 	std::ifstream infile(fileName);
 	int index = 0;
 
 	float x, y;
+	float xMin, xMax, yMin, yMax;
 
 	while (infile >> x >> y) {
 		rXCoordinates[index] = x;
 		rYCoordinates[index] = y;
 
+		if (index == 0) {
+			xMin = x;
+			xMax = x;
+			yMin = y;
+			yMax = y;
+		}
+		else {
+			xMin = min(xMin, x);
+			xMax = max(xMax, x);
+			yMin = min(yMin, y);
+			yMax = max(yMax, y);
+		}
+
 		if (++index > 999)
 			break;
 	}
+
+	int width = (int)(xMax - xMin);
+	int height = (int)(yMax - yMin);
+	float scale = min(1000 / width, 1000 / height);
+
+	threshold = threshold / scale;
 }
 
 void checkCoordinates(const irsdk_header* header, const char* data) {
@@ -597,13 +618,13 @@ void checkCoordinates(const irsdk_header* header, const char* data) {
 		float dy = velocityX * cos(yaw);
 
 		if ((dx > 0) || (dy > 0)) {
-			running = max(floor(running * 1000), 999);
+			running = min(floor(running * 1000), 999);
 
 			float coordinateX = rXCoordinates[(int)running];
 			float coordinateY = rYCoordinates[(int)running];
 
 			for (int i = 0; i < numCoordinates; i++) {
-				if (abs(xCoordinates[i] - coordinateX) < 20.0 && abs(yCoordinates[i] - coordinateY) < 20.0) {
+				if (abs(xCoordinates[i] - coordinateX) < threshold && abs(yCoordinates[i] - coordinateY) < threshold) {
 					char buffer[60] = "";
 					char numBuffer[60] = "";
 

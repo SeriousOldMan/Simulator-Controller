@@ -1638,6 +1638,13 @@ clearWearFields(database, table, id) {
 }
 
 updateConfigurationForV425() {
+	try {
+		FileRemoveDir %kDatabaseDirectory%User\Tracks, 1
+	}
+	catch exception {
+		; ignore
+	}
+
 	Loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV

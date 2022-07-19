@@ -632,7 +632,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingSim64DX11.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 

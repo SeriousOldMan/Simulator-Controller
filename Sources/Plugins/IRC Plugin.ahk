@@ -250,6 +250,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		standings := readSimulatorData(this.Code, "-Standings")
 
+		Loop % getConfigurationValue(standings, "Position Data", "Car.Count", 0)
+			setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr"
+								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
+
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }

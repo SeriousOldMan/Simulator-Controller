@@ -497,11 +497,15 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 		lastLap = laps;
 	else if (!recording) {
 		if (laps != lastLap) {
+			lastLap = laps;
+			
 			printf("0.0;0.0;0.0\n");
 
 			recording = true;
 		}
 	}
+	else if (laps != lastLap) 
+		return false;
 	else {
 		int carIdx = atoi(playerCarIdx);
 

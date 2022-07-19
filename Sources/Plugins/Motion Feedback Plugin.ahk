@@ -1094,9 +1094,11 @@ startMotion() {
 	protectionOn()
 
 	try {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
+		if SimulatorController.Instance.isActive(plugin) {
+			action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-		action.fireAction(action.Function, "On")
+			action.fireAction(action.Function, "On")
+		}
 	}
 	finally {
 		protectionOff()
@@ -1110,9 +1112,11 @@ stopMotion() {
 	protectionOn()
 
 	try {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
+		if SimulatorController.Instance.isActive(plugin) {
+			action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-		action.fireAction(action.Function, "Off")
+			action.fireAction(action.Function, "Off")
+		}
 	}
 	finally {
 		protectionOff()

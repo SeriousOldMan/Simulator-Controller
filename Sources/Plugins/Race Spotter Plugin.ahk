@@ -182,6 +182,28 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		this.shutdownAutomation()
 	}
 
+	selectTrackAutomation(name) {
+		if this.Simulator {
+			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
+																		, this.Simulator.Car, this.Simulator.Track)
+
+			for ignore, candidate in trackAutomations
+				if (candidate.Name = name) {
+					enabled := this.TrackAutomationEnabled
+
+					if enabled
+						this.disableTrackAutomations()
+
+					this.Simulator.TrackAutomation := candidate
+
+					if enabled
+						this.enableTrackAutomation()
+
+					return
+				}
+		}
+	}
+
 	startupAutomation() {
 		if !this.iAutomationPID && this.Simulator {
 			trackAutomation := this.Simulator.TrackAutomation
@@ -437,6 +459,62 @@ initializeRaceSpotterPlugin() {
 	local controller := SimulatorController.Instance
 
 	new RaceSpotterPlugin(controller, kRaceSpotterPlugin, controller.Configuration)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Controller Action Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+enableTrackAutomation() {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kRaceSpotterPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableTrackAutomation()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableTrackAutomation() {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kRaceSpotterPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableTrackAutomation()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+selectTrackAutomation(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kRaceSpotterPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.selectTrackAutomation(name)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

@@ -415,44 +415,68 @@ callSimHub(command) {
 
 activatePedalVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 
-	action.fireAction(action.Function, "On")
+		action.fireAction(action.Function, "On")
+	}
 }
 
 deactivatePedalVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 
-	action.fireAction(action.Function, "Off")
+		action.fireAction(action.Function, "Off")
+	}
 }
 
 activateFrontChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 
-	action.fireAction(action.Function, "On")
+		action.fireAction(action.Function, "On")
+	}
 }
 
 deactivateFrontChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 
-	action.fireAction(action.Function, "Off")
+		action.fireAction(action.Function, "Off")
+	}
 }
 
 activateRearChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 
-	action.fireAction(action.Function, "On")
+		action.fireAction(action.Function, "On")
+	}
 }
 
 deactivateRearChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-	local action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
+	local action
+	
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 
-	action.fireAction(action.Function, "Off")
+		action.fireAction(action.Function, "Off")
+	}
 }
 
 initializeTactileFeedbackPlugin() {

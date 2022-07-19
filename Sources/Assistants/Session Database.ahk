@@ -1739,6 +1739,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									; ignore
 								}
 						}
+					case translate("Automations"):
+						if this.SessionDatabase.hasTrackAutomations(simulator, car, track)
+							this.SessionDatabase.setTrackAutomations(simulator, car, track, [])
 				}
 
 				Gui %window%:Default
@@ -1884,6 +1887,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									; ignore
 								}
 						}
+					case translate("Automations"):
+						trackAutomations := this.SessionDatabase.getTrackAutomations(simulator, car, track)
+
+						this.SessionDatabase.saveTrackAutomations(trackAutomations, targetDirectory . "Track.automations")
 				}
 
 				Gui %window%:Default
@@ -2064,6 +2071,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
 								}
 							}
+
+							if (selection.HasKey(key . "Automations") && FileExist(sourceDirectory . "\Track.automations")) {
+								code := this.SessionDatabase.getSimulatorCode(simulator)
+
+								automations := this.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations")
+
+								trackAutomations := this.SessionDatabase.getTrackAutomations(simulator, car, track)
+
+								for ignore, automation in automations {
+									automation.Active := false
+
+									trackAutomations.Push(automation)
+								}
+
+								this.SessionDatabase.setTrackAutomations(simulator, car, track, trackAutomations)
+							}
 						}
 					}
 			}
@@ -2184,6 +2207,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									if (strategies > 0)
 										LV_Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
+
+									automations := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
+
+									if (automations > 0)
+										LV_Add("", translate("Automations"), (carName . " / " . trackName), "-", automations)
 								}
 							}
 						}
@@ -2233,6 +2261,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				telemetry := 0
 				pressures := 0
 				strategies := 0
+				automations := 0
 				tracks := 0
 
 				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
@@ -2281,6 +2310,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										strategies += 1
 									}
 
+									count := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
+
+									if (count > 0) {
+										automations += count
+
+										found := true
+									}
+
 									if (found && !inList(cars, car))
 										cars.Push(car)
 								}
@@ -2288,6 +2325,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 
 				LV_Add("", translate("Tracks"), tracks.Length())
+				LV_Add("", translate("Automations"), automations)
 				LV_Add("", translate("Drivers"), drivers.Length())
 				LV_Add("", translate("Cars"), cars.Length())
 				LV_Add("", translate("Telemetry"), telemetry)
@@ -3302,6 +3340,13 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 					if (strategies > 0)
 						LV_Add("Check", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
+
+					if FileExist(sourceDirectory . "\Track.automations") {
+						automations := editor.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations").Length()
+
+						if (automations > 0)
+							LV_Add("Check", translate("Automations"), (carName . " / " . trackName), "-", automations)
+					}
 				}
 			}
 		}

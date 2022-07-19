@@ -401,10 +401,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 planPitstop() {
+	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+	
 	protectionOn()
 
 	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).planPitstop()
+		if SimulatorController.Instance.isActive(plugin)
+			plugin.planPitstop()
 	}
 	finally {
 		protectionOff()
@@ -412,10 +415,13 @@ planPitstop() {
 }
 
 preparePitstop() {
+	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+	
 	protectionOn()
 
 	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).preparePitstop()
+		if SimulatorController.Instance.isActive(plugin)
+			plugin.preparePitstop()
 	}
 	finally {
 		protectionOff()

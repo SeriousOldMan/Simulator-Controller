@@ -298,6 +298,10 @@ class SimulatorPlugin extends ControllerPlugin {
 
 			return this.iTrackAutomation
 		}
+
+		Set {
+			return (this.iTrackAutomation := value)
+		}
 	}
 
 	SessionState[asText := false] {
@@ -1053,7 +1057,7 @@ getCurrentSimulatorPlugin(option := false) {
 openPitstopMFD(descriptor := false) {
 	local plugin := getCurrentSimulatorPlugin()
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {
@@ -1077,7 +1081,7 @@ openPitstopMFD(descriptor := false) {
 closePitstopMFD() {
 	local plugin := getCurrentSimulatorPlugin()
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {
@@ -1156,7 +1160,7 @@ changePitstopOption(option, selection := "Next", increments := 1) {
 
 	plugin := getCurrentSimulatorPlugin(option)
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {

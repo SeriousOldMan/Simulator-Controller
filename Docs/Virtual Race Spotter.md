@@ -169,15 +169,15 @@ Track maps are used by the "Race Center" which provide a [live view](https://git
 
 A special case when recording the track coordinates is *iRacing*. This simulator does not provide real track coordinates. A special algorithm is used here using the *yaw* angle of the car combined with the current velocity, while scanning this data with a 60 Hz resolution. Therefore it is absolutely necessary that you drive as clean as possible during the time where the track is recorded - typically during the first 4 laps. Drifting and sliding, although a lot of fun, will give you very bad results. The coordinates are derived as follows:
 
-	1. Initialize the starting position as *x = 0.0* and *y = 0.0*
-	1. Apply a fixed sampling rate, in this case 60 Hz.
-	2. Get a cars *yaw* value from the *iRacing* API.
-	4. Get the cars *velocity* for the x-direction from the *iRacing* API.
-	5. Calculate *dx* as *velocity(x)* * *sin(yaw)*
-	6. Calculate *dy* as *velocity(x)* * *cos(yaw)*
-	7. Set *x* as *x* + *dx*.
-	8. Set *y* as *y* + *dy*.
-	9. Wait one sample and go to 2. until the starting position (plus / minus a threshold) has been reached.
+1. Initialize the starting position as *x = 0.0* and *y = 0.0*.
+1. Apply a fixed sampling rate, in this case 60 Hz.
+2. Get a cars *yaw* value from the *iRacing* API.
+4. Get the cars *velocity* for the x-direction from the *iRacing* API.
+5. Calculate *dx* as *velocity(x)* * *sin(yaw)*.
+6. Calculate *dy* as *velocity(x)* * *cos(yaw)*.
+7. Set *x* as *x* + *dx*.
+8. Set *y* as *y* + *dy*.
+9. Wait one sample and go to 2. until the starting position (plus / minus a threshold) has been reached.
 
 As you can see, the yaw angle is the most important value in this calculation, therefore drive smoothly.
 

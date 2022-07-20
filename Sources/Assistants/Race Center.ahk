@@ -6976,7 +6976,9 @@ class RaceCenter extends ConfigurationItem {
 
 				scale := 0.99
 
-				while (imgWidth > (width / 2)) {
+				imgAreaWidth := (width / 2)
+
+				while (imgWidth > imgAreaWidth) {
 					imgWidth := Floor(imgWidth * scale)
 					imgHeight := Floor(imgHeight * scale)
 				}
@@ -6999,7 +7001,7 @@ class RaceCenter extends ConfigurationItem {
 
 			tableCSS := getTableCSS()
 
-			hWidth := Round(width / 2)
+			hWidth := Round(width / 2.5)
 
 			script =
 			(

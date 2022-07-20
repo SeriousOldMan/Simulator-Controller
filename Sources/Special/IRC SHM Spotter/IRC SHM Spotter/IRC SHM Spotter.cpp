@@ -716,7 +716,7 @@ int main(int argc, char* argv[])
 
 						getYamlValue(buffer, irsdk_getSessionInfoStr(), "WeekendInfo:TrackLength:");
 
-						trackLength = atof(buffer);
+						trackLength = atof(buffer) * 1000;
 					}
 
 					if (mapTrack) {

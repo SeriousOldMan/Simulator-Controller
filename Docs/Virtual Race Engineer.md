@@ -507,7 +507,7 @@ Notes:
 
 #### Automation
 
-At this page, you can define automatic actions for specific locations at the track. There is a [dedicated chapter](*) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
+At this page, you can define automatic actions for specific locations at the track. There is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 

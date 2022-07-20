@@ -167,7 +167,7 @@ Track maps are used by the "Race Center" which provide a [live view](https://git
 
 ### Special notes about track mapping in *iRacing*
 
-A special case when recording the track coordinates is *iRacing*. This simulator does not provide real track coordinates. A special algorithm is used here using the *Yaw* angle of the car combined with the current velocity, while scanning this data with a 60 Hz resolution. Therefore it is absolutely necessary that you drive as clean as possible during the time where the track is recorded - zypically during the first 4 laps. Drifting and sliding, although a lot of fun, will give you funny results.
+A special case when recording the track coordinates is *iRacing*. This simulator does not provide real track coordinates. A special algorithm is used here using the *yaw* angle of the car combined with the current velocity, while scanning this data with a 60 Hz resolution. Therefore it is absolutely necessary that you drive as clean as possible during the time where the track is recorded - typically during the first 4 laps. Drifting and sliding, although a lot of fun, will give you very bad results.
 
 ## Track Automations
 

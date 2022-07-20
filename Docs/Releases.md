@@ -3,13 +3,13 @@
   1. Bugfixes, as always
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
-  4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track position.
-     - A new page has been added to "Session Database", which allows you to specify [position dependent actions](*) for a specific simulator / car / track combination.
-     - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable position dependend actions when you are out on the track.
-	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](*), which let you control the track automationsm while on the track.
+  4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track location.
+     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automation) for a specific simulator / car / track combination.
+     - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
+	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the track automationsm while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.
 	 - Track automations can be exported and imported using the "Session Database" administration tool.
-  5. Track mapping incl. track automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](*).
+  5. Track mapping incl. track automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-425), especially if you are an *iRacing* user.
 	 

@@ -49,7 +49,7 @@ Updates are automatic. Please note, that all recorded track images will be delet
 
 A "TrackAutomation" action has been added to the "Race Spotter" plugin. You must add it to your configuration, if you want the new track events automation feature. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icon for the new "TrackAutomation" action will be available to you.
 
-IMPORTANT for *iRacing* users: The identification of the *iRacing* simulator main windows has changed. If you want to use the new track automation feature, you must change your configuration as well. Do the following:
+IMPORTANT for *iRacing* users: The identification of the *iRacing* simulator main window has changed. If you want to use the new track automation feature, you must change your configuration as well. Do the following:
 
 1. If you are still using "Simulator Setup" for all your configuration tasks, simply recreate a configuration. Done.
 2. If you use "Simulator Configuration", go to the "Applications" tab, select the "iRacing" application and set the Window title to "ahk_exe iRacingSim64DX11.exe". Save and Done.

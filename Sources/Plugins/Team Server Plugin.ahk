@@ -1032,6 +1032,45 @@ initializeTeamServerPlugin() {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Controller Action Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+enableTeamServer() {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kTeamServerPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableTeamServer()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableTeamServer() {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(kTeamServerPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableTeamServer()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 

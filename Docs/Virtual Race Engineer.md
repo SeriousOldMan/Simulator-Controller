@@ -505,6 +505,12 @@ Notes:
 
   2. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
 
+#### Automation
+
+At this page, you can define automatic actions for specific locations at the track. There is a [dedicated chapter](*) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
+
 #### Administration
 
 Here you can browse all available data in your session database. Data can be deleted by request and you can export data, so that it can be imported by one of your team mates or vice versa. The driver, who originally created the corresponding data will be preserved. Data of multiple drivers can be used in the strategy development using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development). When running team races using the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), data of your team mates will be stored to your database as well.

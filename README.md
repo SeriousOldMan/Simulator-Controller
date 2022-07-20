@@ -131,6 +131,10 @@ Simulator Controller also comes with a Virtual Spotter, which will keep an eye o
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2011.JPG)
 
+Beside the typical duties of a Spotter, this Assistant is also able to automate various actions depending on your location on the track. For example, it can automatically reduce the traction control, when approaching a tight turn.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
+
 #### Setup Advisor
 
 Another very useful tool of the Simulator Controller suite is the Setup Advisor. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.

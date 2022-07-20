@@ -370,6 +370,11 @@ Although you may call any globally defined function, you should use only the fol
 | openSessionDatabase | - | Race Engineer, Race Strategist | Opens the tool for the session database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. |
 | openStrategyWorkbench | - | Race Strategist | Opens the "Strategy Workbench" tool, with which you can explore the telemetrie data for past session, as long as they have been saved by the Race Strategist, and with which you can create a strategy for an upcoming race. If a simulation is currently running, several selections (car, track, and so on) will already be prefilled. |
 | openRaceCenter | - | Race Engineer, Race Strategist, Team Server | Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly. |
+| enableTeamServer | - | Team Server | Enables the team mode and opens a connection to the currently configured Team Server. Must be called before session start. |
+| disableTeamServer | - | Team Server | Disables the team mode and closes the connection to the Team Server. |
+| enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
+| disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
+| selectTrackAutomation | name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If track automation is currently enabled, the execution of actions will start with the next lap. |
 
 #### Trigger Detector Tool
 

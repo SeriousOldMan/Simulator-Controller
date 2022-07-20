@@ -159,7 +159,7 @@ Using the positions of the cars on the track, Elisa is able to create a map of a
 
 The second file, which is generated using the way points from the meta data file, is a simple image file representing the outline of the track (typical a PNG file).
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.png)
 
 The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
 

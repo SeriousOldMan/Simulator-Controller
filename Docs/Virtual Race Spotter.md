@@ -134,7 +134,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 ## Track Mapping
 
-Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except *iRacing*, where a different method is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (typically between 1000 and 1500 points for a typical race course).
+Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).
 
 	[General]
 	Simulator=Assetto Corsa Competizione
@@ -163,7 +163,7 @@ The second file, which is generated using the way points from the meta data file
 
 The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
 
-Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in he current simulator by issueing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of track automation.
+Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of track automation.
 
 ### Special notes about track mapping in *iRacing*
 
@@ -177,7 +177,7 @@ A special case when recording the track coordinates is *iRacing*. This simulator
 6. Calculate *dy* as *velocity(x)* * *cos(yaw)*.
 7. Set *x* as *x* + *dx*.
 8. Set *y* as *y* + *dy*.
-9. Wait one sample and go to 2. until the starting position (plus / minus a threshold) has been reached.
+9. Wait one sample and go to 2. unless the starting position (plus / minus a threshold) has been reached.
 
 As you can see, the yaw angle is the most important value in this calculation, therefore drive smoothly.
 
@@ -221,7 +221,7 @@ As you have seen above, you can select one of the available track automations as
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%201.JPG)
 
-If you are using "Simulator Setup" for your configuration tasks, you can achieve the same by adding the following lines to the ["Configuration Patch.ini"}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+If you are using "Simulator Setup" for your configuration tasks, you can achieve the same by adding the following lines to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
 
 	[Controller Functions]
 	Custom.42.Call=<^<!W

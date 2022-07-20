@@ -303,6 +303,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				result := (isNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
+				hasNull := false
 
 				Loop % lapsCount
 				{
@@ -310,9 +311,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					if (!isNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
-					else if (A_Index <= 2)
-						lapTimes.Push("null")
-					else
+					else if (A_Index == lapsCount)
 						result := "DNF"
 				}
 

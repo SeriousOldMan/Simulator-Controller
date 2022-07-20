@@ -665,11 +665,11 @@ int main(int argc, char* argv[])
 				int candidate;
 				float cDistance;
 
-				for (int c = 0; c < 999; c++) {
+				for (int c = 0; c < 1000; c++) {
 					float cX = rXCoordinates[c];
 					float cY = rYCoordinates[c];
 
-					float distance = sqrt((cX - x) * (cX - x) + (cY - y) * (cY -y));
+					float distance = sqrt((cX - x) * (cX - x) + (cY - y) * (cY - y));
 
 					if (c == 0 || distance < cDistance) {
 						cDistance = distance;
@@ -677,7 +677,7 @@ int main(int argc, char* argv[])
 					}
 				}
 
-				trackDistances[i] = ((float)candidate) / 1000.0;
+				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
 	
 				numCoordinates += 1;
 			}

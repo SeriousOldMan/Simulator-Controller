@@ -12,6 +12,7 @@
   5. Track mapping incl. track automations are now supported for *iRacing* as well. But since the algorithm to derive the track layout works without a real coordinate system, there are a [few things to mention](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing).
   6. Pretty track names will be collected for *iRacing* when you visit a track.
   7. Fixed a bug in race reports for *iRacing* when car race numbers contain a **"**.
+  8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-425), especially if you are an *iRacing* user.
 	 

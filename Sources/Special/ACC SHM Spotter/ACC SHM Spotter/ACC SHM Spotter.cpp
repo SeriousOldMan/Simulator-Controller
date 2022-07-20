@@ -576,7 +576,7 @@ bool writeCoordinates() {
 		
 		cout << coordinateX << "," << coordinateY << endl;
 
-		if (initialX == 0.0) {
+		if (coordCount == 0) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}

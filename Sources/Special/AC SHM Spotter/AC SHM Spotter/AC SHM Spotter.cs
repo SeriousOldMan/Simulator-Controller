@@ -651,7 +651,7 @@ namespace ACSHMSpotter {
 
 				Console.WriteLine(coordinateX + "," + coordinateY);
 
-				if (initialX == 0.0)
+				if (coordCount == 0)
 				{
 					initialX = coordinateX;
 					initialY = coordinateY;

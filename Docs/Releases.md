@@ -15,6 +15,10 @@
   8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.
   9. Improved handling of data inconsistencies in race reports, especially for *rFactor 2*.
   10. "Behind" alerts are now issued by the Spotter in *iRacing*.
+  11. Automatic forced restart of UDP connection to ACC on session changes.
+  12. New car models for "Setup Advisor":
+      - Assetto Corsa Competizione
+        - Ferrari 488 GT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-425), especially if you are an *iRacing* user.
 	 

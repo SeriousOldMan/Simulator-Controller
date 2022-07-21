@@ -280,6 +280,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
+		
+		return false
 	}
 
 	finishSession(arguments*) {
@@ -424,6 +426,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
+		
+		return false
 	}
 
 	positionTrigger(actionNr, positionX, positionY) {

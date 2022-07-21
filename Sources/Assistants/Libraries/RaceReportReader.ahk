@@ -194,29 +194,33 @@ class RaceReportReader {
 					validTimes.Push(time)
 			}
 
-		min := Round(minimum(validTimes) / 1000, 1)
-
-		stdDev := stdDeviation(validTimes)
-		avg := average(validTimes)
-
-		invalidTimes := []
-
-		for ignore, time in validTimes
-			if ((time > avg) && (Abs(time - avg) > stdDev))
-				invalidTimes.Push(time)
-
-		for ignore, time in invalidTimes
-			validTimes.RemoveAt(inList(validTimes, time))
-
-		if (validTimes.Length() > 1) {
-			max := Round(maximum(validTimes) / 1000, 1)
-			avg := Round(average(validTimes) / 1000, 1)
-			stdDev := (stdDeviation(validTimes) / 1000)
-
-			return true
-		}
-		else
+		if (validTimes.Length() = 0)
 			return false
+		else {
+			min := Round(minimum(validTimes) / 1000, 1)
+
+			stdDev := stdDeviation(validTimes)
+			avg := average(validTimes)
+
+			invalidTimes := []
+
+			for ignore, time in validTimes
+				if ((time > avg) && (Abs(time - avg) > stdDev))
+					invalidTimes.Push(time)
+
+			for ignore, time in invalidTimes
+				validTimes.RemoveAt(inList(validTimes, time))
+
+			if (validTimes.Length() > 1) {
+				max := Round(maximum(validTimes) / 1000, 1)
+				avg := Round(average(validTimes) / 1000, 1)
+				stdDev := (stdDeviation(validTimes) / 1000)
+
+				return true
+			}
+			else
+				return false
+		}
 	}
 
 	getDriverPotential(raceData, positions, car) {
@@ -238,14 +242,18 @@ class RaceReportReader {
 		{
 			position := positions[A_Index]
 
-			result += (Max(0, 11 - position) / 10)
+			if ((position = kNull) && (A_Index = positions.Length()))
+				return 0
+			else if (position != kNull) {
+				result += (Max(0, 11 - position) / 10)
 
-			if lastPosition
-				result += (lastPosition - position)
+				if lastPosition
+					result += (lastPosition - position)
 
-			lastPosition := position
+				lastPosition := position
 
-			result := Max(0, result)
+				result := Max(0, result)
+			}
 		}
 
 		return result
@@ -318,9 +326,15 @@ class RaceReportReader {
 		min := minimum(values)
 
 		for index, value in values
-			values[index] := halfTarget + (value - min)
+			if (value != 0)
+				values[index] := halfTarget + (value - min)
 
-		factor := (target / maximum(values))
+		max := maximum(values)
+
+		if (max = 0)
+			factor := 0
+		else
+			factor := (target / max)
 
 		for index, value in values
 			values[index] *= factor
@@ -403,7 +417,7 @@ correctEmptyValues(table, default := "__Undefined__") {
 
 		Loop % table[line].Length()
 			if (table[line][A_Index] = "-")
-				table[line][A_Index] := ((default == kUndefined) ? ((A_Index > 1) ? table[line][A_Index - 1] : "-") : default)
+				table[line][A_Index] := ((default == kUndefined) ? ((line > 1) ? table[line - 1][A_Index] : "-") : default)
 	}
 
 	return table

@@ -1680,19 +1680,18 @@ class RaceStrategist extends RaceAssistant {
 				if (carNr == kUndefined)
 					break
 
-				if raceInfo.HasKey(carNr . "") {
-					carIndex := raceInfo[carNr . ""]
+				carNr := (carNr . "")
+				carIndex := (raceInfo.HasKey(carNr) ? raceInfo[carNr] : A_Index)
 
-					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
-					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
-					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
+				times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
+				positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
+				laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
 
-					driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
-					driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
-					driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
+				driverForname := knowledgeBase.getValue(carPrefix . ".Driver.Forname")
+				driverSurname := knowledgeBase.getValue(carPrefix . ".Driver.Surname")
+				driverNickname := knowledgeBase.getValue(carPrefix . ".Driver.Nickname")
 
-					drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
-				}
+				drivers[carIndex] := computeDriverName(driverForname, driverSurname, driverNickname)
 			}
 
 			setConfigurationValue(data, "Times", lapNumber, values2String(";", times*))

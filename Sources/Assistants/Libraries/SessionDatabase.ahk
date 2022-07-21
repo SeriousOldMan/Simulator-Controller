@@ -274,8 +274,33 @@ class SessionDatabase extends ConfigurationItem {
 	getTrackMap(simulator, track) {
 		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
-		if FileExist(prefix . ".map")
-			return readConfiguration(prefix . ".map")
+		if FileExist(prefix . ".map") {
+			trackMap := false
+			points := false
+			header := ""
+
+			Loop Read, %prefix%.map
+			{
+				if (A_LoopReadLine == "[Points]") {
+					trackMap := parseConfiguration(header)
+
+					points := {}
+				}
+				else if points {
+					keyValue := string2Values("=", A_LoopReadLine)
+
+					points[keyValue[1]] := (keyValue[2] + 0)
+				}
+				else
+					header .= (A_LoopReadLine . "`n")
+			}
+
+			count := points.Count()
+
+			setConfigurationSectionValues(trackMap, "Points", points)
+
+			return trackMap
+		}
 		else
 			return false
 	}

@@ -600,10 +600,9 @@ class SessionDatabase extends ConfigurationItem {
 			compounds := settingsDB.readSettingValue(simulator, car, track, "*"
 												   , "Session Settings", "Tyre.Compound.Choices"
 												   , kUndefined)
+			data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
 			if (compounds == kUndefined) {
-				data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
-
 				compounds := getConfigurationValue(data, "Cars", car . ";" . track, kUndefined)
 
 				if (compounds == kUndefined)

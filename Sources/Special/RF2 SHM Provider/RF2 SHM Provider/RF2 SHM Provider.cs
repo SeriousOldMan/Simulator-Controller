@@ -275,7 +275,7 @@ namespace RF2SHMProvider {
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
 					var vehicle = scoring.mVehicles[i];
 
-					Console.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + vehicle.mPos.z);
+					Console.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
 				}
 			}
 

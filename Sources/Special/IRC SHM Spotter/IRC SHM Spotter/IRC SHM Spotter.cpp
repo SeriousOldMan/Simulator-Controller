@@ -306,11 +306,13 @@ const char* computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
 			}
+			else
+				situationCount += 1;
 		}
 		else
 			situationCount = 0;
@@ -472,7 +474,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 	int flags = atoi(buffer);
 
 	if ((waitYellowFlagState & YELLOW) != 0) {
-		if (yellowCount++ > 50) {
+		if (yellowCount > 50) {
 			if ((flags & irsdk_yellow) == 0 && (flags & irsdk_yellowWaving) == 0)
 				waitYellowFlagState &= ~YELLOW;
 
@@ -486,6 +488,8 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 				return true;
 			}
 		}
+		else
+			yellowCount += 1;
 	}
 	else
 		yellowCount = 0;
@@ -498,11 +502,13 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -547,7 +553,6 @@ float initialX = 0.0;
 float initialY = 0.0;
 float lastX = 0.0;
 float lastY = 0.0;
-int coordCount = 0;
 int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;

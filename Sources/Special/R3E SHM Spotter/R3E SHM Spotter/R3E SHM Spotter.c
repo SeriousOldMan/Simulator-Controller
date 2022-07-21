@@ -161,11 +161,13 @@ char* computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
 			}
+			else
+				situationCount += 1;
 		}
 		else
 			situationCount = 0;
@@ -390,7 +392,7 @@ BOOL checkFlagState() {
 	int sector = 0;
 	
 	if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
-		if (yellowCount++ > 50) {
+		if (yellowCount > 50) {
 			if (map_buffer->flags.sector_yellow[0] == 0)
 				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -420,6 +422,8 @@ BOOL checkFlagState() {
 				sector = 3;
 			}
 		}
+		else
+			yellowCount += 1;
 	}
 	else
 		yellowCount = 0;
@@ -433,11 +437,13 @@ BOOL checkFlagState() {
 
 				return TRUE;
 			}
-			else if (blueCount++ > 1000) {
+			else if (blueCount > 1000) {
 				lastFlagState &= ~BLUE;
 
 				blueCount = 0;
 			}
+			else
+				blueCount += 1;
 		}
 		else {
 			lastFlagState &= ~BLUE;
@@ -592,8 +598,10 @@ BOOL writeCoordinates(int playerID) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount++ > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return FALSE;
+		else
+			coordCount += 1;
 	}
 
 	return TRUE;

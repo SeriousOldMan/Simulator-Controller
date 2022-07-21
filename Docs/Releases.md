@@ -13,7 +13,8 @@
   6. Pretty track names will be collected for *iRacing* when you visit a track.
   7. Fixed a bug in race reports for *iRacing* when car race numbers contain a **"**.
   8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.
-  9. "Behind" alerts are now issued by the Spotter in *iRacing*.
+  9. Improved handling of data inconsistencies in race reports, especially for *rFactor 2*.
+  10. "Behind" alerts are now issued by the Spotter in *iRacing*.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-425), especially if you are an *iRacing* user.
 	 

@@ -113,7 +113,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else
 				SetTimer updateRaceSpotterSessionState, 5000
 
-			OnExit(ObjBindMethod(this, "shutdownAutomation", true))
+			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 		}
 	}
@@ -180,7 +180,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	disableTrackAutomation() {
 		this.iTrackAutomationEnabled := false
 
-		this.shutdownAutomation()
+		this.shutdownTrackAutomation()
 	}
 
 	selectTrackAutomation(name) {
@@ -205,7 +205,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	startupAutomation() {
+	startupTrackAutomation() {
 		if !this.iAutomationPID && this.Simulator {
 			trackAutomation := this.Simulator.TrackAutomation
 
@@ -226,7 +226,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
 				if FileExist(exePath) {
-					this.shutdownAutomation()
+					this.shutdownTrackAutomation()
 
 					try {
 						if data
@@ -252,7 +252,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	shutdownAutomation(force := false) {
+	shutdownTrackAutomation(force := false) {
 		automationPID := this.iAutomationPID
 
 		if automationPID {
@@ -285,7 +285,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	finishSession(arguments*) {
 		this.iHasTrackMap := false
 		this.iMapping := false
-		this.shutdownAutomation(true)
+		this.shutdownTrackAutomation(true)
 
 		base.finishSession(arguments*)
 	}
@@ -312,7 +312,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				this.iHasTrackMap := true
 
 				if (!this.iAutomationPID && this.TrackAutomationEnabled)
-					this.startupAutomation()
+					this.startupTrackAutomation()
 			}
 			else if (!this.iMapperPID) {
 				this.iMapping := true
@@ -379,10 +379,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				SetTimer %callback%, -10000
 			}
 			else {
+				this.iMapperPID := false
+
 				try {
 					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, Hide
-
-					this.iMapperPID := false
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))

@@ -365,7 +365,7 @@ class RaceReportReader {
 						if (!laps || inList(laps, A_Index))
 							drivers.Push(string2Values(";", A_LoopReadLine))
 
-					drivers := correctEmptyValues(drivers)
+					drivers := correctEmptyValues(drivers, "")
 				}
 
 				if positions {
@@ -401,10 +401,9 @@ correctEmptyValues(table, default := "__Undefined__") {
 	{
 		line := A_Index
 
-		if (line > 1)
-			Loop % table[line].Length()
-				if (table[line][A_Index] = "-")
-					table[line][A_Index] := ((default == kUndefined) ? table[line][A_Index - 1] : default)
+		Loop % table[line].Length()
+			if (table[line][A_Index] = "-")
+				table[line][A_Index] := ((default == kUndefined) ? ((A_Index > 1) ? table[line][A_Index - 1] : "-") : default)
 	}
 
 	return table

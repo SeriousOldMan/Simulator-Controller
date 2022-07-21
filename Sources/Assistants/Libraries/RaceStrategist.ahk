@@ -1606,7 +1606,8 @@ class RaceStrategist extends RaceAssistant {
 					carNr := StrReplace(knowledgeBase.getValue("Car." . A_Index . ".Nr", 0) . "", """", "")
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
+										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 
 					if (grid != false) {
 						index := (raceInfo.HasKey(carNr) ? raceInfo[carNr] : A_Index)
@@ -1614,7 +1615,8 @@ class RaceStrategist extends RaceAssistant {
 						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[index + 0])
 					}
 					else
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position"
+											, knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
 				}
 
 				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")

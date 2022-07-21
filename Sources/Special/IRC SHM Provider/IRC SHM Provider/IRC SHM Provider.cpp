@@ -536,6 +536,28 @@ void readDriverInfo(const char* sessionInfo, char* carIdx, char* forName, char* 
 	}
 }
 
+bool hasTrackCoordinates = false;
+float rXCoordinates[1000];
+float rYCoordinates[1000];
+
+bool getCarCoordinates(const irsdk_header* header, const char* data, const char* sessionInfo,
+					  const int carIdx, float& coordinateX, float& coordinateY) {
+	char* trackPositions;
+
+	if (hasTrackCoordinates) {
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+			int index = min((int)round(((float*)trackPositions)[carIdx] * 1000), 999);
+
+			coordinateX = rXCoordinates[index];
+			coordinateY = rYCoordinates[index];
+
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 void writeStandings(const irsdk_header *header, const char* data)
 {
 	if (header && data)
@@ -614,10 +636,6 @@ void writeStandings(const irsdk_header *header, const char* data)
 		}
 	}
 }
-
-bool hasTrackCoordinates = false;
-float rXCoordinates[1000];
-float rYCoordinates[1000];
 
 void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 {
@@ -911,31 +929,27 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("Grip=%s\n", gripLevel);
 
-			if (hasTrackCoordinates) {
-				char* trackPositions;
+			for (int i = 1; ; i++) {
+				char posIdx[10];
+				char carIdx[10];
 
-				if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
-					for (int i = 1; ; i++) {
-						char posIdx[10];
-						char carIdx[10];
+				itoa(i, posIdx, 10);
 
-						itoa(i, posIdx, 10);
+				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+					int carIndex = atoi(carIdx);
+					float coordinateX;
+					float coordinateY;
 
-						if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
-							int carIndex = atoi(carIdx);
-							char carIdx1[10];
+					if (getCarCoordinates(header, data, sessionInfo, carIndex, coordinateX, coordinateY)) {
+						char carIdx1[10];
 
-							itoa(carIndex + 1, carIdx1, 10);
+						itoa(carIndex + 1, carIdx1, 10);
 
-							float percentage = ((float*)trackPositions)[carIndex];
-
-							int index = min((int)round(percentage * 1000), 999);
-
-							printf("Car.%s.Position=%f,%f\n", carIdx1, rXCoordinates[index], rYCoordinates[index]);
-						}
-						else
-							break;
+						printf("Car.%s.Position=%f,%f\n", carIdx1, coordinateX, coordinateY);
 					}
+				}
+				else
+					break;
 			}
 
 			printf("[Weather Data]\n");

@@ -112,7 +112,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
 | ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
 | Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert              | Yes           | Yes                        | Yes             | No (2)  | Yes                        | Yes       | Yes            |
+| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2)  | Yes                        | Yes       | Yes            |
 | Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
@@ -128,7 +128,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (1) Due to the way the data acquisition for *Assetto Corsa* works, it is possible that alerts for cars on your side will be given for the wrong side from time to time. I am working on a heuristic to prevent that.
 
-(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
+(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
 

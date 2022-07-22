@@ -211,6 +211,8 @@ Don't forget to save the Track Automation finally. After you have create all req
 
 Some words of advice: The action points are identified by the current location of your car. Since there is a sampling rate of about 200 Hz, the location on the track is never exact. Therefore a distance threshold is used, which is about 20 meters. Additionally a cool down period of 2 seconds is used to suppress multiple activations of the same action. This works pretty well. But make sure to use enough distance between your action locations, at least larger than the above mentioned threshold. This is especially important, where two parts of the track are quite near (only separated by a wall, for example). If you ever crash exactly at the location of an action point, this action might be triggered mutiple times, but you will already have a different problem, right?
 
+And a final warning: This kind of automation might be considered illegal according to the rules of some leagues. Therefore please check the rulebooks, when participating in league races. Please obey the rules and follow the spirit of sportsmanship.
+
 ### Enabling and disabling Track Automations
 
 For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations.

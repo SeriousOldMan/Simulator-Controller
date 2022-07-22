@@ -200,23 +200,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 
-	startupUDPClient() {
-		if !this.UDPClient {
+	startupUDPClient(force := false) {
+		if (!this.UDPClient || force) {
+			this.shutdownUDPClient(force)
+
 			exePath := kBinariesDirectory . "ACC UDP Provider.exe"
 
 			try {
-				Loop 6 {
-					Process Exist, ACC UDP Provider.exe
-
-					if ErrorLevel {
-						Process Close, %ErrorLevel%
-
-						Sleep 250
-					}
-					else
-						break
-				}
-
 				if FileExist(kTempDirectory . "ACCUDP.cmd")
 					FileDelete %kTempDirectory%ACCUDP.cmd
 
@@ -246,8 +236,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	shutdownUDPClient() {
-		if this.UDPClient {
+	shutdownUDPClient(force := false) {
+		if (this.UDPClient || force) {
 			FileAppend Exit, %kTempDirectory%ACCUDP.cmd
 
 			Sleep 250
@@ -276,11 +266,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !ErrorLevel
 			this.iUDPClient := false
 
-		if !this.UDPClient
+		if (this.SessionState == kSessionRace)
 			this.startupUDPClient()
 	}
 
 	updateSessionState(sessionState) {
+		lastSessionState := this.SessionState
+
 		base.updateSessionState(sessionState)
 
 		activeModes := this.Controller.ActiveModes
@@ -292,7 +284,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPitstopMode.updateActions(sessionState)
 
 		if (sessionState == kSessionRace)
-			this.startupUDPClient()
+			this.startupUDPClient((lastSessionState != kSessionRace) && (lastSessionState != kSessionPaused))
 		else {
 			if (sessionState == kSessionFinished) {
 				this.iRepairSuspensionChosen := true

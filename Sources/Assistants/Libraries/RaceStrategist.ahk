@@ -724,7 +724,12 @@ class RaceStrategist extends RaceAssistant {
 		setConfigurationValue(raceData, "Cars", "Driver", getConfigurationValue(data, "Position Data", "Driver.Car"))
 
 		Loop %carCount% {
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
+
+			if InStr(carNr, """")
+				carNr := StrReplace(carNr, """", "")
+
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
 		}
 
@@ -1564,7 +1569,7 @@ class RaceStrategist extends RaceAssistant {
 
 			grid.Push(carPosition)
 
-			raceInfo[carNr . ""] := A_Index
+			raceInfo["#" . carNr] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
@@ -1603,18 +1608,22 @@ class RaceStrategist extends RaceAssistant {
 				grid := (raceInfo ? raceInfo["Grid"] : false)
 
 				Loop %carCount% {
-					carNr := StrReplace(knowledgeBase.getValue("Car." . A_Index . ".Nr", 0) . "", """", "")
+					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
+
+					if InStr(carNr, """")
+						carNr := StrReplace(carNr, """", "")
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
+										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 
-					if (grid != false) {
-						index := (raceInfo.HasKey(carNr) ? raceInfo[carNr] : A_Index)
+					key := ("#" . carNr)
 
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[index + 0])
-					}
+					if ((grid != false) && raceInfo.HasKey(key))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[raceInfo[key]])
 					else
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position"
+											, knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
 				}
 
 				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")
@@ -1657,7 +1666,10 @@ class RaceStrategist extends RaceAssistant {
 
 			raceInfo := this.RaceInfo
 
-			carCount := raceInfo["Cars"]
+			if raceInfo
+				carCount := raceInfo["Cars"]
+			else
+				raceInfo := {}
 
 			times := []
 			positions := []
@@ -1677,10 +1689,19 @@ class RaceStrategist extends RaceAssistant {
 
 				if (carNr == kUndefined)
 					break
+				else if InStr(carNr, """")
+					carNr := StrReplace(carNr, """", "")
 
-				if raceInfo.HasKey(carNr . "") {
-					carIndex := raceInfo[carNr . ""]
+				key := ("#" . carNr)
 
+				if raceInfo.HasKey(key)
+					carIndex := raceInfo[key]
+				else if (A_Index <= carCount)
+					carIndex := A_Index
+				else
+					carIndex := false
+
+				if carIndex {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
 					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))

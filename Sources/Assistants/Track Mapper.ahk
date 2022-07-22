@@ -50,8 +50,9 @@ createTrackImage(trackMap) {
 	offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
 	offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
 
-	marginX := (mapWidth / 20)
-	marginY := (mapHeight / 20)
+	margin := Min(mapWidth / 20, mapHeight / 20)
+	marginX := margin
+	marginY := margin
 
 	setConfigurationValue(trackMap, "Map", "Margin.X", marginX)
 	setConfigurationValue(trackMap, "Map", "Margin.Y", marginY)

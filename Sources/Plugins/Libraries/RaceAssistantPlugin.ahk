@@ -1249,16 +1249,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if ((dataLastLap < this.LastLap) || (this.iLastSession != sessionState)) {
 					; Start of new session without finishing previous session first
 
+					wasFinished := (this.iLastSession == kSessionFinished)
+
 					this.iLastSession := sessionState
 					this.iLastLap := 0
 					this.iLastLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
-					if this.RaceAssistant {
-						this.finishSession()
+					if !wasFinished {
+						this.updateSessionState(kSessionFinished)
 
-						return
+						if this.RaceAssistant {
+							this.finishSession()
+
+							return
+						}
 					}
 				}
 

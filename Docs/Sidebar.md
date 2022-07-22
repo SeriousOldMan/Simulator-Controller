@@ -112,6 +112,7 @@
     - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1)
     - [Setup Repository](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setup-repository)
     - [Tyre Pressure Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressure-advisor)
+    - [Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automation)
 	- [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information)
     - [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-rule-engine)
@@ -152,6 +153,7 @@
     - [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information)
   - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
   - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping)
+  - [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

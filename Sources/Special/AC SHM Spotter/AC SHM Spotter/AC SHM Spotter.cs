@@ -651,13 +651,15 @@ namespace ACSHMSpotter {
 
 				Console.WriteLine(coordinateX + "," + coordinateY);
 
-				if (initialX == 0.0)
+				if (coordCount == 0)
 				{
 					initialX = coordinateX;
 					initialY = coordinateY;
 				}
-				else if (coordCount++ > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+				else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 					return false;
+
+				coordCount += 1;
 			}
 
 			return true;

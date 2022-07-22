@@ -279,16 +279,40 @@ int waitYellowFlagState = 0;
 bool pitWindowOpenReported = false;
 bool pitWindowClosedReported = true;
 
+float rXCoordinates[1000];
+float rYCoordinates[1000];
+bool hasTrackCoordinates = false;
+
+bool getCarCoordinates(const irsdk_header* header, const char* data, const char* sessionInfo,
+	const int carIdx, float& coordinateX, float& coordinateY) {
+	char* trackPositions;
+
+	if (hasTrackCoordinates) {
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+			int index = min((int)round(((float*)trackPositions)[carIdx] * 1000), 999);
+
+			coordinateX = rXCoordinates[index];
+			coordinateY = rYCoordinates[index];
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 const char* computeAlert(int newSituation) {
 	const char* alert = noAlert;
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
 			}
+			else
+				situationCount += 1;
 		}
 		else
 			situationCount = 0;
@@ -341,8 +365,12 @@ const char* computeAlert(int newSituation) {
 	return alert;
 }
 
-bool checkPositions(const irsdk_header* header, const char* data) {
+bool checkPositions(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
 	char buffer[64];
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char sessionID[10] = "";
+
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
 
 	getDataValue(buffer, header, data, "CarLeftRight");
 
@@ -354,8 +382,44 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 		newSituation = LEFT;
 	else if (newSituation == 6)
 		newSituation = RIGHT;
-	else if (newSituation > CLEAR)
-		newSituation = newSituation;
+	else if (newSituation >= THREE)
+		newSituation = THREE;
+
+	carBehind = false;
+
+	if (newSituation == CLEAR) {
+		char* trackPositions;
+
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+			float playerRunning = ((float*)trackPositions)[playerCarIndex];
+
+			for (int i = 1; ; i++) {
+				char posIdx[10];
+				char carIdx[10];
+
+				itoa(i, posIdx, 10);
+
+				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+					int carIndex = atoi(carIdx);
+
+					if (carIndex != playerCarIndex) {
+						float carRunning = ((float*)trackPositions)[carIndex];
+
+						if (carRunning < playerRunning)
+							if (abs(carRunning - playerRunning) < (nearByDistance / trackLength)) {
+								carBehind = true;
+
+								break;
+							}
+					}
+				}
+				else
+					break;
+			}
+		}
+	}
+	else
+		carBehindReported = false;
 
 	const char* alert = computeAlert(newSituation);
 
@@ -374,6 +438,18 @@ bool checkPositions(const irsdk_header* header, const char* data) {
 
 		return true;
 	}
+	else if (carBehind)
+	{
+		if (!carBehindReported) {
+			carBehindReported = true;
+
+			sendSpotterMessage("proximityAlert:Behind");
+
+			return true;
+		}
+	}
+	else
+		carBehindReported = false;
 
 	return false;
 }
@@ -398,7 +474,7 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 	int flags = atoi(buffer);
 
 	if ((waitYellowFlagState & YELLOW) != 0) {
-		if (yellowCount++ > 50) {
+		if (yellowCount > 50) {
 			if ((flags & irsdk_yellow) == 0 && (flags & irsdk_yellowWaving) == 0)
 				waitYellowFlagState &= ~YELLOW;
 
@@ -412,6 +488,8 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 				return true;
 			}
 		}
+		else
+			yellowCount += 1;
 	}
 	else
 		yellowCount = 0;
@@ -424,11 +502,13 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -473,7 +553,6 @@ float initialX = 0.0;
 float initialY = 0.0;
 float lastX = 0.0;
 float lastY = 0.0;
-int coordCount = 0;
 int lastLap = 0;
 float lastRunning = 0.0;
 bool recording = false;
@@ -543,9 +622,6 @@ bool writeCoordinates(const irsdk_header* header, const char* data) {
 	return true;
 }
 
-float rXCoordinates[1000];
-float rYCoordinates[1000];
-
 float xCoordinates[60];
 float yCoordinates[60];
 float trackDistances[60];
@@ -565,6 +641,8 @@ void loadTrackCoordinates(char* fileName) {
 		if (++index > 999)
 			break;
 	}
+
+	hasTrackCoordinates = true;
 }
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
@@ -643,7 +721,7 @@ int main(int argc, char* argv[])
 	timeBeginPeriod(1);
 
 	bool running = false;
-	int countdown = 4000;
+	int countdown = 1000;
 	bool mapTrack = false;
 	bool positionTrigger = false;
 
@@ -665,11 +743,11 @@ int main(int argc, char* argv[])
 				int candidate;
 				float cDistance;
 
-				for (int c = 0; c < 999; c++) {
+				for (int c = 0; c < 1000; c++) {
 					float cX = rXCoordinates[c];
 					float cY = rYCoordinates[c];
 
-					float distance = sqrt((cX - x) * (cX - x) + (cY - y) * (cY -y));
+					float distance = sqrt((cX - x) * (cX - x) + (cY - y) * (cY - y));
 
 					if (c == 0 || distance < cDistance) {
 						cDistance = distance;
@@ -677,7 +755,7 @@ int main(int argc, char* argv[])
 					}
 				}
 
-				trackDistances[i] = ((float)candidate) / 1000.0;
+				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
 	
 				numCoordinates += 1;
 			}
@@ -764,9 +842,12 @@ int main(int argc, char* argv[])
 							char playerCarIdx[10] = "";
 
 							getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+
+							int playerCarIndex = atoi(playerCarIdx);
+
 							getRawDataValue(rawValue, pHeader, g_data, "CarIdxOnPitRoad");
 
-							if (((bool*)rawValue)[atoi(playerCarIdx)])
+							if (((bool*)rawValue)[playerCarIndex])
 								inPit = true;
 							/*
 							else {
@@ -779,7 +860,7 @@ int main(int argc, char* argv[])
 							*/
 
 							if (onTrack && !inPit) {
-								if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data))
+								if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
 									checkPitWindow(pHeader, g_data);
 
 								continue;

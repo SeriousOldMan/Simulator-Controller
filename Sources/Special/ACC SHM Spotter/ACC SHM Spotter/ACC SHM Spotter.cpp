@@ -162,7 +162,9 @@ string computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			situationCount += 1;
+
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
@@ -391,7 +393,9 @@ bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
-		if (yellowCount++ > 50) {
+		yellowCount += 1;
+
+		if (yellowCount > 50) {
 			if (!gf->GlobalYellow1)
 				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -439,11 +443,13 @@ bool checkFlagState() {
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -576,12 +582,14 @@ bool writeCoordinates() {
 		
 		cout << coordinateX << "," << coordinateY << endl;
 
-		if (initialX == 0.0) {
+		if (coordCount == 0) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount++ > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
+		
+		coordCount += 1;
 	}
 
 	return true;

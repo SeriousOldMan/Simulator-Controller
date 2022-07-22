@@ -1184,7 +1184,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, threshold := 20) {
+	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, threshold := 40) {
 		trackMap := this.TrackMap
 		trackImage := this.TrackImage
 
@@ -1211,7 +1211,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			x := ((x / scale) - offsetX - marginX)
 			y := ((y / scale) - offsetY - marginY)
 
-			candidateX := false
+			candidateX := kUndefined
 			candidateY := false
 			deltaX := false
 			deltaY := false
@@ -1226,7 +1226,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				dX := Abs(coordX - x)
 				dY := Abs(coordY - y)
 
-				if ((dX <= threshold) && (dY <= threshold) && (!candidateX || ((dX + dy) < (deltaX + deltaY)))) {
+				if ((dX <= threshold) && (dY <= threshold) && ((candidateX == kUndefined) || ((dx + dy) < (deltaX + deltaY)))) {
 					candidateX := coordX
 					candidateY := coordY
 					deltaX := dX
@@ -1234,7 +1234,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 
-			if candidateX {
+			if (candidateX != kUndefined) {
 				coordinateX := candidateX
 				coordinateY := candidateY
 

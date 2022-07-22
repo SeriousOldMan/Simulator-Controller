@@ -303,6 +303,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				result := (isNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
+				hasNull := false
 
 				Loop % lapsCount
 				{
@@ -310,9 +311,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					if (!isNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
-					else if (A_Index <= 2)
-						lapTimes.Push("null")
-					else
+					else if (A_Index == lapsCount)
 						result := "DNF"
 				}
 
@@ -731,18 +730,50 @@ class RaceReportViewer extends RaceReportReader {
 				driverTimes[lap] := lapTimes
 			}
 
+			invalidCars := []
+
+			for index, car in selectedCars {
+				carTimes := []
+
+				for ignore, lap in laps {
+					time := drivertimes[lap][car]
+
+					if (time != kNull)
+						carTimes.Push(time)
+				}
+
+				if (carTimes.Length() == 0)
+					invalidCars.Push(car)
+				else {
+					avg := average(carTimes)
+
+					for ignore, lap in laps
+						if (drivertimes[lap][car] = kNull)
+							drivertimes[lap][car] := avg
+				}
+			}
+
 			drawChartFunction := "function drawChart() {"
 
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 
 			cars := []
 
-			for ignore, car in selectedCars
-				cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+			offset := 0
 
-			singleChar := (selectedCars.Length() = 1)
+			for index, car in selectedCars
+				if inList(invalidCars, car) {
+					for ignore, lap in laps
+						driverTimes[lap].RemoveAt(index - offset)
 
-			if singleChar {
+					offset += 1
+				}
+				else
+					cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+
+			singleCar := (cars.Length() = 1)
+
+			if singleCar {
 				cars.Push(translate("Max"))
 				cars.Push(translate("Avg"))
 				cars.Push(translate("Min"))
@@ -788,7 +819,7 @@ class RaceReportViewer extends RaceReportReader {
 			series := ""
 			title := ""
 
-			if singleChar {
+			if singleCar {
 				consistency := 0
 
 				for ignore, time in allTimes

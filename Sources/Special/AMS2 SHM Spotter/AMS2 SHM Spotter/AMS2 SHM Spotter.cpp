@@ -116,11 +116,13 @@ const char* computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
 			}
+			else
+				situationCount += 1;
 		}
 		else
 			situationCount = 0;
@@ -339,7 +341,7 @@ bool checkPositions(const SharedMemory* sharedData) {
 
 bool checkFlagState(const SharedMemory* sharedData) {
 	if ((waitYellowFlagState & YELLOW) != 0) {
-		if (yellowCount++ > 50) {
+		if (yellowCount > 50) {
 			if (!(sharedData->mHighestFlagColour == FLAG_COLOUR_YELLOW || sharedData->mHighestFlagColour == FLAG_COLOUR_DOUBLE_YELLOW))
 				waitYellowFlagState &= ~YELLOW;
 
@@ -353,6 +355,8 @@ bool checkFlagState(const SharedMemory* sharedData) {
 				return true;
 			}
 		}
+		else
+			yellowCount += 1;
 	}
 	else
 		yellowCount = 0;
@@ -365,11 +369,13 @@ bool checkFlagState(const SharedMemory* sharedData) {
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -441,12 +447,14 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 
 		printf("%f,%f\n", coordinateX, coordinateY);
 
-		if (initialX == 0.0) {
+		if (coordCount == 0) {
 			initialX = coordinateX;
 			initialY = coordinateY;
 		}
-		else if (coordCount++ > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
+		
+		coordCount += 1;
 	}
 
 	return true;

@@ -112,7 +112,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
 | ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
 | Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert              | Yes           | Yes                        | Yes             | No (2)  | Yes                        | Yes       | Yes            |
+| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2)  | Yes                        | Yes       | Yes            |
 | Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
@@ -128,13 +128,13 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (1) Due to the way the data acquisition for *Assetto Corsa* works, it is possible that alerts for cars on your side will be given for the wrong side from time to time. I am working on a heuristic to prevent that.
 
-(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. So there is actually no way to safely decide, whether a car is behind you.
+(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
 
 ## Track Mapping
 
-Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except iRacing, where no coordinates are available through the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (typically between 1000 and 1500 points for a typical race course).
+Using the positions of the cars on the track, Elisa is able to create a map of any track in any simulator (except for *iRacing*, where a [different method](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#special-notes-about-track-mapping-in-iracing) is applied, since no coordinates are available in the API). A track map consists of two files which are stored in your local database. The first file with the ".map" extension contains the meta data of the track map and all way points (between 1000 and 1500 points for a typical race course).
 
 	[General]
 	Simulator=Assetto Corsa Competizione
@@ -159,25 +159,37 @@ Using the positions of the cars on the track, Elisa is able to create a map of a
 
 The second file, which is generated using the way points from the meta data file, is a simple image file representing the outline of the track (typical a PNG file).
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Map.png)
 
 The track maps are recorded using a 20 Hz resolution, which is comparable to the resolution of high end GPS-based track mapping devices. Therefore the resolution of the generated maps is very good. But since the maps are created, while you are driving on a track, it may be possible that the generated map is not perfect, because you had an offtrack or even an accident. If you face such a situation, simply delete the track in question using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) tool and the track map will be regenerated during your next visit on this track.
 
-Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in he current simulator by issueing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of track automation.
+Track maps are used by the "Race Center" which provide a [live view](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) of the current race situation. And using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), you can associate actions with specific locations on the track map. This actions can change settings in the current simulator by issuing keyboard commands or they can even lauch a Windows script or application, when you arrive at this location. See the section below for a detailed discussion of Track Automation.
 
-### Special notes about track mapping in *iRacing*
+### Special notes about Track Mapping in *iRacing*
 
-A special case when recording the track coordinates is *iRacing*. This simulator does not provide real track coordinates. A special algorithm is used here using the *Yaw* angle of the car combined with the current velocity, while scanning this data with a 60 Hz resolution. Therefore it is absolutely necessary that you drive as clean as possible during the time where the track is recorded - zypically during the first 4 laps. Drifting and sliding, although a lot of fun, will give you funny results.
+A special case when recording the track coordinates is *iRacing*. This simulator does not provide real track coordinates. A special algorithm is used here using the *yaw* angle of the car combined with the current velocity, while scanning this data with a 60 Hz resolution. Therefore it is absolutely necessary that you drive as clean as possible during the time where the track is recorded - typically during the first 4 laps. Drifting and sliding, although a lot of fun, will give you very bad results. The coordinates are derived as follows:
+
+1. Initialize the starting position as *x = 0.0* and *y = 0.0*.
+1. Apply a fixed sampling rate, in this case 60 Hz.
+2. Get a cars *yaw* value from the *iRacing* API.
+4. Get the cars *velocity* for the x-direction from the *iRacing* API.
+5. Calculate *dx* as *velocity(x)* * *sin(yaw)*.
+6. Calculate *dy* as *velocity(x)* * *cos(yaw)*.
+7. Set *x* as *x* + *dx*.
+8. Set *y* as *y* + *dy*.
+9. Wait one sample and go to 2. unless the starting position (plus / minus a threshold) has been reached.
+
+As you can see, the yaw angle is the most important value in this calculation, therefore drive smoothly.
 
 ## Track Automations
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 
-Track automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Once a track map is available for a given track, you can choose the "Automation" section there:
+Track Automations are configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). Once a track map is available for a given track, you can choose the "Automation" section there:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%202.JPG)
 
-You can create different sets of track automations for different purposes. Here we have a "Hotlap" automation for Zandvoort, where the traction control is reduced by 2 before T1 and is returned to its original setting after T4. The "Race" automation is similar, but reduces the traction control only by 1.
+You can create different sets of Track Automations for different purposes. Here we have a "Hotlap" automation for Zandvoort, where the traction control is reduced by 2 before T1 and is returned to its original setting after T4. The "Race" automation is similar, but reduces the traction control only by 1.
 
 First you have to create an automation by pressing the "+" button. Then give it a name and enter as many actions as necessary, by clicking at the corresponding track location. The following dialog opens:
 
@@ -195,28 +207,30 @@ Here you define, what should happen, when you arrive at this specific location o
    
 You can reopen the action dialog anytime, by clicking again at the automation location and you can delete an action by holding down the "Control" key, while clicking on it.
 
-Don't forget to save the track automation finally. After you have create all required track automations, choose one of them as the default to load when you enable track automations, by checking it in the list of automations.
+Don't forget to save the Track Automation finally. After you have create all required Track Automations, choose one of them as the default to load when you enable Track Automations, by checking it in the list of automations.
 
 Some words of advice: The action points are identified by the current location of your car. Since there is a sampling rate of about 200 Hz, the location on the track is never exact. Therefore a distance threshold is used, which is about 20 meters. Additionally a cool down period of 2 seconds is used to suppress multiple activations of the same action. This works pretty well. But make sure to use enough distance between your action locations, at least larger than the above mentioned threshold. This is especially important, where two parts of the track are quite near (only separated by a wall, for example). If you ever crash exactly at the location of an action point, this action might be triggered mutiple times, but you will already have a different problem, right?
 
-### Enabling and disabling track automations
+And a final warning: This kind of automation might be considered illegal according to the rules of some leagues. Therefore please check the rulebooks, when participating in league races. Please obey the rules and follow the spirit of sportsmanship.
 
-For track automations to be active, you must enable them, when you are on the track. Once track automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable track automations.
+### Enabling and disabling Track Automations
 
-### Choosing between different track automations
+For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations.
 
-As you have seen above, you can select one of the available track automations as the default, which will be loaded and activated, when you enable track automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different track automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) action function. To use this, you must create an entry in your configuration like:
+### Choosing between different Track Automations
+
+As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) action function. To use this, you must create an entry in your configuration like:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%201.JPG)
 
-If you are using "Simulator Setup" for your configuration tasks, you can achieve the same by adding the following lines to the ["Configuration Patch.ini"}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+If you are using "Simulator Setup" for your configuration tasks, you can achieve the same by adding the following lines to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
 
 	[Controller Functions]
 	Custom.42.Call=<^<!W
 	Custom.42.Call Action=selectTrackAutomation(Wet)
 
-In this example, the "<^<!W" stands for the [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) *W* pressed together with left *Control* and the left *Alt* key. But you can also use a button on your steering wheel, for example: "3Joy15". However. when the trigger is detected, the action function "selectTrackAutomation" track automation is called and loads the track automation named "Wet" for the current simulator / car / track combination.
+In this example, the "<^<!W" stands for the [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) *W* pressed together with left *Control* and the left *Alt* key. But you can also use a button on your steering wheel, for example: "3Joy15". However. when the trigger is detected, the action function "selectTrackAutomation" Track Automation is called and loads the Track Automation named "Wet" for the current simulator / car / track combination.
 
-### Ex- and importing track automations
+### Ex- and importing Track Automations
 
 Track Automations can be exported and imported using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) administration tool, so you can share them with your team mates. Please note, that for *iRacing* it might be necessary to share the track map as well, since the track coordinates might differ with each recording of the track.

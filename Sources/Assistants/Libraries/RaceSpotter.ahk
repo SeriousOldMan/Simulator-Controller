@@ -1601,6 +1601,8 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		this.iSpotterPID := false
+		
+		return false
 	}
 
 	createSession(settings, data) {

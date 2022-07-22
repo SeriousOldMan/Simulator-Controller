@@ -208,12 +208,14 @@ namespace RF2SHMSpotter {
 			{
 				if (lastSituation > CLEAR)
 				{
-					if (situationCount++ > situationRepeat)
+					if (situationCount > situationRepeat)
 					{
 						situationCount = 0;
 
 						alert = "Hold";
 					}
+					else
+						situationCount += 1;
 				}
 				else
 					situationCount = 0;
@@ -320,7 +322,7 @@ namespace RF2SHMSpotter {
 				rotateBy(ref transX, ref transY, angle);
 
 				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
-					return (transX > 0) ? RIGHT : LEFT;
+					return (transX < 0) ? RIGHT : LEFT;
 				else
 				{
 					if (transY < 0)
@@ -329,7 +331,7 @@ namespace RF2SHMSpotter {
 
 						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
 							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
-							if (transX > 0)
+							if (transX < 0)
 								carBehindRight = true;
 							else
 								carBehindLeft = true;
@@ -368,7 +370,7 @@ namespace RF2SHMSpotter {
 
 			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
 			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
@@ -380,7 +382,7 @@ namespace RF2SHMSpotter {
 
 				double coordinateX = playerScoring.mPos.x;
 				double coordinateY = playerScoring.mPos.y;
-				double coordinateZ = playerScoring.mPos.z;
+				double coordinateZ = (- playerScoring.mPos.z);
 				double speed = 0.0;
 
 				if (hasLastCoordinates)
@@ -405,10 +407,10 @@ namespace RF2SHMSpotter {
 
 						if (hasLastCoordinates)
 							faster = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
-												  lastCoordinates[i, 2] - vehicle.mPos.z) > speed * 1.01;
+												  lastCoordinates[i, 2] - (- vehicle.mPos.z)) > speed * 1.01;
 
 						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
-														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
+														 vehicle.mPos.x, (- vehicle.mPos.z), vehicle.mPos.y);
 
 						if ((newSituation == THREE) && carBehind)
 							break;
@@ -421,7 +423,7 @@ namespace RF2SHMSpotter {
 
 					lastCoordinates[i, 0] = position.x;
 					lastCoordinates[i, 1] = position.y;
-					lastCoordinates[i, 2] = position.z;
+					lastCoordinates[i, 2] = (- position.z);
 				}
 
 				hasLastCoordinates = true;
@@ -474,7 +476,9 @@ namespace RF2SHMSpotter {
 		{
 			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0)
 			{
-				if (yellowCount++ > 50)
+				yellowCount += 1;
+
+				if (yellowCount > 50)
 				{
 					if (scoring.mScoringInfo.mSectorFlag[0] == 0)
 						waitYellowFlagState &= ~YELLOW_SECTOR_1;
@@ -528,12 +532,14 @@ namespace RF2SHMSpotter {
 
 					return true;
 				}
-				else if (blueCount++ > 1000)
+				else if (blueCount > 1000)
 				{
 					lastFlagState &= ~BLUE;
 
 					blueCount = 0;
 				}
+				else
+					blueCount += 1;
 			}
 			else
 			{
@@ -652,22 +658,24 @@ namespace RF2SHMSpotter {
 
 			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
 			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
 				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = playerScoring.mPos.y;
+				double coordinateY = (- playerScoring.mPos.z);
 				
 				Console.WriteLine(coordinateX + "," + coordinateY);
 
-				if (initialX == 0.0)
+				if (coordCount == 0)
 				{
 					initialX = coordinateX;
 					initialY = coordinateY;
 				}
-				else if (coordCount++ > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+				else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 					return false;
+
+				coordCount += 1;
 			}
 
 			return true;
@@ -700,12 +708,12 @@ namespace RF2SHMSpotter {
 
 				double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
 				double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-				double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+				double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 				{
 					double coordinateX = playerScoring.mPos.x;
-					double coordinateY = playerScoring.mPos.y;
+					double coordinateY = (- playerScoring.mPos.z);
 
 					for (int i = 0; i < numCoordinates; i += 2)
 					{

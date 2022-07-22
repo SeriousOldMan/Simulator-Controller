@@ -265,7 +265,6 @@ int main(int argc, char* argv[])
 			printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		}
 		printData("InPit", gf->isInPit ? "true" : "false");
-
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'T'))
@@ -278,8 +277,10 @@ int main(int argc, char* argv[])
 		printData("Temperature", pf->roadTemp);
 		printData("Grip", getGrip(gf->trackGripStatus));
 
-		for (int id = 0; id < gf->activeCars; id++)
-			wcout << "Car." << gf->carID[id] + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+		for (int id = 0; id < gf->activeCars; id++) {
+			wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+		}
 	}
 	
 	if ((argc == 1) || (argv[1][0] == 'W'))

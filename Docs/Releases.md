@@ -1,3 +1,7 @@
+## 4.2.5.1-release 07/23/22
+
+  1. Fixed position data in multiplayer races for *Assetto Corsa Competizione*.
+
 ## 4.2.5.0-release 07/22/22
 
   1. Bugfixes, as always

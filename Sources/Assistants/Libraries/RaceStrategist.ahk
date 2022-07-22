@@ -725,11 +725,13 @@ class RaceStrategist extends RaceAssistant {
 
 		Loop %carCount% {
 			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
+			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
 			if InStr(carNr, """")
 				carNr := StrReplace(carNr, """", "")
 
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", carID)
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
 		}
 
@@ -1562,14 +1564,17 @@ class RaceStrategist extends RaceAssistant {
 
 		grid := []
 
+
 		Loop % raceInfo["Cars"]
 		{
 			carNr := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
 
 			grid.Push(carPosition)
 
 			raceInfo["#" . carNr] := A_Index
+			raceInfo["!" . carID] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
@@ -1609,11 +1614,13 @@ class RaceStrategist extends RaceAssistant {
 
 				Loop %carCount% {
 					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
+					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
 
 					if InStr(carNr, """")
 						carNr := StrReplace(carNr, """", "")
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".ID", carID)
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
 										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 

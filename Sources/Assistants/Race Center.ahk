@@ -6874,8 +6874,14 @@ class RaceCenter extends ConfigurationItem {
 						brushCar := Gdip_BrushCreateSolid(0xff000000)
 						brushGray := Gdip_BrushCreateSolid(0xffBBBBBB)
 
+						carIndices := {}
+
 						if positions {
-							driver := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
+							Loop % getConfigurationValue(positions, "Position Data", "Car.Count")
+								carIndices[getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".ID", A_Index)] := A_Index
+
+							driverIndex := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
+							driverID := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".ID", driverIndex)
 							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driver . ".Position", 0)
 
 							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
@@ -6883,19 +6889,24 @@ class RaceCenter extends ConfigurationItem {
 							behindBrush := Gdip_BrushCreateSolid(0xffff0000)
 						}
 						else {
-							driver := false
+							driverIndex := false
+							driverID := false
 							driverPosition := false
 						}
 
 						r := Round(15 / (imgScale * 3))
 
 						Loop {
-							if (A_Index = driver)
-								continue
-
 							coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
 							if coordinates {
+								carID := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".ID", A_Index)
+
+								if (carID = driverID)
+									continue
+
+								carIndex := ((carID && carIndices.HasKey(carID)) ? carIndices[carID] : false)
+
 								coordinates := string2Values(",", coordinates)
 
 								x := Round((marginX + offsetX + coordinates[1]) * scale)
@@ -6903,8 +6914,8 @@ class RaceCenter extends ConfigurationItem {
 
 								brush := brushGray
 
-								if (positions && driverPosition && !hasAhead) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+								if (positions && driverPosition && !hasLeader && carIndex) {
+									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition == 1) && (driverPosition != 1)) {
 										brush := leaderBrush
@@ -6913,8 +6924,8 @@ class RaceCenter extends ConfigurationItem {
 									}
 								}
 
-								if (positions && driverPosition && !hasAhead) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+								if (positions && driverPosition && !hasAhead && carIndex) {
+									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition + 1) = driverPosition) {
 										brush := aheadBrush
@@ -6923,8 +6934,8 @@ class RaceCenter extends ConfigurationItem {
 									}
 								}
 
-								if (positions && driverPosition && !hasBehind) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0)
+								if (positions && driverPosition && !hasBehind && carIndex) {
+									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition - 1) = driverPosition) {
 										brush := behindBrush
@@ -6939,16 +6950,21 @@ class RaceCenter extends ConfigurationItem {
 								break
 						}
 
-						coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . driver . ".Position", false)
+						Loop
+							if (driverID = getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".ID", A_Index)) {
+								coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
-						if coordinates {
-							coordinates := string2Values(",", coordinates)
+								if coordinates {
+									coordinates := string2Values(",", coordinates)
 
-							x := Round((marginX + offsetX + coordinates[1]) * scale)
-							y := Round((marginX + offsetY + coordinates[2]) * scale)
+									x := Round((marginX + offsetX + coordinates[1]) * scale)
+									y := Round((marginX + offsetY + coordinates[2]) * scale)
 
-							Gdip_FillEllipse(graphics, brushCar, x - r, y - r, r * 2, r * 2)
-						}
+									Gdip_FillEllipse(graphics, brushCar, x - r, y - r, r * 2, r * 2)
+								}
+
+								break
+							}
 
 						Gdip_DeleteBrush(brushGray)
 						Gdip_DeleteBrush(brushCar)

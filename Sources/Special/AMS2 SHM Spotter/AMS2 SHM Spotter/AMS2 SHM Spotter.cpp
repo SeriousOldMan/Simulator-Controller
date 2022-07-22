@@ -453,8 +453,8 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 		}
 		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return false;
-		else
-			coordCount += 1;
+		
+		coordCount += 1;
 	}
 
 	return true;

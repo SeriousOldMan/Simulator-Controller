@@ -656,8 +656,10 @@ namespace ACSHMSpotter {
 					initialX = coordinateX;
 					initialY = coordinateY;
 				}
-				else if (coordCount++ > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+				else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
 					return false;
+
+				coordCount += 1;
 			}
 
 			return true;

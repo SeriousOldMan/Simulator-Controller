@@ -600,8 +600,8 @@ BOOL writeCoordinates(int playerID) {
 		}
 		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
 			return FALSE;
-		else
-			coordCount += 1;
+		
+		coordCount += 1;
 	}
 
 	return TRUE;

@@ -1,4 +1,4 @@
-## 4.2.5.0-release 07/22/22 (planned)
+## 4.2.5.0-release 07/22/22
 
   1. Bugfixes, as always
   2. Documentation updates, as always
@@ -15,8 +15,10 @@
   8. Fixed general bug in race reports, where no lap times where available in the "Overview" report in special situations. Also improved DNF calculation.
   9. Improved handling of data inconsistencies in race reports, especially for *rFactor 2*.
   10. "Behind" alerts are now issued by the Spotter in *iRacing*.
-  11. Automatic forced restart of UDP connection to ACC on session changes.
+  11. Automatic forced restart of UDP connection to ACC on session changes. Still buggy, but better than ever.
   12. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - BMW Z4 GT3
       - Assetto Corsa Competizione
         - Ferrari 488 GT3
 

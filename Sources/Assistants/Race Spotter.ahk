@@ -18,7 +18,7 @@ SendMode Input					; Recommended for new scripts due to its superior speed and r
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+; ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
 ;@Ahk2Exe-ExeName Race Spotter.exe

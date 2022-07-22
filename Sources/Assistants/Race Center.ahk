@@ -6882,7 +6882,7 @@ class RaceCenter extends ConfigurationItem {
 
 							driverIndex := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
 							driverID := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".ID", driverIndex)
-							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driver . ".Position", 0)
+							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".Position", 0)
 
 							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
 							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
@@ -6905,7 +6905,7 @@ class RaceCenter extends ConfigurationItem {
 								if (carID = driverID)
 									continue
 
-								carIndex := ((carID && carIndices.HasKey(carID)) ? carIndices[carID] : false)
+								carIndex := (carIndices.HasKey(carID) ? carIndices[carID] : false)
 
 								coordinates := string2Values(",", coordinates)
 
@@ -6914,7 +6914,7 @@ class RaceCenter extends ConfigurationItem {
 
 								brush := brushGray
 
-								if (positions && driverPosition && !hasLeader && carIndex) {
+								if (!hasLeader && positions && driverPosition && carIndex) {
 									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition == 1) && (driverPosition != 1)) {
@@ -6924,7 +6924,7 @@ class RaceCenter extends ConfigurationItem {
 									}
 								}
 
-								if (positions && driverPosition && !hasAhead && carIndex) {
+								if (!hasAhead && positions && driverPosition && carIndex) {
 									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition + 1) = driverPosition) {
@@ -6934,7 +6934,7 @@ class RaceCenter extends ConfigurationItem {
 									}
 								}
 
-								if (positions && driverPosition && !hasBehind && carIndex) {
+								if (!hasBehind && positions && driverPosition && carIndex) {
 									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
 
 									if ((carPosition - 1) = driverPosition) {

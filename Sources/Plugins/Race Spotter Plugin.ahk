@@ -280,7 +280,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		
+
 		return false
 	}
 
@@ -300,6 +300,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
+		if isDebug() {
+			logMessage(kLogCritical, "Spotter Lap: " . lapNumber)
+			logMessage(kLogCritical, "State 1: " . (this.RaceAssistant != false) . " " . (this.Simulator != false) . " " . !this.iMapping . " " . this.iHasTrackMap)
+		}
+
 		if (this.RaceAssistant && this.Simulator && !this.iMapping) {
 			if this.iHasTrackMap
 				hasTrackMap := true
@@ -308,6 +313,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
 
 				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
+
+				if isDebug() {
+					logMessage(kLogCritical, "State 2: " . simulator . " " . track . " " . hasTrackMap)
+				}
 			}
 
 			if hasTrackMap {
@@ -328,6 +337,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
 
 					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
+
+					if isDebug() {
+						logMessage(kLogCritical, "State 3: " . code . " " . dataFile . " " . exePath)
+					}
 
 					if FileExist(exePath) {
 						try {
@@ -426,7 +439,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				}
 			}
 		}
-		
+
 		return false
 	}
 

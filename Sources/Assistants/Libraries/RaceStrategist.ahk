@@ -1129,6 +1129,8 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+
 		static lastSector := 1
 
 		if !IsObject(data)

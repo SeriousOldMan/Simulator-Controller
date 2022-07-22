@@ -1156,11 +1156,11 @@ class RaceSpotter extends RaceAssistant {
 		speaker.startTalk()
 
 		try {
-			opponentType := trackAhead.OpponentType
-
 			if (trackAhead && (trackAhead != standingsAhead)
-			 && trackAhead.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
+				opponentType := trackAhead.OpponentType
+
 				if (!trackAhead.Reported && (sector > 1)) {
 					if (opponentType = "LapDown") {
 						speaker.speakPhrase("LapDownDriver")
@@ -1601,7 +1601,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		this.iSpotterPID := false
-		
+
 		return false
 	}
 
@@ -1870,6 +1870,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+
 		static lastSector := 1
 
 		update := false
@@ -1884,7 +1886,7 @@ class RaceSpotter extends RaceAssistant {
 
 			update := true
 
-			this.KnowledgeBase.addFact("Sector", sector)
+			knowledgeBase.addFact("Sector", sector)
 		}
 
 		result := base.updateLap(lapNumber, data)

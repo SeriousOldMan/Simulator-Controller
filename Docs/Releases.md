@@ -1,6 +1,7 @@
 ## 4.2.5.1-release 07/23/22
 
   1. Fixed position data in multiplayer races for *Assetto Corsa Competizione*.
+  2. Fixed a regression introduced with 4.2.5, where plugins for Simulators did not create the "Assistant" mode.
 
 ## 4.2.5.0-release 07/22/22
 

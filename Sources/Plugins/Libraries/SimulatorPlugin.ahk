@@ -667,18 +667,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		if base.__New(controller, name, simulator, configuration) {
+		base.__New(controller, name, simulator, configuration)
+
+		if (this.Active || isDebug()) {
 			this.iActionMode := kAssistantMode
 
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 
 			controller.registerPlugin(this)
-
-			return true
 		}
-		else
-			return false
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {

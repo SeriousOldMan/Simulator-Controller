@@ -2,7 +2,7 @@
 Version=4.2.5.1-dev
 Target=4.2.5.1-release
 Date=07/23/2022
-Download=
+Download=Fixed Assistant command mode for Simulator plugins, Fixed position handling in ACC multiplayer races
 Changes=
 [Release]
 Version=4.2.5.0-release

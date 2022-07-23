@@ -346,6 +346,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						try {
 							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, mapperPID
 
+							if isDebug() {
+								logMessage(kLogCritical, "Run: " . ErrorLevel . " " . mapperPID)
+							}
+
 							this.iMapperPID := mapperPID
 						}
 						catch exception {

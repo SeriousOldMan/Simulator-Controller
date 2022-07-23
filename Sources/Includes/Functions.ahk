@@ -2030,41 +2030,33 @@ readConfiguration(configFile) {
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
 	configuration := Object()
+	section := false
 
-	IniRead sections, %configFile%
+	Loop Read, %configFile%
+	{
+		currentLine := LTrim(A_LoopReadLine)
+		firstChar := SubStr(currentLine, 1, 1)
 
-	sections := StrSplit(sections, "`n")
+		if (firstChar = ";")
+			continue
+		else if (firstChar = "[") {
+			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-	for i, section in sections {
-		IniRead keyValues, %configFile%, %section%
+			configuration[section] := {}
+		}
+		else if section {
+			keyValue := LTrim(A_LoopReadLine)
 
-		keyValues := StrSplit(keyValues, "`n")
-		sectionValues := Object()
+			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+								   , "=", "", 2)
 
-		for j, keyValue in keyValues {
-			if (SubStr(keyValue, 1, 2) != "//") {
-				keyValue := StrReplace(keyValue, "\=", "_#_EQ-#_")
-				keyValue := StrReplace(keyValue, "\\", "_#_AC-#_")
-				keyValue := StrReplace(keyValue, "\n", "_#_CR-#_")
+				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+				value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
 
-				keyValue := StrSplit(keyValue, "=", "", 2)
-
-				key := keyValue[1]
-				value := keyValue[2]
-
-				key := StrReplace(key, "_#_EQ-#_", "=")
-				key := StrReplace(key, "_#_AC-#_", "\\")
-				key := StrReplace(key, "_#_CR-#_", "`n")
-
-				value := StrReplace(value, "_#_EQ-#_", "=")
-				value := StrReplace(value, "_#_AC-#_", "\")
-				value := StrReplace(value, "_#_CR-#_", "`n")
-
-				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 			}
 		}
-
-		configuration[section] := sectionValues
 	}
 
 	return configuration

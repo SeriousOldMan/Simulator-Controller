@@ -29,7 +29,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	iAutomationPID := false
 
 	iMapperPID := false
-	iMapping := false
+	iMapperPhase := false
 	iHasTrackMap := false
 
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
@@ -286,7 +286,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	finishSession(arguments*) {
 		this.iHasTrackMap := false
-		this.iMapping := false
+
+		this.shutdownTrackMapper(true)
 		this.shutdownTrackAutomation(true)
 
 		base.finishSession(arguments*)
@@ -300,23 +301,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
 
-		if isDebug() {
-			logMessage(kLogCritical, "Spotter Lap: " . lapNumber)
-			logMessage(kLogCritical, "State 1: " . (this.RaceAssistant != false) . " " . (this.Simulator != false) . " " . !this.iMapping . " " . this.iHasTrackMap)
-		}
+		if (this.RaceAssistant && this.Simulator) {
+			simulator := this.Simulator.Simulator[true]
 
-		if (this.RaceAssistant && this.Simulator && !this.iMapping) {
 			if this.iHasTrackMap
 				hasTrackMap := true
+			else if this.iMapperPID
+				hasTrackMap := false
 			else {
-				simulator := this.Simulator.Simulator[true]
 				track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
 
 				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
-
-				if isDebug() {
-					logMessage(kLogCritical, "State 2: " . simulator . " " . track . " " . hasTrackMap)
-				}
 			}
 
 			if hasTrackMap {
@@ -325,30 +320,22 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				if (!this.iAutomationPID && this.TrackAutomationEnabled)
 					this.startupTrackAutomation()
 			}
-			else if (!this.iMapperPID) {
-				this.iMapping := true
-
+			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
-				learning := getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
-
 				if (lapNumber > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+					track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
+
 					code := sessionDB.getSimulatorCode(simulator)
 					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
 
 					exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
-					if isDebug() {
-						logMessage(kLogCritical, "State 3: " . code . " " . dataFile . " " . exePath)
-					}
-
 					if FileExist(exePath) {
 						try {
-							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, mapperPID
+							this.iMapperPhase := "Collect"
 
-							if isDebug() {
-								logMessage(kLogCritical, "Run: " . ErrorLevel . " " . mapperPID)
-							}
+							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, mapperPID
 
 							this.iMapperPID := mapperPID
 						}
@@ -398,23 +385,51 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				SetTimer %callback%, -10000
 			}
 			else {
-				this.iMapperPID := false
-
 				try {
-					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, Hide
+					this.iMapperPhase := "Map"
+
+					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, UserErrorLevel Hide, mapperPID
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
 
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+					mapperPID := false
+				}
+
+				if ((ErrorLevel != "Error") && mapperPID) {
+					this.iMapperPID := mapperPID
+
+					callback := ObjBindMethod(this, "finalizeTrackMap")
+
+					SetTimer %callback%, -120000
 				}
 			}
 		}
 	}
 
+	finalizeTrackMap() {
+		mapperPID := this.iMapperPID
+
+		if mapperPID {
+			Process Exist, %mapperPID%
+
+			if ErrorLevel {
+				callback := ObjBindMethod(this, "finalizeTrackMap")
+
+				SetTimer %callback%, -10000
+			}
+			else {
+				this.iMapperPID := false
+				this.iMapperPhase := false
+			}
+		}
+	}
+
 	shutdownTrackMapper(force := false) {
-		if this.iMapperPID {
+		if (this.iMapperPID && (this.iMapperPhase = "Collect")) {
 			mapperPID := this.iMapperPID
 
 			if mapperPID {

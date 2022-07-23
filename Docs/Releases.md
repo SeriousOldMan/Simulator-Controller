@@ -1,3 +1,7 @@
+## 4.2.5.2-release 07/23/22
+
+  1. Fixed a bug, when a track gets not mapped when Spotter learning laps are set to a value > 0.
+
 ## 4.2.5.1-release 07/23/22
 
   1. Fixed position data in multiplayer races for *Assetto Corsa Competizione*.

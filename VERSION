@@ -1,16 +1,16 @@
 [Development]
-Version=4.2.5.1-dev
+Version=4.2.5.1-release
 Target=4.2.5.1-release
 Date=07/23/2022
-Download=Fixed Assistant command mode for Simulator plugins, Fixed position handling in ACC multiplayer races
-Changes=
+Download=https://cntr.click/2jMa7gN
+Changes=New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench", Automation of position specific events for all simulators which support track maps, Editor for track automation in "Session Database", New "TrackAutomation" action for Race Spotter to enable of disable track events, New icon in Stream Deck icon set for "TrackAutomation", Export / Import for track automations, Track mappping for iRacing, Automation support for iRacing, New *enableTrackAutomation*, *disableTrackAutomation* and *selectTrackAutomation* action functions for "Race Spotter" plugin, Collect pretty track names in *iRacing*, Fixed race reports for *iRacing*, Improved DNF calculation in race reports, Improved handling of data inconsistency in race reports, Support for "Behind" alerts in Spotter for *iRacing*, Automatic forced restart of UDP connection to ACC on session changes, New car models for "Setup Advisor", Fixed Assistant command mode for Simulator plugins, Fixed position handling in ACC multiplayer races
 [Release]
-Version=4.2.5.0-release
-Date=07/22/2022
-Download=https://cntr.click/mh0tPqA
-Changes=New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench", Automation of position specific events for all simulators which support track maps, Editor for track automation in "Session Database", New "TrackAutomation" action for Race Spotter to enable of disable track events, New icon in Stream Deck icon set for "TrackAutomation", Export / Import for track automations, Track mappping for iRacing, Automation support for iRacing, New *enableTrackAutomation*, *disableTrackAutomation* and *selectTrackAutomation* action functions for "Race Spotter" plugin, Collect pretty track names in *iRacing*, Fixed race reports for *iRacing*, Improved DNF calculation in race reports, Improved handling of data inconsistency in race reports, Support for "Behind" alerts in Spotter for *iRacing*, Automatic forced restart of UDP connection to ACC on session changes, New car models for "Setup Advisor"
+Version=4.2.5.1-release
+Date=07/23/2022
+Download=https://cntr.click/2jMa7gN
+Changes=New option in pitstop rules for always refueling and always tyre changing in "Strategy Workbench", Automation of position specific events for all simulators which support track maps, Editor for track automation in "Session Database", New "TrackAutomation" action for Race Spotter to enable of disable track events, New icon in Stream Deck icon set for "TrackAutomation", Export / Import for track automations, Track mappping for iRacing, Automation support for iRacing, New *enableTrackAutomation*, *disableTrackAutomation* and *selectTrackAutomation* action functions for "Race Spotter" plugin, Collect pretty track names in *iRacing*, Fixed race reports for *iRacing*, Improved DNF calculation in race reports, Improved handling of data inconsistency in race reports, Support for "Behind" alerts in Spotter for *iRacing*, Automatic forced restart of UDP connection to ACC on session changes, New car models for "Setup Advisor", Fixed Assistant command mode for Simulator plugins, Fixed position handling in ACC multiplayer races
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.2.5.0-release
-Development=4.2.5.1-dev
+Release=4.2.5.1-release
+Development=4.2.5.1-release

@@ -1325,11 +1325,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	hasPlannedPitstop() {
-		return this.KnowledgeBase.getValue("Pitstop.Planned", false)
+		return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Pitstop.Planned", false) : false)
 	}
 
 	hasPreparedPitstop() {
-		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
+		return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Pitstop.Prepared", false) : false)
 	}
 
 	supportsPitstop() {

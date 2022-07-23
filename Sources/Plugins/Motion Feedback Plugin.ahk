@@ -617,7 +617,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		action := this.findAction(this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-		action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
+		if action
+			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 
 		SetTimer updateMotionState, -100
 	}

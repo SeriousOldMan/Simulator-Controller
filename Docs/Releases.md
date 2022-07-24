@@ -1,3 +1,7 @@
+## 4.2.5.3-release 07/24/22
+
+  1. Fixed "Simulator Setup", which was not working at all.
+
 ## 4.2.5.2-release 07/23/22
 
   1. Fixed a bug, when a track gets not mapped when Spotter learning laps are set to a value > 0.

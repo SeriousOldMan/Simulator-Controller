@@ -505,6 +505,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					this.logFunctionNotFound(descriptor)
 			}
 
+			if register
+				controller.registerPlugin(this)
+
 			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
 				this.startMotion(false, true)
 			else if ((motionArguments[1] = "Off") && this.Application.isRunning())
@@ -932,7 +935,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	startMotion(label := false, force := false) {
 		if (!this.MotionActive || force) {
-			motionMode := this.findMode(kMotionMode).deselectEffect()
 			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
 			action := this.findAction(actionLabel)
 
@@ -972,7 +974,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	stopMotion(label := false, force := false, stop := true) {
 		if (this.MotionActive || force) {
-			motionMode := this.findMode(kMotionMode).deselectEffect()
 			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
 			action := this.findAction(actionLabel)
 
@@ -980,7 +981,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				label := actionLabel
 
 			if stop {
-				motionMode.deselectEffect()
+				motionMode := this.findMode(kMotionMode)
+
+				if motionMode
+					motionMode.deselectEffect()
 
 				if kSimFeedbackConnector {
 					if this.MotionActive {

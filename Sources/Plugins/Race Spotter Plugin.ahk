@@ -174,7 +174,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return data
 	}
 
-	toggleTrackAUtomation() {
+	toggleTrackAutomation() {
 		if this.TrackAutomationEnabled
 			this.disableTrackAutomation()
 		else
@@ -189,6 +189,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if !hasTrayMenu {
 			callback := ObjBindMethod(this, "toggleTrackAutomation")
 
+			Menu Tray, Insert, 1&
 			Menu Tray, Insert, 1&, %label%, %callback%
 
 			hasTrayMenu := true

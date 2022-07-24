@@ -525,9 +525,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
 
 			if this.RaceAssistantEnabled
-				this.enableRaceAssistant()
+				this.enableRaceAssistant(false, true)
 			else
-				this.disableRaceAssistant()
+				this.disableRaceAssistant(false, true)
 		}
 	}
 
@@ -665,7 +665,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	updateTrayLabel(label, enabled) {
 		static hasTrayMenu := {}
-		static first := false
+		static first := true
 
 		label := StrReplace(label, "`n", A_Space)
 
@@ -674,6 +674,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if first
 				Menu Tray, Insert, 1&
+
 			Menu Tray, Insert, 1&, %label%, %callback%
 
 			hasTrayMenu[this] := true
@@ -700,7 +701,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	disableRaceAssistant(label := false, force := false) {
-		if (!this.RaceAssistantEnabled || force) {
+		if (this.RaceAssistantEnabled || force) {
 			if !label
 				label := this.getLabel("RaceAssistant.Toggle")
 

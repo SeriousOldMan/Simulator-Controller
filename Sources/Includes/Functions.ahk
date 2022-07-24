@@ -2317,9 +2317,12 @@ loadSimulatorConfiguration()
 
 if !vDetachedInstallation {
 	checkForUpdates()
-	requestShareSessionDatabaseConsent()
-	shareSessionDatabase()
-	checkForNews()
+
+	if !isDebug() {
+		requestShareSessionDatabaseConsent()
+		shareSessionDatabase()
+		checkForNews()
+	}
 }
 
 initializeLoggingSystem()

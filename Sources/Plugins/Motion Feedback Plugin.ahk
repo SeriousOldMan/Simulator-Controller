@@ -505,17 +505,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					this.logFunctionNotFound(descriptor)
 			}
 
+			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
+				this.startMotion(false, true)
+			else if ((motionArguments[1] = "Off") && this.Application.isRunning())
+				this.stopMotion(false, true)
+			else
+				this.stopMotion(false, true, false)
+
 			if register
 				controller.registerPlugin(this)
-
-			if this.isActive() {
-				if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
-					this.startMotion(false, true)
-				else if ((motionArguments[1] = "Off") && this.Application.isRunning())
-					this.stopMotion(false, true)
-				else
-					this.stopMotion(false, true, false)
-			}
 		}
 	}
 

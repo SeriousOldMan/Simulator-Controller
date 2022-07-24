@@ -3,7 +3,7 @@ Version=4.2.6.0-dev
 Target=4.2.6.0-release
 Date=07/23/2022
 Download=
-Changes=Close all applpications from "Simulator Startup", Proper tray popup feedback for controller action functions, New commands in Simulator Controller tray menu, New controller action functions "enableRaceAssistant" and "disableRaceAssistant", Renamed "changePitstopBrakeType" to "changePitstopBrakePadType"
+Changes=Close all applpications from "Simulator Startup", Proper tray popup feedback for controller action functions, New commands in Simulator Controller tray menu, New controller action functions "enableRaceAssistant" and "disableRaceAssistant", Renamed "changePitstopBrakeType" to "changePitstopBrakePadType", New preset "Muted Race Spotter" for "Simulator Setup"
 [Release]
 Version=4.2.5.1-release
 Date=07/23/2022

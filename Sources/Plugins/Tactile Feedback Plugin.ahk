@@ -263,9 +263,6 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
 				this.createEffectAction(controller, chassisMode, string2Values(A_Space, effect)*)
 
-			if register
-				controller.registerPlugin(this)
-
 			if this.RearVibrationEnabled
 				this.enableRearVibration(false, true, false)
 			else
@@ -280,6 +277,9 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.enablePedalVibration(false, true, false)
 			else
 				this.disablePedalVibration(false, true, false)
+
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 

@@ -533,6 +533,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			sessionDB := new SessionDatabase()
 			carIndices := []
+			maxPosition := 0
 
 			Loop % carsCount
 			{
@@ -543,6 +544,8 @@ class RaceReportViewer extends RaceReportReader {
 					if positions.HasKey(lap)
 						if (positions[lap].HasKey(car) && (positions[lap][car] != kNull) && (positions[lap][car] > 0)) {
 							valid := true
+
+							maxPosition := Max(maxPosition, positions[lap][car])
 
 							break
 						}
@@ -606,7 +609,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			if hasData {
 				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: 1, max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
 
 				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}

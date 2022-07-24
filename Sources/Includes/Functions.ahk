@@ -1980,6 +1980,9 @@ raiseEvent(messageType, event, data, target := false) {
 }
 
 trayMessage(title, message, duration := false) {
+	title := StrReplace(title, "`n", A_Space)
+	message := StrReplace(message, "`n", A_Space)
+
 	if !duration
 		duration := vTrayMessageDuration
 
@@ -2035,6 +2038,10 @@ readConfiguration(configFile) {
 	Loop Read, %configFile%
 	{
 		currentLine := LTrim(A_LoopReadLine)
+
+		if (StrLen(currentLine) == 0)
+			continue
+
 		firstChar := SubStr(currentLine, 1, 1)
 
 		if (firstChar = ";")

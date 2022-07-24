@@ -180,24 +180,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (this.Active && ((trigger = "Off") || (trigger == "Push"))) {
-				plugin.findMode(kMotionMode).deselectEffect()
-
-				plugin.stopMotion()
-			}
+			if (this.Active && ((trigger = "Off") || (trigger == "Push")))
+				plugin.stopMotion(plugin.actionLabel(this))
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
-				plugin.startMotion()
-
-			if this.Active {
-				trayMessage(plugin.actionLabel(this), translate("State: On"))
-
-				function.setLabel(plugin.actionLabel(this), "Green")
-			}
-			else {
-				trayMessage(plugin.actionLabel(this), translate("State: Off"))
-
-				function.setLabel(plugin.actionLabel(this), "Gray")
-			}
+				plugin.startMotion(plugin.actionLabel(this))
 		}
 	}
 
@@ -524,9 +510,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			if this.isActive() {
 				if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
-					this.startMotion(true)
+					this.startMotion(false, true)
 				else if ((motionArguments[1] = "Off") && this.Application.isRunning())
-					this.stopMotion(true)
+					this.stopMotion(false, true)
+				else
+					this.stopMotion(false, true, false)
 			}
 		}
 	}
@@ -917,8 +905,42 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		this.resetEffectIntensities()
 	}
 
-	startMotion(force := false) {
-		if (force || !this.MotionActive) {
+	toggleMotion() {
+		if this.MotionActive
+			this.stopMotion()
+		else
+			this.startMotion()
+	}
+
+	updateTrayLabel(label, enabled) {
+		static hasTrayMenu := false
+
+		label := StrReplace(label, "`n", A_Space)
+
+		if !hasTrayMenu {
+			callback := ObjBindMethod(this, "toggleMotion")
+
+			Menu Tray, Insert, 1&
+			Menu Tray, Insert, 1&, %label%, %callback%
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			Menu Tray, Check, %label%
+		else
+			Menu Tray, Uncheck, %label%
+	}
+
+	startMotion(label := false, force := false) {
+		if (!this.MotionActive || force) {
+			motionMode := this.findMode(kMotionMode).deselectEffect()
+			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
+			action := this.findAction(actionLabel)
+
+			if !label
+				label := actionLabel
+
 			if kSimFeedbackConnector {
 				this.callSimFeedback("StartMotion")
 
@@ -941,39 +963,62 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 
 			this.updatePluginState()
+
+			trayMessage(label, translate(this.MotionActive ? "State: On" : "State: Off"))
+
+			this.updateTrayLabel(label, this.MotionActive)
+
+			action.Function.setLabel(label, "Green")
 		}
 	}
 
-	stopMotion(force := false) {
-		if (force || this.MotionActive) {
-			if kSimFeedbackConnector {
-				if this.MotionActive {
-					this.resetToInitialState()
+	stopMotion(label := false, force := false, stop := true) {
+		if (this.MotionActive || force) {
+			motionMode := this.findMode(kMotionMode).deselectEffect()
+			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
+			action := this.findAction(actionLabel)
 
-					this.callSimFeedback("StopMotion")
+			if !label
+				label := actionLabel
 
-					Sleep 5000
+			if stop {
+				motionMode.deselectEffect()
 
-					this.loadMotionStateFromSimFeedback()
+				if kSimFeedbackConnector {
+					if this.MotionActive {
+						this.resetToInitialState()
+
+						this.callSimFeedback("StopMotion")
+
+						Sleep 5000
+
+						this.loadMotionStateFromSimFeedback()
+					}
 				}
-			}
-			else {
-				wasHidden := this.showMotionWindow()
+				else {
+					wasHidden := this.showMotionWindow()
 
-				if this.MotionActive {
-					this.resetToInitialState()
+					if this.MotionActive {
+						this.resetToInitialState()
 
-					ControlClick Stop, % this.Application.WindowTitle
-					Sleep 100
+						ControlClick Stop, % this.Application.WindowTitle
+						Sleep 100
 
-					this.iIsMotionActive := false
+						this.iIsMotionActive := false
+					}
+
+					if wasHidden
+						this.hideMotionWindow()
 				}
 
-				if wasHidden
-					this.hideMotionWindow()
+				this.updatePluginState()
 			}
 
-			this.updatePluginState()
+			trayMessage(label, translate(this.MotionActive ? "State: On" : "State: Off"))
+
+			this.updateTrayLabel(label, this.MotionActive)
+
+			action.Function.setLabel(label, "Gray")
 		}
 	}
 
@@ -1096,9 +1141,9 @@ startMotion() {
 
 	try {
 		if SimulatorController.Instance.isActive(plugin) {
-			action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
+			; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-			action.fireAction(action.Function, "On")
+			plugin.startMotion() ; action.fireAction(action.Function, "On")
 		}
 	}
 	finally {
@@ -1114,9 +1159,9 @@ stopMotion() {
 
 	try {
 		if SimulatorController.Instance.isActive(plugin) {
-			action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
+			; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
 
-			action.fireAction(action.Function, "Off")
+			plugin.stopMotion() ; action.fireAction(action.Function, "Off")
 		}
 	}
 	finally {

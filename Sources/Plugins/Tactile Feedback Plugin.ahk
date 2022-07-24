@@ -34,6 +34,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	iPedalVibrationMode := false
 	iChassisVibrationMode := false
 
+	iPedalVibrationEnabled := false
+	iFrontVibrationEnabled := false
+	iRearVibrationEnabled := false
+
 	class PedalVibrationMode extends ControllerMode {
 		Mode[] {
 			Get {
@@ -61,6 +65,12 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	class SimHub1WayAction extends ControllerAction {
 		iCommand := false
 
+		Command[] {
+			Get {
+				return this.iCommand
+			}
+		}
+
 		__New(function, label, icon, command) {
 			this.iCommand := command
 
@@ -68,13 +78,25 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			callSimHub(this.iCommand)
+			callSimHub(this.Command)
 		}
 	}
 
 	class SimHub2WayAction extends ControllerAction {
 		iUpCommand := false
 		iDownCommand := false
+
+		UpCommand[] {
+			Get {
+				return this.iUpCommand
+			}
+		}
+
+		DownCommand[] {
+			Get {
+				return this.iDownCommand
+			}
+		}
 
 		__New(function, label, icon, upCommand, downCommand) {
 			this.iUpCommand := upCommand
@@ -84,50 +106,33 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			callSimHub(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpCommand : this.iDownCommand)
+			callSimHub(((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.UpCommand : this.DownCommand)
 		}
 	}
 
 	class FXToggleAction extends TactileFeedbackPlugin.SimHub1WayAction {
-		iIsActive := true
-
 		Active[] {
 			Get {
-				return this.iIsActive
+				switch this.Command {
+					case "togglePedalVibration":
+						return this.Plugin.PedalVibrationEnabled
+					case "toggleFrontChassisVibration":
+						return this.Plugin.FrontVibrationEnabled
+					case "toggleRearChassisVibration":
+						return this.Plugin.RearVibrationEnabled
+					default:
+						Throw "Unsupported command detected in FXToggleAction.Active..."
+				}
 			}
-		}
-
-		__New(function, label, icon, command, initialActive) {
-			this.iIsActive := initialActive
-
-			base.__New(function, label, icon, command)
 		}
 
 		fireAction(function, trigger) {
-			local plugin := this.Controller.findPlugin(kTactileFeedbackPlugin)
+			local plugin := this.Plugin
 
-			if !plugin.Application.isRunning() {
-				plugin.requireSimHub()
-
-				return
-			}
-
-			if (this.iIsActive && ((trigger = "Off") || (trigger == "Push"))) {
-				base.fireAction(function, trigger)
-				this.iIsActive := false
-
-				trayMessage(translate(this.Label), translate("State: Off"))
-
-				function.setLabel(translate(this.Label), "Black")
-			}
-			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push"))) {
-				base.fireAction(function, trigger)
-				this.iIsActive := true
-
-				trayMessage(translate(this.Label), translate("State: On"))
-
-				function.setLabel(translate(this.Label), "Green")
-			}
+			if (this.Active && ((trigger = "Off") || (trigger == "Push")))
+				plugin.disableFX(translate(this.Label), false, this.Command)
+			else if (!this.iIsActive && ((trigger = "On") || (trigger == "Push")))
+				plugin.enableFX(translate(this.Label), false, this.Command)
 		}
 	}
 
@@ -135,6 +140,18 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		iEffect := ""
 		iUpChange := ""
 		iDownChange := false
+
+		UpChange[] {
+			Get {
+				return this.iUpChange
+			}
+		}
+
+		DownChange[] {
+			Get {
+				return this.iDownChange
+			}
+		}
 
 		__New(function, label, icon, effect, upChange, downChange := false) {
 			this.iEffect := effect
@@ -157,7 +174,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			base.fireAction(function, trigger)
 
-			change := (((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.iUpChange : this.iDownChange)
+			change := (((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.UpChange : this.DownChange)
 
 			StringUpper change, change, T
 
@@ -174,6 +191,24 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	Application[] {
 		Get {
 			return this.iVibrationApplication
+		}
+	}
+
+	PedalVibrationEnabled[] {
+		Get {
+			return this.iPedalVibrationEnabled
+		}
+	}
+
+	FrontVibrationEnabled[] {
+		Get {
+			return this.iFrontVibrationEnabled
+		}
+	}
+
+	RearVibrationEnabled[] {
+		Get {
+			return this.iRearVibrationEnabled
 		}
 	}
 
@@ -230,6 +265,21 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 			if register
 				controller.registerPlugin(this)
+
+			if this.RearVibrationEnabled
+				this.enableRearVibration(false, true, false)
+			else
+				this.disableRearVibration(false, true, false)
+
+			if this.FrontVibrationEnabled
+				this.enableFrontVibration(false, true, false)
+			else
+				this.disableFrontVibration(false, true, false)
+
+			if this.PedalVibrationEnabled
+				this.enablePedalVibration(false, true, false)
+			else
+				this.disablePedalVibration(false, true, false)
 		}
 	}
 
@@ -242,11 +292,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(toggle, "Toggle")
 
-				this.registerAction(new this.FXToggleAction(function, this.getLabel(descriptor, toggle), this.getIcon(descriptor), command, initialState))
+				this.registerAction(new this.FXToggleAction(function, this.getLabel(descriptor, toggle), this.getIcon(descriptor), command))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
+
+		this["i" . toggle . "Enabled"] := initialState
 	}
 
 	createDialAction(mode, effect, descriptor) {
@@ -328,6 +380,153 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.deactivate()
 			this.activate()
 		}
+	}
+
+	togglePedalVibration() {
+		if this.PedalVibrationEnabled
+			this.disablePedalVibration()
+		else
+			this.enablePedalVibration()
+	}
+
+	toggleFrontChassisVibration() {
+		if this.FrontVibrationEnabled
+			this.disableFrontVibration()
+		else
+			this.enableFrontVibration()
+	}
+
+	toggleRearChassisVibration() {
+		if this.RearVibrationEnabled
+			this.disableRearVibration()
+		else
+			this.enableRearVibration()
+	}
+
+	updateTrayLabel(label, enabled, callback) {
+		static hasTrayMenu := {}
+		static first := true
+
+		label := StrReplace(label, "`n", A_Space)
+
+		if !hasTrayMenu.HasKey(callback) {
+			handler := ObjBindMethod(this, callback)
+
+			if first
+				Menu Tray, Insert, 1&
+
+			Menu Tray, Insert, 1&, %label%, %handler%
+
+			hasTrayMenu[callback] := true
+			first := false
+		}
+
+		if enabled
+			Menu Tray, Check, %label%
+		else
+			Menu Tray, Uncheck, %label%
+	}
+
+	enableFX(label, action, command, call := true) {
+		if (call && !this.Application.isRunning()) {
+			this.requireSimHub()
+
+			return false
+		}
+
+		actionLabel := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)
+
+		if !label
+			label := actionLabel
+
+		trayMessage(label, translate("State: On"))
+
+		this.findAction(actionLabel).Function.setLabel(label, "Green")
+
+		if call
+			callSimHub(command)
+
+		this.updateTrayLabel(label, true, command)
+
+		return true
+	}
+
+	disableFX(label, action, command, call := true) {
+		if (call && !this.Application.isRunning()) {
+			this.requireSimHub()
+
+			return false
+		}
+
+		actionLabel := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), action)
+
+		if !label
+			label := actionLabel
+
+		trayMessage(label, translate("State: Off"))
+
+		this.findAction(actionLabel).Function.setLabel(label, "Black")
+
+		if call
+			callSimHub(command)
+
+		this.updateTrayLabel(label, false, command)
+
+		return true
+	}
+
+	enablePedalVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Pedal Vibration")
+
+		if (!this.PedalVibrationEnabled || force)
+			if this.enableFX(label, "PedalVibration", "togglePedalVibration", call)
+				this.iPedalVibrationEnabled := true
+	}
+
+	disablePedalVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Pedal Vibration")
+
+		if (this.PedalVibrationEnabled || force)
+			if this.enableFX(label, "PedalVibration", "togglePedalVibration", call)
+				this.iPedalVibrationEnabled := false
+	}
+
+	enableFrontVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Front Vibration")
+
+		if (!this.FrontVibrationEnabled || force)
+			if this.enableFX(label, "FrontVibration", "toggleFrontChassisVibration", call)
+				this.iFrontVibrationEnabled := true
+	}
+
+	disableFrontVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Front Vibration")
+
+		if (this.FrontVibrationEnabled || force)
+			if this.enableFX(label, "FrontVibration", "toggleFrontChassisVibration", call)
+				this.iFrontVibrationEnabled := false
+	}
+
+	enableRearVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Rear Vibration")
+
+		if (!this.RearVibrationEnabled || force)
+			if this.enableFX(label, "RearVibration", "toggleRearChassisVibration", call)
+				this.iRearVibrationEnabled := true
+	}
+
+	disableRearVibration(label := false, force := false, call := true) {
+		if !label
+			label := translate("Rear Vibration")
+
+		if (this.RearVibrationEnabled || force)
+			if this.enableFX(label, "RearVibration", "toggleRearChassisVibration", call)
+				this.iRearVibrationEnabled := false
 	}
 
 	updateVibrationState() {
@@ -416,66 +615,66 @@ callSimHub(command) {
 activatePedalVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 
-		action.fireAction(action.Function, "On")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
+
+		plugin.enablePedalVibration() ; action.fireAction(action.Function, "On")
 	}
 }
 
 deactivatePedalVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
 
-		action.fireAction(action.Function, "Off")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("PedalVibration", "Toggle"), "PedalVibration"))
+
+		plugin.disablePedalVibration() ; action.fireAction(action.Function, "Off")
 	}
 }
 
 activateFrontChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 
-		action.fireAction(action.Function, "On")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
+
+		plugin.enableFrontVibration() ; action.fireAction(action.Function, "On")
 	}
 }
 
 deactivateFrontChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
 
-		action.fireAction(action.Function, "Off")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("FrontVibration", "Toggle"), "FrontVibration"))
+
+		plugin.disableFrontVibration() ; action.fireAction(action.Function, "Off")
 	}
 }
 
 activateRearChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 
-		action.fireAction(action.Function, "On")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
+
+		plugin.enableRearVibration() ; action.fireAction(action.Function, "On")
 	}
 }
 
 deactivateRearChassisVibration() {
 	local plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
 	local action
-	
-	if (plugin && SimulatorController.Instance.isActive(plugin)) {
-		action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
 
-		action.fireAction(action.Function, "Off")
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
+		; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("RearVibration", "Toggle"), "RearVibration"))
+
+		plugin.disableFrontVibration() ; action.fireAction(action.Function, "Off")
 	}
 }
 

@@ -71,16 +71,12 @@ class TeamServerPlugin extends ControllerPlugin {
 			local plugin := this.Plugin
 
 			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.enableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: On"))
+				plugin.enableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
 			}
@@ -295,9 +291,9 @@ class TeamServerPlugin extends ControllerPlugin {
 				controller.registerPlugin(this)
 
 			if this.TeamServerEnabled
-				this.enableTeamServer()
+				this.enableTeamServer(false, true)
 			else
-				this.disableTeamServer()
+				this.disableTeamServer(false, true)
 
 			this.keepAlive()
 		}
@@ -356,10 +352,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.enableTeamServer()
 	}
 
-	updateTrayLabel(enabled) {
+	updateTrayLabel(label, enabled) {
 		static hasTrayMenu := false
 
-		label := translate("Team Server")
+		label := StrReplace(label, "`n", A_Space)
 
 		if !hasTrayMenu {
 			callback := ObjBindMethod(this, "toggleTeamServer")
@@ -386,26 +382,40 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	enableTeamServer() {
-		this.iTeamServerEnabled := true
+	enableTeamServer(label := false, force := false) {
+		if (!this.TeamServerEnabled || force) {
+			if !label
+				label := this.getLabel("TeamServer.Toggle")
 
-		callback := ObjBindMethod(this, "tryConnect")
+			trayMessage(label, translate("State: On"))
 
-		SetTimer %callback%, -5000
+			this.iTeamServerEnabled := true
 
-		this.updateActions(kSessionFinished)
+			callback := ObjBindMethod(this, "tryConnect")
 
-		this.updateTrayLabel(true)
+			SetTimer %callback%, -5000
+
+			this.updateActions(kSessionFinished)
+
+			this.updateTrayLabel(label, true)
+		}
 	}
 
-	disableTeamServer() {
-		this.disconnect()
+	disableTeamServer(label := false, force := false) {
+		if (this.TeamServerEnabled || force) {
+			if !label
+				label := this.getLabel("TeamServer.Toggle")
 
-		this.iTeamServerEnabled := false
+			trayMessage(label, translate("State: Off"))
 
-		this.updateActions(kSessionFinished)
+			this.disconnect()
 
-		this.updateTrayLabel(false)
+			this.iTeamServerEnabled := false
+
+			this.updateActions(kSessionFinished)
+
+			this.updateTrayLabel(label, false)
+		}
 	}
 
 	parseObject(properties) {

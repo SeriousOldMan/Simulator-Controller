@@ -57,16 +57,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			local plugin := this.Plugin
 
 			if (plugin.TrackAutomationEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-				plugin.disableTrackAutomation()
-
-				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+				plugin.disableTrackAutomation(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.enableTrackAutomation()
-
-				trayMessage(plugin.actionLabel(this), translate("State: On"))
+				plugin.enableTrackAutomation(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
 			}
@@ -115,6 +111,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
+
+			if this.iTrackAutomationEnabled
+				this.enableTrackAutomation(false, true)
+			else
+				this.disableTrackAutomation(false, true)
 		}
 	}
 
@@ -173,17 +174,61 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return data
 	}
 
-	enableTrackAutomation() {
-		this.iTrackAutomationEnabled := true
+	toggleTrackAUtomation() {
+		if this.TrackAutomationEnabled
+			this.disableTrackAutomation()
+		else
+			this.enableTrackAutomation()
 	}
 
-	disableTrackAutomation() {
-		this.iTrackAutomationEnabled := false
+	updateAutomationTrayLabel(label, enabled) {
+		static hasTrayMenu := false
 
-		this.shutdownTrackAutomation()
+		label := StrReplace(label, "`n", A_Space)
+
+		if !hasTrayMenu {
+			callback := ObjBindMethod(this, "toggleTrackAutomation")
+
+			Menu Tray, Insert, 1&, %label%, %callback%
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			Menu Tray, Check, %label%
+		else
+			Menu Tray, Uncheck, %label%
 	}
 
-	selectTrackAutomation(name) {
+	enableTrackAutomation(label := false, force := false) {
+		if (!this.TrackAutomationEnabled || force) {
+			if !label
+				label := this.getLabel("TrackAutomation.Toggle")
+
+			trayMessage(label, translate("State: On"))
+
+			this.iTrackAutomationEnabled := true
+
+			this.updateAutomationTrayLabel(label, true)
+		}
+	}
+
+	disableTrackAutomation(label := false, force := false) {
+		if (this.TrackAutomationEnabled || force) {
+			if !label
+				label := this.getLabel("TrackAutomation.Toggle")
+
+			trayMessage(label, translate("State: Off"))
+
+			this.iTrackAutomationEnabled := false
+
+			this.shutdownTrackAutomation()
+
+			this.updateAutomationTrayLabel(label, false)
+		}
+	}
+
+	selectTrackAutomation(name, label := false) {
 		if this.Simulator {
 			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
 																		, this.Simulator.Car, this.Simulator.Track)
@@ -194,6 +239,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					if enabled
 						this.disableTrackAutomations()
+
+					if !label
+						label := this.getLabel("TrackAutomation.Toggle")
+
+					trayMessage(label, translate("Select: ") . name)
 
 					this.Simulator.TrackAutomation := candidate
 

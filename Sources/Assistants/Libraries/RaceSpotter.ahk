@@ -293,7 +293,8 @@ class PositionInfo {
 			lastLap := knowledgeBase.getValue("Lap")
 			position := knowledgeBase.getValue("Position")
 
-			if (Abs(position - this.Car.Position) == 1)
+			if ((Abs(position - this.Car.Position) == 1)
+			 || ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true]))
 				return "Position"
 			else if (lastLap > this.Car.LastLap)
 				return "LapDown"

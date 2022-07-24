@@ -689,21 +689,21 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	enableRaceAssistant(label := false, force := false) {
 		if (!this.RaceAssistantEnabled || force) {
-			if !label
-				label := this.getLabel("RaceAssistant.Toggle")
+			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
 
-			trayMessage(label, translate("State: On"))
+			if this.RaceAssistantEnabled {
+				label := translate(this.Plugin)
 
-			this.iRaceAssistantEnabled := this.iRaceAssistantName
+				trayMessage(label, translate("State: On"))
 
-			this.updateTrayLabel(label, true)
+				this.updateTrayLabel(label, true)
+			}
 		}
 	}
 
 	disableRaceAssistant(label := false, force := false) {
 		if (this.RaceAssistantEnabled || force) {
-			if !label
-				label := this.getLabel("RaceAssistant.Toggle")
+			label := translate(this.Plugin)
 
 			trayMessage(label, translate("State: Off"))
 
@@ -1750,5 +1750,39 @@ openRaceCenter(plugin := false) {
 
 		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+enableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableRaceAssistant()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableRaceAssistant()
+	}
+	finally {
+		protectionOff()
 	}
 }

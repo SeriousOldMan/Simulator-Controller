@@ -2390,6 +2390,8 @@ initializeSimulatorSetup() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	FileCreateDir %kUserHomeDirectory%Setup
 
 	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")

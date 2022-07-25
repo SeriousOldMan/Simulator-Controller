@@ -24,6 +24,7 @@ Release 4.2.2=Release 4.2.0 -> updateConfigurationForV422
 Release 4.2.3=Release 4.2.2 -> updateConfigurationForV423
 Release 4.2.4=Release 4.2.3 -> updateConfigurationForV424, updatePluginsForV424
 Release 4.2.5=Release 4.2.4 -> updateConfigurationForV425
+; Release 4.2.6=Release 4.2.5 -> updateConfigurationForV426
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

@@ -669,6 +669,8 @@ startSimulator() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 
 	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))

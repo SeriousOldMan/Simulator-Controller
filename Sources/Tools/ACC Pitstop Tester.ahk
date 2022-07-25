@@ -768,6 +768,8 @@ runACCPitstopTester() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	while true {
 		pitstopTester := new ACCPitstopTester()

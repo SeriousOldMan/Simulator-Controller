@@ -864,6 +864,8 @@ runRaceReports() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 
 	if !reportsDirectory {
@@ -880,20 +882,17 @@ runRaceReports() {
 
 	current := fixIE(13)
 
-	try {
-		reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)
+	OnExit(Func("fixIE").Bind(current))
 
-		reports.createGui(reports.Configuration)
-		reports.show()
+	reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)
 
-		simulators := reports.getSimulators()
+	reports.createGui(reports.Configuration)
+	reports.show()
 
-		if (simulators.Length() > 0)
-			reports.loadSimulator(simulators[1])
-	}
-	finally {
-		fixIE(current)
-	}
+	simulators := reports.getSimulators()
+
+	if (simulators.Length() > 0)
+		reports.loadSimulator(simulators[1])
 
 	return
 

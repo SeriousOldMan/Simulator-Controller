@@ -79,6 +79,8 @@ runTeamSessionLogger() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	try {
 		FileDelete %kTempDirectory%Team Session.log

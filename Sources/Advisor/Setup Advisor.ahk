@@ -3137,6 +3137,8 @@ runSetupAdvisor() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	simulator := false
 	car := false
 	track := false
@@ -3165,39 +3167,36 @@ runSetupAdvisor() {
 
 	current := fixIE()
 
-	try {
-		if car
-			car := new SessionDatabase().getCarName(simulator, car)
+	OnExit(Func("fixIE").Bind(current))
 
-		advisor := new SetupAdvisor(simulator, car, track, weather)
+	if car
+		car := new SessionDatabase().getCarName(simulator, car)
 
-		advisor.createGui(advisor.Configuration)
+	advisor := new SetupAdvisor(simulator, car, track, weather)
 
-		advisor.show()
+	advisor.createGui(advisor.Configuration)
 
-		if !GetKeyState("Ctrl", "P")
-			if simulator {
-				advisor.loadSimulator(simulator, true)
+	advisor.show()
 
-				if inList(advisor.AvailableCars, car)
-					advisor.loadCar(car)
+	if !GetKeyState("Ctrl", "P")
+		if simulator {
+			advisor.loadSimulator(simulator, true)
 
-				if track
-					advisor.loadTrack(track)
+			if inList(advisor.AvailableCars, car)
+				advisor.loadCar(car)
 
-				if weather
-					advisor.loadWeather(weather)
-			}
-			else
-				advisor.loadSimulator(true, true)
-		else {
-			callback := ObjBindMethod(advisor, "restoreState")
+			if track
+				advisor.loadTrack(track)
 
-			SetTimer %callback%, -50
+			if weather
+				advisor.loadWeather(weather)
 		}
-	}
-	finally {
-		; fixIE(current)
+		else
+			advisor.loadSimulator(true, true)
+	else {
+		callback := ObjBindMethod(advisor, "restoreState")
+
+		SetTimer %callback%, -50
 	}
 
 	return

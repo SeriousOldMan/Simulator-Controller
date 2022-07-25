@@ -463,6 +463,8 @@ runR3EPitstopTester() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	while true {
 		pitstopTester := new R3EPitstopTester()

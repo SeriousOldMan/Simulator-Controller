@@ -10935,6 +10935,8 @@ startupRaceCenter() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	current := fixIE(11)
 
 	OnExit(Func("fixIE").Bind(current))

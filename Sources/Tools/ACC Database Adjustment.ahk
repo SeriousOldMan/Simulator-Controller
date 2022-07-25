@@ -205,6 +205,8 @@ cleanupACCDatabase() {
 
 		Menu Tray, NoStandard
 		Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 		
 		cleanupTyrePressures()
 		cleanupTelemetryData()

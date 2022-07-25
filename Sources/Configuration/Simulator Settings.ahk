@@ -50,6 +50,8 @@ showSettingsEditor() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	settings := readConfiguration(kSimulatorSettingsFile)
 	

@@ -4599,6 +4599,8 @@ showSessionDatabaseEditor() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	simulator := false
 	car := false
 	track := false

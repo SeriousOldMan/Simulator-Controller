@@ -3420,6 +3420,8 @@ runStrategyWorkbench() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	simulator := "Assetto Corsa Competizione"
 	car := false
 	track := false
@@ -3470,16 +3472,13 @@ runStrategyWorkbench() {
 
 	current := fixIE(11)
 
-	try {
-		workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature
-										 , compound, compoundColor, map, tc, abs)
+	OnExit(Func("fixIE").Bind(current))
 
-		workbench.createGui(workbench.Configuration)
-		workbench.show()
-	}
-	finally {
-		fixIE(current)
-	}
+	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature
+									 , compound, compoundColor, map, tc, abs)
+
+	workbench.createGui(workbench.Configuration)
+	workbench.show()
 
 	return
 

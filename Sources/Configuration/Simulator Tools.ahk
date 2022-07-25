@@ -1637,6 +1637,15 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV426() {
+	try {
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
+	}
+	catch exception {
+		; ignore
+	}
+}
+
 updateConfigurationForV425() {
 	try {
 		FileRemoveDir %kDatabaseDirectory%User\Tracks, 1
@@ -2646,6 +2655,8 @@ startSimulatorTools() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 

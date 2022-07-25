@@ -1883,6 +1883,8 @@ initializeSimulatorController() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	SetKeyDelay 5, 25
 
 	settings := readConfiguration(kSimulatorSettingsFile)

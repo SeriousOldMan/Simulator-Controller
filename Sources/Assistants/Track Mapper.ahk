@@ -288,6 +288,8 @@ startTrackMapper() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	simulator := false
 	track := false
 	data := false

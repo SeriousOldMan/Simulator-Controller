@@ -244,6 +244,8 @@ updateSessionDatabase() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)

@@ -918,8 +918,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			if (action.Type = "Hotkey") {
 				this.activateWindow()
 
-				for ignore, theHotkey in string2Values("|", action.Action)
+				for ignore, theHotkey in string2Values("|", action.Action) {
 					this.sendCommand(theHotKey)
+
+					Sleep 25
+				}
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)

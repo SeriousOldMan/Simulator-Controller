@@ -3,7 +3,7 @@ Version=4.2.6.0-dev
 Target=4.2.6.0-release
 Date=07/25/2022
 Download=
-Changes=Close all applications from "Simulator Startup", Further improvements of race reports for rFactor 2, Improved delta calculation for Race Spotter, Proper tray popup feedback for controller action functions, New commands in Simulator Controller tray menu, New controller action functions "enableRaceAssistant" and "disableRaceAssistant", Renamed "changePitstopBrakeType" to "changePitstopBrakePadType", New preset "Muted Race Spotter" for "Simulator Setup", Deferred connect to Team Server in "Simulator Configuration", Brake temperatures and wear is now available as a report in "Race Center"
+Changes=Close all applications from "Simulator Startup", Further improvements of race reports for rFactor 2, Improved delta calculation for Race Spotter, Proper tray popup feedback for controller action functions, New commands in Simulator Controller tray menu, New controller action functions "enableRaceAssistant" and "disableRaceAssistant", Renamed "changePitstopBrakeType" to "changePitstopBrakePadType", New preset "Muted Race Spotter" for "Simulator Setup", Deferred connect to Team Server in "Simulator Configuration", Brake temperatures and wear is now available as a report in "Race Center", Fixed driver identification for R3E in race reports and post race review
 [Release]
 Version=4.2.5.1-release
 Date=07/23/2022

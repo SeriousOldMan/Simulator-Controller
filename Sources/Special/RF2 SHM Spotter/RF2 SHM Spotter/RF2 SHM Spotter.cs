@@ -715,7 +715,7 @@ namespace RF2SHMSpotter {
 					double coordinateX = playerScoring.mPos.x;
 					double coordinateY = (- playerScoring.mPos.z);
 
-					for (int i = 0; i < numCoordinates; i += 2)
+					for (int i = 0; i < numCoordinates; i += 1)
 					{
 						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 						{

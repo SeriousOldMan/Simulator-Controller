@@ -10932,28 +10932,31 @@ startupRaceCenter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
 	current := fixIE(11)
 
-	try {
-		rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
+	OnExit(Func("fixIE").Bind(current))
 
-		rCenter.createGui(rCenter.Configuration)
+	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 
-		rCenter.connect(true)
+	rCenter.createGui(rCenter.Configuration)
 
-		registerEventHandler("Setup", "functionEventHandler")
+	rCenter.connect(true)
 
-		SetTimer runTasks, -2000
+	registerEventHandler("Setup", "functionEventHandler")
 
-		rCenter.show()
+	SetTimer runTasks, -2000
 
-		SetTimer runTasks, Off
+	rCenter.show()
 
-		ExitApp 0
-	}
-	finally {
-		fixIE(current)
-	}
+	SetTimer runTasks, Off
+
+	ExitApp 0
+
+Exit:
+	ExitApp 0
 }
 
 

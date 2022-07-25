@@ -291,6 +291,14 @@ int main(int argc, char* argv[])
 					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
 			else
 				wprintf_s(L"TyreWear=0,0,0,0\n");
+			if (map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp != -1)
+				wprintf_s(L"BrakeTemperature=%f,%f,%f,%f\n",
+					map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_FRONT_RIGHT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_REAR_LEFT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_REAR_RIGHT].current_temp);
+			else
+				wprintf_s(L"BrakeTemperature=0,0,0,0\n");
 		}
 
 		wprintf_s(L"[Stint Data]\n");

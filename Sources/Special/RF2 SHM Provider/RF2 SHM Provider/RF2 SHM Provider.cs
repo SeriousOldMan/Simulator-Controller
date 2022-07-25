@@ -256,6 +256,11 @@ namespace RF2SHMProvider {
 									  (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				else
 					Console.WriteLine("0,0,0,0");
+				Console.Write("BrakeTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
 			

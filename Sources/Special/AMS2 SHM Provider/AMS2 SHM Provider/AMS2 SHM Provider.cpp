@@ -246,6 +246,18 @@ int main(int argc, char* argv[]) {
 			(int)round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
 			(int)round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
 
+		printf("BrakeTemperature=%f,%f,%f,%f\n", localCopy->mBrakeTempCelsius[TYRE_FRONT_LEFT],
+			localCopy->mBrakeTempCelsius[TYRE_FRONT_RIGHT],
+			localCopy->mBrakeTempCelsius[TYRE_REAR_LEFT],
+			localCopy->mBrakeTempCelsius[TYRE_REAR_RIGHT]);
+
+		printf("BrakeWear=%d,%d,%d,%d\n", (int)round(localCopy->mBrakeDamage[TYRE_FRONT_LEFT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_FRONT_RIGHT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
+
+
+
 		printf("[Stint Data]\n");
 
 		char* name = localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName;

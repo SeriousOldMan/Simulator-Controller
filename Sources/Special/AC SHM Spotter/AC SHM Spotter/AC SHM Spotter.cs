@@ -649,17 +649,20 @@ namespace ACSHMSpotter {
 				float coordinateX = cars.cars[carID].worldPosition.x;
 				float coordinateY = cars.cars[carID].worldPosition.z;
 
-				Console.WriteLine(coordinateX + "," + coordinateY);
-
-				if (coordCount == 0)
+				if ((coordinateX != 0) || (coordinateY != 0))
 				{
-					initialX = coordinateX;
-					initialY = coordinateY;
-				}
-				else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
-					return false;
+					Console.WriteLine(coordinateX + "," + coordinateY);
 
-				coordCount += 1;
+					if (coordCount == 0)
+					{
+						initialX = coordinateX;
+						initialY = coordinateY;
+					}
+					else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+						return false;
+
+					coordCount += 1;
+				}
 			}
 
 			return true;
@@ -685,17 +688,18 @@ namespace ACSHMSpotter {
 					float coordinateX = cars.cars[carID].worldPosition.x;
 					float coordinateY = cars.cars[carID].worldPosition.z;
 
-					for (int i = 0; i < numCoordinates; i++)
-					{
-						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+					if ((coordinateX != 0) || (coordinateY != 0))
+						for (int i = 0; i < numCoordinates; i++)
 						{
-							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+							{
+								SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
 
-							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+								lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-							break;
+								break;
+							}
 						}
-					}
 				}
 			}
 		}
@@ -722,6 +726,11 @@ namespace ACSHMSpotter {
 
 			while (true)
 			{
+				physics = ReadPhysics();
+				graphics = ReadGraphics();
+				staticInfo = ReadStaticInfo();
+				cars = ReadCars();
+
 				if (mapTrack)
 				{
 					if (!writeCoordinates())
@@ -731,11 +740,6 @@ namespace ACSHMSpotter {
 					checkCoordinates();
 				else
 				{
-					physics = ReadPhysics();
-					graphics = ReadGraphics();
-					staticInfo = ReadStaticInfo();
-					cars = ReadCars();
-
 					if (!running)
 						running = ((lastTime != graphics.SessionTimeLeft) || (countdown-- <= 0) || (physics.SpeedKmh >= 200));
 

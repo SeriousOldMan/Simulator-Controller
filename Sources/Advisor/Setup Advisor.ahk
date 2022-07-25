@@ -2892,6 +2892,12 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+exitFixIE(previous) {
+	fixIE(previous)
+
+	return false
+}
+
 initializeSlider(slider1, value1, slider2, value2) {
 	window := SetupAdvisor.Instance.Window
 
@@ -3167,7 +3173,7 @@ runSetupAdvisor() {
 
 	current := fixIE()
 
-	OnExit(Func("fixIE").Bind(current))
+	OnExit(Func("exitFixIE").Bind(current))
 
 	if car
 		car := new SessionDatabase().getCarName(simulator, car)

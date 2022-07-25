@@ -1640,28 +1640,31 @@ clearWearFields(database, table, id) {
 updateConfigurationForV426() {
 	try {
 		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\AMS2, 1
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\PCARS2, 1
 	}
 	catch exception {
 		; ignore
 	}
 
-	Loop Files, %kDatabaseDirectory%User\R3E\*.*, D					; Car
-	{
-		car := A_LoopFileName
-
-		Loop Files, %kDatabaseDirectory%User\R3E\%car%\*.*, D		; Track
+	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"]
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
-			track := A_LoopFileName
+			car := A_LoopFileName
 
-			if FileExist(kDatabaseDirectory . "User\R3E\" . car . "\" . track . "\Track.automations")
-				try {
-					FileDelete %kDatabaseDirectory%User\R3E\%car%\%track%\Track.automations
-				}
-				catch exception {
-					; ignore
-				}
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+
+				if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
+					try {
+						FileDelete %kDatabaseDirectory%User\%simulator%\%car%\%track%\Track.automations
+					}
+					catch exception {
+						; ignore
+					}
+			}
 		}
-	}
 }
 
 updateConfigurationForV425() {

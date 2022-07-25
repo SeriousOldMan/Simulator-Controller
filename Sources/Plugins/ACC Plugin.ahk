@@ -432,22 +432,24 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setConfigurationValue(data, "Session Data", "Paused", true)
 
-		brakePadThickness := string2Values(",", getConfigurationValue(data, "Car Data", "BrakePadLifeRaw"))
-		frontBrakePadCompound := getConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
-		rearBrakePadCompound := getConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
+		if (getConfigurationValue(data, "Session Data", "Active", false) && !getConfigurationValue(data, "Session Data", "Paused", false)) {
+			brakePadThickness := string2Values(",", getConfigurationValue(data, "Car Data", "BrakePadLifeRaw"))
+			frontBrakePadCompound := getConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
+			rearBrakePadCompound := getConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
 
-		brakePadWear := [this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[1])
-					   , this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[2])
-					   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[3])
-					   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[4])]
+			brakePadWear := [this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[1])
+						   , this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[2])
+						   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[3])
+						   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[4])]
 
-		setConfigurationValue(data, "Car Data", "BrakeWear", values2String(",", brakePadWear*))
+			setConfigurationValue(data, "Car Data", "BrakeWear", values2String(",", brakePadWear*))
 
-		if !isDebug() {
-			removeConfigurationValue(data, "Car Data", "BrakePadLifeRaw")
-			removeConfigurationValue(data, "Car Data", "BrakeDiscLifeRaw")
-			removeConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
-			removeConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
+			if !isDebug() {
+				removeConfigurationValue(data, "Car Data", "BrakePadLifeRaw")
+				removeConfigurationValue(data, "Car Data", "BrakeDiscLifeRaw")
+				removeConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
+				removeConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
+			}
 		}
 	}
 

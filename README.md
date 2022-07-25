@@ -77,6 +77,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 10. [Working with data from multiple Drivers](https://youtu.be/TK-TMtd1W9o) - This time you will learn how to work with data from multiple drivers in your telemetry database and how to create team strategies from this data. You will also see, how you can export and import data from and to your telemetry database.
 
+11. [Track Mapping and Track Automation](https://youtu.be/QWJyUYdjlFg) - This video shows you how to create a track map for any track in any simulator and where you can use these track maps. A special usage is the automation of in-car settings like traction control or ABS depending on your location on the track, which will be demonstrated on-track at the end of the video.
+
 This list will be extended with one new video per week.
 
 ### Discord Community

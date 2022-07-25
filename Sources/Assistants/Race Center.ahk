@@ -9784,6 +9784,12 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+exitFixIE(previous) {
+	fixIE(previous)
+
+	return false
+}
+
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	static result := false
 
@@ -10939,7 +10945,7 @@ startupRaceCenter() {
 
 	current := fixIE(11)
 
-	OnExit(Func("fixIE").Bind(current))
+	OnExit(Func("exitFixIE").Bind(current))
 
 	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 

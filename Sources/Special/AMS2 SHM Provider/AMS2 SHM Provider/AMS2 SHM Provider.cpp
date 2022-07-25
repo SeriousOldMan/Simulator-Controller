@@ -314,7 +314,7 @@ int main(int argc, char* argv[]) {
 		for (int id = 0; id < sharedData->mNumParticipants; id++)
 			printf("Car.%d.Position=%f,%f\n", id + 1,
 											  sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-											  sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
+											  - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
 
 		char* weather = getWeather(localCopy);
 

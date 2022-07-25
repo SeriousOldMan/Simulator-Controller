@@ -855,6 +855,13 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+exitFixIE(previous) {
+	fixIE(previous)
+
+	return false
+}
+
+
 runRaceReports() {
 	icon := kIconsDirectory . "Chart.ico"
 
@@ -882,7 +889,7 @@ runRaceReports() {
 
 	current := fixIE(13)
 
-	OnExit(Func("fixIE").Bind(current))
+	OnExit(Func("exitFixIE").Bind(current))
 
 	reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)
 

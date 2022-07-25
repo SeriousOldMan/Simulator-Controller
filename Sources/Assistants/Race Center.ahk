@@ -7314,6 +7314,19 @@ class RaceCenter extends ConfigurationItem {
 				dataY5DropDown := 1
 				dataY6DropDown := 1
 			}
+			else if (report = "Brakes") {
+				GuiControl Choose, chartTypeDropDown, 4
+
+				this.iSelectedChartType := "Line"
+
+				dataXDropDown := inList(xChoices, "Lap")
+				dataY1DropDown := inList(y1Choices, "Temperature.Air")
+				dataY2DropDown := inList(y2Choices, "Brake.Temperature.Front.Average") + 1
+				dataY3DropDown := inList(y3Choices, "Brake.Temperature.Rear.Average") + 1
+				dataY4DropDown := inList(y4Choices, "Brake.Wear.Front.Average") + 1
+				dataY5DropDown := inList(y5Choices, "Brake.Wear.Rear.Average") + 1
+				dataY6DropDown := 1
+			}
 			else if (report = "Temperatures") {
 				GuiControl Choose, chartTypeDropDown, 1
 
@@ -7507,6 +7520,10 @@ class RaceCenter extends ConfigurationItem {
 						lapData["Brake.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
 						lapData["Brake.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
 					}
+					else
+						for ignore, field in ["Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+											, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
+							lapData[field] := kNull
 
 					brakeWears := string2Values(",", getConfigurationValue(telemetry, "Car Data", "BrakeWear", ""))
 
@@ -7524,6 +7541,10 @@ class RaceCenter extends ConfigurationItem {
 						lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
 						lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
 					}
+					else
+						for ignore, field in ["Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
+											, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"]
+							lapData[field] := kNull
 				}
 
 				sessionStore.add("Lap.Data", lapData)

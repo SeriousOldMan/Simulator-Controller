@@ -400,12 +400,55 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	computeBrakePadWear(location, compound, thickness) {
+		if (location = "Front")
+			switch compound {
+				case 1, 4:
+					return Max(0, Min(100, 100 - ((thickness - 15) / 14 * 100)))
+				case 2:
+					return Max(0, Min(100, 100 - ((thickness - 13) / 16 * 100)))
+				case 3:
+					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
+				default:
+					Throw "Unknown compound detected in ACCPlugin.computeBrakePadWear..."
+			}
+		else
+			switch compound {
+				case 1, 4:
+					return Max(0, Min(100, 100 - ((thickness - 15.5) / 13.5 * 100)))
+				case 2:
+					return Max(0, Min(100, 100 - ((thickness - 12.5) / 16.5 * 100)))
+				case 3:
+					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
+				default:
+					Throw "Unknown compound detected in ACCPlugin.computeBrakePadWear..."
+			}
+	}
+
 	updateSessionData(data) {
 		base.updateSessionData(data)
 
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setConfigurationValue(data, "Session Data", "Paused", true)
+
+		brakePadThickness := string2Values(",", getConfigurationValue(data, "Car Data", "BrakePadLifeRaw"))
+		frontBrakePadCompound := getConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
+		rearBrakePadCompound := getConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
+
+		brakePadWear := [this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[1])
+					   , this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[2])
+					   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[3])
+					   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[4])]
+
+		setConfigurationValue(data, "Car Data", "BrakeWear", values2String(",", brakePadWear*))
+
+		if !isDebug() {
+			removeConfigurationValue(data, "Car Data", "BrakePadLifeRaw")
+			removeConfigurationValue(data, "Car Data", "BrakeDiscLifeRaw")
+			removeConfigurationValue(data, "Car Data", "FrontBrakePadCompoundRaw")
+			removeConfigurationValue(data, "Car Data", "RearBrakePadCompoundRaw")
+		}
 	}
 
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {

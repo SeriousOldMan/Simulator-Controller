@@ -1644,6 +1644,24 @@ updateConfigurationForV426() {
 	catch exception {
 		; ignore
 	}
+
+	Loop Files, %kDatabaseDirectory%User\R3E\*.*, D					; Car
+	{
+		car := A_LoopFileName
+
+		Loop Files, %kDatabaseDirectory%User\R3E\%car%\*.*, D		; Track
+		{
+			track := A_LoopFileName
+
+			if FileExist(kDatabaseDirectory . "User\R3E\" . car . "\" . track . "\Track.automations")
+				try {
+					FileDelete %kDatabaseDirectory%User\R3E\%car%\%track%\Track.automations
+				}
+				catch exception {
+					; ignore
+				}
+		}
+	}
 }
 
 updateConfigurationForV425() {

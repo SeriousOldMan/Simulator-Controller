@@ -76,9 +76,9 @@ Normally, it is not necessary to close *Simulator Controller.exe*, since it is v
 
 ### Enabling and disabling features
 
-Simulataor Controller is a modular software and consists of many functions, which can be enabled or disabled during runtime. Beside using buttons on your hardware controller to enable or disable these functions, for example the connection to the Team Server or whether Track Automations will be active during the current session, you can also control most of them from the tray menu of the "Simulator Controller" application. Please don't touch the options in the "Support" submenu, unless told you otherwise when tracking down problems.
+Simulataor Controller is a modular software and consists of many functions, which can be enabled or disabled during runtime. Beside using buttons on your hardware controller to enable or disable these functions, for example the connection to the Team Server or whether Track Automations will be active during the current session, you can also control most of them from the tray menu of the "Simulator Controller" application. Please don't touch the options in the "Support" submenu, unless told you so when tracking down problems.
 
-(*) picture
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
 ### Voice Commands
 

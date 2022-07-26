@@ -4,7 +4,7 @@
   2. Documentation updates, as always
   3. The quality of race reports has been improved for *rFactor 2*.
   4. Some tweaks in the delta calculation of the Spotter.
-  5. Many of the important settings like Team Server On/Off, Track Automation On/Off, and so on, are now available in the tray menu of "Simulator Controller". See the [Documentation](*) for more information.
+  5. Many of the important settings like Team Server On/Off, Track Automation On/Off, and so on, are now available in the tray menu of "Simulator Controller". See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#enabling-and-disabling-features) for more information.
   6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you control the availability of the Race Assistants with an external event source.
   7. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType".
   8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature.

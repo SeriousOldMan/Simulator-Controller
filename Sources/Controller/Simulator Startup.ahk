@@ -494,6 +494,10 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Text, w580 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
 
+		Gui LP:Font, s8 Norm, Arial
+
+		Gui LP:Add, Text, x550 YP w30, % string2Values("-", kVersion)[1]
+
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 

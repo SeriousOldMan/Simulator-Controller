@@ -136,6 +136,8 @@ The reports at the top of the list are the well known report, wich are also avai
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2019.JPG)
 
+Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators this value is directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
+
 Last but not least, using the small button with the gear icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
 A very special report is the live track view, which is available for all race simulators, which support track ccordinates. The track maps will be created automatically when you have driven a couple of laps on a given track with the Race Spotter active. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis) for more information. If a track map is available, you can select the "Track" report from the reports list to open the live view of the current race situation.

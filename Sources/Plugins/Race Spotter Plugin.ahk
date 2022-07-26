@@ -229,13 +229,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	selectTrackAutomation(name, label := false) {
+	selectTrackAutomation(name := false, label := false) {
 		if this.Simulator {
 			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
 																		, this.Simulator.Car, this.Simulator.Track)
 
 			for ignore, candidate in trackAutomations
-				if (candidate.Name = name) {
+				if ((name && (candidate.Name = name)) || candidate.Active) {
 					enabled := this.TrackAutomationEnabled
 
 					if enabled
@@ -244,7 +244,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					if !label
 						label := this.getLabel("TrackAutomation.Toggle")
 
-					trayMessage(label, translate("Select: ") . name)
+					trayMessage(label, translate("Select: ") . (name ? name : "Active"))
 
 					this.Simulator.TrackAutomation := candidate
 
@@ -591,7 +591,7 @@ disableTrackAutomation() {
 	}
 }
 
-selectTrackAutomation(name) {
+selectTrackAutomation(name := false) {
 	local plugin
 
 	controller := SimulatorController.Instance

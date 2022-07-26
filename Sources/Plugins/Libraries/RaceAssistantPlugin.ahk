@@ -419,7 +419,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, register)
 
-		if (this.Active || isDebug) {
+		if (this.Active || isDebug()) {
 			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
 			if (teamServer && this.Controller.isActive(teamServer))

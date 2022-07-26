@@ -376,7 +376,7 @@ Although you may call any globally defined function, you should use only the fol
 | disableTeamServer | - | Team Server | Disables the team mode and closes the connection to the Team Server. |
 | enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
 | disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
-| selectTrackAutomation | name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If track automation is currently enabled, the execution of actions will start with the next lap. |
+| selectTrackAutomation | [Optional] name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If *name* is omitted, the automation marked as the active one, will be loaded. If track automation is currently enabled, the execution of actions will start with the next lap. |
 
 #### Trigger Detector Tool
 

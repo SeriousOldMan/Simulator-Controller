@@ -43,6 +43,16 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this..
 
+## Release 4.2.6
+
+Unfortunately, this update will once again delete the track maps for *Assetto Corsa*, *Autommobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. This has become necessary, since the coordinate system transformation was reversed, so that the track maps were mirrored. All automations created for these simulators are invalid as well.
+
+A new preset "Muted Race Spotter" has been added to "Simulator Setup", which let you use the track mapping and track automation services provided by the Spotter, although you are using a different software as a Spotter in your setup.
+
+The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType". You must adopt your configuration, if you have used this function.
+
+***
+
 ## Release 4.2.5
 
 Updates are automatic. Please note, that all recorded track images will be deleted, since the mapping information has changed for the new automation feature. They will be automatically recreated, after you have driven a few laps on each track.

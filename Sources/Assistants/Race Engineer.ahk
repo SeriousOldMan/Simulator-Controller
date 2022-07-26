@@ -103,6 +103,8 @@ startRaceEngineer() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	remotePID := 0
 	engineerName := "Jona"

@@ -293,7 +293,9 @@ class PositionInfo {
 			lastLap := knowledgeBase.getValue("Lap")
 			position := knowledgeBase.getValue("Position")
 
-			if (Abs(position - this.Car.Position) == 1)
+			if ((Abs(position - this.Car.Position) == 1)
+			 || (lastLap == this.LastLap)
+			 || ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true]))
 				return "Position"
 			else if (lastLap > this.Car.LastLap)
 				return "LapDown"
@@ -920,7 +922,9 @@ class RaceSpotter extends RaceAssistant {
 				info.update(computeDriverName(knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
-						  , knowledgeBase.getValue("Car." . A_Index . ".Position"), lap, sector
+						  , knowledgeBase.getValue("Car." . A_Index . ".Position")
+						  , knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Laps")
+						  , sector
 						  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
 						  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 						  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)

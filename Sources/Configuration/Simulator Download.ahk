@@ -52,6 +52,8 @@ downloadSimulatorController() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	if !A_IsAdmin {
 		options := ""
 

@@ -1639,7 +1639,6 @@ clearWearFields(database, table, id) {
 
 updateConfigurationForV426() {
 	try {
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\AC, 1
 		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
 		FileRemoveDir %kDatabaseDirectory%User\Tracks\AMS2, 1
 		FileRemoveDir %kDatabaseDirectory%User\Tracks\PCARS2, 1

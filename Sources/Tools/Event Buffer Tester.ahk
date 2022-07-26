@@ -188,6 +188,8 @@ runEventBufferTester() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	selectCommand()
 

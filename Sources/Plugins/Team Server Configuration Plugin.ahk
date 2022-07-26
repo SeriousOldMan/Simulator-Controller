@@ -241,8 +241,6 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
-		this.connect(false)
-
 		this.updateState()
 	}
 
@@ -288,6 +286,21 @@ class TeamServerConfigurator extends ConfigurationItem {
 		setConfigurationSectionValues(tsConfiguration, "Team Server", getConfigurationSectionValues(configuration, "Team Server"))
 
 		writeConfiguration(kUserConfigDirectory . "Team Server.ini", tsConfiguration)
+	}
+
+	activate() {
+		if !this.Token {
+			window := this.Editor.Window
+
+			Gui %window%:+Disabled
+
+			try {
+				this.connect()
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
 	}
 
 	connect(message := true) {

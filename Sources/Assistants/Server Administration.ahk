@@ -813,6 +813,8 @@ startupServerAdministration() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	administrationEditor(kSimulatorConfiguration)
 	

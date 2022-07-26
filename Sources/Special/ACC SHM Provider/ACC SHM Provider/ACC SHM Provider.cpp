@@ -228,6 +228,11 @@ int main(int argc, char* argv[])
 		printData("TyreSet", gf->currentTyreSet);
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
+		printData("BrakeTemperature", pf->brakeTemp);
+		printData("BrakePadLifeRaw", pf->padLife);
+		printData("BrakeDiscLifeRaw", pf->discLife);
+		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound);
+		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound);
 	}
 
 	if ((argc == 1) || (argv[1][0] == 'D'))

@@ -531,6 +531,8 @@ initializeSimulatorConfiguration() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	kConfigurationEditor := true
 
 	protectionOn()

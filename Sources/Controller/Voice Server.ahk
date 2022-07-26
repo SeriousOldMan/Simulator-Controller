@@ -959,6 +959,8 @@ initializeVoiceServer() {
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
 
+	installSupportMenu()
+
 	debug := false
 
 	index := 1

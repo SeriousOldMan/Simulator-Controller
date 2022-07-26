@@ -34,9 +34,10 @@ updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
 
 updateGrid(?, ?car) <= =<(?car, 0), !
 updateGrid(?lap, ?car) <= carDriverForname(?car, ?forname), carDriverSurname(?car, ?surname),
-						  carDriverNickname(?car, ?nickname), carNumber(?car, ?carNumber),
+						  carDriverNickname(?car, ?nickname), carNumber(?car, ?carNumber), carID(?car, ?carID),
 						  Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
-						  Set(?prefix, Nr, ?carNumber), Set(?prefix, Driver.Forname, ?forname),
+						  Set(?prefix, Nr, ?carNumber), Set(?prefix, ID, ?carID),
+						  Set(?prefix, Driver.Forname, ?forname),
 						  Set(?prefix, Driver.Surname, ?surname), Set(?prefix, Driver.Nickname, ?nickname),
 						  ?nextCar = ?car - 1, updateGrid(?lap, ?nextCar)
 

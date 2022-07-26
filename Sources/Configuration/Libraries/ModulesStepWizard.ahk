@@ -449,10 +449,10 @@ class ModulesStepWizard extends StepWizard {
 		if (definition.Length() > 12)
 			Throw "Too many modules detected in ModulesStepWizard.createGui..."
 
+		window := this.Window
+			
 		Loop % definition.Length()
 		{
-			window := this.Window
-
 			iconHandle := false
 			labelHandle := false
 			checkBoxHandle := false

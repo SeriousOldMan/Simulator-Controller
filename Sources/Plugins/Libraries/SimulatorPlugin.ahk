@@ -918,8 +918,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			if (action.Type = "Hotkey") {
 				this.activateWindow()
 
-				for ignore, theHotkey in string2Values("|", action.Action)
+				for ignore, theHotkey in string2Values("|", action.Action) {
 					this.sendCommand(theHotKey)
+
+					Sleep 25
+				}
 			}
 			else if (action.Type = "Command")
 				execute(action.Action)
@@ -1129,12 +1132,12 @@ changePitstopTyrePressure(tyre, direction, increments := 1) {
 	changePitstopOption(tyre, direction, increments)
 }
 
-changePitstopBrakeType(brake, selection) {
+changePitstopBrakePadType(brake, selection) {
 	if !inList(["Front Brake", "Rear Brake"], brake)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
 
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
 
 	changePitstopOption(brake, selection)
 }

@@ -251,16 +251,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if plugin.RaceAssistantName
 				if (plugin.RaceAssistantEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-					plugin.disableRaceAssistant()
-
-					trayMessage(plugin.actionLabel(this), translate("State: Off"))
+					plugin.disableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Black")
 				}
 				else if (!plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger == "Push"))) {
-					plugin.enableRaceAssistant()
-
-					trayMessage(plugin.actionLabel(this), translate("State: On"))
+					plugin.enableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Green")
 				}
@@ -286,16 +282,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local plugin := this.Plugin
 
 			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.enableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: On"))
+				plugin.enableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
 			}
@@ -427,7 +419,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, register)
 
-		if (this.Active || isDebug) {
+		if (this.Active || isDebug()) {
 			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
 			if (teamServer && this.Controller.isActive(teamServer))
@@ -531,6 +523,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			controller.registerPlugin(this)
 
 			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
+
+			if this.RaceAssistantEnabled
+				this.enableRaceAssistant(false, true)
+			else
+				this.disableRaceAssistant(false, true)
 		}
 	}
 
@@ -659,35 +656,84 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 	}
 
-	enableRaceAssistant() {
-		this.iRaceAssistantEnabled := this.iRaceAssistantName
+	toggleRaceAssistant() {
+		if this.RaceAssistantEnabled
+			this.disableRaceAssistant()
+		else
+			this.enableRaceAssistant()
 	}
 
-	disableRaceAssistant() {
-		this.iRaceAssistantEnabled := false
+	updateTrayLabel(label, enabled) {
+		static hasTrayMenu := {}
+		static first := true
 
-		this.iLastSession := kSessionFinished
-		this.iLastLap := 0
-		this.iLastLapCounter := 0
-		this.iFinished := false
-		this.iInPit := false
+		label := StrReplace(label, "`n", A_Space)
 
-		if this.RaceAssistant
-			this.finishSession()
+		if !hasTrayMenu.HasKey(this) {
+			callback := ObjBindMethod(this, "toggleRaceAssistant")
+
+			if first
+				Menu Tray, Insert, 1&
+
+			Menu Tray, Insert, 1&, %label%, %callback%
+
+			hasTrayMenu[this] := true
+			first := false
+		}
+
+		if enabled
+			Menu Tray, Check, %label%
+		else
+			Menu Tray, Uncheck, %label%
 	}
 
-	enableTeamServer() {
+	enableRaceAssistant(label := false, force := false) {
+		if (!this.RaceAssistantEnabled || force) {
+			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
+
+			if this.RaceAssistantEnabled {
+				label := translate(this.Plugin)
+
+				trayMessage(label, translate("State: On"))
+
+				this.updateTrayLabel(label, true)
+			}
+		}
+	}
+
+	disableRaceAssistant(label := false, force := false) {
+		if (this.RaceAssistantEnabled || force) {
+			label := translate(this.Plugin)
+
+			trayMessage(label, translate("State: Off"))
+
+			this.iRaceAssistantEnabled := false
+
+			this.iLastSession := kSessionFinished
+			this.iLastLap := 0
+			this.iLastLapCounter := 0
+			this.iFinished := false
+			this.iInPit := false
+
+			if this.RaceAssistant
+				this.finishSession()
+
+			this.updateTrayLabel(label, false)
+		}
+	}
+
+	enableTeamServer(label := false) {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
-			teamServer.enableTeamServer()
+			teamServer.enableTeamServer(label)
 	}
 
-	disableTeamServer() {
+	disableTeamServer(label := false) {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
-			teamServer.disableTeamServer()
+			teamServer.disableTeamServer(label)
 	}
 
 	createRaceAssistant(pid) {
@@ -1704,5 +1750,39 @@ openRaceCenter(plugin := false) {
 
 		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+enableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableRaceAssistant()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableRaceAssistant()
+	}
+	finally {
+		protectionOff()
 	}
 }

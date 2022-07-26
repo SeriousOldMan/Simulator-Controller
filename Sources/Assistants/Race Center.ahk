@@ -57,7 +57,7 @@ global kClose = "Close"
 global kConnect = "Connect"
 global kEvent = "Event"
 
-global kSessionReports = concatenate(["Track"], kRaceReports, ["Pressures", "Temperatures", "Free"])
+global kSessionReports = concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
 global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
@@ -79,7 +79,12 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 										  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 										  , "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
 										  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-										  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
+										  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"
+										  , "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right"
+										  , "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+										  , "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
+										  , "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
+										  , "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -1753,12 +1758,12 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Pressures", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
 
-			if inList(["Pressures", "Temperatures", "Free"], this.SelectedReport) {
+			if inList(["Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport) {
 				GuiControl Enable, chartTypeDropDown
 
 				GuiControl Enable, driverDropDown
@@ -7144,6 +7149,18 @@ class RaceCenter extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps")
 	}
 
+	showBrakesReport() {
+		this.selectReport("Brakes")
+
+		this.showTelemetryReport()
+
+		this.updateState()
+	}
+
+	editBrakesReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps")
+	}
+
 	showTemperaturesReport() {
 		this.selectReport("Temperatures")
 
@@ -7201,8 +7218,23 @@ class RaceCenter extends ConfigurationItem {
 				y5Choices := y1Choices
 				y6Choices := y1Choices
 			}
+			else if (report = "Brakes") {
+				xChoices := ["Stint", "Lap", "Lap.Time", "Brake.Wear.Average"]
+
+				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining"
+							, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
+							, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+							, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
+							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
+
+				y2Choices := y1Choices
+				y3Choices := y1Choices
+				y4Choices := y1Choices
+				y5Choices := y1Choices
+				y6Choices := y1Choices
+			}
 			else if (report = "Temperatures") {
-				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Wear.Average"]
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
@@ -7210,7 +7242,11 @@ class RaceCenter extends ConfigurationItem {
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
-							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
+							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"
+							, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
+							, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+							, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
+							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -7219,7 +7255,7 @@ class RaceCenter extends ConfigurationItem {
 				y6Choices := y1Choices
 			}
 			else if (report = "Free") {
-				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average"]
+				xChoices := ["Stint", "Lap", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps", "Map", "TC", "ABS"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
@@ -7228,7 +7264,11 @@ class RaceCenter extends ConfigurationItem {
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
-							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
+							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"
+							, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
+							, "Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+							, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
+							, "Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"]
 
 				y2Choices := y1Choices
 				y3Choices := y1Choices
@@ -7272,6 +7312,19 @@ class RaceCenter extends ConfigurationItem {
 				dataY3DropDown := inList(y3Choices, "Tyre.Pressure.Hot.Average") + 1
 				dataY4DropDown := 1
 				dataY5DropDown := 1
+				dataY6DropDown := 1
+			}
+			else if (report = "Brakes") {
+				GuiControl Choose, chartTypeDropDown, 4
+
+				this.iSelectedChartType := "Line"
+
+				dataXDropDown := inList(xChoices, "Lap")
+				dataY1DropDown := inList(y1Choices, "Temperature.Air")
+				dataY2DropDown := inList(y2Choices, "Brake.Temperature.Front.Average") + 1
+				dataY3DropDown := inList(y3Choices, "Brake.Temperature.Rear.Average") + 1
+				dataY4DropDown := inList(y4Choices, "Brake.Wear.Front.Average") + 1
+				dataY5DropDown := inList(y5Choices, "Brake.Wear.Rear.Average") + 1
 				dataY6DropDown := 1
 			}
 			else if (report = "Temperatures") {
@@ -7448,6 +7501,52 @@ class RaceCenter extends ConfigurationItem {
 				lapData["Tyre.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
 				lapData["Tyre.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
 
+				telemetry := parseConfiguration(lap.Telemetry)
+
+				if (telemetry.Count() > 0) {
+					brakeTemperatures := string2Values(",", getConfigurationValue(telemetry, "Car Data", "BrakeTemperature", ""))
+
+					if (brakeTemperatures.Count() = 4) {
+						temperatureFL := brakeTemperatures[1]
+						temperatureFR := brakeTemperatures[2]
+						temperatureRL := brakeTemperatures[3]
+						temperatureRR := brakeTemperatures[4]
+
+						lapData["Brake.Temperature.Front.Left"] := null(temperatureFL)
+						lapData["Brake.Temperature.Front.Right"] := null(temperatureFR)
+						lapData["Brake.Temperature.Rear.Left"] := null(temperatureRL)
+						lapData["Brake.Temperature.Rear.Right"] := null(temperatureRR)
+						lapData["Brake.Temperature.Average"] := null(average([temperatureFL, temperatureFR, temperatureRL, temperatureRR]))
+						lapData["Brake.Temperature.Front.Average"] := null(average([temperatureFL, temperatureFR]))
+						lapData["Brake.Temperature.Rear.Average"] := null(average([temperatureRL, temperatureRR]))
+					}
+					else
+						for ignore, field in ["Brake.Temperature.Front.Left", "Brake.Temperature.Front.Right", "Brake.Temperature.Rear.Left", "Brake.Temperature.Rear.Right"
+											, "Brake.Temperature.Average", "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
+							lapData[field] := kNull
+
+					brakeWears := string2Values(",", getConfigurationValue(telemetry, "Car Data", "BrakeWear", ""))
+
+					if (brakeWears.Count() = 4) {
+						wearFL := brakeWears[1]
+						wearFR := brakeWears[2]
+						wearRL := brakeWears[3]
+						wearRR := brakeWears[4]
+
+						lapData["Brake.Wear.Front.Left"] := null(wearFL)
+						lapData["Brake.Wear.Front.Right"] := null(wearFR)
+						lapData["Brake.Wear.Rear.Left"] := null(wearRL)
+						lapData["Brake.Wear.Rear.Right"] := null(wearRR)
+						lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
+						lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
+						lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
+					}
+					else
+						for ignore, field in ["Brake.Wear.Front.Left", "Brake.Wear.Front.Right", "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
+											, "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"]
+							lapData[field] := kNull
+				}
+
 				sessionStore.add("Lap.Data", lapData)
 
 				currentListView := A_DefaultListView
@@ -7614,6 +7713,9 @@ class RaceCenter extends ConfigurationItem {
 			case "Pressures":
 				if this.editPressuresReportSettings()
 					this.showPressuresReport()
+			case "Brakes":
+				if this.editBrakesReportSettings()
+					this.showBrakesReport()
 			case "Temperatures":
 				if this.editTemperaturesReportSettings()
 					this.showTemperaturesReport()
@@ -7640,6 +7742,8 @@ class RaceCenter extends ConfigurationItem {
 			this.showRaceReport(report)
 		else if (report = "Pressures")
 			this.showPressuresReport()
+		else if (report = "Brakes")
+			this.showBrakesReport()
 		else if (report = "Temperatures")
 			this.showTemperaturesReport()
 		else if (report = "Free")
@@ -9680,6 +9784,12 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+exitFixIE(previous) {
+	fixIE(previous)
+
+	return false
+}
+
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	static result := false
 
@@ -10828,28 +10938,33 @@ startupRaceCenter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
+
 	current := fixIE(11)
 
-	try {
-		rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
+	OnExit(Func("exitFixIE").Bind(current))
 
-		rCenter.createGui(rCenter.Configuration)
+	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 
-		rCenter.connect(true)
+	rCenter.createGui(rCenter.Configuration)
 
-		registerEventHandler("Setup", "functionEventHandler")
+	rCenter.connect(true)
 
-		SetTimer runTasks, -2000
+	registerEventHandler("Setup", "functionEventHandler")
 
-		rCenter.show()
+	SetTimer runTasks, -2000
 
-		SetTimer runTasks, Off
+	rCenter.show()
 
-		ExitApp 0
-	}
-	finally {
-		fixIE(current)
-	}
+	SetTimer runTasks, Off
+
+	ExitApp 0
+
+Exit:
+	ExitApp 0
 }
 
 

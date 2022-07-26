@@ -205,7 +205,7 @@ Here you define, what should happen, when you arrive at this specific location o
 
    In this case, you can selected every script or application, which is executable by Windows. Use the "..." button to locate the executable.
    
-You can reopen the action dialog anytime, by clicking again at the automation location and you can delete an action by holding down the "Control" key, while clicking on it.
+You can reopen the action dialog anytime, by clicking again at the automation location. And you can move actions around whith the left mouse button pressed and you can delete an action by holding down the "Control" key, while clicking on it.
 
 Don't forget to save the Track Automation finally. After you have create all required Track Automations, choose one of them as the default to load when you enable Track Automations, by checking it in the list of automations.
 

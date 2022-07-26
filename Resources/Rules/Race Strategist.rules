@@ -450,7 +450,7 @@ clearStanding(?)
 
 clearStanding(?, 0) <= !
 clearStanding(?, ?car) <= ?car < 0, !
-clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Nr, Delta, Laps, Time, Time.Average,
+clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Nr, ID, Delta, Laps, Time, Time.Average,
 														Position, Driver.Forname, Driver.Surname, Driver.Nickname]),
 							 Clear(Standings.Extrapolated, ?lap, Car, ?car, Position),
 							 Clear(Standings.Extrapolated, ?lap, Car, ?car, Sequence),

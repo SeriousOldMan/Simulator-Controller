@@ -658,9 +658,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSessionData(data) {
-		base.updateSessionData(data)
-
 		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
+
+		base.updateSessionData(data)
 	}
 
 	getImageFileNames(imageNames*) {

@@ -49,6 +49,8 @@ global vDispatching = false
 global vPendingTrayMessages = []
 global vTrayMessageDuration = 1500
 
+global vHasSupportMenu = false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
@@ -1090,6 +1092,55 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+installSupportMenu() {
+	try {
+		Menu LogMenu, DeleteAll
+	}
+	catch exception {
+		; ignore
+	}
+
+	try {
+		Menu SupportMenu, DeleteAll
+	}
+	catch exception {
+		; ignore
+	}
+
+	levels := {Off: kLogOff, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+
+	for ignore, label in ["Off", "Info", "Warn", "Critical"] {
+		level := levels[label]
+
+		label := translate(label)
+		handler := Func("setLogLevel").Bind(level)
+
+		Menu LogMenu, Add, %label%, %handler%
+
+		if (level == getLogLevel())
+			Menu LogMenu, Check, %label%
+	}
+
+	label := translate("Debug")
+	handler := Func("toggleDebug")
+
+	Menu SupportMenu, Add, %label%, %handler%
+
+	if isDebug()
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Logging")
+
+	Menu SupportMenu, Add, %label%, :LogMenu
+
+	label := translate("Support")
+
+	Menu Tray, Insert, 1&
+	Menu Tray, Insert, 1&, %label%, :SupportMenu
+
+	vHasSupportMenu := true
+}
 
 viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
 	static htmlViewer
@@ -2258,7 +2309,19 @@ getControllerActionIcons() {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+toggleDebug() {
+	setDebug(!isDebug())
+}
+
 setDebug(debug) {
+	label := translate("Debug")
+
+	if vHasSupportMenu
+		if debug
+			Menu SupportMenu, Check, %label%
+		else
+			Menu SupportMenu, Uncheck, %label%
+
 	vDebug := debug
 
 	title := translate("Modular Simulator Controller System")
@@ -2268,6 +2331,13 @@ setDebug(debug) {
 }
 
 setLogLevel(level) {
+	if vHasSupportMenu
+		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
+			label := translate(label)
+
+			Menu LogMenu, Uncheck, %label%
+		}
+
 	switch level {
 		case "Info":
 			level := kLogInfo
@@ -2294,6 +2364,9 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
+	if vHasSupportMenu
+		Menu LogMenu, Check, %state%
+
 	title := translate("Modular Simulator Controller System")
 
 	TrayTip %title%, % translate("Log Level: ") . state
@@ -2317,9 +2390,12 @@ loadSimulatorConfiguration()
 
 if !vDetachedInstallation {
 	checkForUpdates()
-	requestShareSessionDatabaseConsent()
-	shareSessionDatabase()
-	checkForNews()
+
+	if !isDebug() {
+		requestShareSessionDatabaseConsent()
+		shareSessionDatabase()
+		checkForNews()
+	}
 }
 
 initializeLoggingSystem()

@@ -443,7 +443,7 @@ bool writeCoordinates(const SharedMemory* sharedData) {
 		int carID = sharedData->mViewedParticipantIndex;
 
 		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
-		float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+		float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 
 		printf("%f,%f\n", coordinateX, coordinateY);
 
@@ -475,9 +475,9 @@ void checkCoordinates(const SharedMemory* sharedData) {
 			int carID = sharedData->mViewedParticipantIndex;
 
 			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
-			float coordinateY = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 
-			for (int i = 0; i < numCoordinates; i += 2) {
+			for (int i = 0; i < numCoordinates; i += 1) {
 				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
 					char buffer[60] = "";
 					char numBuffer[60];

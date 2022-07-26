@@ -361,7 +361,7 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopTyreSet | selection | ACC | Selects the tyre sez to change to during  the next pitstop. *selection* must be either "Next" or "Previous". |
 | changePitstopTyreCompound | selection | AC, ACC, RF2 | Selects the tyre compound to change to during  the next pitstop. *selection* must be either "Increase" or "Decrease" to cycle through the list of available options. |
 | changePitstopTyrePressure | tyre, direction, [Optional] increments | AC, ACC, RF2, IRC | Changes the tyre pressure during the next pitstop. *tyre* must be one of "All Around", "Front Left", "Front Right", "Rear Left" and "Rear Right", and *direction* must be either "Increase" or "Decrease". *increments* with a default of 1 define the change in 0.1 psi increments. |
-| changePitstopBrakeType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
+| changePitstopBrakePadType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
 | changePitstopDriver | selection | ACC, RF2 | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
 | planPitstop | - | Race Engineer | *planPitstop* triggers Jona, the Virtual Race Engineer, to plan a pitstop. |
 | preparePitstop | - | Race Engineer | *preparePitstop* triggers Jona, the Virtual Race Engineer, to prepare a previously planned pitstop. |
@@ -370,11 +370,13 @@ Although you may call any globally defined function, you should use only the fol
 | openSessionDatabase | - | Race Engineer, Race Strategist | Opens the tool for the session database, with which you can get the tyre pressures for a given session depending on the current environmental conditions. If a simulation is currently running, most of the query arguments will already be prefilled. |
 | openStrategyWorkbench | - | Race Strategist | Opens the "Strategy Workbench" tool, with which you can explore the telemetrie data for past session, as long as they have been saved by the Race Strategist, and with which you can create a strategy for an upcoming race. If a simulation is currently running, several selections (car, track, and so on) will already be prefilled. |
 | openRaceCenter | - | Race Engineer, Race Strategist, Team Server | Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly. |
+| enableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Enables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
+| disableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Disables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
 | enableTeamServer | - | Team Server | Enables the team mode and opens a connection to the currently configured Team Server. Must be called before session start. |
 | disableTeamServer | - | Team Server | Disables the team mode and closes the connection to the Team Server. |
 | enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
 | disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
-| selectTrackAutomation | name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If track automation is currently enabled, the execution of actions will start with the next lap. |
+| selectTrackAutomation | [Optional] name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If *name* is omitted, the automation marked as the active one, will be loaded. If track automation is currently enabled, the execution of actions will start with the next lap. |
 
 #### Trigger Detector Tool
 

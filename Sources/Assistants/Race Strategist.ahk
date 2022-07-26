@@ -103,6 +103,8 @@ startRaceStrategist() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	remotePID := 0
 	strategistName := "Cato"

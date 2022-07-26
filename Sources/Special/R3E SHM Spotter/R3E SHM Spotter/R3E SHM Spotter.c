@@ -366,7 +366,7 @@ BOOL checkPositions(int playerID) {
 		}
 		else if (carBehind) {
 			if (!carBehindReported) {
-				carBehindReported = FALSE;
+				carBehindReported = TRUE;
 
 				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
@@ -590,7 +590,7 @@ BOOL writeCoordinates(int playerID) {
 			}
 
 		r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
-		r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+		r3e_float32 coordinateY = - map_buffer->all_drivers_data_1[index].position.z;
 
 		printf("%f,%f\n", coordinateX, coordinateY);
 
@@ -629,9 +629,9 @@ void checkCoordinates(int playerID) {
 				}
 
 			r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
-			r3e_float32 coordinateY = map_buffer->all_drivers_data_1[index].position.z;
+			r3e_float32 coordinateY = - map_buffer->all_drivers_data_1[index].position.z;
 
-			for (int i = 0; i < numCoordinates; i += 2) {
+			for (int i = 0; i < numCoordinates; i += 1) {
 				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
 					char buffer[60] = "";
 					char numBuffer[60];

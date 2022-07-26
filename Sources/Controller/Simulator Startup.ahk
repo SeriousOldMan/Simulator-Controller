@@ -362,6 +362,13 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
+closeApplication(application) {
+	Process Exist, %application%.exe
+
+	if ErrorLevel
+		Process Close, %ErrorLevel%
+}
+
 launchPad(command := false, arguments*) {
 	local application
 
@@ -388,6 +395,11 @@ launchPad(command := false, arguments*) {
 
 	if (command = kClose)
 		result := kClose
+	else if (command = "Close All") {
+		for ignore, application in concatenate(kBackgroundApps, kForegroundApps)
+			if (application != "Simulator Startup")
+				closeApplication(application)
+	}
 	else if (command = "ToolTip") {
 		if toolTips.HasKey(arguments[1])
 			return translate(toolTips[arguments[1]])
@@ -482,6 +494,10 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Text, w580 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
 
+		Gui LP:Font, s8 Norm, Arial
+
+		Gui LP:Add, Text, x550 YP w30, % string2Values("-", kVersion)[1]
+
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 
@@ -518,6 +534,8 @@ launchPad(command := false, arguments*) {
 		Gui LP:Add, CheckBox, x16 yp+10 w250 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
 		Gui LP:Add, Button, x267 yp w80 h23 Default GcloseLaunchPad, % translate("Close")
 
+		Gui LP:Add, Button, x482 yp w100 h23 GcloseAll, % translate("Close All...")
+
 		OnMessage(0x0200, "WM_MOUSEMOVE")
 
 		Gui LP:Show
@@ -534,6 +552,17 @@ launchPad(command := false, arguments*) {
 
 closeLaunchPad() {
 	launchPad(kClose)
+}
+
+closeAll() {
+	title := translate("Modular Simulator Controller System")
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	MsgBox 262436, %title%, % translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		launchPad("Close All")
 }
 
 moveLaunchPad() {
@@ -643,6 +672,8 @@ startSimulator() {
 
 	Menu Tray, NoStandard
 	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 

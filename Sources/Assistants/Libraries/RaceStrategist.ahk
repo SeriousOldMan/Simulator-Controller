@@ -1626,7 +1626,7 @@ class RaceStrategist extends RaceAssistant {
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
 										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 
-					key := ("#" . carNr)
+					key := ("!" . carID)
 
 					if ((grid != false) && raceInfo.HasKey(key))
 						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[raceInfo[key]])
@@ -1694,14 +1694,12 @@ class RaceStrategist extends RaceAssistant {
 
 			Loop {
 				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
-				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
+				carID := knowledgeBase.getValue(carPrefix . ".ID", kUndefined)
 
-				if (carNr == kUndefined)
+				if (carID == kUndefined)
 					break
-				else if InStr(carNr, """")
-					carNr := StrReplace(carNr, """", "")
 
-				key := ("#" . carNr)
+				key := ("!" . carID)
 
 				if raceInfo.HasKey(key)
 					carIndex := raceInfo[key]

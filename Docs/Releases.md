@@ -1,3 +1,22 @@
+## 4.2.6.0-release 07/30/22 (planned)
+
+  1. Bugfixes, as always
+  2. Documentation updates, as always
+  3. The quality of race reports has been improved for *rFactor 2*.
+  4. Some tweaks in the delta calculation of the Spotter.
+  5. Many of the important settings like Team Server On/Off, Track Automation On/Off, and so on, are now available in the tray menu of "Simulator Controller". See the [Documentation](*) for more information.
+  6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](*) let you control the availability of the Race Assistants with an external event source.
+  7. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType".
+  8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature.
+  9. The connection to the Team Server is now deferred in "Simulator Configuration", until you enter the Team tab. The tool therefore starts much faster now.
+  10. Brake temperatures and brake wear are now available in "Race Center" for those simulators, which support reading these values.
+  11. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
+  12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
+  13. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded. Track automations must be recreated as well.
+  14. Additional tyre meta data has been added for *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](*) for more information about tyre meta data.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-426), there are a couple of things to mention.
+
 ## 4.2.5.1-release 07/23/22
 
   1. Fixed position data in multiplayer races for *Assetto Corsa Competizione*.

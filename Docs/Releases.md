@@ -10,6 +10,9 @@
   8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature.
   9. The connection to the Team Server is now deferred in "Simulator Configuration", until you enter the Team tab. The tool therefore starts much faster now.
   10. Brake temperatures and brake wear are now available in "Race Center" for those simulators, which support reading these values.
+  
+      ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2021.JPG)
+	  
   11. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
   12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
   13. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded. Track automations must be recreated as well.

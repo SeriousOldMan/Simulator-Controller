@@ -1247,7 +1247,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			return false
 	}
 
-	findTrackAction(coordinateX, coordinateY, threshold := 20) {
+	findTrackAction(coordinateX, coordinateY, threshold := 40) {
 		trackMap := this.TrackMap
 		trackImage := this.TrackImage
 
@@ -4294,8 +4294,39 @@ selectTrackAction() {
 				IfMsgBox Yes
 					editor.deleteTrackAction(action)
 			}
-			else
-				editor.actionClicked(coordinateX, coordinateY, action)
+			else {
+				originalX := action.X
+				originalY := action.Y
+
+				while (GetKeyState("LButton", "P")) {
+					MouseGetPos x, y
+
+					if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
+												, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
+												, coordinateX, coordinateY) {
+						action.X := coordinateX
+						action.Y := coordinateY
+
+						editor.updateTrackMap()
+					}
+				}
+
+				currentX := action.X
+				currentY := action.Y
+
+				action.X := originalX
+				action.Y := originalY
+
+				if (editor.findTrackAction(currentX, currentY) == action) {
+					editor.updateTrackMap()
+
+					editor.actionClicked(originalX, originalY, action)
+				}
+				else {
+					action.X := currentX
+					action.Y := currentY
+				}
+			}
 		}
 		else
 			editor.trackClicked(coordinateX, coordinateY)

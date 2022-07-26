@@ -17,6 +17,7 @@
   12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
   13. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded. Track automations must be recreated as well.
   14. Additional tyre meta data has been added for *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](*) for more information about tyre meta data.
+  15. Action points can now be dragged with the mouse in the track automation editor.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-426), there are a couple of things to mention.
 

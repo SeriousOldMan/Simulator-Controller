@@ -8,7 +8,7 @@
   6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you control the availability of the Race Assistants with an external event source.
   7. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType".
   8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature.
-  9. The connection to the Team Server is now deferred in "Simulator Configuration", until you enter the Team tab. The tool therefore starts much faster now.
+  9. The connection to the Team Server is now deferred in "Simulator Configuration" until you enter the "Team" tab. The tool therefore starts much faster now.
   10. Brake temperatures and brake wear are now available in "Race Center" for those simulators, which support reading these values.
   
       ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2021.JPG)

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.2.6.0-dev](https://www.dropbox.com/s/nwyquvlf1y1rdlr/Simulator%20Controller%204.2.6.0-dev.zip?dl=1) (Early build for 4.2.6.0. New features: Close all applications from "Simulator Startup", Further improvements of race reports for rFactor 2, Improved delta calculation for Race Spotter, Proper tray popup feedback for controller action functions, Many new commands in Simulator Controller tray menu, New controller action functions "enableRaceAssistant" and "disableRaceAssistant", Renamed "changePitstopBrakeType" to "changePitstopBrakePadType", New preset "Muted Race Spotter" for "Simulator Setup", Deferred connect to Team Server in "Simulator Configuration", Brake temperatures and wear is now available as a report in "Race Center", Fixed driver identification for R3E in race reports and post race review, Support commands in Tray menu, Fixed coordinate transformation for AMS2, PCARS2 and R3E track mapping, Fixed track map creation of AC, More tyre meta data for AMS2, More tyre meta data for R3E, Action points in track automations can be dragged by the mouse, Display version number in "Simulator Startup". Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-426) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

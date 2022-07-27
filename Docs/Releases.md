@@ -17,8 +17,14 @@
   12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
   13. Version number is display in the launch pad window of "Simulator Startup".
   14. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded. Track automations must be recreated as well.
-  15. Additional tyre meta data has been added for *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
+  15. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
   16. Action points can now be dragged with the mouse in the track automation editor.
+  17. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
+  18. New car models for "Setup Advisor":
+      - Assetto Corsa Competizione
+        - Audi R8 LMS
+		- Audi R8 LMS EVO
+		- Mercedes AMG GT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-426), there are a couple of things to mention.
 

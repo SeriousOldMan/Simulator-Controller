@@ -102,6 +102,42 @@ namespace RF2SHMProvider {
 				return "";
 		}
 
+		public string GetCarName(string carClass, string carName)
+        {
+			if (carName.Contains(carClass))
+			{
+				if (carName[0] == '#')
+				{
+					char[] delims = { ' ' };
+					string[] parts = carName.Split(delims, 2);
+
+					if (parts.Length > 1)
+						carName = parts[1].Trim();
+				}
+				else if (carName.Contains("#"))
+					carName = carName.Split('#')[0].Trim();
+			}
+			else
+				carName = carClass;
+
+			return carName;
+		}
+
+		public string GetCarNr(int id, string carClass, string carName)
+		{
+			if (carName[0] == '#')
+			{
+				char[] delims = { ' ' };
+				string[] parts = carName.Split(delims, 2);
+
+				return parts[0].Split('#')[1].Trim();
+			}
+			else if (carName.Contains("#"))
+				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+			else
+				return id.ToString();
+		}
+
 		public void ReadStandings() {
 			Console.WriteLine("[Position Data]");
 
@@ -125,20 +161,11 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
-				string carModel = GetStringFromBytes(vehicle.mVehicleName);
-				string[] parts = carModel.Split('#');
 
-				if (parts.Length > 1)
-				{
-					carModel = parts[0].Trim();
-
-					Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(int.Parse(parts[1]));
-				}
-				else
-				{
-					Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(vehicle.mID);
-				}
-
+				string carModel = GetCarName(GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				string carNr = GetCarNr(vehicle.mID, GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				
+				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
@@ -162,7 +189,13 @@ namespace RF2SHMProvider {
 			Console.WriteLine("[Session Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
-				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
+				if (playerTelemetry.mWheels == null)
+					Console.WriteLine("Paused=true");
+				else
+				{
+					Console.Write("Paused=");
+					Console.WriteLine(scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
+				}
 
 				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
@@ -174,14 +207,8 @@ namespace RF2SHMProvider {
 					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
-
-				string carModel = GetStringFromBytes(playerScoring.mVehicleName);
-				string[] parts = carModel.Split('#');
-
-				if (parts.Length > 1)
-					carModel = parts[0].Trim();
-
-				Console.Write("Car="); Console.WriteLine(carModel);
+				Console.Write("Car="); Console.WriteLine(GetCarName(GetStringFromBytes(playerScoring.mVehicleClass),
+																	GetStringFromBytes(playerScoring.mVehicleName)));
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
@@ -232,7 +259,7 @@ namespace RF2SHMProvider {
 			}
 
 			Console.WriteLine("[Car Data]");
-			if (connected) {
+			if (connected && (playerTelemetry.mWheels != null)) {
 				Console.WriteLine("MAP=n/a");
 				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
 				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);

@@ -7,7 +7,7 @@
   5. Many of the important settings like Team Server On/Off, Track Automation On/Off, and so on, are now available in the tray menu of "Simulator Controller". See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#enabling-and-disabling-features) for more information.
   6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you control the availability of the Race Assistants with an external event source.
   7. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType".
-  8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature.
+  8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature that are handled by the Spotter as well.
   9. The connection to the Team Server is now deferred in "Simulator Configuration" until you enter the "Team" tab. The tool therefore starts much faster now.
   10. Brake temperatures and brake wear are now available in "Race Center" for those simulators, which support reading these values.
   
@@ -15,8 +15,8 @@
 	  
   11. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
   12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
-  13. Version number is display in the launch pad window of "Simulator Startup".
-  14. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded. Track automations must be recreated as well.
+  13. The current version number is displayed in the launch pad window of "Simulator Startup".
+  14. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded, since either the scaling factor or the coordinate system has changed. Track automations must be recreated as well.
   15. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
   16. Action points can now be dragged with the mouse in the track automation editor.
   17. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.

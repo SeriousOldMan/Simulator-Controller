@@ -1587,7 +1587,7 @@ prepareSessionDatabase(data) {
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
 		if ((car != kUndefined) && (track != kUndefined))
-			sessionDB.prepareDatabase(simulator, car, track)
+			sessionDB.prepareDatabase(simulator, car, track, data)
 
 		sessionDB.registerDriver(simulator, plugin.Controller.ID
 							   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")

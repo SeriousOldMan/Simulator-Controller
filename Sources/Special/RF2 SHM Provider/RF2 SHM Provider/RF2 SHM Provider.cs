@@ -207,8 +207,13 @@ namespace RF2SHMProvider {
 					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
-				Console.Write("Car="); Console.WriteLine(GetCarName(GetStringFromBytes(playerScoring.mVehicleClass),
-																	GetStringFromBytes(playerScoring.mVehicleName)));
+
+				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
+				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
+
+				Console.Write("Car="); Console.WriteLine(GetCarName(vehicleClass, vehicleName));
+				Console.Write("CarName="); Console.WriteLine(vehicleName);
+				Console.Write("CarClass="); Console.WriteLine(vehicleClass);
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));

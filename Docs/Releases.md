@@ -22,6 +22,7 @@
   17. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
   18. New car models for "Setup Advisor":
       - Assetto Corsa Competizione
+        - Porsche 991 GT3 R
         - Audi R8 LMS
 		- Audi R8 LMS EVO
 		- Mercedes AMG GT3

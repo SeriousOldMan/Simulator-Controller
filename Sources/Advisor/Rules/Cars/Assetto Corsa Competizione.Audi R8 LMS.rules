@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         Audi R8 LMS Evo                 ;;;
+;;;                                         Audi R8 LMS                     ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,4 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "Audi R8 LMS Evo", Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "Audi R8 LMS", Aero.Splitter.Front))

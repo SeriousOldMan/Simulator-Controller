@@ -137,9 +137,9 @@ class SessionDatabase extends ConfigurationItem {
 						if FileExist(prefix . carName . "\" . track) {
 							try {
 								if FileExist(prefix . car . "\" . track)
-									FileMoveDir %prefix%%carName%\%track%, %prefix%%car%\%track%, 2
+									FileMoveDir %prefix%%carName%, %prefix%%car%, 2
 								else
-									FileMoveDir %prefix%%carName%\%track%, %prefix%%car%\%track%, R
+									FileMoveDir %prefix%%carName%, %prefix%%car%, R
 							}
 							catch exception {
 								; ignore
@@ -151,12 +151,12 @@ class SessionDatabase extends ConfigurationItem {
 						if (InStr(carName, "#") > 1) {
 							carName := string2Values("#", carName)[1]
 
-							if FileExist(prefix . carName . "\" . track) {
+							if ((car != carName) && FileExist(prefix . carName . "\" . track)) {
 								try {
 									if FileExist(prefix . car . "\" . track)
-										FileMoveDir %prefix%%carName%\%track%, %prefix%%car%\%track%, 2
+										FileMoveDir %prefix%%carName%, %prefix%%car%, 2
 									else
-										FileMoveDir %prefix%%carName%\%track%, %prefix%%car%\%track%, R
+										FileMoveDir %prefix%%carName%, %prefix%%car%, R
 								}
 								catch exception {
 									; ignore

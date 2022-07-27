@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
-;;;                                         Porsche 911II GT3 Cup           ;;;
+;;;                                         Porsche 991II GT3 Cup           ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 911II GT3 Cup",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 991II GT3 Cup",
 										[Electronics.TC, Aero.Splitter.Front,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,

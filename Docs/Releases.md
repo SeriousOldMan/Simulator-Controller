@@ -25,6 +25,9 @@
   20. New icons for Stream Deck for the "BrakeTemperatures" and "BrakeWear" information request action.
   21. The Stream Deck Icons preset has been updated as well.
   22. New car models for "Setup Advisor":
+      - Assetto Corsa
+	    - Mercedes-Benz SLS AMG GT3
+		- Nissan GT-R NISMO 2014 GT3
       - Assetto Corsa Competizione
         - Porsche 991 GT3 R
         - Audi R8 LMS

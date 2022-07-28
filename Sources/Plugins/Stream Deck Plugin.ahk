@@ -380,12 +380,15 @@ class StreamDeck extends FunctionController {
 		if (this.isRunning() && this.hasFunction(function)) {
 			enabled := false
 
-			for ignore, theAction in this.Actions[function]
-				if controller.function.Enabled[theAction] {
-					enabled := true
+			if (this.Actions[function].Length() = 0)
+				enabled := true
+			else
+				for ignore, theAction in this.Actions[function]
+					if function.Enabled[theAction] {
+						enabled := true
 
-					break
-				}
+						break
+					}
 
 			if (!icon || (icon = ""))
 				icon := "clear"
@@ -457,6 +460,8 @@ class StreamDeck extends FunctionController {
 	}
 
 	refresh() {
+		local function
+
 		static cycle := 0
 
 		if (cycle++ > 2) {
@@ -477,16 +482,23 @@ class StreamDeck extends FunctionController {
 					if (fullRefresh || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
 						this.setFunctionTitle(theFunction, title, true)
 
+				controller := this.Controller
+
 				for theFunction, image in this.iFunctionImages
 					if (fullRefresh || (this.iChangedFunctionImages.HasKey(theFunction) && this.iChangedFunctionImages[theFunction])) {
 						enabled := false
 
-						for ignore, theAction in this.Actions[theFunction]
-							if controller.function.Enabled[theAction] {
-								enabled := true
+						function := controller.findFunction(theFunction)
 
-								break
-						}
+						if (this.Actions[function].Length() = 0)
+							enabled := true
+						else
+							for ignore, theAction in this.Actions[function]
+								if function.Enabled[theAction] {
+									enabled := true
+
+									break
+							}
 
 						this.setFunctionImage(theFunction, image, enabled, true)
 					}
@@ -536,12 +548,14 @@ disabledIcon(fileName) {
 				value := Gdip_GetPixel(bitmap, x, y)
 
 				red := (0x00FF0000 & value)
+				red := (red >> 16)
 				blue := (0x0000FF00 & value)
+				blue := (blue >> 8)
 				green := (0x000000FF & value)
 
 				gray := Round((0.299 * red) + (0.587 * green) + (0.114 * blue))
 
-				Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (gray << 32) + (gray << 16) + gray))
+				Gdip_SetPixel(bitmap, x, y, ((value & 0xFF000000) + (gray << 16) + (gray << 8) + gray))
 			}
 		}
 

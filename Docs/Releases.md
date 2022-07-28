@@ -13,17 +13,17 @@
   
       ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2021.JPG)
 	  
-  11. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
-  12. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
-  13. The current version number is displayed in the launch pad window of "Simulator Startup".
-  14. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded, since either the scaling factor or the coordinate system has changed. Track automations must be recreated as well.
-  15. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
-  16. Action points can now be dragged with the mouse in the track automation editor.
-  17. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
-  18. New voice commands for the Race Engineer to request the current brake temperatures and wear. Not supported for all simulators, though.
-  19. New information request actions "BrakeTemperatures" and "BrakeWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the brake temperatures and wear by pressing a button on your hardware controller.
-  20. New icons for Stream Deck for the "BrakeTemperatures" and "BrakeWear" information request action.
-  21. The Stream Deck Icons preset has been updated as well.
+  11. New voice commands for the Race Engineer to request the current brake temperatures and wear. Not supported for all simulators, though.
+  12. New information request actions "BrakeTemperatures" and "BrakeWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the brake temperatures and wear by pressing a button on your hardware controller.
+  13. New icons for Stream Deck for the "BrakeTemperatures" and "BrakeWear" information request action.
+  14. The Stream Deck Icons preset has been updated as well.
+  15. Fixed the identification of the current driver in race reports and post race reviews for *RaceRoom Racing Experience*.
+  16. The launch pad of "Simulator Startup" now has a button with which you can close all running applications with one click.
+  17. The current version number is displayed in the launch pad window of "Simulator Startup".
+  18. Fixed many errors in track map creation for *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. All recorded maps so far will be deleted and re-recorded, since either the scaling factor or the coordinate system has changed. Track automations must be recreated as well.
+  19. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
+  20. Action points can now be dragged with the mouse in the track automation editor.
+  21. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
   22. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - Mercedes-Benz SLS AMG GT3

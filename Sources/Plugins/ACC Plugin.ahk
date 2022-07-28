@@ -410,7 +410,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				case 3:
 					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
 				default:
-					Throw "Unknown compound detected in ACCPlugin.computeBrakePadWear..."
+					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
 			}
 		else
 			switch compound {
@@ -421,7 +421,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				case 3:
 					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
 				default:
-					Throw "Unknown compound detected in ACCPlugin.computeBrakePadWear..."
+					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
 			}
 	}
 

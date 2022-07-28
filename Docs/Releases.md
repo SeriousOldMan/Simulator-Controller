@@ -24,7 +24,8 @@
   19. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
   20. Action points can now be dragged with the mouse in the track automation editor.
   21. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
-  22. New car models for "Setup Advisor":
+  22. Stream Deck icons will be grayed out for disabled actions.
+  23. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - Mercedes-Benz SLS AMG GT3
 		- Nissan GT-R NISMO 2014 GT3

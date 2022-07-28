@@ -408,8 +408,12 @@ class StreamDeck extends FunctionController {
 	}
 
 	setFunctionTitle(function, title, refresh := false) {
-		if refresh
+		if refresh {
+			if (title = "")
+				title := " "
+
 			this.Connector.SetTitle(function, title)
+		}
 		else if this.RefreshActive {
 			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionTitle", function, title))
 

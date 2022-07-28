@@ -1564,7 +1564,20 @@ logMessage(logLevel, message) {
 
 		SplitPath fileName, , directory
 		FileCreateDir %directory%
-		FileAppend %message%, %fileName%, UTF-16
+
+		tries := 5
+
+		while (tries > 0)
+			try {
+				FileAppend %message%, %fileName%, UTF-16
+
+				break
+			}
+			catch exception {
+				Sleep 1
+
+				tries -= 1
+			}
 	}
 }
 

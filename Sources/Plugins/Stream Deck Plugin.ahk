@@ -107,7 +107,7 @@ class StreamDeck extends FunctionController {
 	Actions[function := false] {
 		Get {
 			if function
-				return (function ? this.iActions[function] : [])
+				return (function ? (this.iActions.HasKey(function) ? this.iActions[function] : []) : [])
 			else
 				return this.iActions
 		}
@@ -478,6 +478,8 @@ class StreamDeck extends FunctionController {
 			this.iRefreshActive := true
 
 			try {
+				logMessage(kLogCritical, "Start refresh...")
+
 				for theFunction, title in this.iFunctionTitles
 					if (fullRefresh || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
 						this.setFunctionTitle(theFunction, title, true)
@@ -499,6 +501,8 @@ class StreamDeck extends FunctionController {
 
 									break
 							}
+
+						logMessage(kLogCritical, theFunction . " " . image . " " . enabled)
 
 						this.setFunctionImage(theFunction, image, enabled, true)
 					}

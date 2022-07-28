@@ -371,16 +371,16 @@ class RaceEngineer extends RaceAssistant {
 
 			speaker.speakPhrase("Temperatures")
 
-			speaker.speakPhrase("BrakeFL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL"), 1)
+			speaker.speakPhrase("BrakeFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL"))
 										 , unit: fragments["Degrees"]})
 
-			speaker.speakPhrase("BrakeFR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR"), 1)
+			speaker.speakPhrase("BrakeFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR"))
 										 , unit: fragments["Degrees"]})
 
-			speaker.speakPhrase("BrakeRL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL"), 1)
+			speaker.speakPhrase("BrakeRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL"))
 										 , unit: fragments["Degrees"]})
 
-			speaker.speakPhrase("BrakeRR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR"), 1)
+			speaker.speakPhrase("BrakeRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR"))
 										 , unit: fragments["Degrees"]})
 		}
 		finally {
@@ -398,7 +398,7 @@ class RaceEngineer extends RaceAssistant {
 		speaker := this.getSpeaker()
 
 		lap := knowledgeBase.getValue("Lap")
-		flWear := knowledgeBase.getValue("Lap." . lap . ".Break.Wear.FL", kUndefined)
+		flWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FL", kUndefined)
 
 		if (flWear == kUndefined)
 			speaker.speakPhrase("NoWear")
@@ -412,13 +412,13 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("Wear")
 
-				speaker.speakPhrase("WearFL", {used: Round(flWear), remaining: Round(100 - flWear)})
+				speaker.speakPhrase("WearFL", {used: printNumber(flWear, 1), remaining: printNumber(100 - flWear, 1)})
 
-				speaker.speakPhrase("WearFR", {used: Round(frWear), remaining: Round(100 - frWear)})
+				speaker.speakPhrase("WearFR", {used: printNumber(frWear, 1), remaining: printNumber(100 - frWear, 1)})
 
-				speaker.speakPhrase("WearRL", {used: Round(rlWear), remaining: Round(100 - rlWear)})
+				speaker.speakPhrase("WearRL", {used: printNumber(rlWear, 1), remaining: printNumber(100 - rlWear, 1)})
 
-				speaker.speakPhrase("WearRR", {used: Round(rrWear), remaining: Round(100 - rrWear)})
+				speaker.speakPhrase("WearRR", {used: printNumber(rrWear, 1), remaining: printNumber(100 - rrWear, 1)})
 			}
 			finally {
 				speaker.finishTalk()

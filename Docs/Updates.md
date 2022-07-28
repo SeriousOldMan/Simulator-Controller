@@ -45,11 +45,15 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.2.6
 
-Unfortunately, this update will once again delete the track maps for *Assetto Corsa*, *Autommobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. This has become necessary, since the coordinate system transformation was reversed, so that the track maps were mirrored. All automations created for these simulators are invalid as well.
+A couple of things to do for you for this update:
 
-A new preset "Muted Race Spotter" has been added to "Simulator Setup", which let you use the track mapping and track automation services provided by the Spotter, although you are using a different software as a Spotter in your setup.
+1. Unfortunately, this update will once again delete the track maps for *Assetto Corsa*, *Autommobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. This has become necessary, since the coordinate system transformation was reversed, so that the track maps were mirrored. All automations created for these simulators are invalid as well.
 
-The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType". You must adopt your configuration, if you have used this function.
+2. A new preset "Muted Race Spotter" has been added to "Simulator Setup", which let you use the track mapping and track automation services provided by the Spotter, although you are using a different software as a Spotter in your setup.
+
+3. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType". You must adopt your configuration, if you have used this function.
+
+4. The actions "BrakeTemperatures" and "BreakeWear" have been added to the "Race Engineer" plugin. You can add it to your configuration, if you want to get these informations by the press of abutton on your controller (but they are available as voice commands as well). If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icons for the new "BrakeTemperatures" and "BreakeWear" actions will be available to you.
 
 ***
 

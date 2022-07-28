@@ -1376,7 +1376,16 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	setSimulatorValue(simulator, key, value, update := true) {
-		this.KnowledgeBase.setFact("Simulator." . simulator . ".Key." . key, value)
+		oldCaseSense := A_StringCaseSense
+
+		try {
+			StringCaseSense On
+
+			this.KnowledgeBase.setFact("Simulator." . simulator . ".Key." . key, value)
+		}
+		finally {
+			StringCaseSense %oldCaseSense%
+		}
 
 		if update
 			this.updateState()

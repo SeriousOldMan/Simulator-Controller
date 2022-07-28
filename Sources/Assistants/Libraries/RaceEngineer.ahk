@@ -148,6 +148,10 @@ class RaceEngineer extends RaceAssistant {
 				this.lapInfoRecognized(words)
 			case "FuelRemaining":
 				this.fuelInfoRecognized(words)
+			case "BrakeWear":
+				this.brakeWearRecognized(words)
+			case "BrakeTemperatures":
+				this.brakeTemperaturesRecognized(words)
 			case "TyreWear":
 				this.tyreWearRecognized(words)
 			case "TyreTemperatures":
@@ -343,6 +347,78 @@ class RaceEngineer extends RaceAssistant {
 				speaker.speakPhrase("WearRL", {used: Round(rlWear), remaining: Round(100 - rlWear)})
 
 				speaker.speakPhrase("WearRR", {used: Round(rrWear), remaining: Round(100 - rrWear)})
+			}
+			finally {
+				speaker.finishTalk()
+			}
+		}
+	}
+
+	brakeTemperaturesRecognized(words) {
+		local value
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+
+		speaker.startTalk()
+
+		try {
+			lap := knowledgeBase.getValue("Lap")
+
+			speaker.speakPhrase("Temperatures")
+
+			speaker.speakPhrase("BrakeFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR"))
+										 , unit: fragments["Degrees"]})
+		}
+		finally {
+			speaker.finishTalk()
+		}
+	}
+
+	brakeWearRecognized(words) {
+		local value
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+
+		lap := knowledgeBase.getValue("Lap")
+		flWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FL", kUndefined)
+
+		if (flWear == kUndefined)
+			speaker.speakPhrase("NoWear")
+		else {
+			frWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FR")
+			rlWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.RL")
+			rrWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.RR")
+
+			speaker.startTalk()
+
+			try {
+				speaker.speakPhrase("Wear")
+
+				speaker.speakPhrase("WearFL", {used: printNumber(flWear, 1), remaining: printNumber(100 - flWear, 1)})
+
+				speaker.speakPhrase("WearFR", {used: printNumber(frWear, 1), remaining: printNumber(100 - frWear, 1)})
+
+				speaker.speakPhrase("WearRL", {used: printNumber(rlWear, 1), remaining: printNumber(100 - rlWear, 1)})
+
+				speaker.speakPhrase("WearRR", {used: printNumber(rrWear, 1), remaining: printNumber(100 - rrWear, 1)})
 			}
 			finally {
 				speaker.finishTalk()
@@ -1364,6 +1440,10 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyreWear":
 				this.tyreWearRecognized([])
+			case "BrakeTemperatures":
+				this.brakeTemperaturesRecognized([])
+			case "BrakeWear":
+				this.brakeWearRecognized([])
 		}
 	}
 

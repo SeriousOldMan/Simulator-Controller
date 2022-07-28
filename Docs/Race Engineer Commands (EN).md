@@ -86,6 +86,10 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 	[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 
 	[{Check, Please check} {the tire wear, the tire wear at the moment}, (TellMe) {the tire wear, the tire wear at the moment}]
+	
+	[(WhatAre) {the brake temperatures, the current brake temperatures, the brake temperatures at the moment}, (TellMe) {the brake temperatures, the current brake temperatures, the brake temperatures at the moment}]
+
+	[{Check, Please check} {the brake wear, the brake wear at the moment}, (TellMe) {the brake wear, the brake wear at the moment}]
 
 	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go]
 

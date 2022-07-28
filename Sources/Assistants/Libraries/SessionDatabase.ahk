@@ -122,13 +122,54 @@ class SessionDatabase extends ConfigurationItem {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
 	}
 
-	prepareDatabase(simulator, car, track) {
+	prepareDatabase(simulator, car, track, data := false) {
 		if (simulator && car && track) {
 			simulatorCode := this.getSimulatorCode(simulator)
 			car := this.getCarCode(simulator, car)
 
-			if (simulatorCode && (car != true) && (track != true))
-				FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+			if (simulatorCode && (car != true) && (track != true)) {
+				prefix := (kDatabaseDirectory . "User\" . simulatorCode . "\")
+
+				if ((simulatorCode = "RF2") && data) {
+					carName := getConfigurationValue(data, "Session Data", "CarName")
+
+					if (car != carName) {
+						if FileExist(prefix . carName . "\" . track) {
+							try {
+								if FileExist(prefix . car . "\" . track)
+									FileMoveDir %prefix%%carName%, %prefix%%car%, 2
+								else
+									FileMoveDir %prefix%%carName%, %prefix%%car%, R
+							}
+							catch exception {
+								; ignore
+							}
+
+							return
+						}
+
+						if (InStr(carName, "#") > 1) {
+							carName := string2Values("#", carName)[1]
+
+							if ((car != carName) && FileExist(prefix . carName . "\" . track)) {
+								try {
+									if FileExist(prefix . car . "\" . track)
+										FileMoveDir %prefix%%carName%, %prefix%%car%, 2
+									else
+										FileMoveDir %prefix%%carName%, %prefix%%car%, R
+								}
+								catch exception {
+									; ignore
+								}
+
+								return
+							}
+						}
+					}
+				}
+
+				FileCreateDir %prefix%%car%\%track%
+			}
 		}
 	}
 

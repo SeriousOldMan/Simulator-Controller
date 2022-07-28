@@ -231,8 +231,8 @@ int main(int argc, char* argv[])
 		printData("BrakeTemperature", pf->brakeTemp);
 		printData("BrakePadLifeRaw", pf->padLife);
 		printData("BrakeDiscLifeRaw", pf->discLife);
-		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound);
-		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound);
+		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
+		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 	}
 
 	if ((argc == 1) || (argv[1][0] == 'D'))

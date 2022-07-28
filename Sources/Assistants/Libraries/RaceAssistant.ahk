@@ -1092,6 +1092,24 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4]))
 		}
 
+		brakeTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "BrakeTemperature", ""))
+
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FL", Round(brakeTemperatures[1] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FR", Round(brakeTemperatures[2] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RL", Round(brakeTemperatures[3] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RR", Round(brakeTemperatures[4] / 10) * 10)
+
+		brakeWear := getConfigurationValue(data, "Car Data", "BrakeWear", "")
+
+		if (brakeWear != "") {
+			brakeWear := string2Values(",", brakeWear)
+
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FL", Round(brakeWear[1], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FR", Round(brakeWear[2], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RL", Round(brakeWear[3], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RR", Round(brakeWear[4], 1))
+		}
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getConfigurationValue(data, "Track Data", "Grip", "Green"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)

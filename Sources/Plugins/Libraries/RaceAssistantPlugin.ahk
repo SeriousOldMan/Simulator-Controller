@@ -41,7 +41,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	iLastSession := kSessionFinished
 	iLastLap := 0
-	iLastLapCounter := 0
+	iUpdateLapCounter := 0
 	iWaitForShutdown := 0
 	iInPit := false
 	iFinished := false
@@ -711,7 +711,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			this.iLastSession := kSessionFinished
 			this.iLastLap := 0
-			this.iLastLapCounter := 0
+			this.iUpdateLapCounter := 0
 			this.iFinished := false
 			this.iInPit := false
 
@@ -1282,7 +1282,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
@@ -1299,7 +1299,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					this.iLastSession := sessionState
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
@@ -1332,7 +1332,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 
-						if (this.iLastLapCounter = 3) {
+						if (this.iUpdateLapCounter = 2) {
 							dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
 
 							writeConfiguration(dataFile, data)
@@ -1345,7 +1345,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.prepareSession(settingsFile, dataFile)
 						}
 
-						this.iLastLapCounter := this.iLastLapCounter + 1
+						this.iUpdateLapCounter := this.iUpdateLapCounter + 1
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -1405,7 +1405,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if this.iFinished {
 								this.iLastSession := kSessionFinished
 								this.iLastLap := 0
-								this.iLastLapCounter := 0
+								this.iUpdateLapCounter := 0
 								this.iFinished := false
 								this.iInPit := false
 
@@ -1416,7 +1416,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							}
 
 							this.iLastLap := dataLastLap
-							this.iLastLapCounter := 0
+							this.iUpdateLapCounter := 0
 
 							if !firstLap
 								this.iFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) == 0)
@@ -1457,9 +1457,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.restoreSessionState()
 						}
 
-						this.iLastLapCounter := this.iLastLapCounter + 1
+						this.iUpdateLapCounter := this.iUpdateLapCounter + 1
 
-						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iLastLapCounter . ".data"
+						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iUpdateLapCounter . ".data"
 
 						writeConfiguration(newDataFile, data)
 
@@ -1472,7 +1472,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				else {
 					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 				}
@@ -1492,7 +1492,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			this.iLastSession := kSessionFinished
 			this.iLastLap := 0
-			this.iLastLapCounter := 0
+			this.iUpdateLapCounter := 0
 			this.iFinished := false
 			this.iInPit := false
 
@@ -1587,7 +1587,7 @@ prepareSessionDatabase(data) {
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
 		if ((car != kUndefined) && (track != kUndefined))
-			sessionDB.prepareDatabase(simulator, car, track)
+			sessionDB.prepareDatabase(simulator, car, track, data)
 
 		sessionDB.registerDriver(simulator, plugin.Controller.ID
 							   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")

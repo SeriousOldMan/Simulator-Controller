@@ -713,15 +713,27 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	runningSimulator() {
-		for ignore, thePlugin in this.Plugins
-			if this.isActive(thePlugin) {
-				simulator := thePlugin.runningSimulator()
+		static lastSimulator := false
+		static lastCheck := 0
 
-				if (simulator != false)
-					return simulator
-			}
+		if (A_TickCount + (lastCheck + 10000)) {
+			lastSimulator := false
 
-		return false
+			for ignore, thePlugin in this.Plugins
+				if this.isActive(thePlugin) {
+					simulator := thePlugin.runningSimulator()
+
+					if (simulator != false) {
+						lastSimulator := simulator
+
+						break
+					}
+				}
+
+			lastCheck := A_TickCount
+		}
+
+		return lastSimulator
 	}
 
 	simulatorStartup(simulator) {
@@ -1889,8 +1901,6 @@ initializeSimulatorController() {
 
 	settings := readConfiguration(kSimulatorSettingsFile)
 
-	updateTrayMessageState(settings)
-
 	argIndex := inList(A_Args, "-Voice")
 	voice := false
 
@@ -1940,6 +1950,8 @@ startupSimulatorController() {
 		ExitApp 0
 
 	SetTimer externalCommandManager, -5000
+
+	updateTrayMessageState(controller.Settings)
 
 	controller.startup()
 }

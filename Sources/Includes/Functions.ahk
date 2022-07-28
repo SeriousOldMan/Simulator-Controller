@@ -47,7 +47,7 @@ global vOutgoingMessages = []
 global vDispatching = false
 
 global vPendingTrayMessages = []
-global vTrayMessageDuration = 1500
+global vTrayMessageDuration = false
 
 global vHasSupportMenu = false
 

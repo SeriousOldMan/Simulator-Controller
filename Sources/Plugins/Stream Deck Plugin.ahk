@@ -380,15 +380,12 @@ class StreamDeck extends FunctionController {
 		if (this.isRunning() && this.hasFunction(function)) {
 			enabled := false
 
-			if (this.Actions[function].Length() = 0)
-				enabled := true
-			else
-				for ignore, theAction in this.Actions[function]
-					if function.Enabled[theAction] {
-						enabled := true
+			for ignore, theAction in this.Actions[function]
+				if function.Enabled[theAction] {
+					enabled := true
 
-						break
-					}
+					break
+				}
 
 			if (!icon || (icon = ""))
 				icon := "clear"
@@ -433,19 +430,14 @@ class StreamDeck extends FunctionController {
 	}
 
 	setFunctionImage(function, icon, enabled := false, refresh := false) {
-		if refresh {
-			; showMessage("R: " . function . " - " . icon)
-
+		if refresh
 			this.Connector.SetImage(function, ((icon = "clear") || enabled) ? icon : disabledIcon(icon))
-		}
 		else if this.RefreshActive {
 			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon, enabled))
 
 			return
 		}
 		else {
-			; showMessage("S: " . function . " - " . icon)
-
 			if this.iFunctionImages.HasKey(function) {
 				if (this.iFunctionImages[function] != icon)
 					this.iChangedFunctionImages[function] := true
@@ -459,18 +451,8 @@ class StreamDeck extends FunctionController {
 		}
 	}
 
-	refresh() {
+	refresh(full := false) {
 		local function
-
-		static cycle := 0
-
-		if (cycle++ > 2) {
-			fullRefresh := true
-
-			cycle := 0
-		}
-		else
-			fullRefresh := false
 
 		if this.RefreshActive
 			return
@@ -478,31 +460,24 @@ class StreamDeck extends FunctionController {
 			this.iRefreshActive := true
 
 			try {
-				logMessage(kLogCritical, "Start refresh...")
-
 				for theFunction, title in this.iFunctionTitles
-					if (fullRefresh || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
+					if (full || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
 						this.setFunctionTitle(theFunction, title, true)
 
 				controller := this.Controller
 
 				for theFunction, image in this.iFunctionImages
-					if (fullRefresh || (this.iChangedFunctionImages.HasKey(theFunction) && this.iChangedFunctionImages[theFunction])) {
+					if (full || (this.iChangedFunctionImages.HasKey(theFunction) && this.iChangedFunctionImages[theFunction])) {
 						enabled := false
 
 						function := controller.findFunction(theFunction)
 
-						if (this.Actions[function].Length() = 0)
-							enabled := true
-						else
-							for ignore, theAction in this.Actions[function]
-								if function.Enabled[theAction] {
-									enabled := true
+						for ignore, theAction in this.Actions[function]
+							if function.Enabled[theAction] {
+								enabled := true
 
-									break
-							}
-
-						logMessage(kLogCritical, theFunction . " " . image . " " . enabled)
+								break
+						}
 
 						this.setFunctionImage(theFunction, image, enabled, true)
 					}
@@ -528,12 +503,12 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 
 disabledIcon(fileName) {
-	SplitPath fileName, name
+	SplitPath fileName, , , extension, name
 
-	disabledFileName := (kTempDirectory . "DisabledIcons\" . name)
+	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
 
 	if !FileExist(disabledFileName) {
-		FileCreateDir %kTempDirectory%DisabledIcons
+		FileCreateDir %kTempDirectory%Icons
 
 		token := Gdip_Startup()
 
@@ -576,9 +551,20 @@ disabledIcon(fileName) {
 }
 
 refreshStreamDecks() {
+	static cycle := 0
+
+	if (++cycle > 1) {
+		cycle := 0
+
+		full := true
+	}
+	else
+		full := false
+
+
 	for ignore, fnController in SimulatorController.Instance.FunctionController
 		if isInstance(fnController, StreamDeck)
-			fnController.refresh()
+			fnController.refresh(full)
 
 	SetTimer refreshStreamDecks, -5000
 }

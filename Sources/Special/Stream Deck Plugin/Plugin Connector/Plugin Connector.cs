@@ -51,13 +51,19 @@ namespace PluginConnector {
             var pipeClient = new NamedPipeClientStream(".", "scconnector", PipeDirection.InOut, PipeOptions.None,
                                                        TokenImpersonationLevel.Impersonation);
 
-            pipeClient.Connect();
+            try
+            {
+                pipeClient.Connect(2000);
 
-            var ss = new StreamString(pipeClient);
+                var ss = new StreamString(pipeClient);
 
-            ss.WriteString(message);
+                ss.WriteString(message);
 
-            pipeClient.Close();
+                pipeClient.Close();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public void SetTitle(string function, string title) {

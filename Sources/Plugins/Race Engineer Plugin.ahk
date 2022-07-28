@@ -215,7 +215,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["Time", "LapsRemaining", "FuelRemaining", "Weather"
-									   , "TyrePressures", "TyreTemperatures", "TyreWear"], arguments[1])) {
+									   , "TyrePressures", "TyreTemperatures", "TyreWear"
+									   , "BrakeTemperatures", "BrakeWear"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)
 
 			return true
@@ -402,7 +403,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 planPitstop() {
 	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-	
+
 	protectionOn()
 
 	try {
@@ -416,7 +417,7 @@ planPitstop() {
 
 preparePitstop() {
 	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
-	
+
 	protectionOn()
 
 	try {

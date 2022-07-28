@@ -20,7 +20,11 @@
   15. Additional tyre meta data has been added for *rFactor 2*, *Automobilista 2* and *RaceRoom Racing Experience*. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) for more information about tyre meta data.
   16. Action points can now be dragged with the mouse in the track automation editor.
   17. Finally fixed car model detection for *rFactor 2* in certain car classes, for example Formula 2.
-  18. New car models for "Setup Advisor":
+  18. New voice commands for the Race Engineer to request the current brake temperatures and wear. Not supported for all simulators, though.
+  19. New information request actions "BrakeTemperatures" and "BrakeWear" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin to request the brake temperatures and wear by pressing a button on your hardware controller.
+  20. New icons for Stream Deck for the "BrakeTemperatures" and "BrakeWear" information request action.
+  21. The Stream Deck Icons preset has been updated as well.
+  22. New car models for "Setup Advisor":
       - Assetto Corsa Competizione
         - Porsche 991 GT3 R
         - Audi R8 LMS

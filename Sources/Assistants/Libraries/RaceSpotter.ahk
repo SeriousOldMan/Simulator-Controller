@@ -1429,8 +1429,6 @@ class RaceSpotter extends RaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			if alert {
-				FileAppend %A_TickCount% <- %alert%`n, D:\Speaker.trace
-
 				this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
@@ -1468,8 +1466,6 @@ class RaceSpotter extends RaceAssistant {
 							this.SpotterSpeaking := true
 
 							try {
-								FileAppend %A_TickCount% -> %alert%`n, D:\Speaker.trace
-
 								speaker.speakPhrase(alert, false, false, alert)
 							}
 							finally {

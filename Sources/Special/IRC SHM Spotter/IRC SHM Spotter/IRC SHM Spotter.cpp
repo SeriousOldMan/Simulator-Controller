@@ -248,7 +248,7 @@ void sendAutomationMessage(char* message) {
 #define PI 3.14159265
 
 const float nearByDistance = 8.0;
-const float longitudinalDistance = 4;
+const float longitudinalDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 

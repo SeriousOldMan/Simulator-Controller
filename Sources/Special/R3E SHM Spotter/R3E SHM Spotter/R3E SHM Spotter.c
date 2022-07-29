@@ -118,7 +118,7 @@ void sendAutomationMessage(char* message) {
 
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
-#define longitudinalDistance 4
+#define longitudinalDistance 5
 #define lateralDistance 6
 #define verticalDistance 2
 

@@ -77,7 +77,7 @@ void sendAutomationMessage(char* message) {
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-const float longitudinalDistance = 4;
+const float longitudinalDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 

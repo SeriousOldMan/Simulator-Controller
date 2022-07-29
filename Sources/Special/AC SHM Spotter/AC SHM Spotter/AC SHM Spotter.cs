@@ -261,7 +261,7 @@ namespace ACSHMSpotter {
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
-		const double longitudinalDistance = 4;
+		const double longitudinalDistance = 5;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
 

@@ -120,7 +120,7 @@ int sessionDuration = 0;
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-const float longitudinalDistance = 4;
+const float longitudinalDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 
@@ -288,8 +288,6 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 float lastCoordinates[60][3];
 bool hasLastCoordinates = false;
 
-std::ofstream ofs("D:\Spotter.trace", std::ofstream::out);
-
 bool checkPositions() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -364,8 +362,6 @@ bool checkPositions() {
 			if (alert != "Hold")
 				carBehindReported = false;
 
-			ofs << GetTickCount64() << "proximityAlert:" << alert << endl;
-
 			sendSpotterMessage("proximityAlert:" + alert);
 
 			return true;
@@ -373,9 +369,6 @@ bool checkPositions() {
 		else if (carBehind) {
 			if (!carBehindReported) {
 				carBehindReported = true;
-
-				ofs << GetTickCount64() << (carBehindLeft ? "proximityAlert:BehindLeft" :
-					(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind")) << endl;
 
 				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
@@ -662,7 +655,7 @@ int main(int argc, char* argv[])
 	initGraphics();
 	initStatic();
 	
-	bool running = false;
+	bool running = true;
 	bool mapTrack = false;
 	bool positionTrigger = false;
 
@@ -730,7 +723,7 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-
+		
 		if (positionTrigger)
 			Sleep(10);
 		else

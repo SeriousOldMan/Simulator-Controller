@@ -1648,6 +1648,28 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV430() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	changed := false
+
+	if (getConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", false) = "Automobilista 2") {
+		setConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", "ahk_exe AMS2AVX.exe")
+
+		changed := true
+	}
+
+	if (getConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", false) = "Project CARS 2") {
+		setConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", "PCARS2AVX.exe")
+
+		changed := true
+	}
+
+	if changed
+		writeConfiguration(userConfigurationFile, userConfiguration)
+}
+
 updateConfigurationForV426() {
 	try {
 		FileRemoveDir %kDatabaseDirectory%User\Tracks\AC, 1

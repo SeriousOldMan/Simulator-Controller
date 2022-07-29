@@ -3,7 +3,7 @@ Version=4.3.0.0-dev
 Target=4.3.0.0-release
 Date=07/29/2022
 Download=
-Changes=Cleanup of Temp and Logs folder after a release, Increased reliability of ACC UDP interface, More precise Spotter side alerts
+Changes=Cleanup of Temp and Logs folder after a release, Increased reliability of ACC UDP interface, More precise Spotter side alerts, Exit is now detected correctly for AMS2 and PCARS2
 [Release]
 Version=4.2.6.0-release
 Date=07/29/2022

@@ -288,7 +288,7 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 float lastCoordinates[60][3];
 bool hasLastCoordinates = false;
 
-std::ofstream ofs("C:\Spotter.trace", std::ofstream::out);
+std::ofstream ofs("D:\Spotter.trace", std::ofstream::out);
 
 bool checkPositions() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;

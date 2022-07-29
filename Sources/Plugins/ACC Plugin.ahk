@@ -238,7 +238,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	shutdownUDPClient(force := false) {
 		if (this.UDPClient || force) {
-			FileAppend Exit, %kTempDirectory%ACCUDP.cmd
+			FileAppend Exit`n, %kTempDirectory%ACCUDP.cmd
 
 			Sleep 250
 
@@ -317,7 +317,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			fileName := kTempDirectory . "ACCUDP.cmd"
 
-			FileAppend Read, %fileName%
+			FileAppend Read`n, %fileName%
 
 			tries := 10
 

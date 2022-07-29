@@ -427,7 +427,7 @@ launchPad(command := false, arguments*) {
 		Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-		 	ExitApp 0
+		 	exit()
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
@@ -683,12 +683,12 @@ startSimulator() {
 		launchPad()
 
 	if (!vStartupManager || vStartupManager.Finished)
-		ExitApp 0
+		exit()
 
 	return
 
 Exit:
-	ExitApp 0
+	exit()
 }
 
 playSong(songFile) {
@@ -700,6 +700,19 @@ playSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+exit() {
+	fileName := (kTempDirectory . "Startup.semaphore")
+
+	try {
+		FileDelete %fileName%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	ExitApp 0
+}
 
 exitStartup(sayGoodBye := false) {
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
@@ -723,7 +736,7 @@ exitStartup(sayGoodBye := false) {
 		}
 
 		if !vStartupStayOpen
-			ExitApp 0
+			exit()
 	}
 }
 

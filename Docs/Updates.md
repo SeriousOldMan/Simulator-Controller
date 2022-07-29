@@ -53,7 +53,7 @@ A couple of things to do for you for this update:
 
 3. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType". You must adopt your configuration, if you have used this function.
 
-4. The actions "BrakeTemperatures" and "BreakeWear" have been added to the "Race Engineer" plugin. You can add it to your configuration, if you want to get these informations by the press of abutton on your controller (but they are available as voice commands as well). If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icons for the new "BrakeTemperatures" and "BreakeWear" actions will be available to you.
+4. The actions "BrakeTemperatures" and "BreakeWear" have been added to the "Race Engineer" plugin. You can add it to your configuration, if you want to get these informations by the press of a button on your controller (but they are available as voice commands as well). If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icons for the new "BrakeTemperatures" and "BreakeWear" actions will be available to you.
 
 ***
 

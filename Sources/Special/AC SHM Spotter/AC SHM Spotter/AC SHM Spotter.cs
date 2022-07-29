@@ -628,9 +628,11 @@ namespace ACSHMSpotter {
 			return false;
 		}
 
-		void checkPitWindow()
+		bool checkPitWindow()
 		{
 			// No support by Assetto Corsa
+
+			return false;
 		}
 
 		float initialX = 0.0f;
@@ -731,6 +733,8 @@ namespace ACSHMSpotter {
 				staticInfo = ReadStaticInfo();
 				cars = ReadCars();
 
+				bool wait = true;
+
 				if (mapTrack)
 				{
 					if (!writeCoordinates())
@@ -762,7 +766,9 @@ namespace ACSHMSpotter {
 						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
 						{
 							if (!checkFlagState() && !checkPositions())
-								checkPitWindow();
+								wait = !checkPitWindow();
+							else
+								wait = false;
 						}
 						else
 						{
@@ -779,7 +785,7 @@ namespace ACSHMSpotter {
 
 				if (positionTrigger)
 					Thread.Sleep(10);
-				else
+				else if (wait)
 					Thread.Sleep(50);
 			}
 

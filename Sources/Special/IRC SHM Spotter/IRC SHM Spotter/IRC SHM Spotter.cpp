@@ -545,8 +545,10 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 	return false;
 }
 
-void checkPitWindow(const irsdk_header* header, const char* data) {
+bool checkPitWindow(const irsdk_header* header, const char* data) {
 	// No support in iRacing
+
+	return false;
 }
 
 float initialX = 0.0;
@@ -772,6 +774,8 @@ int main(int argc, char* argv[])
 		g_data = NULL;
 		int tries = 3;
 
+		bool wait = true;
+
 		while (tries-- > 0) {
 			// wait for new data and copy it into the g_data buffer, if g_data is not null
 			if (irsdk_waitForDataReady(TIMEOUT, g_data)) {
@@ -861,7 +865,9 @@ int main(int argc, char* argv[])
 
 							if (onTrack && !inPit) {
 								if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
-									checkPitWindow(pHeader, g_data);
+									wait = !checkPitWindow(pHeader, g_data);
+								else
+									wait = false;
 
 								continue;
 							}
@@ -886,7 +892,7 @@ int main(int argc, char* argv[])
 			Sleep(1);
 		else if (positionTrigger)
 			Sleep(10);
-		else
+		else if (wait)
 			Sleep(50);
 	}
 

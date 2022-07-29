@@ -412,7 +412,7 @@ bool checkFlagState(const SharedMemory* sharedData) {
 	return false;
 }
 
-void checkPitWindow(const SharedMemory* sharedData) {
+bool checkPitWindow(const SharedMemory* sharedData) {
 	if (sharedData->mEnforcedPitStopLap > 0)
 		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted + 1) &&
 			!pitWindowOpenReported) {
@@ -420,6 +420,8 @@ void checkPitWindow(const SharedMemory* sharedData) {
 			pitWindowClosedReported = false;
 
 			sendSpotterMessage("pitWindow:Open");
+
+			return true;
 		}
 		else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
 			!pitWindowClosedReported) {
@@ -427,7 +429,11 @@ void checkPitWindow(const SharedMemory* sharedData) {
 			pitWindowOpenReported = false;
 
 			sendSpotterMessage("pitWindow:Closed");
+
+			return true;
 		}
+
+	return false;
 }
 
 float initialX = 0.0;
@@ -548,6 +554,8 @@ int main(int argc, char* argv[]) {
 
 		while (true)
 		{
+			bool wait = true;
+
 			if (sharedData->mSequenceNumber % 2)
 			{
 				// Odd sequence number indicates, that write into the shared memory is just happening
@@ -579,7 +587,9 @@ int main(int argc, char* argv[]) {
 				if (running) {
 					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
 						if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-							checkPitWindow(localCopy);
+							wait = !checkPitWindow(localCopy);
+						else
+							wait = false;
 					}
 					else {
 						lastSituation = CLEAR;
@@ -595,7 +605,7 @@ int main(int argc, char* argv[]) {
 
 			if (positionTrigger)
 				Sleep(10);
-			else
+			else if (wait)
 				Sleep(50);
 		}
 	}

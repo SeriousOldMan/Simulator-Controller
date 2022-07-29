@@ -529,7 +529,7 @@ bool checkFlagState() {
 	return false;
 }
 
-void checkPitWindow() {
+bool checkPitWindow() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -546,14 +546,20 @@ void checkPitWindow() {
 			pitWindowClosedReported = false;
 
 			sendSpotterMessage("pitWindow:Open");
+
+			return true;
 		}
 		else if (pitWindowEnd < currentTime && !pitWindowClosedReported) {
 			pitWindowClosedReported = true;
 			pitWindowOpenReported = false;
 
 			sendSpotterMessage("pitWindow:Closed");
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 float initialX = 0.0;
@@ -682,6 +688,8 @@ int main(int argc, char* argv[])
 	int safety = 200;
 
 	while (true) {
+		bool wait = true;
+
 		if (mapTrack) {
 			if (!writeCoordinates())
 				break;
@@ -710,7 +718,9 @@ int main(int argc, char* argv[])
 
 				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
 					if (!checkFlagState() && !checkPositions())
-						checkPitWindow();
+						wait = !checkPitWindow();
+					else
+						wait = false;
 				}
 				else {
 					lastSituation = CLEAR;
@@ -726,7 +736,7 @@ int main(int argc, char* argv[])
 		
 		if (positionTrigger)
 			Sleep(10);
-		else
+		else if (wait)
 			Sleep(50);
 	}
 

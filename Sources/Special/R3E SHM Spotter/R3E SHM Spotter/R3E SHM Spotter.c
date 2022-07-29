@@ -555,19 +555,25 @@ BOOL checkFlagState() {
 		return FALSE;
 }
 
-void checkPitWindow() {
+BOOL checkPitWindow() {
 	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported) {
 		pitWindowOpenReported = TRUE;
 		pitWindowClosedReported = FALSE;
 
 		sendSpotterMessage("pitWindow:Open");
+
+		return TRUE;
 	}
 	else if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_CLOSED) && !pitWindowClosedReported) {
 		pitWindowClosedReported = TRUE;
 		pitWindowOpenReported = FALSE;
 
 		sendSpotterMessage("pitWindow:Closed");
+
+		return TRUE;
 	}
+
+	return FALSE;
 }
 
 float initialX = 0.0;
@@ -680,6 +686,8 @@ int main(int argc, char* argv[])
 	}
 
 	while (TRUE) {
+		BOOL wait = TRUE;
+
 		if (!mapped_r3e && map_exists())
 			if (!map_init()) {
 				mapped_r3e = TRUE;
@@ -701,7 +709,9 @@ int main(int argc, char* argv[])
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
 						if (!checkFlagState() && !checkPositions(playerID))
-							checkPitWindow();
+							wait = !checkPitWindow();
+						else
+							wait = FALSE;
 					}
 					else {
 						lastSituation = CLEAR;
@@ -718,7 +728,7 @@ int main(int argc, char* argv[])
         
 		if (positionTrigger)
 			Sleep(10);
-		else
+		else if (wait)
 			Sleep(50);
     }
 

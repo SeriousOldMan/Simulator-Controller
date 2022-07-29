@@ -40,6 +40,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iUDPClient := false
 	iUDPConnection := false
 
+	iSessionID := 0
+
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
@@ -238,36 +240,35 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	shutdownUDPClient(force := false) {
 		if (this.UDPClient || force) {
-			FileAppend Exit`n, %kTempDirectory%ACCUDP.cmd
+			Process Exist, ACC UDP Provider.exe
 
-			Sleep 250
-
-			Loop 5 {
-				Process Exist, ACC UDP Provider.exe
-
-				if ErrorLevel {
-					Process Close, %ErrorLevel%
+			if ErrorLevel
+				Loop 5 {
+					FileAppend Exit`n, %kTempDirectory%ACCUDP.cmd
 
 					Sleep 250
-				}
-				else
-					break
-			}
 
-			this.iUDPClient := false
+					Process Exist, ACC UDP Provider.exe
+
+					if !ErrorLevel {
+						this.iUDPClient := false
+
+						break
+					}
+				}
 		}
 
 		return false
 	}
 
-	requireUDPClient() {
+	requireUDPClient(restart := false) {
 		Process Exist, ACC UDP Provider.exe
 
 		if !ErrorLevel
 			this.iUDPClient := false
 
 		if (this.SessionState == kSessionRace)
-			this.startupUDPClient()
+			this.startupUDPClient(restart)
 	}
 
 	updateSessionState(sessionState) {
@@ -292,7 +293,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if (sessionState != kSessionPaused)
-				this.shutdownUDPClient()
+				this.shutdownUDPClient(true)
 		}
 	}
 
@@ -303,9 +304,24 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		static lastDriverCar := false
 		static lastRead := false
 		static standings := false
+		static sessionID := 0
+		static lastLap := 0
+
+		lap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		restart := false
+
+		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
+			sessionID += 1
+
+			restart := true
+		}
+
+		this.iSessionID := sessionID
+
+		lastLap := lap
 
 		if (this.SessionState == kSessionRace)
-			this.requireUDPClient()
+			this.requireUDPClient(restart)
 		else if !this.UDPClient
 			return
 
@@ -315,7 +331,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if ((A_TickCount + 5000) > lastRead) {
 			lastRead := (A_TickCount + 0)
 
-			fileName := kTempDirectory . "ACCUDP.cmd"
+			fileName := (kTempDirectory . "ACCUDP.cmd")
 
 			FileAppend Read`n, %fileName%
 
@@ -355,7 +371,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if standings {
-			if (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)
+			if (lap <= 1)
 				lastDriverCar := false
 
 			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")

@@ -683,6 +683,17 @@ checkInstallation() {
 
 				showProgress({progress: 100, message: translate("Finished...")})
 
+				try {
+					FileRemoveDir %kLogsDirectory%, 1
+					FileRemoveDir %kTempDirectory%, 1
+				}
+				catch exception {
+					; ignore
+				}
+
+				FileCreateDir %kLogsDirectory%
+				FileCreateDir %kTempDirectory%
+
 				Sleep 1000
 
 				hideProgress()

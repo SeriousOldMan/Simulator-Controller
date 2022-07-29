@@ -165,7 +165,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			controller.registerPlugin(this)
 
-			OnExit(ObjBindMethod(this, "shutdownUDPClient"))
+			OnExit(ObjBindMethod(this, "shutdownUDPClient", true))
 		}
 	}
 

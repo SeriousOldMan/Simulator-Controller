@@ -73,7 +73,7 @@ class AssistantMode extends ControllerMode {
 			sessionState := kSessionFinished
 
 		for ignore, theAction in this.Actions
-			if isInstance(theAction, RaceAssistantAction)
+			if (isInstance(theAction, RaceAssistantAction) && inList(this.Controller.ActiveModes, this))
 				if inList(kAssistantAnswerActions, theAction.Action) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
@@ -104,7 +104,7 @@ class PitstopMode extends AssistantMode {
 
 	updatePitstopActions(sessionState) {
 		for ignore, theAction in this.Actions
-			if isInstance(theAction, PitstopAction)
+			if (isInstance(theAction, PitstopAction) && inList(this.Controller.ActiveModes, this))
 				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)

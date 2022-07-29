@@ -708,8 +708,11 @@ class SimulatorController extends ConfigurationItem {
 	unregisterActiveMode(mode) {
 		position := inList(this.iActiveModes, mode)
 
-		if position
+		while position {
 			this.iActiveModes.RemoveAt(position)
+
+			position := inList(this.iActiveModes, mode)
+		}
 	}
 
 	runningSimulator() {
@@ -1762,7 +1765,7 @@ getLabelForLogMessage(action) {
 	if (label == "")
 		label := action.base.__Class
 
-	return label
+	return StrReplace(label, "`n", A_Space)
 }
 
 getPluginForLogMessage(plugin) {

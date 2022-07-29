@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
+#include <fstream>
 #include <string.h>
 #include <windows.h>
 #include <tchar.h>
@@ -287,6 +288,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 float lastCoordinates[60][3];
 bool hasLastCoordinates = false;
 
+std::ofstream ofs("C:\Spotter.trace", std::ofstream::out);
+
 bool checkPositions() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -361,6 +364,8 @@ bool checkPositions() {
 			if (alert != "Hold")
 				carBehindReported = false;
 
+			ofs << GetTickCount64() << "proximityAlert:" << alert << endl;
+
 			sendSpotterMessage("proximityAlert:" + alert);
 
 			return true;
@@ -368,6 +373,9 @@ bool checkPositions() {
 		else if (carBehind) {
 			if (!carBehindReported) {
 				carBehindReported = true;
+
+				ofs << GetTickCount64() << (carBehindLeft ? "proximityAlert:BehindLeft" :
+					(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind")) << endl;
 
 				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));

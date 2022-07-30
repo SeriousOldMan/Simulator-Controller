@@ -261,7 +261,8 @@ namespace ACSHMSpotter {
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
-		double longitudinalDistance = 5;
+		double longitudinalFrontDistance = 4;
+		double longitudinalRearDistance = 5;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
 
@@ -281,6 +282,7 @@ namespace ACSHMSpotter {
 		bool carBehindLeft = false;
 		bool carBehindRight = false;
 		bool carBehindReported = false;
+		int carBehindCount = 0;
 
 		const int YELLOW = 1;
 
@@ -411,7 +413,7 @@ namespace ACSHMSpotter {
 
 				rotateBy(ref transX, ref transY, angle);
 
-				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
+				if ((Math.Abs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
 					return (transX < 0) ? RIGHT : LEFT;
 				else
 				{
@@ -419,8 +421,8 @@ namespace ACSHMSpotter {
 					{
 						carBehind = true;
 
-						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
-							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+						if ((faster && Math.Abs(transY) < longitudinalFrontDistance * 1.5) ||
+							(Math.Abs(transY) < longitudinalFrontDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
 							if (transX < 0)
 								carBehindRight = true;
 							else
@@ -507,32 +509,35 @@ namespace ACSHMSpotter {
 					carBehindReported = false;
 				}
 
+				if (carBehindCount++ > 200)
+					carBehindCount = 0;
+
 				string alert = computeAlert(newSituation);
 
 				if (alert != noAlert)
 				{
-					longitudinalDistance = 4;
-					
-					if (alert != "Hold")
-						carBehindReported = false;
+					longitudinalRearDistance = 4;
 
 					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
 				else {
-					longitudinalDistance = 5;
+					longitudinalRearDistance = 5;
 					
 					if (carBehind)
 					{
 						if (!carBehindReported)
 						{
-							carBehindReported = true;
+							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
+							{
+								carBehindReported = true;
 
-							SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-															   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+								SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+																   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-							return true;
+								return true;
+							}
 						}
 					}
 					else
@@ -541,7 +546,7 @@ namespace ACSHMSpotter {
 			}
 			else
 			{
-				longitudinalDistance = 5;
+				longitudinalRearDistance = 5;
 					
 				lastSituation = CLEAR;
 				carBehind = false;
@@ -780,7 +785,7 @@ namespace ACSHMSpotter {
 						}
 						else
 						{
-							longitudinalDistance = 5;
+							longitudinalRearDistance = 5;
 					
 							lastSituation = CLEAR;
 							carBehind = false;

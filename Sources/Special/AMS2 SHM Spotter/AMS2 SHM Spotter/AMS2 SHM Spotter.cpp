@@ -77,7 +77,8 @@ void sendAutomationMessage(char* message) {
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-float longitudinalDistance = 5;
+float longitudinalFrontDistance = 4;
+float longitudinalRearDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 
@@ -97,6 +98,7 @@ bool carBehind = false;
 bool carBehindLeft = false;
 bool carBehindRight = false;
 bool carBehindReported = false;
+int carBehindCount = 0;
 
 const int YELLOW = 1;
 
@@ -217,14 +219,14 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 
 		rotateBy(&transX, &transY, angle);
 
-		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
+		if ((fabs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && fabs(transY) < longitudinalDistance * 1.5) ||
-					(fabs(transY) < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+				if ((faster && fabs(transY) < longitudinalFrontDistance * 1.5) ||
+					(fabs(transY) < longitudinalFrontDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = true;
 					else
@@ -300,13 +302,13 @@ bool checkPositions(const SharedMemory* sharedData) {
 			carBehindReported = false;
 		}
 
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
+
 		const char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			longitudinalDistance = 4;
-			
-			if (strcmp(alert, "Hold") == 0)
-				carBehindReported = false;
+			longitudinalRearDistance = 4;
 
 			char buffer[128];
 
@@ -318,16 +320,18 @@ bool checkPositions(const SharedMemory* sharedData) {
 			return true;
 		}
 		else {
-			longitudinalDistance = 5;
+			longitudinalRearDistance = 5;
 			
 			if (carBehind) {
 				if (!carBehindReported) {
-					carBehindReported = true;
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+						carBehindReported = true;
 
-					sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-													   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+							(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-					return true;
+						return true;
+					}
 				}
 			}
 			else
@@ -335,7 +339,7 @@ bool checkPositions(const SharedMemory* sharedData) {
 		}
 	}
 	else {
-		longitudinalDistance = 5;
+		longitudinalRearDistance = 5;
 		
 		lastSituation = CLEAR;
 		carBehind = false;
@@ -600,7 +604,7 @@ int main(int argc, char* argv[]) {
 							wait = false;
 					}
 					else {
-						longitudinalDistance = 5;
+						longitudinalRearDistance = 5;
 						
 						lastSituation = CLEAR;
 						carBehind = false;

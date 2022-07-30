@@ -118,7 +118,8 @@ void sendAutomationMessage(char* message) {
 
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
-float longitudinalDistance 5
+float longitudinalFrontDistance = 4;
+float longitudinalRearDistance = 5;
 #define lateralDistance 6
 #define verticalDistance 2
 
@@ -138,6 +139,7 @@ BOOL carBehind = FALSE;
 BOOL carBehindLeft = FALSE;
 BOOL carBehindRight = FALSE;
 BOOL carBehindReported = FALSE;
+int carBehindCount = 0;
 
 #define YELLOW_SECTOR_1 1
 #define YELLOW_SECTOR_2 2
@@ -262,14 +264,15 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 
 		rotateBy(&transX, &transY, angle);
 
-		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
+		if ((fabs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) &&
+			(fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0) {
 				carBehind = TRUE;
 
-				if ((faster && fabs(transY) < longitudinalDistance * 1.5) ||
-					(fabs(transY) < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+				if ((faster && fabs(transY) < longitudinalFrontDistance * 1.5) ||
+					(fabs(transY) < longitudinalFrontDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = TRUE;
 					else
@@ -349,13 +352,13 @@ BOOL checkPositions(int playerID) {
 			carBehindReported = FALSE;
 		}
 
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
+
 		char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			longitudinalDistance = 4;
-			
-			if (strcmp(alert, "Hold") == 0)
-				carBehindReported = FALSE;
+			longitudinalRearDistance = 4;
 
 			char buffer[128];
 
@@ -367,16 +370,18 @@ BOOL checkPositions(int playerID) {
 			return TRUE;
 		}
 		else {
-			longitudinalDistance = 5;
+			longitudinalRearDistance = 5;
 		
 			if (carBehind) {
 				if (!carBehindReported) {
-					carBehindReported = TRUE;
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+						carBehindReported = TRUE;
 
-					sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-													   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+														   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-					return TRUE;
+						return TRUE;
+					}
 				}
 			}
 			else
@@ -384,7 +389,7 @@ BOOL checkPositions(int playerID) {
 		}
 	}
 	else {
-		longitudinalDistance = 5;
+		longitudinalRearDistance = 5;
 		
 		lastSituation = CLEAR;
 		carBehind = FALSE;
@@ -722,7 +727,7 @@ int main(int argc, char* argv[])
 							wait = FALSE;
 					}
 					else {
-						longitudinalDistance = 5;
+						longitudinalRearDistance = 5;
 						
 						lastSituation = CLEAR;
 						carBehind = FALSE;

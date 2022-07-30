@@ -1661,7 +1661,7 @@ updateConfigurationForV430() {
 	}
 
 	if (getConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", false) = "Project CARS 2") {
-		setConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", "PCARS2AVX.exe")
+		setConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", "ahk_exe PCARS2AVX.exe")
 
 		changed := true
 	}

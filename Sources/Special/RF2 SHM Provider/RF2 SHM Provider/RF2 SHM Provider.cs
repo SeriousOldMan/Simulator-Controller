@@ -172,6 +172,9 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
+				Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
+				Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine(vehicle.mPitState != 3 ? "true" : "false");
+
 				if (vehicle.mIsPlayer != 0)
 				{
 					Console.Write("Driver.Car=");

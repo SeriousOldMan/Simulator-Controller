@@ -625,6 +625,11 @@ void writeStandings(const irsdk_header *header, const char* data)
 				printf("Car.%s.Driver.Forname=%s\n", carIdx1, forName);
 				printf("Car.%s.Driver.Surname=%s\n", carIdx1, surName);
 				printf("Car.%s.Driver.Nickname=%s\n", carIdx1, nickName);
+
+				char* pitLaneStates;
+
+				if (getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad"))
+					printf("Car.%s.InPitLane=%s\n", carIdx1, ((bool*)pitLaneStates)[carIndex] ? "true" : "false");
 			}
 			else {
 				itoa(i - 1, posIdx, 10);

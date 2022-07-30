@@ -179,6 +179,9 @@ int main(int argc, char* argv[]) {
 					printf("Car.%d.Driver.Surname=%s\n", i, "");
 					printf("Car.%d.Driver.Nickname=%s\n", i, "");
 				}
+
+				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
+				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
 			}
 		}
 	}

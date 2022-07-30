@@ -342,6 +342,14 @@ namespace ACCUDPProvider {
 										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
 									}
 
+                                    CarLocationEnum location = car.CarLocation;
+                                    bool inPitLane = false;
+
+                                    if (location == CarLocationEnum.Pitlane)
+                                        inPitLane = true;
+
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".InPitlane="); outStream.WriteLine(inPitLane ? "true" : "false");
+
                                     index += 1;
 								}
 

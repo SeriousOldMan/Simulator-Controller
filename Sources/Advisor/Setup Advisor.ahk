@@ -3171,7 +3171,7 @@ runSetupAdvisor() {
 		}
 	}
 
-	current := fixIE()
+	current := fixIE(11)
 
 	OnExit(Func("exitFixIE").Bind(current))
 

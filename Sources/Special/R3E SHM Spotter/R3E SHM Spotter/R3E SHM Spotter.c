@@ -118,7 +118,7 @@ void sendAutomationMessage(char* message) {
 
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
-#define longitudinalDistance 5
+float longitudinalDistance 5
 #define lateralDistance 6
 #define verticalDistance 2
 
@@ -352,6 +352,8 @@ BOOL checkPositions(int playerID) {
 		char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
+			longitudinalDistance = 4;
+			
 			if (strcmp(alert, "Hold") == 0)
 				carBehindReported = FALSE;
 
@@ -364,20 +366,26 @@ BOOL checkPositions(int playerID) {
 
 			return TRUE;
 		}
-		else if (carBehind) {
-			if (!carBehindReported) {
-				carBehindReported = TRUE;
+		else {
+			longitudinalDistance = 5;
+		
+			if (carBehind) {
+				if (!carBehindReported) {
+					carBehindReported = TRUE;
 
-				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+					sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+													   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-				return TRUE;
+					return TRUE;
+				}
 			}
+			else
+				carBehindReported = FALSE;
 		}
-		else
-			carBehindReported = FALSE;
 	}
 	else {
+		longitudinalDistance = 5;
+		
 		lastSituation = CLEAR;
 		carBehind = FALSE;
 		carBehindLeft = FALSE;
@@ -714,6 +722,8 @@ int main(int argc, char* argv[])
 							wait = FALSE;
 					}
 					else {
+						longitudinalDistance = 5;
+						
 						lastSituation = CLEAR;
 						carBehind = FALSE;
 						carBehindLeft = FALSE;

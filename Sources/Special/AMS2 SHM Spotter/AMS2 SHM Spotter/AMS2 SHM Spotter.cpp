@@ -77,7 +77,7 @@ void sendAutomationMessage(char* message) {
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-const float longitudinalDistance = 5;
+float longitudinalDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 
@@ -303,6 +303,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 		const char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
+			longitudinalDistance = 4;
+			
 			if (strcmp(alert, "Hold") == 0)
 				carBehindReported = false;
 
@@ -315,20 +317,26 @@ bool checkPositions(const SharedMemory* sharedData) {
 
 			return true;
 		}
-		else if (carBehind) {
-			if (!carBehindReported) {
-				carBehindReported = true;
+		else {
+			longitudinalDistance = 5;
+			
+			if (carBehind) {
+				if (!carBehindReported) {
+					carBehindReported = true;
 
-				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+					sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+													   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-				return true;
+					return true;
+				}
 			}
+			else
+				carBehindReported = false;
 		}
-		else
-			carBehindReported = false;
 	}
 	else {
+		longitudinalDistance = 5;
+		
 		lastSituation = CLEAR;
 		carBehind = false;
 		carBehindLeft = false;
@@ -592,6 +600,8 @@ int main(int argc, char* argv[]) {
 							wait = false;
 					}
 					else {
+						longitudinalDistance = 5;
+						
 						lastSituation = CLEAR;
 						carBehind = false;
 						carBehindLeft = false;

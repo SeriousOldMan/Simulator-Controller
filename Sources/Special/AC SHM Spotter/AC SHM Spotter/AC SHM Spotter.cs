@@ -261,7 +261,7 @@ namespace ACSHMSpotter {
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
-		const double longitudinalDistance = 5;
+		double longitudinalDistance = 5;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
 
@@ -511,6 +511,8 @@ namespace ACSHMSpotter {
 
 				if (alert != noAlert)
 				{
+					longitudinalDistance = 4;
+					
 					if (alert != "Hold")
 						carBehindReported = false;
 
@@ -518,23 +520,29 @@ namespace ACSHMSpotter {
 
 					return true;
 				}
-				else if (carBehind)
-				{
-					if (!carBehindReported)
+				else {
+					longitudinalDistance = 5;
+					
+					if (carBehind)
 					{
-						carBehindReported = true;
+						if (!carBehindReported)
+						{
+							carBehindReported = true;
 
-						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-														   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+							SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+															   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-						return true;
+							return true;
+						}
 					}
+					else
+						carBehindReported = false;
 				}
-				else
-					carBehindReported = false;
 			}
 			else
 			{
+				longitudinalDistance = 5;
+					
 				lastSituation = CLEAR;
 				carBehind = false;
 				carBehindLeft = false;
@@ -772,6 +780,8 @@ namespace ACSHMSpotter {
 						}
 						else
 						{
+							longitudinalDistance = 5;
+					
 							lastSituation = CLEAR;
 							carBehind = false;
 							carBehindLeft = false;

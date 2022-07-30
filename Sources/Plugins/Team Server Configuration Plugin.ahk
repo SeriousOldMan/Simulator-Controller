@@ -11,6 +11,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -240,13 +241,14 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
-		this.connect(false)
-
 		this.updateState()
 	}
 
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
+
+		if FileExist(kUserConfigDirectory . "Team Server.ini")
+			configuration := readConfiguration(kUserConfigDirectory . "Team Server.ini")
 
 		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
@@ -278,6 +280,27 @@ class TeamServerConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
 
 		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
+
+		tsConfiguration := newConfiguration()
+
+		setConfigurationSectionValues(tsConfiguration, "Team Server", getConfigurationSectionValues(configuration, "Team Server"))
+
+		writeConfiguration(kUserConfigDirectory . "Team Server.ini", tsConfiguration)
+	}
+
+	activate() {
+		if !this.Token {
+			window := this.Editor.Window
+
+			Gui %window%:+Disabled
+
+			try {
+				this.connect()
+			}
+			finally {
+				Gui %window%:-Disabled
+			}
+		}
 	}
 
 	connect(message := true) {
@@ -610,24 +633,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	normalizeDriverName(name) {
-		parts := string2Values(A_Space, name)
-
 		forName := ""
 		surName := ""
 		nickName := ""
 
-		if (parts.Length() > 0)
-			forName := parts[1]
+		parseDriverName(name, forName, surName, nickName)
 
-		if (parts.Length() > 1)
-			surName := parts[2]
-
-		if (parts.Length() > 2) {
-			parts.RemoveAt(1, 2)
-
-			nickName := Trim(StrReplace(StrReplace(values2String(A_Space, parts*), "(", ""), ")", ""))
-		}
-		else {
+		if (nickName = "") {
 			StringUpper initialForName, % SubStr(forName, 1, 1)
 			StringUpper initialSurName, % SubStr(surName, 1, 1)
 
@@ -636,15 +648,19 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		nickName := SubStr(nickName, 1, 3)
 
-		return (forName . A_Space . surName . A_Space . translate("(") . nickName . translate(")"))
+		return computeDriverName(forName, surName, nickName)
 	}
 
 	addDriver(name) {
 		name := this.normalizeDriverName(name)
 
-		parts := string2Values(A_Space, name)
+		forName := ""
+		surName := ""
+		nickName := ""
 
-		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], parts[1], parts[2], StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+		parseDriverName(name, forName, surName, nickName)
+
+		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], forName, surName, nickName)
 
 		drivers := this.Drivers
 
@@ -740,28 +756,13 @@ chooseSessionStorePath() {
 	GuiControlGet sessionStorePathEdit
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%sessionStorePathEdit%, 0, % translate("Select local Session Folder...")
 	OnMessage(0x44, "")
 
 	if (directory != "")
 		GuiControl Text, sessionStorePathEdit, %directory%
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 copyURL() {

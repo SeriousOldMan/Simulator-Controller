@@ -211,61 +211,63 @@ class SystemPlugin extends ControllerPlugin {
 
 		base.__New(controller, name, configuration, false)
 
-		for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
+		if (this.Active || isDebug()) {
+			for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
+				if (descriptor != false) {
+					function := controller.findFunction(descriptor)
+
+					if (function != false) {
+						action := new this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
+
+						this.iModeSelectors.Push(action)
+
+						this.registerAction(action)
+					}
+					else
+						this.logFunctionNotFound(descriptor)
+				}
+
+			for ignore, arguments in string2Values(",", this.getArgumentValue("launchApplications", ""))
+				this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
+
+			descriptor := this.getArgumentValue("logo", false)
+
 			if (descriptor != false) {
 				function := controller.findFunction(descriptor)
 
 				if (function != false) {
-					action := new this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
+					if !this.iLaunchMode
+						this.iLaunchMode := new this.LaunchMode(this)
 
-					this.iModeSelectors.Push(action)
-
-					this.registerAction(action)
+					this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
 			}
 
-		for ignore, arguments in string2Values(",", this.getArgumentValue("launchApplications", ""))
-			this.createLaunchAction(controller, this.parseValues(A_Space, arguments)*)
+			descriptor := this.getArgumentValue("shutdown", false)
 
-		descriptor := this.getArgumentValue("logo", false)
+			if (descriptor != false) {
+				function := controller.findFunction(descriptor)
 
-		if (descriptor != false) {
-			function := controller.findFunction(descriptor)
+				if (function != false) {
+					if !this.iLaunchMode
+						this.iLaunchMode := new this.LaunchMode(this)
 
-			if (function != false) {
-				if !this.iLaunchMode
-					this.iLaunchMode := new this.LaunchMode(this)
-
-				this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
+					this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
+				}
+				else
+					this.logFunctionNotFound(descriptor)
 			}
-			else
-				this.logFunctionNotFound(descriptor)
+
+			if this.iLaunchMode
+				this.registerMode(this.iLaunchMode)
+
+			if register
+				controller.registerPlugin(this)
+
+			this.initializeBackgroundTasks()
 		}
-
-		descriptor := this.getArgumentValue("shutdown", false)
-
-		if (descriptor != false) {
-			function := controller.findFunction(descriptor)
-
-			if (function != false) {
-				if !this.iLaunchMode
-					this.iLaunchMode := new this.LaunchMode(this)
-
-				this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
-			}
-			else
-				this.logFunctionNotFound(descriptor)
-		}
-
-		if this.iLaunchMode
-			this.registerMode(this.iLaunchMode)
-
-		if register
-			controller.registerPlugin(this)
-
-		this.initializeBackgroundTasks()
 	}
 
 	loadFromConfiguration(configuration) {

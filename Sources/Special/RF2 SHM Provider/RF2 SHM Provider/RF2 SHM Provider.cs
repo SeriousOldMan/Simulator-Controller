@@ -102,6 +102,42 @@ namespace RF2SHMProvider {
 				return "";
 		}
 
+		public string GetCarName(string carClass, string carName)
+        {
+			if (carName.Contains(carClass))
+			{
+				if (carName[0] == '#')
+				{
+					char[] delims = { ' ' };
+					string[] parts = carName.Split(delims, 2);
+
+					if (parts.Length > 1)
+						carName = parts[1].Trim();
+				}
+				else if (carName.Contains("#"))
+					carName = carName.Split('#')[0].Trim();
+			}
+			else
+				carName = carClass;
+
+			return carName;
+		}
+
+		public string GetCarNr(int id, string carClass, string carName)
+		{
+			if (carName[0] == '#')
+			{
+				char[] delims = { ' ' };
+				string[] parts = carName.Split(delims, 2);
+
+				return parts[0].Split('#')[1].Trim();
+			}
+			else if (carName.Contains("#"))
+				return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+			else
+				return id.ToString();
+		}
+
 		public void ReadStandings() {
 			Console.WriteLine("[Position Data]");
 
@@ -125,14 +161,22 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetStringFromBytes(vehicle.mVehicleName));
+
+				string carModel = GetCarName(GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				string carNr = GetCarNr(vehicle.mID, GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				
+				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
 				if (vehicle.mIsPlayer != 0)
-					Console.Write("Driver.Car="); Console.WriteLine(i);
+				{
+					Console.Write("Driver.Car=");
+					Console.WriteLine(i);
+				}
 			}
 		}
 
@@ -140,12 +184,18 @@ namespace RF2SHMProvider {
 			rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 			rF2VehicleTelemetry playerTelemetry = GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
+			string session = "";
+
 			Console.WriteLine("[Session Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
-				Console.Write("Paused="); Console.WriteLine(scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
-
-				string session;
+				if (playerTelemetry.mWheels == null)
+					Console.WriteLine("Paused=true");
+				else
+				{
+					Console.Write("Paused=");
+					Console.WriteLine(scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
+				}
 
 				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
@@ -157,17 +207,31 @@ namespace RF2SHMProvider {
 					session = "Other";
 
 				Console.Write("Session="); Console.WriteLine(session);
-				
-				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerScoring.mVehicleName));
+
+				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
+				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
+
+				Console.Write("Car="); Console.WriteLine(GetCarName(vehicleClass, vehicleName));
+				Console.Write("CarName="); Console.WriteLine(vehicleName);
+				Console.Write("CarClass="); Console.WriteLine(vehicleClass);
 				Console.Write("Track="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mTrackName));
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
-				
-				long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
+				if (session == "Practice")
+				{
+					Console.WriteLine("SessionTimeRemaining=3600000");
 
-				Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+					Console.WriteLine("SessionLapsRemaining=30");
+				}
+				else
+				{
+					long time = GetRemainingTime(ref playerScoring);
+
+					Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
+
+					Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+				}
 			}
 
 			Console.WriteLine("[Stint Data]");
@@ -184,16 +248,23 @@ namespace RF2SHMProvider {
 				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
-				long time = GetRemainingTime(ref playerScoring);
+				if (session == "Practice")
+				{
+					Console.WriteLine("StintTimeRemaining=3600000");
+					Console.WriteLine("DriverTimeRemaining=3600000");
+				}
+				else
+				{
+					long time = GetRemainingTime(ref playerScoring);
 
-				Console.Write("StintTimeRemaining="); Console.WriteLine(time);
-				Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
-
+					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
+					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
+				}
 				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
 			}
 
 			Console.WriteLine("[Car Data]");
-			if (connected) {
+			if (connected && (playerTelemetry.mWheels != null)) {
 				Console.WriteLine("MAP=n/a");
 				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
 				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
@@ -217,29 +288,15 @@ namespace RF2SHMProvider {
 									  (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				else
 					Console.WriteLine("0,0,0,0");
+				Console.Write("BrakeTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
-
-				Console.Write("TyreCompound="); Console.WriteLine(compound.Contains("Rain") ? "Wet" : "Dry");
-
-				if (compound.Contains("Red"))
-					Console.WriteLine("TyreCompoundColor=Red");
-				else if (compound.Contains("Yellow"))
-					Console.WriteLine("TyreCompoundColor=Yellow");
-				else if (compound.Contains("White"))
-					Console.WriteLine("TyreCompoundColor=White");
-				else if (compound.Contains("Green"))
-					Console.WriteLine("TyreCompoundColor=Green");
-				else if (compound.Contains("Blue"))
-					Console.WriteLine("TyreCompoundColor=Blue");
-				else if (compound.Contains("Soft"))
-					Console.WriteLine("TyreCompoundColor=Soft");
-				else if (compound.Contains("Medium"))
-					Console.WriteLine("TyreCompoundColor=Medium");
-				else if (compound.Contains("Hard"))
-					Console.WriteLine("TyreCompoundColor=Hard");
-				else
-					Console.WriteLine("TyreCompoundColor=Black");
+			
+				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
 
 				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
@@ -247,9 +304,16 @@ namespace RF2SHMProvider {
 
 			Console.WriteLine("[Track Data]");
 
-			if (connected) {
+			if (connected)
+			{
 				Console.WriteLine("Grip=Optimum");
 				Console.Write("Temperature="); Console.WriteLine(scoring.mScoringInfo.mTrackTemp);
+
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
+					var vehicle = scoring.mVehicles[i];
+
+					Console.WriteLine("Car." + (i + 1) + ".Position=" + vehicle.mPos.x + "," + (- vehicle.mPos.z));
+				}
 			}
 
 			Console.WriteLine("[Weather Data]");
@@ -489,45 +553,20 @@ namespace RF2SHMProvider {
 			SendPitstopCommand(new string(action, (int)Double.Parse(stepsArgument)));
 		}
 
-		private void ExecuteSetTyreCompoundCommand(string[] tyreCompoundArgument) {
-			string compound = tyreCompoundArgument[0];
-
-			if (tyreCompoundArgument[0] == "None") {
+		private void ExecuteSetTyreCompoundCommand(string tyreCompound) {
+			if (tyreCompound == "None") {
 				Console.WriteLine("Adjusting Tyre Compound: No Change");
 
-				compound = "No Change";
+				tyreCompound = "No Change";
 			}
 			else {
 				Console.Write("Adjusting Tyre Compound: ");
-				Console.Write(compound); Console.Write(" ");
-				Console.WriteLine(tyreCompoundArgument[1]);
-
-				if (compound == "Wet")
-					compound = "Rain";
-				else
-					switch (tyreCompoundArgument[1]) {
-						case "Red":
-							compound = "Soft";
-
-							break;
-						case "White":
-							compound = "Medium";
-
-							break;
-						case "Blue":
-							compound = "Hard";
-
-							break;
-						default:
-							compound = "";
-
-							break;
-					}
+				Console.WriteLine(tyreCompound);
 			}
 
 			void selectAxleTyreCompound(string category) {
 				if (SelectPitstopCategory(category))
-					SelectPitstopOption(compound, "+");
+					SelectPitstopOption(tyreCompound, "+");
 			}
 
 			selectAxleTyreCompound("F TIRES:");
@@ -653,7 +692,7 @@ namespace RF2SHMProvider {
 					ExecuteSetRefuelCommand(arguments[0]);
 					break;
 				case "Tyre Compound":
-					ExecuteSetTyreCompoundCommand(arguments);
+					ExecuteSetTyreCompoundCommand(arguments[0]);
 					break;
 				case "Tyre Set":
 					ExecuteSetTyreSetCommand(arguments[0]);
@@ -766,6 +805,7 @@ namespace RF2SHMProvider {
 
 		public void ReadSetup() {
 			Console.WriteLine("[Setup Data]");
+			
 			if (connected) {
 				if (!SelectPitstopCategory("FUEL:"))
 					return;
@@ -779,23 +819,8 @@ namespace RF2SHMProvider {
 
 				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				if (compound.Contains("Rain")) {
-					Console.WriteLine("Wet");
-					Console.WriteLine("TyreCompoundColor=Black");
-				}
-				else {
-					Console.WriteLine("Dry");
-
-					if (compound.Contains("Soft"))
-						Console.WriteLine("TyreCompoundColor=Red");
-					else if (compound.Contains("Medium"))
-						Console.WriteLine("TyreCompoundColor=White");
-					else if (compound.Contains("Hard"))
-						Console.WriteLine("TyreCompoundColor=Blue");
-					else
-						Console.WriteLine("TyreCompoundColor=Black");
-				}
-
+				Console.WriteLine("TyreCompoundRaw=" + compound);
+				
 				void writePressure(string category, string key) {
 					if (!SelectPitstopCategory(category))
 						return;

@@ -41,7 +41,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	iLastSession := kSessionFinished
 	iLastLap := 0
-	iLastLapCounter := 0
+	iUpdateLapCounter := 0
 	iWaitForShutdown := 0
 	iInPit := false
 	iFinished := false
@@ -251,16 +251,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if plugin.RaceAssistantName
 				if (plugin.RaceAssistantEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-					plugin.disableRaceAssistant()
-
-					trayMessage(plugin.actionLabel(this), translate("State: Off"))
+					plugin.disableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Black")
 				}
 				else if (!plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger == "Push"))) {
-					plugin.enableRaceAssistant()
-
-					trayMessage(plugin.actionLabel(this), translate("State: On"))
+					plugin.enableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Green")
 				}
@@ -286,16 +282,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local plugin := this.Plugin
 
 			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
-				plugin.disableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: Off"))
+				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
 			}
 			else if (!plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger == "Push"))) {
-				plugin.enableTeamServer()
-
-				trayMessage(plugin.actionLabel(this), translate("State: On"))
+				plugin.enableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Green")
 			}
@@ -427,112 +419,116 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	__New(controller, name, configuration := false, register := true) {
 		base.__New(controller, name, configuration, register)
 
-		if (!this.Active && !isDebug())
-			return
+		if (this.Active || isDebug()) {
+			teamServer := this.Controller.findPlugin(kTeamServerPlugin)
 
-		teamServer := this.Controller.findPlugin(kTeamServerPlugin)
-
-		if (teamServer && this.Controller.isActive(teamServer))
-			this.iTeamServer := teamServer
-		else
-			teamServer := false
-
-		this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
-		this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
-		this.iRaceAssistantLanguage := this.getArgumentValue("raceAssistantLanguage", false)
-
-		raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
-
-		if raceAssistantToggle {
-			arguments := string2Values(A_Space, raceAssistantToggle)
-
-			if (arguments.Length() == 0)
-				arguments := ["On"]
-
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "On")
-
-			this.iRaceAssistantEnabled := (arguments[1] = "On")
-
-			if (arguments.Length() > 1)
-				this.createRaceAssistantAction(controller, "RaceAssistant", arguments[2])
-		}
-		else
-			this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
-
-		teamServerToggle := this.getArgumentValue("teamServer", false)
-
-		if (teamServerToggle && teamServer && teamServer.Active) {
-			arguments := string2Values(A_Space, teamServerToggle)
-
-			if (arguments.Length() == 0)
-				arguments := ["Off"]
-
-			if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
-				arguments.InsertAt(1, "Off")
-
-			if (arguments[1] = "On")
-				this.enableTeamServer()
+			if (teamServer && this.Controller.isActive(teamServer))
+				this.iTeamServer := teamServer
 			else
-				this.disableTeamServer()
+				teamServer := false
 
-			if (arguments.Length() > 1)
-				this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
+			this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
+			this.iRaceAssistantLanguage := this.getArgumentValue("raceAssistantLanguage", false)
+
+			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
+
+			if raceAssistantToggle {
+				arguments := string2Values(A_Space, raceAssistantToggle)
+
+				if (arguments.Length() == 0)
+					arguments := ["On"]
+
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "On")
+
+				this.iRaceAssistantEnabled := (arguments[1] = "On")
+
+				if (arguments.Length() > 1)
+					this.createRaceAssistantAction(controller, "RaceAssistant", arguments[2])
+			}
+			else
+				this.iRaceAssistantEnabled := (this.iRaceAssistantName != false)
+
+			teamServerToggle := this.getArgumentValue("teamServer", false)
+
+			if (teamServerToggle && teamServer && teamServer.Active) {
+				arguments := string2Values(A_Space, teamServerToggle)
+
+				if (arguments.Length() == 0)
+					arguments := ["Off"]
+
+				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+					arguments.InsertAt(1, "Off")
+
+				if (arguments[1] = "On")
+					this.enableTeamServer()
+				else
+					this.disableTeamServer()
+
+				if (arguments.Length() > 1)
+					this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
+			}
+
+			openRaceSettings := this.getArgumentValue("openRaceSettings", false)
+
+			if openRaceSettings
+				this.createRaceAssistantAction(controller, "RaceSettingsOpen", openRaceSettings)
+
+			importSetup := this.getArgumentValue("importSetup", false)
+
+			if importSetup
+				this.createRaceAssistantAction(controller, "SetupImport", importSetup)
+
+			openSessionDatabase := this.getArgumentValue("openSessionDatabase", false)
+
+			if openSessionDatabase
+				this.createRaceAssistantAction(controller, "SessionDatabaseOpen", openSessionDatabase)
+
+			openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
+
+			if openSetupAdvisor
+				this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
+
+			openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
+
+			if openStrategyWorkbench
+				this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
+
+			openRaceCenter := this.getArgumentValue("openRaceCenter", false)
+
+			if openRaceCenter
+				this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
+
+			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
+				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
+
+			this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
+
+			assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
+
+			if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
+				this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
+
+				this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
+
+				this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
+
+				assistantListener := this.getArgumentValue("raceAssistantListener", false)
+
+				if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
+					this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
+			}
+
+			controller.registerPlugin(this)
+
+			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
+
+			if this.RaceAssistantEnabled
+				this.enableRaceAssistant(false, true)
+			else
+				this.disableRaceAssistant(false, true)
 		}
-
-		openRaceSettings := this.getArgumentValue("openRaceSettings", false)
-
-		if openRaceSettings
-			this.createRaceAssistantAction(controller, "RaceSettingsOpen", openRaceSettings)
-
-		importSetup := this.getArgumentValue("importSetup", false)
-
-		if importSetup
-			this.createRaceAssistantAction(controller, "SetupImport", importSetup)
-
-		openSessionDatabase := this.getArgumentValue("openSessionDatabase", false)
-
-		if openSessionDatabase
-			this.createRaceAssistantAction(controller, "SessionDatabaseOpen", openSessionDatabase)
-
-		openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
-
-		if openSetupAdvisor
-			this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
-
-		openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
-
-		if openStrategyWorkbench
-			this.createRaceAssistantAction(controller, "StrategyWorkbenchOpen", openStrategyWorkbench)
-
-		openRaceCenter := this.getArgumentValue("openRaceCenter", false)
-
-		if openRaceCenter
-			this.createRaceAssistantAction(controller, "RaceCenterOpen", openRaceCenter)
-
-		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
-
-		this.iRaceAssistantSynthesizer := this.getArgumentValue("raceAssistantSynthesizer", false)
-
-		assistantSpeaker := this.getArgumentValue("raceAssistantSpeaker", false)
-
-		if ((assistantSpeaker != false) && (assistantSpeaker != kFalse) && (assistantSpeaker != "Off")) {
-			this.iRaceAssistantSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
-
-			this.iRaceAssistantSpeakerVocalics := this.getArgumentValue("raceAssistantSpeakerVocalics", false)
-
-			this.iRaceAssistantRecognizer := this.getArgumentValue("raceAssistantRecognizer", false)
-
-			assistantListener := this.getArgumentValue("raceAssistantListener", false)
-
-			if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
-				this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
-		}
-
-		controller.registerPlugin(this)
-
-		registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
 	}
 
 	handleRemoteCalls(event, data) {
@@ -660,35 +656,84 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 	}
 
-	enableRaceAssistant() {
-		this.iRaceAssistantEnabled := this.iRaceAssistantName
+	toggleRaceAssistant() {
+		if this.RaceAssistantEnabled
+			this.disableRaceAssistant()
+		else
+			this.enableRaceAssistant()
 	}
 
-	disableRaceAssistant() {
-		this.iRaceAssistantEnabled := false
+	updateTrayLabel(label, enabled) {
+		static hasTrayMenu := {}
+		static first := true
 
-		this.iLastSession := kSessionFinished
-		this.iLastLap := 0
-		this.iLastLapCounter := 0
-		this.iFinished := false
-		this.iInPit := false
+		label := StrReplace(label, "`n", A_Space)
 
-		if this.RaceAssistant
-			this.finishSession()
+		if !hasTrayMenu.HasKey(this) {
+			callback := ObjBindMethod(this, "toggleRaceAssistant")
+
+			if first
+				Menu Tray, Insert, 1&
+
+			Menu Tray, Insert, 1&, %label%, %callback%
+
+			hasTrayMenu[this] := true
+			first := false
+		}
+
+		if enabled
+			Menu Tray, Check, %label%
+		else
+			Menu Tray, Uncheck, %label%
 	}
 
-	enableTeamServer() {
+	enableRaceAssistant(label := false, force := false) {
+		if (!this.RaceAssistantEnabled || force) {
+			this.iRaceAssistantEnabled := (this.RaceAssistantName != false)
+
+			if this.RaceAssistantEnabled {
+				label := translate(this.Plugin)
+
+				trayMessage(label, translate("State: On"))
+
+				this.updateTrayLabel(label, true)
+			}
+		}
+	}
+
+	disableRaceAssistant(label := false, force := false) {
+		if (this.RaceAssistantEnabled || force) {
+			label := translate(this.Plugin)
+
+			trayMessage(label, translate("State: Off"))
+
+			this.iRaceAssistantEnabled := false
+
+			this.iLastSession := kSessionFinished
+			this.iLastLap := 0
+			this.iUpdateLapCounter := 0
+			this.iFinished := false
+			this.iInPit := false
+
+			if this.RaceAssistant
+				this.finishSession()
+
+			this.updateTrayLabel(label, false)
+		}
+	}
+
+	enableTeamServer(label := false) {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
-			teamServer.enableTeamServer()
+			teamServer.enableTeamServer(label)
 	}
 
-	disableTeamServer() {
+	disableTeamServer(label := false) {
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
-			teamServer.disableTeamServer()
+			teamServer.disableTeamServer(label)
 	}
 
 	createRaceAssistant(pid) {
@@ -846,7 +891,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant.prepareSession(settingsFile, dataFile)
 	}
 
-	startSession(settingsFile, dataFile, teamSession) {
+	startSession(settings, data, teamSession) {
 		if this.Simulator {
 			code := this.Simulator.Code
 			assistant := this.Plugin
@@ -854,8 +899,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			FileCreateDir %kTempDirectory%%code% Data
 
 			Loop Files, %kTempDirectory%%code% Data\%assistant%*.*
-				if (A_LoopFilePath != dataFile)
+				try {
 					FileDelete %A_LoopFilePath%
+				}
+				catch exception {
+					; ignore
+				}
+
+			this.Simulator.startSession(settings, data)
 
 			if this.RaceAssistant
 				this.finishSession(false, !teamSession)
@@ -864,8 +915,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			this.iSessionActive := true
 
-			if this.RaceAssistant
+			if this.RaceAssistant {
+				settingsFile := (kTempDirectory . this.Plugin . ".settings")
+				dataFile := (kTempDirectory . this.Plugin . ".data")
+
+				writeConfiguration(settingsFile, settings)
+				writeConfiguration(dataFile, data)
+
 				this.RaceAssistant.startSession(settingsFile, dataFile)
+			}
 		}
 	}
 
@@ -956,13 +1014,27 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if !settingsDB
 			settingsDB := new SettingsDatabase()
 
-		maxFuel := settingsDB.getSettingValue(getConfigurationValue(data, "Session Data", "Simulator")
-											, getConfigurationValue(data, "Session Data", "Car")
-											, getConfigurationValue(data, "Session Data", "Track")
+		simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		car := getConfigurationValue(data, "Session Data", "Car")
+		track := getConfigurationValue(data, "Session Data", "Track")
+
+		maxFuel := settingsDB.getSettingValue(simulator, car, track
 											, "*", "Session Settings", "Fuel.Amount", kUndefined)
 
 		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 			setConfigurationValue(data, "Session Data", "FuelAmount", maxFuel)
+
+		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+
+		if (compound != kUndefined) {
+			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, "Dry")
+			compoundColor := false
+
+			splitCompound(compound, compound, compoundColor)
+
+			setConfigurationValue(data, "Car Data", "TyreCompound", compound)
+			setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+		}
 
 		this.Simulator.updateSessionData(data)
 	}
@@ -971,93 +1043,119 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.updatePositionsData(data)
 	}
 
+	runningSession(data) {
+		return getConfigurationValue(data, "Session Data", "Active", false)
+	}
+
 	activeSession(data) {
 		return (getDataSessionState(data) >= kSessionPractice)
 	}
 
-	saveSessionState(settingsFile, stateFile) {
+	callSaveSessionState(settingsFile, stateFile) {
+		if settingsFile {
+			FileRead sessionSettings, %settingsFile%
+
+			sessionSettings := parseConfiguration(sessionSettings)
+
+			try {
+				FileDelete %settingsFile%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else
+			sessionSettings := false
+
+		if stateFile {
+			FileRead sessionState, %stateFile%
+
+			sessionState := parseConfiguration(sessionState)
+
+			try {
+				FileDelete %stateFile%
+			}
+			catch exception {
+				; ignore
+			}
+		}
+		else
+			sessionState := false
+
+		this.saveSessionState(sessionSettings, sessionState)
+	}
+
+	saveSessionState(settings, state) {
+		this.Simulator.saveSessionState(settings, state)
+
 		teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active) {
-			FileRead sessionSettings, %settingsFile%
-			FileRead sessionState, %stateFile%
-
 			if isDebug()
 				showMessage("Saving session for " . this.RaceAssistantName)
 
-			teamServer.setSessionValue(this.Plugin . " Settings", sessionSettings)
-			teamServer.setSessionValue(this.Plugin . " State", sessionState)
-		}
+			if settings
+				teamServer.setSessionValue(this.Plugin . " Settings", printConfiguration(settings))
 
-		try {
-			FileDelete %settingsFile%
-			FileDelete %stateFile%
-		}
-		catch exception {
-			; ignore
+			if state
+				teamServer.setSessionValue(this.Plugin . " State", printConfiguration(state))
 		}
 	}
 
-	createSessionSettingsFile(ByRef sessionSettings) {
+	createSessionSettings() {
 		teamServer := this.TeamServer
 
-		parse := (sessionSettings != false)
-
-		if (teamServer && teamServer.Active) {
+		if (teamServer && teamServer.Active)
 			try {
 				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
 
 				if (!sessionSettings || (sessionSettings = ""))
 					Throw "No data..."
+				else
+					return parseConfiguration(sessionSettings)
 			}
 			catch exception {
 				return false
 			}
-
-			Random postfix, 1, 1000000
-
-			settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
-
-			FileAppend %sessionSettings%, %settingsFile%, UTF-16
-
-			if parse
-				sessionSettings := parseConfiguration(sessionSettings)
-
-			return settingsFile
-		}
 		else
 			return false
 	}
 
-	createSessionStateFile(ByRef sessionState) {
+	createSessionState() {
 		teamServer := this.TeamServer
 
-		parse := (sessionState != false)
-
-		if (teamServer && teamServer.Active) {
+		if (teamServer && teamServer.Active)
 			try {
 				sessionState := teamServer.getSessionValue(this.Plugin . " State")
 
 				if (!sessionState || (sessionState = ""))
 					Throw "No data..."
+				else
+					return parseConfiguration(sessionState)
 			}
 			catch exception {
 				return false
 			}
-
-			Random postfix, 1, 1000000
-
-			stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".state")
-
-			FileAppend %sessionState%, %stateFile%, UTF-16
-
-			if parse
-				sessionState := parseConfiguration(sessionState)
-
-			return stateFile
-		}
 		else
 			return false
+	}
+
+	createSessionSettingsFile(sessionSettings) {
+		Random postfix, 1, 1000000
+
+		settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+		sessionSettings := printConfiguration(sessionSettings)
+
+		FileAppend %sessionSettings%, %settingsFile%, UTF-16
+	}
+
+	createSessionStateFile(sessionState) {
+		Random postfix, 1, 1000000
+
+		stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+		sessionState := printConfiguration(sessionState)
+
+		FileAppend %sessionState%, %stateFile%, UTF-16
 	}
 
 	restoreSessionState() {
@@ -1068,13 +1166,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if isDebug()
 					showMessage("Restoring session state for " . this.RaceAssistantName)
 
-				sessionSettings := true
-				sessionState := true
-
-				this.RaceAssistant.restoreSessionState(this.createSessionSettingsFile(sessionSettings), this.createSessionStateFile(sessionState))
+				sessionSettings := this.createSessionSettings()
+				sessionState := this.createSessionState()
 
 				if (sessionSettings || sessionState)
 					this.Simulator.restoreSessionState(sessionSettings, sessionState)
+
+				if sessionSettings
+					sessionSettings := this.createSettingsFile(sessionSettings)
+
+				if sessionState
+					sessionState := this.createStateFile(sessionState)
+
+				this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
 			}
 		}
 	}
@@ -1091,9 +1195,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
-		code := this.Simulator.Code
+		static sessionDB := false
 
-		data := readSimulatorData(code)
+		if !sessionDB
+			sessionDB := new SessionDatabase()
+
+		simulator := this.Simulator
+		code := simulator.Code
+
+		trackData := sessionDB.getTrackData(code, simulator.Track)
+
+		data := (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
 
 		this.updateSessionData(data)
 
@@ -1135,7 +1247,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			dataLastLap := getConfigurationValue(data, "Stint Data", "Laps", 0)
 
-			if (dataLastLap == 0)
+			if (this.runningSession(data) && (this.iLastLap == 0))
 				prepareSessionDatabase(data)
 
 			if isDebug() {
@@ -1170,7 +1282,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
@@ -1183,16 +1295,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if ((dataLastLap < this.LastLap) || (this.iLastSession != sessionState)) {
 					; Start of new session without finishing previous session first
 
+					wasFinished := (this.iLastSession == kSessionFinished)
+
 					this.iLastSession := sessionState
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 
-					if this.RaceAssistant {
-						this.finishSession()
+					if !wasFinished {
+						this.updateSessionState(kSessionFinished)
 
-						return
+						if this.RaceAssistant {
+							this.finishSession()
+
+							return
+						}
 					}
 				}
 
@@ -1214,7 +1332,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 
-						if (this.iLastLapCounter = 3) {
+						if (this.iUpdateLapCounter = 2) {
 							dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
 
 							writeConfiguration(dataFile, data)
@@ -1227,7 +1345,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							this.prepareSession(settingsFile, dataFile)
 						}
 
-						this.iLastLapCounter := this.iLastLapCounter + 1
+						this.iUpdateLapCounter := this.iUpdateLapCounter + 1
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -1241,8 +1359,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								if (!teamSessionActive || !this.TeamServer.Connected)
 									return ; No Team Server, no late join
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.iInPit := false
 
@@ -1251,8 +1372,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							else if (this.LastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, new stint
 
-								if !this.driverActive(data)
+								if !this.driverActive(data) {
+									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
+
 									return ; Still a different driver, might happen in some simulations
+								}
 
 								this.TeamServer.addStint(dataLastLap)
 
@@ -1281,7 +1405,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							if this.iFinished {
 								this.iLastSession := kSessionFinished
 								this.iLastLap := 0
-								this.iLastLapCounter := 0
+								this.iUpdateLapCounter := 0
 								this.iFinished := false
 								this.iInPit := false
 
@@ -1292,59 +1416,52 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							}
 
 							this.iLastLap := dataLastLap
-							this.iLastLapCounter := 0
+							this.iUpdateLapCounter := 0
 
 							if !firstLap
 								this.iFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) == 0)
 						}
 
-						this.iLastLapCounter := this.iLastLapCounter + 1
-
-						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iLastLapCounter . ".data"
-
-						writeConfiguration(newDataFile, data)
-
 						if firstLap {
-							if this.connectTeamSession() {
-								teamServer := this.TeamServer
+							if this.connectTeamSession()
+								if this.driverActive(data) {
+									teamServer := this.TeamServer
 
-								teamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
-													 , getConfigurationValue(data, "Session Data", "Track")
-													 , dataLastLap
-													 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
+									teamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+														 , getConfigurationValue(data, "Session Data", "Car")
+														 , getConfigurationValue(data, "Session Data", "Track")
+														 , dataLastLap
+														 , Round((getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
-								this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
-								this.TeamServer.setSessionValue(this.Plugin . " State", "")
-							}
+									this.TeamServer.setSessionValue(this.Plugin . " Settings", "")
+									this.TeamServer.setSessionValue(this.Plugin . " State", "")
+								}
+								else {
+									; Wrong Driver - no team session
 
-							settings := this.prepareSettings(data)
-							settingsFile := (kTempDirectory . this.Plugin . ".settings")
+									this.disconnectTeamSession()
 
-							writeConfiguration(settingsFile, settings)
+									logMessage(kLogWarn, translate("Cannot join the team session. Driver names in team session and in simulation do not match."))
+								}
 
-							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
+							this.startSession(this.prepareSettings(data), data, this.TeamSessionActive)
 						}
 						else if joinedSession {
-							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Car")
+							this.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+													  , getConfigurationValue(data, "Session Data", "Car")
 													  , getConfigurationValue(data, "Session Data", "Track")
 													  , dataLastLap)
 
-							settingsFile := this.createSessionSettingsFile()
-
-							if !settingsFile {
-								settings := this.prepareSettings(data)
-
-								Random postfix, 1, 1000000
-
-								settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
-
-								writeConfiguration(settingsFile, settings)
-							}
-
-							this.startSession(settingsFile, newDataFile, this.TeamSessionActive)
+							this.startSession(this.prepareSettings(data), data, this.TeamSessionActive)
 
 							this.restoreSessionState()
 						}
+
+						this.iUpdateLapCounter := this.iUpdateLapCounter + 1
+
+						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iUpdateLapCounter . ".data"
+
+						writeConfiguration(newDataFile, data)
 
 						if newLap
 							this.addLap(dataLastLap, newDataFile, telemetryData, positionsData)
@@ -1355,7 +1472,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				else {
 					this.iLastSession := kSessionFinished
 					this.iLastLap := 0
-					this.iLastLapCounter := 0
+					this.iUpdateLapCounter := 0
 					this.iFinished := false
 					this.iInPit := false
 				}
@@ -1375,7 +1492,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			this.iLastSession := kSessionFinished
 			this.iLastLap := 0
-			this.iLastLapCounter := 0
+			this.iUpdateLapCounter := 0
 			this.iFinished := false
 			this.iInPit := false
 
@@ -1405,9 +1522,10 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
 	catch exception {
-		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
-												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-												   . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+												   , {simulator: simulator, protocol: protocol})
+							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+							   . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 									  , {exePath: exePath, simulator: simulator, protocol: protocol})
@@ -1462,11 +1580,19 @@ prepareSessionDatabase(data) {
 		plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+		sessionDB := new SessionDatabase()
+
+		simulator := plugin.Simulator.runningSimulator()
 		car := getConfigurationValue(data, "Session Data", "Car", kUndefined)
 		track := getConfigurationValue(data, "Session Data", "Track", kUndefined)
 
-		if ((car != kUndefined) && (track && kUndefined))
-			new SessionDatabase().prepareDatabase(plugin.Simulator.runningSimulator(), car, track)
+		if ((car != kUndefined) && (track != kUndefined))
+			sessionDB.prepareDatabase(simulator, car, track, data)
+
+		sessionDB.registerDriver(simulator, plugin.Controller.ID
+							   , computeDriverName(getConfigurationValue(data, "Stint Data", "DriverForname")
+												 , getConfigurationValue(data, "Stint Data", "DriverSurname")
+												 , getConfigurationValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 
@@ -1624,5 +1750,39 @@ openRaceCenter(plugin := false) {
 
 		showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+}
+
+enableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.enableRaceAssistant()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+disableRaceAssistant(name) {
+	local plugin
+
+	controller := SimulatorController.Instance
+	plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.disableRaceAssistant()
+	}
+	finally {
+		protectionOff()
 	}
 }

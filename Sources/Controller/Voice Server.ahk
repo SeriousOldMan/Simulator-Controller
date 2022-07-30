@@ -938,7 +938,7 @@ class VoiceServer extends ConfigurationItem {
 
 	voiceCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Command phrase recognized: " . values2String(A_Space, words*), false, "Information.png", 5000)
+			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
 		descriptor := voiceClient.VoiceCommands[grammar]
 
@@ -955,6 +955,11 @@ initializeVoiceServer() {
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 
 	debug := false
 
@@ -976,6 +981,11 @@ initializeVoiceServer() {
 	new VoiceServer(kSimulatorConfiguration)
 
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

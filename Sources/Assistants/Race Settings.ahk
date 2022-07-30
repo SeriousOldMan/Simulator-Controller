@@ -67,6 +67,9 @@ global vTrack := false
 global vWeather := "Dry"
 global vAirTemperature := 23
 global vTrackTemperature := 27
+
+global vTyreCompounds := kTyreCompounds
+
 global vCompound := false
 global vCompoundColor := false
 
@@ -228,55 +231,40 @@ cancelLogin() {
 	loginDialog(kCancel)
 }
 
-moveSettingsEditor() {
+moveRaceSettingsEditor() {
 	moveByMouse("RES")
 }
 
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
+loadRaceSettings() {
+	editRaceSettings(kLoad)
 }
 
-loadSettings() {
-	editSettings(kLoad)
+saveRaceSettings() {
+	editRaceSettings(kSave)
 }
 
-saveSettings() {
-	editSettings(kSave)
+acceptRaceSettings() {
+	editRaceSettings(kOk)
 }
 
-acceptSettings() {
-	editSettings(kOk)
-}
-
-cancelSettings() {
-	editSettings(kCancel)
+cancelRaceSettings() {
+	editRaceSettings(kCancel)
 }
 
 connectServer() {
-	editSettings(kConnect)
+	editRaceSettings(kConnect)
 }
 
 chooseTeam() {
-	editSettings(kUpdate, "Team")
+	editRaceSettings(kUpdate, "Team")
 }
 
 chooseDriver() {
-	editSettings(kUpdate, "Driver")
+	editRaceSettings(kUpdate, "Driver")
 }
 
 chooseSession() {
-	editSettings(kUpdate, "Session")
+	editRaceSettings(kUpdate, "Session")
 }
 
 openSettingsDocumentation() {
@@ -389,8 +377,7 @@ readTyreSetup(settings) {
 		color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
 	}
 
-	if (color != "Black")
-		spSetupTyreCompoundDropDown := spSetupTyreCompoundDropDown . " (" . color . ")"
+	spSetupTyreCompoundDropDown := compound(spSetupTyreCompoundDropDown, color)
 
 	spSetupTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 1)
 	spPitstopTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 2)
@@ -497,25 +484,7 @@ loadSessions(connector, team) {
 	return sessions
 }
 
-getKeys(map) {
-	keys := []
-
-	for key, ignore in map
-		keys.Push(key)
-
-	return keys
-}
-
-getValues(map) {
-	values := []
-
-	for ignore, value in map
-		values.Push(value)
-
-	return values
-}
-
-editSettings(ByRef settingsOrCommand, arguments*) {
+editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	static result
 	static newSettings
 
@@ -692,7 +661,7 @@ restart:
 
 					connected := true
 
-					editSettings(kUpdate, "Team")
+					editRaceSettings(kUpdate, "Team")
 
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
@@ -763,14 +732,10 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
 
-		if (spSetupTyreCompoundDropDown == 1) {
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Wet")
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", "Black")
-		}
-		else {
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", "Dry")
-			setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", kQualifiedTyreCompoundColors[spSetupTyreCompoundDropDown])
-		}
+		splitCompound(vTyreCompounds[spSetupTyreCompoundDropDown], compound, compoundColor)
+
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", compound)
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
@@ -897,24 +862,24 @@ restart:
 
 		Gui RES:Font, Bold, Arial
 
-		Gui RES:Add, Text, w388 Center gmoveSettingsEditor, % translate("Modular Simulator Controller System")
+		Gui RES:Add, Text, w388 Center gmoveRaceSettingsEditor, % translate("Modular Simulator Controller System")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic Underline, Arial
 
-		Gui RES:Add, Text, YP+20 w388 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
+		Gui RES:Add, Text, x118 YP+20 w168 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
 
 		Gui RES:Font, Norm, Arial
 
 		if !vTestMode {
-			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y450 w80 h23 gcancelSettings, % translate("&Cancel")
+			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptRaceSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y450 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
-			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelSettings, % translate("Close")
+			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelRaceSettings, % translate("Close")
 
-		Gui RES:Add, Button, x8 y450 w77 h23 gloadSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y450 w77 h23 gsaveSettings, % translate("&Save...")
+		Gui RES:Add, Button, x8 y450 w77 h23 gloadRaceSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y450 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
 			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
@@ -1019,7 +984,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet / Intermediate Tyres")
 
 		Gui RES:Font, Norm, Arial
 
@@ -1077,11 +1042,14 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 
-		choices := map(kQualifiedTyreCompounds, "translate")
+		choices := map(vTyreCompounds, "translate")
 
-		spSetupTyreCompoundDropDown := inList(kQualifiedTyreCompounds, spSetupTyreCompoundDropDown)
+		spSetupTyreCompoundDropDown := inList(vTyreCompounds, spSetupTyreCompoundDropDown)
 
-		Gui RES:Add, DropDownList, x106 yp w100 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
+		if ((spSetupTyreCompoundDropDown == 0) && (choices.Length() > 0))
+			spSetupTyreCompoundDropDown := 1
+
+		Gui RES:Add, DropDownList, x106 yp w110 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
 
 		Gui RES:Add, Text, x16 yp+26 w90 h20, % translate("Start Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%
@@ -1137,7 +1105,7 @@ restart:
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
 
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet Tyres")
+		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet / Intermediate Tyres")
 
 		Gui RES:Font, Norm, Arial
 
@@ -1200,8 +1168,9 @@ restart:
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
 
+
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
-		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
+		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x126 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
@@ -1264,7 +1233,7 @@ restart:
 					dirName := kRaceSettingsFile
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
@@ -1295,7 +1264,7 @@ restart:
 				title := translate("Save Race Settings...")
 
 				Gui +OwnDialogs
-		
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
 				OnMessage(0x44, "")
@@ -1433,7 +1402,26 @@ readSimulatorData(simulator) {
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 
-	return readConfiguration(dataFile)
+	data := readConfiguration(dataFile)
+
+	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
+		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+
+		if (compound != kUndefined) {
+			compound := new SessionDatabase().getTyreCompoundName(simulator, vCar, vTrack, compound, false)
+
+			if compound {
+				compoundColor := false
+
+				splitCompound(compound, compound, compoundColor)
+
+				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
+				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+			}
+		}
+	}
+
+	return data
 }
 
 openSessionDatabase() {
@@ -1515,7 +1503,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 
-				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
+				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
 
 					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
@@ -1526,10 +1514,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			else {
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
-				if (compoundColor = "Black")
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
-				else
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
+				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
 
 				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
@@ -1544,18 +1529,18 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			spWetRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)
 
 			if settings {
-				color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compound)
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
 
-				if (!vSilentMode && (simulator != "rFactor 2") && (simulator != "Automobilista 2")) {
-					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
+				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
+					message := (translate("Tyre setup imported: ") . compound(compound, compoundColor))
 
 					showMessage(message . translate("; ")
 							  . Round(spWetFrontLeftEdit, 1) . translate(", ") . Round(spWetFrontRightEdit, 1) . translate(", ")
@@ -1565,10 +1550,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			else {
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
-				if (compoundColor = "Black")
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound)
-				else
-					GuiControl Choose, spSetupTyreCompoundDropDown, % inList(kQualifiedTyreCompounds, compound . " (" . compoundColor . ")")
+				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
 
 				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
 				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
@@ -1584,6 +1566,11 @@ showRaceSettingsEditor() {
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 
 	vSimulator := false
 	vCar := false
@@ -1630,6 +1617,9 @@ showRaceSettingsEditor() {
 		}
 	}
 
+	if (vSimulator && vCar)
+		vTyreCompounds := new SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack ? vTrack : "*")
+
 	if (vAirTemperature <= 0)
 		vAirTemperature := 23
 
@@ -1664,13 +1654,16 @@ showRaceSettingsEditor() {
 	else {
 		registerEventHandler("Setup", "functionEventHandler")
 
-		if (editSettings(settings) = kOk) {
+		if (editRaceSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
 
 			ExitApp 0
 		}
 	}
 
+	ExitApp 0
+
+Exit:
 	ExitApp 0
 }
 

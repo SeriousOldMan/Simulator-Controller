@@ -85,13 +85,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
 
-		if (!this.Active && !isDebug())
-			return
-
-		if (this.RaceAssistantName)
-			SetTimer collectRaceEngineerSessionData, 10000
-		else
-			SetTimer updateRaceEngineerSessionState, 5000
+		if (this.Active || isDebug()) {
+			if (this.RaceAssistantName)
+				SetTimer collectRaceEngineerSessionData, 10000
+			else
+				SetTimer updateRaceEngineerSessionState, 5000
+		}
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -166,8 +165,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		return settings
 	}
 
-	startSession(settingsFile, dataFile, teamSession) {
-		base.startSession(settingsFile, dataFile, teamSession)
+	startSession(settings, data, teamSession) {
+		base.startSession(settings, data, teamSession)
 
 		this.iLapDatabase := false
 	}
@@ -216,7 +215,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	requestInformation(arguments*) {
 		if (this.RaceEngineer && inList(["Time", "LapsRemaining", "FuelRemaining", "Weather"
-									   , "TyrePressures", "TyreTemperatures", "TyreWear"], arguments[1])) {
+									   , "TyrePressures", "TyreTemperatures", "TyreWear"
+									   , "BrakeTemperatures", "BrakeWear"], arguments[1])) {
 			this.RaceEngineer.requestInformation(arguments*)
 
 			return true
@@ -344,10 +344,22 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		teamServer := this.TeamServer
 		session := this.TeamSession
 
-		if (teamServer && teamServer.Active && session)
+		if (teamServer && teamServer.Active && session) {
+			lastStint := false
+			driverID := kNull
+
 			Loop % teamServer.getCurrentLap(session)
 			{
 				try {
+					stint := teamServer.getLapStint(A_Index, session)
+					newStint := (stint != lastStint)
+
+					if newStint {
+						lastStint := stint
+
+						driverID := teamServer.getStintValue(stint, "ID", session)
+					}
+
 					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
 
 					if (!lapPressures || (lapPressures == ""))
@@ -355,9 +367,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 					lapPressures := string2Values(";", lapPressures)
 
+					if (newStint && driverID)
+						tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
+
 					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
-										  , string2Values(",", lapPressures[10]), false)
+										  , string2Values(",", lapPressures[10]), false, driverID)
 				}
 				catch exception {
 					break
@@ -366,6 +381,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					tyresDB.flush()
 				}
 			}
+		}
 		else
 			try {
 				for ignore, lapData in this.LapDatabase.Tables["Pressures"]
@@ -386,10 +402,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 planPitstop() {
+	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+
 	protectionOn()
 
 	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).planPitstop()
+		if SimulatorController.Instance.isActive(plugin)
+			plugin.planPitstop()
 	}
 	finally {
 		protectionOff()
@@ -397,10 +416,13 @@ planPitstop() {
 }
 
 preparePitstop() {
+	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+
 	protectionOn()
 
 	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).preparePitstop()
+		if SimulatorController.Instance.isActive(plugin)
+			plugin.preparePitstop()
 	}
 	finally {
 		protectionOff()

@@ -75,7 +75,16 @@
   - [AMS2 - Automobilista 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ams2)
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-5)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-5)
+  - [PCARS2 - Project CARS 2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2)
+    - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-6)
+    - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-6)
 
+[Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#introduction)
+  - [Compound Rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#compound-rules)
+  - [Using Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds)
+  
 [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#introduction)
@@ -90,6 +99,8 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation)
   - [Interacting with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona)
+    - [List of all voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#list-of-all-voice-commands)
+    - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona)
     - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race)
     - [Pitstop Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-pitstop)
@@ -101,6 +112,8 @@
     - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1)
     - [Setup Repository](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setup-repository)
     - [Tyre Pressure Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressure-advisor)
+    - [Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automation)
+	- [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information)
     - [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#the-rule-engine)
 	- [States & History](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interaction-states)
@@ -112,6 +125,8 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#introduction)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#installation)
   - [Interacting with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#interacting-with-cato)
+    - [List of all voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#list-of-all-voice-commands)
+    - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#tab-strategy)
 	- [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#how-it-works)
@@ -119,6 +134,7 @@
   - [Strategy Development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development)
     - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings)
     - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service)
+	- [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers)
     - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation)
     - [Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling)
@@ -129,9 +145,15 @@
 [Virtual Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#introduction)
+  - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#installation)
+  - [Interacting with Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#interacting-with-elisa)
+    - [List of all voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#list-of-all-voice-commands)
+    - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#enabling-and-disabling-specific-warnings-and-announcements)
   - [Alerts & Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information)
     - [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information)
   - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#simulator-integration)
+  - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-mapping)
+  - [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations)
 
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

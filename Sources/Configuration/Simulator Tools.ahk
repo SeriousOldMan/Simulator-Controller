@@ -35,7 +35,10 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Database.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -122,7 +125,7 @@ installOptions(options) {
 
 				valid := false
 			}
-		else
+		else if (InStr(kHomeDirectory, directory) != 1)
 			Loop Files, %directory%\*.*, FD
 			{
 				empty := false
@@ -155,8 +158,9 @@ installOptions(options) {
 		Gui Install:Add, Text, w330 Center gmoveInstallEditor, % translate("Modular Simulator Controller System")
 
 		Gui Install:Font, Norm, Arial
+		Gui Install:Font, Italic Underline, Arial
 
-		Gui Install:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Install")
+		Gui Install:Add, Text, x108 YP+20 w130 cBlue Center gopenInstallDocumentation, % translate("Install")
 
 		Gui Install:Font, Norm, Arial
 
@@ -250,8 +254,9 @@ uninstallOptions(options) {
 		Gui Uninstall:Add, Text, w330 Center gmoveUninstallEditor, % translate("Modular Simulator Controller System")
 
 		Gui Uninstall:Font, Norm, Arial
+		Gui Uninstall:Font, Italic Underline, Arial
 
-		Gui Uninstall:Add, Text, YP+20 w330 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
+		Gui Uninstall:Add, Text, x108 YP+20 w130 cBlue Center gopenInstallDocumentation, % translate("Uninstall")
 
 		Gui Uninstall:Font, Norm, Arial
 
@@ -319,7 +324,7 @@ chooseInstallLocationPath() {
 	GuiControlGet installLocationPathEdit
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
 	FileSelectFolder directory, *%installLocationPathEdit%, 0, % translate("Select Installation folder...")
 	OnMessage(0x44, "")
@@ -340,7 +345,7 @@ chooseInstallLocationPath() {
 
 				valid := false
 			}
-		else
+		else if (InStr(kHomeDirectory, directory) != 1)
 			Loop Files, %directory%\*.*, FD
 			{
 				empty := false
@@ -361,6 +366,78 @@ chooseInstallLocationPath() {
 
 openInstallDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration
+}
+
+exitProcesses(silent := false, force := false) {
+	Process Exist
+
+	self := ErrorLevel
+
+	while true {
+		hasFGProcesses := false
+		hasBGProcesses := false
+
+		for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
+			Process Exist, %app%.exe
+
+			if ErrorLevel {
+				hasFGProcesses := true
+
+				break
+			}
+		}
+
+		for ignore, app in kBackgroundApps {
+			Process Exist, %app%.exe
+
+			if (ErrorLevel && (ErrorLevel != self)) {
+				hasBGProcesses := true
+
+				break
+			}
+		}
+
+		if (hasFGProcesses && !silent) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Continue", "Cancel"]))
+			title := translate("Installation")
+			MsgBox 8500, %title%, % translate("Before you can run the update, you must first close all running Simulator Controller applications (not Simulator Tools).")
+			OnMessage(0x44, "")
+
+			IfMsgBox Yes
+				continue
+			else
+				return false
+		}
+
+		if hasFGProcesses
+			if force
+				for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
+					Process Exist, %app%.exe
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						if !ErrorLevel
+							return false
+					}
+				}
+			else
+				return false
+
+		if hasBGProcesses
+			for ignore, app in kBackgroundApps {
+				Process Exist, %app%.exe
+
+				if (ErrorLevel && (ErrorLevel != self)) {
+					Process Close, %ErrorLevel%
+
+					if !ErrorLevel
+						return false
+				}
+			}
+
+		return true
+	}
 }
 
 checkInstallation() {
@@ -387,6 +464,9 @@ checkInstallation() {
 
 			ExitApp 0
 		}
+
+		if !exitProcesses()
+			ExitApp 1
 
 		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 				  , InstallLocation: normalizePath(installLocation)
@@ -481,7 +561,7 @@ checkInstallation() {
 						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
 				catch exception {
-					;ignore
+					; ignore
 				}
 
 				ExitApp 0
@@ -491,6 +571,10 @@ checkInstallation() {
 				installLocation := normalizePath(kInstallDirectory)
 
 			isNew := !FileExist(installLocation)
+
+			if !isNew
+				if !exitProcesses()
+					ExitApp 1
 
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
 					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
@@ -1513,62 +1597,97 @@ updateInstallationForV392() {
 	}
 }
 
-updateInstallationForV376() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+addOwnerField(database, table, id) {
+	rows := database.Tables[table]
 
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+	if (rows.Length() > 0) {
+		changed := false
 
-		FileCreateShortCut %installLocation%\Binaries\Race Center.exe, %A_StartMenu%\Simulator Controller\Race Center.lnk, %installLocation%\Binaries
-		FileCreateShortCut %installLocation%\Binaries\Server Administration.exe, %A_StartMenu%\Simulator Controller\Server Administration.lnk, %installLocation%\Binaries
+		for ignore, row in rows
+			if (!row.HasKey("Owner") || (row.Owner = kNull)) {
+				row.Owner := id
+
+				changed := true
+			}
+
+		if changed
+			database.changed(table)
 	}
 }
 
-updateInstallationForV358() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+clearWearFields(database, table, id) {
+	rows := database.Tables[table]
 
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+	if (rows.Length() > 0) {
+		changed := false
 
-		FileCreateShortCut %installLocation%\Binaries\Strategy Workbench.exe, %A_StartMenu%\Simulator Controller\Strategy Workbench.lnk, %installLocation%\Binaries
+		for ignore, row in rows
+			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				field := ("Tyre.Wear." . tyre)
+
+				if (row.HasKey(field) && (row[field] = id)) {
+					row[field] := kNull
+
+					changed := true
+				}
+			}
+
+		if changed
+			database.changed(table)
 	}
 }
 
-updateInstallationForV354() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
-
-		FileCreateShortCut %installLocation%\Binaries\Race Reports.exe, %A_StartMenu%\Simulator Controller\Race Reports.lnk, %installLocation%\Binaries
+updateConfigurationForV426() {
+	try {
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\AC, 1
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\AMS2, 1
+		FileRemoveDir %kDatabaseDirectory%User\Tracks\PCARS2, 1
 	}
+	catch exception {
+		; ignore
+	}
+
+	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"]
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+
+				if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
+					try {
+						FileDelete %kDatabaseDirectory%User\%simulator%\%car%\%track%\Track.automations
+					}
+					catch exception {
+						; ignore
+					}
+			}
+		}
 }
 
-updateConfigurationForV402() {
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
-		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+updateConfigurationForV425() {
+	try {
+		FileRemoveDir %kDatabaseDirectory%User\Tracks, 1
 	}
-}
+	catch exception {
+		; ignore
+	}
 
-updateConfigurationForV420() {
 	Loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
+
 			changed := false
-			
-			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter")) {
-				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter")
-				
+
+			if InStr(text, "Pitstop.KeyDelay") {
+				text := StrReplace(text, "Pitstop.KeyDelay", "Command.KeyDelay")
+
 				changed := true
 			}
-			
-			if InStr(text, "Assistant.Spotter Settings") {
-				text := StrReplace(text, "Assistant.Spotter Settings", "Assistant.Spotter")
-				
-				changed := true
-			}
-			
+
 			if changed {
 				try {
 					FileDelete %A_LoopFilePath%\Settings.CSV
@@ -1580,6 +1699,231 @@ updateConfigurationForV420() {
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
 		}
+
+}
+
+updateConfigurationForV424() {
+	tyresDB := new TyresDatabase()
+
+	simulator := "rFactor 2"
+
+	Loop Files, %kDatabaseDirectory%User\RF2\*.*, D
+		if InStr(A_LoopFileName, "#") {
+			car := string2Values("#", A_LoopFileName)[1]
+
+			if !FileExist(kDatabaseDirectory "User\RF2\" . car)
+				FileMoveDir %kDatabaseDirectory%User\RF2\%A_LoopFileName%, %kDatabaseDirectory%User\RF2\%car%, R
+			else {
+				oldCar := A_LoopFileName
+
+				Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
+				{
+					track := A_LoopFileName
+
+					sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
+
+					sourceDB := new Database(sourceDirectory, kTelemetrySchemas)
+					targetDB := new TelemetryDatabase(simulator, car, track).Database
+
+					for ignore, row in sourceDB.Tables["Electronics"] {
+						data := Object()
+
+						for ignore, field in kTelemetrySchemas["Electronics"]
+							data[field] := row[field]
+
+						targetDB.add("Electronics", data, true)
+					}
+
+					for ignore, row in sourceDB.Tables["Tyres"] {
+						data := Object()
+
+						for ignore, field in kTelemetrySchemas["Tyres"]
+							data[field] := row[field]
+
+						targetDB.add("Tyres", data, true)
+					}
+
+					tyresDB := new TyresDatabase()
+					sourceDB := new Database(sourceDirectory, kTyresSchemas)
+					targetDB := tyresDB.getTyresDatabase(simulator, car, track)
+
+					for ignore, row in sourceDB.Tables["Tyres.Pressures"] {
+						data := Object()
+
+						for ignore, field in kTyresSchemas["Tyres.Pressures"]
+							data[field] := row[field]
+
+						targetDB.add("Tyres.Pressures", data, true)
+					}
+
+					for ignore, row in sourceDB.Tables["Tyres.Pressures.Distribution"] {
+						tyresDB.updatePressure(simulator, car, track
+											 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+											 , row.Compound, row["Compound.Color"]
+											 , row.Type, row.Tyre, row.Pressure, row.Count
+											 , false, true, "User", row.Driver)
+					}
+
+					tyresDB.flush()
+
+					targetDirectory := (kDatabaseDirectory . "User\RF2\" . car . "\" . track . "\Race Strategies")
+
+					FileCreateDir %targetDirectory%
+
+					Loop Files, %sourceDirectory%Race Strategies\*.*, F
+					{
+						fileName := A_LoopFileName
+						targetName := fileName
+
+						while FileExist(targetDirectory . "\" . targetName) {
+							SplitPath targetName, , , , name
+
+							targetName := (name . " (" . (A_Index + 1) . ").strategy")
+						}
+
+						FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+					}
+				}
+
+				FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+			}
+		}
+}
+
+updateConfigurationForV423() {
+	if FileExist(kUserConfigDirectory . "Session Database.ini") {
+		sessionDB := new SessionDatabase()
+		sessionDBConfig := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		for key, drivers in getConfigurationSectionValues(sessionDBConfig, "Drivers", Object()) {
+			key := StrSplit(key, ".", " `t", 2)
+			simulator := key[1]
+			id := key[2]
+
+			for ignore, driver in string2Values("###", drivers)
+				sessionDB.registerDriver(simulator, id, driver)
+		}
+
+		removeConfigurationSection(sessionDBConfig, "Drivers")
+
+		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
+	}
+
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+
+		if (simulator = "ACC")
+			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			{
+				car := A_LoopFileName
+
+				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+				{
+					track := A_LoopFileName
+
+					empty := true
+
+					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
+					{
+						empty := false
+
+						break
+					}
+
+					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track)))
+						try {
+							FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%
+						}
+						catch exception {
+							; ignore
+						}
+				}
+			}
+	}
+}
+
+updateConfigurationForV422() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	if (getConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
+		setConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")
+
+		writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+
+	FileRead id, % kUserConfigDirectory . "ID"
+
+	tyresDB := new TyresDatabase()
+
+	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	{
+		simulator := A_LoopFileName
+
+		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		{
+			car := A_LoopFileName
+
+			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			{
+				track := A_LoopFileName
+
+				db := new TelemetryDatabase(simulator, car, track).Database
+
+				addOwnerField(db, "Electronics", id)
+				clearWearFields(db, "Tyres", id)
+				addOwnerField(db, "Tyres", id)
+
+				db.flush()
+
+				db := tyresDB.getTyresDatabase(simulator, car, track)
+
+				addOwnerField(db, "Tyres.Pressures", id)
+				addOwnerField(db, "Tyres.Pressures.Distribution", id)
+
+				db.flush()
+			}
+		}
+	}
+}
+
+updateConfigurationForV420() {
+	Loop Files, %kDatabaseDirectory%User\*.*, D
+		if FileExist(A_LoopFilePath . "\Settings.CSV") {
+			FileRead text, %A_LoopFilePath%\Settings.CSV
+			changed := false
+
+			if (InStr(text, "Spotter Settings") && !InStr(text, "Assistant.Spotter")) {
+				text := StrReplace(text, "Spotter Settings", "Assistant.Spotter")
+
+				changed := true
+			}
+
+			if InStr(text, "Assistant.Spotter Settings") {
+				text := StrReplace(text, "Assistant.Spotter Settings", "Assistant.Spotter")
+
+				changed := true
+			}
+
+			if changed {
+				try {
+					FileDelete %A_LoopFilePath%\Settings.CSV
+				}
+				catch exception {
+					; ignore
+				}
+
+				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
+			}
+		}
+}
+
+updateConfigurationForV402() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileAppend `nPatch.Configuration.Files=`%kUserHomeDirectory`%Setup\Configuration Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+		FileAppend `nPatch.Settings.Files=`%kUserHomeDirectory`%Setup\Settings Patch.ini, %kUserHomeDirectory%Setup\Setup.data
+	}
 }
 
 updateConfigurationForV400() {
@@ -1664,6 +2008,58 @@ updateConfigurationForV398() {
 	}
 }
 
+updatePluginsForV426() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	if (userConfiguration.Count() > 0) {
+		changed := false
+
+		if getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
+			pcars2 := new Plugin("PCARS2", userConfiguration)
+
+			if (pcars2.Simulators.Length() = 0) {
+				pcars2.iSimulators := ["Project CARS 2"]
+
+				pcars2.saveToConfiguration(userConfiguration)
+
+				changed := true
+			}
+		}
+		else {
+			pcars2 := new Plugin("PCARS2", false, false, "Project CARS 2")
+
+			pcars2.saveToConfiguration(userConfiguration)
+
+			changed := true
+		}
+
+		if getConfigurationValue(userConfiguration, "Plugins", "Project CARS 2", false) {
+			removeConfigurationValue(userConfiguration, "Plugins", "Project CARS 2")
+
+			changed := true
+		}
+
+		if changed
+			writeConfiguration(userConfigurationFile, userConfiguration)
+	}
+}
+
+updatePluginsForV424() {
+	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	userConfiguration := readConfiguration(userConfigurationFile)
+
+	if (userConfiguration.Count() > 0) {
+		if !getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
+			pcars2 := new Plugin("Project CARS 2", false, false, "", "")
+
+			pcars2.saveToConfiguration(userConfiguration)
+
+			writeConfiguration(userConfigurationFile, userConfiguration)
+		}
+	}
+}
+
 updateConfigurationForV394() {
 	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	userConfiguration := readConfiguration(userConfigurationFile)
@@ -1680,8 +2076,6 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	setupDB := new TyresDatabase()
-
 	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
@@ -1720,161 +2114,6 @@ updateConfigurationForV384() {
 					}
 			}
 	}
-}
-
-updateConfigurationForV378() {
-	if FileExist(kDatabaseDirectory . "Local\ACC\iexus_rc_f_gt3")
-		FileMoveDir %kDatabaseDirectory%Local\ACC\iexus_rc_f_gt3, %kDatabaseDirectory%Local\ACC\lexus_rc_f_gt3, R
-}
-
-updateConfigurationForV372() {
-	setupDB := new TyresDatabase()
-
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
-	{
-		simulator := A_LoopFileName
-
-		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
-		{
-			car := A_LoopFileName
-
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
-			{
-				track := A_LoopFileName
-
-				Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Tyre Setup*.*
-				{
-					condition := string2Values(A_Space, StrReplace(StrReplace(A_LoopFileName, "Tyre Setup ", ""), ".data", ""))
-
-					if (condition.Length() == 2) {
-						compound := condition[1]
-						compoundColor := "Black"
-						weather := condition[2]
-					}
-					else {
-						compound := condition[1]
-						compoundColor := condition[2]
-						weather := condition[3]
-					}
-
-					setupDB.requireDatabase(simulator, car, track)
-
-					pressureData := readConfiguration(A_LoopFilePath)
-
-					for temperature, pressures in getConfigurationSectionValues(pressureData, "Pressures", Object()) {
-						temperature := ConfigurationItem.splitDescriptor(temperature)
-						airTemperature := temperature[1]
-						trackTemperature := temperature[2]
-						pressures := string2Values(";", pressures)
-
-						for index, tyre in ["FL", "FR", "RL", "RR"]
-							for ignore, pressure in string2Values(",", pressures[index]) {
-								pressure := string2Values(":", pressure)
-
-								setupDB.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-													 , "Cold", tyre, pressure[1], pressure[2], false, false)
-							}
-					}
-
-					setupDB.flush()
-
-					try {
-						FileDelete %A_LoopFilePath%
-					}
-					catch exception {
-						; ignore
-					}
-				}
-			}
-		}
-	}
-}
-
-updateConfigurationForV368() {
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		setupConfig := readConfiguration(kUserHomeDirectory . "Setup\Setup.data")
-
-		if (getConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", kUndefined) == kUndefined) {
-			setConfigurationValue(setupConfig, "Setup", "Module.Controller.Selected", getConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected", false))
-			removeConfigurationValue(setupConfig, "Setup", "Module.Button Box.Selected")
-
-			writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", setupConfig)
-		}
-	}
-}
-
-updateConfigurationForV358() {
-	sourceDirectory := (kUserHomeDirectory . "Setup Database")
-	destinationDirectory := (kUserHomeDirectory . "Database")
-
-	if FileExist(sourceDirectory)
-		FileMoveDir %sourceDirectory%, %destinationDirectory%, 1
-}
-
-updateConfigurationForV314() {
-	if FileExist(kUserConfigDirectory . "Race Engineer.settings")
-		try {
-			FileMove %kUserConfigDirectory%Race Engineer.settings, %kUserConfigDirectory%Race.settings, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
-	{
-		simulator := A_LoopFileName
-
-		Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D					; Car
-		{
-			car := A_LoopFileName
-
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D			; Track
-			{
-				track := A_LoopFileName
-
-				try {
-					FileMoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Engineer Settings, %kDatabaseDirectory%Local\%simulator%\%car%\%track%\Race Settings, R
-				}
-				catch exception {
-					; ignore
-				}
-			}
-		}
-	}
-}
-
-updateConfigurationForV310() {
-	if FileExist(kUserConfigDirectory . "Race Engineer.rules")
-		try {
-			FileMove %kUserConfigDirectory%Race Engineer.rules, %kUserRulesDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Translations.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserTranslationsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Controller Plugin Labels.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserTranslationsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-	for ignore, fileName in getFileNames("Race Engineer.grammars.*", kUserConfigDirectory)
-		try {
-			FileMove %fileName%, %kUserGrammarsDirectory%, 1
-		}
-		catch exception {
-			; ignore
-		}
 }
 
 updatePluginsForV402() {
@@ -1961,107 +2200,7 @@ updatePluginsForV386() {
 	}
 }
 
-updatePluginsForV370() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "Team Server", false) {
-			teamServer := new Plugin("Team Server", false, false, "", "teamServer: Off")
-
-			teamServer.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-	}
-}
-
-updatePluginsForV322() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
-
-		if engineerDescriptor {
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerCommands", "assistantCommands")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSettings", "openRaceSettings")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerOpenSetups", "openSetupDatabase")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineerImportSettings", "importSetup")
-			engineerDescriptor := StrReplace(engineerDescriptor, "raceEngineer", "raceAssistant")
-
-			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
-		}
-
-		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
-
-		if strategistDescriptor {
-			strategistDescriptor := StrReplace(strategistDescriptor, "Cato", "Khato")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistCommands", "assistantCommands")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSettings", "openRaceSettings")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistOpenSetups", "openSetupDatabase")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategistImportSettings", "importSetup")
-			strategistDescriptor := StrReplace(strategistDescriptor, "raceStrategist", "raceAssistant")
-
-			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
-		}
-
-		writeConfiguration(userConfigurationFile, userConfiguration)
-	}
-}
-
-updatePluginsForV316() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "AMS2", false) {
-			ams2Plugin := new Plugin("AMS2", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-
-			ams2Plugin.iIsActive := false
-
-			ams2Plugin.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-	}
-}
-
-updatePluginsForV312() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0)
-		if getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
-			raceStrategistPlugin := new Plugin("Race Strategist", userConfiguration)
-
-			if (raceStrategistPlugin.getArgumentValue("raceStrategistName", "Toni") = "Toni") {
-				raceStrategistPlugin.setArgumentValue("raceStrategistName", "Cato")
-
-				raceStrategistPlugin.saveToConfiguration(userConfiguration)
-
-				writeConfiguration(userConfigurationFile, userConfiguration)
-			}
-		}
-}
-
-updatePluginsForV310() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
-
-	if (userConfiguration.Count() > 0)
-		if !getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false) {
-			raceStrategistPlugin := new Plugin("Race Strategist", readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory)))
-
-			raceStrategistPlugin.iIsActive := false
-
-			raceStrategistPlugin.saveToConfiguration(userConfiguration)
-
-			writeConfiguration(userConfigurationFile, userConfiguration)
-		}
-}
-
-updateToV30() {
+updateToV380() {
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 	title := translate("Error")
 	MsgBox 262160, %title%, % translate("Your installed version is to old to be updated automatically. Please remove the ""Simulator Controller"" folder in your user ""Documents"" folder and restart the application. Application will exit...")
@@ -2573,6 +2712,11 @@ startSimulatorTools() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
+
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 
 	if (A_Args.Length() > 0)
@@ -2638,6 +2782,9 @@ startSimulatorTools() {
 			hideSplashTheme()
 	}
 
+	ExitApp 0
+
+Exit:
 	ExitApp 0
 }
 

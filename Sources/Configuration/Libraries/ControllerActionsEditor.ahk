@@ -114,7 +114,7 @@ class ControllerActionsEditor extends ConfigurationItem {
 		Gui PAE:Font, Norm, Arial
 		Gui PAE:Font, Italic Underline, Arial
 
-		Gui PAE:Add, Text, YP+20 w388 cBlue Center gopenPluginActionsDocumentation, % translate("Labels && Icons")
+		Gui PAE:Add, Text, x128 YP+20 w148 cBlue Center gopenPluginActionsDocumentation, % translate("Labels && Icons")
 
 		Gui PAE:Font, Norm, Arial
 		

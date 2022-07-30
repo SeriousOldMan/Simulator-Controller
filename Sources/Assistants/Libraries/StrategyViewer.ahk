@@ -95,7 +95,7 @@ class StrategyViewer {
 	createSetupInfo(strategy) {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translateQualifiedCompound(strategy.TyreCompound, strategy.TyreCompoundColor) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
@@ -111,11 +111,14 @@ class StrategyViewer {
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]
 
+		startStint := strategy.StartStint
+
 		html := ""
 
 		if !strategy.LastPitstop {
 			html .= "<table class=""table-std"">"
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">1</th></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
@@ -129,6 +132,7 @@ class StrategyViewer {
 		}
 		else {
 			stints := []
+			drivers := []
 			maps := []
 			laps := []
 			lapTimes := []
@@ -137,6 +141,7 @@ class StrategyViewer {
 			refuels := []
 			tyreChanges := []
 
+			lastDriver := strategy.DriverName
 			lastMap := strategy.Map
 			lastLap := strategy.StartLap
 			lastLapTime := strategy.AvgLapTime
@@ -149,7 +154,8 @@ class StrategyViewer {
 			for ignore, pitstop in strategy.Pitstops {
 				pitstopLap := (pitstop.Lap - lastLap)
 
-				stints.Push("<th class=""th-std"">" . A_Index . "</th>")
+				stints.Push("<th class=""th-std"">" . (startStint + A_Index - 1) . "</th>")
+				drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
 				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
 				laps.Push("<td class=""td-std"">" . Max(pitstopLap, 0) . "</td>")
 				lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
@@ -163,13 +169,14 @@ class StrategyViewer {
 				fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
 				tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
 
+				lastDriver := pitstop.DriverName
 				lastMap := pitstop.Map
 				lastLap := pitstop.Lap
 				lastFuelConsumption := pitstop.FuelConsumption
 				lastLapTime := pitstop.AvgLapTime
 				lastRefuel := pitstop.RefuelAmount
 				lastPitstopLap := pitstop.Lap
-				lastTyreChange := (pitstop.TyreChange ? translateQualifiedCompound(pitstop.TyreCompound, pitstop.TyreCompoundColor) : translate("No"))
+				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
 				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
@@ -178,7 +185,8 @@ class StrategyViewer {
 				tyreSeries.Push(lastTyreLaps)
 			}
 
-			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + 1) . "</th>")
+			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + startStint) . "</th>")
+			drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
 			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
 			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
 			lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
@@ -194,6 +202,7 @@ class StrategyViewer {
 
 			html .= "<table class=""table-std"">"
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
+			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th>" . values2String("", drivers*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", map(lapTimes, ObjBindMethod(this, "lapTimeDisplayValue"))*) . "</tr>")

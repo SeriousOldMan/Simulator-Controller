@@ -6,6 +6,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -193,15 +201,52 @@ class PitstopToggleAction extends PitstopAction {
 }
 
 class SimulatorPlugin extends ControllerPlugin {
+	iCommandMode := "Event"
+	iCommandDelay := kUndefined
+
 	iSimulator := false
 	iSessionState := kSessionFinished
 
 	iCar := false
 	iTrack := false
 
+	iTrackAutomation := kUndefined
+
 	Code[] {
 		Get {
 			return this.Plugin
+		}
+	}
+
+	CommandMode[] {
+		Get {
+			return this.iCommandMode
+		}
+
+		Set {
+			return (this.iCommandMode := value)
+		}
+	}
+
+	CommandDelay[] {
+		Get {
+			if (this.iCommandDelay = kUndefined) {
+				simulator := this.Simulator[true]
+				car := (this.Car ? this.Car : "*")
+				track := (this.Track ? this.Track : "*")
+
+				settings := new SettingsDatabase().loadSettings(simulator, car, track, "*")
+
+				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 20)
+
+				this.iCommandDelay := getConfigurationValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
+			}
+
+			return this.iCommandDelay
+		}
+
+		Set {
+			return (this.iCommandDelay := value)
 		}
 	}
 
@@ -215,11 +260,47 @@ class SimulatorPlugin extends ControllerPlugin {
 		Get {
 			return this.iCar
 		}
+
+		Set {
+			if (value != this.iCar)
+				this.iTrackAutomation := kUndefined
+
+			this.iCommandDelay := kUndefined
+
+			return (this.iCar := value)
+		}
 	}
 
 	Track[] {
 		Get {
 			return this.iTrack
+		}
+
+		Set {
+			if (value != this.iTrack)
+				this.iTrackAutomation := kUndefined
+
+			this.iCommandDelay := kUndefined
+
+			return (this.iTrack := value)
+		}
+	}
+
+	TrackAutomation[] {
+		Get {
+			if (this.iTrackAutomation == kUndefined) {
+				simulator := this.Simulator[true]
+				car := this.Car
+				track := this.Track
+
+				this.iTrackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track)
+			}
+
+			return this.iTrackAutomation
+		}
+
+		Set {
+			return (this.iTrackAutomation := value)
 		}
 	}
 
@@ -249,21 +330,22 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		base.__New(controller, name, configuration, register)
 
-		if (!this.Active && !isDebug())
-			return
+		if (this.Active || isDebug()) {
+			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
-		for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
-			arguments := string2Values(A_Space, theAction)
+			for ignore, theAction in string2Values(",", this.getArgumentValue("pitstopCommands", "")) {
+				arguments := string2Values(A_Space, theAction)
 
-			theAction := arguments[1]
+				theAction := arguments[1]
 
-			if (inList(kAssistantAnswerActions, theAction) || inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
-				this.createRaceAssistantAction(controller, arguments*)
-			else
-				this.createPitstopAction(controller, arguments*)
+				if (inList(kAssistantAnswerActions, theAction) || inList(kAssistantRaceActions, theAction) || (theAction = "InformationRequest"))
+					this.createRaceAssistantAction(controller, arguments*)
+				else
+					this.createPitstopAction(controller, arguments*)
+			}
+
+			controller.registerPlugin(this)
 		}
-
-		controller.registerPlugin(this)
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
@@ -342,6 +424,42 @@ class SimulatorPlugin extends ControllerPlugin {
 		selectActions := []
 	}
 
+	activateWindow() {
+		window := this.Simulator.WindowTitle
+
+		if !WinExist(window)
+			if isDebug()
+				showMessage(this.Simulator[true] . " not found...")
+
+		if !WinActive(window)
+			WinActivate %window%
+	}
+
+	sendCommand(command) {
+		try {
+			switch this.CommandMode {
+				case "Event":
+					SendEvent %command%
+				case "Input":
+					SendInput %command%
+				case "Play":
+					SendPlay %command%
+				case "Raw":
+					SendRaw %command%
+				default:
+					Send %command%
+			}
+		}
+		catch exception {
+			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
+		}
+
+		delay := this.CommandDelay
+
+		if delay
+			Sleep %delay%
+	}
+
 	runningSimulator() {
 		return (this.Simulator.isRunning() ? this.Simulator.Application : false)
 	}
@@ -376,8 +494,8 @@ class SimulatorPlugin extends ControllerPlugin {
 			this.iSessionState := sessionState
 
 			if (sessionState == kSessionFinished) {
-				this.iCar := false
-				this.iTrack := false
+				this.Car := false
+				this.Track := false
 
 				this.Controller.setModes()
 			}
@@ -507,6 +625,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iRaceStrategist := false
 	iRaceSpotter := false
 
+	iCurrentTyreCompound := false
+	iRequestedTyreCompound := false
+
 	RaceEngineer[] {
 		Get {
 			return this.iRaceEngineer
@@ -525,18 +646,37 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
+	CurrentTyreCompound[] {
+		Get {
+			return this.iCurrentTyreCompound
+		}
+
+		Set {
+			return (this.iCurrentTyreCompound := value)
+		}
+	}
+
+	RequestedTyreCompound[] {
+		Get {
+			return this.iRequestedTyreCompound
+		}
+
+		Set {
+			return (this.iRequestedTyreCompound := value)
+		}
+	}
+
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 
-		if (!this.Active && !isDebug())
-			return
+		if (this.Active || isDebug()) {
+			this.iActionMode := kAssistantMode
 
-		this.iActionMode := kAssistantMode
+			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
+				this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
 
-		for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
-			this.createRaceAssistantAction(controller, string2Values(A_Space, theAction)*)
-
-		controller.registerPlugin(this)
+			controller.registerPlugin(this)
+		}
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -663,6 +803,17 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
+	supportsTrackMap() {
+		return false
+	}
+
+	updateSessionState(sessionState) {
+		base.updateSessionState(sessionState)
+
+		if (sessionState = kSessionFinished)
+			this.iTyreCompound := false
+	}
+
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return
@@ -688,6 +839,15 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceStrategist.reject()
 		else if this.RaceSpotter
 			this.RaceSpotter.reject()
+	}
+
+	startSession(settings, data) {
+		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+
+		this.CurrentTyreCompound := compound(compound, compoundColor)
+
+		this.updateTyreCompound(data)
 	}
 
 	recommendPitstop() {
@@ -717,6 +877,56 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	pitstopFinished(pitstopNumber) {
+		if this.RequestedTyreCompound {
+			this.CurrentTyreCompound := this.RequestedTyreCompound
+			this.RequestedTyreCompound := false
+		}
+	}
+
+	tyreCompoundIndex(compound, compoundColor := false) {
+		if compound {
+			compounds := new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
+			index := inList(compounds, compound(compound, compoundColor))
+
+			if index
+				return index
+			else
+				for index, candidate in compounds
+					if (InStr(candidate, compound) == 1)
+						return index
+
+			return false
+		}
+		else
+			return false
+	}
+
+	tyreCompoundCode(compound, compoundColor := false) {
+		if compound {
+			index := this.tyreCompoundIndex(compound, compoundColor)
+
+			return (index ? sessionDB.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+		}
+		else
+			return false
+	}
+
+	triggerAction(actionNr, positionX, positionY) {
+		if this.TrackAutomation {
+			action := this.TrackAutomation.Actions[actionNr]
+
+			if (action.Type = "Hotkey") {
+				this.activateWindow()
+
+				for ignore, theHotkey in string2Values("|", action.Action) {
+					this.sendCommand(theHotKey)
+
+					Sleep 25
+				}
+			}
+			else if (action.Type = "Command")
+				execute(action.Action)
+		}
 	}
 
 	startPitstopSetup(pitstopNumber) {
@@ -729,12 +939,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		if compound
+			this.RequestedTyreCompound := compound(compound, compoundColor)
+		else
+			this.RequestedTyreCompound := false
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
@@ -743,14 +957,70 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updatePositionsData(data) {
 	}
 
-	updateSessionData(data) {
-		if (this.SessionState != kSessionFinished) {
-			this.iCar := getConfigurationValue(data, "Session Data", "Car")
-			this.iTrack := getConfigurationValue(data, "Session Data", "Track")
+	updateTyreCompound(data) {
+		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
+		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
+			if this.CurrentTyreCompound {
+				compound := "Dry"
+				compoundColor := "Black"
+
+				splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+
+				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
+				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+			}
 		}
 	}
 
-	restoreSessionState(sessionSettings, sessionState) {
+	updateSessionData(data) {
+		this.updateTyreCompound(data)
+
+		if (this.SessionState != kSessionFinished) {
+			this.Car := getConfigurationValue(data, "Session Data", "Car")
+			this.Track := getConfigurationValue(data, "Session Data", "Track")
+		}
+	}
+
+	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
+		if !sessionSettings
+			sessionSettings := newConfiguration()
+
+		if this.CurrentTyreCompound {
+			compound := "Dry"
+			compoundColor := "Black"
+
+			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Current", compoundColor)
+		}
+
+		if this.RequestedTyreCompound {
+			compound := "Dry"
+			compoundColor := "Black"
+
+			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
+
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Requested", compoundColor)
+		}
+	}
+
+	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
+		this.CurrentTyreCompound := false
+		this.RequestedTyreCompound := false
+
+		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", false)
+
+		if compound
+			this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																			   , "Simulator Settings", "Tyre.Compound.Color.Current"))
+
+		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", false)
+
+		if compound
+			this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																				 , "Simulator Settings", "Tyre.Compound.Color.Requested"))
 	}
 }
 
@@ -788,7 +1058,7 @@ getCurrentSimulatorPlugin(option := false) {
 openPitstopMFD(descriptor := false) {
 	local plugin := getCurrentSimulatorPlugin()
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {
@@ -812,7 +1082,7 @@ openPitstopMFD(descriptor := false) {
 closePitstopMFD() {
 	local plugin := getCurrentSimulatorPlugin()
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {
@@ -862,12 +1132,12 @@ changePitstopTyrePressure(tyre, direction, increments := 1) {
 	changePitstopOption(tyre, direction, increments)
 }
 
-changePitstopBrakeType(brake, selection) {
+changePitstopBrakePadType(brake, selection) {
 	if !inList(["Front Brake", "Rear Brake"], brake)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
 
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakeType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
 
 	changePitstopOption(brake, selection)
 }
@@ -891,7 +1161,7 @@ changePitstopOption(option, selection := "Next", increments := 1) {
 
 	plugin := getCurrentSimulatorPlugin(option)
 
-	if plugin {
+	if (plugin && SimulatorController.Instance.isActive(plugin)) {
 		protectionOn()
 
 		try {

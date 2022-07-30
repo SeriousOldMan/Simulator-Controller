@@ -101,10 +101,14 @@ class ControllerEditor extends ConfigurationItem {
 	AutoSave[] {
 		Get {
 			try {
+				/*
 				if (ConfigurationEditor && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
+				*/
+
+				return false
 			}
 			catch exception {
 				return false
@@ -151,7 +155,7 @@ class ControllerEditor extends ConfigurationItem {
 		Gui CTRLE:Font, Norm, Arial
 		Gui CTRLE:Font, Italic Underline, Arial
 
-		Gui CTRLE:Add, Text, x0 YP+20 w432 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
+		Gui CTRLE:Add, Text, x160 YP+20 w112 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
 
 		this.iControlsList.createGui(buttonBoxConfiguration)
 		this.iLabelsList.createGui(buttonBoxConfiguration)
@@ -294,6 +298,12 @@ global controlDeleteButton
 global controlUpdateButton
 
 class ControlsList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -450,6 +460,12 @@ global labelDeleteButton
 global labelUpdateButton
 
 class LabelsList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -564,7 +580,7 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	getLabels() {
-		if this.AutoSave {
+		if ControllerEditor.Instance.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
@@ -614,6 +630,12 @@ class LayoutsList extends ConfigurationItemList {
 
 	iButtonBoxWidgets := []
 	iStreamDeckWidgets := []
+
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
 
 	ButtonBoxConfiguration[] {
 		Get {
@@ -1612,7 +1634,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Font, Norm, Arial
 		Gui IRE:Font, Italic Underline, Arial
 
-		Gui IRE:Add, Text, x0 YP+20 w332 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
+		Gui IRE:Add, Text, x110 YP+20 w112 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
 
 		Gui IRE:Font, Norm, Arial
 
@@ -1762,6 +1784,12 @@ global displayRuleDeleteButton
 global displayRuleUpdateButton
 
 class DisplayRulesList extends ConfigurationItemList {
+	AutoSave[] {
+		Get {
+			return ControllerEditor.Instance.AutoSave
+		}
+	}
+
 	__New(configuration) {
 		base.__New(configuration)
 
@@ -1966,7 +1994,7 @@ chooseImageFile(path) {
 	title := translate("Select Image...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
 	FileSelectFile pictureFile, 1, %path%, %title%, Image (*.jpg; *.png; *.gif; *.ico)
 	OnMessage(0x44, "")

@@ -100,6 +100,11 @@ startRaceStrategist() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Strategist
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	remotePID := 0
 	strategistName := "Cato"
@@ -193,6 +198,11 @@ startRaceStrategist() {
 		
 		SetTimer checkRemoteProcessAlive, 10000
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

@@ -11,13 +11,14 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) | This plugin integrates Jona, the Virtual Race Engineer, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Engineer. |
 | [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) | This plugin integrates Cato, the Virtual Race Strategist, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Strategist. |
 | [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) | This plugin integrates Elisa, the Virtual Race Spotter, with all other plugins for the simulation games, like the ACC plugin. The plugin handles the data transfer between the simulation game and the Virtual Race Spotter. |
-| [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) | The *Team Server* supports using the Virtual Race Assistants even in a multiplayer team race. It is based on a serverside solution, which manages the state of the car and assistants knowledge and passes them between the participating drivers. |
-| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked with the controller hardware using the "Pitstop" mode, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. An integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
-| [AC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) | Integration for Assetto Corsa, which supports  Jona, the Virtual Race Engineer. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
-| [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Integration for Automobilista 2, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the race assistants. |
-| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
-| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
-| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the race assistant commands from your hardware controller. |
+| [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) | The *Team Server* supports using the Virtual Race Assistants even in a multiplayer team race. It is based on a serverside solution, which manages the state of the car and Assistants knowledge and passes them between the participating drivers. |
+| [ACC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-acc) | Provides special support for starting and stopping *Assetto Corsa Competizione* from your hardware controller. The mode "Chat", which is available when *Assetto Corsa Competizione* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Additionally, beginning with Release 2.0, this plugin provides sophisticated support for the Pitstop MFD of *Assetto Corsa Competizione*. All settings may be tweaked with the controller hardware using the "Pitstop" mode, but it is also possible to control the settings using voice control to keep your hands on the steering wheel. An integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [AC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-ac) | Integration for *Assetto Corsa*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Integration for *Automobilista 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
+| [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, and with Cato, the Virtual Race Strategist is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the Virtual Race Engineer, with Cato, the Virtual Race Strategist and also with Elisa, the Virtual Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the Virtual Race Engineer, Cato, the Virtual Race Strategist and also Elisa, the Virtual Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
@@ -215,7 +216,7 @@ The "Race Engineer" plugin handles the interaction of the currently active simul
 	openRaceSettings: *settingsFunction*; importSetup: *importFunction*;
 	openSessionDatabase: *setupsFunction*; openSetupAdvisor: *advisorFunction*; openRaceCenter: *centerFunction*
 	
-For Jona to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Jona". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Engineer dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
+For Jona to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Jona". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Engineer dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *importSetup* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
 Last, but not least, with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openSetupAdvisor* and *openRaceCenter*, which let you open the "Setup Advisor" and the "Race Center" tool.
 
@@ -225,7 +226,7 @@ Note: If you disable Jona during an active race, the Race Engineer will stop wor
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Jona will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this race assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone. You can also activate voice recognition on the Azure Cognitive Services cloud using the same syntax as described above for the *raceAssistantSynthesizer* parameter. The default value for *raceAssistantRecognizer* is also taken from the general voice configuration, when no value is supplied.
 
@@ -259,7 +260,9 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
 | TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |
-| TyreWear | This command will give you the current tyre wear in percentage of total wear. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
+| TyreWear | This command will give you the current tyre wear in percentage of total wear for the inidividual tyres. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
+| BrakeTemperatures | This command will give you the current temperatures for the individual brakes in Degrees Celsius. |
+| BrakeWear | This command will give you the current tyre wear in percentage of total wear for the brakes. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
@@ -277,14 +280,14 @@ The "Race Strategist" plugin handles the interaction of the currently active sim
 	openRaceSettings: *settingsFunction*; openSessionDatabase: *setupsFunction*;
 	openStrategyWorkbench: *strategyFunction*; openRaceCenter: *centerFunction*
 	
-For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Khato". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Strategist dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
+For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Khato". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Strategist dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. And with *openSessionDatabase* you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openStrategyWorkbench* and *openRaceCenter*, which let you open the "Strategy Workbench" and the "Race Center" tool.
 
 Hint: You can bind the activation and deactivation of all the Virtual Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Cato will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this race assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
@@ -304,7 +307,7 @@ Example:
 
 	assistantCommands: ...,
 					   InformationRequest Position Button.1,
-					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToAhead Track Button.2,
 					   InformationRequest GapToRear Track Button.3,
 					   ...
 	
@@ -317,7 +320,7 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
@@ -334,19 +337,22 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 	raceAssistantSpeaker: On | Off | *Microsoft Speech Generation Language*;
 	raceAssistantSpeakerVocalics: *volume* , *pitch* , *rate*;
 	raceAssistantRecognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey;
-	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*
+	raceAssistantListener: On | Off | *Microsoft Speech Recognition Engine*;
+	trackAutomation: [*initialState*] *onOffFunction*
 	
-For Cato to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Elias". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Spotter dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
+For Elisa to be generally available, you must supply an argument for the *raceAssistantName* parameter, for example "Elias". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the Virtual Race Spotter dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 
 Hint: You can bind the activation and deactivation of all the Virtual Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
 With "On" (or *true*) supplied for *raceAssistantLogo*, Elisa will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
-The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this race assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
+The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synthesis engine, which is used for this Race Assistant. If you supply *Windows* or *dotNET*, you will use the synthesis engine on your local computer. *Windows* specifies the original solution, whereas *dotNET* specifies the enhanced version introduced with the .NET framework. If you supply *Azure|tokenIsszuerEndpoint|subscriptionKey* (with valid values for *tokenIssuerEndpoint* and *subscriptionKey*), you will use the cloud services of Microsoft to generate voice output and you will have access to more and more natural voices, but this possibly does not come for free. Please see the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. Default for the *raceAssistantSynthesizer* parameter is the preconfigured engine.
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
 With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Elisa. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Elisa can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied, the values from the general voice control configuration will be taken as default. For more information about Elisa, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+
+With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 
 Similar as for Cato, you can use the following parameters to trigger some of Elisas service without using voice commands:
 
@@ -361,7 +367,7 @@ Example:
 
 	assistantCommands: ...,
 					   InformationRequest Position Button.1,
-					   InformationRequest GapToFront Track Button.2,
+					   InformationRequest GapToAhead Track Button.2,
 					   InformationRequest GapToRear Track Button.3,
 					   ...
 	
@@ -372,7 +378,7 @@ Please see the following table for available information commands.
 | Time | You will be told the current time of your local computer. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
-| GapToFront [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
+| GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |
 
@@ -415,7 +421,7 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -423,7 +429,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -479,17 +485,17 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 					 
-See the following table for the supported assistant commands.
+See the following table for the supported Assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
-| StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
-| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
-| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
@@ -525,7 +531,7 @@ If you have come so far in your reading and still want to use the image recognit
 
 ## Plugin *AC*
 
-This plugin handles starting and stopping of the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration, and set the window title to "Assetto Corsa Launcher". An integration with Jona is available through the "Race Engineer" plugin.
+This plugin handles starting and stopping of the *Assetto Corsa* simulation game. An application with the name "Assetto Corsa" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAC" as a special function hook in this configuration, and set the window title to "ahk_exe acs.exe". An integration with Jona is available through the "Race Engineer" plugin.
 
 ### Mode *Pitstop*
 
@@ -593,20 +599,24 @@ Note: Be careful, when you change pitstop settings while Jona is active, the Rac
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
-	assistantCommands: Accept *acceptFunction*, Reject *rejectFunction*,
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 					 
-See the following table for the supported assistant commands.
+See the following table for the supported Assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin, for an overview what information can be requested. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -624,7 +634,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ## Plugin *IRC*
 
-This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingUI.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
+This plugin handles starting and stopping of the *iRacing* simulation game. An application with the name "iRacing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please locate the "iRacingUI.exe" application, set "ahk_exe iRacingSim64DX11.exe" as the window title and "startIRC" as a special function hook in this configuration. An integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
 ### Mode *Pitstop*
 
@@ -640,7 +650,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -648,7 +658,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -697,13 +707,13 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 					 
-See the following table for the supported assistant commands.
+See the following table for the supported Assistant commands.
 
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the virtual Eace Strategist for a recommendation for the next pitstop. |
-| StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
@@ -741,7 +751,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -787,13 +797,13 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 					 
-See the following table for the supported assistant commands.
+See the following table for the supported Assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
-| StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
@@ -825,7 +835,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -833,7 +843,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -866,6 +876,7 @@ See the following table for the supported settings:
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
+| TyreCompound | Cycles through the available tyre compounds. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
@@ -880,17 +891,17 @@ With the plugin parameter *assistantCommands* you can supply a list of the comma
 					   Accept *acceptFunction*, Reject *rejectFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
 					 
-See the following table for the supported assistant commands.
+See the following table for the supported Assistant commands.
 
 | Command | Description |
 | ------ | ------ |
-| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
-| StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
-| PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
-| Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
-| Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
@@ -925,11 +936,11 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 All this will be achieved using the following plugin arguments:
 
 	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
-	pitstopCommands: Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+	pitstopCommands: Refuel Dial.2 5, TyreCompound Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -937,7 +948,7 @@ The above will be achieved using the following plugin argument:
 
 	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
-					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
 Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
@@ -966,8 +977,104 @@ See the following table for the supported settings:
 
 | Setting | Description |
 | ------ | ------ |
+| Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
-| TyreChange | Chooses between "Dry" and "Wet" tyres for the next pitstop or no tyre change at all. Currently, only vehicles with one dry tyre compound and one wet tyre compound are supported. |
+| TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. Only the first 3 positions are supported, typically 1. Slicks, 2. Intermediate or Wets and 3. Automatic |
+| SuspensionRepair | Toggles the repair of the suspension components. |
+| BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
+| DriverSwap | Enables or disables driver swap for the upcoming pitstop. |
+
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+
+Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported Assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
+| StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
+
+Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+
+### Special requirements when using the Pitstop automation
+
+It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Before the first usage the ICM must be at the first page with the selection line at the bottom of the ICM. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+
+## Plugin *PCARS2*
+
+This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "Project CARS 2" as the window title.
+
+Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
+
+The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
+
+### Mode *Pitstop*
+
+Similar to the pitstop mode the plugin for *Automobilista 2*, you can control many of the pitstop settings of *Project CARS 2*. 
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2011.JPG)
+
+All this will be achieved using the following plugin arguments:
+
+	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
+	pitstopCommands: Refuel Dial.2 5, TyreCompound Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
+### Configuration
+
+First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Project CARS 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Project CARS 2*. You need to change these bindings in *Project CARS 2*, since the standard bindings are undefined in the current distribution of *Project CARS 2*.
+
+	openPitstopMFD: *openHotkey*;
+	pitstopMFDMode: Event | Input | Play | Raw | Default;
+	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
+	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*
+	
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Project CARS 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Project CARS 2* (see above).
+
+The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
+
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+	
+With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
+
+	pitstopCommands: *setting1* *settingsFunction1* [*settingSteps1*],
+					 *setting2* *settingsFunction2* [*settingSteps2*], ...
+					 
+See the following table for the supported settings:
+
+| Setting | Description |
+| ------ | ------ |
+| Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. Only the first 3 positions are supported, typically 1. Slicks, 2. Intermediate or Wets and 3. Automatic |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
@@ -1000,4 +1107,4 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-It is very important, that you do not use the *Automobilista 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.

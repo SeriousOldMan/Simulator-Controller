@@ -93,11 +93,21 @@ int sendStringMessage(HWND hWnd, int wParam, string msg) {
 	return result;
 }
 
-void sendMessage(string message) {
+void sendSpotterMessage(string message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.exe");
 
 	if (winHandle == 0)
-		FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
+		winHandle = FindWindowEx(0, 0, 0, L"Race Spotter.ahk");
+
+	if (winHandle != 0)
+		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
+}
+
+void sendAutomationMessage(string message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
 
 	if (winHandle != 0)
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
@@ -152,7 +162,9 @@ string computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			situationCount += 1;
+
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
@@ -257,8 +269,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && transY < longitudinalDistance * 1.5) ||
-					(transY < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
+				if ((faster && abs(transY) < longitudinalDistance * 1.5) ||
+					(abs(transY) < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
 					if (transX < 0)
 						carBehindRight = true;
 					else
@@ -349,7 +361,7 @@ bool checkPositions() {
 			if (alert != "Hold")
 				carBehindReported = false;
 
-			sendMessage("proximityAlert:" + alert);
+			sendSpotterMessage("proximityAlert:" + alert);
 
 			return true;
 		}
@@ -357,8 +369,8 @@ bool checkPositions() {
 			if (!carBehindReported) {
 				carBehindReported = true;
 
-				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return true;
 			}
@@ -381,7 +393,9 @@ bool checkFlagState() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
 	if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
-		if (yellowCount++ > 50) {
+		yellowCount += 1;
+
+		if (yellowCount > 50) {
 			if (!gf->GlobalYellow1)
 				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -394,7 +408,7 @@ bool checkFlagState() {
 			yellowCount = 0;
 
 			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0) {
-				sendMessage("yellowFlag:Sector;1");
+				sendSpotterMessage("yellowFlag:Sector;1");
 
 				waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -402,7 +416,7 @@ bool checkFlagState() {
 			}
 
 			if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0) {
-				sendMessage("yellowFlag:Sector;2");
+				sendSpotterMessage("yellowFlag:Sector;2");
 
 				waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
@@ -410,7 +424,7 @@ bool checkFlagState() {
 			}
 
 			if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0) {
-				sendMessage("yellowFlag:Sector;3");
+				sendSpotterMessage("yellowFlag:Sector;3");
 
 				waitYellowFlagState &= ~YELLOW_SECTOR_3;
 
@@ -423,17 +437,19 @@ bool checkFlagState() {
 
 	if (gf->flag == AC_BLUE_FLAG) {
 		if ((lastFlagState & BLUE) == 0) {
-			sendMessage("blueFlag");
+			sendSpotterMessage("blueFlag");
 
 			lastFlagState |= BLUE;
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -443,7 +459,7 @@ bool checkFlagState() {
 
 	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_FULL) == 0) {
-			sendMessage("yellowFlag:Full");
+			sendSpotterMessage("yellowFlag:Full");
 
 			lastFlagState |= YELLOW_FULL;
 
@@ -453,7 +469,7 @@ bool checkFlagState() {
 	else if (gf->GlobalYellow1) {
 		if ((lastFlagState & YELLOW_SECTOR_1) == 0) {
 			/*
-			sendMessage("yellowFlag:Sector;1");
+			sendSpotterMessage("yellowFlag:Sector;1");
 
 			lastFlagState |= YELLOW_SECTOR_1;
 
@@ -468,7 +484,7 @@ bool checkFlagState() {
 	else if (gf->GlobalYellow2) {
 		if ((lastFlagState & YELLOW_SECTOR_2) == 0) {
 			/*
-			sendMessage("yellowFlag:Sector;2");
+			sendSpotterMessage("yellowFlag:Sector;2");
 
 			lastFlagState |= YELLOW_SECTOR_2;
 
@@ -483,7 +499,7 @@ bool checkFlagState() {
 	else if (gf->GlobalYellow3) {
 		if ((lastFlagState & YELLOW_SECTOR_3) == 0) {
 			/*
-			sendMessage("yellowFlag:Sector;3");
+			sendSpotterMessage("yellowFlag:Sector;3");
 
 			lastFlagState |= YELLOW_SECTOR_3;
 
@@ -499,7 +515,7 @@ bool checkFlagState() {
 		if ((lastFlagState & YELLOW_SECTOR_1) != 0 || (lastFlagState & YELLOW_SECTOR_2) != 0 ||
 			(lastFlagState & YELLOW_SECTOR_3) != 0) {
 			if (waitYellowFlagState != lastFlagState)
-				sendMessage("yellowFlag:Clear");
+				sendSpotterMessage("yellowFlag:Clear");
 
 			lastFlagState &= ~YELLOW_FULL;
 			waitYellowFlagState &= ~YELLOW_FULL;
@@ -528,13 +544,106 @@ void checkPitWindow() {
 			pitWindowOpenReported = true;
 			pitWindowClosedReported = false;
 
-			sendMessage("pitWindow:Open");
+			sendSpotterMessage("pitWindow:Open");
 		}
 		else if (pitWindowEnd < currentTime && !pitWindowClosedReported) {
 			pitWindowClosedReported = true;
 			pitWindowOpenReported = false;
 
-			sendMessage("pitWindow:Closed");
+			sendSpotterMessage("pitWindow:Closed");
+		}
+	}
+}
+
+float initialX = 0.0;
+float initialY = 0.0;
+int coordCount = 0;
+
+bool writeCoordinates() {
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	float velocityX = pf->velocity[0];
+	float velocityY = pf->velocity[2];
+	float velocityZ = pf->velocity[1];
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int carID = gf->playerCarID;
+
+		for (int i = 0; i < gf->activeCars; i++)
+			if (gf->carID[i] == carID) {
+				carID = i;
+
+				break;
+			}
+
+		float coordinateX = gf->carCoordinates[carID][0];
+		float coordinateY = gf->carCoordinates[carID][2];
+		
+		cout << coordinateX << "," << coordinateY << endl;
+
+		if (coordCount == 0) {
+			initialX = coordinateX;
+			initialY = coordinateY;
+		}
+		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+			return false;
+		
+		coordCount += 1;
+	}
+
+	return true;
+}
+
+float xCoordinates[60];
+float yCoordinates[60];
+int numCoordinates = 0;
+time_t lastUpdate = 0;
+
+void checkCoordinates() {
+	if (time(NULL) > (lastUpdate + 2)) {
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+		float velocityX = pf->velocity[0];
+		float velocityY = pf->velocity[2];
+		float velocityZ = pf->velocity[1];
+
+		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+			int carID = gf->playerCarID;
+
+			for (int i = 0; i < gf->activeCars; i++)
+				if (gf->carID[i] == carID) {
+					carID = i;
+
+					break;
+				}
+
+			float coordinateX = gf->carCoordinates[carID][0];
+			float coordinateY = gf->carCoordinates[carID][2];
+
+			for (int i = 0; i < numCoordinates; i++) {
+				if (abs(xCoordinates[i] - coordinateX) < 20.0 && abs(yCoordinates[i] - coordinateY) < 20.0) {
+					char buffer[60] = "";
+					char numBuffer[60] = "";
+
+					strcat_s(buffer, "positionTrigger:");
+					_itoa_s(i + 1, numBuffer, 10);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", xCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", yCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+
+					sendAutomationMessage(buffer);
+
+					lastUpdate = time(NULL);
+
+					break;
+				}
+			}
 		}
 	}
 }
@@ -546,6 +655,23 @@ int main(int argc, char* argv[])
 	initStatic();
 	
 	bool running = false;
+	bool mapTrack = false;
+	bool positionTrigger = false;
+
+	if (argc > 1) {
+		mapTrack = (strcmp(argv[1], "-Map") == 0);
+
+		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		if (positionTrigger) {
+			for (int i = 2; i < (argc - 1); i = i + 2) {
+				xCoordinates[numCoordinates] = (float)atof(argv[i]);
+				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+
+				numCoordinates += 1;
+			}
+		}
+	}
 
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -555,41 +681,52 @@ int main(int argc, char* argv[])
 	int safety = 200;
 
 	while (true) {
-		if (!running)
-			running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
+		if (mapTrack) {
+			if (!writeCoordinates())
+				break;
+		}
+		else if (positionTrigger)
+			checkCoordinates();
+		else {
+			if (!running)
+				running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
 
-		if (running) {
-			if (pf->speedKmh > 120)
+			if (running) {
+				if (pf->speedKmh > 120)
+					safety = 200;
+
+				if ((safety-- <= 0) && !waitYellowFlagState)
+					running = false;
+			}
+			else if ((safety <= 0) && (pf->speedKmh > 120)) {
+				running = true;
 				safety = 200;
-
-			if ((safety-- <= 0) && !waitYellowFlagState)
-				running = false;
-		}
-		else if ((safety <= 0) && (pf->speedKmh > 120)) {
-			running = true;
-			safety = 200;
-		}
-
-		if (running) {
-			if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
-				sessionDuration = gf->sessionTimeLeft;
-
-			if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-				if (!checkFlagState() && !checkPositions())
-					checkPitWindow();
 			}
-			else {
-				lastSituation = CLEAR;
-				carBehind = false;
-				carBehindLeft = false;
-				carBehindRight = false;
-				carBehindReported = false;
 
-				lastFlagState = 0;
+			if (running) {
+				if ((sessionDuration == 0) && (gf->sessionTimeLeft > 0))
+					sessionDuration = gf->sessionTimeLeft;
+
+				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+					if (!checkFlagState() && !checkPositions())
+						checkPitWindow();
+				}
+				else {
+					lastSituation = CLEAR;
+					carBehind = false;
+					carBehindLeft = false;
+					carBehindRight = false;
+					carBehindReported = false;
+
+					lastFlagState = 0;
+				}
 			}
 		}
 
-		Sleep(50);
+		if (positionTrigger)
+			Sleep(10);
+		else
+			Sleep(50);
 	}
 
 	dismiss(m_graphics);

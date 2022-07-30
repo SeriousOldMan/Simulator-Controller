@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "irsdk_defines.h"
 #include "yaml_parser.h"
+#include <fstream>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -535,6 +536,28 @@ void readDriverInfo(const char* sessionInfo, char* carIdx, char* forName, char* 
 	}
 }
 
+bool hasTrackCoordinates = false;
+float rXCoordinates[1000];
+float rYCoordinates[1000];
+
+bool getCarCoordinates(const irsdk_header* header, const char* data, const char* sessionInfo,
+					  const int carIdx, float& coordinateX, float& coordinateY) {
+	char* trackPositions;
+
+	if (hasTrackCoordinates) {
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+			int index = min((int)round(((float*)trackPositions)[carIdx] * 1000), 999);
+
+			coordinateX = rXCoordinates[index];
+			coordinateY = rYCoordinates[index];
+
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 void writeStandings(const irsdk_header *header, const char* data)
 {
 	if (header && data)
@@ -671,9 +694,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 		if (setupOnly) {
 			printf("[Setup Data]\n");
 
-			printf("TyreCompound=Dry\n");
-			printf("TyreCompoundColor=Black\n");
-			printf("TyreSet=1\n");
+			// printf("TyreCompound=Dry\n");
+			// printf("TyreCompoundColor=Black\n");
+			// printf("TyreSet=1\n");
 
 			float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
 			float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));
@@ -714,13 +737,17 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				paused = "true";
 
-
 			printf("Active=true\n");
 			printf("Paused=%s\n", paused);
 
+			bool practice = false;
+
 			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
-				if (strstr(result, "Practice"))
+				if (strstr(result, "Practice")) {
 					printf("Session=Practice\n");
+
+					practice = true;
+				}
 				else if (strstr(result, "Qualify"))
 					printf("Session=Qualification\n");
 				else if (strstr(result, "Race"))
@@ -738,6 +765,16 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				printf("Track=Unknown\n");
 
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayName:"))
+				printf("TrackLongName=%s\n", result);
+			else
+				printf("TrackLongName=Unknown\n");
+
+			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackDisplayShortName:"))
+				printf("TrackShortName=%s\n", result);
+			else
+				printf("TrackShortName=Unknown\n");
+
 			if (getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", playerCarIdx))
 				printf("Car=%s\n", result);
 			else
@@ -747,32 +784,40 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			long timeRemaining = -1;
 			
-			if (getDataValue(result, header, data, "SessionTimeRemain")) {
-				float time = atof(result);
+			if (practice)
+				timeRemaining = 3600000;
+			else {
+				if (getDataValue(result, header, data, "SessionTimeRemain")) {
+					float time = atof(result);
 
-				if (time != -1)
-					timeRemaining = ((long)time * 1000);
+					if (time != -1)
+						timeRemaining = ((long)time * 1000);
+				}
+
+				if (timeRemaining == -1)
+					timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 			}
-
-			if (timeRemaining == -1)
-				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
 			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 
 			long lapsRemaining = -1;
 			
-			timeRemaining = -1;
+			if (practice)
+				lapsRemaining = 30;
+			else {
+				timeRemaining = -1;
 
-			if (getDataValue(result, header, data, "SessionLapsRemain"))
-				lapsRemaining = atoi(result);
+				if (getDataValue(result, header, data, "SessionLapsRemain"))
+					lapsRemaining = atoi(result);
 
-			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
-				long estTime = lastTime;
+				if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+					long estTime = lastTime;
 
-				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
-					estTime = (long)(atof(result) * 1000);
+					if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
+						estTime = (long)(atof(result) * 1000);
 
-				lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
+					lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
+				}
 			}
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
@@ -841,7 +886,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 					timeRemaining = ((long)time * 1000);
 			}
 
-			if (timeRemaining == -1)
+			if (!practice && (timeRemaining == -1))
 				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
 
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
@@ -883,6 +928,29 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			}
 
 			printf("Grip=%s\n", gripLevel);
+
+			for (int i = 1; ; i++) {
+				char posIdx[10];
+				char carIdx[10];
+
+				itoa(i, posIdx, 10);
+
+				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+					int carIndex = atoi(carIdx);
+					float coordinateX;
+					float coordinateY;
+
+					if (getCarCoordinates(header, data, sessionInfo, carIndex, coordinateX, coordinateY)) {
+						char carIdx1[10];
+
+						itoa(carIndex + 1, carIdx1, 10);
+
+						printf("Car.%s.Position=%f,%f\n", carIdx1, coordinateX, coordinateY);
+					}
+				}
+				else
+					break;
+			}
 
 			printf("[Weather Data]\n");
 
@@ -932,8 +1000,33 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 	}
 }
 
+void loadTrackCoordinates(char* fileName) {
+	std::ifstream infile(fileName);
+	int index = 0;
+
+	float x, y;
+
+	while (infile >> x >> y) {
+		rXCoordinates[index] = x;
+		rYCoordinates[index] = y;
+
+		if (++index > 999)
+			break;
+	}
+}
+
 int main(int argc, char* argv[])
 {
+	loadTrackCoordinates("D:\\Dateien\\Dokumente\\Simulator Controller\\Database\\User\\Tracks\\IRC\\oulton international.data");
+	hasTrackCoordinates = true;
+	if (argc > 1) {
+		if (strcmp(argv[1], "-Track") == 0) {
+			loadTrackCoordinates(argv[2]);
+
+			hasTrackCoordinates = true;
+		}
+	}
+
 	// bump priority up so we get time from the sim
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 

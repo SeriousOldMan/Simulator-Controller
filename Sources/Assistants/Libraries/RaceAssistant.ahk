@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Includes\Includes.ahk
+#Include ..\Libraries\JSON.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -18,6 +19,7 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceManager.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
@@ -52,6 +54,8 @@ class RaceAssistant extends ConfigurationItem {
 	iAssistantType := ""
 	iSettings := false
 	iVoiceManager := false
+
+	iMuted := false
 
 	iAnnouncements := false
 
@@ -109,7 +113,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		saveSessionState(arguments*) {
-			this.callRemote("saveSessionState", arguments*)
+			this.callRemote("callSaveSessionState", arguments*)
 		}
 	}
 
@@ -209,9 +213,19 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Speaker[] {
+	Muted[]  {
 		Get {
-			return this.VoiceManager.Speaker
+			return this.VoiceManager.Muted
+		}
+
+		Set {
+			return (this.VoiceManager.Muted := value)
+		}
+	}
+
+	Speaker[muted := false] {
+		Get {
+			return this.VoiceManager.Speaker[muted]
 		}
 	}
 
@@ -473,6 +487,16 @@ class RaceAssistant extends ConfigurationItem {
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
+			case "Activate":
+				this.clearContinuation()
+
+				this.activateRecognized(words)
+			case "Deactivate":
+				this.clearContinuation()
+
+				this.deactivateRecognized(words)
+			case "Joke":
+				this.jokeRecognized(words)
 			case "AnnouncementsOn":
 				this.clearContinuation()
 
@@ -560,6 +584,119 @@ class RaceAssistant extends ConfigurationItem {
 
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
+	}
+
+	activateRecognized(words) {
+		this.Muted := false
+
+		this.getSpeaker().speakPhrase("Roger")
+	}
+
+	deactivateRecognized(words) {
+		this.Muted := true
+
+		this.getSpeaker().speakPhrase("Okay")
+	}
+
+	jokeRecognized(words) {
+		Random rnd, 0, 4
+
+		hasJoke := (rnd > 1)
+
+		if hasJoke
+			if (this.VoiceManager.Language = "EN")
+				try {
+					URLDownloadToFile https://api.chucknorris.io/jokes/random, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					joke := JSON.parse(joke)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke.value)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else if (this.VoiceManager.Language = "DE")
+				try {
+					URLDownloadToFile http://www.hahaha.de/witze/zufallswitz.js.php, %kTempDirectory%joke.json
+
+					FileRead joke, %kTempDirectory%joke.json
+
+					html := ComObjCreate("HtmlFile")
+
+					html.write(joke)
+
+					joke := html.documentElement.innerText
+
+					joke := StrReplace(StrReplace(StrReplace(joke, "document.writeln('", ""), "`n", " "), "\", "")
+
+					index := InStr(joke, "</div")
+
+					if index
+						joke := SubStr(joke, 1, index - 1)
+
+					speaker := this.getSpeaker()
+
+					speaker.startTalk()
+
+					try {
+						speaker.speakPhrase("Joke")
+
+						speaker.speak(joke)
+					}
+					finally {
+						speaker.finishTalk()
+					}
+				}
+				catch exception {
+					hasJoke := false
+				}
+			else
+				hasJoke := false
+
+		if !hasJoke
+			this.getSpeaker().speakPhrase("NoJoke")
+	}
+
+	isNumber(word, ByRef number) {
+		static numberFragmentsLookup := false
+
+		if word is Number
+		{
+			number := word
+
+			return true
+		}
+		else {
+			if !numberFragmentsLookup {
+				fragments := this.getSpeaker().Fragments
+
+				numberFragmentsLookup := {}
+
+				for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+					numberFragmentsLookup[fragment] := index - 1
+			}
+
+			if numberFragmentsLookup.HasKey(word) {
+				number := numberFragmentsLookup[word]
+
+				return true
+			}
+			else
+				return false
+		}
 	}
 
 	setContinuation(continuation) {
@@ -955,6 +1092,24 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Wear.RR", Round(tyreWear[4]))
 		}
 
+		brakeTemperatures := string2Values(",", getConfigurationValue(data, "Car Data", "BrakeTemperature", ""))
+
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FL", Round(brakeTemperatures[1] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FR", Round(brakeTemperatures[2] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RL", Round(brakeTemperatures[3] / 10) * 10)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RR", Round(brakeTemperatures[4] / 10) * 10)
+
+		brakeWear := getConfigurationValue(data, "Car Data", "BrakeWear", "")
+
+		if (brakeWear != "") {
+			brakeWear := string2Values(",", brakeWear)
+
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FL", Round(brakeWear[1], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.FR", Round(brakeWear[2], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RL", Round(brakeWear[3], 1))
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Wear.RR", Round(brakeWear[4], 1))
+		}
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Weather", weatherNow)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Grip", getConfigurationValue(data, "Track Data", "Grip", "Green"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Temperature.Air", airTemperature)
@@ -1089,21 +1244,6 @@ printNumber(number, precision) {
 	}
 	else
 		return number
-}
-
-computeDriverName(forName, surName, nickName) {
-	name := ""
-
-	if (forName != "")
-		name .= (forName . A_Space)
-
-	if (surName != "")
-		name .= (surName . A_Space)
-
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
-
-	return Trim(name)
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {

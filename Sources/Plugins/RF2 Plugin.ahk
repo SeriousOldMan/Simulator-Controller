@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -26,8 +27,6 @@ global kRF2Plugin = "RF2"
 ;;;-------------------------------------------------------------------------;;;
 
 class RF2Plugin extends RaceAssistantSimulatorPlugin {
-	iCommandMode := "Event"
-
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
@@ -46,10 +45,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
 
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
-
-		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
-		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		if (this.Active || isDebug()) {
+			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
+			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+		}
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
@@ -84,40 +83,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	activateRF2Window() {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			window := this.Simulator.WindowTitle
-
-			if !WinActive(window)
-				WinActivate %window%
-		}
-	}
-
-	sendWindowCommand(command) {
-		switch this.iCommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
-		}
-
-		Sleep 20
-	}
-
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
 		if this.OpenPitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateRF2Window()
+				this.activateWindow()
 
-				this.sendWindowCommand(this.OpenPitstopMFDHotkey)
+				this.sendCommand(this.OpenPitstopMFDHotkey)
 
 				return true
 			}
@@ -141,9 +114,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 		if this.ClosePitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				this.activateRF2Window()
+				this.activateWindow()
 
-				this.sendWindowCommand(this.ClosePitstopMFDHotkey)
+				this.sendCommand(this.ClosePitstopMFDHotkey)
 			}
 		}
 		else if !reported {
@@ -200,6 +173,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
+	supportsTrackMap() {
+		return true
+	}
+
 	supportsSetupImport() {
 		return true
 	}
@@ -219,7 +196,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				case "Tyre Compound":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					return [getConfigurationValue(data, "Setup Data", "TyreCompound", 0), getConfigurationValue(data, "Setup Data", "TyreCompoundColor", 0)]
+					compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw")
+					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track
+																		, compound, "Dry")
+					compoundColor := false
+
+					splitCompound(compound, compound, compoundColor)
+
+					return [compound, compoundColor]
 				case "Repair Suspension":
 					data := readSimulatorData(this.Code, "-Setup")
 
@@ -237,25 +221,38 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		if compound {
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound, compoundColor)
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
-			if set
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+		if compound {
+			compound := this.tyreCompoundCode(compound, compoundColor)
+
+			if compound {
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+
+				if set
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+			}
 		}
 		else
 			this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+
 		if (repairBodywork && repairSuspension)
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
 		else if repairSuspension
@@ -267,6 +264,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		base.requestPitstopDriver(pitstopNumber, driver)
+
 		if driver {
 			driver := string2Values("|", driver)
 
@@ -275,6 +274,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			Loop % Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
 		}
+	}
+
+	updateSessionData(data) {
+		base.updateSessionData(data)
+
+		if !getConfigurationValue(data, "Stint Data", "InPit", false)
+			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setConfigurationValue(data, "Session Data", "Paused", true)
 	}
 
 	updatePositionsData(data) {
@@ -292,7 +299,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startRF2() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).Simulator, "Simulator Splash Images\RF2 Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).Simulator
+													 , "Simulator Splash Images\RF2 Splash.jpg")
 }
 
 

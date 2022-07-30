@@ -218,6 +218,8 @@ int main(int argc, char* argv[])
 		printNAData("TC", gf->TC);
 		printNAData("ABS", gf->ABS);
 
+		printData("Ignition", pf->ignitionOn ? "true" : "false");
+
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
 		printData("FuelRemaining", pf->fuel);
@@ -226,6 +228,11 @@ int main(int argc, char* argv[])
 		printData("TyreSet", gf->currentTyreSet);
 		printData("TyreTemperature", pf->tyreCoreTemperature);
 		printData("TyrePressure", pf->wheelsPressure);
+		printData("BrakeTemperature", pf->brakeTemp);
+		printData("BrakePadLifeRaw", pf->padLife);
+		printData("BrakeDiscLifeRaw", pf->discLife);
+		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
+		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 	}
 
 	if ((argc == 1) || (argv[1][0] == 'D'))
@@ -248,16 +255,21 @@ int main(int argc, char* argv[])
 		printData("GapAhead", gf->gapAhead);
 		printData("GapBehind", gf->gapBehind);
 
-		double timeLeft = gf->sessionTimeLeft;
-
-		if (timeLeft < 0) {
-			timeLeft = 3600.0 * 1000;
+		if (gf->session == AC_PRACTICE) {
+			printData("StintTimeRemaining", 3600000);
+			printData("DriverTimeRemaining", 3600000);
 		}
+		else {
+			double timeLeft = gf->sessionTimeLeft;
 
-		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
-		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
+			if (timeLeft < 0) {
+				timeLeft = 3600.0 * 1000;
+			}
+
+			printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
+			printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
+		}
 		printData("InPit", gf->isInPit ? "true" : "false");
-
 	}
 
 	if ((argc == 1) || strchr(argv[1], 'T'))
@@ -269,6 +281,11 @@ int main(int argc, char* argv[])
 
 		printData("Temperature", pf->roadTemp);
 		printData("Grip", getGrip(gf->trackGripStatus));
+
+		for (int id = 0; id < gf->activeCars; id++) {
+			wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+		}
 	}
 	
 	if ((argc == 1) || (argv[1][0] == 'W'))
@@ -299,15 +316,20 @@ int main(int argc, char* argv[])
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
-		double timeLeft = gf->sessionTimeLeft;
-
-		if (timeLeft < 0) {
-			timeLeft = 3600.0 * 1000;
+		if (gf->session == AC_PRACTICE) {
+			printData("SessionTimeRemaining", 3600000);
+			printData("SessionLapsRemaining", 30);
 		}
-		
-		printData("SessionTimeRemaining", timeLeft);
-		printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
+		else {
+			double timeLeft = gf->sessionTimeLeft;
 
+			if (timeLeft < 0) {
+				timeLeft = 3600.0 * 1000;
+			}
+
+			printData("SessionTimeRemaining", timeLeft);
+			printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
+		}
 	}
 
 	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))

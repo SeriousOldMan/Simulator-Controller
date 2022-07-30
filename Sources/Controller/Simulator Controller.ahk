@@ -421,6 +421,8 @@ class GuiFunctionController extends FunctionController {
 }
 
 class SimulatorController extends ConfigurationItem {
+	iID := false
+
 	iStarted := false
 
 	iSettings := false
@@ -441,6 +443,12 @@ class SimulatorController extends ConfigurationItem {
 
 	iShowLogo := false
 	iLogoIsVisible := false
+
+	ID[] {
+		Get {
+			return this.iID
+		}
+	}
 
 	Settings[] {
 		Get {
@@ -529,6 +537,10 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
+		FileRead identifier, % kUserConfigDirectory . "ID"
+
+		this.iID := identifier
+
 		SimulatorController.Controller := this
 
 		this.iSettings := settings
@@ -701,15 +713,27 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	runningSimulator() {
-		for ignore, thePlugin in this.Plugins
-			if this.isActive(thePlugin) {
-				simulator := thePlugin.runningSimulator()
+		static lastSimulator := false
+		static lastCheck := 0
 
-				if (simulator != false)
-					return simulator
-			}
+		if (A_TickCount + (lastCheck + 10000)) {
+			lastSimulator := false
 
-		return false
+			for ignore, thePlugin in this.Plugins
+				if this.isActive(thePlugin) {
+					simulator := thePlugin.runningSimulator()
+
+					if (simulator != false) {
+						lastSimulator := simulator
+
+						break
+					}
+				}
+
+			lastCheck := A_TickCount
+		}
+
+		return lastSimulator
 	}
 
 	simulatorStartup(simulator) {
@@ -1405,8 +1429,9 @@ class ControllerPlugin extends Plugin {
 
 		base.__New(name, configuration)
 
-		if register
-			controller.registerPlugin(this)
+		if (this.Active || isDebug())
+			if register
+				controller.registerPlugin(this)
 	}
 
 	findMode(name) {
@@ -1483,7 +1508,7 @@ class ControllerPlugin extends Plugin {
 
 	getLabel(descriptor, default := false) {
 		if !this.sLabelsDatabase
-			this.sLabelsDatabase := getControllerActionLabels()
+			ControllerPlugin.sLabelsDatabase := getControllerActionLabels()
 
 		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
 
@@ -1495,7 +1520,7 @@ class ControllerPlugin extends Plugin {
 
 	getIcon(descriptor, default := false) {
 		if !this.sIconsDatabase
-			this.sIconsDatabase := getControllerActionIcons()
+			ControllerPlugin.sIconsDatabase := getControllerActionIcons()
 
 		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
 
@@ -1702,10 +1727,29 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger) {
+	static pending := false
+
 	protectionOn(true, true)
 
 	try {
-		function.Controller.fireActions(function, trigger)
+		if pending
+			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
+		else {
+			pending := []
+
+			try {
+				function.Controller.fireActions(function, trigger)
+
+				while (pending.Length() > 0) {
+					callable := pending.RemoveAt(1)
+
+					%callable%()
+				}
+			}
+			finally {
+				pending := false
+			}
+		}
 	}
 	finally {
 		protectionOff(true, true)
@@ -1848,9 +1892,14 @@ initializeSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
 
-	settings := readConfiguration(kSimulatorSettingsFile)
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
 
-	updateTrayMessageState(settings)
+	installSupportMenu()
+
+	SetKeyDelay 5, 25
+
+	settings := readConfiguration(kSimulatorSettingsFile)
 
 	argIndex := inList(A_Args, "-Voice")
 	voice := false
@@ -1881,6 +1930,11 @@ initializeSimulatorController() {
 
 	registerEventHandler("Controller", "functionEventHandler")
 	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 startupSimulatorController() {
@@ -1896,6 +1950,8 @@ startupSimulatorController() {
 		ExitApp 0
 
 	SetTimer externalCommandManager, -5000
+
+	updateTrayMessageState(controller.Settings)
 
 	controller.startup()
 }
@@ -2022,5 +2078,5 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                       Initialization Section Part 2                     ;;;
 ;;;-------------------------------------------------------------------------;;;
-setDebug(false)
+
 startupSimulatorController()

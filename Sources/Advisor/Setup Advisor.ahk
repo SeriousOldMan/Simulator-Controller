@@ -288,7 +288,7 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w1184 cBlue Center gopenAdvisorDocumentation, % translate("Setup Advisor")
+		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenAdvisorDocumentation, % translate("Setup Advisor")
 
 		Gui %window%:Add, Text, x8 yp+30 w1200 0x10 Section
 
@@ -1900,7 +1900,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w784 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
+		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
 
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -2437,7 +2437,7 @@ class SetupComparator extends ConfigurationItem {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, YP+20 w784 cBlue Center gopenComparatorDocumentation, % translate("Setup Comparator")
+		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenComparatorDocumentation, % translate("Setup Comparator")
 
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -2892,6 +2892,12 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
+exitFixIE(previous) {
+	fixIE(previous)
+
+	return false
+}
+
 initializeSlider(slider1, value1, slider2, value2) {
 	window := SetupAdvisor.Instance.Window
 
@@ -2937,7 +2943,7 @@ loadSetup() {
 	title := translate("Load Setup...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
 	FileSelectFile fileName, 1, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")
@@ -2950,7 +2956,7 @@ saveSetup() {
 	title := translate("Save Setup...")
 
 	Gui +OwnDialogs
-		
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
 	FileSelectFile fileName, S17, , %title%, Setup (*.setup)
 	OnMessage(0x44, "")
@@ -3134,6 +3140,11 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
+
 	simulator := false
 	car := false
 	track := false
@@ -3162,40 +3173,42 @@ runSetupAdvisor() {
 
 	current := fixIE(11)
 
-	try {
-		if car
-			car := new SessionDatabase().getCarName(simulator, car)
+	OnExit(Func("exitFixIE").Bind(current))
 
-		advisor := new SetupAdvisor(simulator, car, track, weather)
+	if car
+		car := new SessionDatabase().getCarName(simulator, car)
 
-		advisor.createGui(advisor.Configuration)
+	advisor := new SetupAdvisor(simulator, car, track, weather)
 
-		advisor.show()
+	advisor.createGui(advisor.Configuration)
 
-		if !GetKeyState("Ctrl", "P")
-			if simulator {
-				advisor.loadSimulator(simulator, true)
+	advisor.show()
 
-				if inList(advisor.AvailableCars, car)
-					advisor.loadCar(car)
+	if !GetKeyState("Ctrl", "P")
+		if simulator {
+			advisor.loadSimulator(simulator, true)
 
-				if track
-					advisor.loadTrack(track)
+			if inList(advisor.AvailableCars, car)
+				advisor.loadCar(car)
 
-				if weather
-					advisor.loadWeather(weather)
-			}
-			else
-				advisor.loadSimulator(true, true)
-		else {
-			callback := ObjBindMethod(advisor, "restoreState")
+			if track
+				advisor.loadTrack(track)
 
-			SetTimer %callback%, -50
+			if weather
+				advisor.loadWeather(weather)
 		}
+		else
+			advisor.loadSimulator(true, true)
+	else {
+		callback := ObjBindMethod(advisor, "restoreState")
+
+		SetTimer %callback%, -50
 	}
-	finally {
-		; fixIE(current)
-	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

@@ -362,6 +362,13 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
+closeApplication(application) {
+	Process Exist, %application%.exe
+
+	if ErrorLevel
+		Process Close, %ErrorLevel%
+}
+
 launchPad(command := false, arguments*) {
 	local application
 
@@ -369,6 +376,7 @@ launchPad(command := false, arguments*) {
 
 	static toolTips
 	static executables
+	static icons
 
 	static Startup
 	static RaceReports
@@ -387,6 +395,11 @@ launchPad(command := false, arguments*) {
 
 	if (command = kClose)
 		result := kClose
+	else if (command = "Close All") {
+		for ignore, application in concatenate(kBackgroundApps, kForegroundApps)
+			if (application != "Simulator Startup")
+				closeApplication(application)
+	}
 	else if (command = "ToolTip") {
 		if toolTips.HasKey(arguments[1])
 			return translate(toolTips[arguments[1]])
@@ -414,7 +427,7 @@ launchPad(command := false, arguments*) {
 		Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-			ExitApp 0
+		 	exit()
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
@@ -430,6 +443,7 @@ launchPad(command := false, arguments*) {
 		result := false
 		toolTips := {}
 		executables := {}
+		icons := {}
 
 		toolTips["Startup"] := "Startup: Launches all components to be ready for the track."
 
@@ -458,6 +472,19 @@ launchPad(command := false, arguments*) {
 		executables["SessionDatabase"] := "Session Database.exe"
 		executables["SetupAdvisor"] := "Setup Advisor.exe"
 
+		icons["Startup"] := kIconsDirectory . "Startup.ico"
+		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
+		icons["StrategyWorkbench"] := kIconsDirectory . "Dashboard.ico"
+		icons["RaceCenter"] := kIconsDirectory . "Console.ico"
+		icons["ServerAdministration"] := kIconsDirectory . "Server Administration.ico"
+		icons["SimulatorSetup"] := kIconsDirectory . "Configuration Wand.ico"
+		icons["SimulatorConfiguration"] := kIconsDirectory . "Configuration.ico"
+		icons["SimulatorDownload"] := kIconsDirectory . "Installer.ico"
+		icons["SimulatorSettings"] := kIconsDirectory . "Settings.ico"
+		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
+		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
+		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
+
 		Gui LP:Default
 
 		Gui LP:-Border ; -Caption
@@ -465,12 +492,16 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s10 Bold, Arial
 
-		Gui LP:Add, Text, w590 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
+		Gui LP:Add, Text, w580 Center gmoveLaunchPad, % translate("Modular Simulator Controller System")
+
+		Gui LP:Font, s8 Norm, Arial
+
+		Gui LP:Add, Text, x550 YP w30, % string2Values("-", kVersion)[1]
 
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 
-		Gui LP:Add, Text, YP+20 w590 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
+		Gui LP:Add, Text, x258 YP+20 w90 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
 
 		Gui LP:Font, s8 Norm, Arial
 
@@ -503,6 +534,8 @@ launchPad(command := false, arguments*) {
 		Gui LP:Add, CheckBox, x16 yp+10 w250 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
 		Gui LP:Add, Button, x267 yp w80 h23 Default GcloseLaunchPad, % translate("Close")
 
+		Gui LP:Add, Button, x482 yp w100 h23 GcloseAll, % translate("Close All...")
+
 		OnMessage(0x0200, "WM_MOUSEMOVE")
 
 		Gui LP:Show
@@ -519,6 +552,17 @@ launchPad(command := false, arguments*) {
 
 closeLaunchPad() {
 	launchPad(kClose)
+}
+
+closeAll() {
+	title := translate("Modular Simulator Controller System")
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	MsgBox 262436, %title%, % translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		launchPad("Close All")
 }
 
 moveLaunchPad() {
@@ -555,8 +599,7 @@ openLaunchPadDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
 }
 
-WM_MOUSEMOVE()
-{
+WM_MOUSEMOVE() {
     static CurrControl
 	static PrevControl := false
 
@@ -564,7 +607,7 @@ WM_MOUSEMOVE()
 
 	if ((CurrControl != PrevControl) && !InStr(CurrControl, " "))
     {
-        ToolTip  ; Turn off any previous tooltip.
+		ToolTip
 
 		SetTimer RemoveToolTip, Off
         SetTimer DisplayToolTip, 1000
@@ -580,7 +623,7 @@ WM_MOUSEMOVE()
 		text := launchPad("ToolTip", CurrControl)
 
 		if text {
-			ToolTip %text%  ; The leading percent sign tell it to use an expression.
+			ToolTip %text%
 
 			SetTimer RemoveToolTip, 10000
 		}
@@ -594,7 +637,6 @@ WM_MOUSEMOVE()
 
 		return
 }
-
 
 watchStartupSemaphore() {
 	if (!vStartupStayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
@@ -628,10 +670,25 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	if inList(A_Args, "-NoLaunchPad")
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
+
+	noLaunch := inList(A_Args, "-NoLaunchPad")
+
+	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
 		startupSimulator()
 	else
 		launchPad()
+
+	if (!vStartupManager || vStartupManager.Finished)
+		exit()
+
+	return
+
+Exit:
+	exit()
 }
 
 playSong(songFile) {
@@ -644,6 +701,19 @@ playSong(songFile) {
 ;;;                          Event Handler Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+exit() {
+	fileName := (kTempDirectory . "Startup.semaphore")
+
+	try {
+		FileDelete %fileName%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	ExitApp 0
+}
+
 exitStartup(sayGoodBye := false) {
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
 		raiseEvent(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
@@ -652,6 +722,9 @@ exitStartup(sayGoodBye := false) {
 	}
 	else {
 		Hotkey Escape, Off
+
+		if vStartupManager
+			vStartupManager.cancelStartup()
 
 		fileName := (kTempDirectory . "Startup.semaphore")
 
@@ -663,7 +736,7 @@ exitStartup(sayGoodBye := false) {
 		}
 
 		if !vStartupStayOpen
-			ExitApp 0
+			exit()
 	}
 }
 
@@ -709,6 +782,8 @@ try {
 		else {
 			if (vSimulatorControllerPID != 0)
 				raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
+
+			vStartupManager.hideSplashTheme()
 
 			exitStartup(true)
 		}

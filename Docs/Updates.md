@@ -1,6 +1,6 @@
 Before we start, an important information for *First Time Users*: If you install Simulator Controller for the first time, you can skip the information below for the moment, as long, as you don't want to use voice control. Most of the stuff below is only important for users, that already configured their local installation and will want to keep this configuration information, but also want to integrate all the new features as well.
 
-Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
+Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
 ***
 
@@ -41,7 +41,64 @@ When the automated update procedure runs, there are some standard task, that are
 The update procedure itself is handled by the application *Simulator Tools*. It is autmatically started and the other application, which detected the need for the update will wait, until the update finished successfully. You might want to start *Simulator Tools* manually, but in this case, it will also try to perform other maintenance tasks as well, which might result in warning messages, if your distribution is not configured for development. But you can safely ignore those warnings about missing compiler and so on, nothing harmful will happen.
 Although the code, that handles all the update tasks, is integrated into *Simulator Tools*, the activation and, much more important, the dependencies are defined in the *Simulator Tools.targets* file. I do not recommend to change the contents of this file, but it might be helpful to take a look into the update rules, to get a better understanding of the things behind the curtain.
 
-Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
+Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this..
+
+## Release 4.2.6
+
+A couple of things to do for you for this update:
+
+1. Unfortunately, this update will once again delete the track maps for *Assetto Corsa*, *Autommobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*. This has become necessary, since the coordinate system transformation was reversed, so that the track maps were mirrored. All automations created for these simulators are invalid as well.
+
+2. A new preset "Muted Race Spotter" has been added to "Simulator Setup", which let you use the track mapping and track automation services provided by the Spotter, although you are using a different software as a Spotter in your setup.
+
+3. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType". You must adopt your configuration, if you have used this function.
+
+4. The actions "BrakeTemperatures" and "BreakeWear" have been added to the "Race Engineer" plugin. You can add it to your configuration, if you want to get these informations by the press of a button on your controller (but they are available as voice commands as well). If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icons for the new "BrakeTemperatures" and "BreakeWear" actions will be available to you.
+
+***
+
+## Release 4.2.5
+
+Updates are automatic. Please note, that all recorded track images will be deleted, since the mapping information has changed for the new automation feature. They will be automatically recreated, after you have driven a few laps on each track.
+
+A "TrackAutomation" action has been added to the "Race Spotter" plugin. You must add it to your configuration, if you want the new track events automation feature. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icon for the new "TrackAutomation" action will be available to you.
+
+IMPORTANT for *iRacing* users: The identification of the *iRacing* simulator main window has changed. If you want to use the new track automation feature, you must change your configuration as well. Do the following:
+
+1. If you are still using "Simulator Setup" for all your configuration tasks, simply recreate a configuration. Done.
+2. If you use "Simulator Configuration", go to the "Applications" tab, select the "iRacing" application and set the Window title to "ahk_exe iRacingSim64DX11.exe". Save and Done.
+
+***
+
+## Release 4.2.4
+
+Configuration updates are automatic, including a complete and possibly time-cosuming reconfiguration of all data for *rFactor 2*.
+
+This release brings a new integration for *Project CARS 2*. A corresponding plugin will be added as disabled to your configuration, but you still have to create the application entry in "Simulator Configuration" and you must enable the plugin. See the [plugin documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pcars2) for more details. Although, if you are still using "Simulator Setup", rerun it and everything will be configured automatically.
+
+The other major change in this release that requires your attention is the introduction of a tyre compound meta model for all simulators. Please read the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) carefully. It contains instructions, what to do, if you want to use this feature. If you are only racing in *Assetto Corsa Competizione*, you can skip this safely, because only *Dry* and *Wet* tyres are available here. So the choice is easy. 
+
+A "TyreCompound" action has beend added to the *RaceRoom Racing Experience* plugin. You may want to add it to your configuration. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the icons for the new "TyreCompound" action will be available to you.
+
+***
+
+## Release 4.2.3
+
+Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings. If you have used the icon set preset for Stream Deck, remove it from the preset list and reassign it, so that the modified request action names come into effect.
+
+***
+
+## Release 4.2.2
+
+Nothing to do regarding the configuration update, but:
+
+  1. A minor bug in 4.2.1 may have created unnecessary folders in the Session Database, when you have used AC and directly aftwards ACC. These folders will show up as cars from AC in the ACC collection and vice versa, for example in the "Strategy Workbench". Go to the [Documents]\Simulator Controller\User\ACC folder and simply delete these alien folders. Do the same for [Documents]\Simulator Controller\User\AC, if necessary.
+
+  2. The Team Server has been updated to support the storage of owner IDs for all collected data. If you run your own Team Server, make sure to update the binaries, before connecting with any of the applications of the current release. The database structure is unchanged, therefore you can still use your current database file.
+
+  3. The action "TyreChange" is no longer available for the "AMS2" plugin. It has been replaced by "TyreCompound". Two more actions ("Strategy" and "DriverSwap") are available now. You may want to update your configuration and your controller bindings.
+
+***
 
 ## Release 4.2.1
 
@@ -129,7 +186,7 @@ Please note, that from now on, only the changed items in translatable configurat
 
 Update is handled automatically, but you may want to check the possibilities of the new cloud based voice recognition. Details can be found in the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
-The assistant grammars has been modified with this release for the new voice recognition functionalities. Therefore, if you have modified or extended the grammar files of the race assistants, please check the original files and incorporate those changes into your own versions. A new placeholder variable "(Digit)" has been introduced for single-digit numbers. Use it whereever possible, it will increase recognition performance. The usage of "(Number)" for values between 0 and 100 is discouraged where not necessary.
+The Assistant grammars has been modified with this release for the new voice recognition functionalities. Therefore, if you have modified or extended the grammar files of the Race Assistants, please check the original files and incorporate those changes into your own versions. A new placeholder variable "(Digit)" has been introduced for single-digit numbers. Use it whereever possible, it will increase recognition performance. The usage of "(Number)" for values between 0 and 100 is discouraged where not necessary.
 
 ***
 
@@ -185,7 +242,7 @@ Everything is handled automatically, but you might want to have a look at new pl
 
 ## Release 3.8.6
 
-This release introduces the new Virtual Race Spotter. A new [plugin "Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) will be added to your configuration, but it will be initially deactivated. Beside that, it is now possible to control volume, pitch and speech rate for each assistant individually by using the new [plugin parameter "raceAssistantSpeakerVocalics"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A higher speech rate (speed) will be especially helpful for the Spotter.
+This release introduces the new Virtual Race Spotter. A new [plugin "Race Spotter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) will be added to your configuration, but it will be initially deactivated. Beside that, it is now possible to control volume, pitch and speech rate for each Assistant individually by using the new [plugin parameter "raceAssistantSpeakerVocalics"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A higher speech rate (speed) will be especially helpful for the Spotter.
 
 A new action label and action icon slot has been introduced for the Spotter. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
 
@@ -335,7 +392,7 @@ This release is all about speech synthesis - and it took a great step forward.
 
   - A lot of new plugin parameters has been introduced for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and most of the present parameters have been renamed. The renaming will be handled by the automated update procedure, but you might want to take a look at the documentation and integrate the new functions into your Controller configuration.
   - All these new actions may also be used in the configuration for the ["Pitstop" modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) of all the simulator plugins or for the new ["Assistant" modes}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant), which have been introduced with this release. You may want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation), if you use these new modes, so that they are automatically activated during a race or practice session.
-  - Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused race assistant. Nothing to do here, but you should be aware of this new behaviour.
+  - Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused Race Assistant. Nothing to do here, but you should be aware of this new behaviour.
   - New images for the repair options in the *RaceRoom Racing Experience* Pitstop MFD have been introduced. If you created your own images for your local screen resolution and language choice, you need to images for the new options as well ("Bodywork Damage", "Bodywork Damage Selected", "Rear Damage" and "Rear Damage Selected").
 
 ***
@@ -370,7 +427,7 @@ Please take note of the following:
 
 This release takes the next step for Cato, the Virtual Race Strategist and introduces integrations for iRacing, rFactor 2 and RaceRoom Racing Experience. Nothing to do here on your side. Small adaptions may be necessary for:
 
-  - A new plugin parameter *raceStrategist* has been implemented for the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), which allows you to enable or disble the assistant from your controller hardware. Maybe you want to add this parameter to your configuration.
+  - A new plugin parameter *raceStrategist* has been implemented for the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), which allows you to enable or disble the Assistant from your controller hardware. Maybe you want to add this parameter to your configuration.
   - [For Developers]: The class *RaceEngineerSimulatorPlugin* has been renamed to *RaceAssistantSimulatorPlugin* the methods *getAction* and *fireAction* of the class *SimulatorController* have been renamed to *getActions* and *fireActions* and now support multiple actions for one controller function.
   
 Note: Beginning with this release, the source code is no longer part of the distribution to save some space. But you can always load the sources from GitHub, if required.
@@ -379,7 +436,7 @@ Note: Beginning with this release, the source code is no longer part of the dist
 
 ## Release 3.1.0
 
-Release 3.1 introduces a new assistant, Cato, the Virtual Race Strategist. The new assistant, although fully integrated already, does not do anything useful yet (you can ask for info about the remaining laps and upcoming weather changes for demo purposes, though), so you can ignore it for the moment. But to integrate the new assistant in Simulator Controller, a lot of small changes were necessary:
+Release 3.1 introduces a new Assistant, Cato, the Virtual Race Strategist. The new Assistant, although fully integrated already, does not do anything useful yet (you can ask for info about the remaining laps and upcoming weather changes for demo purposes, though), so you can ignore it for the moment. But to integrate the new Assistant in Simulator Controller, a lot of small changes were necessary:
 
   - The voice handling framework now supports multiple different active communication partners. Each one must have an activation command to *focus* the voice recognition for this communication partner (see the [new documentation for voice control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information).
   - A new plugin has been created for the control of the new Virtual Race Strategist. Please take a look at the documentation of the ["Race Strategist" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for more information. This plugin will be added automatically to your configuration, but it will be deactivated by default.

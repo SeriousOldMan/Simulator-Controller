@@ -2,11 +2,11 @@
 
 Welcome to Jona, the world first fully interactive and AI-based Virtual Race Engineer for race car simulations.
 
-Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience* and *iRacing* are supported, although the support for *RaceRoom Racing Experience* and also *iRacing* is somewhat limited).
+Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge about racing. It uses the telemetry data provided by a simulation game and a large domain specific rule set to derive its knowledge from there. Using this knowledge, Jona can give you information about the current state of your car (temperatures, pressures, remaining laps, upcoming pitstops, and so on), and can recommend settings for the next pitstop. Currently, Jona supports the *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing*, *Automobilista 2* and *Project CARS 2* simulation games through their respective plugins. Using the Pitstop MFD handling for *Assetto Corsa Competizione* introduced with [Release 2.0](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-20), Jona is even capable to setup a pitstop without user interaction completely on its own. Step by step, this will be made available for all simulations, where this is possible (currently *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience* and *iRacing* are supported, although the support for *RaceRoom Racing Experience* and also *iRacing* is somewhat limited).
 
 ***
 
-Before we head on, an important note: Depending on the simulation, the race assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a race engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 
@@ -18,7 +18,7 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 ### A typical dialog
 
-**Jona: "Hi, here is Jona, your race engineer today. You can call me anytime if you have questions. Good luck."**
+**Jona: "Hi, here is Jona, your Race Engineer today. You can call me anytime if you have questions. Good luck."**
 
 (You hear this or a similar phrase, whenever Jona is ready to interact with you. Typically this is at the beginning of the second lap in a session. From now on Jona might call you, when important information is available, or you can call her/him anytime using one of the key phrases - see the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#phrase-grammars) on that.)
 
@@ -110,11 +110,25 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 ### Installation of Telemetry Providers
 
-Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In most cases these are already included in Simulator Controller and there is nothing to do, but for *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip* or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. A Readme file is included. For *Automobilista 2*, you have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
+Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
+
+Please, note that all of this also applices to all other Virtual Race Assistants, but  you have to do it only once, of course.
+
+  1. *Assetto Corsa*
+  
+     Please copy the complete *SimlatorController* folder, which is located in the *Utilities\Plugins* folder of the Simulator Controller installation, to the Steam installation folder of *Assetto Corsa* and there into the *apps\python* folder. You will have to enable this plugin in the *Asseto Corsa* settings afterwards. This plugin uses code originally developed by *Sparten* which can be found at [GitHub](https://github.com/Sparten/ACInternalMemoryReader).
+  
+  2. *rFactor 2*
+  
+     You can find the plugin *rFactor2SharedMemoryMapPlugin64.dll* in *Utilities\Plugins* folder the Simulator Controller installation or you can load the [latest version](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) from GitHub. Copy the DLL file to the *Bin64\Plugins* folder in the Steam installation directory of *rFactor 2*.
+
+  3. *Automobilista 2* and *Project CARS 2*
+  
+     You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
 
 ### Important preparation for the Pitstop MFD handling in *Assetto Corsa Competizione* and *RaceRoom Racing Experience*
 
-Jona can control the pitstop settings, as you have seen in the dialog transcript above. Generally, this can be handled in the different simulation games using an API integration, with the exception of *Assetto Corsa Competizione* and *RaceRoom Racing Experience*. In the later cases, a special procedure using image recognition has been developed. Please see the documentation for the required special preparation steps for [*Assetto Corsa Competizione*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
+Jona can control the pitstop settings, as you have seen in the dialog transcript above. Generally, this can be handled in the different simulation games using an API integration, with the exception of *Assetto Corsa Competizione* and *RaceRoom Racing Experience*. In the later cases, a special procedure using image recognition has been developed. Please see the documentation for the special preparation steps for [*Assetto Corsa Competizione*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and [*RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1) that might be necessary.
 
 ## Interacting with Jona
 
@@ -151,9 +165,9 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 	[Speaker Phrases]
 	// Conversation //
-	Greeting.1=Hi, I am %name%, your race engineer today. You can call me anytime if you have questions. Good luck.
-	Greeting.2=Here is %name%. I am your race engineer for this session. Call me anytime.
-	Greeting.3=Here is %name%, your race engineer. Have a great session.
+	Greeting.1=Hi, I am %name%, your Race Engineer today. You can call me anytime if you have questions. Good luck.
+	Greeting.2=Here is %name%. I am your Race Engineer for this session. Call me anytime.
+	Greeting.3=Here is %name%, your Race Engineer. Have a great session.
 	IHearYou.1=I am here. What can I do for you?
 	IHearYou.2=Yeah? Have you called me?
 	IHearYou.3=I hear you. Go on.
@@ -166,17 +180,31 @@ For the reactions of Jona, the format is much more simple. It looks like this:
 
 As you can see here, each phrase provides different alternative sentences. Variables may be used here as well.
 
-I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
+#### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(DE))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
 ### Enabling and disabling specific warnings and announcements
 
-Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings by using a special voice command:
+Jona will give you a lot of information about fuel level, damages after an accident, and so on. You may disable these warnings individually by using a special voice command:
 
 	[Please] No more *warning* [please]
 
-As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the Assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] Give me *warning* [please]
+
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
 
 ## Racing with Jona
 
@@ -294,7 +322,7 @@ The details about the installation, configuration and usage of the *Team Server*
 
 ### The Pitstop
 
-The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing* and *Automobilista 2*.
+The process of the pitstop handling differs between the various supported simulations. Below you will find some simulation specific hints. Please note, that pitstop handling is currently available for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing*, *Automobilista 2* and *Project CARS 2*.
 
 The pitstop is handled by Jona in two phases. In the first phase, the planning phase, Jona creates a list of the necessary activities (refueling, changing tires, repairs) and gives you the chosen service tasks by radio. If you then agree with the selected services, or after you have made any necessary corrections, the settings are transferred to the simulation in the second phase, the preparation phase. After the preparation is finished, you can come to the pit anytime (depending on the simulation, it might be necessary, to activate a "Request pitstop" function as well).
 
@@ -329,11 +357,11 @@ No special setup required for *iRacing*, since this simulation has an integrated
 
 *RaceRoom Racing Experience* does not provide any data interface for initial setup information. So you must take care, that everything is entered correctly into the settings tool, before you head out onto the track. On the other hand, the support for pitstop settings is quite limited in *RaceRoom Racing Experience*, so you might skip tyre pressures and dry vs. wet tyre considerations alltogether.
 
-#### *Automobilista 2*
+#### *Automobilista 2* and *Project CARS 2*
 
-*Automobilista 2* also does not provide any data interface for initial setup information. Therefore you must take care here as well, that everything is entered correctly into the settings tool, before you head out onto the track.
+Both siimulator do not provide any data interface for initial setup information. Therefore you must take care here as well, that everything is entered correctly into the settings tool, before you head out onto the track.
 
-Furthermore, it is very important, that you do not use the *Automobilista 2* ICM yourself, while you want Jona to control the pitstop settings or want to use the "Pitstop" mode of the "AMS2" plugin. Additionally, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+Furthermore, it is very important, that you do not use the *Automobilista 2* and *Project CARS 2* ICM yourself, while you want Jona to control the pitstop settings or want to use the "Pitstop" mode of the "AMS2" plugin. Additionally, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
 
 ### How it works
 
@@ -410,7 +438,7 @@ With the dropdown menu in the lower left corner you can choose whether only your
 Important:
 
   1. If you change the scope using the dropdown menu mentioned above, this will affect only the behaviour and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values ​​by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
-  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the assistants, simply running one lap is enough.
+  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the Assistants, simply running one lap is enough.
 
 Following you will find an overview about the different database topics:
 
@@ -422,7 +450,7 @@ The Virtual Race Assistants provide many settings, as you have seen above in the
 
 When you enter a session, these default values are loaded depending on a [setting in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) and are used to initialize the race settings used for this session. You can provide setting values for each possible combination of simulator / car / track /  weather, as selected in the upper left area. When the settings are loaded, they will be loaded in the order from the least specific to the most specific, thereby allowing you to inherit settings and *overwrite* them for a more specific configuration. Let's take a look at a specific example:
 
-The race assistants use several values from the race settings to calculate how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be identical for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
+The Race Assistants use several values from the race settings to calculate how much time a specific pitstop will need - the time required to refuel the car,  to change the tyres and for entering and leaving the pits. Some values are specific for the given track, some for the car in use and even some might be identical for all cars and tracks. This is how you use the default values for these settings, you simply select the desired scope using the menus in the upper left corner and then enter the required values in the list of settings.
 
 | Settings for *all* cars and *all* tracks | Specific setting for *Hungaroring* |
 |------------------------------------------|------------------------------------|
@@ -476,7 +504,61 @@ Notes:
   1. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
 
   2. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
-  
+
+#### Automation
+
+At this page, you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
+
+#### Administration
+
+Here you can browse all available data in your session database. Data can be deleted by request and you can export data, so that it can be imported by one of your team mates or vice versa. The driver, who originally created the corresponding data will be preserved. Data of multiple drivers can be used in the strategy development using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-development). When running team races using the ["Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center), data of your team mates will be stored to your database as well.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2010.jpg)
+
+You can restrict the scope of the data in the browser using the menus in the topleft corner of the window, thereby making it possible to work with the all the available data of a given simulator or only for a single car on a single track, for example. The window above shows a list of all available cars and tracks for *Assetto Corsa Competizione* with the *Honda NSX Evo* / *Hungaroring* combination selected either for export or even for deletion.
+
+When you export data by clicking on "Export...", you will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.
+
+If you click on "Import..." you will be requested to locate this export directory. When you located a valid export directory, a window opens where you can select all data or only a fraction of the data available in the export package to be imported.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2011.jpg)
+
+Here only the *McLaren 720s* data for the *Mount Panorama* and the *Nürburgring* will be imported, when you click on "Ok".
+
+##### Importing data from other sources
+
+You can import data from foreign sources, for example telemetry information from a real car, in order to use this data in "Strategy Workbench" or in other tools of Simulator Controller, as long as the structure follows the rules:
+
+1. For the moment you have to choose one of the simulators as the home for your imported data. A future release might provide a special place for foreign data.
+2. You have to create a folder with the data to be imported.
+3. You must create a subfolder for each car and therein a subfolder for each track. The names of the cars and the names of the tracks can be chosen as you like, but it is preferred to not interfere with the names of the chosen simulator, so that the data will not be used in conjunction with already present data.
+4. Create a CSV file for each of the telemetry data type you want to import ("Electronics", "Tyres", "Tyres.Pressures", "Tyres.Pressures.Distribution"). Please take a look at a sample export for the naming conventions and the content for these files. But you may omit columns in the CSV files, if the corresponding data is not available (see next point).
+5. At the root of the export folder, you must create a "Export.info" file with the meta data. Here is an example:
+
+		[Driver]
+		123.456.789=Oliver Juwig (OJU)
+		[General]
+		Creator=123.456.789
+		Origin=123.456.789
+		Simulator=Assetto Corsa Competizione
+		[Schema]
+		Electronics=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Map,TC,ABS,Driver
+		Tyres=Weather,Temperature.Air,Temperature.Track,Tyre.Compound,Tyre.Compound.Color,Fuel.Remaining,Fuel.Consumption,Lap.Time,Tyre.Laps,Tyre.Pressure.Front.Left,Tyre.Pressure.Front.Right,Tyre.Pressure.Rear.Left,Tyre.Pressure.Rear.Right,Tyre.Temperature.Front.Left,Tyre.Temperature.Front.Right,Tyre.Temperature.Rear.Left,Tyre.Temperature.Rear.Right,Tyre.Wear.Front.Left,Tyre.Wear.Front.Right,Tyre.Wear.Rear.Left,Tyre.Wear.Rear.Right,Driver
+		Tyres.Pressures=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Tyre.Pressure.Cold.Front.Left,Tyre.Pressure.Cold.Front.Right,Tyre.Pressure.Cold.Rear.Left,Tyre.Pressure.Cold.Rear.Right,Tyre.Pressure.Hot.Front.Left,Tyre.Pressure.Hot.Front.Right,Tyre.Pressure.Hot.Rear.Left,Tyre.Pressure.Hot.Rear.Right,Driver
+		Tyres.Pressures.Distribution=Weather,Temperature.Air,Temperature.Track,Compound,Compound.Color,Type,Tyre,Pressure,Count,Driver
+
+Here is what you have to do:
+
+- For each driver, for whom you have data sets available, create a line in the "[Driver]" section. You may choose the driver id randomly, as long as the identifier follows the 3-dot scheme and is unique acroos all your drivers.
+
+- Identify the simulator, where you want the data to be imported in the "[General]" section. You can omit the *Creator* and *Origin* settings.
+
+- Describe the contents of each of your CSV file in the "[Schema]" section. As mentioned above, you can omit fields, for example the *Temperature.Track*, if not available. The values will be set to *Null* during the import, but whether you can work with this data afterwards, is not guaranted. You must provide the *Driver* field, though, otherwise the import will fail.
+
+Then start the "Session Database", select the target simulator and run the import as described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration).
+
 #### Choosing the Database location
 
 Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a gear in the upper right corner of the *Session Database* window. A file chooser will open up and allow you to select a different folder as the new database location. You will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that once you have changed the database location, you have to restart all applications.
@@ -539,7 +621,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing*, *Automobilista 2* and *Project CARS 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications like "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

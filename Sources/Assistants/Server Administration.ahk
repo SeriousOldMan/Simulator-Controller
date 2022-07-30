@@ -558,7 +558,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Font, Norm, Arial
 		Gui ADM:Font, Italic Underline, Arial
 
-		Gui ADM:Add, Text, YP+20 w388 cBlue Center gopenAdministrationDocumentation, % translate("Server Administration")
+		Gui ADM:Add, Text, x118 YP+20 w168 cBlue Center gopenAdministrationDocumentation, % translate("Server Administration")
 		
 		Gui ADM:Add, Text, x24 yp+30 w356 0x10
 
@@ -810,9 +810,17 @@ startupServerAdministration() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Server Administration
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	administrationEditor(kSimulatorConfiguration)
 	
+	ExitApp 0
+
+Exit:
 	ExitApp 0
 }
 

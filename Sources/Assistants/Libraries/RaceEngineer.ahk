@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -147,6 +148,10 @@ class RaceEngineer extends RaceAssistant {
 				this.lapInfoRecognized(words)
 			case "FuelRemaining":
 				this.fuelInfoRecognized(words)
+			case "BrakeWear":
+				this.brakeWearRecognized(words)
+			case "BrakeTemperatures":
+				this.brakeTemperaturesRecognized(words)
 			case "TyreWear":
 				this.tyreWearRecognized(words)
 			case "TyreTemperatures":
@@ -206,11 +211,17 @@ class RaceEngineer extends RaceAssistant {
 			case "PitstopNoPressureChange":
 				this.clearContinuation()
 
-				this.pitstopAdjustNoPressureRecognized(words)
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopAdjustNoPressureRecognized(words)
 			case "PitstopNoTyreChange":
 				this.clearContinuation()
 
-				this.pitstopAdjustNoTyreRecognized(words)
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else
+					this.pitstopAdjustNoTyreRecognized(words)
 			case "PitstopAdjustRepairSuspension":
 				this.clearContinuation()
 
@@ -249,7 +260,7 @@ class RaceEngineer extends RaceAssistant {
 
 		lap := knowledgeBase.getValue("Lap", 0)
 
-		if (laps == 0)
+		if (lap == 0)
 			this.getSpeaker().speakPhrase("Later")
 		else {
 			fuel := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0)
@@ -343,6 +354,78 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	brakeTemperaturesRecognized(words) {
+		local value
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+		fragments := speaker.Fragments
+
+		speaker.startTalk()
+
+		try {
+			lap := knowledgeBase.getValue("Lap")
+
+			speaker.speakPhrase("Temperatures")
+
+			speaker.speakPhrase("BrakeFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL"))
+										 , unit: fragments["Degrees"]})
+
+			speaker.speakPhrase("BrakeRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR"))
+										 , unit: fragments["Degrees"]})
+		}
+		finally {
+			speaker.finishTalk()
+		}
+	}
+
+	brakeWearRecognized(words) {
+		local value
+		local knowledgeBase := this.KnowledgeBase
+
+		if !this.hasEnoughData()
+			return
+
+		speaker := this.getSpeaker()
+
+		lap := knowledgeBase.getValue("Lap")
+		flWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FL", kUndefined)
+
+		if (flWear == kUndefined)
+			speaker.speakPhrase("NoWear")
+		else {
+			frWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.FR")
+			rlWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.RL")
+			rrWear := knowledgeBase.getValue("Lap." . lap . ".Brake.Wear.RR")
+
+			speaker.startTalk()
+
+			try {
+				speaker.speakPhrase("Wear")
+
+				speaker.speakPhrase("WearFL", {used: printNumber(flWear, 1), remaining: printNumber(100 - flWear, 1)})
+
+				speaker.speakPhrase("WearFR", {used: printNumber(frWear, 1), remaining: printNumber(100 - frWear, 1)})
+
+				speaker.speakPhrase("WearRL", {used: printNumber(rlWear, 1), remaining: printNumber(100 - rlWear, 1)})
+
+				speaker.speakPhrase("WearRR", {used: printNumber(rrWear, 1), remaining: printNumber(100 - rrWear, 1)})
+			}
+			finally {
+				speaker.finishTalk()
+			}
+		}
+	}
+
 	weatherRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
@@ -398,8 +481,7 @@ class RaceEngineer extends RaceAssistant {
 			if litresPosition {
 				litres := words[litresPosition - 1]
 
-				if litres is number
-				{
+				if this.isNumber(litres, litres) {
 					speaker.speakPhrase("ConfirmFuelChange", {litres: litres}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", litres))
@@ -454,18 +536,9 @@ class RaceEngineer extends RaceAssistant {
 		local action
 
 		static tyreTypeFragments := false
-		static numberFragmentsLookup := false
 
 		speaker := this.getSpeaker()
 		fragments := speaker.Fragments
-
-		if !tyreTypeFragments {
-			tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
-			numberFragmentsLookup := {}
-
-			for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-				numberFragmentsLookup[fragments[fragment]] := index - 1
-		}
 
 		if !this.hasPlannedPitstop() {
 			speaker.startTalk()
@@ -481,6 +554,9 @@ class RaceEngineer extends RaceAssistant {
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
+			if !tyreTypeFragments
+				tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
+
 			tyreType := false
 
 			if inList(words, fragments["Front"]) {
@@ -511,13 +587,7 @@ class RaceEngineer extends RaceAssistant {
 					psiValue := words[pointPosition - 1]
 					tenthPsiValue := words[pointPosition + 1]
 
-					if psiValue is not number
-					{
-						psiValue := numberFragmentsLookup[psiValue]
-						tenthPsiValue := numberFragmentsLookup[tenthPsiValue]
-					}
-
-					found := true
+					found := (this.isNumber(psiValue, psiValue) && this.isNumber(tenthPsiValue, tenthPsiValue))
 				}
 				else
 					for ignore, word in words {
@@ -535,15 +605,12 @@ class RaceEngineer extends RaceAssistant {
 
 							if startChar is Integer
 								if (StrLen(word) = 2) {
-									psiValue := (startChar + 0)
-									tenthPsiValue := (SubStr(word, 2, 1) + 0)
+									found := (this.isNumber(startChar, psiValue) && this.isNumber(SubStr(word, 2, 1), tenthPsiValue))
 
-									found := true
-
-									break
+									if found
+										break
 								}
 						}
-
 					}
 
 				if found {
@@ -1033,7 +1100,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
-		if this.KnowledgeBase {
+		local knowledgeBase := this.KnowledgeBase
+
+		if knowledgeBase {
 			if (this.Session == kSessionRace) {
 				Process Exist, Race Strategist.exe
 
@@ -1044,7 +1113,7 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false)) {
+			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
 				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData)
@@ -1085,11 +1154,13 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
+			if (((phase = "After") && (this.SaveSettings = kAsk)) || ((phase = "Before") && (this.SaveSettings = kAlways)))
+				if (this.Session == kSessionRace)
+					this.saveSessionSettings()
 
-			if ((this.SaveTyrePressures = ((phase = "After") ? kAsk : kAlways)) && this.HasPressureData && this.collectTyrePressures())
-				this.updateTyresDatabase()
+			if (((phase = "After") && (this.SaveTyrePressures = kAsk)) || ((phase = "Before") && (this.SaveTyrePressures = kAlways)))
+				if (this.HasPressureData && this.collectTyrePressures())
+					this.updateTyresDatabase()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -1330,11 +1401,11 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	hasPlannedPitstop() {
-		return this.KnowledgeBase.getValue("Pitstop.Planned", false)
+		return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Pitstop.Planned", false) : false)
 	}
 
 	hasPreparedPitstop() {
-		return this.KnowledgeBase.getValue("Pitstop.Prepared", false)
+		return (this.KnowledgeBase ? this.KnowledgeBase.getValue("Pitstop.Prepared", false) : false)
 	}
 
 	supportsPitstop() {
@@ -1369,6 +1440,10 @@ class RaceEngineer extends RaceAssistant {
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyreWear":
 				this.tyreWearRecognized([])
+			case "BrakeTemperatures":
+				this.brakeTemperaturesRecognized([])
+			case "BrakeWear":
+				this.brakeWearRecognized([])
 		}
 	}
 
@@ -1641,7 +1716,7 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setFact("Pitstop.Planned.Repair.Bodywork", values[1])
 			}
 
-			if this.Speaker
+			if this.Speaker[false]
 				this.getSpeaker().speakPhrase("ConfirmPlanUpdate")
 		}
 	}
@@ -1649,7 +1724,7 @@ class RaceEngineer extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if this.Speaker
+		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
 
 		if !lapNumber
@@ -1761,7 +1836,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	lowFuelWarning(remainingLaps) {
-		if (this.Speaker && this.Announcements["FuelWarning"]) {
+		if (this.Speaker[false] && this.Announcements["FuelWarning"]) {
 			speaker := this.getSpeaker()
 
 			speaker.startTalk()
@@ -1793,7 +1868,7 @@ class RaceEngineer extends RaceAssistant {
 	damageWarning(newSuspensionDamage, newBodyworkDamage) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && this.Announcements["DamageReporting"]) {
+		if (this.Speaker[false] && this.Announcements["DamageReporting"]) {
 			speaker := this.getSpeaker()
 			phrase := false
 
@@ -1824,7 +1899,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if (this.Speaker && this.Announcements["DamageAnalysis"]) {
+			if (this.Speaker[false] && this.Announcements["DamageAnalysis"]) {
 				speaker := this.getSpeaker()
 
 				stintLaps := Round(stintLaps)
@@ -1856,7 +1931,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 
 		if !ErrorLevel
-			if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+			if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1869,7 +1944,7 @@ class RaceEngineer extends RaceAssistant {
 		Process Exist, Race Strategist.exe
 
 		if (!ErrorLevel && (knowledgeBase.getValue("Lap.Remaining") > 3))
-			if (this.Speaker && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -2023,7 +2098,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, compound,
 	pressures := false
 	certainty := 1.0
 
-	if (!inList(kTyreCompounds, compound) || !inList(kTyreCompoundColors, compoundColor)) {
+	if !inList(kTyreCompounds, compound(compound, compoundColor)) {
 		compound := false
 		compoundColor := false
 	}

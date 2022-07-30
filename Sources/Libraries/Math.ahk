@@ -10,30 +10,33 @@
 ;;;-------------------------------------------------------------------------;;;
 
 minimum(numbers) {
-	min := 0
+	min := kUndefined
 
-	for ignore, number in numbers
-		min := (!min ? number : Min(min, number))
+	for ignore, value in numbers
+		if value is number
+			min := ((min == kUndefined) ? value : Min(min, value))
 
-	return min
+	return ((min == kUndefined) ? 0 : min)
 }
 
 maximum(numbers) {
-	max := 0
+	max := kUndefined
 
-	for ignore, number in numbers
-		max := (!max ? number : Max(max, number))
+	for ignore, value in numbers
+		if value is number
+			max := ((max == kUndefined) ? value : Max(max, value))
 
-	return max
+	return ((max == kUndefined) ? 0 : max)
 }
 
 average(numbers) {
 	avg := 0
 
 	for ignore, value in numbers
-		avg += value
+		if value is number
+			avg += value
 
-	count := count(numbers)
+	count := count(numbers, false)
 
 	if (count > 0)
 		return (avg / count)
@@ -47,15 +50,26 @@ stdDeviation(numbers) {
 	squareSum := 0
 
 	for ignore, value in numbers
-		squareSum += ((value - avg) * (value - avg))
+		if value is number
+			squareSum += ((value - avg) * (value - avg))
 
-	squareSum := (squareSum / count(numbers))
+	squareSum := (squareSum / count(numbers, false))
 
 	return Sqrt(squareSum)
 }
 
-count(values) {
-	return values.Length()
+count(values, null := true) {
+	if null
+		return values.Length()
+	else {
+		result := 0
+
+		for ignore, value in values
+			if (value != kNull)
+				result += 1
+
+		return result
+	}
 }
 
 linRegression(xValues, yValues, ByRef a, ByRef b) {
@@ -66,13 +80,22 @@ linRegression(xValues, yValues, ByRef a, ByRef b) {
 	divisor := 0
 
 	for index, xValue in xValues {
-		xDelta := (xValue - xAverage)
-		yDelta := (yValues[index] - yAverage)
+		if xValue is number
+		{
+			xDelta := (xValue - xAverage)
+			yDelta := (yValues[index] - yAverage)
 
-		dividend += (xDelta * yDelta)
-		divisor += (xDelta * xDelta)
+			dividend += (xDelta * yDelta)
+			divisor += (xDelta * xDelta)
+		}
 	}
 
-	b := (dividend / divisor)
-	a := (yAverage - (b * xAverage))
+	if (divisor != 0) {
+		b := (dividend / divisor)
+		a := (yAverage - (b * xAverage))
+	}
+	else {
+		a := 0
+		b := 0
+	}
 }

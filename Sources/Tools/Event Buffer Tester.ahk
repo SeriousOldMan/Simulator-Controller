@@ -185,8 +185,18 @@ runEventBufferTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Event Buffer Tester
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	selectCommand()
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

@@ -58,11 +58,9 @@ void map_close()
 }
 
 int getPlayerCarID() {
-    for (int i = 0; i < map_buffer->num_cars; i++) {
-        if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
+    for (int i = 0; i < map_buffer->num_cars; i++)
+        if (map_buffer->all_drivers_data_1[i].place == map_buffer->position)
             return i;
-         }
-    }
 
     return -1;
 }
@@ -157,27 +155,27 @@ int main(int argc, char* argv[])
 			for (int i = 1; i <= map_buffer->num_cars; ++i) {
 				r3e_driver_data vehicle = map_buffer->all_drivers_data_1[i - 1];
 
-				int carNr = vehicle.driver_info.slot_id + 1;
 				int position = vehicle.place;
 
-				wprintf_s(L"Car.%d.Nr=%d\n", carNr, carNr);
-				wprintf_s(L"Car.%d.Position=%d\n", carNr, position);
-				wprintf_s(L"Car.%d.Lap=%d\n", carNr, vehicle.completed_laps);
-				wprintf_s(L"Car.%d.Lap.Running=%f\n", carNr, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
-				wprintf_s(L"Car.%d.Lap.Valid=%s\n", carNr, vehicle.current_lap_valid ? L"true" : L"false");
+				wprintf_s(L"Car.%d.ID=%d\n", i, vehicle.driver_info.slot_id);
+				wprintf_s(L"Car.%d.Nr=%d\n", i, vehicle.driver_info.car_number);
+				wprintf_s(L"Car.%d.Position=%d\n", i, position);
+				wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
+				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));
+				wprintf_s(L"Car.%d.Lap.Valid=%s\n", i, vehicle.current_lap_valid ? L"true" : L"false");
 
 				long sector1Time = ((long)vehicle.sector_time_previous_self[0] * 1000);
 				long sector2Time = ((long)vehicle.sector_time_previous_self[1] * 1000);
 				long sector3Time = ((long)vehicle.sector_time_previous_self[2] * 1000);
 
-				wprintf_s(L"Car.%d.Time=%ld\n", carNr, sector1Time + sector2Time + sector3Time);
-				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", carNr, sector1Time, sector2Time, sector3Time);
+				wprintf_s(L"Car.%d.Time=%ld\n", i, sector1Time + sector2Time + sector3Time);
+				wprintf_s(L"Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, sector1Time, sector2Time, sector3Time);
 
 				char buffer[33];
 
 				_itoa_s(vehicle.driver_info.model_id, buffer, 32, 10);
 
-				wprintf_s(L"Car.%d.Car=%S\n", carNr, buffer);
+				wprintf_s(L"Car.%d.Car=%S\n", i, buffer);
 				
 				char* name = (char*)vehicle.driver_info.name;
 				
@@ -192,19 +190,21 @@ int main(int argc, char* argv[])
 					substring(name, surName, length + 1, strlen(name) - length - 1);
 					nickName[0] = forName[0], nickName[1] = surName[0], nickName[2] = '\0';
 
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", carNr, forName);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", carNr, surName);
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", carNr, nickName);
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, forName);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, surName);
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, nickName);
 				}
 				else {
-					wprintf_s(L"Car.%d.Driver.Forname=%S\n", carNr, name);
-					wprintf_s(L"Car.%d.Driver.Surname=%S\n", carNr, "");
-					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", carNr, "");
+					wprintf_s(L"Car.%d.Driver.Forname=%S\n", i, name);
+					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
+					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
 				}
 			}
 		}
 	}
 	else {
+		BOOL practice = FALSE;
+
 		wprintf_s(L"[Session Data]\n");
 		wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
 		if (mapped_r3e) {
@@ -213,8 +213,11 @@ int main(int argc, char* argv[])
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				wprintf_s(L"Session=Race\n");
-			else if (map_buffer->session_type == R3E_SESSION_PRACTICE)
+			else if (map_buffer->session_type == R3E_SESSION_PRACTICE) {
 				wprintf_s(L"Session=Practice\n");
+
+				practice = TRUE;
+			}
 			else
 				wprintf_s(L"Session=Other\n");
 			
@@ -227,11 +230,18 @@ int main(int argc, char* argv[])
 			wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
 			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
 
-			long timeRemaining = (getRemainingTime() * 1000);
+			if (practice) {
+				wprintf_s(L"SessionTimeRemaining=3600000\n");
 
-			wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"SessionLapsRemaining=30\n");
+			}
+			else {
+				long timeRemaining = (getRemainingTime() * 1000);
 
-			wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+				wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+
+				wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+			}
 		}
 
 		wprintf_s(L"[Car Data]\n");
@@ -246,17 +256,21 @@ int main(int argc, char* argv[])
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
-			char tyreCompoundColor[11] = "Black";
+			char tyreCompoundRaw[11] = "Unknown";
 			
-			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_SOFT)
-				strcpy_s(tyreCompoundColor, 10, "Soft");
+			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_PRIMARY)
+				strcpy_s(tyreCompoundRaw, 10, "Primary");
+			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_ALTERNATE)
+				strcpy_s(tyreCompoundRaw, 10, "Alternate");
+			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_SOFT)
+				strcpy_s(tyreCompoundRaw, 10, "Soft");
 			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_MEDIUM)
-				strcpy_s(tyreCompoundColor, 10, "Medium");
+				strcpy_s(tyreCompoundRaw, 10, "Medium");
 			else if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_HARD)
-				strcpy_s(tyreCompoundColor, 10, "Hard");
+				strcpy_s(tyreCompoundRaw, 10, "Hard");
 				
-			wprintf_s(L"TyreCompound=Dry\n");
-			wprintf_s(L"TyreCompoundColor=%S\n", tyreCompoundColor);
+			wprintf_s(L"TyreCompoundRaw=%S\n", tyreCompoundRaw);
+			
 			wprintf_s(L"TyreTemperature=%f,%f,%f,%f\n",
 				map_buffer->tire_temp[R3E_TIRE_FRONT_LEFT].current_temp[R3E_TIRE_TEMP_CENTER],
 				map_buffer->tire_temp[R3E_TIRE_FRONT_RIGHT].current_temp[R3E_TIRE_TEMP_CENTER],
@@ -275,6 +289,14 @@ int main(int argc, char* argv[])
 					(int)round(normalize(map_buffer->tire_wear[R3E_TIRE_REAR_RIGHT]) * 100));
 			else
 				wprintf_s(L"TyreWear=0,0,0,0\n");
+			if (map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp != -1)
+				wprintf_s(L"BrakeTemperature=%f,%f,%f,%f\n",
+					map_buffer->brake_temp[R3E_TIRE_FRONT_LEFT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_FRONT_RIGHT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_REAR_LEFT].current_temp,
+					map_buffer->brake_temp[R3E_TIRE_REAR_RIGHT].current_temp);
+			else
+				wprintf_s(L"BrakeTemperature=0,0,0,0\n");
 		}
 
 		wprintf_s(L"[Stint Data]\n");
@@ -312,16 +334,29 @@ int main(int argc, char* argv[])
 			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector));
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
-			long timeRemaining = (getRemainingTime() * 1000);
+			if (practice) {
+				wprintf_s(L"StintTimeRemaining=3600000\n");
+				wprintf_s(L"DriverTimeRemaining=3600000\n");
+			}
+			else {
+				long timeRemaining = (getRemainingTime() * 1000);
 
-			wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
-			wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
+			}
 			wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
 		}
 
 		wprintf_s(L"[Track Data]\n");
 		wprintf_s(L"Temperature=26\n");
 		wprintf_s(L"Grip=Optimum\n");
+
+		for (int id = 0; id < map_buffer->num_cars; id++) {
+			r3e_driver_data vehicle = map_buffer->all_drivers_data_1[id];
+
+			wprintf_s(L"Car.%d.ID=%d\n", id + 1, vehicle.driver_info.slot_id);
+			wprintf_s(L"Car.%d.Position=%f,%f\n", id + 1, vehicle.position.x, - vehicle.position.z);
+		}
 
 		wprintf_s(L"[Weather Data]\n");
 		wprintf_s(L"Temperature=24\n");

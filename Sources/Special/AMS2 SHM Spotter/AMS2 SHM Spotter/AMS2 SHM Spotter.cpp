@@ -6,6 +6,7 @@
 // Used for this example
 #include <stdio.h>
 #include <conio.h>
+#include <time.h>
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
@@ -40,11 +41,27 @@ int sendStringMessage(HWND hWnd, int wParam, char* msg) {
 	return result;
 }
 
-void sendMessage(char* message) {
+void sendSpotterMessage(char* message) {
 	HWND winHandle = FindWindowExA(0, 0, 0, "Race Spotter.exe");
 
 	if (winHandle == 0)
 		FindWindowExA(0, 0, 0, "Race Spotter.ahk");
+
+	if (winHandle != 0) {
+		char buffer[128];
+
+		strcpy_s(buffer, 128, "Race Spotter:");
+		strcpy_s(buffer + strlen("Race Spotter:"), 128 - strlen("Race Spotter:"), message);
+
+		sendStringMessage(winHandle, 0, buffer);
+	}
+}
+
+void sendAutomationMessage(char* message) {
+	HWND winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.exe");
+
+	if (winHandle == 0)
+		winHandle = FindWindowEx(0, 0, 0, L"Simulator Controller.ahk");
 
 	if (winHandle != 0) {
 		char buffer[128];
@@ -99,11 +116,13 @@ const char* computeAlert(int newSituation) {
 
 	if (lastSituation == newSituation) {
 		if (lastSituation > CLEAR) {
-			if (situationCount++ > situationRepeat) {
+			if (situationCount > situationRepeat) {
 				situationCount = 0;
 
 				alert = "Hold";
 			}
+			else
+				situationCount += 1;
 		}
 		else
 			situationCount = 0;
@@ -204,8 +223,8 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && transY < longitudinalDistance * 1.5) ||
-					(transY < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+				if ((faster && fabs(transY) < longitudinalDistance * 1.5) ||
+					(fabs(transY) < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = true;
 					else
@@ -292,7 +311,7 @@ bool checkPositions(const SharedMemory* sharedData) {
 			strcpy_s(buffer, 128, "proximityAlert:");
 			strcpy_s(buffer + strlen("proximityAlert:"), 128 - strlen("proximityAlert:"), alert);
 
-			sendMessage(buffer);
+			sendSpotterMessage(buffer);
 
 			return true;
 		}
@@ -300,8 +319,8 @@ bool checkPositions(const SharedMemory* sharedData) {
 			if (!carBehindReported) {
 				carBehindReported = true;
 
-				sendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-											(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 				return true;
 			}
@@ -322,37 +341,41 @@ bool checkPositions(const SharedMemory* sharedData) {
 
 bool checkFlagState(const SharedMemory* sharedData) {
 	if ((waitYellowFlagState & YELLOW) != 0) {
-		if (yellowCount++ > 50) {
+		if (yellowCount > 50) {
 			if (!(sharedData->mHighestFlagColour == FLAG_COLOUR_YELLOW || sharedData->mHighestFlagColour == FLAG_COLOUR_DOUBLE_YELLOW))
 				waitYellowFlagState &= ~YELLOW;
 
 			yellowCount = 0;
 
 			if ((waitYellowFlagState & YELLOW) != 0) {
-				sendMessage("yellowFlag:Ahead");
+				sendSpotterMessage("yellowFlag:Ahead");
 
 				waitYellowFlagState &= ~YELLOW;
 
 				return true;
 			}
 		}
+		else
+			yellowCount += 1;
 	}
 	else
 		yellowCount = 0;
 
 	if (sharedData->mHighestFlagColour == FLAG_COLOUR_BLUE) {
 		if ((lastFlagState & BLUE) == 0) {
-			sendMessage("blueFlag");
+			sendSpotterMessage("blueFlag");
 
 			lastFlagState |= BLUE;
 
 			return true;
 		}
-		else if (blueCount++ > 1000) {
+		else if (blueCount > 1000) {
 			lastFlagState &= ~BLUE;
 
 			blueCount = 0;
 		}
+		else
+			blueCount += 1;
 	}
 	else {
 		lastFlagState &= ~BLUE;
@@ -363,7 +386,7 @@ bool checkFlagState(const SharedMemory* sharedData) {
 	if (sharedData->mHighestFlagColour == FLAG_COLOUR_YELLOW || sharedData->mHighestFlagColour == FLAG_COLOUR_DOUBLE_YELLOW) {
 		if ((lastFlagState & YELLOW) == 0) {
 			/*
-			sendMessage("yellowFlag:Ahead");
+			sendSpotterMessage("yellowFlag:Ahead");
 
 			lastFlagState |= YELLOW;
 
@@ -377,7 +400,7 @@ bool checkFlagState(const SharedMemory* sharedData) {
 	}
 	else if ((lastFlagState & YELLOW) != 0) {
 		if (waitYellowFlagState != lastFlagState)
-			sendMessage("yellowFlag:Clear");
+			sendSpotterMessage("yellowFlag:Clear");
 
 		lastFlagState &= ~YELLOW;
 		waitYellowFlagState &= ~YELLOW;
@@ -391,20 +414,93 @@ bool checkFlagState(const SharedMemory* sharedData) {
 
 void checkPitWindow(const SharedMemory* sharedData) {
 	if (sharedData->mEnforcedPitStopLap > 0)
-		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
+		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted + 1) &&
 			!pitWindowOpenReported) {
 			pitWindowOpenReported = true;
 			pitWindowClosedReported = false;
 
-			sendMessage("pitWindow:Open");
+			sendSpotterMessage("pitWindow:Open");
 		}
 		else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
 			!pitWindowClosedReported) {
 			pitWindowClosedReported = true;
 			pitWindowOpenReported = false;
 
-			sendMessage("pitWindow:Closed");
+			sendSpotterMessage("pitWindow:Closed");
 		}
+}
+
+float initialX = 0.0;
+float initialY = 0.0;
+int coordCount = 0;
+
+bool writeCoordinates(const SharedMemory* sharedData) {
+	float velocityX = sharedData->mWorldVelocity[VEC_X];
+	float velocityY = sharedData->mWorldVelocity[VEC_Z];
+	float velocityZ = sharedData->mWorldVelocity[VEC_Y];
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int carID = sharedData->mViewedParticipantIndex;
+
+		float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
+		float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+
+		printf("%f,%f\n", coordinateX, coordinateY);
+
+		if (coordCount == 0) {
+			initialX = coordinateX;
+			initialY = coordinateY;
+		}
+		else if (coordCount > 100 && fabs(coordinateX - initialX) < 10.0 && fabs(coordinateY - initialY) < 10.0)
+			return false;
+		
+		coordCount += 1;
+	}
+
+	return true;
+}
+
+float xCoordinates[60];
+float yCoordinates[60];
+int numCoordinates = 0;
+time_t lastUpdate = 0;
+
+void checkCoordinates(const SharedMemory* sharedData) {
+	if (time(NULL) > (lastUpdate + 2)) {
+		float velocityX = sharedData->mWorldVelocity[VEC_X];
+		float velocityY = sharedData->mWorldVelocity[VEC_Z];
+		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
+
+		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+			int carID = sharedData->mViewedParticipantIndex;
+
+			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
+			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+
+			for (int i = 0; i < numCoordinates; i += 1) {
+				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
+					char buffer[60] = "";
+					char numBuffer[60];
+
+					strcat_s(buffer, "positionTrigger:");
+					_itoa_s(i + 1, numBuffer, 10);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", xCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+					strcat_s(buffer, ";");
+					sprintf_s(numBuffer, "%f", yCoordinates[i]);
+					strcat_s(buffer, numBuffer);
+
+					sendAutomationMessage(buffer);
+
+					lastUpdate = time(NULL);
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -413,24 +509,34 @@ int main(int argc, char* argv[]) {
 
 	const SharedMemory* sharedData = NULL;
 	SharedMemory* localCopy = NULL;
+	bool mapTrack = false;
+	bool positionTrigger = false;
+
+	if (argc > 1) {
+		mapTrack = (strcmp(argv[1], "-Map") == 0);
+
+		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
+
+		for (int i = 2; i < (argc - 1); i = i + 2) {
+			xCoordinates[numCoordinates] = (float)atof(argv[i]);
+			yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+
+			numCoordinates += 1;
+		}
+	}
 
 	if (fileHandle != NULL) {
 		sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
 		localCopy = new SharedMemory;
-	
+
 		if (sharedData == NULL) {
 			CloseHandle(fileHandle);
 
 			fileHandle = NULL;
 		}
-		/*
-		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
-			CloseHandle(fileHandle);
+	}
 
-			fileHandle = NULL;
-		}
-		*/
-
+	if (sharedData != NULL) {
 		//------------------------------------------------------------------------------
 		// TEST DISPLAY CODE
 		//------------------------------------------------------------------------------
@@ -438,8 +544,7 @@ int main(int argc, char* argv[]) {
 		unsigned int indexChange(0);
 
 		bool running = false;
-
-		int countdown = 4000;
+		int countdown = 400;
 
 		while (true)
 		{
@@ -461,32 +566,40 @@ int main(int argc, char* argv[]) {
 				continue;
 			}
 			
-			if (!running)
-				running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
+			if (mapTrack) {
+				if (!writeCoordinates(sharedData))
+					break;
+			}
+			else if (positionTrigger)
+				checkCoordinates(sharedData);
+			else {
+				if (!running)
+					running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
 
-			if (running) {
-				if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-					if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-						checkPitWindow(localCopy);
-				}
-				else {
-					lastSituation = CLEAR;
-					carBehind = false;
-					carBehindLeft = false;
-					carBehindRight = false;
-					carBehindReported = false;
+				if (running) {
+					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
+						if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+							checkPitWindow(localCopy);
+					}
+					else {
+						lastSituation = CLEAR;
+						carBehind = false;
+						carBehindLeft = false;
+						carBehindRight = false;
+						carBehindReported = false;
 
-					lastFlagState = 0;
+						lastFlagState = 0;
+					}
 				}
 			}
 
-			Sleep(50);
+			if (positionTrigger)
+				Sleep(10);
+			else
+				Sleep(50);
 		}
 	}
 
-	//------------------------------------------------------------------------------
-
-	// Cleanup
 	UnmapViewOfFile(sharedData);
 	CloseHandle(fileHandle);
 	delete localCopy;

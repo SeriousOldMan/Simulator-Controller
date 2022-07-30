@@ -303,6 +303,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				result := (isNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
+				hasNull := false
 
 				Loop % lapsCount
 				{
@@ -310,9 +311,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					if (!isNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
-					else if (A_Index <= 2)
-						lapTimes.Push("null")
-					else
+					else if (A_Index == lapsCount)
 						result := "DNF"
 				}
 
@@ -331,7 +330,9 @@ class RaceReportViewer extends RaceReportReader {
 
 				hasDNF := (hasDNF || (result = "DNF"))
 
-				rows.Push(Array(cars[A_Index][1], "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				nr := StrReplace(cars[A_Index][1], """", "")
+
+				rows.Push(Array(nr, "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 
@@ -532,6 +533,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			sessionDB := new SessionDatabase()
 			carIndices := []
+			maxPosition := 0
 
 			Loop % carsCount
 			{
@@ -542,6 +544,8 @@ class RaceReportViewer extends RaceReportReader {
 					if positions.HasKey(lap)
 						if (positions[lap].HasKey(car) && (positions[lap][car] != kNull) && (positions[lap][car] > 0)) {
 							valid := true
+
+							maxPosition := Max(maxPosition, positions[lap][car])
 
 							break
 						}
@@ -605,7 +609,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			if hasData {
 				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: 1, max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
 
 				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
@@ -729,18 +733,50 @@ class RaceReportViewer extends RaceReportReader {
 				driverTimes[lap] := lapTimes
 			}
 
+			invalidCars := []
+
+			for index, car in selectedCars {
+				carTimes := []
+
+				for ignore, lap in laps {
+					time := drivertimes[lap][car]
+
+					if (time != kNull)
+						carTimes.Push(time)
+				}
+
+				if (carTimes.Length() == 0)
+					invalidCars.Push(car)
+				else {
+					avg := average(carTimes)
+
+					for ignore, lap in laps
+						if (drivertimes[lap][car] = kNull)
+							drivertimes[lap][car] := avg
+				}
+			}
+
 			drawChartFunction := "function drawChart() {"
 
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 
 			cars := []
 
-			for ignore, car in selectedCars
-				cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+			offset := 0
 
-			singleChar := (selectedCars.Length() = 1)
+			for index, car in selectedCars
+				if inList(invalidCars, car) {
+					for ignore, lap in laps
+						driverTimes[lap].RemoveAt(index - offset)
 
-			if singleChar {
+					offset += 1
+				}
+				else
+					cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+
+			singleCar := (cars.Length() = 1)
+
+			if singleCar {
 				cars.Push(translate("Max"))
 				cars.Push(translate("Avg"))
 				cars.Push(translate("Min"))
@@ -786,7 +822,7 @@ class RaceReportViewer extends RaceReportReader {
 			series := ""
 			title := ""
 
-			if singleChar {
+			if singleCar {
 				consistency := 0
 
 				for ignore, time in allTimes
@@ -1054,12 +1090,12 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Font, s10 Bold, Arial
 
-		Gui RRS:Add, Text, w344 Center gmoveSettings, % translate("Modular Simulator Controller System")
+		Gui RRS:Add, Text, w351 Center gmoveSettings, % translate("Modular Simulator Controller System")
 
 		Gui RRS:Font, s9 Norm, Arial
 		Gui RRS:Font, Italic Underline, Arial
 
-		Gui RRS:Add, Text, YP+20 w344 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
+		Gui RRS:Add, Text, x136 YP+20 w104 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
 
 		Gui RRS:Font, s8 Norm, Arial
 

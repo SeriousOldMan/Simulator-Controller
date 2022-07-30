@@ -96,49 +96,48 @@ int main(int argc, char* argv[]) {
 
 			fileHandle = NULL;
 		}
-		/*
-		else if (sharedData->mVersion != SHARED_MEMORY_VERSION) {
-			CloseHandle(fileHandle);
+		else {
+			unsigned int updateIndex(0);
+			unsigned int indexChange(0);
 
-			fileHandle = NULL;
-		}
-		*/
-
-		//------------------------------------------------------------------------------
-		// TEST DISPLAY CODE
-		//------------------------------------------------------------------------------
-		unsigned int updateIndex(0);
-		unsigned int indexChange(0);
-
-		while (true)
-		{
-			if (sharedData->mSequenceNumber % 2)
+			while (true)
 			{
-				// Odd sequence number indicates, that write into the shared memory is just happening
-				continue;
+				if (sharedData->mSequenceNumber % 2)
+				{
+					// Odd sequence number indicates, that write into the shared memory is just happening
+					continue;
+				}
+
+				indexChange = sharedData->mSequenceNumber - updateIndex;
+				updateIndex = sharedData->mSequenceNumber;
+
+				//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
+				memcpy(localCopy, sharedData, sizeof(SharedMemory));
+
+				if (localCopy->mSequenceNumber != updateIndex)
+				{
+					// More writes had happened during the read. Should be rare, but can happen.
+					continue;
+				}
+
+				break;
 			}
-
-			indexChange = sharedData->mSequenceNumber - updateIndex;
-			updateIndex = sharedData->mSequenceNumber;
-
-			//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
-			memcpy(localCopy, sharedData, sizeof(SharedMemory));
-
-			if (localCopy->mSequenceNumber != updateIndex)
-			{
-				// More writes had happened during the read. Should be rare, but can happen.
-				continue;
-			}
-
-			break;
 		}
 	}
 
 	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
 		printf("[Position Data]\n");
 
-		if (fileHandle == NULL)
+		if (fileHandle == NULL) {
+			printf("Active=false\n");
+
+			return 1;
+		}
+
+		if (fileHandle == NULL) {
 			printf("Car.Count=0\n");
+			printf("Driver.Car=0\n");
+		}
 		else {
 			printf("Car.Count=%d\n", localCopy->mNumParticipants);
 			printf("Driver.Car=%d\n", localCopy->mViewedParticipantIndex + 1);
@@ -209,8 +208,15 @@ int main(int argc, char* argv[]) {
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
 		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
-		printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
-		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+
+		if (localCopy->mSessionState == SESSION_PRACTICE) {
+			printf("SessionTimeRemaining=3600000\n");
+			printf("SessionLapsRemaining=30\n");
+		}
+		else {
+			printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
+			printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+		}
 
 		printf("[Car Data]\n");
 
@@ -224,9 +230,6 @@ int main(int argc, char* argv[]) {
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
-
-		printf("TyreCompound=Dry\n");
-		printf("TyreCompoundColor=Black\n");
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
 			localCopy->mTyreTemp[TYRE_FRONT_RIGHT],
@@ -242,6 +245,18 @@ int main(int argc, char* argv[]) {
 			(int)round(localCopy->mTyreWear[TYRE_FRONT_RIGHT] * 100),
 			(int)round(localCopy->mTyreWear[TYRE_REAR_LEFT] * 100),
 			(int)round(localCopy->mTyreWear[TYRE_REAR_RIGHT] * 100));
+
+		printf("BrakeTemperature=%f,%f,%f,%f\n", localCopy->mBrakeTempCelsius[TYRE_FRONT_LEFT],
+			localCopy->mBrakeTempCelsius[TYRE_FRONT_RIGHT],
+			localCopy->mBrakeTempCelsius[TYRE_REAR_LEFT],
+			localCopy->mBrakeTempCelsius[TYRE_REAR_RIGHT]);
+
+		printf("BrakeWear=%d,%d,%d,%d\n", (int)round(localCopy->mBrakeDamage[TYRE_FRONT_LEFT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_FRONT_RIGHT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100),
+			(int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
+
+
 
 		printf("[Stint Data]\n");
 
@@ -282,13 +297,24 @@ int main(int argc, char* argv[]) {
 
 		long timeRemaining = getRemainingTime(localCopy);
 
-		printf("StintTimeRemaining=%ld\n", timeRemaining);
-		printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		if (localCopy->mSessionState == SESSION_PRACTICE) {
+			printf("StintTimeRemaining=3600000\n");
+			printf("DriverTimeRemaining=3600000\n");
+		}
+		else {
+			printf("StintTimeRemaining=%ld\n", timeRemaining);
+			printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		}
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");
 		printf("Temperature=%f\n", localCopy->mTrackTemperature);
 		printf("Grip=Optimum\n");
+
+		for (int id = 0; id < sharedData->mNumParticipants; id++)
+			printf("Car.%d.Position=%f,%f\n", id + 1,
+											  sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+											  - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
 
 		char* weather = getWeather(localCopy);
 

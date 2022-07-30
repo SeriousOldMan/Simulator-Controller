@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,47 +28,45 @@ global kIRCPlugin = "IRC"
 
 class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	iCurrentPitstopMFD := false
-	
-	iCommandMode := "Event"
-	
+
 	iPitstopFuelMFDHotkey := false
 	iPitstopTyreMFDHotkey := false
-	
+
 	PitstopFuelMFDHotkey[] {
 		Get {
 			return this.iPitstopFuelMFDHotkey
 		}
 	}
-	
+
 	PitstopTyreMFDHotkey[] {
 		Get {
 			return this.iPitstopTyreMFDHotkey
 		}
 	}
-	
+
 	__New(controller, name, simulator, configuration := false) {
 		base.__New(controller, name, simulator, configuration)
-		
-		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
-		
-		this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
-		this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
+
+		if (this.Active || isDebug()) {
+			this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
+			this.iPitstopTyreMFDHotkey := this.getArgumentValue("togglePitstopTyreMFD", false)
+		}
 	}
-	
+
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , RepairRequest: "Repair"}
 		selectActions := []
 	}
-	
+
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
 		if this.iCurrentPitstopMFD {
 			simulator := this.Code
 			arguments := values2String(";", arguments*)
-			
+
 			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-		
+
 			try {
 				if operation
 					RunWait %ComSpec% /c ""%exePath%" -%command% %operation% "%message%:%arguments%"", , Hide
@@ -78,41 +77,24 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 														   . kBinariesDirectory . translate(")"))
-					
+
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 	}
-	
-	sendWindowCommand(command) {
-		switch this.iCommandMode {
-			case "Event":
-				SendEvent %command%
-			case "Input":
-				SendInput %command%
-			case "Play":
-				SendPlay %command%
-			case "Raw":
-				SendRaw %command%
-			default:
-				Send %command%
-		}
-		
-		Sleep 20
-	}
-	
+
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 		key := false
-		
+
 		if !descriptor
 			descriptor := "Fuel"
-		
+
 		if (this.iCurrentPitstopMFD && (this.iCurrentPitstopMFD != descriptor))
 			this.closePitstopMFD()
-		
+
 		if !this.iCurrentPitstopMFD {
 			if (!descriptor || (descriptor = "Fuel"))
 				key := this.PitstopFuelMFDHotkey
@@ -120,13 +102,13 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				key := this.PitstopTyreMFDHotkey
 			else
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
-		
+
 			if key {
 				if (key != "Off") {
-					this.sendWindowCommand(key)
-				
+					this.sendCommand(key)
+
 					this.iCurrentPitstopMFD := descriptor
-					
+
 					return true
 				}
 				else
@@ -134,20 +116,20 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			else if !reported {
 				reported := true
-			
+
 				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-			
+
 				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-						  
+
 				return false
 			}
 		}
 	}
-	
+
 	closePitstopMFD() {
 		key := false
-		
+
 		if this.iCurrentPitstopMFD {
 			if (this.iCurrentPitstopMFD = "Fuel")
 				key := this.PitstopFuelMFDHotkey
@@ -155,103 +137,133 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				key := this.PitstopTyreMFDHotkey
 			else {
 				this.iCurrentPitstopMFD := false
-			
+
 				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
 			}
-			
+
 			if (key != "Off")
-				this.sendWindowCommand(key)
-			
+				this.sendCommand(key)
+
 			this.iCurrentPitstopMFD := false
 		}
 	}
-	
+
 	requirePitstopMFD() {
 		return true
 	}
-	
+
 	selectPitstopOption(option) {
 		actions := false
 		ignore := false
-		
+
 		this.getPitstopActions(actions, ignore)
-		
+
 		for ignore, candidate in actions
 			if (candidate = option)
 				return true
-			
+
 		return false
 	}
-	
+
 	changePitstopOption(option, action, steps := 1) {
 		switch option {
 			case "Refuel":
 				if (steps == 1)
 					steps := 4
-				
+
 				this.openPitstopMFD("Fuel")
-	
+
 				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
 			case "Change Tyres":
 				this.openPitstopMFD("Tyre")
-	
+
 				this.sendPitstopCommand("Pitstop", "Change", "Tyre Change", (action = kIncrease) ? "true" : "false")
 			case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 				this.openPitstopMFD("Tyre")
-	
+
 				this.sendPitstopCommand("Pitstop", "Change", option, Round(steps * 0.1 * ((action = kIncrease) ? 1 : -1), 1))
 			case "Repair":
 				this.openPitstopMFD("Fuel")
-	
+
 				this.sendPitstopCommand("Pitstop", "Change", "Repair", (action = kIncrease) ? "true" : "false")
 		}
 	}
-	
+
 	supportsPitstop() {
 		return true
 	}
-	
+
+	supportsTrackMap() {
+		return true
+	}
+
 	supportsSetupImport() {
 		return true
 	}
-	
+
+	startSession(settings, data) {
+		base.startSession(settings, data)
+
+		new SessionDatabase().registerTrack(getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "Track", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "TrackShortName", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "TrackLongName", "Unknown"))
+	}
+
 	startPitstopSetup(pitstopNumber) {
+		base.startPitstopSetup()
+
 		openPitstopMFD()
 	}
-	
+
 	finishPitstopSetup(pitstopNumber) {
+		base.finishPitstopSetup()
+
 		closePitstopMFD()
 	}
-	
+
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		base.setPitstopRefuelAmount(pitstopNumber, litres)
+
 		this.openPitstopMFD("Fuel")
-		
+
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
 	}
-	
+
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+
 		this.openPitstopMFD("Tyre")
-		
+
 		this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+
 		this.openPitstopMFD("Tyre")
-		
-		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+
+		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
+							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+
 		this.openPitstopMFD("Fuel")
-		
+
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
-	
+
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
-		
+
 		standings := readSimulatorData(this.Code, "-Standings")
-		
+
+		Loop % getConfigurationValue(standings, "Position Data", "Car.Count", 0)
+			setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr"
+								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
+
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
@@ -262,7 +274,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startIRC() {
-	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator, "Simulator Splash Images\IRC Splash.jpg")
+	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator
+													 , "Simulator Splash Images\IRC Splash.jpg")
 }
 
 
@@ -272,7 +285,7 @@ startIRC() {
 
 initializeIRCPlugin() {
 	local controller := SimulatorController.Instance
-	
+
 	new IRCPlugin(controller, kIRCPlugin, kIRCApplication, controller.Configuration)
 }
 

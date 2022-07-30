@@ -140,12 +140,23 @@ namespace RF2SHMSpotter {
 			return result;
 		}
 
-		void SendMessage(string message)
+		void SendSpotterMessage(string message)
 		{
 			int winHandle = FindWindowEx(0, 0, null, "Race Spotter.exe");
 
 			if (winHandle == 0)
 				FindWindowEx(0, 0, null, "Race Spotter.ahk");
+
+			if (winHandle != 0)
+				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
+		}
+
+		void SendAutomationMessage(string message)
+		{
+			int winHandle = FindWindowEx(0, 0, null, "Simulator Controller.exe");
+
+			if (winHandle == 0)
+				winHandle = FindWindowEx(0, 0, null, "Simulator Controller.ahk");
 
 			if (winHandle != 0)
 				SendStringMessage(winHandle, 0, "Race Spotter:" + message);
@@ -197,12 +208,14 @@ namespace RF2SHMSpotter {
 			{
 				if (lastSituation > CLEAR)
 				{
-					if (situationCount++ > situationRepeat)
+					if (situationCount > situationRepeat)
 					{
 						situationCount = 0;
 
 						alert = "Hold";
 					}
+					else
+						situationCount += 1;
 				}
 				else
 					situationCount = 0;
@@ -309,16 +322,16 @@ namespace RF2SHMSpotter {
 				rotateBy(ref transX, ref transY, angle);
 
 				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
-					return (transX > 0) ? RIGHT : LEFT;
+					return (transX < 0) ? RIGHT : LEFT;
 				else
 				{
 					if (transY < 0)
 					{
 						carBehind = true;
 
-						if ((faster && transY < longitudinalDistance * 1.5) ||
-							(transY < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
-							if (transX > 0)
+						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
+							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+							if (transX < 0)
 								carBehindRight = true;
 							else
 								carBehindLeft = true;
@@ -357,7 +370,7 @@ namespace RF2SHMSpotter {
 
 			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
 			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ;
+			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
@@ -369,7 +382,7 @@ namespace RF2SHMSpotter {
 
 				double coordinateX = playerScoring.mPos.x;
 				double coordinateY = playerScoring.mPos.y;
-				double coordinateZ = playerScoring.mPos.z;
+				double coordinateZ = (- playerScoring.mPos.z);
 				double speed = 0.0;
 
 				if (hasLastCoordinates)
@@ -394,10 +407,10 @@ namespace RF2SHMSpotter {
 
 						if (hasLastCoordinates)
 							faster = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
-												  lastCoordinates[i, 2] - vehicle.mPos.z) > speed * 1.01;
+												  lastCoordinates[i, 2] - (- vehicle.mPos.z)) > speed * 1.01;
 
 						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
-														 vehicle.mPos.x, vehicle.mPos.z, vehicle.mPos.y);
+														 vehicle.mPos.x, (- vehicle.mPos.z), vehicle.mPos.y);
 
 						if ((newSituation == THREE) && carBehind)
 							break;
@@ -410,7 +423,7 @@ namespace RF2SHMSpotter {
 
 					lastCoordinates[i, 0] = position.x;
 					lastCoordinates[i, 1] = position.y;
-					lastCoordinates[i, 2] = position.z;
+					lastCoordinates[i, 2] = (- position.z);
 				}
 
 				hasLastCoordinates = true;
@@ -430,7 +443,7 @@ namespace RF2SHMSpotter {
 					if (alert != "Hold")
 						carBehindReported = false;
 
-					SendMessage("proximityAlert:" + alert);
+					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
@@ -440,7 +453,7 @@ namespace RF2SHMSpotter {
 					{
 						carBehindReported = true;
 
-						SendMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
 						return true;
@@ -463,7 +476,9 @@ namespace RF2SHMSpotter {
 		{
 			if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0 || (waitYellowFlagState & YELLOW_SECTOR_2) != 0 || (waitYellowFlagState & YELLOW_SECTOR_3) != 0)
 			{
-				if (yellowCount++ > 50)
+				yellowCount += 1;
+
+				if (yellowCount > 50)
 				{
 					if (scoring.mScoringInfo.mSectorFlag[0] == 0)
 						waitYellowFlagState &= ~YELLOW_SECTOR_1;
@@ -478,7 +493,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_1) != 0)
 					{
-						SendMessage("yellowFlag:Sector;1");
+						SendSpotterMessage("yellowFlag:Sector;1");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_1;
 
@@ -487,7 +502,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_2) != 0)
 					{
-						SendMessage("yellowFlag:Sector;2");
+						SendSpotterMessage("yellowFlag:Sector;2");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_2;
 
@@ -496,7 +511,7 @@ namespace RF2SHMSpotter {
 
 					if ((waitYellowFlagState & YELLOW_SECTOR_3) != 0)
 					{
-						SendMessage("yellowFlag:Sector;3");
+						SendSpotterMessage("yellowFlag:Sector;3");
 
 						waitYellowFlagState &= ~YELLOW_SECTOR_3;
 
@@ -511,18 +526,20 @@ namespace RF2SHMSpotter {
 			{
 				if ((lastFlagState & BLUE) == 0)
 				{
-					SendMessage("blueFlag");
+					SendSpotterMessage("blueFlag");
 
 					lastFlagState |= BLUE;
 
 					return true;
 				}
-				else if (blueCount++ > 1000)
+				else if (blueCount > 1000)
 				{
 					lastFlagState &= ~BLUE;
 
 					blueCount = 0;
 				}
+				else
+					blueCount += 1;
 			}
 			else
 			{
@@ -535,7 +552,7 @@ namespace RF2SHMSpotter {
 			{
 				if ((lastFlagState & YELLOW_FULL) == 0)
 				{
-					SendMessage("yellowFlag:Full");
+					SendSpotterMessage("yellowFlag:Full");
 
 					lastFlagState |= YELLOW_FULL;
 
@@ -547,7 +564,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_1) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;1");
+					SendSpotterMessage("yellowFlag:Sector;1");
 
 					lastFlagState |= YELLOW_SECTOR_1;
 
@@ -564,7 +581,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_2) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;2");
+					SendSpotterMessage("yellowFlag:Sector;2");
 
 					lastFlagState |= YELLOW_SECTOR_2;
 
@@ -581,7 +598,7 @@ namespace RF2SHMSpotter {
 				if ((lastFlagState & YELLOW_SECTOR_3) == 0)
 				{
 					/*
-					SendMessage("yellowFlag:Sector;3");
+					SendSpotterMessage("yellowFlag:Sector;3");
 
 					lastFlagState |= YELLOW_SECTOR_3;
 
@@ -599,7 +616,7 @@ namespace RF2SHMSpotter {
 					(lastFlagState & YELLOW_SECTOR_3) != 0)
 				{
 					if (waitYellowFlagState != lastFlagState)
-						SendMessage("yellowFlag:Clear");
+						SendSpotterMessage("yellowFlag:Clear");
 
 					lastFlagState &= ~YELLOW_FULL;
 					waitYellowFlagState &= ~YELLOW_FULL;
@@ -617,7 +634,114 @@ namespace RF2SHMSpotter {
 			// No support by rFactor 2
 		}
 
-		public void Run() {
+		double initialX = 0.0d;
+		double initialY = 0.0d;
+		int coordCount = 0;
+
+		bool writeCoordinates(ref rF2VehicleScoring playerScoring)
+		{
+			double lVelocityX = playerScoring.mLocalVel.x;
+			double lVelocityY = playerScoring.mLocalVel.y;
+			double lVelocityZ = playerScoring.mLocalVel.z;
+
+			int carID = 0;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (scoring.mVehicles[i].mIsPlayer != 0)
+				{
+					carID = i;
+
+					break;
+				}
+
+			var ori = playerScoring.mOri;
+
+			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			{
+				double coordinateX = playerScoring.mPos.x;
+				double coordinateY = (- playerScoring.mPos.z);
+				
+				Console.WriteLine(coordinateX + "," + coordinateY);
+
+				if (coordCount == 0)
+				{
+					initialX = coordinateX;
+					initialY = coordinateY;
+				}
+				else if (coordCount > 100 && Math.Abs(coordinateX - initialX) < 10.0 && Math.Abs(coordinateY - initialY) < 10.0)
+					return false;
+
+				coordCount += 1;
+			}
+
+			return true;
+		}
+
+		float[] xCoordinates = new float[60];
+		float[] yCoordinates = new float[60];
+		int numCoordinates = 0;
+		long lastUpdate = 0;
+
+		void checkCoordinates(ref rF2VehicleScoring playerScoring)
+		{
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			{
+				double lVelocityX = playerScoring.mLocalVel.x;
+				double lVelocityY = playerScoring.mLocalVel.y;
+				double lVelocityZ = playerScoring.mLocalVel.z;
+
+				int carID = 0;
+
+				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+					if (scoring.mVehicles[i].mIsPlayer != 0)
+					{
+						carID = i;
+
+						break;
+					}
+
+				var ori = playerScoring.mOri;
+
+				double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+				double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+				double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
+
+				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+				{
+					double coordinateX = playerScoring.mPos.x;
+					double coordinateY = (- playerScoring.mPos.z);
+
+					for (int i = 0; i < numCoordinates; i += 1)
+					{
+						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+						{
+							SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+
+							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		public void initializeTrigger(string[] args)
+        {
+			for (int i = 1; i < (args.Length - 1); i += 2)
+			{
+				xCoordinates[numCoordinates] = float.Parse(args[i]);
+				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+
+				numCoordinates += 1;
+			}
+		}
+
+		public void Run(bool mapTrack, bool positionTrigger) {
 			bool running = false;
 			int countdown = 4000;
 
@@ -638,31 +762,44 @@ namespace RF2SHMSpotter {
 					}
 
 					if (connected) {
-						if (!running)
-							if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
-								running = true;
+						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
-						if (running)
+						if (mapTrack)
 						{
-							rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
+							if (!writeCoordinates(ref playerScoring))
+								break;
+						}
+						else if (positionTrigger)
+							checkCoordinates(ref playerScoring);
+						else
+						{
+							if (!running)
+								if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
+									running = true;
 
-							if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-								playerScoring.mPitState < (byte)Entering)
+							if (running)
 							{
-								if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-									checkPitWindow(ref playerScoring);
-							}
-							else
-							{
-								lastSituation = CLEAR;
-								carBehind = false;
-								carBehindReported = false;
+								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+									playerScoring.mPitState < (byte)Entering)
+								{
+									if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+										checkPitWindow(ref playerScoring);
+								}
+								else
+								{
+									lastSituation = CLEAR;
+									carBehind = false;
+									carBehindReported = false;
 
-								lastFlagState = 0;
+									lastFlagState = 0;
+								}
 							}
 						}
 
-						Thread.Sleep(50);
+						if (positionTrigger)
+							Thread.Sleep(10);
+						else
+							Thread.Sleep(50);
 					}
 					else
 						Thread.Sleep(1000);

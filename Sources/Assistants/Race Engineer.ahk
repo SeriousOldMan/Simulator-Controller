@@ -100,6 +100,11 @@ startRaceEngineer() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Engineer
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	remotePID := 0
 	engineerName := "Jona"
@@ -193,6 +198,11 @@ startRaceEngineer() {
 		
 		SetTimer checkRemoteProcessAlive, 10000
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

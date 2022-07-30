@@ -109,12 +109,13 @@ class TestPitstopHandler {
 			showMessage("Invoking pitstop action " . action . ((arguments.Length() > 0) ? (" with " . values2String(", ", arguments*)) : ""))
 	}
 
-	saveSessionState(stateFile) {
+	saveSessionState(settingsFile, stateFile) {
+		FileRead settings, %settingsFile%
 		FileRead state, %stateFile%
 
 		this.showAction("saveSessionState", stateFile, SubStr(state, 1, 20) . "...")
 
-		vCompletedActions["saveSessionState"] := state
+		vCompletedActions["saveSessionState"] := [settings, state]
 	}
 
 	pitstopPlanned(pitstopNumber, plannedLap := false) {
@@ -905,9 +906,9 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(FuelReporting)
-	;~ AHKUnit.AddTestClass(DamageReporting)
-	;~ AHKUnit.AddTestClass(DamageAnalysis)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

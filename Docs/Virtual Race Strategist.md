@@ -4,7 +4,7 @@ Cato is based entirely on the technology of Jona, the Virtual Race Engineer. The
 
 ## Introduction
 
-As a complement to Jona, your Virtual Race Engineer, this new assistant will accompany you during your races as a Virtual Strategist. Cato will have complete knowledge over the race session incl. lap times of you and your opponents, the current race positions, pitstop events, weather changes, and so on. You can request updates for all these informations by asking Cato for the position, the gaps to the car in front and behind and also request information about the current lap times of your opponents and wether they are closing in. All this, although very useful, if you are racing using VR, is only a part of Catos capabilties. Cato will furthermore be able to develop appropriate pitstop strategies if you are stuck in traffic and he will be able to react to unforeseen events such as sudden weather changes and severe damage - all hand in hand with Jona, the Virtual Race Engineer. This functionality will come step by step over the course of the next releases. Also step by step will the support for the various simulation games develop. Support for *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing* and *Automobilista 2*is already there.
+As a complement to Jona, your Virtual Race Engineer, this new Assistant will accompany you during your races as a Virtual Strategist. Cato will have complete knowledge over the race session incl. lap times of you and your opponents, the current race positions, pitstop events, weather changes, and so on. You can request updates for all these informations by asking Cato for the position, the gaps to the car in front and behind and also request information about the current lap times of your opponents and wether they are closing in. All this, although very useful, if you are racing using VR, is only a part of Catos capabilties. Cato will furthermore be able to develop appropriate pitstop strategies if you are stuck in traffic and he will be able to react to unforeseen events such as sudden weather changes and severe damage - all hand in hand with Jona, the Virtual Race Engineer. This functionality will come step by step over the course of the next releases. Also step by step will the support for the various simulation games develop. Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing*, *Automobilista 2* and *Project CARS 2* is already there.
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Cato.
 
@@ -54,11 +54,11 @@ Important: If you have multiple *dialog partners* active, for example Jona and C
 
 (Cato again runs a complex simulation, taking into account your remaining fuel, the current race positions and the weather outlook. Cato will recommend the lap for the pitstop, where you will have the least traffic after the stop, or the lap where an undercut might be possible, taking into account the best lap for a tyre compound change, if applicable.)
 
-**Cato: "I recommend a pitstop in lap 17. Should I inform your race engineer?"**
+**Cato: "I recommend a pitstop in lap 17. Should I inform your Race Engineer?"**
 
 **Driver: "Yes, please."**
 
-(Cato will hand over the information to your virtual race engineer, which will handle the technical stuff and plan the pitstop.)
+(Cato will hand over the information to your Virtual Race Strategist, which will handle the technical stuff and plan the pitstop.)
 
 To have an error free session like this one, you must have a perfect setup for voice recognition. I strongly recommend using a headset, since alien noises might lead to false positives in Catos voice recognition. Please see the section on [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#troubleshooting) in the documentation for Jona, if you need some hints.
 
@@ -70,7 +70,13 @@ The installation procedure for Cato is the same as the [installation procedure f
 
 The same principles as [described for Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#interacting-with-jona) apply here as well, since Cato is based on the same technology as Jona.
 
-I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
+### List of all voice commands
+
+1. [English version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN))
+
+2. [German version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(DE))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
 ### Enabling and disabling specific warnings and announcements
 
@@ -82,9 +88,17 @@ As you might expect, the word "please" is optional. Only one option for *warning
 
 	[Please] Give me *warning* [please]
 
+As an alternative, you can disable unwanted talking completely by saying:
+
+	Be quiet please
+
+To reactivate the Assistant use:
+
+	I can listen now
+
 ## Racing with Cato
 
-Cato will be active during practice and race sessions by default, although the assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). 
+Cato will be active during practice and race sessions by default, although the Assistant will be of not much help in a practice session, since it only collects data for future race strategy development purposes. You can configure the sessions, where Cato collects telemetry data using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database). 
 
 Cato will always be active during a race, even if you have disabled data collection for races. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own as often as Jona does, but Cato will collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
 
@@ -201,7 +215,11 @@ The "Strategy Workbench" is divided into two main areas. The upper area allows y
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector.JPG)
 
-Each group provide data sets for all tyre compounds which have been used in the seelected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+Each group provide data sets for all tyre compounds which have been used in the selected conditions. You can choose between the different tyre compounds and you can select up to four different series of values ​​that are to be plotted against each other in the chart.
+
+If you have data for different drivers available in your telemetry database, you switch between the dfferent drivers yusing the "Driver" menu. Only data of the selected driver will then be visible in the various charts.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector%202.JPG)
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based partly on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 
@@ -230,6 +248,8 @@ Loading of settings is supported for:
 	   - Service Rules
 	   - Fuel Capacity
 	   - Safety Fuel
+	 - Drivers
+	   - The complete list of drivers, as long as known in the current telemetry database), will be restored
 	 - Simulation
 	   - Tyre Compound
 	   - Tyre Compound Color
@@ -403,6 +423,14 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%202.JPG)
 
+### Drivers
+
+Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not the grand average of all available data is used instead.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
+
+Note: If you import the strategy into the "Race Center", the driver information may be used to populate the stint plan for the session in "Race Center".
+
 ### Simulation
 
 This is the central functionality for strategy development. Using the fields in this tab, you can define the starting conditions and settings for your first stint and run a strategy simulation. You can choose, whether to use only the values you entered here for engine map, lap time and average fuel consumption, or you can include the full knowledge from the telemetry data from previous sessions on the same track in similar conditions. For each different engine map and therefore fuel consumption and resulting average lap time, a strategy scenario will be created. A complex tyre degredation model as well as the improvement of the lap times, as the car gets lighter with decreasing fuel level, are taken into account as well. These scenarios together with all additional scenarios created by the optimization algorithm (see below), will be compared at the end of the simulation and the best one regarding the overall race result will be selected as the best strategy. 
@@ -455,11 +483,11 @@ Please note, that in a team race, the starting driver must be the one, which cre
 
 ## Technical information
 
-Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set is identical for both assistants. Therefore, you can consult the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) of Jona, if you want to dig deeper into the inner workings.
+Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set is identical for both Assistants. Therefore, you can consult the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) of Jona, if you want to dig deeper into the inner workings.
 
 ### Data Acquisition
 
-The complete position information is requested from the simulation gane every 10 seconds. For each car, the data contains the current position, the last lap time and the fraction of the track which has been driven since the car last crossed the S/F line. The data acquisition is controlled by the "Race Strategist" plugin. For *RaceRoom Racing Experience*, *rFactor 2*, *iRacing* and *Automobilista 2* the data is requested from shared memory using the same data providers, which are used by Jona as well, whereas a special UDP client is used for *Assetto Corsa Competizione*.
+The complete position information is requested from the simulation gane every 10 seconds. For each car, the data contains the current position, the last lap time and the fraction of the track which has been driven since the car last crossed the S/F line. The data acquisition is controlled by the "Race Strategist" plugin. For *Assetto Corsa*, *RaceRoom Racing Experience*, *rFactor 2*, *iRacing*, *Automobilista 2* and *Project CARS 2* the data is requested from shared memory using the same data providers, which are used by Jona as well, whereas a special UDP client is used for *Assetto Corsa Competizione*.
 
 After the data has been gathered, it is then transfered to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
 

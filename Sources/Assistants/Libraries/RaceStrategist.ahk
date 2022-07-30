@@ -34,6 +34,8 @@ class RaceStrategist extends RaceAssistant {
 	iSaveRaceReport := false
 	iRaceReview := false
 
+	iHasTelemetryData := false
+
 	iFirstStandingsLap := true
 
 	iSessionReportsDatabase := false
@@ -112,6 +114,12 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
+	HasTelemetryData[] {
+		Get {
+			return this.iHasTelemetryData
+		}
+	}
+
 	SessionReportsDatabase[] {
 		Get {
 			return this.iSessionReportsDatabase
@@ -160,6 +168,9 @@ class RaceStrategist extends RaceAssistant {
 	updateDynamicValues(values) {
 		base.updateDynamicValues(values)
 
+		if values.HasKey("HasTelemetryData")
+			this.iHasTelemetryData := values["HasTelemetryData"]
+
 		if values.HasKey("StrategyReported")
 			this.iStrategyReported := values["StrategyReported"]
 	}
@@ -189,8 +200,8 @@ class RaceStrategist extends RaceAssistant {
 				this.lapTimesRecognized(words)
 			case "FuturePosition":
 				this.futurePositionRecognized(words)
-			case "GapToFront":
-				this.gapToFrontRecognized(words)
+			case "GapToAhead", "GapToFront":
+				this.gapToAheadRecognized(words)
 			case "GapToBehind":
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
@@ -258,6 +269,9 @@ class RaceStrategist extends RaceAssistant {
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
+		if ((this.Session != kSessionRace) && !this.hasEnoughData())
+			return
+
 		speaker := this.getSpeaker()
 		position := Round(knowledgeBase.getValue("Position", 0))
 
@@ -295,43 +309,35 @@ class RaceStrategist extends RaceAssistant {
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 
-			if lapDelta is number
-			{
+			if this.isNumber(lapDelta, lapDelta) {
 				currentLap := knowledgeBase.getValue("Lap")
-				lap := currentLap + lapDelta
+				lap := (currentLap + lapDelta)
 
 				if (lap <= currentLap)
 					speaker.speakPhrase("NoFutureLap")
 				else {
 					car := knowledgeBase.getValue("Driver.Car")
 
-					speaker.startTalk()
+					speaker.speakPhrase("Confirm")
 
-					try {
-						speaker.speakPhrase("Confirm")
+					sendMessage()
 
-						sendMessage()
+					Loop 10
+						Sleep 500
 
-						Loop 10
-							Sleep 500
+					knowledgeBase.setFact("Standings.Extrapolate", lap)
 
-						knowledgeBase.setFact("Standings.Extrapolate", lap)
+					knowledgeBase.produce()
 
-						knowledgeBase.produce()
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledge(this.KnowledgeBase)
 
-						if this.Debug[kDebugKnowledgeBase]
-							this.dumpKnowledge(this.KnowledgeBase)
+					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 
-						position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
-
-						if position
-							speaker.speakPhrase("FuturePosition", {position: position})
-						else
-							speaker.speakPhrase("NoFuturePosition")
-					}
-					finally {
-						speaker.finishTalk()
-					}
+					if position
+						speaker.speakPhrase("FuturePosition", {position: position})
+					else
+						speaker.speakPhrase("NoFuturePosition")
 				}
 
 				return
@@ -341,19 +347,19 @@ class RaceStrategist extends RaceAssistant {
 		speaker.speakPhrase("Repeat")
 	}
 
-	gapToFrontRecognized(words) {
+	gapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if !this.hasEnoughData()
 			return
 
 		if inList(words, this.getSpeaker().Fragments["Car"])
-			this.trackGapToFrontRecognized(words)
+			this.trackGapToAheadRecognized(words)
 		else
-			this.standingsGapToFrontRecognized(words)
+			this.standingsGapToAheadRecognized(words)
 	}
 
-	trackGapToFrontRecognized(words) {
+	trackGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
@@ -363,7 +369,7 @@ class RaceStrategist extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -380,15 +386,15 @@ class RaceStrategist extends RaceAssistant {
 			speaker.speakPhrase("NoTrackGap")
 	}
 
-	standingsGapToFrontRecognized(words) {
+	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: printNumber(delta, 1)})
+			this.getSpeaker().speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -450,7 +456,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000)
 
@@ -460,6 +466,9 @@ class RaceStrategist extends RaceAssistant {
 
 	reportLapTime(phrase, driverLapTime, car) {
 		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+
+		if !this.hasEnoughData()
+			return
 
 		if lapTime {
 			lapTime /= 1000
@@ -487,7 +496,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		car := knowledgeBase.getValue("Driver.Car")
-		lap := knowledgeBase.getValue("Lap")
+		lap := knowledgeBase.getValue("Lap", 0)
 		position := Round(knowledgeBase.getValue("Position"))
 		cars := Round(knowledgeBase.getValue("Car.Count"))
 
@@ -522,22 +531,37 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	strategyOverviewRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.reportStrategy()
 	}
 
 	cancelStrategyRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.cancelStrategy()
 	}
 
 	nextPitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.reportStrategy({NextPitstop: true})
 	}
 
 	recommendPitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.pitstopLapRecognized(words)
 	}
 
 	simulatePitstopRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
 		this.pitstopLapRecognized(words, true)
 	}
 
@@ -548,7 +572,7 @@ class RaceStrategist extends RaceAssistant {
 			if lapPosition {
 				lap := words[lapPosition + 1]
 
-				if lap is not number
+				if !this.isNumber(lap, lap)
 					lap := false
 			}
 			else
@@ -562,62 +586,61 @@ class RaceStrategist extends RaceAssistant {
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if !this.hasEnoughData()
-			return
+		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
+			speaker := this.getSpeaker()
 
-		speaker := this.getSpeaker()
+			speaker.startTalk()
 
-		speaker.startTalk()
+			try {
+				if (position <= (cars / 5))
+					speaker.speakPhrase("GreatRace", {position: position})
+				else if (position <= ((cars / 5) * 3))
+					speaker.speakPhrase("MediocreRace", {position: position})
+				else
+					speaker.speakPhrase("CatastrophicRace", {position: position})
 
-		try {
-			if (position <= (cars / 5))
-				speaker.speakPhrase("GreatRace", {position: position})
-			else if (position <= ((cars / 5) * 3))
-				speaker.speakPhrase("MediocreRace", {position: position})
-			else
-				speaker.speakPhrase("CatastrophicRace", {position: position})
+				if (position > 1) {
+					only := ""
 
-			if (position > 1) {
-				only := ""
+					if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
+						only := speaker.Fragments["Only"]
 
-				if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
-					only := speaker.Fragments["Only"]
+					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 
-				speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
+					driver := knowledgeBase.getValue("Driver.Car")
 
-				driver := knowledgeBase.getValue("Driver.Car")
+					if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
+					 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
+						speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
 
-				if (((laps - knowledgeBase.getValue("Car." . driver . ".Valid.Laps", laps)) > (laps * 0.08))
-				 || (knowledgeBase.getValue("Car." . driver . ".Incidents", 0) > (laps * 0.08)))
-					speaker.speakPhrase("InvalidCritics", {conjunction: speaker.Fragments[(only != "") ? "But" : "And"]})
+					if (position <= (cars / 3))
+						speaker.speakPhrase("PositiveSummary")
 
-				if (position <= (cars / 3))
-					speaker.speakPhrase("PositiveSummary")
+					if (driverMinLapTime && driverLapTimeStdDev) {
+						goodPace := false
 
-				if (driverMinLapTime && driverLapTimeStdDev) {
-					goodPace := false
+						if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
+							speaker.speakPhrase("GoodPace")
 
-					if (driverMinLapTime <= (leaderAvgLapTime * 1.005)) {
-						speaker.speakPhrase("GoodPace")
+							goodPace := true
+						}
+						else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
+							speaker.speakPhrase("MediocrePace")
+						else
+							speaker.speakPhrase("BadPace")
 
-						goodPace := true
+						if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
+							speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
+						else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
+							speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
+						else
+							speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 					}
-					else if (driverMinLapTime <= (leaderAvgLapTime * 1.01))
-						speaker.speakPhrase("MediocrePace")
-					else
-						speaker.speakPhrase("BadPace")
-
-					if (driverLapTimeStdDev < (driverAvgLapTime * 0.004))
-						speaker.speakPhrase("GoodConsistency", {conjunction: speaker.Fragments[goodPace ? "And" : "But"]})
-					else if (driverLapTimeStdDev < (driverAvgLapTime * 0.008))
-						speaker.speakPhrase("MediocreConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
-					else
-						speaker.speakPhrase("BadConsistency", {conjunction: speaker.Fragments[goodPace ? "But" : "And"]})
 				}
 			}
-		}
-		finally {
-			speaker.finishTalk()
+			finally {
+				speaker.finishTalk()
+			}
 		}
 
 		continuation := this.Continuation
@@ -629,7 +652,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	collectTelemetry() {
+	collectTelemetryData() {
 		session := "Other"
 		default := false
 
@@ -701,7 +724,14 @@ class RaceStrategist extends RaceAssistant {
 		setConfigurationValue(raceData, "Cars", "Driver", getConfigurationValue(data, "Position Data", "Driver.Car"))
 
 		Loop %carCount% {
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"))
+			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
+			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
+
+			if InStr(carNr, """")
+				carNr := StrReplace(carNr, """", "")
+
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", carID)
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
 		}
 
@@ -823,10 +853,10 @@ class RaceStrategist extends RaceAssistant {
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
 									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
-									  , RaceReview: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", true)
+									  , RaceReview: (getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
+		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasTelemetryData: false
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
 								, EnoughData: false, StrategyReported: false})
 
@@ -841,7 +871,10 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
-			if (shutdown && review && (this.Session = kSessionRace) && this.RaceReview && this.hasEnoughData(false)) {
+			lastLap := knowledgeBase.getValue("Lap", 0)
+
+			if (shutdown && review && this.RaceReview && (this.Session = kSessionRace)
+						 && (lastLap > this.LearningLaps)) {
 				this.finishSessionWithReview(shutdown)
 
 				return
@@ -854,20 +887,20 @@ class RaceStrategist extends RaceAssistant {
 			if (shutdown && !review && !ErrorLevel && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
 
-			if (shutdown && this.hasEnoughData(false) && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
+			if (shutdown && (lastLap > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
 				if this.Listener {
 					asked := true
 
 					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-					  || (this.collectTelemetry() && (this.SaveTelemetry == kAsk)))
+					  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
 					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
 					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
 						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
 					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-						  || (this.collectTelemetry() && (this.SaveTelemetry == kAsk)))
+						  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 					else
 						asked := false
@@ -889,7 +922,8 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, StrategyReported: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
+								, StrategyReported: false, HasTelemetryData: false})
 		this.updateSessionValues({Simulator: "", Session: kSessionFinished, Strategy: false, SessionTime: false})
 	}
 
@@ -920,14 +954,17 @@ class RaceStrategist extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
-			if ((this.Session == kSessionRace) && (this.SaveSettings = ((phase = "Before") ? kAlways : kAsk)))
-				this.saveSessionSettings()
+			if (((phase = "After") && (this.SaveSettings = kAsk)) || ((phase = "Before") && (this.SaveSettings = kAlways)))
+				if (this.Session == kSessionRace)
+					this.saveSessionSettings()
 
-			if ((this.Session == kSessionRace) && (this.SaveRaceReport = ((phase = "Before") ? kAlways : kAsk)))
-				this.createRaceReport()
+			if (((phase = "After") && (this.SaveRaceReport = kAsk)) || ((phase = "Before") && (this.SaveRaceReport = kAlways)))
+				if (this.Session == kSessionRace)
+					this.createRaceReport()
 
-			if ((this.SaveTelemetry = ((phase = "After") ? kAsk : kAlways)))
-				this.updateTelemetryDatabase()
+			if (((phase = "After") && (this.SaveTelemetry = kAsk)) || ((phase = "Before") && (this.SaveTelemetry = kAlways)))
+				if (this.HasTelemetryData && this.collectTelemetryData())
+					this.updateTelemetryDatabase()
 		}
 		finally {
 			this.iSessionDataActive := false
@@ -937,7 +974,7 @@ class RaceStrategist extends RaceAssistant {
 			if this.Speaker
 				this.getSpeaker().speakPhrase("RaceReportSaved")
 
-			this.updateDynamicValues({KnowledgeBase: false})
+			this.updateDynamicValues({KnowledgeBase: false, HasTelemetryData: false})
 
 			this.finishSession()
 		}
@@ -994,7 +1031,7 @@ class RaceStrategist extends RaceAssistant {
 		lastLap := lapNumber
 
 		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy) {
-			if this.Speaker {
+			if this.Speaker[false] {
 				this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "reportStrategy"))
@@ -1043,7 +1080,7 @@ class RaceStrategist extends RaceAssistant {
 		if pitstop
 			pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
 
-		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetry()) {
+		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetryData()) {
 			prefix := "Lap." . lapNumber
 
 			validLap := knowledgeBase.getValue(prefix . ".Valid", true)
@@ -1092,6 +1129,8 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+
 		static lastSector := 1
 
 		if !IsObject(data)
@@ -1140,12 +1179,12 @@ class RaceStrategist extends RaceAssistant {
 				this.positionRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
-			case "GapToFrontStandings":
-				this.gapToFrontRecognized([])
-			case "GapToFrontTrack":
-				this.gapToFrontRecognized(Array(this.getSpeaker().Fragments["Car"]))
-			case "GapToFront":
-				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToAheadStandings", "GapToFrontStandings":
+				this.gapToAheadRecognized([])
+			case "GapToAheadTrack", "GapToFrontTrack":
+				this.gapToAheadRecognized(Array(this.getSpeaker().Fragments["Car"]))
+			case "GapToAhead", "GapToAhead":
+				this.gapToAheadRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToBehindStandings":
 				this.gapToBehindRecognized([])
 			case "GapToBehindTrack":
@@ -1221,18 +1260,26 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local fact
 
-		if (this.Speaker && confirm) {
-			this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+		hasStrategy := knowledgeBase.getValue("Strategy.Name", false)
 
-			this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+		if (this.Speaker && confirm) {
+			if hasStrategy {
+				this.getSpeaker().speakPhrase("ConfirmCancelStrategy", false, true)
+
+				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
+			}
+			else
+				speaker.speakPhrase("NoStrategy")
 
 			return
 		}
 
-		this.clearStrategy()
+		if hasStrategy {
+			this.clearStrategy()
 
-		if this.Speaker
-			this.getSpeaker().speakPhrase("StrategyCanceled")
+			if this.Speaker
+				this.getSpeaker().speakPhrase("StrategyCanceled")
+		}
 	}
 
 	clearStrategy() {
@@ -1353,7 +1400,7 @@ class RaceStrategist extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Strategy && this.Speaker)
+		if (this.Strategy && this.Speaker[false])
 			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 		else
 			nextPitstop := false
@@ -1397,7 +1444,7 @@ class RaceStrategist extends RaceAssistant {
 	weatherChangeNotification(change, minutes) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -1408,7 +1455,7 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (knowledgeBase.getValue("Lap.Remaining") > 3)
-			if (this.Speaker && (this.Session == kSessionRace)) {
+			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -1435,7 +1482,7 @@ class RaceStrategist extends RaceAssistant {
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker()
 
 			if this.hasEnoughData(false) {
@@ -1519,14 +1566,17 @@ class RaceStrategist extends RaceAssistant {
 
 		grid := []
 
+
 		Loop % raceInfo["Cars"]
 		{
 			carNr := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
 
 			grid.Push(carPosition)
 
-			raceInfo[carNr . ""] := A_Index
+			raceInfo["#" . carNr] := A_Index
+			raceInfo["!" . carID] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
@@ -1565,18 +1615,24 @@ class RaceStrategist extends RaceAssistant {
 				grid := (raceInfo ? raceInfo["Grid"] : false)
 
 				Loop %carCount% {
-					carNr := (knowledgeBase.getValue("Car." . A_Index . ".Nr", kUndefined) . "")
+					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
+					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
+
+					if InStr(carNr, """")
+						carNr := StrReplace(carNr, """", "")
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car", knowledgeBase.getValue("Car." . A_Index . ".Car"))
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".ID", carID)
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
+										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 
-					if (grid != false) {
-						index := (raceInfo.HasKey(carNr) ? raceInfo[carNr] : A_Index)
+					key := ("!" . carID)
 
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[index + 0])
-					}
+					if ((grid != false) && raceInfo.HasKey(key))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[raceInfo[key]])
 					else
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position"
+											, knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
 				}
 
 				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")
@@ -1619,7 +1675,10 @@ class RaceStrategist extends RaceAssistant {
 
 			raceInfo := this.RaceInfo
 
-			carCount := raceInfo["Cars"]
+			if raceInfo
+				carCount := raceInfo["Cars"]
+			else
+				raceInfo := {}
 
 			times := []
 			positions := []
@@ -1635,14 +1694,21 @@ class RaceStrategist extends RaceAssistant {
 
 			Loop {
 				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
-				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
+				carID := knowledgeBase.getValue(carPrefix . ".ID", kUndefined)
 
-				if (carNr == kUndefined)
+				if (carID == kUndefined)
 					break
 
-				if raceInfo.HasKey(carNr . "") {
-					carIndex := raceInfo[carNr . ""]
+				key := ("!" . carID)
 
+				if raceInfo.HasKey(key)
+					carIndex := raceInfo[key]
+				else if (A_Index <= carCount)
+					carIndex := A_Index
+				else
+					carIndex := false
+
+				if carIndex {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
 					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))
@@ -1689,15 +1755,20 @@ class RaceStrategist extends RaceAssistant {
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures, wear) {
-		if this.RemoteHandler
+		if (this.RemoteHandler && this.collectTelemetryData()) {
+			this.updateDynamicValues({HasTelemetryData: true})
+
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
 											   , compound, compoundColor, pressures, temperatures, wear)
+		}
 	}
 
 	updateTelemetryDatabase() {
-		if (this.RemoteHandler && this.collectTelemetry())
+		if (this.RemoteHandler && this.collectTelemetryData())
 			this.RemoteHandler.updateTelemetryDatabase()
+
+		this.updateDynamicValues({HasTelemetryData: false})
 	}
 }
 

@@ -48,6 +48,8 @@ class VoiceManager {
 	iSpeakerPitch := 0
 	iSpeakerSpeed := 0
 
+	iMuted := false
+
 	iRecognizer := "Desktop"
 	iListener := false
 
@@ -373,9 +375,19 @@ class VoiceManager {
 		}
 	}
 
-	Speaker[] {
+	Muted[]  {
 		Get {
-			return this.iSpeaker
+			return this.iMuted
+		}
+
+		Set {
+			return (this.iMuted := value)
+		}
+	}
+
+	Speaker[muted := true] {
+		Get {
+			return (muted || !this.Muted) ? this.iSpeaker : false
 		}
 	}
 

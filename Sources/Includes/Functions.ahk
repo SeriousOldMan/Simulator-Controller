@@ -19,10 +19,6 @@
 
 global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kBackgroundApps = ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings"]
-
-global kForegroundApps = ["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
@@ -51,7 +47,9 @@ global vOutgoingMessages = []
 global vDispatching = false
 
 global vPendingTrayMessages = []
-global vTrayMessageDuration = 1500
+global vTrayMessageDuration = false
+
+global vHasSupportMenu = false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -663,7 +661,7 @@ shareSessionDatabase() {
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-					showMessage(translate("Der Datenbankabgleich kann nicht gestartet werden - Bitte überprüfen Sie die Programme im Binaries Verzeichnis...")
+					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
@@ -812,6 +810,7 @@ checkForUpdates() {
 restartUpdate:
 		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
 			if !getConfigurationValue(updates, "Processed", target, false) {
+				/*
 				SoundPlay *32
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
@@ -852,6 +851,13 @@ restartUpdate:
 				{
 					break
 				}
+				*/
+
+				RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
+
+				loadSimulatorConfiguration()
+
+				break
 			}
 	}
 }
@@ -1009,6 +1015,7 @@ initializeEnvironment() {
 	FileCreateDir %kUserHomeDirectory%Plugins
 	FileCreateDir %kUserHomeDirectory%Translations
 	FileCreateDir %kUserHomeDirectory%Grammars
+	FileCreateDir %kUserHomeDirectory%Simulator Data
 	FileCreateDir %kUserHomeDirectory%Temp
 	FileCreateDir %kDatabaseDirectory%Community
 	FileCreateDir %kDatabaseDirectory%User
@@ -1085,6 +1092,55 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+installSupportMenu() {
+	try {
+		Menu LogMenu, DeleteAll
+	}
+	catch exception {
+		; ignore
+	}
+
+	try {
+		Menu SupportMenu, DeleteAll
+	}
+	catch exception {
+		; ignore
+	}
+
+	levels := {Off: kLogOff, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+
+	for ignore, label in ["Off", "Info", "Warn", "Critical"] {
+		level := levels[label]
+
+		label := translate(label)
+		handler := Func("setLogLevel").Bind(level)
+
+		Menu LogMenu, Add, %label%, %handler%
+
+		if (level == getLogLevel())
+			Menu LogMenu, Check, %label%
+	}
+
+	label := translate("Debug")
+	handler := Func("toggleDebug")
+
+	Menu SupportMenu, Add, %label%, %handler%
+
+	if isDebug()
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Logging")
+
+	Menu SupportMenu, Add, %label%, :LogMenu
+
+	label := translate("Support")
+
+	Menu Tray, Insert, 1&
+	Menu Tray, Insert, 1&, %label%, :SupportMenu
+
+	vHasSupportMenu := true
+}
 
 viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
 	static htmlViewer
@@ -1472,7 +1528,8 @@ isNull(value) {
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 	if isDebug()
-		showMessage("The literal value " . reference . " was used as an object...")
+		showMessage("The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+				  , false, kUndefined, 5000)
 
 	return false
 }
@@ -1507,7 +1564,20 @@ logMessage(logLevel, message) {
 
 		SplitPath fileName, , directory
 		FileCreateDir %directory%
-		FileAppend %message%, %fileName%, UTF-16
+
+		tries := 5
+
+		while (tries > 0)
+			try {
+				FileAppend %message%, %fileName%, UTF-16
+
+				break
+			}
+			catch exception {
+				Sleep 1
+
+				tries -= 1
+			}
 	}
 }
 
@@ -1885,6 +1955,24 @@ removeDuplicates(list) {
 	return result
 }
 
+getKeys(map) {
+	keys := []
+
+	for key, ignore in map
+		keys.Push(key)
+
+	return keys
+}
+
+getValues(map) {
+	values := []
+
+	for ignore, value in map
+		values.Push(value)
+
+	return values
+}
+
 greaterComparator(a, b) {
 	return (a > b)
 }
@@ -1956,6 +2044,9 @@ raiseEvent(messageType, event, data, target := false) {
 }
 
 trayMessage(title, message, duration := false) {
+	title := StrReplace(title, "`n", A_Space)
+	message := StrReplace(message, "`n", A_Space)
+
 	if !duration
 		duration := vTrayMessageDuration
 
@@ -2006,41 +2097,37 @@ readConfiguration(configFile) {
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
 	configuration := Object()
+	section := false
 
-	IniRead sections, %configFile%
+	Loop Read, %configFile%
+	{
+		currentLine := LTrim(A_LoopReadLine)
 
-	sections := StrSplit(sections, "`n")
+		if (StrLen(currentLine) == 0)
+			continue
 
-	for i, section in sections {
-		IniRead keyValues, %configFile%, %section%
+		firstChar := SubStr(currentLine, 1, 1)
 
-		keyValues := StrSplit(keyValues, "`n")
-		sectionValues := Object()
+		if (firstChar = ";")
+			continue
+		else if (firstChar = "[") {
+			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-		for j, keyValue in keyValues {
-			if (SubStr(keyValue, 1, 2) != "//") {
-				keyValue := StrReplace(keyValue, "\=", "_#_EQ-#_")
-				keyValue := StrReplace(keyValue, "\\", "_#_AC-#_")
-				keyValue := StrReplace(keyValue, "\n", "_#_CR-#_")
+			configuration[section] := {}
+		}
+		else if section {
+			keyValue := LTrim(A_LoopReadLine)
 
-				keyValue := StrSplit(keyValue, "=", "", 2)
+			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+								   , "=", "", 2)
 
-				key := keyValue[1]
-				value := keyValue[2]
+				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+				value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
 
-				key := StrReplace(key, "_#_EQ-#_", "=")
-				key := StrReplace(key, "_#_AC-#_", "\\")
-				key := StrReplace(key, "_#_CR-#_", "`n")
-
-				value := StrReplace(value, "_#_EQ-#_", "=")
-				value := StrReplace(value, "_#_AC-#_", "\")
-				value := StrReplace(value, "_#_CR-#_", "`n")
-
-				sectionValues[keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 			}
 		}
-
-		configuration[section] := sectionValues
 	}
 
 	return configuration
@@ -2235,7 +2322,19 @@ getControllerActionIcons() {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+toggleDebug() {
+	setDebug(!isDebug())
+}
+
 setDebug(debug) {
+	label := translate("Debug")
+
+	if vHasSupportMenu
+		if debug
+			Menu SupportMenu, Check, %label%
+		else
+			Menu SupportMenu, Uncheck, %label%
+
 	vDebug := debug
 
 	title := translate("Modular Simulator Controller System")
@@ -2245,6 +2344,13 @@ setDebug(debug) {
 }
 
 setLogLevel(level) {
+	if vHasSupportMenu
+		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
+			label := translate(label)
+
+			Menu LogMenu, Uncheck, %label%
+		}
+
 	switch level {
 		case "Info":
 			level := kLogInfo
@@ -2271,6 +2377,9 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
+	if vHasSupportMenu
+		Menu LogMenu, Check, %state%
+
 	title := translate("Modular Simulator Controller System")
 
 	TrayTip %title%, % translate("Log Level: ") . state
@@ -2294,9 +2403,12 @@ loadSimulatorConfiguration()
 
 if !vDetachedInstallation {
 	checkForUpdates()
-	requestShareSessionDatabaseConsent()
-	shareSessionDatabase()
-	checkForNews()
+
+	if !isDebug() {
+		requestShareSessionDatabaseConsent()
+		shareSessionDatabase()
+		checkForNews()
+	}
 }
 
 initializeLoggingSystem()

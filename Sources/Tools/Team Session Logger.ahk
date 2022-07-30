@@ -76,6 +76,11 @@ runTeamSessionLogger() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Team Session Logger
+
+	Menu Tray, NoStandard
+	Menu Tray, Add, Exit, Exit
+
+	installSupportMenu()
 	
 	try {
 		FileDelete %kTempDirectory%Team Session.log
@@ -103,6 +108,11 @@ runTeamSessionLogger() {
 		
 		Sleep 10000
 	}
+
+	return
+
+Exit:
+	ExitApp 0
 }
 
 

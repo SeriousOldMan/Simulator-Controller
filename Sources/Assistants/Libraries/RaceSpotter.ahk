@@ -293,7 +293,9 @@ class PositionInfo {
 			lastLap := knowledgeBase.getValue("Lap")
 			position := knowledgeBase.getValue("Position")
 
-			if (Abs(position - this.Car.Position) == 1)
+			if ((Abs(position - this.Car.Position) == 1)
+			 || (lastLap == this.LastLap)
+			 || ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true]))
 				return "Position"
 			else if (lastLap > this.Car.LastLap)
 				return "LapDown"
@@ -447,8 +449,8 @@ class PositionInfo {
 
 	checkpoint(sector) {
 		position := this.forPosition()
-		observed := ((this.inFront(false) ? "TF" : "") . (this.atBehind(false) ? "TB" : "")
-				   . ((position = "Ahead") ? "SF" : "") . ((position = "Behind") ? "SB" : ""))
+		observed := ((this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
+				   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
 
 		if (observed != this.Observed) {
 			if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
@@ -617,7 +619,7 @@ class RaceSpotter extends RaceAssistant {
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true, SideProximity: true, RearProximity: true
 		 											  , YellowFlags: true, BlueFlags: true, StartSummary: true, FinalLaps: true, PitWindow: true}})
 
-		OnExit(ObjBindMethod(this, "shutdownSpotter"))
+		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
 
 	createVoiceManager(name, options) {
@@ -650,8 +652,8 @@ class RaceSpotter extends RaceAssistant {
 				this.positionRecognized(words)
 			case "LapTimes":
 				this.lapTimesRecognized(words)
-			case "GapToFront":
-				this.gapToFrontRecognized(words)
+			case "GapToAhead":
+				this.gapToAheadRecognized(words)
 			case "GapToBehind":
 				this.gapToBehindRecognized(words)
 			case "GapToLeader":
@@ -686,19 +688,19 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	gapToFrontRecognized(words) {
+	gapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if !this.hasEnoughData()
 			return
 
 		if inList(words, this.getSpeaker().Fragments["Car"])
-			this.trackGapToFrontRecognized(words)
+			this.trackGapToAheadRecognized(words)
 		else
-			this.standingsGapToFrontRecognized(words)
+			this.standingsGapToAheadRecognized(words)
 	}
 
-	trackGapToFrontRecognized(words) {
+	trackGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		speaker := this.getSpeaker()
 
@@ -708,7 +710,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.startTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToFront", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -725,15 +727,15 @@ class RaceSpotter extends RaceAssistant {
 			speaker.speakPhrase("NoTrackGap")
 	}
 
-	standingsGapToFrontRecognized(words) {
+	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("StandingsGapToFront", {delta: printNumber(delta, 1)})
+			this.getSpeaker().speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
 		}
 	}
 
@@ -795,7 +797,7 @@ class RaceSpotter extends RaceAssistant {
 			return
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToFront")
+			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000)
 
@@ -920,7 +922,9 @@ class RaceSpotter extends RaceAssistant {
 				info.update(computeDriverName(knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")
 											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
-						  , knowledgeBase.getValue("Car." . A_Index . ".Position"), lap, sector
+						  , knowledgeBase.getValue("Car." . A_Index . ".Position")
+						  , knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Laps")
+						  , sector
 						  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
 						  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 						  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
@@ -1008,22 +1012,22 @@ class RaceSpotter extends RaceAssistant {
 			return false
 	}
 
-	getPositionInfos(ByRef standingsFront, ByRef standingsBehind, ByRef trackFront, ByRef trackBehind) {
-		standingsFront := false
+	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind, ByRef trackAhead, ByRef trackBehind) {
+		standingsAhead := false
 		standingsBehind := false
-		trackFront := false
+		trackAhead := false
 		trackBehind := false
 
 		for nr, candidate in this.PositionInfos {
 			observed := candidate.Observed
 
-			if InStr(observed, "TF")
-				trackFront := candidate
+			if InStr(observed, "TA")
+				trackAhead := candidate
 			else if InStr(observed, "TB")
 				trackBehind := candidate
 
-			if InStr(observed, "SF")
-				standingsFront := candidate
+			if InStr(observed, "SA")
+				standingsAhead := candidate
 			else if InStr(observed, "SB")
 				standingsBehind := candidate
 		}
@@ -1032,17 +1036,17 @@ class RaceSpotter extends RaceAssistant {
 	tacticalAdvice(sector, regular) {
 		speaker := this.getSpeaker(true)
 
-		standingsFront := false
+		standingsAhead := false
 		standingsBehind := false
-		trackFront := false
+		trackAhead := false
 		trackBehind := false
 
-		this.getPositionInfos(standingsFront, standingsBehind, trackFront, trackBehind)
+		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind)
 
-		if (regular && trackFront && trackFront.inDelta(sector) && !trackFront.isFaster(sector)
+		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
-			situation := ("ProtectSlower " . trackFront . A_Space . trackBehind)
+			situation := ("ProtectSlower " . trackAhead . A_Space . trackBehind)
 
 			if !this.Advices.HasKey(situation) {
 				this.Advices[situation] := true
@@ -1136,15 +1140,15 @@ class RaceSpotter extends RaceAssistant {
 			behindGainThreshold := getDeprecatedConfigurationValue(this.Settings, "Assistant.Spotter", "Spotter Settings", "Behind.Gain.Threshold", 1.5)
 		}
 
-		standingsFront := false
+		standingsAhead := false
 		standingsBehind := false
-		trackFront := false
+		trackAhead := false
 		trackBehind := false
 
-		this.getPositionInfos(standingsFront, standingsBehind, trackFront, trackBehind)
+		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind)
 
 		if this.Debug[kDebugPositions] {
-			info := ("=================================`n" . regular . (standingsFront != false) . (standingsBehind != false) . (trackFront != false) . (trackBehind != false) . "`n=================================`n`n")
+			info := ("=================================`n" . regular . (standingsAhead != false) . (standingsBehind != false) . (trackAhead != false) . (trackBehind != false) . "`n=================================`n`n")
 
 			FileAppend %info%, %kTempDirectory%Race Spotter.positions
 		}
@@ -1156,59 +1160,59 @@ class RaceSpotter extends RaceAssistant {
 		speaker.startTalk()
 
 		try {
-			opponentType := trackFront.OpponentType
+			if (trackAhead && (trackAhead != standingsAhead)
+			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
+				opponentType := trackAhead.OpponentType
 
-			if (trackFront && (trackFront != standingsFront)
-			 && trackFront.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
-			 && !trackFront.isFaster(sector) && !trackFront.runningAway(sector, frontGainThreshold)) {
-				if (!trackFront.Reported && (sector > 1)) {
+				if (!trackAhead.Reported && (sector > 1)) {
 					if (opponentType = "LapDown") {
 						speaker.speakPhrase("LapDownDriver")
 
-						trackFront.Reported := true
+						trackAhead.Reported := true
 					}
 					else if (opponentType = "LapUp") {
 						speaker.speakPhrase("LapUpDriver")
 
-						trackFront.Reported := true
+						trackAhead.Reported := true
 					}
 				}
 			}
-			else if standingsFront {
-				delta := Abs(standingsFront.Delta[false, true, 1])
-				deltaDifference := Abs(standingsFront.DeltaDifference[sector])
-				lapTimeDifference := Abs(standingsFront.LapTimeDifference)
+			else if standingsAhead {
+				delta := Abs(standingsAhead.Delta[false, true, 1])
+				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
+				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
 
 				if this.Debug[kDebugPositions] {
 					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-											  , standingsFront.Car.Nr, standingsFront.Reported, values2String("|", standingsFront.Car.LapTimes*), standingsFront.Car.LapTime[true]
-											  , values2String("|", standingsFront.Car.Deltas[sector]*), standingsFront.Delta[sector], standingsFront.Delta[false, true, 1]
-											  , standingsFront.inFront(), standingsFront.atBehind(), standingsFront.inFront(false), standingsFront.atBehind(false), standingsFront.forPosition()
-											  , standingsFront.DeltaDifference[sector], standingsFront.LapTimeDifference[true]
-											  , standingsFront.isFaster(sector), standingsFront.closingIn(sector, frontGainThreshold), standingsFront.runningAway(sector, frontLostThreshold))
+											  , standingsAhead.Car.Nr, standingsAhead.Reported, values2String("|", standingsAhead.Car.LapTimes*), standingsAhead.Car.LapTime[true]
+											  , values2String("|", standingsAhead.Car.Deltas[sector]*), standingsAhead.Delta[sector], standingsAhead.Delta[false, true, 1]
+											  , standingsAhead.inFront(), standingsAhead.atBehind(), standingsAhead.inFront(false), standingsAhead.atBehind(false), standingsAhead.forPosition()
+											  , standingsAhead.DeltaDifference[sector], standingsAhead.LapTimeDifference[true]
+											  , standingsAhead.isFaster(sector), standingsAhead.closingIn(sector, frontGainThreshold), standingsAhead.runningAway(sector, frontLostThreshold))
 
 					info := ("=================================`n" . info . "`n=================================`n`n")
 
 					FileAppend %info%, %kTempDirectory%Race Spotter.positions
 				}
 
-				if ((delta <= frontAttackThreshold) && !standingsFront.isFaster(sector) && !standingsFront.Reported) {
+				if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported) {
 					speaker.speakPhrase("GotHim", {delta: printNumber(delta, 1)
 												 , gained: printNumber(deltaDifference, 1)
 												 , lapTime: printNumber(lapTimeDifference, 1)})
 
-					car := standingsFront.Car
+					car := standingsAhead.Car
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriverFront")
 					else if (car.InvalidLaps > 3)
 						speaker.speakPhrase("InconsistentDriverFront")
 
-					standingsFront.Reported := true
+					standingsAhead.Reported := true
 
-					standingsFront.reset(sector)
+					standingsAhead.reset(sector)
 				}
-				else if (regular && standingsFront.closingIn(sector, frontGainThreshold) && !standingsFront.Reported) {
+				else if (regular && standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													  , gained: printNumber(deltaDifference, 1)
 													  , lapTime: printNumber(lapTimeDifference, 1)})
@@ -1223,14 +1227,14 @@ class RaceSpotter extends RaceAssistant {
 
 					informed := true
 
-					standingsFront.reset(sector)
+					standingsAhead.reset(sector)
 				}
-				else if (regular && standingsFront.runningAway(sector, frontLostThreshold)) {
+				else if (regular && standingsAhead.runningAway(sector, frontLostThreshold)) {
 					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
 
-					standingsFront.reset(sector, true)
+					standingsAhead.reset(sector, true)
 				}
 			}
 
@@ -1257,7 +1261,7 @@ class RaceSpotter extends RaceAssistant {
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
 
-					car := standingsFront.Car
+					car := standingsAhead.Car
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriveBehind")
@@ -1322,7 +1326,7 @@ class RaceSpotter extends RaceAssistant {
 	updateDriver(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
 
-		if (this.Speaker && (this.Session = kSessionRace)) {
+		if (this.Speaker[false] && (this.Session = kSessionRace)) {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector)
 
@@ -1421,7 +1425,7 @@ class RaceSpotter extends RaceAssistant {
 	proximityAlert(alert) {
 		static alerting := false
 
-		if this.Speaker {
+		if this.Speaker[false] {
 			speaker := this.getSpeaker(true)
 
 			if alert {
@@ -1478,7 +1482,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	yellowFlag(alert, arguments*) {
-		if (this.Announcements["YellowFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["YellowFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1508,7 +1512,7 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local knowledgeBase := this.KnowledgeBase
 
-		if (this.Announcements["BlueFlags"] && this.Speaker) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["BlueFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1527,7 +1531,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pitWindow(state) {
-		if (this.Announcements["PitWindow"] && this.Speaker && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
+		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -1542,16 +1546,28 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	startupSpotter() {
+	startupSpotter(forceShutdown := false) {
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
 			exePath := (kBinariesDirectory . code . " SHM Spotter.exe")
 
 			if FileExist(exePath) {
-				this.shutdownSpotter()
+				this.shutdownSpotter(forceShutdown)
 
-				Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				try {
+					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+				}
+				catch exception {
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: "SHM"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 
 				if ((ErrorLevel != "Error") && spotterPID)
 					this.iSpotterPID := spotterPID
@@ -1559,27 +1575,33 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	shutdownSpotter() {
-		if this.iSpotterPID {
-			spotterPID := this.iSpotterPID
+	shutdownSpotter(force := false) {
+		spotterPID := this.iSpotterPID
 
+		if spotterPID {
 			Process Close, %spotterPID%
-		}
 
-		processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+			Sleep 500
 
-		tries := 5
+			Process Exist, %spotterPID%
 
-		while (tries-- > 0) {
-			Process Exist, %processName%
+			if (force && ErrorLevel) {
+				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
-			if ErrorLevel {
-				Process Close, %ErrorLevel%
+				tries := 5
 
-				Sleep 500
+				while (tries-- > 0) {
+					Process Exist, %processName%
+
+					if ErrorLevel {
+						Process Close, %ErrorLevel%
+
+						Sleep 500
+					}
+					else
+						break
+				}
 			}
-			else
-				break
 		}
 
 		this.iSpotterPID := false
@@ -1656,7 +1678,7 @@ class RaceSpotter extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
 
-		callback := ObjBindMethod(this, "startupSpotter")
+		callback := ObjBindMethod(this, "startupSpotter", true)
 
 		SetTimer %callback%, -10000
 	}
@@ -1764,7 +1786,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			this.shutdownSpotter()
+			this.shutdownSpotter(true)
 
 			this.updateDynamicValues({KnowledgeBase: false})
 		}
@@ -1852,6 +1874,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateLap(lapNumber, data) {
+		local knowledgeBase := this.KnowledgeBase
+
 		static lastSector := 1
 
 		update := false
@@ -1866,7 +1890,7 @@ class RaceSpotter extends RaceAssistant {
 
 			update := true
 
-			this.KnowledgeBase.addFact("Sector", sector)
+			knowledgeBase.addFact("Sector", sector)
 		}
 
 		result := base.updateLap(lapNumber, data)
@@ -1926,12 +1950,12 @@ class RaceSpotter extends RaceAssistant {
 				this.positionRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
-			case "GapToFrontStandings":
-				this.gapToFrontRecognized([])
-			case "GapToFrontTrack":
-				this.gapToFrontRecognized(Array(this.getSpeaker().Fragments["Car"]))
-			case "GapToFront":
-				this.gapToFrontRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
+			case "GapToAheadStandings", "GapToFrontStandings":
+				this.gapToAheadRecognized([])
+			case "GapToAheadTrack", "GapToFrontTrack":
+				this.gapToAheadRecognized(Array(this.getSpeaker().Fragments["Car"]))
+			case "GapToAhead", "GapToAhead":
+				this.gapToAheadRecognized(inList(arguments, "Track") ? Array(this.getSpeaker().Fragments["Car"]) : [])
 			case "GapToBehindStandings":
 				this.gapToBehindRecognized([])
 			case "GapToBehindTrack":

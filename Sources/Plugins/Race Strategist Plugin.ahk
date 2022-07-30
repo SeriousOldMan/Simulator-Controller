@@ -90,13 +90,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	__New(controller, name, configuration := false) {
 		base.__New(controller, name, configuration)
 
-		if (!this.Active && !isDebug())
-			return
-
-		if (this.RaceAssistantName)
-			SetTimer collectRaceStrategistSessionData, 10000
-		else
-			SetTimer updateRaceStrategistSessionState, 5000
+		if (this.Active || isDebug()) {
+			if (this.RaceAssistantName)
+				SetTimer collectRaceStrategistSessionData, 10000
+			else
+				SetTimer updateRaceStrategistSessionState, 5000
+		}
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
@@ -121,8 +120,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceStrategist(this, pid)
 	}
 
-	startSession(settingsFile, dataFile, teamSession) {
-		base.startSession(settingsFile, dataFile, teamSession)
+	startSession(settings, data, teamSession) {
+		base.startSession(settings, data, teamSession)
 
 		this.iLapDatabase := false
 	}
@@ -169,7 +168,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	requestInformation(arguments*) {
-		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTimes", "GapToFront", "GapToBehind", "GapToFrontStandings", "GapToBehindStandings", "GapToFrontTrack", "GapToBehindTrack", "GapToLeader", "StrategyOverview", "NextPitstop"], arguments[1])) {
+		if (this.RaceStrategist && inList(["Time", "LapsRemaining", "Weather", "Position", "LapTimes"
+										 , "GapToAhead", "GapToFront", "GapToBehind", "GapToAheadStandings", "GapToFrontStandings"
+										 , "GapToBehindStandings", "GapToAheadTrack", "GapToBehindTrack", "GapToLeader"
+										 , "StrategyOverview", "NextPitstop"], arguments[1])) {
 			this.RaceStrategist.requestInformation(arguments*)
 
 			return true
@@ -255,10 +257,22 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		runningLap := 0
 
-		if (teamServer && teamServer.Active && session)
+		if (teamServer && teamServer.Active && session) {
+			lastStint := false
+			driverID := kNull
+
 			Loop % teamServer.getCurrentLap(session)
 			{
 				try {
+					stint := teamServer.getLapStint(A_Index, session)
+					newStint := (stint != lastStint)
+
+					if newStint {
+						lastStint := stint
+
+						driverID := teamServer.getStintValue(stint, "ID", session)
+					}
+
 					telemetryData := teamServer.getLapValue(A_Index, this.Plugin . " Telemetry", session)
 
 					if (!telemetryData || (telemetryData == ""))
@@ -268,6 +282,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					if !telemetryDB
 						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+
+					if (newStint && driverID)
+						telemetryDB.registerDriver(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
 
 					pitstop := telemetryData[10]
 
@@ -283,19 +300,20 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-													 , telemetryData[9])
+													 , telemetryData[9], driverID)
 
 						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 											   , pressures[1], pressures[2], pressures[4], pressures[4]
 											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 											   , telemetryData[7], telemetryData[8], telemetryData[9]
-											   , wear[1], wear[2], wear[3], wear[4])
+											   , wear[1], wear[2], wear[3], wear[4], driverID)
 					}
 				}
 				catch exception {
 					break
 				}
 			}
+		}
 		else
 			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
 				if !telemetryDB
@@ -634,49 +652,54 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		this.createRaceReport(report)
 
 		try {
-			reader := new RaceReportReader(report)
+			try {
+				reader := new RaceReportReader(report)
 
-			raceData := true
-			drivers := true
-			positions := true
-			times := true
+				raceData := true
+				drivers := true
+				positions := true
+				times := true
 
-			reader.loadData(false, raceData, drivers, positions, times)
+				reader.loadData(false, raceData, drivers, positions, times)
 
-			cars := getConfigurationValue(raceData, "Cars", "Count", 0)
-			driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
-			laps := getConfigurationValue(raceData, "Laps", "Count", 0)
+				cars := getConfigurationValue(raceData, "Cars", "Count", 0)
+				driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
+				laps := getConfigurationValue(raceData, "Laps", "Count", 0)
 
-			if laps
-				position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
-			else
-				position := cars
+				if laps
+					position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
+				else
+					position := cars
 
-			leader := 0
+				leader := 0
 
-			for car, candidate in positions[laps]
-				if (candidate = 1) {
-					leader := car
+				for car, candidate in positions[laps]
+					if (candidate = 1) {
+						leader := car
 
-					break
-				}
+						break
+					}
 
-			min := false
-			max := false
-			leaderAvgLapTime := false
-			stdDev := false
+				min := false
+				max := false
+				leaderAvgLapTime := false
+				stdDev := false
 
-			reader.getDriverPace(raceData, times, leader, min, max, leaderAvgLapTime, stdDev)
+				reader.getDriverPace(raceData, times, leader, min, max, leaderAvgLapTime, stdDev)
 
-			driverMinLapTime := false
-			driverMaxLapTime := false
-			driverAvgLapTime := false
-			driverLapTimeStdDev := false
+				driverMinLapTime := false
+				driverMaxLapTime := false
+				driverAvgLapTime := false
+				driverLapTimeStdDev := false
 
-			reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
+				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-			this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
-											  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
+												  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+			}
+			catch exception {
+				this.RaceAssistant[true].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
+			}
 		}
 		finally {
 			try {

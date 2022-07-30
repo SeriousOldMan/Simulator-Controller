@@ -354,6 +354,11 @@ namespace TeamServer {
 			return Get("session/" + identifier + "/team");
 		}
 
+		public string GetSessionStint(string identifier, string stint) {
+			return Get("session/" + identifier + "/stint",
+					   arguments: new Parameters() { { "stint", stint } });
+		}
+
 		public string GetSessionLap(string identifier, string lap) {
 			return Get("session/" + identifier + "/lap",
 					   arguments: new Parameters() { { "lap", lap } });
@@ -368,7 +373,7 @@ namespace TeamServer {
 		}
 
 		public string GetSessionCurrentStint(string identifier) {
-			return Get("session/" + identifier + "/stint");
+			return Get("session/" + identifier + "/currentstint");
 		}
 
 		public string GetSessionStints(string identifier) {
@@ -418,6 +423,10 @@ namespace TeamServer {
 			return Get("stint/" + identifier);
 		}
 
+		public string GetStintSession(string identifier) {
+			return Get("stint/" + identifier + "/session");
+		}
+
 		public string GetStintDriver(string identifier) {
 			return Get("stint/" + identifier + "/driver");
 		}
@@ -446,6 +455,10 @@ namespace TeamServer {
 
 		public string GetLap(string identifier) {
 			return Get("lap/" + identifier);
+		}
+
+		public string GetLapStint(string identifier) {
+			return Get("lap/" + identifier + "/stint");
 		}
 
 		public string GetLapValue(string identifier, string name) {

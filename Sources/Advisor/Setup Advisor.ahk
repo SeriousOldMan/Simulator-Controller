@@ -3160,7 +3160,7 @@ runSetupAdvisor() {
 		}
 	}
 
-	current := fixIE()
+	current := fixIE(11)
 
 	try {
 		if car

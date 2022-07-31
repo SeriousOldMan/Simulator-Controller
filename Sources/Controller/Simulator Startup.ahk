@@ -38,9 +38,10 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Libraries Include Section                        ;;;
+;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Configuration\Libraries\SettingsEditor.ahk
 
 
@@ -186,7 +187,7 @@ class SimulatorStartup extends ConfigurationItem {
 	startComponent(component) {
 		logMessage(kLogInfo, translate("Starting component ") . component)
 
-		raiseEvent(kFileMessage, "Startup", "startupComponent:" . component, vSimulatorControllerPID)
+		sendMessage(kFileMessage, "Startup", "startupComponent:" . component, vSimulatorControllerPID)
 	}
 
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
@@ -222,7 +223,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iStartupOption := this.iSimulators[1]
 
 		if this.iStartupOption
-			raiseEvent(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, vSimulatorControllerPID)
+			sendMessage(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, vSimulatorControllerPID)
 	}
 
 	startup() {
@@ -652,7 +653,7 @@ startupSimulator() {
 
 	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 	;
-	; registerEventHandler("Startup", "functionEventHandler")
+	; registerMessageHandler("Startup", "functionMessageHandler")
 	;
 	; Using a sempahore file instead...
 
@@ -693,12 +694,12 @@ Exit:
 
 playSong(songFile) {
 	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-		raiseEvent(kFileMessage, "Startup", "playStartupSong:" . songFile, vSimulatorControllerPID)
+		sendMessage(kFileMessage, "Startup", "playStartupSong:" . songFile, vSimulatorControllerPID)
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 exit() {
@@ -716,7 +717,7 @@ exit() {
 
 exitStartup(sayGoodBye := false) {
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
-		raiseEvent(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
+		sendMessage(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 
 		SetTimer exitStartup, -2000
 	}
@@ -774,14 +775,14 @@ try {
 			IfMsgBox Yes
 			{
 				if (vSimulatorControllerPID != 0)
-					raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
+					sendMessage(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
 
 				vStartupManager.cancelStartup()
 			}
 		}
 		else {
 			if (vSimulatorControllerPID != 0)
-				raiseEvent(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
+				sendMessage(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
 
 			vStartupManager.hideSplashTheme()
 

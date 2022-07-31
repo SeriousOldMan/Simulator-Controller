@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceEngineer.ahk
 
@@ -182,7 +183,7 @@ startRaceEngineer() {
 											, engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
 											, engineerRecognizer, engineerListener, voiceServer)
 	
-	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")
+	registerMessageHandler("Race Engineer", "handleEngineerMessage")
 	
 	if (debug && engineerSpeaker) {
 		RaceEngineer.Instance.getSpeaker()
@@ -207,7 +208,7 @@ Exit:
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceEngineer(shutdown := false) {
@@ -223,7 +224,7 @@ shutdownRaceEngineer(shutdown := false) {
 		SetTimer shutdownRaceEngineer, -1000
 }
 
-handleEngineerRemoteCalls(event, data) {
+handleEngineerMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		

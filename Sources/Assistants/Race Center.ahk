@@ -37,6 +37,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\GDIP.ahk
@@ -115,6 +116,67 @@ global vWorking := 0
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                        RaceCenterTask                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class RaceCenterTask extends Task {
+	Window[] {
+		Get {
+			return RaceCenter.Instance.Window
+		}
+	}
+
+	run() {
+		rCenter := RaceCenter.Instance
+
+		if rCenter.startWorking() {
+			try {
+				base.run()
+
+				return false
+			}
+			finally {
+				rCenter.finishWorking()
+			}
+		}
+		else
+			return this
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                       SyncSessionTask                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SyncSessionTask extends RaceCenterTask {
+	__New() {
+		SyncSessionTask.Instance := this
+
+		base.__New(ObjBindMethod(RaceCenter.Instance, "syncSession"), 86400000)
+	}
+
+	run() {
+		base.run()
+
+		this.enable()
+
+		return this
+	}
+
+	enable(wait := 10000) {
+		this.NextExecution := (A_TickCount + wait)
+	}
+
+	disable() {
+		this.NextExecution := 2147483647
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                          RaceCenter                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global messageField
 
@@ -1486,7 +1548,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Default
 
-		SetTimer syncSession, Off
+		SyncSessionTask.Instance.disable()
 
 		try {
 			if (!this.ServerToken || (this.ServerToken = ""))
@@ -1500,9 +1562,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.loadTeams()
 
-			syncSession()
-
-			SetTimer syncSession, -50
+			SyncSessionTask.Instance.enable(0)
 		}
 		catch exception {
 			this.iServerToken := "__INVALID__"
@@ -1625,7 +1685,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	selectSession(identifier) {
-		SetTimer syncSession, Off
+		SyncSessionTask.Instance.disable()
 
 		window := this.Window
 
@@ -1649,7 +1709,7 @@ class RaceCenter extends ConfigurationItem {
 		this.initializeSession()
 		this.loadSessionDrivers()
 
-		syncSession()
+		SyncSessionTask.Instance.enable(0)
 	}
 
 	selectDriver(driver, force := false) {
@@ -3537,8 +3597,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	pushTask(task) {
-		this.iTasks.Push(task)
+	pushTask(theTask) {
+		Task.runTask(new RaceCenterTask(theTask))
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -6418,7 +6478,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, "")
 			}
 			else {
-				SetTimer syncSession, Off
+				SyncSessionTask.Instance.disable()
 
 				this.iConnected := false
 
@@ -6497,7 +6557,7 @@ class RaceCenter extends ConfigurationItem {
 		while !this.iClosed
 			Sleep 1000
 
-		SetTimer syncSession, Off
+		SyncSessionTask.Instance.disable()
 	}
 
 	close() {
@@ -10889,49 +10949,6 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 	return false
 }
 
-syncSession() {
-	rCenter := RaceCenter.Instance
-
-	if !inList(rCenter.iTasks, "syncSessionAsync")
-		rCenter.pushTask("syncSessionAsync")
-
-	SetTimer syncSession, -10000
-}
-
-syncSessionAsync() {
-	RaceCenter.Instance.syncSession()
-}
-
-runTasks() {
-	worked := false
-
-	rCenter := RaceCenter.Instance
-
-	try {
-		if rCenter.isWorking()
-			return
-		else if (rCenter.iTasks.Length() > 0) {
-			if rCenter.startWorking() {
-				try {
-					while (rCenter.iTasks.Length() > 0) {
-						task := rCenter.iTasks.RemoveAt(1)
-
-						worked := true
-
-						%task%()
-					}
-				}
-				finally {
-					rCenter.finishWorking()
-				}
-			}
-		}
-	}
-	finally {
-		SetTimer runTasks, % worked ? -200 : -50
-	}
-}
-
 startupRaceCenter() {
 	icon := kIconsDirectory . "Console.ico"
 
@@ -10949,17 +10966,15 @@ startupRaceCenter() {
 
 	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 
+	Task.runTask(new SyncSessionTask())
+
 	rCenter.createGui(rCenter.Configuration)
 
 	rCenter.connect(true)
 
-	registerEventHandler("Setup", "functionEventHandler")
-
-	SetTimer runTasks, -2000
+	registerMessageHandler("Setup", "functionMessageHandler")
 
 	rCenter.show()
-
-	SetTimer runTasks, Off
 
 	ExitApp 0
 

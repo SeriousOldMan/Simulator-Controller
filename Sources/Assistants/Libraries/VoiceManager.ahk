@@ -17,6 +17,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
@@ -150,7 +151,7 @@ class VoiceManager {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
@@ -313,6 +314,8 @@ class VoiceManager {
 		}
 
 		continue() {
+			local continuation
+
 			continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.VoiceContinuation)
@@ -471,7 +474,7 @@ class VoiceManager {
 		if !this.Speaker
 			this.iListener := false
 
-		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
+		registerMessageHandler("Voice", "methodMessageHandler", this)
 
 		if (!this.VoiceServer && this.PushToTalk) {
 			listen := ObjBindMethod(this, "listen")
@@ -489,7 +492,7 @@ class VoiceManager {
 
 			processID := ErrorLevel
 
-			raiseEvent(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
+			sendMessage(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
 		}
 
 		return false
@@ -579,7 +582,7 @@ class VoiceManager {
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
-				raiseEvent(kFileMessage, "Voice"
+				sendMessage(kFileMessage, "Voice"
 						 , "registerVoiceClient:" . values2String(";", this.Name, processID
 																, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized"
 																, this.Language, this.Synthesizer, this.Speaker
@@ -731,7 +734,7 @@ class VoiceManager {
 			if speechRecognizer
 				speechRecognizer.setChoices(name, choices)
 			else
-				raiseEvent(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -757,7 +760,7 @@ class VoiceManager {
 				}
 			}
 			else if (grammar != "Call")
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
 		if speechRecognizer
@@ -768,21 +771,11 @@ class VoiceManager {
 				; ignore^
 			}
 		else
-			raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-	}
-
-	handleVoiceCalls(event, data) {
-		if InStr(data, ":") {
-			data := StrSplit(data, ":", , 2)
-
-			return withProtection(ObjBindMethod(this, data[1]), string2Values(";", data[2])*)
-		}
-		else
-			return withProtection(ObjBindMethod(this, data))
+			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 	}
 
 	raisePhraseRecognized(grammar, words) {
-		raiseEvent(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
+		sendMessage(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
 	}
 
 	localPhraseRecognized(grammar, words*) {
@@ -817,12 +810,12 @@ class VoiceManager {
 	}
 
 	recognizeActivation(grammar, words) {
-		raiseEvent(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
+		sendMessage(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
 	}
 
 	recognizeCommand(grammar, words) {
 		if this.VoiceServer
-			raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
+			sendMessage(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
 		else if this.Grammars.HasKey(grammar)
 			this.phraseRecognized(grammar, words)
 	}

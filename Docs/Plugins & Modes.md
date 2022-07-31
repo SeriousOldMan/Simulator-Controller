@@ -415,7 +415,7 @@ Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* 
 
 Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: {Insert};
+	openPitstopMFD: p; closePitstopMFD: {Insert};
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
 					 TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
 
@@ -436,7 +436,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
+First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "p" and the "Insert" keys on the keyboard.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -541,7 +541,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: {Down};
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, BodyworkRepair Button.3, SuspensionRepair Button.4, EngineRepair Button.7
 
@@ -737,7 +737,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: p; closePitstopMFD: p;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
@@ -829,7 +829,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: p; closePitstopMFD: p;
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3,
 					 PitstopPlan Button.7, PitstopPrepare Button.8
 
@@ -858,7 +858,7 @@ First, you need to define, how to open and close the Pitstop MFD (aka Menu) in *
 	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*;
 	acceptChoice: *acceptChoiceHotkey*
 	
-Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "W", "S", "A", "D" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "w", "s", "a", "d" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
@@ -921,7 +921,7 @@ Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a sma
 
 ## Plugin *AMS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "Automobilista 2" as the window title.
+This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "ahk_exe AMS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
 
@@ -935,7 +935,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
+	openPitstopMFD: i; previousOption: z; nextOption: h; previousChoice: g; nextChoice: j;
 	pitstopCommands: Refuel Dial.2 5, TyreCompound Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
 
 ### Mode *Assistant*
@@ -955,14 +955,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Automobilista 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, for which unfortunately no events can be generated by software.
+First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Automobilista 2*. "i" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, for which unfortunately no events can be generated by software.
 
 	openPitstopMFD: *openHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default;
 	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
 	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*
 	
-Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Automobilista 2* (see above).
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "z", "h", "g" and "j", which are **not** the default bindings of *Automobilista 2* (see above).
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
@@ -1017,7 +1017,7 @@ It is very important, that you do not use the *Automobilista 2* ICM on your own,
 
 ## Plugin *PCARS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "Project CARS 2" as the window title.
+This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
 

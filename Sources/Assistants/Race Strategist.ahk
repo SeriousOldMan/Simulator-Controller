@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceStrategist.ahk
 
@@ -182,7 +183,7 @@ startRaceStrategist() {
 												, strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
 												, strategistRecognizer, strategistListener, voiceServer)
 
-	registerEventHandler("Race Strategist", "handleStrategistRemoteCalls")
+	registerMessageHandler("Race Strategist", "handleStrategistMessage")
 	
 	if (debug && strategistSpeaker) {
 		RaceStrategist.Instance.getSpeaker()
@@ -207,7 +208,7 @@ Exit:
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceStrategist(shutdown := false) {
@@ -223,7 +224,7 @@ shutdownRaceStrategist(shutdown := false) {
 		SetTimer shutdownRaceStrategist, -1000
 }
 
-handleStrategistRemoteCalls(event, data) {
+handleStrategistMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 		

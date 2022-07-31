@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
@@ -389,13 +390,13 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				raiseEvent(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				sendMessage(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
 		deactivate() {
 			if this.DeactivationCallback
-				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
+				sendMessage(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 
 		recognizeVoiceCommand(grammar, words) {
@@ -942,7 +943,7 @@ class VoiceServer extends ConfigurationItem {
 
 		descriptor := voiceClient.VoiceCommands[grammar]
 
-		raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
+		sendMessage(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
 }
 
@@ -980,7 +981,7 @@ initializeVoiceServer() {
 
 	new VoiceServer(kSimulatorConfiguration)
 
-	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+	registerMessageHandler("Voice", "handleVoiceMessage")
 
 	return
 
@@ -990,10 +991,10 @@ Exit:
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleVoiceRemoteCalls(event, data) {
+handleVoiceMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 

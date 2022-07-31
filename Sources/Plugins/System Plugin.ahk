@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Messages.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -330,7 +337,7 @@ class SystemPlugin extends ControllerPlugin {
 		if this.ChildProcess {
 			; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 			;
-			; raiseEvent(kPipeMessage, "Startup", "exitStartup")
+			; sendMessage(kPipeMessage, "Startup", "exitStartup")
 			;
 			; Using a sempahore file instead...
 
@@ -583,12 +590,12 @@ initializeSystemPlugin() {
 
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 
-	registerEventHandler("Startup", "functionEventHandler")
+	registerMessageHandler("Startup", "functionEventHandler")
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 startupApplication(application, silent := true) {

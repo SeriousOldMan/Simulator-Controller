@@ -66,4 +66,4 @@ If this is *true*, most applications of Simulator Controller will adopt accordin
 Miscellaneous constants, which define string representations for often used code constants.
 
 #### *kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage*
-These constans define the various delivery methods for events raised by the function [raiseEvent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#raiseeventmessagetype--oneofklocalmessage-kwindowmessage-kpipemessage-kfilemessage-event--string-data--string-target--false).
+These constans define the various delivery methods for messages send by the function [sendMessage](*).

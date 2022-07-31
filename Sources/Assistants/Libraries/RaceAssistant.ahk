@@ -109,7 +109,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		callRemote(function, arguments*) {
-			raiseEvent(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
+			sendMessage(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
 		saveSessionState(arguments*) {
@@ -463,6 +463,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handleVoiceCommand(grammar, words) {
+		local continuation
+
 		switch grammar {
 			case "Time":
 				this.timeRecognized(words)

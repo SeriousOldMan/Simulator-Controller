@@ -173,7 +173,7 @@ class RaceEngineer extends RaceAssistant {
 				else {
 					this.getSpeaker().speakPhrase("Confirm")
 
-					sendMessage()
+					Task.yield()
 
 					Loop 10
 						Sleep 500
@@ -447,7 +447,7 @@ class RaceEngineer extends RaceAssistant {
 	preparePitstopRecognized(words) {
 		this.getSpeaker().speakPhrase("Confirm")
 
-		sendMessage()
+		Task.yield()
 
 		Loop 10
 			Sleep 500
@@ -1803,7 +1803,7 @@ class RaceEngineer extends RaceAssistant {
 			if confirm {
 				this.getSpeaker().speakPhrase("Confirm")
 
-				sendMessage()
+				Task.yield()
 
 				Loop 10
 					Sleep 500
@@ -1823,7 +1823,7 @@ class RaceEngineer extends RaceAssistant {
 		else {
 			this.getSpeaker().speakPhrase("Confirm")
 
-			sendMessage()
+			Task.yield()
 
 			Loop 10
 				Sleep 500

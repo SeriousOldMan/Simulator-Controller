@@ -14,6 +14,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Messages.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -41,11 +48,6 @@ global vProgressBar
 global vProgressTitle
 global vProgressMessage
 
-global vEventHandlers = Object()
-global vIncomingMessages = []
-global vOutgoingMessages = []
-global vDispatching = false
-
 global vPendingTrayMessages = []
 global vTrayMessageDuration = false
 
@@ -62,17 +64,6 @@ moveHTMLViewer() {
 
 dismissHTMLViewer() {
 	viewHTML(false)
-}
-
-createMessageReceiver() {
-	; Gui MR:-Border -Caption
-	Gui MR:New, , % A_ScriptName
-	Gui MR:Color, D0D0D0, D8D8D8
-	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
-	Gui MR:Add, Text, , % A_ScriptName
-
-	Gui MR:Margin, 10, 10
-	Gui MR:Show, X0 Y0 Hide AutoSize
 }
 
 consentDialog(id, consent := false) {
@@ -192,258 +183,6 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-receivePipeMessage() {
-	result := false
-
-	for event, handler in vEventHandlers {
-		if (event = "*")
-			continue
-
-		pipeName := "\\.\pipe\SC." . event
-
-		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
-			Loop Read, %pipeName%
-			{
-				data := StrSplit(A_LoopReadLine, ":", , 2)
-				event := data[1]
-
-				eventHandler := vEventHandlers[event]
-
-				if (!eventHandler)
-					eventHandler := vEventHandlers["*"]
-
-				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-				vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-
-				result := true
-			}
-	}
-
-	return result
-}
-
-sendPipeMessage(event, data) {
-	static ERROR_PIPE_CONNECTED := 535
-	static ERROR_PIPE_LISTENING := 536
-	static ptr
-
-	pipeName := "\\.\pipe\SC." . event
-
-	pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0)
-
-	DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
-
-	if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
-		message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
-
-		DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
-
-		DllCall("CloseHandle", ptr, pipe)
-
-		return true
-	}
-	else
-		return false
-}
-
-receiveWindowMessage(wParam, lParam) {
-	;---------------------------------------------------------------------------
-    ; retrieve info from COPYDATASTRUCT
-    ;---------------------------------------------------------------------------
-    dwData := NumGet(lParam + A_PtrSize * 0)    ; DWORD encoded request
-    cbData := NumGet(lParam + A_PtrSize * 1)    ; length of DATA string (incl ZERO)
-    lpData := NumGet(lParam + A_PtrSize * 2)    ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-    ; interpret available info
-    ;---------------------------------------------------------------------------
-    request := decodeDWORD(dwData)              ; 4-char decoded request
-
-	if (request = "EVNT") {
-		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length)           ; DATA string from pointer
-	}
-	else if ((request = "RS") || (request = "SD")) {
-		length  := (cbData - 1)						; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length, "")       ; DATA string from pointer
-	}
-	else
-		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
-
-	data := StrSplit(data, ":", , 2)
-	event := data[1]
-
-	eventHandler := vEventHandlers[event]
-
-	if (!eventHandler)
-		eventHandler := vEventHandlers["*"]
-
-	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-	if (request = "RS")
-		withProtection(eventHandler, event, data[2])
-	else
-		vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-}
-
-sendWindowMessage(target, event, data) {
-	curDetectHiddenWindows := A_DetectHiddenWindows
-	curTitleMatchMode := A_TitleMatchMode
-
-	event := event . ":" . data
-
-	;---------------------------------------------------------------------------
-	; construct the message to send
-	;---------------------------------------------------------------------------
-	dwData := encodeDWORD("EVNT")
-	cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
-	lpData := &event                                ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-	; put the message in a COPYDATASTRUCT
-	;---------------------------------------------------------------------------
-	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
-	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
-	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
-	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
-
-	;---------------------------------------------------------------------------
-	; parameters for SendMessage command
-	;---------------------------------------------------------------------------
-	message := 0x4a     ; WM_COPYDATA
-	wParam  := ""       ; not used
-	lParam  := &struct  ; COPYDATASTRUCT
-	control := ""       ; not needed
-
-	SetTitleMatchMode 2 ; match part of the title
-	DetectHiddenWindows On ; needed for sending messages
-
-	try {
-		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
-
-		return (ErrorLevel != "FAIL")
-	}
-	catch exception {
-		return false
-	}
-	finally {
-		DetectHiddenWindows %curDetectHiddenWindows%
-		SetTitleMatchMode %curTitleMatchMode%
-	}
-}
-
-receiveFileMessage() {
-	result := false
-
-	Process Exist
-
-	pid := ErrorLevel
-
-	fileName := kTempDirectory . "Messages\" . pid . ".msg"
-
-	if FileExist(fileName) {
-		file := false
-
-		try {
-			file := FileOpen(fileName, "rw-rwd")
-		}
-		catch exception {
-			return false
-		}
-
-		while !file.AtEOF {
-			line := Trim(file.ReadLine(), " `t`n`r")
-
-			if (StrLen(line) == 0)
-				break
-
-			data := StrSplit(line, ":", , 2)
-			event := data[1]
-
-			eventHandler := vEventHandlers[event]
-
-			if (!eventHandler)
-				eventHandler := vEventHandlers["*"]
-
-			logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-			vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-
-			result := true
-		}
-
-		file.Length := 0
-
-		file.Close()
-	}
-
-	return result
-}
-
-sendFileMessage(pid, event, data) {
-	text := event . ":" . data . "`n"
-
-	try {
-		FileAppend %text%, % kTempDirectory . "Messages\" . pid . ".msg"
-	}
-	catch exception {
-		return false
-	}
-
-	return true
-}
-
-receiveMessage() {
-	return (receiveFileMessage() || receivePipeMessage())
-}
-
-sendMessage() {
-	if (vOutgoingMessages.Length() > 0) {
-		handler := vOutgoingMessages[1]
-
-		if %handler%()
-			vOutgoingMessages.RemoveAt(1)
-	}
-}
-
-messageDispatcher() {
-	if vDispatching
-		return
-	else {
-		vDispatching := true
-
-		try {
-			while (vIncomingMessages.Length() > 0) {
-				descriptor := vIncomingMessages.RemoveAt(1)
-
-				withProtection(descriptor[1], descriptor[2], descriptor[3])
-			}
-		}
-		finally {
-			vDispatching := false
-
-			SetTimer messageDispatcher, -200
-		}
-	}
-}
-
-messageQueue() {
-	protectionOn()
-
-	try {
-		if !receiveMessage()
-			sendMessage()
-	}
-	finally {
-		protectionOff()
-
-		SetTimer messageQueue, -100
-
-		messageDispatcher()
-	}
-}
-
 trayMessageQueue() {
 	if (vPendingTrayMessages.Length() > 0) {
 		protectionOn()
@@ -486,65 +225,6 @@ trayMessageQueue() {
 	}
 	else
 		SetTimer trayMessageQueue, -500
-}
-
-encodeDWORD(string) {
-	result := 0
-
-	Loop % StrLen(string) {
-        result <<= 8
-        result += Asc(SubStr(string, A_Index, 1))
-    }
-
-    return result
-}
-
-decodeDWORD(data) {
-	result := ""
-
-    Loop 4 {
-        result := Chr(data & 0xFF) . result
-        data >>= 8
-    }
-
-    return result
-}
-
-unknownEventHandler(event, data) {
-	logMessage(kLogCritical, translate("Unhandled event """) . event . translate(""": ") . data)
-
-	raiseEvent(kLocalMessage, event, data)
-}
-
-stopMessageManager() {
-	Process Exist
-
-	pid := ErrorLevel
-
-	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
-
-	return false
-}
-
-startMessageManager() {
-	FileCreateDir %kTempDirectory%Messages
-
-	OnMessage(0x4a, "receiveWindowMessage")
-
-	registerEventHandler("*", "unknownEventHandler")
-
-	Process Exist
-
-	pid := ErrorLevel
-
-	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
-
-	OnExit("stopMessageManager")
-
-	SetTimer messageQueue, -2000
-	SetTimer messageDispatcher, -4000
 }
 
 logError(exception) {
@@ -1999,50 +1679,6 @@ bubbleSort(ByRef array, comparator := "greaterComparator") {
 	}
 }
 
-functionEventHandler(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
-
-		return withProtection(data[1], string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(data)
-}
-
-registerEventHandler(event, handler) {
-	vEventHandlers[event] := handler
-}
-
-raiseEvent(messageType, event, data, target := false) {
-	switch messageType {
-		case kLocalMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
-
-			eventHandler := vEventHandlers[event]
-
-			if (!eventHandler)
-				eventHandler := vEventHandlers["*"]
-
-			logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
-
-			vIncomingMessages.Push(Array(eventHandler, event, data))
-		case kWindowMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
-
-			vOutgoingMessages.Push(Func("sendWindowMessage").Bind(target, event, data))
-		case kPipeMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
-
-			vOutgoingMessages.Push(Func("sendPipeMessage").Bind(event, data))
-		case kFileMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
-
-			vOutgoingMessages.Push(Func("sendFileMessage").Bind(target, event, data))
-		default:
-			Throw "Unknown message type (" . messageType . ") detected in raiseEvent..."
-	}
-}
-
 trayMessage(title, message, duration := false) {
 	title := StrReplace(title, "`n", A_Space)
 	message := StrReplace(message, "`n", A_Space)
@@ -2251,7 +1887,7 @@ getControllerConfiguration(configuration := false) {
 	pid := ErrorLevel
 
 	if (pid && !configuration && !FileExist(kUserConfigDirectory . "Simulator Controller.config")) {
-		raiseEvent(kFileMessage, "Controller", "writeControllerConfiguration", pid)
+		sendMessage(kFileMessage, "Controller", "writeControllerConfiguration", pid)
 
 		tries := 10
 
@@ -2412,6 +2048,4 @@ if !vDetachedInstallation {
 }
 
 initializeLoggingSystem()
-startMessageManager()
 startTrayMessageManager()
-createMessageReceiver()

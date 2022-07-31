@@ -217,7 +217,7 @@ class RaceStrategist extends RaceAssistant {
 
 				this.getSpeaker().speakPhrase("Confirm")
 
-				sendMessage()
+				Task.yield()
 
 				Loop 10
 					Sleep 500
@@ -228,7 +228,7 @@ class RaceStrategist extends RaceAssistant {
 
 				this.getSpeaker().speakPhrase("Confirm")
 
-				sendMessage()
+				Task.yield()
 
 				Loop 10
 					Sleep 500
@@ -320,7 +320,7 @@ class RaceStrategist extends RaceAssistant {
 
 					speaker.speakPhrase("Confirm")
 
-					sendMessage()
+					Task.yield()
 
 					Loop 10
 						Sleep 500
@@ -585,6 +585,7 @@ class RaceStrategist extends RaceAssistant {
 	reviewRace(cars, laps, position, leaderAvgLapTime
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
+		local continuation
 
 		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
 			speaker := this.getSpeaker()
@@ -1379,7 +1380,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__") {
-		sendMessage()
+		Task.yield()
 
 		Loop 10
 			Sleep 500
@@ -1389,12 +1390,12 @@ class RaceStrategist extends RaceAssistant {
 		if ErrorLevel
 			if plannedLap {
 				if (refuel != kUndefined)
-					raiseEvent(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
+					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
 				else
-					raiseEvent(kFileMessage, "Race Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . plannedLap, ErrorLevel)
 			}
 			else
-				raiseEvent(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)
+				sendMessage(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)
 	}
 
 	performPitstop(lapNumber := false) {
@@ -1433,7 +1434,7 @@ class RaceStrategist extends RaceAssistant {
 
 		this.getSpeaker().speakPhrase("Confirm")
 
-		sendMessage()
+		Task.yield()
 
 		Loop 10
 			Sleep 500

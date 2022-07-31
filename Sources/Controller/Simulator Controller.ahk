@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 
@@ -774,7 +775,7 @@ class SimulatorController extends ConfigurationItem {
 						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-							raiseEvent(kLocalMessage, "Startup", "playStartupSong:" . songFile)
+							sendMessage(kLocalMessage, "Startup", "playStartupSong:" . songFile)
 
 						posX := Round((A_ScreenWidth - 300) / 2)
 						posY := A_ScreenHeight - 150
@@ -827,13 +828,13 @@ class SimulatorController extends ConfigurationItem {
 				if !registered {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 
-					raiseEvent(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false
+					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false
 																								, false, false, false, true, true), this.VoiceServer)
 
 					registered := true
 				}
 
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
 			}
 
 			return descriptor
@@ -1931,8 +1932,8 @@ initializeSimulatorController() {
 		protectionOff()
 	}
 
-	registerEventHandler("Controller", "functionEventHandler")
-	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+	registerMessageHandler("Controller", "functionMessageHandler")
+	registerMessageHandler("Voice", "methodMessageHandler", SimulatorController.Instance)
 
 	return
 
@@ -2045,21 +2046,11 @@ setMode(actionOrPlugin, mode := false) {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 writeControllerConfiguration() {
 	SimulatorController.Instance.writeControllerConfiguration()
-}
-
-handleVoiceRemoteCalls(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
-
-		return withProtection(ObjBindMethod(SimulatorController.Instance, data[1]), string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(ObjBindMethod(SimulatorController.Instance, data))
 }
 
 

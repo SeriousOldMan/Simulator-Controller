@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
@@ -79,7 +80,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else
 				return
 
-			raiseEvent(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
+			sendMessage(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
 		shutdown(arguments*) {
@@ -522,23 +523,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			controller.registerPlugin(this)
 
-			registerEventHandler(this.Plugin, ObjBindMethod(this, "handleRemoteCalls"))
+			registerMessageHandler(this.Plugin, "methodMessageHandler", this)
 
 			if this.RaceAssistantEnabled
 				this.enableRaceAssistant(false, true)
 			else
 				this.disableRaceAssistant(false, true)
 		}
-	}
-
-	handleRemoteCalls(event, data) {
-		if InStr(data, ":") {
-			data := StrSplit(data, ":", , 2)
-
-			return withProtection(ObjBindMethod(this, data[1]), string2Values(";", data[2])*)
-		}
-		else
-			return withProtection(ObjBindMethod(this, data))
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {

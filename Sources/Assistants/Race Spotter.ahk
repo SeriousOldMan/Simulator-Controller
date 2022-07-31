@@ -35,6 +35,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceSpotter.ahk
 
@@ -182,7 +183,7 @@ startRaceSpotter() {
 										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
 										  , spotterRecognizer, spotterListener, voiceServer)
 
-	registerEventHandler("Race Spotter", "handleSpotterRemoteCalls")
+	registerMessageHandler("Race Spotter", "handleSpotterMessage")
 
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()
@@ -207,7 +208,7 @@ Exit:
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceSpotter(shutdown := false) {
@@ -223,7 +224,7 @@ shutdownRaceSpotter(shutdown := false) {
 		SetTimer shutdownRaceSpotter, -1000
 }
 
-handleSpotterRemoteCalls(event, data) {
+handleSpotterMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 

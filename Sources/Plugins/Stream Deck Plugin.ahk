@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\GDIP.ahk
 
@@ -573,7 +574,7 @@ refreshStreamDecks() {
 	SetTimer refreshStreamDecks, -5000
 }
 
-streamDeckEventHandler(event, data) {
+handleStreamDeckMessage(category, data) {
 	local function
 
 	command := string2Values(A_Space, data)
@@ -599,7 +600,7 @@ streamDeckEventHandler(event, data) {
 		case kDialType:
 			rotateDial(descriptor[2], command[2])
 		default:
-			Throw "Unknown controller function type (" . descriptor[1] . ") detected in streamDeckEventHandler..."
+			Throw "Unknown controller function type (" . descriptor[1] . ") detected in handleStreamDeckMessage..."
 	}
 }
 
@@ -614,7 +615,7 @@ initializeStreamDeckPlugin() {
 		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
 
-	registerEventHandler("Stream Deck", "streamDeckEventHandler")
+	registerMessageHandler("Stream Deck", "handleStreamDeckMessage")
 
 	SetTimer refreshStreamDecks, -5000
 }

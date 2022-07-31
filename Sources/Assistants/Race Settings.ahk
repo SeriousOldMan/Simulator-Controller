@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
 #Include Libraries\SessionDatabase.ahk
 
@@ -1652,7 +1653,7 @@ showRaceSettingsEditor() {
 		writeConfiguration(fileName, settings)
 	}
 	else {
-		registerEventHandler("Setup", "functionEventHandler")
+		registerMessageHandler("Setup", "functionMessageHandler")
 
 		if (editRaceSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
@@ -1669,7 +1670,7 @@ Exit:
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {

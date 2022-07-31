@@ -1742,7 +1742,7 @@ fireControllerActions(function, trigger, fromTask := false) {
 				pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
 			else {
 				pending := []
-				
+
 				try {
 					function.Controller.fireActions(function, trigger)
 
@@ -1760,11 +1760,11 @@ fireControllerActions(function, trigger, fromTask := false) {
 		finally {
 			protectionOff(true, true)
 		}
-		
+
 		return false
 	}
 	else
-		Task.runTask(ObjBindMethod(this, "fireControllerActions", function, trigger, true), 0, kLowPriority)
+		Task.runTask(Func("fireControllerActions").Bind(function, trigger, true), 0, kLowPriority)
 }
 
 getLabelForLogMessage(action) {

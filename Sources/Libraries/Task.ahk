@@ -41,7 +41,7 @@ class Task {
 
 	iCallable := false
 
-	Task[] {
+	CurrentTask[] {
 		Get {
 			return Task.sCurrentTask
 		}

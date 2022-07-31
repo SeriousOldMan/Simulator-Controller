@@ -579,9 +579,7 @@ updateModeSelector() {
 		protectionOff()
 	}
 
-	Task.CurrentTask.NextExecution := (A_TickCount + nextUpdate)
-
-	return Task.CurrentTask
+	Task.CurrentTask.Sleep := nextUpdate
 }
 
 initializeSystemPlugin() {
@@ -591,7 +589,7 @@ initializeSystemPlugin() {
 
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 
-	registerMessageHandler("Startup", "functionEventHandler")
+	registerMessageHandler("Startup", "functionMessageHandler")
 }
 
 

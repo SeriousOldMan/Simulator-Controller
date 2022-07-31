@@ -24,92 +24,75 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                       MessageHandler                              ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class MessageHandler {
-	iHandler := false
-
-	Handler[] {
-		Get {
-			return this.iHandler
-		}
-	}
-
-	__New(handler := false) {
-		this.iHandler := handler
-	}
-
-	call(category, data) {
-		handler := this.Handler
-
-		%handler%(category, data)
-		
-		return false
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    FunctionMessageHandler                         ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class FunctionMessageHandler extends MessageHandler {
-	call(category, data) {
-		if this.Handler
-			base.call(category, data)
-		else if InStr(data, ":") {
-			data := StrSplit(data, ":", , 2)
-
-			withProtection(data[1], string2Values(";", data[2])*)
-		}
-		else
-			withProtection(data)
-			
-		return false
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                     MethodMessageHandler                          ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class MethodMessageHandler extends MessageHandler {
-	iObject := false
-
-	Object[] {
-		Get {
-			return this.iObject
-		}
-	}
-
-	__New(object, handler := false) {
-		this.iObject := object
-
-		base.__New(handler)
-	}
-
-	call(category, data) {
-		handler := this.Handler
-
-		if handler
-			%handler%(category, object, data)
-		else if InStr(data, ":") {
-			data := StrSplit(data, ":", , 2)
-
-			return withProtection(ObjBindMethod(object, data[1], string2Values(";", data[2])*))
-		}
-		else
-			return withProtection(ObjBindMethod(object, data))
-	}
-}
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                        MessageManager                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class MessageManager extends Task {
 	static sMessageHandlers := {}
 	static sOutgoingMessages := []
+
+	class MessageHandler {
+		iHandler := false
+
+		Handler[] {
+			Get {
+				return this.iHandler
+			}
+		}
+
+		__New(handler := false) {
+			this.iHandler := handler
+		}
+
+		call(category, data) {
+			handler := this.Handler
+
+			if handler
+				%handler%(category, data)
+			else if InStr(data, ":") {
+				data := StrSplit(data, ":", , 2)
+
+				withProtection(data[1], string2Values(";", data[2])*)
+			}
+			else
+				withProtection(data)
+
+			return false
+		}
+	}
+
+	class FunctionMessageHandler extends MessageManager.MessageHandler {
+	}
+
+	class MethodMessageHandler extends MessageManager.MessageHandler {
+		iObject := false
+
+		Object[] {
+			Get {
+				return this.iObject
+			}
+		}
+
+		__New(object, handler := false) {
+			this.iObject := object
+
+			base.__New(handler)
+		}
+
+		call(category, data) {
+			handler := this.Handler
+
+			if handler
+				%handler%(category, this.Object, data)
+			else if InStr(data, ":") {
+				data := StrSplit(data, ":", , 2)
+
+				return withProtection(ObjBindMethod(this.Object, data[1], string2Values(";", data[2])*))
+			}
+			else
+				return withProtection(ObjBindMethod(this.Object, data))
+		}
+	}
 
 	class MessagesDispatcher extends Task {
 		iMessages := false
@@ -272,7 +255,7 @@ class MessageManager extends Task {
 	receiveMessages() {
 		fileMessages := this.receiveFileMessages()
 
-		return (fileMessages.Length() > 0) ? fileMassages : this.receivePipeMessages()
+		return ((fileMessages.Length() > 0) ? fileMessages : this.receivePipeMessages())
 	}
 
 	deliverMessage() {
@@ -535,13 +518,13 @@ methodMessageHandler(category, object, data) {
 }
 
 registerMessageHandler(category, handler, object := false) {
-	if isInstance(handler, MessageHandler)
+	if isInstance(handler, MessageManager.MessageHandler)
 		MessageManager.MessageHandlers[category] := handler
 	else {
 		if object
-			MessageManager.MessageHandlers[category] := new MethodMessageHandler(object, handler)
+			MessageManager.MessageHandlers[category] := new MessageManager.MethodMessageHandler(object, handler)
 		else
-			MessageManager.MessageHandlers[category] := new FunctionMessageHandler(handler)
+			MessageManager.MessageHandlers[category] := new MessageManager.FunctionMessageHandler(handler)
 	}
 }
 

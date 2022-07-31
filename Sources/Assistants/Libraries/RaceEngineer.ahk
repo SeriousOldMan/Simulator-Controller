@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
@@ -1122,9 +1123,7 @@ class RaceEngineer extends RaceAssistant {
 
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					callback := ObjBindMethod(this, "forceFinishSession")
-
-					SetTimer %callback%, -120000
+					Task.runTask(ObjBindMethod(this, "forceFinishSession"), 120000)
 
 					return
 				}
@@ -1143,11 +1142,10 @@ class RaceEngineer extends RaceAssistant {
 
 			this.finishSession()
 		}
-		else {
-			callback := ObjBindMethod(this, "forceFinishSession")
-
-			SetTimer %callback%, -5000
-		}
+		else
+			Task.runTask(ObjBindMethod(this, "forceFinishSession"), 5000)
+			
+		return false
 	}
 
 	shutdownSession(phase) {

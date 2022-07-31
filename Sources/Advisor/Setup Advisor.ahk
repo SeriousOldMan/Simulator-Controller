@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
@@ -495,7 +496,9 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 		}
 		else
-			advisor.loadSimulator(true, true)
+			this.loadSimulator(true, true)
+			
+		return false
 	}
 
 	show() {
@@ -3199,11 +3202,8 @@ runSetupAdvisor() {
 		}
 		else
 			advisor.loadSimulator(true, true)
-	else {
-		callback := ObjBindMethod(advisor, "restoreState")
-
-		SetTimer %callback%, -50
-	}
+	else
+		Task.runTask(ObjBindMethod(advisor, "restoreState"), 100)
 
 	return
 

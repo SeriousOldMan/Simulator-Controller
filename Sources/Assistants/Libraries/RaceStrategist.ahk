@@ -912,9 +912,7 @@ class RaceStrategist extends RaceAssistant {
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					callback := ObjBindMethod(this, "forceFinishSession")
-
-					SetTimer %callback%, -120000
+					Task.runTask(ObjBindMethod(this, "forceFinishSession"), 120000)
 
 					return
 				}
@@ -934,11 +932,10 @@ class RaceStrategist extends RaceAssistant {
 
 			this.finishSession()
 		}
-		else {
-			callback := ObjBindMethod(this, "forceFinishSession")
-
-			SetTimer %callback%, -5000
-		}
+		else
+			Task.runTask(ObjBindMethod(this, "forceFinishSession"), 5000)
+		
+		return false
 	}
 
 	finishSessionWithReview(shutdown) {

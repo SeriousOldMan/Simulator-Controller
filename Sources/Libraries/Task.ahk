@@ -34,7 +34,7 @@ class Task {
 	static sNormalTasks := []
 	static sHighTasks := []
 
-	static sActiveTask := false
+	static sCurrentTask := false
 
 	iPriority := kNormalPriority
 	iNextExecution := false
@@ -43,7 +43,7 @@ class Task {
 
 	Task[] {
 		Get {
-			return Task.sActiveTask
+			return Task.sCurrentTask
 		}
 	}
 
@@ -81,8 +81,8 @@ class Task {
 		}
 	}
 
-	__New(callable := false, wait := 0, priority := 1) {
-		this.iNextExecution := (A_TickCount + wait)
+	__New(callable := false, sleep := 0, priority := 1) {
+		this.iNextExecution := (A_TickCount + sleep)
 		this.iCallable := callable
 		this.iPriority := priority
 	}
@@ -141,7 +141,7 @@ class Task {
 				Throw "Unexpected priority detected in Task.addTask..."
 		}
 
-		if (Task.ActiveTask && (priority > Task.ActiveTask.Priority))
+		if (Task.CurrentTask && (priority > Task.CurrentTask.Priority))
 			Task.interrupt()
 	}
 
@@ -158,16 +158,16 @@ class Task {
 		}
 	}
 
-	runTask(theTask, wait := "__Undefined__", priority := "__Undefined__") {
+	runTask(theTask, sleep := "__Undefined__", priority := "__Undefined__") {
 		if isInstance(theTask, Task) {
-			if (wait != kUndefined)
-				theTask.iNextExecution := (A_TickCount + wait)
+			if (sleep != kUndefined)
+				theTask.iNextExecution := (A_TickCount + sleep)
 
 			if (priority != kUndefined)
 				theTask.iPriority := priority
 		}
 		else
-			theTask := new Task(theTask, wait, (priority != kUndefined) ? priority : kNormalPriority)
+			theTask := new Task(theTask, sleep, (priority != kUndefined) ? priority : kNormalPriority)
 
 		Task.addTask(theTask)
 	}
@@ -204,7 +204,7 @@ class Task {
 					next := Task.getNextTask(false)
 
 					if next
-						if (!Task.ActiveTask || (Task.ActiveTask.Priority < next.Priority)) {
+						if (!Task.CurrentTask || (Task.CurrentTask.Priority < next.Priority)) {
 							Task.removeTask(next)
 
 							worked := true
@@ -220,8 +220,8 @@ class Task {
 	}
 
 	execute(theTask) {
-		oldActiveTask := Task.sActiveTask
-		Task.sActiveTask := theTask
+		oldCurrentTask := Task.CurrentTask
+		Task.sCurrentTask := theTask
 
 		oldDefault := A_DefaultGui
 		window := theTask.Window
@@ -242,7 +242,7 @@ class Task {
 				Gui %window%:-Disabled
 			}
 
-			Task.sActiveTask := oldActiveTask
+			Task.sCurrentTask := oldCurrentTask
 		}
 
 		if next
@@ -250,6 +250,37 @@ class Task {
 	}
 }
 
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                       PeriodicTask                                ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class PeriodicTask extends Task {
+	iSleep := false
+
+	Sleep[] {
+		Get {
+			return this.iSleep
+		}
+
+		Set {
+			return (this.iSleep := value)
+		}
+	}
+
+	__New(callable, sleep, priority := 1) {
+		this.iSleep := sleep
+
+		base.__New(callable, sleep, priority)
+	}
+
+	run() {
+		base.run()
+
+		this.NextExecution := (A_TickCount + this.Sleep)
+
+		return this
+	}
+}
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                       Continuation                                ;;;
@@ -271,7 +302,7 @@ class Continuation extends Task {
 	}
 
 	__New(task := false, continuation := false) {
-		this.iTask := (task ? task : Task.ActiveTask)
+		this.iTask := (task ? task : Task.CurrentTask)
 
 		base.__New(continuation)
 	}

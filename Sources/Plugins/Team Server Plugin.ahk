@@ -391,9 +391,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.iTeamServerEnabled := true
 
-			callback := ObjBindMethod(this, "tryConnect")
-
-			SetTimer %callback%, -5000
+			Task.runTask(ObjBindMethod(this, "tryConnect"), 2000, kLowPriority)
 
 			this.updateActions(kSessionFinished)
 
@@ -1023,9 +1021,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		else
 			this.iConnected := false
 
-		callback := ObjBindMethod(this, "keepAlive")
-
-		SetTimer %callback%, -%nextPing%
+		Task.runTask(ObjBindMethod(this, "keepAlive"), nextPing, kLowPriority)
+		
+		return false
 	}
 }
 

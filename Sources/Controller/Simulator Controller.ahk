@@ -1093,7 +1093,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	initializeBackgroundTasks() {
-		SetTimer updateSimulatorState, -10000
+		Task.runTask(new PeriodicTask("updateSimulatorState", 10000, kLowPriority))
+		Task.runTask(new PeriodicTask("externalCommandManager", 100, kLowPriority))
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
@@ -1730,34 +1731,40 @@ functionActionCallable(function, trigger, action) {
 	return (action ? action : Func("fireControllerActions").Bind(function, trigger))
 }
 
-fireControllerActions(function, trigger) {
+fireControllerActions(function, trigger, fromTask := false) {
 	static pending := false
 
-	protectionOn(true, true)
+	if fromTask {
+		protectionOn(true, true)
 
-	try {
-		if pending
-			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
-		else {
-			pending := []
+		try {
+			if pending
+				pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
+			else {
+				pending := []
+				
+				try {
+					function.Controller.fireActions(function, trigger)
 
-			try {
-				function.Controller.fireActions(function, trigger)
+					while (pending.Length() > 0) {
+						callable := pending.RemoveAt(1)
 
-				while (pending.Length() > 0) {
-					callable := pending.RemoveAt(1)
-
-					%callable%()
+						%callable%()
+					}
+				}
+				finally {
+					pending := false
 				}
 			}
-			finally {
-				pending := false
-			}
 		}
+		finally {
+			protectionOff(true, true)
+		}
+		
+		return false
 	}
-	finally {
-		protectionOff(true, true)
-	}
+	else
+		Task.runTask(ObjBindMethod(this, "fireControllerActions", function, trigger, true), 0, kLowPriority)
 }
 
 getLabelForLogMessage(action) {
@@ -1826,12 +1833,12 @@ updateSimulatorState() {
 				fnController.updateVisibility()
 
 		if isSimulatorRunning {
-			SetTimer updateSimulatorState, -5000
+			Task.CurrentTask.Sleep := 5000
 
 			controller.hideLogo()
 		}
 		else {
-			SetTimer updateSimulatorState, -1000
+			Task.CurrentTask.Sleep := 1000
 
 			show := true
 
@@ -1869,7 +1876,12 @@ externalCommandManager() {
 	if FileExist(kTempDirectory . "Function.cmd") {
 		FileReadLine command, % kTempDirectory . "Function.cmd", 1
 
-		FileDelete % kTempDirectory . "Function.cmd"
+		try {
+			FileDelete % kTempDirectory . "Function.cmd"
+		}
+		catch exception {
+			; ignore
+		}
 
 		command := string2Values(A_Space, command)
 
@@ -1886,8 +1898,6 @@ externalCommandManager() {
 				Throw "Unknown controller function type (" . function[1] . ") detected in externalCommand..."
 		}
 	}
-
-	SetTimer externalCommandManager, -50
 }
 
 initializeSimulatorController() {
@@ -1904,6 +1914,8 @@ initializeSimulatorController() {
 	SetKeyDelay 5, 25
 
 	settings := readConfiguration(kSimulatorSettingsFile)
+
+	updateTrayMessageState(settings)
 
 	argIndex := inList(A_Args, "-Voice")
 	voice := false
@@ -1952,10 +1964,6 @@ startupSimulatorController() {
 
 	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-NoStartup"))
 		ExitApp 0
-
-	SetTimer externalCommandManager, -5000
-
-	updateTrayMessageState(controller.Settings)
 
 	controller.startup()
 }

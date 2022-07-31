@@ -17,6 +17,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 
 
@@ -142,24 +143,26 @@ moveConsentDialog() {
 changeProtection(up, critical := false, block := false) {
 	static level := 0
 
-	level += (up ? 1 : -1)
+	if (critical || block) {
+		level += (up ? 1 : -1)
 
-	if (level > 0) {
-		if critical
-			Critical 100
+		if (level > 0) {
+			if critical
+				Critical 100
 
-		if block
-			BlockInput On
+			if block
+				BlockInput On
+		}
+		else if (level == 0) {
+			if block
+				BlockInput Off
+
+			if critical
+				Critical Off
+		}
+		else if (level <= 0)
+			Throw "Nesting error detected in changeProtection..."
 	}
-	else if (level == 0) {
-		if block
-			BlockInput Off
-
-		if critical
-			Critical Off
-	}
-	else if (level <= 0)
-		Throw "Nesting error detected in changeProtection..."
 }
 
 playThemeSong(songFile) {
@@ -219,12 +222,8 @@ trayMessageQueue() {
 		}
 		finally {
 			protectionOff()
-
-			SetTimer trayMessageQueue, -500
 		}
 	}
-	else
-		SetTimer trayMessageQueue, -500
 }
 
 logError(exception) {
@@ -241,7 +240,7 @@ initializeLoggingSystem() {
 }
 
 startTrayMessageManager() {
-	SetTimer trayMessageQueue, -1000
+	Task.runTask(new PeriodicTask("trayMessageQueue", 500, kLowPriority))
 }
 
 requestShareSessionDatabaseConsent() {

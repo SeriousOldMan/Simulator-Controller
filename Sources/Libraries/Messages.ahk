@@ -44,6 +44,8 @@ class MessageHandler {
 		handler := this.Handler
 
 		%handler%(category, data)
+		
+		return false
 	}
 }
 
@@ -58,10 +60,12 @@ class FunctionMessageHandler extends MessageHandler {
 		else if InStr(data, ":") {
 			data := StrSplit(data, ":", , 2)
 
-			return withProtection(data[1], string2Values(";", data[2])*)
+			withProtection(data[1], string2Values(";", data[2])*)
 		}
 		else
-			return withProtection(data)
+			withProtection(data)
+			
+		return false
 	}
 }
 

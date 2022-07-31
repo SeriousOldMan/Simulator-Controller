@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 
 
@@ -405,8 +406,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	initializeBackgroundTasks() {
-		SetTimer updateApplicationStates, 5000
-		SetTimer updateModeSelector, -500
+		Task.runTask(new PeriodicTask("updateApplicationStates", 5000, kLowPriority))
+		Task.runTask(new PeriodicTask("updateModeSelector", 500, kLowPriority))
 	}
 }
 
@@ -544,8 +545,6 @@ updateModeSelector() {
 	static modeSelectorMode := false
 	static controller := false
 
-	nextUpdate := -500
-
 	if !controller
 		controller := SimulatorController.Instance
 
@@ -572,15 +571,17 @@ updateModeSelector() {
 				function.setLabel(currentMode, "Gray")
 		}
 
-		nextUpdate := (modeSelectorMode ? -2000 : -1000)
+		nextUpdate := (modeSelectorMode ? 2000 : 1000)
 
 		modeSelectorMode := !modeSelectorMode
 	}
 	finally {
 		protectionOff()
-
-		SetTimer updateModeSelector, %nextUpdate%
 	}
+
+	Task.CurrentTask.NextExecution := (A_TickCount + nextUpdate)
+
+	return Task.CurrentTask
 }
 
 initializeSystemPlugin() {

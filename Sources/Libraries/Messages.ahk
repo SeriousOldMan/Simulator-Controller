@@ -27,7 +27,7 @@
 ;;; Class                        MessageManager                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class MessageManager extends Task {
+class MessageManager extends PeriodicTask {
 	static sMessageHandlers := {}
 	static sOutgoingMessages := []
 
@@ -284,9 +284,7 @@ class MessageManager extends Task {
 			protectionOff()
 		}
 
-		this.NextExecution := (A_TickCount + 200)
-
-		return this
+		this.Sleep := 200
 	}
 
 	sendMessage(messageType, category, data, target := false) {
@@ -330,7 +328,6 @@ class MessageManager extends Task {
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
-	; Gui MR:-Border -Caption
 	Gui MR:New, , % A_ScriptName
 	Gui MR:Color, D0D0D0, D8D8D8
 	Gui MR:Add, Text, X10 Y10, Modular Simulator Controller System

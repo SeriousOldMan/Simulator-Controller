@@ -41,6 +41,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Configuration\Libraries\SettingsEditor.ahk
 
@@ -662,7 +663,7 @@ startupSimulator() {
 	if !FileExist(fileName)
 		FileAppend Startup, %fileName%
 
-	SetTimer watchStartupSemaphore, 2000
+	Task.runTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
 }
 
 startSimulator() {
@@ -719,7 +720,7 @@ exitStartup(sayGoodBye := false) {
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
 		sendMessage(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 
-		SetTimer exitStartup, -2000
+		Task.runTask("exitStartup", 2000)
 	}
 	else {
 		Hotkey Escape, Off

@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
@@ -1432,17 +1433,13 @@ class RaceSpotter extends RaceAssistant {
 				this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
-					callback := ObjBindMethod(this, "proximityAlert", false)
-
-					SetTimer %callback%, -1000
+					Task.runTask(ObjBindMethod(this, "proximityAlert", false), 1000, kHighPriority)
 
 					return
 				}
 			}
 			else if (alerting || speaker.isSpeaking()) {
-				callback := ObjBindMethod(this, "proximityAlert", false)
-
-				SetTimer %callback%, -100
+				Task.runTask(ObjBindMethod(this, "proximityAlert", false), 100, kHighPriority)
 
 				return
 			}
@@ -1479,6 +1476,8 @@ class RaceSpotter extends RaceAssistant {
 				alerting := false
 			}
 		}
+
+		return false
 	}
 
 	yellowFlag(alert, arguments*) {
@@ -1573,6 +1572,8 @@ class RaceSpotter extends RaceAssistant {
 					this.iSpotterPID := spotterPID
 			}
 		}
+
+		return false
 	}
 
 	shutdownSpotter(force := false) {
@@ -1678,9 +1679,7 @@ class RaceSpotter extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
 
-		callback := ObjBindMethod(this, "startupSpotter", true)
-
-		SetTimer %callback%, -10000
+		Task.runTask(ObjBindMethod(this, "startupSpotter", true), 5000)
 	}
 
 	startSession(settings, data) {
@@ -1745,11 +1744,8 @@ class RaceSpotter extends RaceAssistant {
 		if !this.GridPosition
 			this.initializeGridPosition(data)
 
-		if joined {
-			callback := ObjBindMethod(this, "startupSpotter")
-
-			SetTimer %callback%, -10000
-		}
+		if joined
+			Task.runTask(ObjBindMethod(this, "startupSpotter"), 10000)
 		else
 			this.startupSpotter()
 
@@ -1778,9 +1774,7 @@ class RaceSpotter extends RaceAssistant {
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					callback := ObjBindMethod(this, "forceFinishSession")
-
-					SetTimer %callback%, -120000
+					Task.runTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
 
 					return
 				}
@@ -1801,11 +1795,10 @@ class RaceSpotter extends RaceAssistant {
 
 			this.finishSession()
 		}
-		else {
-			callback := ObjBindMethod(this, "forceFinishSession")
+		else
+			Task.runTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
-			SetTimer %callback%, -5000
-		}
+		return false
 	}
 
 	prepareData(lapNumber, data) {

@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\RaceReportReader.ahk
@@ -92,9 +93,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		if (this.Active || isDebug()) {
 			if (this.RaceAssistantName)
-				SetTimer collectRaceStrategistSessionData, 10000
+				Task.runTask(new PeriodicTask("collectRaceStrategistSessionData", 10000))
 			else
-				SetTimer updateRaceStrategistSessionState, 5000
+				Task.runTask(new PeriodicTask("updateRaceStrategistSessionState", 5000))
 		}
 	}
 

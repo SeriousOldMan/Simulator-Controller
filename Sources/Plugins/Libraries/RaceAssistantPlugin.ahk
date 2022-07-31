@@ -830,13 +830,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	reloadSettings(pid, settingsFileName) {
 		Process Exist, %pid%
 
-		if ErrorLevel {
-			callback := ObjBindMethod(this, "reloadSettings", pid, settingsFileName)
-
-			SetTimer %callback%, -1000
-		}
+		if ErrorLevel
+			Task.runTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
 		else if this.RaceAssistant
 			this.RaceAssistant.updateSession(settingsFileName)
+		
+		return false
 	}
 
 	connectTeamSession() {
@@ -1664,11 +1663,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 				for ignore, plugin in [kRaceEngineerPlugin, kRaceStrategistPlugin, kRaceSpotterPlugin] {
 					plugin := controller.findPlugin(plugin)
 
-					if (plugin && controller.isActive(plugin)) {
-						callback := ObjBindMethod(plugin, "reloadSettings", pid, fileName)
-
-						SetTimer %callback%, -1000
-					}
+					if (plugin && controller.isActive(plugin))
+						Task.runTask(ObjBindMethod(plugin, "reloadSettings", pid, fileName), 1000, kLowPriority)
 				}
 		}
 	}

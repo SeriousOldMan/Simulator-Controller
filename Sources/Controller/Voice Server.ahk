@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
@@ -286,12 +287,9 @@ class VoiceServer extends ConfigurationItem {
 
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
-					if retry {
-						function := ObjBindMethod(this, "startListening", true)
-
-						SetTimer %function%, -200
-					}
-
+					if retry
+						Task.runTask(ObjBindMethod(this, "startListening", true), 200)
+					
 					return false
 				}
 				else {
@@ -309,11 +307,8 @@ class VoiceServer extends ConfigurationItem {
 
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
-					if retry {
-						function := ObjBindMethod(this, "stopListening", true)
-
-						SetTimer %function%, -200
-					}
+					if retry
+						Task.runTask(ObjBindMethod(this, "stopListening", true), 200)
 
 					return false
 				}
@@ -525,13 +520,8 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		timer := ObjBindMethod(this, "runPendingCommands")
-
-		SetTimer %timer%, 500
-
-		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
-
-		SetTimer %timer%, 5000
+		Task.runTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500, kHighPriority))
+		Task.runTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
 
 		try {
 			FileDelete %kTempDirectory%Voice.mute
@@ -540,9 +530,7 @@ class VoiceServer extends ConfigurationItem {
 			; ignore
 		}
 
-		timer := ObjBindMethod(this, "muteVoiceClients")
-
-		SetTimer %timer%, 50
+		Task.runTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -559,11 +547,8 @@ class VoiceServer extends ConfigurationItem {
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
-		if this.PushToTalk {
-			listen := ObjBindMethod(this, "listen")
-
-			SetTimer %listen%, 50
-		}
+		if this.PushToTalk
+			Task.runTask(new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority))
 	}
 
 	listen() {
@@ -661,11 +646,8 @@ class VoiceServer extends ConfigurationItem {
 
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
-				if retry {
-					function := ObjBindMethod(this, "startActivationListener", true)
-
-					SetTimer %function%, -200
-				}
+				if retry
+					Task.runTask(ObjBindMethod(this, "startActivationListener", true), 200)
 
 				return false
 			}
@@ -684,11 +666,8 @@ class VoiceServer extends ConfigurationItem {
 
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
-				if retry {
-					function := ObjBindMethod(this, "stopActivationListener", true)
-
-					SetTimer %function%, -200
-				}
+				if retry
+					Task.runTask(ObjBindMethod(this, "stopActivationListener", true), 200)
 
 				return false
 			}

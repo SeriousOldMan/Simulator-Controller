@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\GDIP.ahk
@@ -570,8 +571,6 @@ refreshStreamDecks() {
 	for ignore, fnController in SimulatorController.Instance.FunctionController
 		if isInstance(fnController, StreamDeck)
 			fnController.refresh(full)
-
-	SetTimer refreshStreamDecks, -5000
 }
 
 handleStreamDeckMessage(category, data) {
@@ -617,7 +616,7 @@ initializeStreamDeckPlugin() {
 
 	registerMessageHandler("Stream Deck", "handleStreamDeckMessage")
 
-	SetTimer refreshStreamDecks, -5000
+	Task.runTask(new PeriodicTask("refreshStreamDecks", 5000, kLowPriority))
 }
 
 

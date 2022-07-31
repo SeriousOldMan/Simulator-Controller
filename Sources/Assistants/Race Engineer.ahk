@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceEngineer.ahk
@@ -197,7 +198,7 @@ startRaceEngineer() {
 	if (remotePID != 0) {
 		vRemotePID := remotePID
 		
-		SetTimer checkRemoteProcessAlive, 10000
+		Task.runTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
 	}
 
 	return
@@ -215,13 +216,12 @@ shutdownRaceEngineer(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if (RaceEngineer.Instance.Session == kSessionFinished) {
-		callback := Func("shutdownRaceEngineer").Bind(true)
-		
-		SetTimer %callback%, -10000
-	}
+	if (RaceEngineer.Instance.Session == kSessionFinished)
+		Task.runTask(Func("shutdownRaceEngineer").Bind(true), 10000, kLowPriority)
 	else
-		SetTimer shutdownRaceEngineer, -1000
+		Task.runTask("shutdownRaceEngineer", 1000, kLowPriority)
+	
+	return false
 }
 
 handleEngineerMessage(category, data) {
@@ -229,7 +229,7 @@ handleEngineerMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 		
 		if (data[1] = "Shutdown") {
-			SetTimer shutdownRaceEngineer, -20000
+			Task.runTask("shutdownRaceEngineer", 20000, kLowPriority)
 			
 			return true
 		}
@@ -237,7 +237,7 @@ handleEngineerMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		SetTimer shutdownRaceEngineer, -20000
+		Task.runTask("shutdownRaceEngineer", 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }

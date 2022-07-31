@@ -22,6 +22,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\CLR.ahk
 
 
@@ -262,11 +263,8 @@ class SpeechSynthesizer {
 	updateSpeechStatus(pid) {
 		Process Exist, %pid%
 
-		if ErrorLevel {
-			callback := ObjBindMethod(this, "updateSpeechStatus", pid)
-
-			SetTimer, %callback%, -50
-		}
+		if ErrorLevel
+			Task.runTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kHighPriority)
 		else {
 			this.iSoundPlayer := false
 
@@ -274,6 +272,8 @@ class SpeechSynthesizer {
 
 			%callback%("Stop")
 		}
+		
+		return false
 	}
 
 	playSound(soundFile, wait := true) {
@@ -334,11 +334,8 @@ class SpeechSynthesizer {
 				if callback
 					%callback%("Stop")
 			}
-			else {
-				callback := ObjBindMethod(this, "updateSpeechStatus", pid)
-
-				Settimer %callback%, -500
-			}
+			else
+				Task.runTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
 		}
 		else {
 			if wait {

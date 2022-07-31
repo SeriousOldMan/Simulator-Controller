@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
@@ -105,9 +106,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				this.iTrackAutomationEnabled := false
 
 			if (this.RaceAssistantName)
-				SetTimer collectRaceSpotterSessionData, 10000
+				Task.runTask(new PeriodicTask("collectRaceSpotterSessionData", 10000))
 			else
-				SetTimer updateRaceSpotterSessionState, 5000
+				Task.runTask(new PeriodicTask("updateRaceSpotterSessionState", 5000))
 
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
@@ -403,11 +404,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 							this.iMapperPID := false
 						}
 
-						if ((ErrorLevel != "Error") && this.iMapperPID) {
-							callback := ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile)
-
-							SetTimer %callback%, -120000
-						}
+						if ((ErrorLevel != "Error") && this.iMapperPID)
+							Task.runTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
 					}
 				}
 			}
@@ -430,11 +428,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if mapperPID {
 			Process Exist, %mapperPID%
 
-			if ErrorLevel {
-				callback := ObjBindMethod(this, "createTrackMap", simulator, track, dataFile)
-
-				SetTimer %callback%, -10000
-			}
+			if ErrorLevel
+				Task.runTask(Task.CurrentTask, 10000)
 			else {
 				try {
 					this.iMapperPhase := "Map"
@@ -453,9 +448,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				if ((ErrorLevel != "Error") && mapperPID) {
 					this.iMapperPID := mapperPID
 
-					callback := ObjBindMethod(this, "finalizeTrackMap")
-
-					SetTimer %callback%, -120000
+					Task.runTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
 				}
 			}
 		}
@@ -467,11 +460,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if mapperPID {
 			Process Exist, %mapperPID%
 
-			if ErrorLevel {
-				callback := ObjBindMethod(this, "finalizeTrackMap")
-
-				SetTimer %callback%, -10000
-			}
+			if ErrorLevel
+				Task.runTask(Task.CurrentTask, 10000)
 			else {
 				this.iMapperPID := false
 				this.iMapperPhase := false

@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
@@ -28,6 +29,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
 
+	iCollectorTask := false
 	iPitstopPending := false
 
 	iLapDatabase := false
@@ -86,10 +88,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		base.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
-			if (this.RaceAssistantName)
-				SetTimer collectRaceEngineerSessionData, 10000
+			if (this.RaceAssistantName) {
+				this.iCollectorTask := new PeriodicTask("collectRaceEngineerSessionData", 10000)
+				
+				Task.runTask(this.iCollectorTask)
+			}
 			else
-				SetTimer updateRaceEngineerSessionState, 5000
+				Task.runTask(new PeriodicTask("updateRaceEngineerSessionState", 5000))
 		}
 	}
 
@@ -240,7 +245,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.iPitstopPending := false
 
-		SetTimer collectRaceEngineerSessionData, 10000
+		this.iCollectorTask.Sleep := 10000
 	}
 
 	pitstopOptionChanged(option, values*) {
@@ -257,7 +262,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.Simulator.pitstopPrepared(pitstopNumber)
 
-		SetTimer collectRaceEngineerSessionData, 5000
+		this.iCollectorTask.Sleep := 5000
 	}
 
 	pitstopFinished(pitstopNumber) {
@@ -265,7 +270,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.Simulator.pitstopFinished(pitstopNumber)
 
-		SetTimer collectRaceEngineerSessionData, 10000
+		this.iCollectorTask.Sleep := 10000
 	}
 
 	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {

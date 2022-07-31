@@ -17,6 +17,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
@@ -476,11 +477,8 @@ class VoiceManager {
 
 		registerMessageHandler("Voice", "methodMessageHandler", this)
 
-		if (!this.VoiceServer && this.PushToTalk) {
-			listen := ObjBindMethod(this, "listen")
-
-			SetTimer %listen%, 100
-		}
+		if (!this.VoiceServer && this.PushToTalk)
+			Task.runTask(new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority))
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -633,11 +631,8 @@ class VoiceManager {
 
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
-				if retry {
-					callback := ObjBindMethod(this, "startListening", true)
-
-					SetTimer %callback%, -200
-				}
+				if retry
+					Task.runTask(ObjBindMethod(this, "startListening", true), 200)
 
 				return false
 			}
@@ -655,11 +650,8 @@ class VoiceManager {
 
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
-				if retry {
-					callback := ObjBindMethod(this, "stopListening", true)
-
-					SetTimer %callback%, -200
-				}
+				if retry
+					Task.runTask(ObjBindMethod(this, "stopListening", true), 200)
 
 				return false
 			}

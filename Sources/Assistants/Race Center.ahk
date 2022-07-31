@@ -106,14 +106,6 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vToken := false
-global vWorking := 0
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -264,6 +256,7 @@ global pitstopPressureRREdit := ""
 global pitstopRepairsDropDown
 
 class RaceCenter extends ConfigurationItem {
+	iWorking := 0
 	iClosed := false
 
 	iSessionDirectory := false
@@ -3970,20 +3963,20 @@ class RaceCenter extends ConfigurationItem {
 		start := false
 
 		if state {
-			start := (vWorking == 0)
+			start := (this.iWorking == 0)
 
-			vWorking += 1
+			this.iWorking += 1
 
 			if !start
 				return false
 		}
 		else {
-			vWorking -= 1
+			this.iWorking -= 1
 
-			if (vWorking > 0)
+			if (this.iWorking > 0)
 				return
 			else
-				vWorking := 0
+				this.iWorking := 0
 		}
 
 		window := this.Window
@@ -4003,7 +3996,7 @@ class RaceCenter extends ConfigurationItem {
 		waitViewer.Document.Write(html)
 		waitViewer.Document.Close()
 
-		return (start || (vWorking == 0))
+		return (start || (this.iWorking == 0))
 	}
 
 	finishWorking() {
@@ -4011,7 +4004,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	isWorking() {
-		return (vWorking > 0)
+		return (this.iWorking > 0)
 	}
 
 	initializeSession() {
@@ -10877,10 +10870,10 @@ choosePitstop() {
 }
 
 chooseReport() {
-	if vWorking
-		return
-
 	rCenter := RaceCenter.Instance
+
+	if rCenter.isWorking()
+		return
 
 	currentListView := A_DefaultListView
 

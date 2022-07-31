@@ -35,6 +35,7 @@ SetBatchLines -1				; Maximize CPU utilization
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceSpotter.ahk
@@ -197,7 +198,7 @@ startRaceSpotter() {
 	if (remotePID != 0) {
 		vRemotePID := remotePID
 
-		SetTimer checkRemoteProcessAlive, 10000
+		Task.runTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
 	}
 
 	return
@@ -215,13 +216,12 @@ shutdownRaceSpotter(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if (RaceSpotter.Instance.Session == kSessionFinished) {
-		callback := Func("shutdownRaceSpotter").Bind(true)
-
-		SetTimer %callback%, -10000
-	}
+	if (RaceSpotter.Instance.Session == kSessionFinished)
+		Task.runTask(Func("shutdownRaceSpotter").Bind(true), 10000, kLowPriority)
 	else
-		SetTimer shutdownRaceSpotter, -1000
+		Task.runTask("shutdownRaceSpotter", 1000, kLowPriority)
+		
+	return false
 }
 
 handleSpotterMessage(category, data) {
@@ -229,7 +229,7 @@ handleSpotterMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			SetTimer shutdownRaceSpotter, -20000
+			Task.runTask("shutdownRaceSpotter", 20000, kLowPriority)
 
 			return true
 		}
@@ -237,7 +237,7 @@ handleSpotterMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceSpotter.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		SetTimer shutdownRaceSpotter, -20000
+		Task.runTask("shutdownRaceSpotter", 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceSpotter.Instance, data))
 }

@@ -7,6 +7,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -30,6 +37,8 @@ global kChassisVibrationMode = "Chassis Vibration"
 ;;;-------------------------------------------------------------------------;;;
 
 class TactileFeedbackPlugin extends ControllerPlugin {
+	iUpdateTask := false
+	
 	iVibrationApplication := false
 	iPedalVibrationMode := false
 	iChassisVibrationMode := false
@@ -424,11 +433,16 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		this.updateActions()
 
-		SetTimer updateVibrationState, -50
+		if !this.iUpdateTask {
+			this.iUpdateTask := new PeriodicTask("updateVibrationState", 50, kLowPriority)
+			
+			Task.runTask(this.iUpdateTask)
+		}
 	}
 
 	deactivate() {
-		SetTimer updateVibrationState, Off
+		if this.iUpdateTask
+			this.iUpdateTask.Sleep := 8640000
 
 		base.deactivate()
 	}
@@ -604,15 +618,16 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	updateVibrationState() {
 		static isRunning := "__Undefined__"
 
+		controller := this.Controller
+					
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
 
-		if (isRunning != this.Application.isRunning()) {
+		if ((isRunning != this.Application.isRunning()) && controller.isActive(this)) {
 			protectionOn()
 
 			try {
 				if isRunning {
-					controller := this.Controller
 					activeModes := this.Controller.ActiveModes
 					pedalMode := this.findMode(kPedalVibrationMode)
 					chassisMode := this.findMode(kChassisVibrationMode)
@@ -642,7 +657,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 
-		setTimer updateVibrationState, % isRunning ? 5000 : 1000
+		Task.CurrentTask.Sleep := (isRunning ? 5000 : 1000)
 	}
 }
 

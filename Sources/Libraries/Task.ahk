@@ -36,6 +36,9 @@ class Task {
 
 	static sCurrentTask := false
 
+	iRunnable := true
+	iSleep := false
+
 	iPriority := kNormalPriority
 	iNextExecution := false
 
@@ -69,9 +72,23 @@ class Task {
 		}
 	}
 
-	Active[] {
+	Runnable[] {
 		Get {
-			return (A_TickCount > this.NextExecution)
+			return (this.iRunnable && (A_TickCount > this.NextExecution))
+		}
+
+		Set {
+			return (this.iRunnable := value)
+		}
+	}
+
+	Sleep[] {
+		Get {
+			return this.iSleep
+		}
+
+		Set {
+			return (this.iSleep := value)
 		}
 	}
 
@@ -82,7 +99,9 @@ class Task {
 	}
 
 	__New(callable := false, sleep := 0, priority := 1) {
+		this.iSleep := Sleep
 		this.iNextExecution := (A_TickCount + sleep)
+
 		this.iCallable := callable
 		this.iPriority := priority
 	}
@@ -90,18 +109,22 @@ class Task {
 	run() {
 		callable := this.Callable
 
-		if isInstance(callable, Task)
-			return callable.run()
-		else {
-			result := %callable%()
+		result := (isInstance(callable, Task) ? callable.run() : %callable%())
 
-			return (isInstance(result, Task) ? result : false)
-		}
+		return (isInstance(result, Task) ? result : false)
+	}
+
+	start() {
+		this.Runnable := true
+	}
+
+	stop() {
+		this.Runnable := false
 	}
 
 	getNextTask(remove := true) {
 		for index, candidate in Task.sHighTasks
-			if candidate.Active {
+			if candidate.Runnable {
 				if remove
 					Task.sHighTasks.RemoveAt(index)
 
@@ -109,7 +132,7 @@ class Task {
 			}
 
 		for index, candidate in Task.sNormalTasks
-			if candidate.Active {
+			if candidate.Runnable {
 				if remove
 					Task.sNormalTasks.RemoveAt(index)
 
@@ -117,7 +140,7 @@ class Task {
 			}
 
 		for index, candidate in Task.sLowTasks
-			if candidate.Active {
+			if candidate.Runnable {
 				if remove
 					Task.sLowTasks.RemoveAt(index)
 
@@ -158,7 +181,7 @@ class Task {
 		}
 	}
 
-	runTask(theTask, sleep := "__Undefined__", priority := "__Undefined__") {
+	startTask(theTask, sleep := "__Undefined__", priority := "__Undefined__") {
 		if isInstance(theTask, Task) {
 			if (sleep != kUndefined)
 				theTask.iNextExecution := (A_TickCount + sleep)
@@ -170,10 +193,19 @@ class Task {
 			theTask := new Task(theTask, sleep, (priority != kUndefined) ? priority : kNormalPriority)
 
 		Task.addTask(theTask)
+
+		theTask.Runnable := true
+
+	}
+
+	stopTask(theTask) {
+		theTask.Runnable := false
+
+		Task.removeTask(theTask)
 	}
 
 	yield() {
-		this.schedule()
+		Task.schedule()
 	}
 
 	interrupt() {
@@ -255,24 +287,6 @@ class Task {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PeriodicTask extends Task {
-	iSleep := false
-
-	Sleep[] {
-		Get {
-			return this.iSleep
-		}
-
-		Set {
-			return (this.iSleep := value)
-		}
-	}
-
-	__New(callable, sleep, priority := 1) {
-		this.iSleep := sleep
-
-		base.__New(callable, sleep, priority)
-	}
-
 	run() {
 		base.run()
 

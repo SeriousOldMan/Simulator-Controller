@@ -1433,13 +1433,13 @@ class RaceSpotter extends RaceAssistant {
 				this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
-					Task.runTask(ObjBindMethod(this, "proximityAlert", false), 1000, kHighPriority)
+					Task.startTask(ObjBindMethod(this, "proximityAlert", false), 1000, kHighPriority)
 
 					return
 				}
 			}
 			else if (alerting || speaker.isSpeaking()) {
-				Task.runTask(ObjBindMethod(this, "proximityAlert", false), 100, kHighPriority)
+				Task.startTask(ObjBindMethod(this, "proximityAlert", false), 100, kHighPriority)
 
 				return
 			}
@@ -1679,7 +1679,7 @@ class RaceSpotter extends RaceAssistant {
 		if this.Speaker
 			this.getSpeaker().speakPhrase("Greeting")
 
-		Task.runTask(ObjBindMethod(this, "startupSpotter", true), 5000)
+		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 5000)
 	}
 
 	startSession(settings, data) {
@@ -1745,7 +1745,7 @@ class RaceSpotter extends RaceAssistant {
 			this.initializeGridPosition(data)
 
 		if joined
-			Task.runTask(ObjBindMethod(this, "startupSpotter"), 10000)
+			Task.startTask(ObjBindMethod(this, "startupSpotter"), 10000)
 		else
 			this.startupSpotter()
 
@@ -1774,7 +1774,7 @@ class RaceSpotter extends RaceAssistant {
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					Task.runTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
 
 					return
 				}
@@ -1796,7 +1796,7 @@ class RaceSpotter extends RaceAssistant {
 			this.finishSession()
 		}
 		else
-			Task.runTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
 		return false
 	}

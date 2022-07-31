@@ -198,7 +198,7 @@ startRaceStrategist() {
 	if (remotePID != 0) {
 		vRemotePID := remotePID
 		
-		Task.runTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
+		Task.startTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
 	}
 
 	return
@@ -217,9 +217,9 @@ shutdownRaceStrategist(shutdown := false) {
 		ExitApp 0
 
 	if (RaceStrategist.Instance.Session == kSessionFinished)
-		Task.runTask(Func("shutdownRaceStrategist").Bind(true), 10000, kLowPriority)
+		Task.startTask(Func("shutdownRaceStrategist").Bind(true), 10000, kLowPriority)
 	else
-		Task.runTask("shutdownRaceStrategist", 1000, kLowPriority)
+		Task.startTask("shutdownRaceStrategist", 1000, kLowPriority)
 	
 	return false
 }
@@ -229,7 +229,7 @@ handleStrategistMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 		
 		if (data[1] = "Shutdown") {
-			Task.runTask("shutdownRaceStrategist", 20000, kLowPriority)
+			Task.startTask("shutdownRaceStrategist", 20000, kLowPriority)
 			
 			return true
 		}
@@ -237,7 +237,7 @@ handleStrategistMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceStrategist.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.runTask("shutdownRaceStrategist", 20000, kLowPriority)
+		Task.startTask("shutdownRaceStrategist", 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceStrategist.Instance, data))
 }

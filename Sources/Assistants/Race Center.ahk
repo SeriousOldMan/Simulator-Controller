@@ -144,25 +144,23 @@ class RaceCenterTask extends Task {
 
 class SyncSessionTask extends RaceCenterTask {
 	__New() {
-		SyncSessionTask.Instance := this
+		base.__New(ObjBindMethod(RaceCenter.Instance, "syncSession"), 10000)
 
-		base.__New(ObjBindMethod(RaceCenter.Instance, "syncSession"), 86400000)
+		this.Runnable := false
 	}
 
 	run() {
 		base.run()
 
-		this.enable()
+		this.NextExecution := (A_TickCount + 10000)
 
 		return this
 	}
 
-	enable(wait := 10000) {
-		this.NextExecution := (A_TickCount + wait)
-	}
+	start() {
+		base.start()
 
-	disable() {
-		this.NextExecution := 2147483647
+		this.NextExecution := A_TickCount
 	}
 }
 
@@ -257,6 +255,8 @@ global pitstopRepairsDropDown
 
 class RaceCenter extends ConfigurationItem {
 	iWorking := 0
+	iSyncTask := false
+
 	iClosed := false
 
 	iSessionDirectory := false
@@ -1105,6 +1105,10 @@ class RaceCenter extends ConfigurationItem {
 		base.__New(configuration)
 
 		RaceCenter.Instance := this
+
+		this.iSyncTask := new SyncSessionTask()
+
+		Task.addTask(this.iSyncTask)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1541,7 +1545,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Default
 
-		SyncSessionTask.Instance.disable()
+		this.iSyncTask.stop()
 
 		try {
 			if (!this.ServerToken || (this.ServerToken = ""))
@@ -1555,7 +1559,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.loadTeams()
 
-			SyncSessionTask.Instance.enable(0)
+			this.iSyncTask.start()
 		}
 		catch exception {
 			this.iServerToken := "__INVALID__"
@@ -1678,7 +1682,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	selectSession(identifier) {
-		SyncSessionTask.Instance.disable()
+		this.iSyncTask.stop()
 
 		window := this.Window
 
@@ -1702,7 +1706,7 @@ class RaceCenter extends ConfigurationItem {
 		this.initializeSession()
 		this.loadSessionDrivers()
 
-		SyncSessionTask.Instance.enable(0)
+		this.iSyncTask.start()
 	}
 
 	selectDriver(driver, force := false) {
@@ -3591,7 +3595,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	pushTask(theTask) {
-		Task.runTask(new RaceCenterTask(theTask))
+		Task.startTask(new RaceCenterTask(theTask))
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -6471,7 +6475,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, "")
 			}
 			else {
-				SyncSessionTask.Instance.disable()
+				this.iSyncTask.stop()
 
 				this.iConnected := false
 
@@ -6550,7 +6554,7 @@ class RaceCenter extends ConfigurationItem {
 		while !this.iClosed
 			Sleep 1000
 
-		SyncSessionTask.Instance.disable()
+		this.iSyncTask.stop()
 	}
 
 	close() {
@@ -10958,8 +10962,6 @@ startupRaceCenter() {
 	OnExit(Func("exitFixIE").Bind(current))
 
 	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
-
-	Task.runTask(new SyncSessionTask())
 
 	rCenter.createGui(rCenter.Configuration)
 

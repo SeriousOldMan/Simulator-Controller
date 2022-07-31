@@ -1093,8 +1093,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	initializeBackgroundTasks() {
-		Task.runTask(new PeriodicTask("updateSimulatorState", 10000, kLowPriority))
-		Task.runTask(new PeriodicTask("externalCommandManager", 100, kLowPriority))
+		Task.startTask(new PeriodicTask("updateSimulatorState", 10000, kLowPriority))
+		Task.startTask(new PeriodicTask("externalCommandManager", 100, kLowPriority))
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
@@ -1764,7 +1764,7 @@ fireControllerActions(function, trigger, fromTask := false) {
 		return false
 	}
 	else
-		Task.runTask(Func("fireControllerActions").Bind(function, trigger, true), 0, kLowPriority)
+		Task.startTask(Func("fireControllerActions").Bind(function, trigger, true), 0, kLowPriority)
 }
 
 getLabelForLogMessage(action) {

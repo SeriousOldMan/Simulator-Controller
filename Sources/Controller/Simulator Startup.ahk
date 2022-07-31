@@ -663,7 +663,7 @@ startupSimulator() {
 	if !FileExist(fileName)
 		FileAppend Startup, %fileName%
 
-	Task.runTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
+	Task.startTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
 }
 
 startSimulator() {
@@ -720,7 +720,7 @@ exitStartup(sayGoodBye := false) {
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
 		sendMessage(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 
-		Task.runTask("exitStartup", 2000)
+		Task.startTask("exitStartup", 2000)
 	}
 	else {
 		Hotkey Escape, Off

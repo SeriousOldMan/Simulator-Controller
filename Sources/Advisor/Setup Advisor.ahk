@@ -3203,7 +3203,7 @@ runSetupAdvisor() {
 		else
 			advisor.loadSimulator(true, true)
 	else
-		Task.runTask(ObjBindMethod(advisor, "restoreState"), 100)
+		Task.startTask(ObjBindMethod(advisor, "restoreState"), 100)
 
 	return
 

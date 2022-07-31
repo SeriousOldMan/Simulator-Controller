@@ -264,7 +264,7 @@ class SpeechSynthesizer {
 		Process Exist, %pid%
 
 		if ErrorLevel
-			Task.runTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kHighPriority)
+			Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kHighPriority)
 		else {
 			this.iSoundPlayer := false
 
@@ -335,7 +335,7 @@ class SpeechSynthesizer {
 					%callback%("Stop")
 			}
 			else
-				Task.runTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
+				Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
 		}
 		else {
 			if wait {

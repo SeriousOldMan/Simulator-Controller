@@ -240,7 +240,7 @@ initializeLoggingSystem() {
 }
 
 startTrayMessageManager() {
-	Task.runTask(new PeriodicTask("trayMessageQueue", 500, kLowPriority))
+	Task.startTask(new PeriodicTask("trayMessageQueue", 500, kLowPriority))
 }
 
 requestShareSessionDatabaseConsent() {

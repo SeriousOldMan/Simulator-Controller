@@ -288,7 +288,7 @@ class VoiceServer extends ConfigurationItem {
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
 					if retry
-						Task.runTask(ObjBindMethod(this, "startListening", true), 200)
+						Task.startTask(ObjBindMethod(this, "startListening", true), 200)
 					
 					return false
 				}
@@ -308,7 +308,7 @@ class VoiceServer extends ConfigurationItem {
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
 					if retry
-						Task.runTask(ObjBindMethod(this, "stopListening", true), 200)
+						Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
 
 					return false
 				}
@@ -520,8 +520,8 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		Task.runTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500, kHighPriority))
-		Task.runTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
+		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500, kHighPriority))
+		Task.startTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
 
 		try {
 			FileDelete %kTempDirectory%Voice.mute
@@ -530,7 +530,7 @@ class VoiceServer extends ConfigurationItem {
 			; ignore
 		}
 
-		Task.runTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50))
+		Task.startTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -548,7 +548,7 @@ class VoiceServer extends ConfigurationItem {
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
 		if this.PushToTalk
-			Task.runTask(new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority))
+			Task.startTask(new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority))
 	}
 
 	listen() {
@@ -647,7 +647,7 @@ class VoiceServer extends ConfigurationItem {
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
 				if retry
-					Task.runTask(ObjBindMethod(this, "startActivationListener", true), 200)
+					Task.startTask(ObjBindMethod(this, "startActivationListener", true), 200)
 
 				return false
 			}
@@ -667,7 +667,7 @@ class VoiceServer extends ConfigurationItem {
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry
-					Task.runTask(ObjBindMethod(this, "stopActivationListener", true), 200)
+					Task.startTask(ObjBindMethod(this, "stopActivationListener", true), 200)
 
 				return false
 			}

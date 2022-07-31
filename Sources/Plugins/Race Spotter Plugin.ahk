@@ -106,9 +106,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				this.iTrackAutomationEnabled := false
 
 			if (this.RaceAssistantName)
-				Task.runTask(new PeriodicTask("collectRaceSpotterSessionData", 10000))
+				Task.startTask(new PeriodicTask("collectRaceSpotterSessionData", 10000))
 			else
-				Task.runTask(new PeriodicTask("updateRaceSpotterSessionState", 5000))
+				Task.startTask(new PeriodicTask("updateRaceSpotterSessionState", 5000))
 
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
@@ -405,7 +405,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						}
 
 						if ((ErrorLevel != "Error") && this.iMapperPID)
-							Task.runTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
+							Task.startTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
 					}
 				}
 			}
@@ -429,7 +429,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %mapperPID%
 
 			if ErrorLevel
-				Task.runTask(Task.CurrentTask, 10000)
+				Task.startTask(Task.CurrentTask, 10000)
 			else {
 				try {
 					this.iMapperPhase := "Map"
@@ -448,7 +448,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				if ((ErrorLevel != "Error") && mapperPID) {
 					this.iMapperPID := mapperPID
 
-					Task.runTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
+					Task.startTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
 				}
 			}
 		}
@@ -461,7 +461,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %mapperPID%
 
 			if ErrorLevel
-				Task.runTask(Task.CurrentTask, 10000)
+				Task.startTask(Task.CurrentTask, 10000)
 			else {
 				this.iMapperPID := false
 				this.iMapperPhase := false

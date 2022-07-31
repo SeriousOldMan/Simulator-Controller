@@ -912,7 +912,7 @@ class RaceStrategist extends RaceAssistant {
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
-					Task.runTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
 
 					return
 				}
@@ -933,7 +933,7 @@ class RaceStrategist extends RaceAssistant {
 			this.finishSession()
 		}
 		else
-			Task.runTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
 		return false
 	}

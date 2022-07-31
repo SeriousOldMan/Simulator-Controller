@@ -478,7 +478,7 @@ class VoiceManager {
 		registerMessageHandler("Voice", "methodMessageHandler", this)
 
 		if (!this.VoiceServer && this.PushToTalk)
-			Task.runTask(new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority))
+			Task.startTask(new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority))
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -632,7 +632,7 @@ class VoiceManager {
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
-					Task.runTask(ObjBindMethod(this, "startListening", true), 200)
+					Task.startTask(ObjBindMethod(this, "startListening", true), 200)
 
 				return false
 			}
@@ -651,7 +651,7 @@ class VoiceManager {
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
-					Task.runTask(ObjBindMethod(this, "stopListening", true), 200)
+					Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
 
 				return false
 			}

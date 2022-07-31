@@ -276,7 +276,7 @@ class MessageManager extends PeriodicTask {
 			messages := this.receiveMessages()
 
 			if (messages.Length() > 0)
-				Task.runTask(new this.MessagesDispatcher(messages))
+				Task.startTask(new this.MessagesDispatcher(messages))
 			else
 				this.deliverMessage()
 		}
@@ -303,7 +303,7 @@ class MessageManager extends PeriodicTask {
 
 				logMessage(kLogInfo, translate("Dispatching message """) . category . (data ? translate(""": ") . data : translate("""")))
 
-				Task.runTask(ObjBindMethod(messageHandler, "call", category, data))
+				Task.startTask(ObjBindMethod(messageHandler, "call", category, data))
 			case kWindowMessage:
 				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")) . translate(" to target ") . target)
 
@@ -454,7 +454,7 @@ receiveWindowMessage(wParam, lParam) {
 	if (request = "RS")
 		withProtection(callable)
 	else
-		Task.runTask(callable)
+		Task.startTask(callable)
 }
 
 stopMessageManager() {
@@ -477,7 +477,7 @@ startMessageManager() {
 
 	registerMessageHandler("*", "unknownMessageHandler")
 
-	Task.runTask(new MessageManager())
+	Task.startTask(new MessageManager())
 
 	Process Exist
 

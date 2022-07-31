@@ -91,10 +91,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			if (this.RaceAssistantName) {
 				this.iCollectorTask := new PeriodicTask("collectRaceEngineerSessionData", 10000)
 				
-				Task.runTask(this.iCollectorTask)
+				Task.startTask(this.iCollectorTask)
 			}
 			else
-				Task.runTask(new PeriodicTask("updateRaceEngineerSessionState", 5000))
+				Task.startTask(new PeriodicTask("updateRaceEngineerSessionState", 5000))
 		}
 	}
 

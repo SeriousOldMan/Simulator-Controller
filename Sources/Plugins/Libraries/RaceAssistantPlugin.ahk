@@ -831,7 +831,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		Process Exist, %pid%
 
 		if ErrorLevel
-			Task.runTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
 		else if this.RaceAssistant
 			this.RaceAssistant.updateSession(settingsFileName)
 		
@@ -1664,7 +1664,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 					plugin := controller.findPlugin(plugin)
 
 					if (plugin && controller.isActive(plugin))
-						Task.runTask(ObjBindMethod(plugin, "reloadSettings", pid, fileName), 1000, kLowPriority)
+						Task.startTask(ObjBindMethod(plugin, "reloadSettings", pid, fileName), 1000, kLowPriority)
 				}
 		}
 	}

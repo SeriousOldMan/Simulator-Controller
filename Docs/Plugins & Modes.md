@@ -143,7 +143,7 @@ All the arguments for the plugin parameters of the "Motion Feedback" plugin must
 
 	controlApplication: *Name of the SimFeedback application configuration*;
 	connector: *path to sfx-100-console-application*;
-	motion: *initialState* *onOffFunction* [*intensityFunction*] *initialIntensity*
+	motion: *initialState* *onOffFunction* [*intensityFunction* [*initialIntensity*]]
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimFeedback*, if it is not named "Motion Feedback". The *connector* parameter may be used, when *SimFeedack* is running in expert mode and you have installed the extensions mentioned above. The path must be set to the location of the console executable, as in "D:\Programme\SimFeedback Connector\sfx-100-streamdeck-console.exe". For *motion*, you supply the *initialState* as one of "On" or "Off". 
 *onOffFunction* will define a controller function to start or stop the motion actuator motors. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. You can supply a function to control the overall motion intensity starting with *initialIntensity* with the optional *intensityFunction* parameter. You must supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "motion: Off 2WayToggle.2 Dial.1 30". The intensity function will become an element of the "Motion" mode.

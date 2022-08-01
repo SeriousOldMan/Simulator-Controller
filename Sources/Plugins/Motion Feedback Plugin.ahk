@@ -415,10 +415,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 			motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
 
-			initialIntensity := motionArguments[motionArguments.Length()]
+			if (motionArguments.Length() == 4) {
+				initialIntensity := motionArguments[4]
 
-			this.kInitialMotionIntensity := initialIntensity
-			this.iCurrentMotionIntensity := initialIntensity
+				this.kInitialMotionIntensity := initialIntensity
+				this.iCurrentMotionIntensity := initialIntensity
+			}
 
 			effectFunctions := []
 
@@ -451,7 +453,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.iMotionMode := motionMode
 
-			if (motionArguments.Length() > 3) {
+			if (motionArguments.Length() > 2) {
 				descriptor := motionArguments[3]
 				function := this.Controller.findFunction(descriptor)
 

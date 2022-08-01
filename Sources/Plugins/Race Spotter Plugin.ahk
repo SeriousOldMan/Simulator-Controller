@@ -106,9 +106,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				this.iTrackAutomationEnabled := false
 
 			if (this.RaceAssistantName)
-				Task.startTask(new PeriodicTask("collectRaceSpotterSessionData", 10000))
+				Task.startTask(new PeriodicTask("collectRaceSpotterSessionData", 10000, kLowPriority))
 			else
-				Task.startTask(new PeriodicTask("updateRaceSpotterSessionState", 5000))
+				Task.startTask(new PeriodicTask("updateRaceSpotterSessionState", 5000, kLowPriority))
 
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))

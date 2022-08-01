@@ -186,46 +186,6 @@ readLanguage(targetLanguageCode) {
 	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-trayMessageQueue() {
-	if (vPendingTrayMessages.Length() > 0) {
-		protectionOn()
-
-		try {
-			if (vPendingTrayMessages.Length() = 0)
-				return
-			else {
-				message := vPendingTrayMessages.RemoveAt(1)
-
-				protectionOff()
-
-				try {
-					duration := message[3]
-					title := StrReplace(message[1], "`n", A_Space)
-					message := StrReplace(message[2], "`n", A_Space)
-
-					TrayTip %title%, %message%
-
-					Sleep %duration%
-
-					TrayTip
-
-					if SubStr(A_OSVersion,1,3) = "10." {
-						Menu Tray, NoIcon
-						Sleep 200  ; It may be necessary to adjust this sleep...
-						Menu Tray, Icon
-					}
-				}
-				finally {
-					protectionOn()
-				}
-			}
-		}
-		finally {
-			protectionOff()
-		}
-	}
-}
-
 logError(exception) {
 	if IsObject(exception)
 		logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
@@ -237,10 +197,6 @@ logError(exception) {
 
 initializeLoggingSystem() {
 	OnError("logError")
-}
-
-startTrayMessageManager() {
-	Task.startTask(new PeriodicTask("trayMessageQueue", 500, kLowPriority))
 }
 
 requestShareSessionDatabaseConsent() {
@@ -1678,21 +1634,35 @@ bubbleSort(ByRef array, comparator := "greaterComparator") {
 	}
 }
 
-trayMessage(title, message, duration := false) {
-	title := StrReplace(title, "`n", A_Space)
-	message := StrReplace(message, "`n", A_Space)
+trayMessage(title, message, duration := false, async := true) {
+	if (async && (duration || vTrayMessageDuration))
+		Task.startTask(Func("trayMessage").Bind(title, message, duration, false), 0, kLowPriority)
+	else {
+		title := StrReplace(title, "`n", A_Space)
+		message := StrReplace(message, "`n", A_Space)
 
-	if !duration
-		duration := vTrayMessageDuration
+		if !duration
+			duration := vTrayMessageDuration
 
-	if duration {
-		protectionOn()
+		if duration {
+			protectionOn()
 
-		try {
-			vPendingTrayMessages.Push(Array(title, message, duration))
-		}
-		finally {
-			protectionOff()
+			try {
+				TrayTip %title%, %message%
+
+				Sleep %duration%
+
+				TrayTip
+
+				if SubStr(A_OSVersion,1,3) = "10." {
+					Menu Tray, NoIcon
+					Sleep 200  ; It may be necessary to adjust this sleep...
+					Menu Tray, Icon
+				}
+			}
+			finally {
+				protectionOff()
+			}
 		}
 	}
 }
@@ -1881,6 +1851,8 @@ removeConfigurationSection(configuration, section) {
 }
 
 getControllerConfiguration(configuration := false) {
+	local pid
+	
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
@@ -2047,4 +2019,3 @@ if !vDetachedInstallation {
 }
 
 initializeLoggingSystem()
-startTrayMessageManager()

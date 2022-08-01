@@ -283,6 +283,8 @@ class Application extends ConfigurationItem {
 	}
 
 	run(application, exePath, workingDirectory, options := "", wait := false) {
+		local pid
+		
 		try {
 			if InStr(exePath, A_Space)
 				exePath := ("""" . exePath . """")

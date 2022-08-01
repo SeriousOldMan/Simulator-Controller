@@ -774,7 +774,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				Run %exePath%, %kBinariesDirectory%, , raceAssistantPID
 
-				Sleep 5000
+				Sleep 1500
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -834,7 +834,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
 		else if this.RaceAssistant
 			this.RaceAssistant.updateSession(settingsFileName)
-		
+
 		return false
 	}
 
@@ -1322,7 +1322,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 
-						if (this.iUpdateLapCounter = 2) {
+						if (this.iUpdateLapCounter = 0) {
 							dataFile := kTempDirectory . this.Plugin . " Lap 0.0.data"
 
 							writeConfiguration(dataFile, data)
@@ -1627,6 +1627,8 @@ getSimulatorOptions(plugin := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 openRaceSettings(import := false, silent := false, plugin := false, fileName := false) {
+	local pid
+
 	exePath := kBinariesDirectory . "Race Settings.exe"
 	controller := SimulatorController.Instance
 
@@ -1677,6 +1679,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 }
 
 openSessionDatabase(plugin := false) {
+	local pid
+
 	exePath := kBinariesDirectory . "Session Database.exe"
 
 	try {
@@ -1693,6 +1697,8 @@ openSessionDatabase(plugin := false) {
 }
 
 openSetupAdvisor(plugin := false) {
+	local pid
+
 	exePath := kBinariesDirectory . "Setup Advisor.exe"
 
 	try {
@@ -1709,6 +1715,8 @@ openSetupAdvisor(plugin := false) {
 }
 
 openStrategyWorkbench(plugin := false) {
+	local pid
+
 	exePath := kBinariesDirectory . "Strategy Workbench.exe"
 
 	try {
@@ -1725,6 +1733,8 @@ openStrategyWorkbench(plugin := false) {
 }
 
 openRaceCenter(plugin := false) {
+	local pid
+
 	exePath := kBinariesDirectory . "Race Center.exe"
 
 	try {

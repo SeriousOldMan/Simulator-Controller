@@ -1426,6 +1426,8 @@ readSimulatorData(simulator) {
 }
 
 openSessionDatabase() {
+	local pid
+	
 	exePath := kBinariesDirectory . "Session Database.exe"
 
 	try {

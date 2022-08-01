@@ -3513,6 +3513,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	choosePitstopMenu(line) {
+		local pid
+		
 		switch line {
 			case 3: ; Manage Team
 				this.manageTeam()

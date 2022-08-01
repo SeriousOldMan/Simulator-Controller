@@ -142,7 +142,7 @@ startUDPClient() {
 		if FileExist(kTempDirectory . "ACCUDP.out")
 			FileDelete %kTempDirectory%ACCUDP.out
 		
-		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide, pid
+		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide
 		
 		vUDPClient := "stopUDPClient"
 		

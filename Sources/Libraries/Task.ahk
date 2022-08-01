@@ -178,9 +178,6 @@ class Task {
 			default:
 				Throw "Unexpected priority detected in Task.addTask..."
 		}
-
-		if (Task.CurrentTask && (priority > Task.CurrentTask.Priority))
-			Task.interrupt()
 	}
 
 	removeTask(theTask) {
@@ -224,16 +221,17 @@ class Task {
 		Task.schedule()
 	}
 
-	interrupt() {
-		Task.schedule(true)
-	}
-
 	schedule(interrupt := false) {
 		protectionOn(true)
 
 		static scheduling := false
 
 		if (scheduling && !interrupt) {
+			protectionOff(true)
+
+			return
+		}
+		else if (interrupt && !scheduling) {
 			protectionOff(true)
 
 			return
@@ -282,6 +280,9 @@ class Task {
 
 		try {
 			next := theTask.execute()
+		}
+		catch exception {
+			logError(exception)
 		}
 		finally {
 			if window {
@@ -390,6 +391,10 @@ initializeTasks() {
 	schedule := ObjBindMethod(Task, "schedule")
 
 	SetTimer %schedule%, 50
+
+	interrupt := ObjBindMethod(Task, "schedule", true)
+
+	SetTimer %interrupt%, 200
 }
 
 

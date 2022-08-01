@@ -93,9 +93,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		if (this.Active || isDebug()) {
 			if (this.RaceAssistantName)
-				Task.startTask(new PeriodicTask("collectRaceStrategistSessionData", 10000))
+				Task.startTask(new PeriodicTask("collectRaceStrategistSessionData", 10000, kLowPriority))
 			else
-				Task.startTask(new PeriodicTask("updateRaceStrategistSessionState", 5000))
+				Task.startTask(new PeriodicTask("updateRaceStrategistSessionState", 5000, kLowPriority))
 		}
 	}
 

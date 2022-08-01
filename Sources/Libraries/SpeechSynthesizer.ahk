@@ -272,13 +272,14 @@ class SpeechSynthesizer {
 
 			%callback%("Stop")
 		}
-		
+
 		return false
 	}
 
 	playSound(soundFile, wait := true) {
 		local callback
 		local player
+		local pid
 
 		callback := this.SpeechStatusCallback
 

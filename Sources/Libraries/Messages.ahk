@@ -91,6 +91,8 @@ class MessageManager extends PeriodicTask {
 			}
 			else
 				return withProtection(ObjBindMethod(this.Object, data))
+
+			return false
 		}
 	}
 

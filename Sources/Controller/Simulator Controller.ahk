@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
@@ -287,6 +288,8 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	show(makeVisible := true) {
+		static hideTask := false
+		
 		if !this.Controller.Started
 			return
 
@@ -298,8 +301,15 @@ class GuiFunctionController extends FunctionController {
 		if (duration > 0) {
 			if ((A_TickCount - this.Controller.LastEvent) > duration)
 				return
-			else
-				SetTimer hideFunctionController, %duration%
+			else {
+				if !hideTask {
+					hideTask := new PeriodicTask("hideFunctionController", duration, kLowPriority)
+					
+					Task.startTask(hideTask)
+				}	
+					
+				hideTask.Sleep := duration
+			}
 
 			protectionOn()
 

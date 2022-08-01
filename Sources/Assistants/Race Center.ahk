@@ -157,8 +157,8 @@ class SyncSessionTask extends RaceCenterTask {
 		return this
 	}
 
-	start() {
-		base.start()
+	resume() {
+		base.resume()
 
 		this.NextExecution := A_TickCount
 	}
@@ -1545,7 +1545,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Default
 
-		this.iSyncTask.stop()
+		this.iSyncTask.pause()
 
 		try {
 			if (!this.ServerToken || (this.ServerToken = ""))
@@ -1559,7 +1559,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.loadTeams()
 
-			this.iSyncTask.start()
+			this.iSyncTask.resume()
 		}
 		catch exception {
 			this.iServerToken := "__INVALID__"
@@ -1682,7 +1682,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	selectSession(identifier) {
-		this.iSyncTask.stop()
+		this.iSyncTask.pause()
 
 		window := this.Window
 
@@ -1706,7 +1706,7 @@ class RaceCenter extends ConfigurationItem {
 		this.initializeSession()
 		this.loadSessionDrivers()
 
-		this.iSyncTask.start()
+		this.iSyncTask.resume()
 	}
 
 	selectDriver(driver, force := false) {
@@ -6475,7 +6475,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, "")
 			}
 			else {
-				this.iSyncTask.stop()
+				this.iSyncTask.pause()
 
 				this.iConnected := false
 
@@ -6554,7 +6554,7 @@ class RaceCenter extends ConfigurationItem {
 		while !this.iClosed
 			Sleep 1000
 
-		this.iSyncTask.stop()
+		this.iSyncTask.pause()
 	}
 
 	close() {

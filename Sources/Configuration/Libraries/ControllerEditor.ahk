@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Configuration\Libraries\ConfigurationItemList.ahk
 #Include ..\Configuration\Libraries\ButtonBoxPreview.ahk
 #Include ..\Configuration\Libraries\StreamDeckPreview.ahk
@@ -212,10 +213,8 @@ class ControllerEditor extends ConfigurationItem {
 		Gui CTRLE:Show, AutoSize x%x% y%y%
 
 		name := this.Name
-
-		callback := ObjBindMethod(this, "selectLayout", name)
-
-		SetTimer %callback%, -1000
+		
+		Task.startTask(ObjBindMethod(this, "selectLayout", name), 1000)
 	}
 
 	close(save := true) {

@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -496,7 +503,7 @@ class ControllerStepWizard extends StepWizard {
 
 		wizard := this.SetupWizard
 
-		if this.iTriggerModeActive
+		if triggerDetector("Active")
 			wizard.toggleTriggerDetector()
 
 		window := this.Window
@@ -521,11 +528,7 @@ class ControllerStepWizard extends StepWizard {
 					callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, row, false)
 			}
 
-			this.iTriggerModeActive := true
-
 			wizard.toggleTriggerDetector(callback)
-
-			SetTimer stopTriggerDetector, 100
 		}
 	}
 
@@ -683,8 +686,6 @@ class ControllerStepWizard extends StepWizard {
 		}
 		else
 			this.iFunctionTriggers[function] := [hotkey]
-
-		this.iTriggerModeActive := false
 
 		wizard.toggleTriggerDetector()
 
@@ -1603,23 +1604,6 @@ updateFunctionTriggers() {
 
 	Loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
-}
-
-stopTriggerDetector() {
-	wizard := SetupWizard.Instance.StepWizards["Controller"]
-
-	if (!wizard.iTriggerModeActive || !vShowTriggerDetector) {
-		SetTimer stopTriggerDetector, Off
-
-		wizard.iTriggerModeActive := false
-	}
-	else if GetKeyState("Esc", "P") {
-		wizard.SetupWizard.toggleTriggerDetector()
-
-		wizard.iTriggerModeActive := false
-
-		SetTimer stopTriggerDetector, Off
-	}
 }
 
 initializeControllerStepWizard() {

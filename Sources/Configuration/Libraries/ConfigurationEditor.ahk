@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include Libraries\ConfigurationItemList.ahk
 
 
@@ -31,16 +32,171 @@ global kCancel = "cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Public Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vShowTriggerDetector = false
-global vTriggerDetectorCallback = false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TriggerDetectorTask                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class TriggerDetectorTask extends Task {
+	iCallback := false
+	iJoysticks := []
+
+	CallBack[] {
+		Get {
+			return this.iCallback
+		}
+	}
+
+	Stopped[] {
+		Set {
+			if value
+				ToolTip, , , 1
+
+			return (base.Stopped := value)
+		}
+	}
+
+	Joysticks[] {
+		Get {
+			return this.iJoysticks
+		}
+	}
+
+	__New(callback, arguments*) {
+		this.iCallback := callback
+
+		base.__New(false, arguments*)
+	}
+
+	run() {
+		joysticks := []
+
+		Loop 16 { ; Query each joystick number to find out which ones exist.
+			GetKeyState joyName, %A_Index%JoyName
+
+			if (joyName != "")
+				joysticks.Push(A_Index)
+		}
+
+		this.iJoysticks := joysticks
+
+		return new TriggerDetectorContinuation(Task.CurrentTask)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TriggerDetectorContinuation                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class TriggerDetectorContinuation extends Continuation {
+	__New(task, arguments*) {
+		base.__New(task, false, arguments*)
+	}
+
+	run() {
+		if !this.Task.Stopped {
+			found := false
+
+			if GetKeyState("Esc", "P") {
+				Task.stopTask(Task.CurrentTask.Task)
+
+				return false
+			}
+
+			joysticks := this.Task.Joysticks
+
+			joystickNumber := joysticks[1]
+
+			joysticks.RemoveAt(1)
+			joysticks.Push(joystickNumber)
+
+			SetFormat Float, 03  ; Omit decimal point from axis position percentages.
+
+			GetKeyState joy_buttons, %joystickNumber%JoyButtons
+			GetKeyState joy_name, %joystickNumber%JoyName
+			GetKeyState joy_info, %joystickNumber%JoyInfo
+
+			buttons_down := ""
+
+			Loop %joy_buttons%
+			{
+				GetKeyState joy%A_Index%, %joystickNumber%joy%A_Index%
+
+				if (joy%A_Index% = "D") {
+					buttons_down = %buttons_down%%A_Space%%A_Index%
+
+					found := A_Index
+				}
+			}
+
+			GetKeyState joyX, %joystickNumber%JoyX
+
+			axis_info = X%joyX%
+
+			GetKeyState joyY, %joystickNumber%JoyY
+
+			axis_info = %axis_info%%A_Space%%A_Space%Y%joyY%
+
+			IfInString joy_info, Z
+			{
+				GetKeyState joyZ, %joystickNumber%JoyZ
+
+				axis_info = %axis_info%%A_Space%%A_Space%Z%joyZ%
+			}
+
+			IfInString joy_info, R
+			{
+				GetKeyState joyR, %joystickNumber%JoyR
+
+				axis_info = %axis_info%%A_Space%%A_Space%R%joyR%
+			}
+
+			IfInString joy_info, U
+			{
+				GetKeyState joyU, %joystickNumber%JoyU
+
+				axis_info = %axis_info%%A_Space%%A_Space%U%joyU%
+			}
+
+			IfInString joy_info, V
+			{
+				GetKeyState joyV, %joystickNumber%JoyV
+
+				axis_info = %axis_info%%A_Space%%A_Space%V%joyV%
+			}
+
+			IfInString joy_info, P
+			{
+				GetKeyState joyp, %joystickNumber%JoyPOV
+
+				axis_info = %axis_info%%A_Space%%A_Space%POV%joyp%
+			}
+
+			buttonsDown := translate("Buttons Down:")
+
+			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
+
+			if found {
+				if this.Task.Callback {
+					callback := this.Task.Callback
+
+					%callback%(joystickNumber . "Joy" . found)
+				}
+				else
+					return new TriggerDetectorContinuation(this.Task, 2000)
+			}
+
+			return new TriggerDetectorContinuation(this.Task, 750)
+		}
+		else {
+			this.Task.stop()
+
+			return false
+		}
+	}
+}
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; ConfigurationEditor                                                     ;;;
@@ -201,17 +357,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	toggleTriggerDetector(callback := false) {
-		if callback {
-			if !vShowTriggerDetector
-				vTriggerDetectorCallback := callback
-		}
-		else
-			vTriggerDetectorCallback := false
-
-		vShowTriggerDetector := !vShowTriggerDetector
-
-		if vShowTriggerDetector
-			SetTimer showTriggerDetector, -100
+		triggerDetector(callback)
 	}
 
 	getSimulators() {
@@ -264,128 +410,24 @@ selectTab() {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showTriggerDetector() {
-	returnHotKey := vTriggerDetectorCallback
-	joystickNumbers := []
+triggerDetector(callback := false) {
+	static detectorTask := false
 
-	vTriggerDetectorCallback := false
+	if (callback = "Active")
+		return (detectorTask && !detectorTask.Stopped)
+	else {
+		if (detectorTask && detectorTask.Stopped)
+			detectorTask := false
 
-	Loop 16 { ; Query each joystick number to find out which ones exist.
-		GetKeyState joyName, %A_Index%JoyName
+		if detectorTask {
+			Task.stopTask(detectorTask)
 
-		if (joyName != "")
-			joystickNumbers.Push(A_Index)
-	}
+			detectorTask := false
+		}
+		else {
+			detectorTask := new TriggerDetectorTask(callback, 100)
 
-	if (joystickNumbers.Length() == 0) {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		title := translate("Warning")
-		MsgBox 262192, %title%, % translate("No controller detected...")
-		OnMessage(0x44, "")
-
-		vShowTriggerDetector := false
-	}
-
-	if vShowTriggerDetector {
-		found := false
-
-		Loop {
-			if GetKeyState("Esc", "P")
-				vShowTriggerDetector := false
-
-			if (vTriggerDetectorCallback && (returnHotKey != vTriggerDetectorCallback))
-				returnHotKey := vTriggerDetectorCallback
-
-			joystickNumber := joystickNumbers[1]
-
-			joystickNumbers.RemoveAt(1)
-			joystickNumbers.Push(joystickNumber)
-
-			SetFormat Float, 03  ; Omit decimal point from axis position percentages.
-
-			GetKeyState joy_buttons, %joystickNumber%JoyButtons
-			GetKeyState joy_name, %joystickNumber%JoyName
-			GetKeyState joy_info, %joystickNumber%JoyInfo
-
-			if !vShowTriggerDetector {
-				ToolTip, , , 1
-
-				break
-			}
-
-			buttons_down := ""
-
-			Loop %joy_buttons%
-			{
-				GetKeyState joy%A_Index%, %joystickNumber%joy%A_Index%
-
-				if (joy%A_Index% = "D") {
-					buttons_down = %buttons_down%%A_Space%%A_Index%
-
-					found := A_Index
-				}
-			}
-
-			GetKeyState joyX, %joystickNumber%JoyX
-
-			axis_info = X%joyX%
-
-			GetKeyState joyY, %joystickNumber%JoyY
-
-			axis_info = %axis_info%%A_Space%%A_Space%Y%joyY%
-
-			IfInString joy_info, Z
-			{
-				GetKeyState joyZ, %joystickNumber%JoyZ
-
-				axis_info = %axis_info%%A_Space%%A_Space%Z%joyZ%
-			}
-
-			IfInString joy_info, R
-			{
-				GetKeyState joyR, %joystickNumber%JoyR
-
-				axis_info = %axis_info%%A_Space%%A_Space%R%joyR%
-			}
-
-			IfInString joy_info, U
-			{
-				GetKeyState joyU, %joystickNumber%JoyU
-
-				axis_info = %axis_info%%A_Space%%A_Space%U%joyU%
-			}
-
-			IfInString joy_info, V
-			{
-				GetKeyState joyV, %joystickNumber%JoyV
-
-				axis_info = %axis_info%%A_Space%%A_Space%V%joyV%
-			}
-
-			IfInString joy_info, P
-			{
-				GetKeyState joyp, %joystickNumber%JoyPOV
-
-				axis_info = %axis_info%%A_Space%%A_Space%POV%joyp%
-			}
-
-			buttonsDown := translate("Buttons Down:")
-
-			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
-
-			if found {
-				if returnHotkey
-					%returnHotkey%(joystickNumber . "Joy" . found)
-				else
-					Sleep 2000
-
-				found := false
-			}
-			else
-				Sleep 750
-
-			if vResult
-				break
+			Task.startTask(detectorTask)
 		}
 	}
 }

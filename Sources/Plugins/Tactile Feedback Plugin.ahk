@@ -37,8 +37,8 @@ global kChassisVibrationMode = "Chassis Vibration"
 ;;;-------------------------------------------------------------------------;;;
 
 class TactileFeedbackPlugin extends ControllerPlugin {
-	iUpdateTask := false
-	
+	iUpdateVibrationStateTask := false
+
 	iVibrationApplication := false
 	iPedalVibrationMode := false
 	iChassisVibrationMode := false
@@ -433,16 +433,19 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		this.updateActions()
 
-		if !this.iUpdateTask {
-			this.iUpdateTask := new PeriodicTask("updateVibrationState", 50, kLowPriority)
-			
-			Task.startTask(this.iUpdateTask)
+		if !this.iUpdateVibrationStateTask {
+			this.iUpdateVibrationStateTask := new PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
+
+			Task.startTask(this.iUpdateVibrationStateTask)
 		}
 	}
 
 	deactivate() {
-		if this.iUpdateTask
-			this.iUpdateTask.Sleep := 8640000
+		if this.iUpdateVibrationStateTask {
+			Task.stopTask(this.iUpdateVibrationStateTask)
+
+			this.iUpdateVibrationStateTask := false
+		}
 
 		base.deactivate()
 	}
@@ -619,7 +622,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		static isRunning := "__Undefined__"
 
 		controller := this.Controller
-					
+
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()
 
@@ -665,15 +668,6 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateVibrationState() {
-	static plugin := false
-
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kTactileFeedbackPlugin)
-
-	plugin.updateVibrationState()
-}
 
 startSimHub() {
 	simHub := new Application("Tactile Feedback", SimulatorController.Instance.Configuration)

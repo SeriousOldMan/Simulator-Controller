@@ -36,6 +36,7 @@ class Task {
 
 	static sCurrentTask := false
 
+	iStopped := false
 	iRunnable := true
 	iSleep := false
 
@@ -72,9 +73,19 @@ class Task {
 		}
 	}
 
+	Stopped[] {
+		Get {
+			return this.iStopped
+		}
+
+		Set {
+			return (this.iStopped := value)
+		}
+	}
+
 	Runnable[] {
 		Get {
-			return (this.iRunnable && (A_TickCount > this.NextExecution))
+			return ((A_TickCount > this.NextExecution) && this.iRunnable && !this.Stopped)
 		}
 
 		Set {
@@ -114,11 +125,11 @@ class Task {
 		return (isInstance(result, Task) ? result : false)
 	}
 
-	start() {
+	resume() {
 		this.Runnable := true
 	}
 
-	stop() {
+	pause() {
 		this.Runnable := false
 	}
 
@@ -200,6 +211,7 @@ class Task {
 
 	stopTask(theTask) {
 		theTask.Runnable := false
+		theTask.Stopped := true
 
 		Task.removeTask(theTask)
 	}
@@ -277,7 +289,7 @@ class Task {
 			Task.sCurrentTask := oldCurrentTask
 		}
 
-		if next
+		if (next && !next.Stopped)
 			Task.addTask(next)
 	}
 }
@@ -287,6 +299,40 @@ class Task {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PeriodicTask extends Task {
+	run() {
+		base.run()
+
+		this.NextExecution := (A_TickCount + this.Sleep)
+
+		return this
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                        WindowTask                                 ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class WindowTask extends Task {
+	iWindow := false
+
+	Window[] {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	__New(window, callable := false, sleep := 0, priority := 1) {
+		this.iWindow := window
+
+		base.__New(callable, sleep, priority)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    WindowPeriodicTask                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class WindowPeriodicTask extends WindowTask {
 	run() {
 		base.run()
 
@@ -315,10 +361,19 @@ class Continuation extends Task {
 		}
 	}
 
-	__New(task := false, continuation := false) {
-		this.iTask := (task ? task : Task.CurrentTask)
+	__New(task := false, continuation := false, sleep := "__Undefined__", priority := "__Undefined__") {
+		if !task
+			task := Task.CurrentTask
 
-		base.__New(continuation)
+		this.iTask := task
+
+		if (sleep = kUndefined)
+			sleep := task.Sleep
+
+		if (priority = kUndefined)
+			priority := task.Priority
+
+		base.__New(continuation, sleep, priority)
 	}
 }
 

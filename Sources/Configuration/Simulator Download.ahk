@@ -32,6 +32,13 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -122,9 +129,9 @@ downloadSimulatorController() {
 
 			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
-			updateProgress := Func("updateProgress").Bind(45)
-
-			SetTimer %updateProgress%, 1500
+			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
+			
+			Task.startTask(updateTask)
 
 			try {
 				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
@@ -141,11 +148,11 @@ downloadSimulatorController() {
 				ExitApp 0
 			}
 
-			SetTimer %updateProgress%, Off
-
-			updateProgress := Func("updateProgress").Bind(90)
-
-			SetTimer %updateProgress%, 1000
+			Task.stopTask(updateTask)
+			
+			updateTask := new PeriodicTask(Func("updateProgress").Bind(90), 1000)
+			
+			Task.startTask(updateTask)
 
 			showProgress({message: translate("Extracting installation files...")})
 
@@ -183,7 +190,7 @@ downloadSimulatorController() {
 				SetWorkingDir %currentDirectory%
 			}
 
-			SetTimer %updateProgress%, Off
+			Task.stopTask(updateTask)
 
 			showProgress({progress: 90, message: translate("Preparing installation...")})
 

@@ -7,6 +7,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -62,9 +69,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	iMotionApplication := false
 	iIsMotionActive := false
 
+	iUpdateMotionStateTask := false
+
 	class MotionMode extends ControllerMode {
 		iSelectedEffect := false
 		iIntensityActions := []
+
+		iUpdateLabelsTask := false
 
 		Mode[] {
 			Get {
@@ -147,13 +158,21 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateActionStates()
 
-			SetTimer updateEffectLabels, 1500
+			if !this.iUpdateLabelsTask {
+				this.iUpdateLabelsTask := new PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
+
+				Task.startTask(this.iUpdateLabelsTask)
+			}
 		}
 
 		deactivate() {
 			base.deactivate()
 
-			SetTimer updateEffectLabels, Off
+			if this.iUpdateLabelsTask {
+				Task.stopTask(this.iUpdateLabelsTask)
+
+				this.iUpdateLabelsTask := false
+			}
 
 			this.deselectEffect()
 		}
@@ -609,11 +628,19 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if action
 			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 
-		SetTimer updateMotionState, -100
+		if !this.iUpdateMotionStateTask {
+			this.iUpdateMotionStateTask := new PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
+
+			Task.startTask(this.iUpdateMotionStateTask)
+		}
 	}
 
 	deactivate() {
-		SetTimer updateMotionState, Off
+		if this.iUpdateMotionStateTask {
+			Task.stopTask(this.iUpdateMotionStateTask)
+
+			this.iUpdateMotionStateTask := false
+		}
 
 		base.deactivate()
 	}
@@ -1065,7 +1092,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			protectionOff()
 		}
 
-		SetTimer updateMotionState, % isRunning ? 10000 : 5000
+		Task.CurrentTask.Sleep := (isRunning ? 10000 : 5000)
 	}
 }
 
@@ -1073,31 +1100,6 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateMotionState() {
-	static plugin := false
-
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
-
-	plugin.updateMotionState()
-}
-
-updateEffectLabels() {
-	static mode := false
-
-	if !mode
-		mode := SimulatorController.Instance.findMode(kMotionFeedbackPlugin, kMotionMode)
-
-	protectionOn()
-
-	try {
-		mode.updateEffectLabels()
-	}
-	finally {
-		protectionOff()
-	}
-}
 
 startSimFeedback(stayOpen := false) {
 	simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)

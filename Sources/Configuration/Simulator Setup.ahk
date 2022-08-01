@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include Libraries\SettingsEditor.ahk
@@ -1731,17 +1732,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	toggleTriggerDetector(callback := false) {
-		if callback {
-			if !vShowTriggerDetector
-				vTriggerDetectorCallback := callback
-		}
-		else
-			vTriggerDetectorCallback := false
-
-		vShowTriggerDetector := !vShowTriggerDetector
-
-		if vShowTriggerDetector
-			SetTimer showTriggerDetector, -100
+		triggerDetector(callback)
 	}
 }
 
@@ -2125,9 +2116,13 @@ class FinishStepWizard extends StepWizard {
 
 		base.showPage(page)
 
+		/*
 		settingsEditor := ObjBindMethod(this, "settingsEditor")
 
 		SetTimer %settingsEditor%, -200
+		*/
+		
+		Task.startTask(ObjBindMethod(this, "settingsEditor"), 200, kHighPriority)
 	}
 
 	hidePage(page) {
@@ -2149,23 +2144,25 @@ class FinishStepWizard extends StepWizard {
 
 	settingsEditor() {
 		if vWorking {
+			/*
 			settingsEditor := ObjBindMethod(this, "settingsEditor")
 
 			SetTimer %settingsEditor%, -200
-
-			return
+			*/
+			Task.startTask(ObjBindMethod(this, "settingsEditor"), 200, kHighPriority)
 		}
+		else {
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+				settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+			else
+				settings := newConfiguration()
 
-		if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-			settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-		else
-			settings := newConfiguration()
+			configuration := this.SetupWizard.getSimulatorConfiguration()
 
-		configuration := this.SetupWizard.getSimulatorConfiguration()
+			editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
 
-		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
-
-		vSettingsReady := true
+			vSettingsReady := true
+		}
 	}
 }
 
@@ -2179,9 +2176,7 @@ finishSetup(finish := false, save := false) {
 		if !vSettingsReady {
 			; Let other threads finish...
 
-			callback := Func("finishSetup").Bind("Finish", save)
-
-			SetTimer %callback%, % -200
+			Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
 
 			return
 		}
@@ -2205,9 +2200,7 @@ finishSetup(finish := false, save := false) {
 		else
 			save := false
 
-		callback := Func("finishSetup").Bind("Finish", save)
-
-		SetTimer %callback%, % -200
+		Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
 	}
 }
 
@@ -2510,7 +2503,7 @@ restartSetup:
 	else {
 		; Let finish all threads
 
-		SetTimer exitApp, % isDebug() ? -5000 : -2000
+		Task.startTask("exitApp", isDebug() ? 5000 : 2000)
 	}
 }
 

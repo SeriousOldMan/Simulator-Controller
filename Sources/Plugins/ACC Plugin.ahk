@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
@@ -521,7 +522,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						this.openPitstopMFD(false, false)
 
 					if this.iPSIsOpen
-						SetTimer updatePitstopState, 5000
+						Task.startTask("updatePitstopState", 5000, kLowPriority)
 				}
 			}
 		}
@@ -549,8 +550,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.sendCommand(this.ClosePitstopMFDHotkey)
 
 				this.iPSIsOpen := false
-
-				SetTimer updatePitstopState, Off
 			}
 		}
 		else if !reported {
@@ -586,8 +585,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 
 			this.iNoImageSearch := true
-
-			SetTimer updatePitstopState, Off
 
 			this.openPitstopMFD(false, true)
 
@@ -1139,8 +1136,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else {
 			this.iPSIsOpen := false
-
-			SetTimer updatePitstopState, Off
 		}
 
 		return lastY
@@ -1530,17 +1525,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return reload
 	}
 
-	updatePitstopState(fromTimer := false) {
+	updatePitstopState(fromTask := false) {
 		if isACCRunning() {
 			beginTickCount := A_TickCount
 			lastY := 0
 			images := []
 
 			try {
-				if (fromTimer || !this.iPSImageSearchArea)
+				if (fromTask || !this.iPSImageSearchArea)
 					lastY := this.searchPitstopLabel(images)
 
-				if (!fromTimer && this.iPSIsOpen) {
+				if (!fromTask && this.iPSIsOpen) {
 					reload := this.searchStrategyLabel(lastY, images)
 
 					; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
@@ -1563,6 +1558,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			catch exception {
 				this.iPSOpen := false
 			}
+
+			if (fromTask && this.iPSOpen && !this.iNoImageSearch) {
+				Task.CurrentTask.NextExecution := (A_TickCount + 5000)
+
+				return Task.CurrentTask
+			}
+
+			return false
 		}
 
 		return false
@@ -1643,18 +1646,21 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		closePitstopMFD()
 	}
 
-	pitstopFinished(pitstopNumber, updateState := false) {
-		static callback := false
+	pitstopFinished(pitstopNumber, async := false) {
+		static updateTask := false
 
-		if !updateState {
-			if callback
-				SetTimer %callback%, Off
+		if !async {
+			if updateTask {
+				Task.stopTask(updateTask)
+
+				updateTask := false
+			}
 
 			base.pitstopFinished(pitstopNumber)
 		}
 
 		if this.RaceEngineer {
-			if updateState {
+			if async {
 				try {
 					retry := false
 
@@ -1672,9 +1678,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						retry := true
 
 					if retry {
-						callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+						Task.CurrentTask.NextExecution := (A_TickCount + 10000)
 
-						SetTimer %callback%, -10000
+						return Task.CurrentTask
 					}
 					else {
 						FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
@@ -1753,11 +1759,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				catch exception {
 					; ignore
 				}
+
+				return false
 			}
 			else {
-				callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+				updateTask := new Task(ObjBindMethod(this, "pitstopFinished", pitstopNumber, true), 10000, kLowPriority)
 
-				SetTimer %callback%, -10000
+				Task.startTask(updateTask)
 			}
 		}
 	}

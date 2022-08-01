@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\GDIP.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
@@ -4243,11 +4244,8 @@ deleteSetup() {
 loadPressures() {
 	editor := SessionDatabaseEditor.Instance
 
-	if (editor.SelectedModule = "Pressures") {
-		callback := ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures")
-
-		SetTimer %callback%, -100
-	}
+	if (editor.SelectedModule = "Pressures")
+		Task.startTask(new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100))
 }
 
 noSelect() {

@@ -399,7 +399,7 @@ openConfigurationDocumentation() {
 selectTab() {
 	GuiControlGet configuratorTabView
 
-	configurator := ((configuratorTabView == 1) ? this.iGeneralTab : ConfigurationEditor.Instance.Configurators[configuratorTabView - 1][2])
+	configurator := ((configuratorTabView == 1) ? ConfigurationEditor.Instance.iGeneralTab : ConfigurationEditor.Instance.Configurators[configuratorTabView - 1][2])
 
 	if configurator.base.HasKey("activate")
 		configurator.activate()

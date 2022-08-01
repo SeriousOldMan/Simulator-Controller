@@ -125,6 +125,10 @@ class Task {
 		return (isInstance(result, Task) ? result : false)
 	}
 
+	execute() {
+		return this.run()
+	}
+
 	resume() {
 		this.Runnable := true
 	}
@@ -253,7 +257,7 @@ class Task {
 
 							worked := true
 
-							Task.execute(next)
+							Task.launch(next)
 						}
 				} until !worked
 			}
@@ -263,7 +267,7 @@ class Task {
 		}
 	}
 
-	execute(theTask) {
+	launch(theTask) {
 		oldCurrentTask := Task.CurrentTask
 		Task.sCurrentTask := theTask
 
@@ -277,7 +281,7 @@ class Task {
 		}
 
 		try {
-			next := theTask.run()
+			next := theTask.execute()
 		}
 		finally {
 			if window {
@@ -299,8 +303,8 @@ class Task {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PeriodicTask extends Task {
-	run() {
-		base.run()
+	execute() {
+		base.execute()
 
 		this.NextExecution := (A_TickCount + this.Sleep)
 
@@ -333,8 +337,8 @@ class WindowTask extends Task {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class WindowPeriodicTask extends WindowTask {
-	run() {
-		base.run()
+	execute() {
+		base.lanch()
 
 		this.NextExecution := (A_TickCount + this.Sleep)
 

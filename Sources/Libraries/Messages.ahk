@@ -534,5 +534,5 @@ sendMessage(messageType, category, data, target := false) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startMessageManager()
 createMessageReceiver()
+startMessageManager()

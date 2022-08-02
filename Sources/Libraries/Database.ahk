@@ -43,6 +43,8 @@ class Database {
 
 	Tables[name := false] {
 		Get {
+			local schema, data, row, values, length, ignore, column
+
 			if name {
 				if !this.iTables.HasKey(name) {
 					schema := this.Schemas[name]
@@ -80,7 +82,7 @@ class Database {
 	}
 
 	query(name, query) {
-		local predicate
+		local predicate, schema, rows, needsClone, predicate, selection, ignore, row, projection, projectedRows
 
 		schema := this.Schemas[name]
 		rows := this.Tables[name]
@@ -140,6 +142,8 @@ class Database {
 	}
 
 	add(name, values, flush := false) {
+		local row, directory, fileName
+
 		this.Tables[name].Push(values)
 
 		if flush {
@@ -162,7 +166,8 @@ class Database {
 	}
 
 	combine(table, query, field, values) {
-		results := []
+		local results := []
+		local ignore, value, result
 
 		for ignore, value in values {
 			query.Where[field] := value
@@ -175,7 +180,8 @@ class Database {
 	}
 
 	remove(name, where, predicate := false, flush := false) {
-		rows := []
+		local rows := []
+		local ignore, row
 
 		if (where && !where.MinParams)
 			where := Func("constraintColumns").Bind(where)
@@ -210,6 +216,8 @@ class Database {
 	}
 
 	flush(name := false) {
+		local directory, fileName, schema, ignore, row, values, column
+
 		if name {
 			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
 				directory := this.Directory
@@ -265,6 +273,8 @@ always(value, ignore*) {
 ;;;-------------------------------------------------------------------------;;;
 
 constraintColumns(constraints, row) {
+	local column, value
+
 	for column, value in constraints
 		if (row.HasKey(column) && (row[column] != value))
 			return false
@@ -273,9 +283,9 @@ constraintColumns(constraints, row) {
 }
 
 groupRows(groupedByColumns, groupedColumns, rows) {
-	local function
-
-	values := {}
+	local values := {}
+	local function, ignore, row, column, key, result, group, groupedRows, columnValues
+	local resultRow, valueColumn, resultColumn
 
 	if !IsObject(groupedByColumns)
 		groupedByColumns := Array(groupedByColumns)
@@ -299,7 +309,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	for group, groupedRows in values {
 		group := string2Values("|", group)
 
-		resultRow := Object()
+		resultRow := {}
 
 		for ignore, column in groupedByColumns
 			resultRow[column] := group[A_Index]

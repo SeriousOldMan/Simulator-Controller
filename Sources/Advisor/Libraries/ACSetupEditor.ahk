@@ -36,7 +36,7 @@ class ACSetup extends FileSetup {
 		}
 
 		Set {
-			local setup
+			local setup, value
 
 			setup := parseConfiguration(value)
 

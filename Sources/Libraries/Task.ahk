@@ -173,8 +173,7 @@ class Task {
 	}
 
 	getNextTask(priority, remove := true) {
-		local index
-		local candidate
+		local index, candidate
 
 		switch priority {
 			case kInterruptPriority:
@@ -273,16 +272,10 @@ class Task {
 	}
 
 	schedule(priority := 1) {
-		local next
-		local worked
-		local interrupt
-		local oldScheduling
-		local visited
-		local schedule
+		local interrupt := (priority > kNormalPriority)
+		local next, worked, interrupt, oldScheduling, visited, schedule
 
 		static scheduling := false
-
-		interrupt := (priority > kNormalPriority)
 
 		protectionOn(true)
 

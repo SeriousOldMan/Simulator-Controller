@@ -54,7 +54,7 @@ class ConfigurationItem {
 	}
 
 	descriptor(values*) {
-		result := ""
+		local result := ""
 
 		for index, value in values {
 			if (index > 1)
@@ -150,6 +150,8 @@ class Application extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local exePath, workinDirectory
+
 		base.loadFromConfiguration(configuration)
 
 		this.iExePath := getConfigurationValue(configuration, this.Application, "Exe Path", "")
@@ -173,6 +175,8 @@ class Application extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local startHandler, shutdownHandler, runningHandler
+
 		base.saveToConfiguration(configuration)
 
 		setConfigurationValue(configuration, this.Application, "Exe Path", this.ExePath)
@@ -192,7 +196,7 @@ class Application extends ConfigurationItem {
 	}
 
 	startup(special := true, wait := false, options := "") {
-		specialStartup := this.iSpecialStartup
+		local specialStartup := this.iSpecialStartup
 
 		logMessage(kLogInfo, "Starting application " . this.Application)
 
@@ -210,7 +214,7 @@ class Application extends ConfigurationItem {
 	}
 
 	shutdown(special := true) {
-		specialShutdown := this.iSpecialShutdown
+		local specialShutdown := this.iSpecialShutdown
 
 		logMessage(kLogInfo, "Stopping application " . this.Application)
 
@@ -241,7 +245,7 @@ class Application extends ConfigurationItem {
 	}
 
 	isRunning(special := true) {
-		specialIsRunning := this.iSpecialIsRunning
+		local specialIsRunning := this.iSpecialIsRunning
 
 		if (special && specialIsRunning && (specialIsRunning != ""))
 			if (Func(specialIsRunning) && %specialIsRunning%())
@@ -255,8 +259,8 @@ class Application extends ConfigurationItem {
 	}
 
 	getProcessID() {
-		processID := false
-		curDetectHiddenWindows := A_DetectHiddenWindows
+		local processID := false
+		local curDetectHiddenWindows := A_DetectHiddenWindows
 
 		DetectHiddenWindows On
 
@@ -283,8 +287,8 @@ class Application extends ConfigurationItem {
 	}
 
 	run(application, exePath, workingDirectory, options := "", wait := false) {
-		local pid
-		
+		local pid, message, result
+
 		try {
 			if InStr(exePath, A_Space)
 				exePath := ("""" . exePath . """")
@@ -357,6 +361,8 @@ class Function extends ConfigurationItem {
 
 	Hotkeys[trigger := false, asText := false] {
 		Get {
+			local result
+
 			if trigger {
 				result := this.iHotkeys[trigger]
 
@@ -380,7 +386,7 @@ class Function extends ConfigurationItem {
 
 	Actions[trigger := false, asText := false] {
 		Get {
-			local action
+			local action, arguments
 
 			if trigger {
 				action := this.iActions[trigger]
@@ -433,11 +439,11 @@ class Function extends ConfigurationItem {
 	}
 
 	__New(functionNumber, configuration := false, hotkeyActions*) {
+		local trigger := this.Trigger
+		local index := 1
+		local ignore
+
 		this.iNumber := functionNumber
-
-		trigger := this.Trigger
-
-		index := 1
 
 		for ignore, trigger in this.Trigger {
 			if (index > hotkeyActions.Length())
@@ -451,6 +457,8 @@ class Function extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local functionDescriptor, descriptorValues
+
 		base.loadFromConfiguration(configuration)
 
 		for functionDescriptor, descriptorValues in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
@@ -472,9 +480,9 @@ class Function extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		local descriptor := this.Descriptor
 
-		descriptor := this.Descriptor
+		base.saveToConfiguration(configuration)
 
 		for ignore, trigger in this.Trigger {
 			setConfigurationValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
@@ -506,6 +514,8 @@ class Function extends ConfigurationItem {
 	}
 
 	computeAction(trigger, action) {
+		local arguments, argument, index
+
 		action := Trim(action)
 
 		if (action == "")
@@ -667,6 +677,8 @@ class Plugin extends ConfigurationItem {
 
 	Arguments[asText := false] {
 		Get {
+			local argument, values, result
+
 			if asText {
 				result := []
 
@@ -684,6 +696,8 @@ class Plugin extends ConfigurationItem {
 	}
 
 	__New(plugin, configuration := false, active := false, simulators := "", arguments := "") {
+		local ignore, simulator
+
 		this.iPlugin := plugin
 		this.iIsActive := active
 
@@ -696,6 +710,8 @@ class Plugin extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local descriptor
+
 		base.loadFromConfiguration(configuration)
 
 		descriptor := getConfigurationValue(configuration, "Plugins", this.Plugin, "")
@@ -718,7 +734,8 @@ class Plugin extends ConfigurationItem {
 	}
 
 	computeArgments(arguments) {
-		result := Object()
+		local ignore, argument
+		local result := {}
 
 		for ignore, argument in string2Values(";", arguments) {
 			argument := string2Values(":", argument, 2)
@@ -734,11 +751,8 @@ class Plugin extends ConfigurationItem {
 	}
 
 	getArgumentValue(argument, default := false) {
-		if this.hasArgument(argument) {
-			arguments := this.Arguments
-
-			return arguments[argument]
-		}
+		if this.hasArgument(argument)
+			return this.iArguments[argument]
 		else
 			return default
 	}
@@ -748,7 +762,8 @@ class Plugin extends ConfigurationItem {
 	}
 
 	parseValues(delimiter, string) {
-		arguments := {}
+		local startPos, endPos, argument, key, result, ignore, value
+		local arguments := {}
 
 		Loop {
 			startPos := InStr(string, """")

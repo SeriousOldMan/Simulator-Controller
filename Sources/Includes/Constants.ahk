@@ -89,8 +89,3 @@ global kLogInfo = 1
 global kLogWarn = 2
 global kLogCritical = 3
 global kLogOff = 4
-
-global kLocalMessage = 0
-global kWindowMessage = 1
-global kPipeMessage = 2
-global kFileMessage = 3

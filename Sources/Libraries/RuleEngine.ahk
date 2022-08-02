@@ -9,9 +9,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Constants.ahk
-#Include ..\Includes\Variables.ahk
-#Include ..\Includes\Functions.ahk
+#Include ..\Includes\Includes.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,19 +51,6 @@ global kTraceFull = 1
 global kTraceMedium = 2
 global kTraceLight = 3
 global kTraceOff = 4
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variables Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vActiveVariables = 0
-
-global vActiveChoicePoints = 0
-global vActiveResultSets = 0
-
-global vMaxChoicePoints = 0
-global vMaxResultSets = 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -113,12 +98,15 @@ class CompositeCondition extends Condition {
 	}
 
 	getFacts(ByRef facts) {
+		local ignore, theCondition
+
 		for ignore, theCondition in this.Conditions
 			theCondition.getFacts(facts)
 	}
 
 	toString(facts := "__NotInitialized__") {
-		conditions := []
+		local conditions := []
+		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
 			conditions.Push(theCondition.toString(facts))
@@ -149,6 +137,8 @@ class ExistQuantor extends Quantor {
     }
 
 	match(facts, variables) {
+		local ignore, theCondition
+
 		for ignore, theCondition in this.Conditions
 			if theCondition.match(facts, variables)
 				return true
@@ -169,6 +159,8 @@ class NotExistQuantor extends Quantor {
     }
 
 	match(facts, variables) {
+		local ignore, theCondition
+
 		for ignore, theCondition in this.Conditions
 			if theCondition.match(facts, variables)
 				return false
@@ -189,7 +181,8 @@ class OneQuantor extends Quantor {
     }
 
 	match(facts, variables) {
-		matched := 0
+		local matched := 0
+		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
 			if theCondition.match(facts, variables)
@@ -211,7 +204,8 @@ class AllQuantor extends Quantor {
     }
 
 	match(facts, variables) {
-		matched := 0
+		local matched := 0
+		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
 			if theCondition.match(facts, variables)
@@ -270,19 +264,19 @@ class Predicate extends Condition {
 	}
 
 	getFacts(ByRef facts) {
-		left := this.iLeftPrimary
+		local left := this.iLeftPrimary
+		local right := this.iRightPrimary
 
 		if ((left != kNotInitialized) && (left.base == Variable))
 			facts.Push(left.Variable[true])
-
-		right := this.iRightPrimary
 
 		if ((right != kNotInitialized) && (right.base == Variable))
 			facts.Push(right.Variable[true])
 	}
 
 	match(facts, variables) {
-		leftPrimary := this.LeftPrimary[facts]
+		local leftPrimary := this.LeftPrimary[facts]
+		local rightPrimary, result
 
 		if (leftPrimary == kNotInitialized)
 			return false
@@ -384,8 +378,6 @@ class Variable extends Primary {
 	}
 
 	__New(name, property := false, rootVariable := false) {
-		; vActiveVariables += 1
-
 		this.iVariable := name
 		this.iProperty := ((property && (property != "")) ? string2Values(".", property) : false)
 		this.iRootVariable := rootVariable
@@ -397,13 +389,9 @@ class Variable extends Primary {
 			Throw "Subclassing of Variable is not allowed..."
 	}
 
-	/*
-	__Delete() {
-		vActiveVariables -= 1
-	}
-	*/
-
 	getValue(variablesFactsOrResultSet, default := "__NotInitialized__") {
+		local value
+
 		if (variablesFactsOrResultSet == kNotInitialized)
 			return this
 		else {
@@ -428,7 +416,8 @@ class Variable extends Primary {
 	}
 
 	substituteVariables(variables) {
-		var := this.Variable[true]
+		local var := this.Variable[true]
+		local newVariable
 
 		if variables.HasKey(var)
 			return variables[var]
@@ -445,8 +434,9 @@ class Variable extends Primary {
 	}
 
 	toString(variablesFactsOrResultSet := "__NotInitialized__") {
-		property := this.Property
-		name := this.Variable
+		local property := this.Property
+		local name := this.Variable
+		local root, value
 
 		if InStr(name, "__Unnamed")
 			name := ""
@@ -468,6 +458,7 @@ class Variable extends Primary {
 
 	occurs(resultSet, var) {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		local cyclic
 
 		if (ruleEngine.TraceLevel <= kTraceFull)
 			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
@@ -645,6 +636,7 @@ class CallAction extends Action {
 	execute(knowledgeBase, variables) {
 		local function
 		local facts := knowledgeBase.Facts
+		local arguments, argument, ignore
 
 		if isInstance(this.Function, Variable)
 			function := this.Function[variables]
@@ -666,7 +658,8 @@ class CallAction extends Action {
 	}
 
 	getValues(facts) {
-		values := []
+		local values := []
+		local ignore, argument
 
 		for ignore, argument in this.Arguments
 			values.Push(argument.getValue(facts, argument))
@@ -675,9 +668,10 @@ class CallAction extends Action {
 	}
 
 	toString(facts := "__NotInitialized__") {
-		arguments := []
+		local arguments := []
+		local ignore, argument
 
-		for index, argument in this.Arguments
+		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 
 		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
@@ -711,7 +705,7 @@ class ProveAction extends CallAction {
 
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
-		local resultSet
+		local resultSet, arguments, ignore, argument, goal
 
 		arguments := []
 
@@ -773,9 +767,8 @@ class SetFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
-		value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 
-		facts.setFact(fact, value)
+		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 	}
 
 	toString(facts := "__NotInitialized__") {
@@ -796,6 +789,8 @@ class SetComposedFactAction extends Action {
 
 	Fact[variablesOrFacts := "__NotInitialized__"] {
 		Get {
+			local result, index, component
+
 			if (variablesOrFacts == kNotInitialized)
 				return this.iFact
 			else {
@@ -830,6 +825,7 @@ class SetComposedFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
+		local index, component
 
 		for index, component in this.Fact {
 			if (index > 1)
@@ -838,13 +834,12 @@ class SetComposedFactAction extends Action {
 			fact .= (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
 		}
 
-		value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
-
-		facts.setFact(fact, value)
+		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 	}
 
 	toString(facts := "__NotInitialized__") {
 		local fact := ""
+		local index, component
 
 		for index, component in this.Fact {
 			if (index > 1)
@@ -879,9 +874,8 @@ class ClearFactAction extends Action {
 
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
-		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 
-		facts.clearFact(fact)
+		facts.clearFact(isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 	}
 
 	toString(facts := "__NotInitialized__") {
@@ -898,6 +892,8 @@ class ClearComposedFactAction extends Action {
 
 	Fact[variablesOrFacts := "__NotInitialized__"] {
 		Get {
+			local result, index, component
+
 			if (variablesOrFacts == kNotInitialized)
 				return this.iFact
 			else {
@@ -922,6 +918,7 @@ class ClearComposedFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
+		local index, component
 
 		for index, component in this.Fact {
 			if (index > 1)
@@ -935,6 +932,7 @@ class ClearComposedFactAction extends Action {
 
 	toString(facts := "__NotInitialized__") {
 		local fact := ""
+		local index, component
 
 		for index, component in this.Fact {
 			if (index > 1)
@@ -1032,7 +1030,8 @@ class Compound extends Term {
 	}
 
 	toString(resultSet := "__NotInitialized__") {
-		arguments := []
+		local arguments := []
+		local ignore, argument
 
 		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(resultSet))
@@ -1041,7 +1040,8 @@ class Compound extends Term {
 	}
 
 	getValues(resultSet) {
-		values := []
+		local values := []
+		local ignore, argument
 
 		for ignore, argument in this.Arguments
 			values.Push(argument.getValue(resultSet, argument))
@@ -1050,7 +1050,7 @@ class Compound extends Term {
 	}
 
 	injectValues(resultSet) {
-		arguments := this.Arguments[resultSet]
+		local arguments := this.Arguments[resultSet]
 
 		if (arguments.Length() == 0)
 			return this
@@ -1059,6 +1059,8 @@ class Compound extends Term {
 	}
 
 	hasVariables() {
+		local ignore, argument
+
 		for ignore, argument in this.Arguments
 			if argument.hasVariables()
 				return true
@@ -1067,6 +1069,8 @@ class Compound extends Term {
 	}
 
 	substituteVariables(variables) {
+		local arguments, ignore, argument
+
 		if this.iHasVariables {
 			arguments := []
 
@@ -1080,6 +1084,8 @@ class Compound extends Term {
 	}
 
 	unify(choicePoint, term) {
+		local termArguments, index, argument
+
 		if ((term.base == Compound) && (this.Functor == term.Functor) && (this.Arity == term.Arity)) {
 			termArguments := term.Arguments
 
@@ -1095,6 +1101,7 @@ class Compound extends Term {
 
 	occurs(resultSet, var) {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		local ignore, argument
 
 		if (ruleEngine.TraceLevel <= kTraceFull)
 			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
@@ -1172,9 +1179,9 @@ class Pair extends Term {
 	}
 
 	toString(resultSet := "__NotInitialized__") {
-		result := "["
-
-		next := this
+		local result := "["
+		local next := this
+		local left, right, separator
 
 		Loop {
 			left := next.LeftTerm.toString(resultSet)
@@ -1226,6 +1233,7 @@ class Pair extends Term {
 
 	occurs(resultSet, var) {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
+		local leftTerm, rightTerm
 
 		if (ruleEngine.TraceLevel <= kTraceFull)
 			ruleEngine.trace(kTraceFull, "Check whether " . var.toString() . " occurs in " . this.toString(resultSet))
@@ -1285,7 +1293,7 @@ class ProductionRule extends Rule {
 		}
 
 		getValue(variable, default := "__NotInitialized__") {
-			fullName := variable.Variable[true]
+			local fullName := variable.Variable[true]
 
 			if this.iVariables.HasKey(fullName)
 				return this.iVariables[fullName]
@@ -1326,6 +1334,7 @@ class ProductionRule extends Rule {
 
 	getFacts() {
 		local facts := []
+		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
 			theCondition.getFacts(facts)
@@ -1334,7 +1343,8 @@ class ProductionRule extends Rule {
 	}
 
 	match(facts) {
-		variables := new this.Variables()
+		local variables := new this.Variables()
+		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
 			if !theCondition.match(facts, variables)
@@ -1344,6 +1354,8 @@ class ProductionRule extends Rule {
 	}
 
 	fire(knowledgeBase, variables) {
+		local ignore, theAction
+
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Firing rule " . this.toString())
 
@@ -1352,6 +1364,8 @@ class ProductionRule extends Rule {
 	}
 
 	produce(knowledgeBase) {
+		local variables
+
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Trying rule " . this.toString())
 
@@ -1367,9 +1381,10 @@ class ProductionRule extends Rule {
 	}
 
 	toString(facts := "__NotInitialized__") {
-		priority := this.Priority
-		conditions := ((priority != 0) ? ["Priority: " . priority] : [])
-		actions := []
+		local priority := this.Priority
+		local conditions := ((priority != 0) ? ["Priority: " . priority] : [])
+		local actions := []
+		local ignore, theCondition, theAction
 
 		for ignore, theCondition in this.Conditions
 			conditions.Push(theCondition.toString(facts))
@@ -1415,7 +1430,8 @@ class ReductionRule extends Rule {
 	}
 
 	toString(resultSet := "__NotInitialized__") {
-		tail := this.Tail
+		local tail := this.Tail
+		local terms, ignore, theTerm
 
 		if (tail && (tail.Length() > 0)) {
 			terms := []
@@ -1430,6 +1446,8 @@ class ReductionRule extends Rule {
 	}
 
 	hasVariables() {
+		local ignore, theTerm
+
 		if this.Head.hasVariables()
 			return true
 
@@ -1441,6 +1459,9 @@ class ReductionRule extends Rule {
 	}
 
 	substituteVariables() {
+		local variables, terms
+		local ignore, theTerm
+
 		if this.iHasVariables {
 			variables := {}
 			terms := []
@@ -1487,6 +1508,7 @@ class ResultSet {
 	ChoicePoint[retry := false] {
 		Get {
 			local choicePoint := this.iChoicePoint
+			local next
 
 			if retry
 				Loop {
@@ -1506,29 +1528,11 @@ class ResultSet {
 		this.iKnowledgeBase := knowledgeBase
 
 		this.iChoicePoint := this.createChoicePoint(goal)
-
-		/*
-		vActiveResultSets += 1
-
-		vMaxResultSets := Max(vMaxResultSets, vActiveResultSets)
-
-		if (Mod(vActiveResultSets, 100) = 0)
-			showMessage("(+) # Active Result Sets: " . vActiveResultSets)
-
-		*/
 	}
-
-	/*
-	__Delete() {
-		vActiveResultSets -= 1
-
-		if (vActiveResultSets > 0)
-			if (Mod(vActiveResultSets, 1000) = 0)
-				showMessage("(-) # Active Result Sets: " . vActiveResultSets)
-	}
-	*/
 
 	dispose() {
+		local cp, removeables
+
 		this.iBindings := false
 
 		cp := this.iChoicePoint
@@ -1552,8 +1556,9 @@ class ResultSet {
 	}
 
 	setVariable(choicePoint, var, value) {
+		local bindings := this.iBindings
+
 		var := var.RootVariable
-		bindings := this.iBindings
 
 		choicePoint.saveVariable(var, (bindings.HasKey(var) ? bindings[var] : kNotInitialized))
 
@@ -1609,9 +1614,8 @@ class ResultSet {
 
 	nextResult() {
 		local ruleEngine := this.RuleEngine
+		local tickCount := A_TickCount
 		local choicePoint
-
-		tickCount := A_TickCount
 
 		if this.iExhausted
 			return false
@@ -1658,9 +1662,9 @@ class ResultSet {
 
 	getValue(var, default := "__NotInitialized__") {
 		local ruleEngine := this.RuleEngine
-		bindings := this.iBindings
-
-		last := default
+		local bindings := this.iBindings
+		local last := default
+		local value, root
 
 		Loop {
 			var := var.RootVariable
@@ -1697,7 +1701,8 @@ class ResultSet {
 	}
 
 	createChoicePoint(goal, environment := false) {
-		functor := goal.Functor
+		local functor := goal.Functor
+		local builtin
 
 		switch functor {
 			case "produce":
@@ -1783,26 +1788,7 @@ class ChoicePoint {
 		this.iResultSet := resultSet
 		this.iGoal := goal
 		this.iEnvironment := environment
-
-		/*
-		vActiveChoicePoints += 1
-
-		vMaxChoicePoints := Max(vMaxChoicePoints, vActiveChoicePoints)
-
-		if (Mod(vActiveChoicePoints, 1000) = 0)
-			showMessage("(+) # Active Choice Points: " . vActiveChoicePoints)
-		*/
 	}
-
-	/*
-	__Delete() {
-		vActiveChoicePoints -= 1
-
-		if (vActiveChoicePoints > 0)
-			if (Mod(vActiveChoicePoints, 1000) = 0)
-				showMessage("(-) # Active Choice Points: " . vActiveChoicePoints)
-	}
-	*/
 
 	dispose() {
 		this.iResultSet := false
@@ -1821,6 +1807,7 @@ class ChoicePoint {
 
 	resetVariables() {
 		local resultSet := this.ResultSet
+		local var, value
 
 		for var, value in this.iSavedVariables
 			resultSet.resetVariable(this, var, value)
@@ -1844,8 +1831,8 @@ class ChoicePoint {
 	}
 
 	unlink() {
-		next := this.iNextChoicePoint
-		previous := this.iPreviousChoicePoint
+		local next := this.iNextChoicePoint
+		local previous := this.iPreviousChoicePoint
 
 		if next
 			next.iPreviousChoicePoint := previous
@@ -1860,6 +1847,8 @@ class ChoicePoint {
 	}
 
 	remove(removeables := false) {
+		local last, cp, subChoicePoints, scpLength
+
 		if !removeables
 			removeables := [this]
 
@@ -1885,7 +1874,8 @@ class ChoicePoint {
 	}
 
 	reset() {
-		subChoicePoints := this.SubChoicePoints
+		local subChoicePoints := this.SubChoicePoints
+		local removeables, ignore, theChoicePoint
 
 		if (subChoicePoints.Length() > 0) {
 			removeables := []
@@ -1937,9 +1927,7 @@ class RulesChoicePoint extends ChoicePoint {
 
 	Reductions[reset := false] {
 		Get {
-			local ruleEngine
-			local goal
-			local resultSet
+			local ruleEngine, goal, resultSet
 
 			if reset {
 				resultSet := this.ResultSet
@@ -1967,8 +1955,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 
 	nextChoice() {
-		local rule
-		local resultSet
+		local rule, resultSet, reductions, index
 
 		reductions := this.Reductions[this.iNextRuleIndex == 1]
 
@@ -2006,7 +1993,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 
 	addSubChoicePoints(goals) {
-		local choicePoint
+		local choicePoint, previous
 
 		this.SubChoicePoints := []
 
@@ -2050,10 +2037,7 @@ class FactChoicePoint extends ChoicePoint {
 	}
 
 	nextChoice() {
-		local resultSet
-		local knowledgeBase
-		local facts
-		local fact
+		local resultSet, knowledgeBase, facts, fact, arguments, length, index, argument, value
 
 		if this.iFirst {
 			this.iFirst := false
@@ -2171,6 +2155,8 @@ class CallChoicePoint extends ChoicePoint {
 	}
 
 	nextChoice() {
+		local result
+
 		if this.iFirst {
 			this.iFirst := false
 
@@ -2199,7 +2185,7 @@ class CallChoicePoint extends ChoicePoint {
 
 	foreignCall() {
 		local resultSet := this.ResultSet
-		local function
+		local function, values, builtin, index, theTerm, value, newValues
 
 		values := []
 		builtin := false
@@ -2241,8 +2227,8 @@ class CallChoicePoint extends ChoicePoint {
 	builtinCall() {
 		local resultSet := this.ResultSet
 		local function := this.Goal.Functor
-
-		values := []
+		local values := []
+		local index, theTerm, newValues, value
 
 		for index, theTerm in this.Goal.Arguments
 			values.Push(theTerm.getValue(resultSet, theTerm))
@@ -2319,9 +2305,8 @@ class CutChoicePoint extends ChoicePoint {
 	previous() {
 		local resultSet := this.ResultSet
 		local ruleEngine := resultSet.RuleEngine
-
-		environment := this.Environment
-		candidate := base.previous()
+		local environment := this.Environment
+		local candidate := base.previous()
 
 		Loop {
 			if !candidate
@@ -2400,11 +2385,11 @@ class KnowledgeBase {
 	}
 
 	__New(ruleEngine, facts, rules) {
+		local production := rules.Productions[false]
+
 		this.iRuleEngine := ruleEngine
 		this.iFacts := facts
 		this.iRules := rules
-
-		production := rules.Productions[false]
 
 		while production {
 			this.registerRuleFacts(production.Rule)
@@ -2415,6 +2400,7 @@ class KnowledgeBase {
 
 	registerRuleFacts(rule) {
 		local facts := this.Facts
+		local ignore, theFact, fRules
 
 		for ignore, theFact in rule.getFacts() {
 			fRules := facts.getObserver(theFact)
@@ -2431,6 +2417,7 @@ class KnowledgeBase {
 
 	deregisterRuleFacts(rule) {
 		local facts := this.Facts
+		local ignore, theFact, fRules
 
 		for ignore, theFact in rule.getFacts() {
 			fRules := facts.getObserver(theFact)
@@ -2501,7 +2488,7 @@ class KnowledgeBase {
 		local facts := this.Facts
 		local rules := this.Rules
 		local result := false
-		local ruleEntry
+		local ruleEntry, tickCount, generation, produced, matched
 
 		tickCount := A_TickCount
 
@@ -2546,9 +2533,8 @@ class KnowledgeBase {
 	}
 
 	prove(goal) {
+		local tickCount := A_TickCount
 		local resultSet
-
-		tickCount := A_TickCount
 
 		resultSet := this.RuleEngine.createResultSet(this, goal)
 
@@ -2717,7 +2703,7 @@ class Facts {
 	}
 
 	getObserver(fact) {
-		observers := this.iObservers
+		local observers := this.iObservers
 
 		return (observers.HasKey(fact) ? observers[fact] : false)
 	}
@@ -2810,7 +2796,7 @@ class Rules {
 
 		Next[active := true] {
 			Get {
-				candidate := this.iNext
+				local candidate := this.iNext
 
 				while candidate
 					if (active && (candidate.Active == false))
@@ -2824,7 +2810,7 @@ class Rules {
 
 		Previous[active := true] {
 			Get {
-				candidate := this.iPrevious
+				local candidate := this.iPrevious
 
 				while candidate
 					if (active && (candidate.Active == false))
@@ -2884,8 +2870,8 @@ class Rules {
 		}
 
 		remove() {
-			next := this.iNext
-			previous := this.iPrevious
+			local next := this.iNext
+			local previous := this.iPrevious
 
 			if next
 				next.iPrevious := previous
@@ -2903,6 +2889,8 @@ class Rules {
 
 	Productions[active := true] {
 		Get {
+			local candidate
+
 			if active {
 				candidate := this.iProductions
 
@@ -2915,7 +2903,8 @@ class Rules {
 
 	Reductions[functor := false, arity := false, create := false] {
 		Get {
-			reductions := this.iReductions
+			local reductions := this.iReductions
+			local key
 
 			if functor {
 				key := functor . "." . arity
@@ -2939,11 +2928,12 @@ class Rules {
 	}
 
 	__New(ruleEngine, productions, reductions) {
+		local last := false
+		local index, production, entry, ignore, reduction, key
+
 		this.iRuleEngine := ruleEngine
 
 		productions := productions.Clone()
-
-		last := false
 
 		for index, production in this.sortProductions(productions) {
 			entry := new this.Production(production, last)
@@ -2964,6 +2954,8 @@ class Rules {
 	}
 
 	addRule(rule) {
+		local priority, last, candidate, newProduction
+
 		if (rule.Type == kProduction) {
 			priority := rule.Priority
 			last := false
@@ -3007,7 +2999,7 @@ class Rules {
 	}
 
 	removeRule(rule) {
-		local rules
+		local rules, production, index, candidate
 
 		if (rule.Type == kProduction) {
 			production := this.Productions[false]
@@ -3151,6 +3143,8 @@ class RuleEngine {
 
 class RuleCompiler {
 	compile(fileName, ByRef productions, ByRef reductions, path := false, includes := false) {
+		local text
+
 		if !includes
 			includes := []
 
@@ -3169,6 +3163,9 @@ class RuleCompiler {
 	}
 
 	compileRules(text, ByRef productions, ByRef reductions, path := false, includes := false) {
+		local incompleteLine := false
+		local line, currentDirectory, fileName, compiledRule
+
 		if !includes
 			includes := []
 
@@ -3179,8 +3176,6 @@ class RuleCompiler {
 			if !IsObject(reductions)
 				reductions := []
 		}
-
-		incompleteLine := false
 
 		Loop Parse, text, `n, `r
 		{
@@ -3245,19 +3240,19 @@ class RuleCompiler {
 	}
 
 	compileProduction(text) {
-		production := this.readProduction(text)
+		local production := this.readProduction(text)
 
 		return this.createProductionRuleParser(production).parse(production)
 	}
 
 	compileReduction(text) {
-		reduction := this.readReduction(text)
+		local reduction := this.readReduction(text)
 
 		return this.createReductionRuleParser(reduction).parse(reduction)
 	}
 
 	compileGoal(text) {
-		goal := this.readHead(text, 1)
+		local goal := this.readHead(text, 1)
 
 		return this.createCompoundParser(goal).parse(goal)
 	}
@@ -3276,8 +3271,8 @@ class RuleCompiler {
 	readProduction(text) {
 		local priority := kNotInitialized
 		local nextCharIndex := 1
-
-		conditions := this.readConditions(text, nextCharIndex, priority)
+		local conditions := this.readConditions(text, nextCharIndex, priority)
+		local actions
 
 		if (this.readLiteral(text, nextCharIndex) != "=>")
 			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readProduction..."
@@ -3291,7 +3286,7 @@ class RuleCompiler {
 	}
 
 	readHead(ByRef text, ByRef nextCharIndex) {
-		head := this.readCompound(text, nextCharIndex)
+		local head := this.readCompound(text, nextCharIndex)
 
 		if (head == kNotFound)
 			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readHead..."
@@ -3300,8 +3295,8 @@ class RuleCompiler {
 	}
 
 	readTail(ByRef text, ByRef nextCharIndex) {
-		local term
 		local literal := this.readLiteral(text, nextCharIndex)
+		local terms, term
 
 		if (literal != "") {
 			if (literal == "<=") {
@@ -3348,6 +3343,8 @@ class RuleCompiler {
 	}
 
 	readCompound(ByRef text, ByRef nextCharIndex, functor := false) {
+		local xOperand, operation, yOperand, arguments
+
 		if !this.isEmpty(text, nextCharIndex) {
 			if !functor
 				functor := this.readLiteral(text, nextCharIndex)
@@ -3412,7 +3409,8 @@ class RuleCompiler {
 	}
 
 	readCompoundArguments(ByRef text, ByRef nextCharIndex) {
-		arguments := []
+		local arguments := []
+		local argument
 
 		Loop {
 			argument := this.readCompoundArgument(text, nextCharIndex)
@@ -3430,7 +3428,7 @@ class RuleCompiler {
 	}
 
 	readCompoundArgument(ByRef text, ByRef nextCharIndex) {
-		local literal
+		local literal, compoundArguments
 
 		if this.skipDelimiter("[", text, nextCharIndex, false)
 			return this.readList(text, nextCharIndex, false)
@@ -3452,6 +3450,8 @@ class RuleCompiler {
 	}
 
 	readList(ByRef text, ByRef nextCharIndex, skip := true) {
+		local arguments, argument
+
 		if (skip && !this.skipDelimiter("[", text, nextCharIndex, false))
 			return kNotFound
 
@@ -3479,7 +3479,8 @@ class RuleCompiler {
 	}
 
 	readConditions(ByRef text, ByRef nextCharIndex, ByRef priority := false) {
-		conditions := []
+		local conditions := []
+		local keyword, leftLiteral, operator, rightLiteral
 
 		Loop {
 			if this.skipDelimiter("{", text, nextCharIndex, false) {
@@ -3518,9 +3519,8 @@ class RuleCompiler {
 	}
 
 	readActions(ByRef text, ByRef nextCharIndex) {
-		local action
-
-		actions := []
+		local actions := []
+		local action, arguments
 
 		Loop {
 			this.skipDelimiter("(", text, nextCharIndex)
@@ -3550,7 +3550,7 @@ class RuleCompiler {
 	}
 
 	isEmpty(ByRef text, ByRef nextCharIndex) {
-		remainingText := Trim(SubStr(text, nextCharIndex))
+		local remainingText := Trim(SubStr(text, nextCharIndex))
 
 		if ((remainingText != "") && this.skipDelimiter(";", remainingText, 1, false))
 			remainingText := ""
@@ -3559,7 +3559,7 @@ class RuleCompiler {
 	}
 
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
-		length := StrLen(text)
+		local length := StrLen(text)
 
 		Loop {
 			if (nextCharIndex > length)
@@ -3573,7 +3573,7 @@ class RuleCompiler {
 	}
 
 	skipDelimiter(delimiter, ByRef text, ByRef nextCharIndex, throwError := true) {
-		length := StrLen(delimiter)
+		local length := StrLen(delimiter)
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -3589,9 +3589,8 @@ class RuleCompiler {
 	}
 
 	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{[()]}|`, `t") {
-		local literal
-
-		length := StrLen(text)
+		local length := StrLen(text)
+		local literal, beginCharIndex, quoted, hasQuote, character, isDelimiter
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -3643,7 +3642,8 @@ class RuleCompiler {
 	}
 
 	parseProductions(rules) {
-		result := []
+		local result := []
+		local ignore, theRule
 
 		for ignore, theRule in rules
 			result.Push(this.parseProduction(theRule))
@@ -3656,7 +3656,8 @@ class RuleCompiler {
 	}
 
 	parseReductions(rules) {
-		result := []
+		local result := []
+		local ignore, theRule
 
 		for ignore, theRule in rules
 			result.Push(this.parseReduction(theRule))
@@ -3752,6 +3753,8 @@ class Parser {
 	}
 
 	getVariable(name) {
+		local key, variables, rootName, rootVariable
+
 		if (SubStr(name, 1, 1) == "?")
 			name := SubStr(name, 2)
 
@@ -3805,11 +3808,12 @@ class RuleParser extends Parser {
 
 class ProductionRuleParser extends RuleParser {
 	parse(rule) {
-		parseActions := false
-		parsePriority := false
-		conditions := []
-		actions := []
-		priority := 0
+		local parseActions := false
+		local parsePriority := false
+		local conditions := []
+		local actions := []
+		local priority := 0
+		local ignore, expressions
 
 		for ignore, expression in rule
 			if parseActions
@@ -3839,8 +3843,8 @@ class ProductionRuleParser extends RuleParser {
 
 class ReductionRuleParser extends RuleParser {
 	parse(rule) {
-		head := this.Compiler.createCompoundParser(rule[1], this.Variables).parse(rule[1])
-		tail := []
+		local head := this.Compiler.createCompoundParser(rule[1], this.Variables).parse(rule[1])
+		local tail := []
 
 		if (rule.Length() > 1) {
 			if (rule[2] != "<=")
@@ -3859,7 +3863,8 @@ class ReductionRuleParser extends RuleParser {
 	}
 
 	parseTail(terms, start) {
-		result := []
+		local result := []
+		local index, theTerm
 
 		for index, theTerm in terms
 			if (index >= start)
@@ -3890,7 +3895,8 @@ class ConditionParser extends Parser {
 	}
 
 	parseArguments(conditions, start) {
-		result := []
+		local result := []
+		local index, theCondition
 
 		for index, theCondition in conditions
 			if (index >= start)
@@ -3936,9 +3942,8 @@ class PrimaryParser extends Parser {
 
 class ActionParser extends Parser {
 	parse(expressions) {
-		local compound
-
 		local action := expressions[1]
+		local compound, argument, arguments
 
 		switch action {
 			case kCall:
@@ -3980,7 +3985,8 @@ class ActionParser extends Parser {
 	}
 
 	parseArguments(expressions, start) {
-		result := []
+		local result := []
+		local index, expression
 
 		for index, expression in expressions
 			if (index >= start)
@@ -4000,7 +4006,8 @@ class CompoundParser extends Parser {
 	}
 
 	parseArguments(terms, start) {
-		result := []
+		local result := []
+		local index, theTerm
 
 		for index, theTerm in terms
 			if (index >= start)
@@ -4036,9 +4043,10 @@ class FailParser extends Parser {
 
 class ListParser extends Parser {
 	parse(terms) {
-		length := terms.Length()
-		subTerms := []
-		lastTerm := false
+		local length := terms.Length()
+		local subTerms := []
+		local lastTerm := false
+		local index, theTerm
 
 		for index, theTerm in terms {
 			if (((theTerm = "[") && (index != 1)) || ((theTerm = "]") && (index != length))
@@ -4131,6 +4139,7 @@ option(choicePoint, option, value) {
 
 squareRoot(choicePoint, operand1, operand2) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4147,7 +4156,7 @@ squareRoot(choicePoint, operand1, operand2) {
 		else {
 			value1 := operand1.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand2, new Literal(Sqrt(value1)))
@@ -4159,9 +4168,10 @@ squareRoot(choicePoint, operand1, operand2) {
 		value1 := operand1.toString(resultSet)
 		value2 := operand2.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
 
 		return (Sqrt(value1) = value2)
@@ -4170,6 +4180,7 @@ squareRoot(choicePoint, operand1, operand2) {
 
 plus(choicePoint, operand1, operand2, operand3) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2, value3
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4182,9 +4193,10 @@ plus(choicePoint, operand1, operand2, operand3) {
 			value2 := operand2.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value2 is not number
+			if value2 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand1, new Literal(value2 + value3))
@@ -4197,9 +4209,10 @@ plus(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand2, new Literal(value1 - value3))
@@ -4212,9 +4225,10 @@ plus(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value2 := operand2.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value2 is not number
+
+			if value2 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand3, new Literal(value1 - value2))
@@ -4227,11 +4241,13 @@ plus(choicePoint, operand1, operand2, operand3) {
 		value2 := operand2.toString(resultSet)
 		value3 := operand3.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
-		if value3 is not number
+
+		if value3 is not Number
 			return false
 
 		return (value1 = (value2 + value3))
@@ -4240,6 +4256,7 @@ plus(choicePoint, operand1, operand2, operand3) {
 
 minus(choicePoint, operand1, operand2, operand3) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2, value3
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4252,9 +4269,10 @@ minus(choicePoint, operand1, operand2, operand3) {
 			value2 := operand2.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value2 is not number
+			if value2 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand1, new Literal(value2 - value3))
@@ -4267,9 +4285,10 @@ minus(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand2, new Literal(value1 + value3))
@@ -4282,9 +4301,10 @@ minus(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value2 := operand2.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value2 is not number
+
+			if value2 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand3, new Literal(value1 + value2))
@@ -4297,11 +4317,13 @@ minus(choicePoint, operand1, operand2, operand3) {
 		value2 := operand2.toString(resultSet)
 		value3 := operand3.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
-		if value3 is not number
+
+		if value3 is not Number
 			return false
 
 		return (value1 = (value2 - value3))
@@ -4310,6 +4332,7 @@ minus(choicePoint, operand1, operand2, operand3) {
 
 multiply(choicePoint, operand1, operand2, operand3) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2, value3
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4322,9 +4345,10 @@ multiply(choicePoint, operand1, operand2, operand3) {
 			value2 := operand2.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value2 is not number
+			if value2 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand1, new Literal(value2 * value3))
@@ -4337,9 +4361,10 @@ multiply(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand2, new Literal(value1 / value3))
@@ -4352,9 +4377,10 @@ multiply(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value2 := operand2.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value2 is not number
+
+			if value2 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand3, new Literal(value1 / value2))
@@ -4367,11 +4393,13 @@ multiply(choicePoint, operand1, operand2, operand3) {
 		value2 := operand2.toString(resultSet)
 		value3 := operand3.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
-		if value3 is not number
+
+		if value3 is not Number
 			return false
 
 		return (value1 = (value2 * value3))
@@ -4380,6 +4408,7 @@ multiply(choicePoint, operand1, operand2, operand3) {
 
 divide(choicePoint, operand1, operand2, operand3) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2, value3
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4392,9 +4421,10 @@ divide(choicePoint, operand1, operand2, operand3) {
 			value2 := operand2.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value2 is not number
+			if value2 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand1, new Literal(value2 / value3))
@@ -4407,9 +4437,10 @@ divide(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value3 := operand3.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value3 is not number
+
+			if value3 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand2, new Literal(value1 * value3))
@@ -4422,9 +4453,10 @@ divide(choicePoint, operand1, operand2, operand3) {
 			value1 := operand1.toString(resultSet)
 			value2 := operand2.toString(resultSet)
 
-			if value1 is not number
+			if value1 is not Number
 				return false
-			if value2 is not number
+
+			if value2 is not Number
 				return false
 
 			return resultSet.unify(choicePoint, operand3, new Literal(value1 * value2))
@@ -4437,11 +4469,13 @@ divide(choicePoint, operand1, operand2, operand3) {
 		value2 := operand2.toString(resultSet)
 		value3 := operand3.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
-		if value3 is not number
+
+		if value3 is not Number
 			return false
 
 		return (value1 = (value2 / value3))
@@ -4450,6 +4484,7 @@ divide(choicePoint, operand1, operand2, operand3) {
 
 greater(choicePoint, operand1, operand2) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4460,9 +4495,10 @@ greater(choicePoint, operand1, operand2) {
 		value1 := operand1.toString(resultSet)
 		value2 := operand2.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
 
 		return (value1 > value2)
@@ -4471,6 +4507,7 @@ greater(choicePoint, operand1, operand2) {
 
 less(choicePoint, operand1, operand2) {
 	local resultSet := choicePoint.ResultSet
+	local value1, value2
 
 	operand1 := operand1.getValue(resultSet, operand1)
 	operand2 := operand2.getValue(resultSet, operand2)
@@ -4481,9 +4518,10 @@ less(choicePoint, operand1, operand2) {
 		value1 := operand1.toString(resultSet)
 		value2 := operand2.toString(resultSet)
 
-		if value1 is not number
+		if value1 is not Number
 			return false
-		if value2 is not number
+
+		if value2 is not Number
 			return false
 
 		return (value1 < value2)
@@ -4532,7 +4570,7 @@ unbound(choicePoint, operand1) {
 }
 
 append(choicePoint, arguments*) {
-	local resultSet
+	local resultSet, operand1, string, ignore, argument
 
 	if (arguments.Length() <= 1)
 		return false
@@ -4555,7 +4593,7 @@ append(choicePoint, arguments*) {
 }
 
 get(choicePoint, arguments*) {
-	local resultSet
+	local resultSet, operand1, operand2, result, index, argument
 
 	if (arguments.Length() <= 1)
 		return false

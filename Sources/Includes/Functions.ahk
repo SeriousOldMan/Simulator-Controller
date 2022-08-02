@@ -68,6 +68,8 @@ dismissHTMLViewer() {
 }
 
 consentDialog(id, consent := false) {
+	local language, texts, chosen
+
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
 	static closed
@@ -173,7 +175,8 @@ playThemeSong(songFile) {
 }
 
 readLanguage(targetLanguageCode) {
-	translations := {}
+	local translations := {}
+	local translation
 
 	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
 	{
@@ -200,15 +203,17 @@ initializeLoggingSystem() {
 }
 
 requestShareSessionDatabaseConsent() {
+	local idFileName, ID, consent, request, countdown, newConsent, result
+
 	if !inList(A_Args, "-Install") {
 		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {
 			idFileName := kUserConfigDirectory . "ID"
 
-			FileReadLine id, %idFileName%, 1
+			FileReadLine ID, %idFileName%, 1
 
 			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
-			request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
+			request := ((consent.Count() == 0) || (ID != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
 
 			if !request {
 				countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
@@ -266,6 +271,8 @@ requestShareSessionDatabaseConsent() {
 }
 
 shareSessionDatabase() {
+	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options
+
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
 
@@ -305,6 +312,8 @@ shareSessionDatabase() {
 }
 
 checkForNews() {
+	local check, lastModified, news, nr, html
+
 	if vDetachedInstallation
 		return
 
@@ -356,6 +365,9 @@ checkForNews() {
 }
 
 checkForUpdates() {
+	local check, lastModified, release, version, current, releasePostFix, currentPostFix, title, automaticUpdates
+	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments
+
 	if vDetachedInstallation
 		return
 
@@ -498,6 +510,8 @@ restartUpdate:
 }
 
 loadSimulatorConfiguration() {
+	local version, section, pid, path
+
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 
 	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
@@ -594,6 +608,8 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
+	local installOptions, installLocation, install, title, newID, idFileName, ID, ticks, wait, major, minor
+
 	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
 
 	if A_IsCompiled {
@@ -671,9 +687,9 @@ initializeEnvironment() {
 	if !newID {
 		idFileName := kUserConfigDirectory . "ID"
 
-		FileReadLine id, %idFileName%, 1
+		FileReadLine ID, %idFileName%, 1
 
-		newID := ((id = false) || (Trim(id) = ""))
+		newID := ((ID = false) || (Trim(ID) = ""))
 	}
 
 	if newID {
@@ -689,7 +705,7 @@ initializeEnvironment() {
 		Random, , % Min(4294967295, A_TickCount)
 		Random minor, 0, 10000
 
-		id := values2String(".", A_TickCount, major, minor)
+		ID := values2String(".", A_TickCount, major, minor)
 
 		try {
 			FileDelete %kUserConfigDirectory%ID
@@ -709,7 +725,8 @@ initializeEnvironment() {
 }
 
 getControllerActionDefinitions(type) {
-	fileName := ("Controller Action " . type . "." . getLanguage())
+	local fileName := ("Controller Action " . type . "." . getLanguage())
+	local definitions, section, values, key, value
 
 	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
 		fileName := ("Controller Action " . type . ".en")
@@ -728,7 +745,78 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+	local ptrSize, button_il, normal_il, L, T, R, B, A
+
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
+
+fixIE(version := 0, exeName := "") {
+	local previousValue
+
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
+
+	if versions.HasKey(version)
+		version := versions[version]
+
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath A_AhkPath, exeName
+	}
+
+	RegRead previousValue, HKCU, %key%, %exeName%
+
+	if (version = "")
+		RegDelete, HKCU, %key%, %exeName%
+	else
+		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
+
+	return previousValue
+}
+
 installSupportMenu() {
+	local levels, level, ignore, label, handler
+
 	try {
 		Menu LogMenu, DeleteAll
 	}
@@ -778,6 +866,9 @@ installSupportMenu() {
 }
 
 viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+	local html, innerWidth, editHeight, buttonX
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 	static htmlViewer
 	static dismissed := false
 
@@ -815,7 +906,7 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if x is not Integer
 		switch x {
 			case "Left":
 				x := 25
@@ -825,7 +916,7 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 				x := "Center"
 		}
 
-	if y is not integer
+	if y is not Integer
 		switch y {
 			case "Top":
 				y := 25
@@ -849,9 +940,11 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 }
 
 showSplash(image, alwaysOnTop := true, video := false) {
+	local lastSplash := vSplashCounter
+	local title, subTitle, extension, html, options
+
 	image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
-	lastSplash := vSplashCounter
 	vSplashCounter += 1
 	vLastImage := image
 
@@ -859,7 +952,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		vSplashCounter := 1
 
 	title := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
-	subtitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
+	subTitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 
 	SplitPath image, , , extension
 
@@ -882,7 +975,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		Gui %vSplashCounter%:Add, Picture, x10 y30 w780 h439, %image%
 
 	Gui %vSplashCounter%:Font, s8 Norm, Arial
-	Gui %vSplashCounter%:Add, Text, x10 y474 w780 Center, %subtitle%
+	Gui %vSplashCounter%:Add, Text, x10 y474 w780 Center, %subTitle%
 
 	options := "x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4)
 
@@ -921,6 +1014,8 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := true) {
+	local song, video, duration, type
+
 	static images := false
 	static number := 1
 	static numImages := 0
@@ -999,6 +1094,8 @@ hideSplashTheme() {
 }
 
 showProgress(options) {
+	local x, y, w, h, color
+
 	if !vProgressIsOpen {
 		x := options.X
 		y := options.Y
@@ -1057,7 +1154,8 @@ hideProgress() {
 }
 
 getAllThemes(configuration := false) {
-	themes := []
+	local descriptor, value, theme
+	local result := []
 
 	if !configuration
 		configuration := kSimulatorConfiguration
@@ -1065,16 +1163,17 @@ getAllThemes(configuration := false) {
 	for descriptor, value in getConfigurationSectionValues(configuration, "Splash Themes", Object()) {
 		theme := StrSplit(descriptor, ".")[1]
 
-		if !inList(themes, theme)
-			themes.Push(theme)
+		if !inList(result, theme)
+			result.Push(theme)
 	}
 
-	return themes
+	return result
 }
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
-	innerWidth := width - 16
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+	local innerWidth := width - 16
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -1100,7 +1199,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if x is not Integer
 		switch x {
 			case "Left":
 				x := 25
@@ -1110,7 +1209,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 				x := "Center"
 		}
 
-	if y is not integer
+	if y is not Integer
 		switch y {
 			case "Top":
 				y := 25
@@ -1129,6 +1228,8 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 }
 
 moveByMouse(window) {
+	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY
+
 	if window is not alpha
 		window := A_Gui
 
@@ -1178,6 +1279,8 @@ getLogLevel() {
 }
 
 logMessage(logLevel, message) {
+	local level, fileName, directory, tries
+
 	if (logLevel >= vLogLevel) {
 		level := ""
 
@@ -1217,7 +1320,8 @@ logMessage(logLevel, message) {
 }
 
 availableLanguages() {
-	translations := {en: "English"}
+	local translations := {en: "English"}
+	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
 		SplitPath fileName, , , languageCode
@@ -1229,8 +1333,9 @@ availableLanguages() {
 }
 
 readTranslations(targetLanguageCode, withUserTranslations := true) {
-	fileNames := []
-	fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
+	local fileNames := []
+	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
+	local translations, translation, ignore, enString
 
 	if FileExist(fileName)
 		fileNames.Push(fileName)
@@ -1267,10 +1372,10 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 }
 
 writeTranslations(languageCode, languageName, translations) {
-	fileName := kUserTranslationsDirectory . "Translations." . languageCode
-
-	stdTranslations := readTranslations(languageCode, false)
-	hasValues := false
+	local fileName := kUserTranslationsDirectory . "Translations." . languageCode
+	local stdTranslations := readTranslations(languageCode, false)
+	local hasValues := false
+	local ignore, key, value, temp, curEncoding, original, translation
 
 	for ignore, value in stdTranslations {
 		hasValues := true
@@ -1322,6 +1427,8 @@ writeTranslations(languageCode, languageName, translations) {
 }
 
 translate(string) {
+	local translation
+
 	static currentLanguageCode := "en"
 	static translations := false
 
@@ -1349,7 +1456,7 @@ setLanguage(languageCode) {
 }
 
 getLanguageFromLCID(lcid) {
-	code := SubStr(lcid, StrLen(lcid) - 1)
+	local code := SubStr(lcid, StrLen(lcid) - 1)
 
 	if (code = "07")
 		return "DE"
@@ -1383,16 +1490,16 @@ withProtection(function, params*) {
 	protectionOn()
 
 	try {
-		result := %function%(params*)
+		return %function%(params*)
 	}
 	finally {
 		protectionOff()
 	}
-
-	return result
 }
 
 isInstance(object, root) {
+	local candidate, classVar, outerClassVar
+
 	if IsObject(object) {
 		candidate := object.base
 
@@ -1421,6 +1528,8 @@ isInstance(object, root) {
 }
 
 getFileName(fileName, directories*) {
+	local driveName, ignore, directory
+
 	fileName := substituteVariables(fileName)
 
 	SplitPath fileName, , , , , driveName
@@ -1440,19 +1549,22 @@ getFileName(fileName, directories*) {
 }
 
 getFileNames(filePattern, directories*) {
-	files := []
+	local result := []
+	local ignore, directory, pattern
 
 	for ignore, directory in directories {
 		pattern := directory . filePattern
 
 		Loop Files, %pattern%, FD
-			files.Push(A_LoopFileLongPath)
+			result.Push(A_LoopFileLongPath)
 	}
 
-	return files
+	return result
 }
 
 normalizeFilePath(filePath) {
+	local position, index
+
 	Loop {
 		position := InStr(filePath, "\..")
 
@@ -1477,9 +1589,8 @@ normalizeFilePath(filePath) {
 }
 
 substituteVariables(string, values := false) {
-	local variable
-
-	result := string
+	local result := string
+	local variable, startPos, endPos, value
 
 	Loop {
 		startPos := InStr(result, "%")
@@ -1510,7 +1621,8 @@ string2Values(delimiter, string, count := false) {
 }
 
 values2String(delimiter, values*) {
-	result := ""
+	local result := ""
+	local index, value
 
 	for index, value in values {
 		if (index > 1)
@@ -1523,6 +1635,8 @@ values2String(delimiter, values*) {
 }
 
 inList(list, value) {
+	local index, candidate
+
 	for index, candidate in list
 		if (candidate = value)
 			return index
@@ -1531,6 +1645,8 @@ inList(list, value) {
 }
 
 listEqual(list1, list2) {
+	local index, value
+
 	if (list1.Length() != list2.Length())
 		return false
 	else
@@ -1541,28 +1657,30 @@ listEqual(list1, list2) {
 	return true
 }
 
-concatenate(arrays*) {
-	result := []
+concatenate(lists*) {
+	local result := []
+	local ignore, list
 
-	for ignore, array in arrays
-		for ignore, value in array
+	for ignore, list in lists
+		for ignore, value in list
 			result.Push(value)
 
 	return result
 }
 
 reverse(list) {
-	newList := []
-	length := list.Length()
+	local result := []
+	local length := list.Length()
 
 	Loop %length%
-		newList.Push(list[length - (A_Index - 1)])
+		result.Push(list[length - (A_Index - 1)])
 
-	return newList
+	return result
 }
 
 map(list, function) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		result.Push(%function%(value))
@@ -1571,7 +1689,8 @@ map(list, function) {
 }
 
 remove(list, object) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		if (value != object)
@@ -1581,7 +1700,8 @@ remove(list, object) {
 }
 
 removeDuplicates(list) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		if !inList(result, value)
@@ -1591,21 +1711,23 @@ removeDuplicates(list) {
 }
 
 getKeys(map) {
-	keys := []
+	local result := []
+	local ignore, key
 
 	for key, ignore in map
-		keys.Push(key)
+		result.Push(key)
 
-	return keys
+	return result
 }
 
 getValues(map) {
-	values := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in map
-		values.Push(value)
+		result.Push(value)
 
-	return values
+	return result
 }
 
 greaterComparator(a, b) {
@@ -1613,7 +1735,8 @@ greaterComparator(a, b) {
 }
 
 bubbleSort(ByRef array, comparator := "greaterComparator") {
-	n := array.Length()
+	local n := array.Length()
+	local newN, i, j, lineI, lineJ
 
 	while (n > 1) {
 		newN := 1
@@ -1676,7 +1799,8 @@ enableTrayMessages(duration := 1500) {
 }
 
 translateMsgBoxButtons(buttonLabels) {
-	curDetectHiddenWindows := A_DetectHiddenWindows
+	local curDetectHiddenWindows := A_DetectHiddenWindows
+	local index, label
 
     DetectHiddenWindows, On
 
@@ -1699,10 +1823,11 @@ translateMsgBoxButtons(buttonLabels) {
 }
 
 readConfiguration(configFile) {
-	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
+	local configuration := {}
+	local section := false
+	local currentLine, firstChar, keyValue, key, value
 
-	configuration := Object()
-	section := false
+	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
 	Loop Read, %configFile%
 	{
@@ -1739,6 +1864,8 @@ readConfiguration(configFile) {
 }
 
 parseConfiguration(text) {
+	local fileName, configuration, postfix
+
 	Random postfix, 1, 100000
 
 	fileName := (kTempDirectory . "Config " . postFix . ".ini")
@@ -1758,6 +1885,8 @@ parseConfiguration(text) {
 }
 
 writeConfiguration(configFile, configuration) {
+	local directory, section, keyValues, key, value, pairs
+
 	configFile := getFileName(configFile, kUserConfigDirectory)
 
 	try {
@@ -1788,6 +1917,8 @@ writeConfiguration(configFile, configuration) {
 }
 
 printConfiguration(configuration) {
+	local fileName, text, postfix
+
 	Random postfix, 1, 100000
 
 	fileName := (kTempDirectory . "Config " . postFix . ".ini")
@@ -1808,6 +1939,8 @@ printConfiguration(configuration) {
 }
 
 getConfigurationValue(configuration, section, key, default := false) {
+	local value
+
 	if configuration.HasKey(section) {
 		value := configuration[section]
 
@@ -1823,7 +1956,7 @@ getConfigurationSectionValues(configuration, section, default := false) {
 }
 
 newConfiguration() {
-	return Object()
+	return {}
 }
 
 setConfigurationValue(configuration, section, key, value) {
@@ -1831,11 +1964,15 @@ setConfigurationValue(configuration, section, key, value) {
 }
 
 setConfigurationSectionValues(configuration, section, values) {
+	local key, value
+
 	for key, value in values
 		setConfigurationValue(configuration, section, key, value)
 }
 
 setConfigurationValues(configuration, otherConfiguration) {
+	local section, values
+
 	for section, values in otherConfiguration
 		setConfigurationSectionValues(configuration, section, values)
 }
@@ -1851,8 +1988,8 @@ removeConfigurationSection(configuration, section) {
 }
 
 getControllerConfiguration(configuration := false) {
-	local pid
-	
+	local pid, tries, options, exePath, fileName
+
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
@@ -1872,9 +2009,13 @@ getControllerConfiguration(configuration := false) {
 	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
-				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
+				Random postfix, 1, 100000
 
-				options := (" -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """")
+				fileName := (kTempDirectory . "Config " . postFix . ".ini")
+
+				writeConfiguration(fileName, configuration)
+
+				options := (" -Configuration """ . fileName . """")
 			}
 			else
 				options := ""
@@ -1897,7 +2038,12 @@ getControllerConfiguration(configuration := false) {
 			}
 
 			if configuration
-				FileDelete %kTempDirectory%Simulator Configuration.ini
+				try {
+					FileDelete %fileName%
+				}
+				catch exception {
+					; ignore
+				}
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1915,7 +2061,8 @@ getControllerActionLabels() {
 }
 
 getControllerActionIcons() {
-	icons := getControllerActionDefinitions("Icons")
+	local icons := getControllerActionDefinitions("Icons")
+	local section, values, key, value
 
 	for section, values in icons
 		for key, value in values
@@ -1934,7 +2081,8 @@ toggleDebug() {
 }
 
 setDebug(debug) {
-	label := translate("Debug")
+	local label := translate("Debug")
+	local title, state
 
 	if vHasSupportMenu
 		if debug
@@ -1951,6 +2099,8 @@ setDebug(debug) {
 }
 
 setLogLevel(level) {
+	local ignore, label, title, state
+
 	if vHasSupportMenu
 		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
 			label := translate(label)

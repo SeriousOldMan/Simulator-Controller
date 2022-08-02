@@ -168,7 +168,8 @@ class SpeechRecognizer {
 
 	Recognizers[language := false] {
 		Get {
-			result := []
+			local result := []
+			local ignore, recognizer
 
 			for ignore, recognizer in this.getRecognizerList()
 				if language {
@@ -183,8 +184,9 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false) {
-		dllName := "Speech.Recognizer.dll"
-		dllFile := kBinariesDirectory . dllName
+		local dllName := "Speech.Recognizer.dll"
+		local dllFile := kBinariesDirectory . dllName
+		local instance, choices, found, ignore, recognizerDescriptor
 
 		this.iEngine := engine
 		this.Instance := false
@@ -289,7 +291,8 @@ class SpeechRecognizer {
 	}
 
 	createRecognizerList() {
-		recognizerList := []
+		local recognizerList := []
+		local culture, name, index, language, recognizer
 
 		if (this.iEngine = "Azure") {
 			for culture, name in kAzureLanguages {
@@ -342,7 +345,7 @@ class SpeechRecognizer {
 	}
 
 	getWords(list) {
-		result := []
+		local result := []
 
 		Loop % list.MaxIndex() + 1
 			result.Push(list[A_Index - 1])
@@ -415,7 +418,8 @@ class SpeechRecognizer {
 	}
 
 	allMatches(string, minRating, maxRating, strings*) {
-		ratings := []
+		local ratings := []
+		local index, value, rating
 
 		if this.Instance
 			for index, value in strings {
@@ -439,8 +443,9 @@ class SpeechRecognizer {
 	}
 
 	bestMatch(string, minRating, maxRating, strings*) {
-		highestRating := 0
-		bestMatch := false
+		local highestRating := 0
+		local bestMatch := false
+		local key, value, rating
 
 		if this.Instance
 			for key, value in strings {
@@ -460,16 +465,12 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		words := this.getWords(wordArr)
-
-		this._grammarCallbacks[name].Call(name, words)
+		this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {
-		local grammar
-		local literal
-
-		words := string2Values(A_Space, text)
+		local words := string2Values(A_Space, text)
+		local name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
 		for index, literal in words {
 			literal := StrReplace(literal, ".", "")
@@ -524,7 +525,7 @@ class SpeechRecognizer {
 	}
 
 	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
-		matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
+		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
 
 		return (matches.HasKey("BestMatch") ? matches["BestMatch"]["Rating"] : false)
 	}
@@ -548,7 +549,9 @@ class GrammarCompiler {
 	}
 
 	compileGrammars(text) {
-		grammars := []
+		local grammars := []
+		local incompleteLine := false
+		local line
 
 		Loop Parse, text, `n, `r
 		{
@@ -598,7 +601,7 @@ class GrammarCompiler {
 	}
 
 	readGrammars(ByRef text, ByRef nextCharIndex, level := 0) {
-		grammars := []
+		local grammars := []
 
 		this.skipDelimiter("[", text, nextCharIndex)
 
@@ -615,7 +618,8 @@ class GrammarCompiler {
 	}
 
 	readList(ByRef text, ByRef nextCharIndex) {
-		grammars := []
+		local grammars := []
+		local literalValue
 
 		while !this.isEmpty(text, nextCharIndex) {
 			this.skipWhiteSpace(text, nextCharIndex)
@@ -638,7 +642,8 @@ class GrammarCompiler {
 	}
 
 	readChoices(ByRef text, ByRef nextCharIndex) {
-		grammars := []
+		local grammars := []
+		local literalValue
 
 		this.skipDelimiter("{", text, nextCharIndex)
 
@@ -660,7 +665,8 @@ class GrammarCompiler {
 	}
 
 	readBuiltinChoices(ByRef text, ByRef nextCharIndex) {
-		builtin := false
+		local builtin := false
+		local literalValue
 
 		this.skipDelimiter("(", text, nextCharIndex)
 
@@ -677,9 +683,8 @@ class GrammarCompiler {
 	}
 
 	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{}[]()`,") {
-		local literal
-
-		length := StrLen(text)
+		local length := StrLen(text)
+		local literal, beginCharIndex, character
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -700,7 +705,7 @@ class GrammarCompiler {
 	}
 
 	isEmpty(ByRef text, ByRef nextCharIndex) {
-		remainingText := Trim(SubStr(text, nextCharIndex))
+		local remainingText := Trim(SubStr(text, nextCharIndex))
 
 		if ((remainingText != "") && this.skipDelimiter(";", remainingText, 1, false))
 			remainingText := ""
@@ -709,7 +714,7 @@ class GrammarCompiler {
 	}
 
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
-		length := StrLen(text)
+		local length := StrLen(text)
 
 		Loop {
 			if (nextCharIndex > length)
@@ -723,7 +728,7 @@ class GrammarCompiler {
 	}
 
 	skipDelimiter(delimiter, ByRef text, ByRef nextCharIndex, throwError := true) {
-		length := StrLen(delimiter)
+		local length := StrLen(delimiter)
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -765,6 +770,8 @@ class Grammar {
 		}
 
 		__New(choices) {
+			local index, choice
+
 			for index, choice in choices
 				if !IsObject(choice)
 					choices[index] := new Grammar.Words(choice)
@@ -773,7 +780,8 @@ class Grammar {
 		}
 
 		matchWords(words, ByRef index) {
-			running := index
+			local running := index
+			local ignore, choice
 
 			for ignore, choice in this.Choices
 				if choice.matchWords(words, running) {
@@ -786,6 +794,8 @@ class Grammar {
 		}
 
 		combinePhrases(phrases) {
+			local ignore, choice
+
 			for ignore, choice in this.Choices
 				choice.combinePhrases(phrases)
 		}
@@ -801,7 +811,7 @@ class Grammar {
 		}
 
 		__New(string) {
-			local literal
+			local index, literal
 
 			if !IsObject(string)
 				string := string2Values(A_Space, string)
@@ -820,7 +830,8 @@ class Grammar {
 		}
 
 		matchWords(words, ByRef index) {
-			running := index
+			local running := index
+			local ignore, word
 
 			for ignore, word in this.Words
 				if (words.Length() < running)
@@ -870,12 +881,14 @@ class Grammar {
 	}
 
 	match(words) {
-		index := 1
+		local index := 1
 
 		return this.matchWords(words, index)
 	}
 
 	matchWords(words, ByRef index) {
+		local alternatives, running, ignore, part
+
 		if (words.Length() < index)
 			return true
 		else {
@@ -907,7 +920,7 @@ class Grammar {
 	}
 
 	allPhrases() {
-		result := []
+		local result := []
 
 		this.combinePhrases(result)
 
@@ -915,8 +928,9 @@ class Grammar {
 	}
 
 	combinePhrases(phrases) {
-		alternatives := false
-		pPhrases := []
+		local alternatives := false
+		local pPhrases := []
+		local index, part, temp, parts, pParts, ignore, p1, p2
 
 		for index, part in this.Parts {
 			if ((index == 1) && isInstance(part, Grammar))
@@ -974,6 +988,8 @@ class GrammarParser {
 	}
 
 	parse(grammar) {
+		local newGrammar
+
 		if isInstance(grammar, GrammarList)
 			return this.parseList(grammar)
 		else if isInstance(grammar, GrammarGrammars)
@@ -990,7 +1006,7 @@ class GrammarParser {
 	}
 
 	parseList(grammarList) {
-		local grammar
+		local ignore, grammar, newGrammar
 
 		newGrammar := this.Compiler.SpeechRecognizer.newGrammar()
 
@@ -1024,7 +1040,8 @@ class GrammarGrammars {
 	}
 
 	toString() {
-		result := "["
+		local result := "["
+		local ignore, list
 
 		for ignore, list in this.GrammarLists {
 			if (A_Index > 1)
@@ -1037,9 +1054,8 @@ class GrammarGrammars {
 	}
 
 	parse(parser) {
-		local grammar
-
-		grammars := []
+		local grammars := []
+		local grammar, ignore, list
 
 		for ignore, list in this.GrammarLists
 			grammars.Push(parser.parseList(list))
@@ -1070,7 +1086,8 @@ class GrammarChoices {
 	}
 
 	toString() {
-		result := "{"
+		local result := "{"
+		local ignore, choice
 
 		for ignore, choice in this.Choices {
 			if (A_Index > 1)
@@ -1083,7 +1100,8 @@ class GrammarChoices {
 	}
 
 	parse(parser) {
-		choices := []
+		local choices := []
+		local ignore, choice
 
 		for ignore, choice in this.Choices {
 			if !isInstance(choice, GrammarLiteral)
@@ -1118,12 +1136,7 @@ class GrammarBuiltinChoices {
 	}
 
 	parse(parser) {
-		choices := this.Builtin
-
-		; if (choices = "Number")
-		; 	choices := "Percent"
-
-		return parser.Compiler.SpeechRecognizer.getChoices(choices)
+		return parser.Compiler.SpeechRecognizer.getChoices(this.Builtin)
 	}
 }
 
@@ -1145,7 +1158,8 @@ class GrammarList {
 	}
 
 	toString() {
-		result := ""
+		local result := ""
+		local ignore, value
 
 		for ignore, value in this.List {
 			if (A_Index > 1)
@@ -1185,6 +1199,8 @@ class GrammarLiteral {
 ;;;-------------------------------------------------------------------------;;;
 
 matchWords(string1, string2) {
+	local dllName, dllFile
+
 	static recognizer := false
 
 	if !recognizer {

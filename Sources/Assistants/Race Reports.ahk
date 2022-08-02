@@ -887,7 +887,7 @@ runRaceReports() {
 		ExitApp 0
 	}
 
-	current := fixIE(13)
+	current := fixIE(11)
 
 	OnExit(Func("exitFixIE").Bind(current))
 

@@ -20,6 +20,16 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kLocalMessage = 0
+global kWindowMessage = 1
+global kPipeMessage = 2
+global kFileMessage = 3
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -106,7 +116,7 @@ class MessageManager extends PeriodicTask {
 		}
 
 		run() {
-			local message
+			local ignore, message
 
 			for ignore, message in this.iMessages
 				withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
@@ -140,11 +150,7 @@ class MessageManager extends PeriodicTask {
 	receivePipeMessages() {
 		local messageHandlers := this.MessageHandlers
 		local result := []
-		local messageHandler
-		local category
-		local data
-		local handler
-		local pipeName
+		local messageHandler, category, data, handler, pipeName
 
 		for category, handler in messageHandlers {
 			if (category = "*")
@@ -174,14 +180,7 @@ class MessageManager extends PeriodicTask {
 
 	receiveFileMessages() {
 		local result := []
-		local messageHandler
-		local result
-		local pid
-		local fileName
-		local file
-		local line
-		local data
-		local category
+		local messageHandler, result, pid, fileName, file, line, data, category
 
 		Process Exist
 
@@ -229,8 +228,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendPipeMessage(category, data) {
-		local pipeName
-		local pipe
+		local pipeName, pipe
 
 		static ERROR_PIPE_CONNECTED := 535
 		static ERROR_PIPE_LISTENING := 536
@@ -307,8 +305,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendMessage(messageType, category, data, target := false) {
-		local messageHandlers
-		local messageHandler
+		local messageHandlers, messageHandler
 
 		switch messageType {
 			case kLocalMessage:
@@ -388,14 +385,7 @@ decodeDWORD(data) {
 sendWindowMessage(target, category, data) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local curTitleMatchMode := A_TitleMatchMode
-	local dwData
-	local cbData
-	local lpData
-	local struct
-	local message
-	local wParam
-	local lParam
-	local control
+	local dwData, cbData, lpData, struct, message, wParam, lParam, control
 
 	category := (category . ":" . data)
 
@@ -440,16 +430,7 @@ sendWindowMessage(target, category, data) {
 }
 
 receiveWindowMessage(wParam, lParam) {
-	local messageHandlers
-	local messageHandler
-	local dwData
-	local cbData
-	local lpData
-	local request
-	local length
-	local category
-	local data
-	local callable
+	local messageHandlers, messageHandler, dwData, cbData, lpData, request, length, category, data, callable
 
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT

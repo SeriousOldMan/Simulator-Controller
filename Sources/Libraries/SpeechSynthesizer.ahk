@@ -73,6 +73,8 @@ class SpeechSynthesizer {
 
 	Voices[language := false] {
 		Get {
+			local voices, voice, lcid, ignore, candidate, name
+
 			if !language
 				return this.iVoices
 			else {
@@ -143,6 +145,8 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo
+
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
@@ -261,6 +265,8 @@ class SpeechSynthesizer {
 	}
 
 	updateSpeechStatus(pid) {
+		local callback
+
 		Process Exist, %pid%
 
 		if ErrorLevel
@@ -277,9 +283,7 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback
-		local player
-		local pid
+		local callback, player, pid, copied, workingDirectory
 
 		callback := this.SpeechStatusCallback
 
@@ -358,7 +362,7 @@ class SpeechSynthesizer {
 	}
 
 	clearCache() {
-		directory := this.iCacheDirectory
+		local directory := this.iCacheDirectory
 
 		if directory {
 			try {
@@ -373,6 +377,8 @@ class SpeechSynthesizer {
 	}
 
 	cacheFileName(cacheKey, fileName := false) {
+		local postfix, dirName
+
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
@@ -397,6 +403,8 @@ class SpeechSynthesizer {
 	}
 
 	speak(text, wait := true, cache := false) {
+		local cacheFileName, postfix, tempName, temp1Name, temp2Name, callback
+
 		static counter := 1
 
 		this.wait()
@@ -519,6 +527,8 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
+		local oldStream, stream, ssml
+
 		this.stop()
 
 		if (this.Synthesizer = "Windows") {
@@ -584,6 +594,8 @@ class SpeechSynthesizer {
 	}
 
 	pause() {
+		local status
+
 		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
 
@@ -603,6 +615,8 @@ class SpeechSynthesizer {
 	}
 
 	stop() {
+		local status
+
 		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
@@ -651,7 +665,8 @@ class SpeechSynthesizer {
 	}
 
 	computeVoice(voice, language, randomize := true) {
-		voices := this.Voices
+		local voices := this.Voices
+		local availableVoices, count, index, locale
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {

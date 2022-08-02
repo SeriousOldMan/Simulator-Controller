@@ -19,6 +19,7 @@
 global kLowPriority = 0
 global kNormalPriority = 1
 global kHighPriority = 2
+global kInterruptPriority = 3
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,9 +31,14 @@ global kHighPriority = 2
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Task {
+	static sInterrupt := -50
+	static sHigh := -200
+	static sNormal := -500
+
 	static sLowTasks := []
 	static sNormalTasks := []
 	static sHighTasks := []
+	static sInterruptTasks := []
 
 	static sCurrentTask := false
 
@@ -44,6 +50,36 @@ class Task {
 	iNextExecution := false
 
 	iCallable := false
+
+	NormalTimer[] {
+		Get {
+			return (- Task.sNormal)
+		}
+
+		Set {
+			return (Task.sNormal := - value)
+		}
+	}
+
+	HighTimer[] {
+		Get {
+			return (- Task.sHigh)
+		}
+
+		Set {
+			return (Task.sHigh := - value)
+		}
+	}
+
+	InterruptTimer[] {
+		Get {
+			return (- Task.sInterrupt)
+		}
+
+		Set {
+			return (Task.sInterrupt := - value)
+		}
+	}
 
 	CurrentTask[] {
 		Get {
@@ -118,9 +154,8 @@ class Task {
 	}
 
 	run() {
-		callable := this.Callable
-
-		result := (isInstance(callable, Task) ? callable.run() : %callable%())
+		local callable := this.Callable
+		local result := (isInstance(callable, Task) ? callable.run() : %callable%())
 
 		return (isInstance(result, Task) ? result : false)
 	}
@@ -137,44 +172,58 @@ class Task {
 		this.Runnable := false
 	}
 
-	getNextTask(remove := true) {
-		for index, candidate in Task.sHighTasks
-			if candidate.Runnable {
-				if remove
-					Task.sHighTasks.RemoveAt(index)
+	getNextTask(priority, remove := true) {
+		local index
+		local candidate
 
-				return candidate
-			}
+		switch priority {
+			case kInterruptPriority:
+				for index, candidate in Task.sInterruptTasks
+					if candidate.Runnable {
+						if remove
+							Task.sInterruptTasks.RemoveAt(index)
 
-		for index, candidate in Task.sNormalTasks
-			if candidate.Runnable {
-				if remove
-					Task.sNormalTasks.RemoveAt(index)
+						return candidate
+					}
+			case kHighPriority:
+				for index, candidate in Task.sHighTasks
+					if candidate.Runnable {
+						if remove
+							Task.sHighTasks.RemoveAt(index)
 
-				return candidate
-			}
+						return candidate
+					}
+			default:
+				for index, candidate in Task.sNormalTasks
+					if candidate.Runnable {
+						if remove
+							Task.sNormalTasks.RemoveAt(index)
 
-		for index, candidate in Task.sLowTasks
-			if candidate.Runnable {
-				if remove
-					Task.sLowTasks.RemoveAt(index)
+						return candidate
+					}
 
-				return candidate
-			}
+				for index, candidate in Task.sLowTasks
+					if candidate.Runnable {
+						if remove
+							Task.sLowTasks.RemoveAt(index)
+
+						return candidate
+					}
+		}
 
 		return false
 	}
 
 	addTask(theTask) {
-		priority := theTask.Priority
-
-		switch priority {
+		switch theTask.Priority {
 			case kNormalPriority:
 				Task.sNormalTasks.Push(theTask)
 			case kHighPriority:
 				Task.sHighTasks.Push(theTask)
 			case kLowPriority:
 				Task.sLowTasks.Push(theTask)
+			case kInterruptPriority:
+				Task.sInterruptTasks.Push(theTask)
 			default:
 				Throw "Unexpected priority detected in Task.addTask..."
 		}
@@ -188,6 +237,8 @@ class Task {
 				Task.sHighTasks := remove(Task.sHighTasks, theTask)
 			case kLowPriority:
 				Task.sLowTasks := remove(Task.sLowTasks, theTask)
+			case kInterruptPriority:
+				Task.sInterruptTasks := remove(Task.sInterruptTasks, theTask)
 			default:
 				Throw "Unexpected priority detected in Task.removeTask..."
 		}
@@ -221,56 +272,72 @@ class Task {
 		Task.schedule()
 	}
 
-	schedule(interrupt := false) {
-		protectionOn(true)
+	schedule(priority := 1) {
+		local next
+		local worked
+		local interrupt
+		local oldScheduling
+		local visited
+		local schedule
 
 		static scheduling := false
 
-		if (scheduling && !interrupt) {
-			protectionOff(true)
+		interrupt := (priority > kNormalPriority)
 
-			return
-		}
-		else if (interrupt && !scheduling) {
-			protectionOff(true)
+		protectionOn(true)
 
-			return
-		}
-		else {
-			oldScheduling := scheduling
-
-			scheduling := true
-
-			try {
+		try {
+			if (scheduling && !interrupt) {
 				protectionOff(true)
 
-				Loop {
-					worked := false
-
-					next := Task.getNextTask(false)
-
-					if next
-						if (!Task.CurrentTask || (Task.CurrentTask.Priority < next.Priority)) {
-							Task.removeTask(next)
-
-							worked := true
-
-							Task.launch(next)
-						}
-				} until !worked
+				return
 			}
-			finally {
-				scheduling := oldScheduling
+			else {
+				oldScheduling := scheduling
+
+				scheduling := true
+
+				try {
+					protectionOff(true)
+
+					visited := {}
+
+					Loop {
+						worked := false
+
+						next := Task.getNextTask(priority, true)
+
+						if next
+							if (!visited.HasKey(next) && (!Task.CurrentTask || (Task.CurrentTask.Priority < next.Priority))) {
+								visited[next] := true
+
+								worked := true
+
+								Task.launch(next)
+							}
+							else
+								Task.addTask(next)
+					} until !worked
+				}
+				finally {
+					scheduling := oldScheduling
+				}
 			}
+		}
+		finally {
+			schedule := ObjBindMethod(Task, "schedule", priority)
+
+			SetTimer %schedule%, % ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : Task.sNormal))
 		}
 	}
 
 	launch(theTask) {
-		oldCurrentTask := Task.CurrentTask
-		Task.sCurrentTask := theTask
+		local oldCurrentTask := Task.CurrentTask
+		local oldDefault := A_DefaultGui
+		local window := theTask.Window
+		local next
 
-		oldDefault := A_DefaultGui
-		window := theTask.Window
+		Task.sCurrentTask := theTask
 
 		if window {
 			Gui %window%:Default
@@ -283,6 +350,8 @@ class Task {
 		}
 		catch exception {
 			logError(exception)
+
+			next := false
 		}
 		finally {
 			if window {
@@ -326,10 +395,10 @@ class WindowTask extends Task {
 		}
 	}
 
-	__New(window, callable := false, sleep := 0, priority := 1) {
+	__New(window, arguments*) {
 		this.iWindow := window
 
-		base.__New(callable, sleep, priority)
+		base.__New(arguments*)
 	}
 }
 
@@ -388,13 +457,17 @@ class Continuation extends Task {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeTasks() {
-	schedule := ObjBindMethod(Task, "schedule")
+	schedule := ObjBindMethod(Task, "schedule", kNormalPriority)
 
-	SetTimer %schedule%, 50
+	SetTimer %schedule%, % Task.sNormal
 
-	interrupt := ObjBindMethod(Task, "schedule", true)
+	schedule := ObjBindMethod(Task, "schedule", kHighPriority)
 
-	SetTimer %interrupt%, 200
+	SetTimer %schedule%, % Task.sHigh
+
+	schedule := ObjBindMethod(Task, "schedule", kInterruptPriority)
+
+	SetTimer %schedule%, % Task.sInterrupt
 }
 
 

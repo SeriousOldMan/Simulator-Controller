@@ -235,7 +235,7 @@ class SpeechSynthesizer {
 	}
 
 	setPlayerLevel(level) {
-		pid := this.iSoundPlayer
+		local pid := this.iSoundPlayer
 
 		if (kNirCmd && pid) {
 			Process Exist, %pid%
@@ -264,7 +264,7 @@ class SpeechSynthesizer {
 		Process Exist, %pid%
 
 		if ErrorLevel
-			Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kHighPriority)
+			Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kInterruptPriority)
 		else {
 			this.iSoundPlayer := false
 
@@ -335,7 +335,7 @@ class SpeechSynthesizer {
 				if callback
 					%callback%("Stop")
 			}
-			else
+			else if callback
 				Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
 		}
 		else {

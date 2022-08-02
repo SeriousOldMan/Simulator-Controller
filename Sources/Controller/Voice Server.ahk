@@ -289,7 +289,7 @@ class VoiceServer extends ConfigurationItem {
 				if !this.SpeechRecognizer.startRecognizer() {
 					if retry
 						Task.startTask(ObjBindMethod(this, "startListening", true), 200)
-					
+
 					return false
 				}
 				else {
@@ -320,21 +320,25 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		mute() {
-			this.iMuted := true
+			if !this.Muted {
+				this.iMuted := true
 
-			synthesizer := this.SpeechSynthesizer
+				synthesizer := this.SpeechSynthesizer
 
-			if synthesizer
-				synthesizer.mute()
+				if synthesizer
+					synthesizer.mute()
+			}
 		}
 
 		unmute() {
-			this.iMuted := false
+			if this.Muted {
+				this.iMuted := false
 
-			synthesizer := this.SpeechSynthesizer
+				synthesizer := this.SpeechSynthesizer
 
-			if synthesizer
-				synthesizer.unmute()
+				if synthesizer
+					synthesizer.unmute()
+			}
 		}
 
 		registerChoices(name, choices*) {
@@ -520,7 +524,7 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500, kHighPriority))
+		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500))
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
 
 		try {
@@ -530,7 +534,7 @@ class VoiceServer extends ConfigurationItem {
 			; ignore
 		}
 
-		Task.startTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50))
+		Task.startTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -691,12 +695,16 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	muteVoiceClients() {
-		if FileExist(kTempDirectory . "Voice.mute")
+		if FileExist(kTempDirectory . "Voice.mute") {
+			logMessage(kLogCritical, "Muted")
 			for ignore, client in this.VoiceClients
 				client.mute()
-		else
+		}
+		else {
+			logMessage(kLogCritical, "Unmuted")
 			for ignore, client in this.VoiceClients
 				client.unmute()
+		}
 	}
 
 	speak(descriptor, text, activate := false) {

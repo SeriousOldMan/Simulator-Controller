@@ -459,6 +459,8 @@ mouseClicked(clicked := true) {
 }
 
 restoreSimulatorVolume() {
+	local pid
+	
 	if kNirCmd
 		try {
 			simulator := SimulatorController.Instance.ActiveSimulator
@@ -476,6 +478,8 @@ restoreSimulatorVolume() {
 }
 
 muteSimulator() {
+	local pid
+	
 	simulator := SimulatorController.Instance.ActiveSimulator
 
 	if (simulator != false) {

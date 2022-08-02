@@ -45,7 +45,7 @@ class MessageManager extends PeriodicTask {
 		}
 
 		call(category, data) {
-			handler := this.Handler
+			local handler := this.Handler
 
 			if handler
 				%handler%(category, data)
@@ -80,7 +80,7 @@ class MessageManager extends PeriodicTask {
 		}
 
 		call(category, data) {
-			handler := this.Handler
+			local handler := this.Handler
 
 			if handler
 				%handler%(category, this.Object, data)
@@ -106,6 +106,8 @@ class MessageManager extends PeriodicTask {
 		}
 
 		run() {
+			local message
+
 			for ignore, message in this.iMessages
 				withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
 
@@ -136,10 +138,13 @@ class MessageManager extends PeriodicTask {
 	}
 
 	receivePipeMessages() {
+		local messageHandlers := this.MessageHandlers
+		local result := []
 		local messageHandler
-
-		messageHandlers := this.MessageHandlers
-		result := []
+		local category
+		local data
+		local handler
+		local pipeName
 
 		for category, handler in messageHandlers {
 			if (category = "*")
@@ -168,9 +173,15 @@ class MessageManager extends PeriodicTask {
 	}
 
 	receiveFileMessages() {
+		local result := []
 		local messageHandler
-
-		result := []
+		local result
+		local pid
+		local fileName
+		local file
+		local line
+		local data
+		local category
 
 		Process Exist
 
@@ -218,6 +229,9 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendPipeMessage(category, data) {
+		local pipeName
+		local pipe
+
 		static ERROR_PIPE_CONNECTED := 535
 		static ERROR_PIPE_LISTENING := 536
 		static ptr
@@ -242,7 +256,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data) {
-		text := category . ":" . data . "`n"
+		local text := category . ":" . data . "`n"
 
 		try {
 			FileAppend %text%, % kTempDirectory . "Messages\" . pid . ".msg"
@@ -255,13 +269,14 @@ class MessageManager extends PeriodicTask {
 	}
 
 	receiveMessages() {
-		fileMessages := this.receiveFileMessages()
+		local fileMessages := this.receiveFileMessages()
 
 		return ((fileMessages.Length() > 0) ? fileMessages : this.receivePipeMessages())
 	}
 
 	deliverMessage() {
-		outgoingMessages := this.OutgoingMessages
+		local outgoingMessages := this.OutgoingMessages
+		local handler
 
 		if (outgoingMessages.Length() > 0) {
 			handler := outgoingMessages[1]
@@ -272,6 +287,8 @@ class MessageManager extends PeriodicTask {
 	}
 
 	run() {
+		local messages
+
 		protectionOn()
 
 		try {
@@ -290,6 +307,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendMessage(messageType, category, data, target := false) {
+		local messageHandlers
 		local messageHandler
 
 		switch messageType {
@@ -346,7 +364,7 @@ unknownMessageHandler(category, data) {
 }
 
 encodeDWORD(string) {
-	result := 0
+	local result := 0
 
 	Loop % StrLen(string) {
         result <<= 8
@@ -357,7 +375,7 @@ encodeDWORD(string) {
 }
 
 decodeDWORD(data) {
-	result := ""
+	local result := ""
 
     Loop 4 {
         result := Chr(data & 0xFF) . result
@@ -368,8 +386,16 @@ decodeDWORD(data) {
 }
 
 sendWindowMessage(target, category, data) {
-	curDetectHiddenWindows := A_DetectHiddenWindows
-	curTitleMatchMode := A_TitleMatchMode
+	local curDetectHiddenWindows := A_DetectHiddenWindows
+	local curTitleMatchMode := A_TitleMatchMode
+	local dwData
+	local cbData
+	local lpData
+	local struct
+	local message
+	local wParam
+	local lParam
+	local control
 
 	category := (category . ":" . data)
 
@@ -414,7 +440,16 @@ sendWindowMessage(target, category, data) {
 }
 
 receiveWindowMessage(wParam, lParam) {
+	local messageHandlers
 	local messageHandler
+	local dwData
+	local cbData
+	local lpData
+	local request
+	local length
+	local category
+	local data
+	local callable
 
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT
@@ -460,6 +495,8 @@ receiveWindowMessage(wParam, lParam) {
 }
 
 stopMessageManager() {
+	local pid
+
 	Task.removeTask(MessageManager.Instance)
 
 	Process Exist
@@ -473,6 +510,8 @@ stopMessageManager() {
 }
 
 startMessageManager() {
+	local pid
+
 	FileCreateDir %kTempDirectory%Messages
 
 	OnMessage(0x4a, "receiveWindowMessage")

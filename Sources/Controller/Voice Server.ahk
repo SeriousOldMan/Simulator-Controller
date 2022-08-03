@@ -100,6 +100,7 @@ class VoiceServer extends ConfigurationItem {
 
 		iMuted := false
 		iInterrupted := false
+		iInterruptable := false
 
 		iSpeechRecognizer := false
 		iSpeaking := false
@@ -241,6 +242,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		Interruptable[] {
+			Get {
+				return this.iInterruptable
+			}
+		}
+
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
@@ -283,16 +290,23 @@ class VoiceServer extends ConfigurationItem {
 			try {
 				try {
 					while (tries-- > 0) {
+						if (tries == 0)
+							this.iInterruptable := false
+
 						if !this.Interrupted
 							this.SpeechSynthesizer[true].speak(text, true)
 
-						if this.Interrupted
+						if this.Interrupted {
+							Sleep 2000
+
 							this.iInterrupted := false
+						}
 						else
 							break
 					}
 				}
 				finally {
+					this.iInterruptable := true
 					this.iSpeaking := oldSpeaking
 				}
 			}
@@ -344,7 +358,7 @@ class VoiceServer extends ConfigurationItem {
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer {
-					if (this.Speaking && synthesizer.Stoppable) {
+					if (this.Speaking && synthesizer.Stoppable && this.Interruptable) {
 						this.iInterrupted := true
 
 						synthesizer.stop()

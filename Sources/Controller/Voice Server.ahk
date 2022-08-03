@@ -73,8 +73,8 @@ class VoiceServer extends ConfigurationItem {
 
 	iSpeechRecognizer := false
 
-	iIsSpeaking := false
-	iIsListening := false
+	iSpeaking := false
+	iListening := false
 
 	iPendingCommands := []
 	iHasPendingActivation := false
@@ -99,10 +99,11 @@ class VoiceServer extends ConfigurationItem {
 		iSpeechSynthesizer := false
 
 		iMuted := false
+		iInterrupted := false
 
 		iSpeechRecognizer := false
-		iIsSpeaking := false
-		iIsListening := false
+		iSpeaking := false
+		iListening := false
 
 		iActivationCallback := false
 		iDeactivationCallback := false
@@ -146,7 +147,7 @@ class VoiceServer extends ConfigurationItem {
 
 		Speaking[] {
 			Get {
-				return this.iIsSpeaking
+				return this.iSpeaking
 			}
 		}
 
@@ -164,7 +165,7 @@ class VoiceServer extends ConfigurationItem {
 
 		Listening[] {
 			Get {
-				return this.iIsListening
+				return this.iListening
 			}
 		}
 
@@ -234,6 +235,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		Interrupted[] {
+			Get {
+				return this.iInterrupted
+			}
+		}
+
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
@@ -260,20 +267,33 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text) {
+			local tries := 3
+			local stopped, oldSpeaking
+
 			while this.Muted
 				Sleep 100
+
+			this.iInterrupted := false
 
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
 
-			this.iIsSpeaking := true
+			this.iSpeaking := true
 
 			try {
 				try {
-					this.SpeechSynthesizer[true].speak(text, true)
+					while (tries-- > 0) {
+						if !this.Interrupted
+							this.SpeechSynthesizer[true].speak(text, true)
+
+						if this.Interrupted
+							this.iInterrupted := false
+						else
+							break
+					}
 				}
 				finally {
-					this.iIsSpeaking := oldSpeaking
+					this.iSpeaking := oldSpeaking
 				}
 			}
 			finally {
@@ -283,8 +303,6 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		startListening(retry := true) {
-			local function
-
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
 					if retry
@@ -296,15 +314,13 @@ class VoiceServer extends ConfigurationItem {
 					if this.VoiceServer.PushToTalk
 						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 
-					this.iIsListening := true
+					this.iListening := true
 
 					return true
 				}
 		}
 
 		stopListening(retry := false) {
-			local function
-
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
 					if retry
@@ -313,24 +329,35 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					this.iIsListening := false
+					this.iListening := false
 
 					return true
 				}
 		}
 
 		mute() {
+			local synthesizer
+
 			if !this.Muted {
 				this.iMuted := true
 
 				synthesizer := this.SpeechSynthesizer
 
-				if synthesizer
+				if synthesizer {
+					if (this.Speaking && synthesizer.Stoppable) {
+						this.iInterrupted := true
+
+						synthesizer.stop()
+					}
+
 					synthesizer.mute()
+				}
 			}
 		}
 
 		unmute() {
+			local synthesizer
+
 			if this.Muted {
 				this.iMuted := false
 
@@ -342,13 +369,14 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		registerChoices(name, choices*) {
-			recognizer := this.SpeechRecognizer[true]
+			local recognizer := this.SpeechRecognizer[true]
 
 			recognizer.setChoices(name, values2String(",", choices*))
 		}
 
 		registerVoiceCommand(grammar, command, callback) {
-			recognizer := this.SpeechRecognizer[true]
+			local recognizer := this.SpeechRecognizer[true]
+			local key, descriptor, nextCharIndex
 
 			if !grammar {
 				for key, descriptor in this.iVoiceCommands
@@ -442,7 +470,7 @@ class VoiceServer extends ConfigurationItem {
 
 	Speaking[] {
 		Get {
-			return this.iIsSpeaking
+			return this.iSpeaking
 		}
 	}
 
@@ -460,7 +488,7 @@ class VoiceServer extends ConfigurationItem {
 
 	Listening[] {
 		Get {
-			return this.iIsListening
+			return this.iListening
 		}
 	}
 
@@ -616,6 +644,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	activateVoiceClient(descriptor, words := false) {
+		local activeVoiceClient
+
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
 			this.ActiveVoiceClient.activate(words)
 		else {
@@ -634,7 +664,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	deactivateVoiceClient(descriptor) {
-		activeVoiceClient := this.ActiveVoiceClient
+		local activeVoiceClient := this.ActiveVoiceClient
 
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
 			activeVoiceClient.stopListening()
@@ -646,8 +676,6 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	startActivationListener(retry := false) {
-		local function
-
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
 				if retry
@@ -659,15 +687,13 @@ class VoiceServer extends ConfigurationItem {
 				if this.PushToTalk
 					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 
-				this.iIsListening := true
+				this.iListening := true
 
 				return true
 			}
 	}
 
 	stopActivationListener(retry := false) {
-		local function
-
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry
@@ -676,41 +702,37 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
-				this.iIsListening := false
+				this.iListening := false
 
 				return true
 			}
 	}
 
 	startListening(retry := true) {
-		activeClient := this.getVoiceClient()
+		local activeClient := this.getVoiceClient()
 
 		return (activeClient ? activeClient.startListening(retry) : false)
 	}
 
 	stopListening(retry := false) {
-		activeClient := this.getVoiceClient()
+		local activeClient := this.getVoiceClient()
 
 		return (activeClient ? activeClient.stopListening(retry) : false)
 	}
 
 	muteVoiceClients() {
-		if FileExist(kTempDirectory . "Voice.mute") {
-			logMessage(kLogCritical, "Muted")
+		if FileExist(kTempDirectory . "Voice.mute")
 			for ignore, client in this.VoiceClients
 				client.mute()
-		}
-		else {
-			logMessage(kLogCritical, "Unmuted")
+		else
 			for ignore, client in this.VoiceClients
 				client.unmute()
-		}
 	}
 
 	speak(descriptor, text, activate := false) {
-		oldSpeaking := this.Speaking
+		local oldSpeaking := this.Speaking
 
-		this.iIsSpeaking := true
+		this.iSpeaking := true
 
 		try {
 			this.getVoiceClient(descriptor).speak(text)
@@ -720,12 +742,12 @@ class VoiceServer extends ConfigurationItem {
 
 		}
 		finally {
-			this.iIsSpeaking := oldSpeaking
+			this.iSpeaking := oldSpeaking
 		}
 	}
 
 	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
-		local grammar
+		local grammar, client, nextCharIndex, command
 
 		static counter := 1
 
@@ -800,7 +822,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterVoiceClient(descriptor, pid) {
-		client := this.VoiceClients[descriptor]
+		local client := this.VoiceClients[descriptor]
+		local theDescriptor, ignore
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
@@ -817,6 +840,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterStaleVoiceClients() {
+		local descriptor, voiceClient
+
 		protectionOn()
 
 		try {
@@ -855,6 +880,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	recognizeCommand(grammar, words*) {
+		local ignore, voiceClient
+
 		for ignore, voiceClient in this.VoiceClients
 			voiceClient.recognizeVoiceCommand(grammar, words)
 	}
@@ -883,6 +910,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	clearPendingActivations() {
+		local index, command
+
 		for index, command in this.iPendingCommands
 			if command[1] {
 				this.iPendingCommands.RemoveAt(index)
@@ -894,6 +923,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	runPendingCommands() {
+		local command
+
 		if (A_TickCount < (this.iLastCommand + 1000))
 			return
 
@@ -925,10 +956,10 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	voiceCommandRecognized(voiceClient, grammar, words) {
+		local descriptor := voiceClient.VoiceCommands[grammar]
+
 		if this.Debug[kDebugRecognitions]
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
-
-		descriptor := voiceClient.VoiceCommands[grammar]
 
 		sendMessage(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
@@ -939,7 +970,8 @@ class VoiceServer extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeVoiceServer() {
-	icon := kIconsDirectory . "Microphon.ico"
+	local icon := kIconsDirectory . "Microphon.ico"
+	local debug, index
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server

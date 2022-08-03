@@ -116,6 +116,12 @@ class SpeechSynthesizer {
 		}
 	}
 
+	Stoppable[] {
+		Get {
+			return true
+		}
+	}
+
 	Locale[] {
 		Get {
 			return this.iLocale
@@ -615,13 +621,18 @@ class SpeechSynthesizer {
 	}
 
 	stop() {
+		local pid := this.iSoundPlayer
 		local status
 
-		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+		if pid {
+			Process Close, %pid%
+
+			this.iSoundPlayer := false
+			this.iPlaysCacheFile := false
+		}
+		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
 				SoundPlay NonExistent.avi
-
-				this.iSoundPlayer := false
 			}
 			catch exception {
 				; Ignore

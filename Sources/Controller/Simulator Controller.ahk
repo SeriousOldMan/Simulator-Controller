@@ -163,7 +163,8 @@ class GuiFunctionController extends FunctionController {
 
 	VisibleDuration[] {
 		Get {
-			controller := this.Controller
+			local controller := this.Controller
+			local inSimulation, type
 
 			if (controller != false) {
 				inSimulation := (controller.ActiveSimulator != false)
@@ -232,7 +233,8 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	setControlLabel(function, text, color := "Black", overlay := false) {
-		window := this.iWindow
+		local window := this.iWindow
+		local handle
 
 		if (window != false) {
 			handle := this.getControlHandle(function.Descriptor)
@@ -255,7 +257,8 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	distanceFromTop() {
-		distance := 0
+		local distance := 0
+		local ignore, fnController
 
 		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
 			if (fnController == this)
@@ -267,8 +270,9 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	distanceFromBottom() {
-		distance := 0
-		controller := []
+		local distance := 0
+		local controller := []
+		local ignore, fnController, index
 
 		for ignore, fnController in this.Controller.FunctionController[GuiFunctionController]
 			controller.Push(fnController)
@@ -288,8 +292,11 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	show(makeVisible := true) {
+		local duration, window, width, height, type, position, x, y, count
+		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 		static hideTask := false
-		
+
 		if !this.Controller.Started
 			return
 
@@ -304,10 +311,10 @@ class GuiFunctionController extends FunctionController {
 			else {
 				if !hideTask {
 					hideTask := new PeriodicTask("hideFunctionController", duration, kLowPriority)
-					
+
 					Task.startTask(hideTask)
-				}	
-					
+				}
+
 				hideTask.Sleep := duration
 			}
 
@@ -379,6 +386,8 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	hide() {
+		local window
+
 		protectionOn()
 
 		try {
@@ -396,13 +405,14 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	moveByMouse(window, button := "LButton") {
-		curCoordMode := A_CoordModeMouse
+		local curCoordMode := A_CoordModeMouse
+		local anchorX, anchorY, winX, winY, newX, newY, w, h
 
 		CoordMode Mouse, Screen
 
 		try {
 			MouseGetPos anchorX, anchorY
-			WinGetPos winX, winY, w, h, %A_ScriptName%
+			WinGetPos winX, winY, w, h, A
 
 			newX := winX
 			newY := winY
@@ -426,7 +436,7 @@ class GuiFunctionController extends FunctionController {
 			this.Controller.reloadSettings(settings)
 		}
 		finally {
-			CoordMode Mouse, curCoordMode
+			CoordMode Mouse, %curCoordMode%
 		}
 	}
 }
@@ -481,6 +491,8 @@ class SimulatorController extends ConfigurationItem {
 
 	FunctionController[class := false] {
 		Get {
+			local controller, ignore, fnController
+
 			if class {
 				controller := []
 
@@ -515,7 +527,8 @@ class SimulatorController extends ConfigurationItem {
 
 	ActiveMode[controller := false] {
 		Get {
-			activeModes := this.ActiveModes
+			local activeModes := this.ActiveModes
+			local ignore, mode
 
 			if controller {
 				for ignore, mode in activeModes
@@ -565,11 +578,14 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local descriptor, arguments, functions
+
 		base.loadFromConfiguration(configuration)
 
 		for descriptor, arguments in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			descriptor := ConfigurationItem.descriptor(descriptor[1], descriptor[2])
+
 			functions := this.Functions
 
 			if !functions.HasKey(descriptor)
@@ -601,7 +617,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	findPlugin(name) {
-		local plugin
+		local ignore, plugin
 
 		for ignore, plugin in this.Plugins
 			if (plugin.Plugin = name)
@@ -611,6 +627,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	findMode(plugin, name) {
+		local ignore, mode
+
 		if !IsObject(plugin)
 			plugin := this.findPlugin(plugin)
 
@@ -622,7 +640,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	findFunction(descriptor) {
-		functions := this.Functions
+		local functions := this.Functions
 
 		return (functions.HasKey(descriptor) ? functions[descriptor] : false)
 	}
@@ -632,9 +650,11 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getLogo() {
-		Random randomLogo, 0, 1
+		local rnd
 
-		return ((Round(randomLogo) == 1) ? kLogoDark : kLogoBright)
+		Random rnd, 0, 1
+
+		return ((Round(rnd) == 1) ? kLogoDark : kLogoBright)
 	}
 
 	registerFunctionController(controller) {
@@ -643,7 +663,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	unregisterFunctionController(controller) {
-		index := inList(this.FunctionController, controller)
+		local index := inList(this.FunctionController, controller)
 
 		if index {
 			controller.hide()
@@ -653,6 +673,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	findFunctionController(function) {
+		local ignore, fnController
+
 		for ignore, fnController in this.FunctionController
 			if fnController.hasFunction(function)
 				return fnController
@@ -680,6 +702,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startup() {
+		local ignore, fnController
+
 		this.iStarted := true
 
 		this.setModes()
@@ -690,7 +714,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	computeControllerModes() {
-		local function
+		local function, ignore, mode, action, fnController
 
 		for ignore, mode in this.Modes {
 			controllers := []
@@ -717,7 +741,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	unregisterActiveMode(mode) {
-		position := inList(this.iActiveModes, mode)
+		local position := inList(this.iActiveModes, mode)
 
 		while position {
 			this.iActiveModes.RemoveAt(position)
@@ -727,6 +751,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	runningSimulator() {
+		local ignore, thePlugin, simulator
+
 		static lastSimulator := false
 		static lastCheck := 0
 
@@ -751,6 +777,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	simulatorStartup(simulator) {
+		local ignore, thePlugin, fnController
+
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
 				thePlugin.simulatorStartup(simulator)
@@ -762,6 +790,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	simulatorShutdown(simulator) {
+		local ignore, thePlugin, fnController
+
 		for ignore, thePlugin in this.Plugins
 			if this.isActive(thePlugin)
 				thePlugin.simulatorShutdown(simulator)
@@ -773,6 +803,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startSimulator(application, splashImage := false) {
+		local theme, songFile, posX, posY, name, started
+
 		if !application.isRunning()
 			if (application.startup(false))
 				if (!kSilentMode && splashImage) {
@@ -821,6 +853,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getVoiceCommandDescriptor(command) {
+		local descriptor, pid
+
 		static registered := false
 
 		if this.iVoiceCommands.HasKey(command)
@@ -833,13 +867,15 @@ class SimulatorController extends ConfigurationItem {
 			if this.VoiceServer {
 				Process Exist
 
-				processID := ErrorLevel
+				pid := ErrorLevel
 
 				if !registered {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 
-					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", processID, activationCommand, "activationCommand", false
-																								, false, false, false, true, true), this.VoiceServer)
+					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", pid
+																								 , activationCommand, "activationCommand", false
+																								 , false, false, false, true, true)
+							  , this.VoiceServer)
 
 					registered := true
 				}
@@ -861,7 +897,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	voiceCommand(grammar, command, words*) {
-		handler := this.iVoiceCommands[command][2]
+		local handler := this.iVoiceCommands[command][2]
 
 		if handler
 			%handler%()
@@ -876,6 +912,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	connectAction(plugin, function, action) {
+		local ignore, fnController
+
 		logMessage(kLogInfo, translate("Connecting ") . function.Descriptor . translate(" to action ") . translate(getLabelForLogMessage(action)))
 
 		function.connectAction(plugin, action)
@@ -893,6 +931,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	disconnectAction(plugin, function, action) {
+		local index, ignore, fnController
+
 		logMessage(kLogInfo, translate("Disconnecting ") . function.Descriptor . translate(" from action ") . translate(getLabelForLogMessage(action)))
 
 		function.disconnectAction(plugin, action)
@@ -917,7 +957,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	fireActions(function, trigger) {
-		local action
+		local ignore, action
 
 		for ignore, action in this.getActions(function, trigger)
 			if function.Enabled[action]
@@ -933,6 +973,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	setMode(newMode) {
+		local modeSwitched, controllers, deactivatedModes, ignore, mode
+
 		if !this.isActive(newMode)
 			return
 
@@ -960,9 +1002,10 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	rotateMode(delta := 1, controller := false) {
-		startMode := false
-		modes := this.Modes
-		position := false
+		local startMode := false
+		local modes := this.Modes
+		local position := false
+		local ignore, mode, fnController, modeController, position, targetMode, index, found
 
 		if controller
 			for ignore, mode in this.ActiveModes {
@@ -1030,7 +1073,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	setModes(simulator := false, session := false) {
-		modes := false
+		local modes := false
+		local ignore, theMode
 
 		if !simulator
 			modes := getConfigurationValue(this.Settings, "Modes", "Default", "")
@@ -1053,6 +1097,9 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	showLogo(show := "__Undefined__") {
+		local info, logo, image, x, y, title1, title2
+		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 		if (show != kUndefined)
 			this.iShowLogo := show
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
@@ -1069,6 +1116,7 @@ class SimulatorController extends ConfigurationItem {
 
 			title1 := translate("Modular Simulator")
 			title2 := translate("Controller System")
+
 			SplashImage %image%, B FS8 CWD0D0D0 w229 x%x% y%y% ZH180 ZW209, %info%, %title1%`n%title2%
 
 			WinSet Transparent, 255, , % translate("Creative Commons - BY-NC-SA")
@@ -1110,7 +1158,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	writeControllerConfiguration() {
-		local controller
+		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
 		configuration := newConfiguration()
 
@@ -1136,13 +1184,16 @@ class SimulatorController extends ConfigurationItem {
 				for ignore, simulator in thePlugin.Simulators
 					simulators.Push(simulator)
 
-				setConfigurationValue(configuration, "Plugins", thePlugin.Plugin, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse), values2String(",", simulators*), values2String(",", modes*)))
+				setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
+									, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
+													   , values2String(",", simulators*), values2String(",", modes*)))
 			}
 		}
 
 		for ignore, fnController in this.FunctionController
-			setConfigurationValue(configuration, fnController.Type, fnController.Descriptor, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
-																											  , fnController.NumButtons, fnController.NumDials))
+			setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
+								, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
+												   , fnController.NumButtons, fnController.NumDials))
 
 		writeConfiguration(kUserConfigDirectory . "Simulator Controller.config", configuration)
 	}
@@ -1217,7 +1268,7 @@ class ControllerFunction {
 	}
 
 	setLabel(text, color := "Black", overlay := false) {
-		local controller
+		local controller, ignore, fnController
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
@@ -1225,7 +1276,7 @@ class ControllerFunction {
 	}
 
 	setIcon(icon) {
-		local controller
+		local controller, ignore, fnController
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
@@ -1233,7 +1284,7 @@ class ControllerFunction {
 	}
 
 	enable(trigger := "__All Trigger__", action := false) {
-		local controller
+		local ignore, fnController
 
 		this.iEnabledActions[action] := true
 
@@ -1248,6 +1299,8 @@ class ControllerFunction {
 	}
 
 	disable(trigger := "__All Trigger__", action := false) {
+		local ignore, fnController
+
 		this.iEnabledActions.Delete(action)
 
 		for ignore, fnController in this.Controller.FunctionController
@@ -1262,7 +1315,8 @@ class ControllerFunction {
 	}
 
 	connectAction(plugin, action) {
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, trigger, handler, ignore, theHotkey, command
 
 		this.iEnabledActions[action] := true
 
@@ -1296,7 +1350,8 @@ class ControllerFunction {
 	}
 
 	disconnectAction(plugin, action) {
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, trigger
 
 		this.iEnabledActions.Delete(action)
 
@@ -1450,6 +1505,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	findMode(name) {
+		local ignore, mode
+
 		for ignore, mode in this.Modes
 			if (mode.Mode = name)
 				return mode
@@ -1458,6 +1515,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	findAction(label) {
+		local ignore, candidate
+
 		for ignore, candidate in this.Actions
 			if (candidate.Label = label)
 				return candidate
@@ -1491,7 +1550,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	activate() {
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, theAction
 
 		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 
@@ -1503,7 +1563,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	deactivate() {
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, theAction
 
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 
@@ -1522,6 +1583,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	getLabel(descriptor, default := false) {
+		local label
+
 		if !this.sLabelsDatabase
 			ControllerPlugin.sLabelsDatabase := getControllerActionLabels()
 
@@ -1534,6 +1597,8 @@ class ControllerPlugin extends Plugin {
 	}
 
 	getIcon(descriptor, default := false) {
+		local icon
+
 		if !this.sIconsDatabase
 			ControllerPlugin.sIconsDatabase := getControllerActionIcons()
 
@@ -1603,6 +1668,8 @@ class ControllerMode {
 	}
 
 	findAction(label) {
+		local ignore, candidate
+
 		for ignore, candidate in this.Actions
 			if (candidate.Label = label)
 				return candidate
@@ -1619,6 +1686,8 @@ class ControllerMode {
 	}
 
 	isActive() {
+		local simulators, simulator
+
 		if this.Plugin.isActive() {
 			simulators := this.Plugin.Simulators
 
@@ -1636,7 +1705,8 @@ class ControllerMode {
 
 	activate() {
 		local plugin := this.Plugin
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, theAction
 
 		logMessage(kLogInfo, translate("Activating mode ") . translate(getModeForLogMessage(this)))
 
@@ -1651,7 +1721,8 @@ class ControllerMode {
 
 	deactivate() {
 		local plugin := this.Plugin
-		controller := this.Controller
+		local controller := this.Controller
+		local ignore, theAction
 
 		controller.unregisterActiveMode(this)
 
@@ -1717,14 +1788,16 @@ class ControllerAction {
 ;;;-------------------------------------------------------------------------;;;
 
 hideFunctionController() {
+	local ignore, fnController
+
 	for ignore, fnController in SimulatorController.Instance.FunctionController[GuiFunctionController]
 		fnController.hide()
 }
 
 setHotkeyEnabled(function, trigger, enabled) {
 	local controller := SimulatorController.Instance
-
-	state := enabled ? "On" : "Off"
+	local state := enabled ? "On" : "Off"
+	local ignore, theHotKey
 
 	for ignore, theHotkey in function.Hotkeys[trigger]
 		if (SubStr(theHotkey, 1, 1) = "?") {
@@ -1742,43 +1815,43 @@ functionActionCallable(function, trigger, action) {
 }
 
 fireControllerActions(function, trigger, fromTask := false) {
+	local callable
+
 	static pending := false
 
-	if fromTask {
-		protectionOn(true, true)
+	protectionOn(true, true)
 
-		try {
-			if pending
-				pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
-			else {
-				pending := []
+	try {
+		if pending
+			pending.Push(ObjBindMethod(function.Controller, "fireActions", function, trigger))
+		else if fromTask {
+			pending := []
 
-				try {
-					function.Controller.fireActions(function, trigger)
+			try {
+				function.Controller.fireActions(function, trigger)
 
-					while (pending.Length() > 0) {
-						callable := pending.RemoveAt(1)
+				while (pending.Length() > 0) {
+					callable := pending.RemoveAt(1)
 
-						%callable%()
-					}
-				}
-				finally {
-					pending := false
+					%callable%()
 				}
 			}
+			finally {
+				pending := false
+			}
 		}
-		finally {
-			protectionOff(true, true)
-		}
-
-		return false
+		else
+			Task.startTask(Func("fireControllerActions").Bind(function, trigger, true), 0, kLowPriority)
 	}
-	else
-		Task.startTask(Func("fireControllerActions").Bind(function, trigger, true), 0, kLowPriority)
+	finally {
+		protectionOff(true, true)
+	}
+
+	return false
 }
 
 getLabelForLogMessage(action) {
-	label := action.Label
+	local label := action.Label
 
 	if (label == "")
 		label := action.base.__Class
@@ -1805,10 +1878,11 @@ getModeForLogMessage(mode) {
 }
 
 updateSimulatorState() {
+	local controller := SimulatorController.Instance
+	local currentSimulator, changed, ignore, fnController, show
+
 	static isSimulatorRunning := false
 	static lastSimulator := false
-
-	controller := SimulatorController.Instance
 
 	protectionOn()
 
@@ -1865,7 +1939,8 @@ updateSimulatorState() {
 }
 
 updateTrayMessageState(settings := false) {
-	inSimulation := false
+	local inSimulation := false
+	local duration
 
 	if !settings {
 		settings := SimulatorController.Instance.Settings
@@ -1883,35 +1958,60 @@ updateTrayMessageState(settings := false) {
 }
 
 externalCommandManager() {
-	if FileExist(kTempDirectory . "Function.cmd") {
-		FileReadLine command, % kTempDirectory . "Function.cmd", 1
+	local fileName := kTempDirectory . "Controller.cmd"
+	local file, line, commands, command, ignore, descriptor
+
+	if FileExist(fileName) {
+		commands := []
+		file := false
 
 		try {
-			FileDelete % kTempDirectory . "Function.cmd"
+			file := FileOpen(fileName, "rw-rwd")
+		}
+		catch exception {
+			return
+		}
+
+		while !file.AtEOF {
+			command := Trim(file.ReadLine(), " `t`n`r")
+
+			if (StrLen(command) == 0)
+				break
+
+			commands.Push(command)
+		}
+
+		file.Close()
+
+		try {
+			FileDelete %fileName%
 		}
 		catch exception {
 			; ignore
 		}
 
-		command := string2Values(A_Space, command)
+		for ignore, command in commands {
+			command := string2Values(A_Space, command)
 
-		descriptor := ConfigurationItem.splitDescriptor(command[1])
+			descriptor := ConfigurationItem.splitDescriptor(command[1])
 
-		switch descriptor[1] {
-			case k1WayToggleType, k2WayToggleType:
-				switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
-			case kButtonType:
-				pushButton(descriptor[2])
-			case kDialType:
-				rotateDial(descriptor[2], command[2])
-			default:
-				Throw "Unknown controller function type (" . function[1] . ") detected in externalCommand..."
+			switch descriptor[1] {
+				case k1WayToggleType, k2WayToggleType:
+					switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
+				case kButtonType:
+					pushButton(descriptor[2])
+				case kDialType:
+					rotateDial(descriptor[2], command[2])
+				default:
+					Throw "Unknown controller function type (" . descriptor[1] . ") detected in externalCommand..."
+			}
 		}
 	}
 }
 
 initializeSimulatorController() {
-	icon := kIconsDirectory . "Gear.ico"
+	local icon := kIconsDirectory . "Gear.ico"
+	local settings, argIndex, voice, configuration
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
@@ -1964,7 +2064,7 @@ Exit:
 }
 
 startupSimulatorController() {
-	controller := SimulatorController.Instance
+	local controller := SimulatorController.Instance
 
 	controller.writeControllerConfiguration()
 
@@ -1972,7 +2072,7 @@ startupSimulatorController() {
 
 	controller.updateLastEvent()
 
-	if ((A_Args.Length() > 0) &&  (A_Args[1] = "-NoStartup"))
+	if ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
 		ExitApp 0
 
 	controller.startup()
@@ -1984,10 +2084,8 @@ startupSimulatorController() {
 ;;;-------------------------------------------------------------------------;;;
 
 pushButton(buttonNumber) {
-	local function
-
-	descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
-	function := SimulatorController.Instance.findFunction(descriptor)
+	local descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
+	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length() > 0))
 		fireControllerActions(function, "Push")
@@ -1996,7 +2094,7 @@ pushButton(buttonNumber) {
 }
 
 rotateDial(dialNumber, direction) {
-	local function
+	local function, descriptor
 
 	if ((direction = kIncrease) || (direction = "plus") || (direction = "+"))
 		direction := "Increase"
@@ -2018,10 +2116,8 @@ rotateDial(dialNumber, direction) {
 }
 
 switchToggle(toggleType, toggleNumber, mode := "activate") {
-	local function
-
-	descriptor := ConfigurationItem.descriptor(toggleType, toggleNumber)
-	function := SimulatorController.Instance.findFunction(descriptor)
+	local descriptor := ConfigurationItem.descriptor(toggleType, toggleNumber)
+	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false) {
 		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length() > 0))
@@ -2039,7 +2135,8 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 }
 
 setMode(actionOrPlugin, mode := false) {
-	controller := SimulatorController.Instance
+	local controller := SimulatorController.Instance
+	local theMode
 
 	protectionOn()
 

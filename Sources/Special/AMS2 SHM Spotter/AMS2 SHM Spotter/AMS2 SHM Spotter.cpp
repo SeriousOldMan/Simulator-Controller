@@ -152,6 +152,10 @@ const char* computeAlert(int newSituation) {
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+				carBehindReported = true;
+				carBehindCount = 21;
+
 				break;
 			case LEFT:
 				if (lastSituation == THREE)

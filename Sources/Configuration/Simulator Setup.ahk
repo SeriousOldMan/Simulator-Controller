@@ -2121,7 +2121,7 @@ class FinishStepWizard extends StepWizard {
 
 		SetTimer %settingsEditor%, -200
 		*/
-		
+
 		Task.startTask(ObjBindMethod(this, "settingsEditor"), 200, kHighPriority)
 	}
 
@@ -2277,30 +2277,6 @@ elevateAndRestart() {
 
 		ExitApp 0
 	}
-}
-
-fixIE(version := 0, exeName := "") {
-	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
-
-	if versions.HasKey(version)
-		version := versions[version]
-
-	if !exeName {
-		if A_IsCompiled
-			exeName := A_ScriptName
-		else
-			SplitPath A_AhkPath, exeName
-	}
-
-	RegRead previousValue, HKCU, %key%, %exeName%
-
-	if (version = "")
-		RegDelete, HKCU, %key%, %exeName%
-	else
-		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
-
-	return previousValue
 }
 
 LV_ClickedColumn(listViewHandle) {

@@ -36,7 +36,7 @@ class ACSetup extends FileSetup {
 		}
 
 		Set {
-			local setup, value
+			local setup
 
 			setup := parseConfiguration(value)
 
@@ -89,11 +89,11 @@ class ACSetupEditor extends FileSetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa\setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -127,7 +127,8 @@ class ACSetupEditor extends FileSetupEditor {
 	}
 
 	saveSetup() {
-		fileName := this.Setup.FileName
+		local fileName := this.Setup.FileName
+		local directory, title, text
 
 		if fileName = this.Setup.FileName[true]
 			SplitPath fileName, , directory
@@ -168,11 +169,11 @@ class ACSetupEditor extends FileSetupEditor {
 
 class ACSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa\setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)

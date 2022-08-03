@@ -106,6 +106,8 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local descriptor, applicationName
+
 		base.loadFromConfiguration(configuration)
 
 		this.iSimulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
@@ -126,10 +128,10 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	prepareConfiguration() {
-		noConfiguration := (this.Configuration.Count() == 0)
-		editConfig := GetKeyState("Ctrl")
-
-		settings := this.Settings
+		local noConfiguration := (this.Configuration.Count() == 0)
+		local editConfig := GetKeyState("Ctrl")
+		local settings := this.Settings
+		local result, error
 
 		if (settings.Count() = 0)
 			editConfig := true
@@ -158,22 +160,22 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startSimulatorController() {
-		local title
+		local title, exePath, pid
 
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
 			exePath := kBinariesDirectory . "Voice Server.exe"
 
-			Run %exePath%, %kBinariesDirectory%, , processID
+			Run %exePath%, %kBinariesDirectory%, , pid
 
-			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup -Voice " . processID
+			exePath := kBinariesDirectory . "Simulator Controller.exe -Startup -Voice " . pid
 
-			Run %exePath%, %kBinariesDirectory%, , processID
+			Run %exePath%, %kBinariesDirectory%, , pid
 
 			Sleep 1000
 
-			return processID
+			return pid
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -192,6 +194,8 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
+		local ignore, component
+
 		for ignore, component in components {
 			if this.Canceled
 				break
@@ -228,12 +232,14 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	startup() {
+		local startSimulator, runningIndex, hidden, hasSplashTheme
+
 		this.prepareConfiguration()
 
 		startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
 
-		this.iSimulatorControllerPID := this.startSimulatorController()
-		vSimulatorControllerPID := this.iSimulatorControllerPID
+		vSimulatorControllerPID := this.startSimulatorController()
+		this.iSimulatorControllerPID := vSimulatorControllerPID
 
 		if (this.iSimulatorControllerPID == 0)
 			exitStartup(true)
@@ -241,14 +247,11 @@ class SimulatorStartup extends ConfigurationItem {
 		if (!kSilentMode && this.iSplashTheme)
 			showSplashTheme(this.iSplashTheme, "playSong")
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		if !kSilentMode {
-			message := translate("Start: Simulator Controller")
-
-			showProgress({x: x, y: y, color: "Blue", message: message, title: translate("Initialize Core System")})
-		}
+		if !kSilentMode
+			showProgress({x: Round((A_ScreenWidth - 300) / 2)
+						, y: A_ScreenHeight - 150, color: "Blue"
+						, message: translate("Start: Simulator Controller")
+						, title: translate("Initialize Core System")})
 
 		Loop 50 {
 			if !kSilentMode
@@ -257,11 +260,9 @@ class SimulatorStartup extends ConfigurationItem {
 			Sleep 20
 		}
 
-		if !kSilentMode {
-			message := translate("...")
-
-			showProgress({progress: 0, color: "Green", message: message, title: translate("Starting System Components")})
-		}
+		if !kSilentMode
+			showProgress({progress: 0, color: "Green"
+					   , message: translate("..."), title: translate("Starting System Components")})
 
 		runningIndex := 1
 
@@ -274,8 +275,8 @@ class SimulatorStartup extends ConfigurationItem {
 		Sleep 500
 
 		this.iFinished := true
-		hidden := false
 
+		hidden := false
 		hasSplashTheme := this.iSplashTheme
 
 		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
@@ -323,47 +324,6 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
-}
-
 closeApplication(application) {
 	Process Exist, %application%.exe
 
@@ -372,7 +332,7 @@ closeApplication(application) {
 }
 
 launchPad(command := false, arguments*) {
-	local application
+	local ignore, application, startupConfig, closeOnStartup
 
 	static result := false
 
@@ -557,7 +517,7 @@ closeLaunchPad() {
 }
 
 closeAll() {
-	title := translate("Modular Simulator Controller System")
+	local title := translate("Modular Simulator Controller System")
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 	MsgBox 262436, %title%, % translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
@@ -580,14 +540,14 @@ launchStartup() {
 }
 
 launchApplication() {
-	executable := launchPad("Executable", A_GuiControl)
+	local executable := launchPad("Executable", A_GuiControl)
 
 	if executable
 		launchPad("Launch", executable)
 }
 
 launchSimulatorDownload() {
-	title := translate("Update")
+	local title := translate("Update")
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 	MsgBox 262436, %title%, % translate("Do you really want to download and install the latest version? You must close all applications before running the update.")
@@ -602,6 +562,8 @@ openLaunchPadDocumentation() {
 }
 
 WM_MOUSEMOVE() {
+	local text
+
     static CurrControl
 	static PrevControl := false
 
@@ -646,6 +608,8 @@ watchStartupSemaphore() {
 }
 
 startupSimulator() {
+	local fileName
+
 	Hotkey Escape, On
 
 	vStartupManager := new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile))
@@ -667,7 +631,8 @@ startupSimulator() {
 }
 
 startSimulator() {
-	icon := kIconsDirectory . "Startup.ico"
+	local icon := kIconsDirectory . "Startup.ico"
+	local noLaunch
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
@@ -704,7 +669,7 @@ playSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 
 exit() {
-	fileName := (kTempDirectory . "Startup.semaphore")
+	local fileName := (kTempDirectory . "Startup.semaphore")
 
 	try {
 		FileDelete %fileName%
@@ -712,11 +677,13 @@ exit() {
 	catch exception {
 		; ignore
 	}
-	
+
 	ExitApp 0
 }
 
 exitStartup(sayGoodBye := false) {
+	local fileName
+
 	if (sayGoodBye && (vSimulatorControllerPID != false)) {
 		sendMessage(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
 
@@ -768,9 +735,9 @@ try {
 			SoundPlay *32
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 
-			title := translate("Startup")
+			_title := translate("Startup")
 
-			MsgBox 262180, %title%, % translate("Cancel Startup?")
+			MsgBox 262180, %_title%, % translate("Cancel Startup?")
 			OnMessage(0x44, "")
 
 			IfMsgBox Yes

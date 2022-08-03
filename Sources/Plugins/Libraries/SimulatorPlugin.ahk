@@ -40,14 +40,6 @@ global kAssistantRaceActions = ["PitstopPlan", "PitstopPrepare", "PitstopRecomme
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRunningSimulator = false
-global vRunningSimulation = false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -69,6 +61,8 @@ class AssistantMode extends ControllerMode {
 	}
 
 	updateRaceAssistantActions(sessionState) {
+		local ignore, theAction
+
 		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
 			sessionState := kSessionFinished
 
@@ -103,6 +97,8 @@ class PitstopMode extends AssistantMode {
 	}
 
 	updatePitstopActions(sessionState) {
+		local ignore, theAction
+
 		for ignore, theAction in this.Actions
 			if (isInstance(theAction, PitstopAction) && inList(this.Controller.ActiveModes, this))
 				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
@@ -201,6 +197,9 @@ class PitstopToggleAction extends PitstopAction {
 }
 
 class SimulatorPlugin extends ControllerPlugin {
+	static sActiveSimulator := false
+	static sActiveimulation := false
+
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
 
@@ -211,6 +210,18 @@ class SimulatorPlugin extends ControllerPlugin {
 	iTrack := false
 
 	iTrackAutomation := kUndefined
+
+	ActiveSimulator[] {
+		Get {
+			return SimulatorPlugin.sActiveSimulator
+		}
+	}
+
+	ActiveSimulation[] {
+		Get {
+			return SimulatorPlugin.sActiveSimulation
+		}
+	}
 
 	Code[] {
 		Get {
@@ -230,6 +241,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	CommandDelay[] {
 		Get {
+			local simulator, car, track, settings, default
+
 			if (this.iCommandDelay = kUndefined) {
 				simulator := this.Simulator[true]
 				car := (this.Car ? this.Car : "*")
@@ -288,6 +301,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	TrackAutomation[] {
 		Get {
+			local simulator, car, track
+
 			if (this.iTrackAutomation == kUndefined) {
 				simulator := this.Simulator[true]
 				car := this.Car
@@ -306,6 +321,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	SessionState[asText := false] {
 		Get {
+			local sessionState
+
 			if asText {
 				sessionState := this.iSessionState
 
@@ -326,6 +343,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false, register := true) {
+		local ignore, theAction, arguments
+
 		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
 
 		base.__New(controller, name, configuration, register)
@@ -349,7 +368,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
-		local function
+		local function, decreaseFunction, mode, label, icon
 
 		this.getPitstopActions(actions, selectActions)
 
@@ -366,7 +385,6 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 
 			function := controller.findFunction(increaseFunction)
-
 			mode := this.findMode(kPitstopMode)
 
 			if (mode == false)
@@ -425,7 +443,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	activateWindow() {
-		window := this.Simulator.WindowTitle
+		local window := this.Simulator.WindowTitle
 
 		if !WinExist(window)
 			if isDebug()
@@ -436,6 +454,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	sendCommand(command) {
+		local delay
+
 		try {
 			switch this.CommandMode {
 				case "Event":
@@ -467,29 +487,31 @@ class SimulatorPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 
-		if ((simulator = this.Simulator.Application) && (vRunningSimulator != this)) {
-			if vRunningSimulator
-				vRunningSimulator.simulatorShutdown(vRunningSimulation)
+		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator != this)) {
+			if SimulatorPlugin.ActiveSimulator
+				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
 
 			this.updateSessionState(kSessionFinished)
 
-			vRunningSimulator := this
-			vRunningSimulation := simulator
+			SimulatorPlugin.sActiveSimulator := this
+			SimulatorPlugin.sActiveSimulation := simulator
 		}
 	}
 
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 
-		if ((simulator = this.Simulator.Application) && (vRunningSimulator == this)) {
+		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
 			this.updateSessionState(kSessionFinished)
 
-			vRunningSimulator := false
-			vRunningSimulation := false
+			SimulatorPlugin.sActiveSimulator := false
+			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
 
 	updateSessionState(sessionState) {
+		local mode
+
 		if ((sessionState != this.SessionState) && (sessionState != kSessionPaused)) {
 			this.iSessionState := sessionState
 
@@ -520,6 +542,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	notifyPitstopChanged(option) {
+		local newValues
+
 		if this.RaceEngineer
 			switch option {
 				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork":
@@ -667,6 +691,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
+		local ignore, theAction
+
 		base.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
@@ -680,7 +706,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, mode, descriptor
 
 		if (action = "InformationRequest") {
 			arguments.InsertAt(1, actionFunction)
@@ -689,7 +715,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 
 		function := controller.findFunction(actionFunction)
-
 		mode := this.findMode(this.iActionMode)
 
 		if (mode == false)
@@ -715,6 +740,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorStartup(simulator) {
+		local raceEngineer, raceStrategist, raceSpotter
+
 		base.simulatorStartup(simulator)
 
 		if (simulator = this.Simulator.Application) {
@@ -751,6 +778,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorShutdown(simulator) {
+		local raceEngineer, raceStrategist, raceSpotter
+
 		base.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
@@ -787,7 +816,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	supportsRaceAssistant(assistantPlugin) {
-		hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
+		local hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
 
 		if (assistantPlugin = kRaceSpotterPlugin)
 			return (hasProvider && FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe"))
@@ -842,8 +871,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	startSession(settings, data) {
-		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+		local compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		local compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
@@ -884,6 +913,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	tyreCompoundIndex(compound, compoundColor := false) {
+		local compounds, index, candidate
+
 		if compound {
 			compounds := new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
 			index := inList(compounds, compound(compound, compoundColor))
@@ -902,6 +933,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	tyreCompoundCode(compound, compoundColor := false) {
+		local index
+
 		if compound {
 			index := this.tyreCompoundIndex(compound, compoundColor)
 
@@ -912,6 +945,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	triggerAction(actionNr, positionX, positionY) {
+		local action, ignore, theHotkey
+
 		if this.TrackAutomation {
 			action := this.TrackAutomation.Actions[actionNr]
 
@@ -958,6 +993,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
+		local compound, compoundColor
+
 		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
 		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
 			if this.CurrentTyreCompound {
@@ -982,6 +1019,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
+		local compound, compoundColor
+
 		if !sessionSettings
 			sessionSettings := newConfiguration()
 
@@ -1007,6 +1046,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
+		local compound
+
 		this.CurrentTyreCompound := false
 		this.RequestedTyreCompound := false
 
@@ -1030,21 +1071,23 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 getCurrentSimulatorPlugin(option := false) {
-	if vRunningSimulator {
+	local actions, ignore, candidate
+
+	if SimulatorPlugin.ActiveSimulator {
 		if option {
 			actions := false
 			ignore := false
 
-			vRunningSimulator.getPitstopActions(actions, ignore)
+			SimulatorPlugin.ActiveSimulator.getPitstopActions(actions, ignore)
 
 			for ignore, candidate in actions
 				if (candidate = option)
-					return vRunningSimulator
+					return SimulatorPlugin.ActiveSimulator
 
 			return false
 		}
 		else
-			return vRunningSimulator
+			return SimulatorPlugin.ActiveSimulator
 	}
 	else
 		return false

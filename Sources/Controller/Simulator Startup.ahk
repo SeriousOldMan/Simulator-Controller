@@ -80,7 +80,6 @@ class SimulatorStartup extends ConfigurationItem {
 	iFinished := false
 	iCanceled := false
 
-
 	Settings[] {
 		Get {
 			return this.iSettings

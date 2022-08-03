@@ -170,6 +170,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		fireAction(function, trigger) {
 			local action := this.Action
+			local enabled
 
 			if ((action = "Accept") || (action = "Reject"))
 				enabled := (this.Plugin.RaceAssistant[true] != false)
@@ -194,7 +195,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	class RaceSettingsAction extends ControllerAction {
 		iPlugin := false
-
 		iAction := false
 
 		Plugin[] {
@@ -309,6 +309,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	RaceAssistant[zombie := false] {
 		Get {
+			local wasZombie
+
 			if (!this.iRaceAssistant && zombie) {
 				if !this.iWaitForShutdown {
 					wasZombie := (this.iRaceAssistantZombie != false)
@@ -418,6 +420,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
+		local openRaceSettings, openSessionDatabase, openSetupAdvisor, openRaceCenter, openStrategyWorkbench, importSetup
+		local assistantSpeaker, assistantListener
+
 		base.__New(controller, name, configuration, register)
 
 		if (this.Active || isDebug()) {
@@ -533,7 +539,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, descriptor
 
 		if (action = "InformationRequest") {
 			arguments.InsertAt(1, actionFunction)
@@ -598,6 +604,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateActions(sessionState) {
+		local ignore, theAction, teamServer
+
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.RaceAssistantName ? (this.RaceAssistantEnabled ? "Green" : "Black") : "Gray")
@@ -610,9 +618,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else if isInstance(theAction, RaceAssistantPlugin.TeamServerToggleAction) {
 				teamServer := this.TeamServer
 
-				theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
-
-				theAction.Function.enable(kAllTrigger, theAction)
+				if teamServer {
+					theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
+					theAction.Function.enable(kAllTrigger, theAction)
+				}
+				else {
+					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					theAction.Function.disable(kAllTrigger, theAction)
+				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SessionDatabaseOpen")
@@ -655,6 +668,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateTrayLabel(label, enabled) {
+		local callback
+
 		static hasTrayMenu := {}
 		static first := true
 
@@ -714,14 +729,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	enableTeamServer(label := false) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
 			teamServer.enableTeamServer(label)
 	}
 
 	disableTeamServer(label := false) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.Active)
 			teamServer.disableTeamServer(label)
@@ -732,16 +747,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startupRaceAssistant() {
+		local pid, options
+
 		if (this.RaceAssistantEnabled) {
 			Process Exist
 
-			controllerPID := ErrorLevel
-			raceAssistantPID := 0
+			pid := ErrorLevel
 
 			try {
 				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 
-				options := " -Remote " . controllerPID
+				options := " -Remote " . pid
 
 				if this.RaceAssistantName
 					options .= " -Name """ . this.RaceAssistantName . """"
@@ -772,7 +788,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				exePath := """" . kBinariesDirectory . this.Plugin . ".exe""" . options
 
-				Run %exePath%, %kBinariesDirectory%, , raceAssistantPID
+				Run %exePath%, %kBinariesDirectory%, , pid
 
 				Sleep 1500
 			}
@@ -785,8 +801,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				return false
 			}
 
-			this.RaceAssistant := this.createRaceAssistant(raceAssistantPID)
+			this.RaceAssistant := this.createRaceAssistant(pid)
+
+			return true
 		}
+		else
+			return false
 	}
 
 	shutdownRaceAssistant() {
@@ -802,17 +822,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	prepareSettings(data) {
-		settingsDB := new SettingsDatabase()
+		local settingsDB := new SettingsDatabase()
+		local simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		local car := getConfigurationValue(data, "Session Data", "Car")
+		local track := getConfigurationValue(data, "Session Data", "Track")
+		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		local  loadSettings := getConfigurationValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
+		local section, values, key, value
 
-		simulator := getConfigurationValue(data, "Session Data", "Simulator")
-		car := getConfigurationValue(data, "Session Data", "Car")
-		track := getConfigurationValue(data, "Session Data", "Track")
-
-		simulatorName := settingsDB.getSimulatorName(simulator)
-
-		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-
-		loadSettings := getConfigurationValue(this.Configuration, this.Plugin . " Startup", simulatorName . ".LoadSettings", "Default")
 		loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulatorName . ".LoadSettings", loadSettings)
 
 		if ((loadSettings = "SettingsDatabase") || (loadSettings = "SessionDatabase"))
@@ -839,7 +857,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	connectTeamSession() {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local settings, sessionIdentifier, serverURL, accessToken, teamIdentifier, driverIdentifier
 
 		this.iTeamSessionActive := false
 
@@ -868,7 +887,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	disconnectTeamSession() {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		this.iTeamSessionActive := false
 
@@ -882,6 +901,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startSession(settings, data, teamSession) {
+		local code, assistant, settingsFile, dataFile
+
 		if this.Simulator {
 			code := this.Simulator.Code
 			assistant := this.Plugin
@@ -999,6 +1020,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateSessionData(data) {
+		local simulator, car, track, maxFuel, compound, compoundColor
+
 		static settingsDB := false
 
 		if !settingsDB
@@ -1042,10 +1065,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	callSaveSessionState(settingsFile, stateFile) {
-		if settingsFile {
-			FileRead sessionSettings, %settingsFile%
+		local sessionSettings, sessionState
 
-			sessionSettings := parseConfiguration(sessionSettings)
+		if settingsFile {
+			sessionSettings := readConfiguration(settingsFile)
 
 			try {
 				FileDelete %settingsFile%
@@ -1058,9 +1081,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			sessionSettings := false
 
 		if stateFile {
-			FileRead sessionState, %stateFile%
-
-			sessionState := parseConfiguration(sessionState)
+			sessionState := readConfiguration(stateFile)
 
 			try {
 				FileDelete %stateFile%
@@ -1076,9 +1097,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	saveSessionState(settings, state) {
-		this.Simulator.saveSessionState(settings, state)
+		local teamServer := this.TeamServer
 
-		teamServer := this.TeamServer
+		this.Simulator.saveSessionState(settings, state)
 
 		if (teamServer && teamServer.Active) {
 			if isDebug()
@@ -1093,7 +1114,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createSessionSettings() {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local sessionSettings
 
 		if (teamServer && teamServer.Active)
 			try {
@@ -1112,7 +1134,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createSessionState() {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local sessionState
 
 		if (teamServer && teamServer.Active)
 			try {
@@ -1131,6 +1154,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createSessionSettingsFile(sessionSettings) {
+		local postfix, settingsFile
+
 		Random postfix, 1, 1000000
 
 		settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
@@ -1140,6 +1165,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createSessionStateFile(sessionState) {
+		local postfix, stateFile
+
 		Random postfix, 1, 1000000
 
 		stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
@@ -1149,42 +1176,42 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	restoreSessionState() {
-		if this.RaceAssistant {
-			teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local sessionSettings, sessionState
 
-			if (teamServer && teamServer.Active) {
-				if isDebug()
-					showMessage("Restoring session state for " . this.RaceAssistantName)
+		if (this.RaceAssistant && teamServer && teamServer.Active) {
+			if isDebug()
+				showMessage("Restoring session state for " . this.RaceAssistantName)
 
-				sessionSettings := this.createSessionSettings()
-				sessionState := this.createSessionState()
+			sessionSettings := this.createSessionSettings()
+			sessionState := this.createSessionState()
 
-				if (sessionSettings || sessionState)
-					this.Simulator.restoreSessionState(sessionSettings, sessionState)
+			if (sessionSettings || sessionState)
+				this.Simulator.restoreSessionState(sessionSettings, sessionState)
 
-				if sessionSettings
-					sessionSettings := this.createSettingsFile(sessionSettings)
+			if sessionSettings
+				sessionSettings := this.createSettingsFile(sessionSettings)
 
-				if sessionState
-					sessionState := this.createStateFile(sessionState)
+			if sessionState
+				sessionState := this.createStateFile(sessionState)
 
-				this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
-			}
+			this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
 		}
 	}
 
 	driverActive(data) {
-		if this.TeamSessionActive {
-			teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
+		if this.TeamSessionActive
 			return ((getConfigurationValue(data, "Stint Data", "DriverForname") = teamServer.DriverForName)
 				 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = teamServer.DriverSurName))
-		}
 		else
 			return true
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		local simulator, code, trackData, data, section, values
+
 		static sessionDB := false
 
 		if !sessionDB
@@ -1192,9 +1219,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		simulator := this.Simulator
 		code := simulator.Code
-
 		trackData := sessionDB.getTrackData(code, simulator.Track)
-
 		data := (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
 
 		this.updateSessionData(data)
@@ -1213,6 +1238,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	collectSessionData() {
+		local code, telemetryData, positionsData, data, dataFile, settings, settingsFile, dataLastLap
+		local testData, message, key, value, sessionState, teamServer, teamSessionActive, joinedSession, wasFinished
+		local newLap, firstLap
+
 		if (A_TickCount <= this.iWaitForShutdown)
 			return
 		else {
@@ -1449,14 +1478,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 						this.iUpdateLapCounter := this.iUpdateLapCounter + 1
 
-						newDataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iUpdateLapCounter . ".data"
+						dataFile := kTempDirectory . code . " Data\" . this.Plugin . " Lap " . this.LastLap . "." . this.iUpdateLapCounter . ".data"
 
-						writeConfiguration(newDataFile, data)
+						writeConfiguration(dataFile, data)
 
 						if newLap
-							this.addLap(dataLastLap, newDataFile, telemetryData, positionsData)
+							this.addLap(dataLastLap, dataFile, telemetryData, positionsData)
 						else
-							this.updateLap(dataLastLap, newDataFile)
+							this.updateLap(dataLastLap, dataFile)
 					}
 				}
 				else {
@@ -1500,7 +1529,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
-	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	local postfix, dataFile, data
 
 	Random postfix, 1, 1000000
 
@@ -1556,12 +1586,11 @@ getDataSessionState(data) {
 		return kSessionFinished
 }
 
-prepareSessionDatabase(data) {
-	local plugin
+findActivePlugin(plugin := false) {
+	local controller := SimulatorController.Instance
 
-	controller := SimulatorController.Instance
-
-	plugin := controller.findPlugin(kRaceEngineerPlugin)
+	if (!plugin || !controller.isActive(plugin))
+		plugin := controller.findPlugin(kRaceEngineerPlugin)
 
 	if (!plugin || !controller.isActive(plugin))
 		plugin := controller.findPlugin(kRaceStrategistPlugin)
@@ -1569,7 +1598,14 @@ prepareSessionDatabase(data) {
 	if (!plugin || !controller.isActive(plugin))
 		plugin := controller.findPlugin(kRaceSpotterPlugin)
 
-	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+	return plugin
+}
+
+prepareSessionDatabase(data) {
+	local plugin := findActivePlugin()
+	local sessionDB, simulator, car, track
+
+	if (plugin  && plugin.Simulator) {
 		sessionDB := new SessionDatabase()
 
 		simulator := plugin.Simulator.runningSimulator()
@@ -1587,20 +1623,12 @@ prepareSessionDatabase(data) {
 }
 
 getSimulatorOptions(plugin := false) {
-	controller := SimulatorController.Instance
+	local options := ""
+	local data
 
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
+	plugin := findActivePlugin(plugin)
 
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceStrategistPlugin)
-
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceSpotterPlugin)
-
-	options := ""
-
-	if (plugin && controller.isActive(plugin) && plugin.Simulator) {
+	if (plugin && plugin.Simulator) {
 		data := readSimulatorData(plugin.Simulator.Code)
 
 		if getConfigurationValue(data, "Session Data", "Active", false) {
@@ -1627,19 +1655,11 @@ getSimulatorOptions(plugin := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 openRaceSettings(import := false, silent := false, plugin := false, fileName := false) {
-	local pid
+	local exePath := kBinariesDirectory . "Race Settings.exe"
+	local controller := SimulatorController.Instance
+	local pid, ignore, options
 
-	exePath := kBinariesDirectory . "Race Settings.exe"
-	controller := SimulatorController.Instance
-
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceEngineerPlugin)
-
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceStrategistPlugin)
-
-	if (!plugin || !controller.isActive(plugin))
-		plugin := controller.findPlugin(kRaceSpotterPlugin)
+	plugin := findActivePlugin(plugin)
 
 	if !fileName
 		fileName := kUserConfigDirectory . "Race.settings"
@@ -1648,7 +1668,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 		if import {
 			options := "-File """ . fileName . """ -Import"
 
-			if (plugin && controller.isActive(plugin) && plugin.Simulator)
+			if (plugin && plugin.Simulator)
 				options := (options . " """ . controller.ActiveSimulator . """ " . plugin.Simulator.Code)
 
 			if silent
@@ -1679,9 +1699,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 }
 
 openSessionDatabase(plugin := false) {
-	local pid
-
-	exePath := kBinariesDirectory . "Session Database.exe"
+	local exePath := kBinariesDirectory . "Session Database.exe"
+	local pid, options
 
 	try {
 		options := getSimulatorOptions(plugin)
@@ -1697,14 +1716,13 @@ openSessionDatabase(plugin := false) {
 }
 
 openSetupAdvisor(plugin := false) {
-	local pid
-
-	exePath := kBinariesDirectory . "Setup Advisor.exe"
+	local exePath := kBinariesDirectory . "Setup Advisor.exe"
+	local options
 
 	try {
 		options := getSimulatorOptions(plugin)
 
-		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Setup Advisor tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1715,14 +1733,13 @@ openSetupAdvisor(plugin := false) {
 }
 
 openStrategyWorkbench(plugin := false) {
-	local pid
-
-	exePath := kBinariesDirectory . "Strategy Workbench.exe"
+	local exePath := kBinariesDirectory . "Strategy Workbench.exe"
+	local options
 
 	try {
 		options := getSimulatorOptions(plugin)
 
-		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Strategy Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1733,14 +1750,13 @@ openStrategyWorkbench(plugin := false) {
 }
 
 openRaceCenter(plugin := false) {
-	local pid
-
-	exePath := kBinariesDirectory . "Race Center.exe"
+	local exePath := kBinariesDirectory . "Race Center.exe"
+	local options
 
 	try {
 		options := getSimulatorOptions(plugin)
 
-		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
+		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1751,10 +1767,8 @@ openRaceCenter(plugin := false) {
 }
 
 enableRaceAssistant(name) {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(name)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
 
 	protectionOn()
 
@@ -1768,10 +1782,8 @@ enableRaceAssistant(name) {
 }
 
 disableRaceAssistant(name) {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(name)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
 
 	protectionOn()
 

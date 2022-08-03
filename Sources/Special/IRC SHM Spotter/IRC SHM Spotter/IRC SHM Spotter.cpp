@@ -266,6 +266,7 @@ int situationCount = 0;
 
 bool carBehind = false;
 bool carBehindReported = false;
+int carBehindCount = 0;
 
 const int YELLOW = 1;
 const int BLUE = 16;
@@ -340,6 +341,10 @@ const char* computeAlert(int newSituation) {
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+				carBehindReported = true;
+				carBehindCount = 21;
+
 				break;
 			case LEFT:
 				if (lastSituation == THREE)
@@ -421,6 +426,9 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 	else
 		carBehindReported = false;
 
+	if (carBehindCount++ > 200)
+		carBehindCount = 0;
+
 	const char* alert = computeAlert(newSituation);
 
 	if (alert != noAlert) {
@@ -441,11 +449,13 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 	else if (carBehind)
 	{
 		if (!carBehindReported) {
-			carBehindReported = true;
+			if (carBehindCount < 20) {
+				carBehindReported = true;
 
-			sendSpotterMessage("proximityAlert:Behind");
+				sendSpotterMessage("proximityAlert:Behind");
 
-			return true;
+				return true;
+			}
 		}
 	}
 	else

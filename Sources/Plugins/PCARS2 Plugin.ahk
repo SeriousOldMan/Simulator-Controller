@@ -270,6 +270,8 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local delta
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
@@ -322,9 +324,9 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		base.updatePositionsData(data)
+		local standings := readSimulatorData(this.Code, "-Standings")
 
-		standings := readSimulatorData(this.Code, "-Standings")
+		base.updatePositionsData(data)
 
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}

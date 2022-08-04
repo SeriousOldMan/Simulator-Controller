@@ -10,15 +10,16 @@
 ;;;-------------------------------------------------------------------------;;;
 
 startAITrack() {
-	aiTrack := new Application("Face Recognition", SimulatorController.Instance.Configuration)
-	
+	local aiTrack := new Application("Face Recognition", SimulatorController.Instance.Configuration)
+	local pid, windowTitle, active
+
 	if !aiTrack.isRunning() {
 		pid := aiTrack.startup(false)
-		
+
 		if pid {
 			windowTitle := aiTrack.WindowTitle
-			
-			WinWait %windowTitle%, 
+
+			WinWait %windowTitle%,
 			WinMove %windowTitle%, , 50, 50
 
 			active := false
@@ -26,15 +27,15 @@ startAITrack() {
 			while !active {
 				if !WinActive(windowTitle)
 					WinActivate %windowTitle%
-			
+
 				active := (ErrorLevel == 0)
-				
+
 				if !active
 					Sleep 500
 			}
 
 			protectionOn()
-			
+
 			try {
 				MouseClick Left,  201,  344
 				Sleep 5000
@@ -45,7 +46,7 @@ startAITrack() {
 				protectionOff()
 			}
 		}
-		
+
 		return pid
 	}
 	else
@@ -53,23 +54,24 @@ startAITrack() {
 }
 
 startVoiceMacro() {
-	voiceMacro := new Application("Voice Recognition", SimulatorController.Instance.Configuration)
-	
+	local voiceMacro := new Application("Voice Recognition", SimulatorController.Instance.Configuration)
+	local pid, curDetectHiddenWindows, windowTitle, active
+
 	if !voiceMacro.isRunning() {
 		pid := voiceMacro.startup(false)
-		
+
 		if pid {
 			curDetectHiddenWindows := A_DetectHiddenWindows
-				
+
 			DetectHiddenWindows On
-			
+
 			try {
 				windowTitle := voiceMacro.WindowTitle
-				
-				IfWinNotActive %windowTitle%, , WinMaximize, %windowTitle% 
+
+				IfWinNotActive %windowTitle%, , WinMaximize, %windowTitle%
 				Sleep 1000
-				
-				WinWait %windowTitle%, 
+
+				WinWait %windowTitle%,
 				WinMove %windowTitle%, , 50, 50
 
 				active := false
@@ -77,15 +79,15 @@ startVoiceMacro() {
 				while !active {
 					if !WinActive(windowTitle)
 						WinActivate %windowTitle%
-				
+
 					active := (ErrorLevel == 0)
-					
+
 					if !active
 						Sleep 500
 				}
-				
+
 				protectionOn()
-			
+
 				try {
 					; MouseClick, Left,  465,  45
 					; MouseClick, Left,  465,  45
@@ -100,7 +102,7 @@ startVoiceMacro() {
 				DetectHiddenWindows % curDetectHiddenWindows
 			}
 		}
-		
+
 		return pid
 	}
 	else

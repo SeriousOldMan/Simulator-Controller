@@ -341,11 +341,9 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local standings
+		local standings := readSimulatorData(this.Code, "-Standings")
 
 		base.updatePositionsData(data)
-
-		standings := readSimulatorData(this.Code, "-Standings")
 
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}

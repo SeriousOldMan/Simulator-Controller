@@ -124,6 +124,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	openPitstopMFD(descriptor := false) {
+		local secondTry
+
 		static first := true
 		static reported := false
 
@@ -198,6 +200,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	analyzePitstopMFD() {
+		local pitMenuState
+
 		if (this.OpenPitstopMFDHotkey = "Off")
 			return
 
@@ -344,7 +348,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	optionChosen(option) {
-		index := this.optionIndex(option)
+		local index := this.optionIndex(option)
 
 		return (index ? this.iPitstopOptionStates[index] : false)
 	}
@@ -373,6 +377,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
+		local index
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Repair Bodywork")
 				return (this.optionAvailable("Repair Bodywork") || this.optionAvailable("Repair Front Aero") || this.optionAvailable("Repair Rear Aero"))
@@ -404,6 +410,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changePitstopOption(option, action, steps := 1) {
+		local changed
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Strategy")
 				this.dialPitstopOption(option, action, steps)
@@ -547,6 +555,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local changed
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -628,9 +638,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		base.updatePositionsData(data)
+		local standings := readSimulatorData(this.Code, "-Standings")
 
-		standings := readSimulatorData(this.Code, "-Standings")
+		base.updatePositionsData(data)
 
 		Loop {
 			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
@@ -664,7 +674,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getImageFileNames(imageNames*) {
-		fileNames := []
+		local fileNames := []
+		local ignore, imageName, fileName
 
 		for ignore, imageName in imageNames {
 			imageName := ("R3E\" . imageName)
@@ -700,6 +711,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchMFDImage(imageNames*) {
+		local imageName, pitstopImages, curTickCount, imageX, imageY, pitsopImage
+
 		static kSearchAreaLeft := 0
 		static kSearchAreaRight := 400
 

@@ -59,10 +59,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
+		local simulator, exePath
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			simulator := this.Code
 			arguments := values2String(";", arguments*)
-
 			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 
 			try {
@@ -134,8 +135,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
-		actions := false
-		ignore := false
+		local actions := false
+		local ignore := false
+		local candidate
 
 		this.getPitstopActions(actions, ignore)
 
@@ -182,6 +184,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopOptionValues(option) {
+		local data, compound, compoundColor
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option {
 				case "Refuel":
@@ -264,6 +268,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		local delta
+
 		base.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
@@ -285,9 +291,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		base.updatePositionsData(data)
+		local standings := readSimulatorData(this.Code, "-Standings")
 
-		standings := readSimulatorData(this.Code, "-Standings")
+		base.updatePositionsData(data)
 
 		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}

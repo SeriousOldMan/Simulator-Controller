@@ -51,8 +51,10 @@ class SystemPlugin extends ControllerPlugin {
 		}
 
 		updateRunningState() {
-			isRunning := this.isRunning()
-			stateChange := false
+			local isRunning := this.isRunning()
+			local stateChange := false
+			local transition := false
+			local controller
 
 			if (isRunning != this.iIsRunning) {
 				this.iIsRunning := isRunning
@@ -61,8 +63,6 @@ class SystemPlugin extends ControllerPlugin {
 
 				trayMessage(translate(kSystemPlugin), (isRunning ? translate("Start: ") : translate("Stop: ")) . this.Application)
 			}
-
-			transition := false
 
 			if !stateChange {
 				transition := (this.LaunchpadAction ? this.LaunchpadAction.Transition : false)
@@ -106,9 +106,8 @@ class SystemPlugin extends ControllerPlugin {
 	class ModeSelectorAction extends ControllerAction {
 		Label[] {
 			Get {
-				controller := this.Controller
-
-				mode := controller.ActiveMode[controller.findFunctionController(this.Function)]
+				local controller := this.Controller
+				local mode := controller.ActiveMode[controller.findFunctionController(this.Function)]
 
 				if mode
 					return mode.Mode
@@ -118,7 +117,7 @@ class SystemPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			controller := this.Controller
+			local controller := this.Controller
 
 			controller.rotateMode(((trigger == "Off") || (trigger = kDecrease)) ? -1 : 1, Array(controller.findFunctionController(function)))
 
@@ -211,8 +210,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local function
-		local action
+		local function, action, ignore, descriptor, arguments
 
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
@@ -279,8 +277,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	loadFromConfiguration(configuration) {
-		local action
-		local function
+		local action, function, descriptor, name, appDescriptor, runnable
 
 		base.loadFromConfiguration(configuration)
 
@@ -314,6 +311,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	createLaunchAction(controller, label, application, function) {
+		local runnable, action
+
 		function := this.Controller.findFunction(function)
 
 		if (function != false) {
@@ -335,6 +334,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	simulatorStartup(simulator) {
+		local fileName
+
 		if this.ChildProcess {
 			; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 			;
@@ -356,6 +357,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	findRunnableApplication(name) {
+		local ignore, candidate
+
 		for ignore, candidate in this.RunnableApplications
 			if (name == candidate.Application)
 				return candidate
@@ -364,7 +367,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	mouseClick(clicked := true) {
-		iMouseClicked := clicked
+		this.iMouseClicked := clicked
 	}
 
 	playStartupSong(songFile) {
@@ -385,6 +388,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	stopStartupSong(callback := false) {
+		local masterVolume
+
 		if this.iStartupSongIsPlaying
 			masterVolume := fadeOut()
 
@@ -417,6 +422,8 @@ class SystemPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 fadeOut() {
+	local masterVolume, currentVolume
+
 	SoundGet masterVolume, MASTER
 
 	currentVolume := masterVolume
@@ -437,7 +444,7 @@ fadeOut() {
 }
 
 fadeIn(masterVolume) {
-	currentVolume := 0
+	local currentVolume := 0
 
 	Loop {
 		currentVolume += 5
@@ -459,8 +466,8 @@ mouseClicked(clicked := true) {
 }
 
 restoreSimulatorVolume() {
-	local pid
-	
+	local pid, simulator
+
 	if kNirCmd
 		try {
 			simulator := SimulatorController.Instance.ActiveSimulator
@@ -478,9 +485,8 @@ restoreSimulatorVolume() {
 }
 
 muteSimulator() {
+	local simulator := SimulatorController.Instance.ActiveSimulator
 	local pid
-	
-	simulator := SimulatorController.Instance.ActiveSimulator
 
 	if (simulator != false) {
 		SetTimer muteSimulator, Off
@@ -521,6 +527,8 @@ unmuteSimulator() {
 }
 
 updateApplicationStates() {
+	local ignore, runnable
+
 	static plugin := false
 	static controller := false
 	static mode:= false
@@ -544,18 +552,21 @@ updateApplicationStates() {
 }
 
 updateModeSelector() {
-	local function
+	local function, ignore, selector, currentMode, nextUpdate
 
 	static modeSelectorMode := false
 	static controller := false
+	static plugin := false
 
-	if !controller
+	if !controller {
 		controller := SimulatorController.Instance
+		plugin := controller.findPlugin(kSystemPlugin)
+	}
 
 	protectionOn()
 
 	try {
-		for ignore, selector in controller.findPlugin(kSystemPlugin).ModeSelectors {
+		for ignore, selector in plugin.ModeSelectors {
 			function := selector.Function
 
 			if modeSelectorMode {
@@ -587,9 +598,7 @@ updateModeSelector() {
 }
 
 initializeSystemPlugin() {
-	local controller
-
-	controller := SimulatorController.Instance
+	local controller := SimulatorController.Instance
 
 	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 
@@ -602,7 +611,7 @@ initializeSystemPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 startupApplication(application, silent := true) {
-	runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(application)
+	local runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(application)
 
 	if (runnable != false)
 		if runnable.isRunning()
@@ -622,7 +631,7 @@ startupSimulator(simulator, silent := false) {
 }
 
 shutdownSimulator(simulator) {
-	runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(simulator)
+	local runnable := SimulatorController.Instance.findPlugin(kSystemPlugin).findRunnableApplication(simulator)
 
 	if (runnable != false)
 		runnable.shutdown()
@@ -662,6 +671,7 @@ execute(command) {
 
 startSimulation(name := false) {
 	local controller := SimulatorController.Instance
+	local simulators
 
 	if !(controller.ActiveSimulator != false) {
 		if !name {
@@ -678,12 +688,13 @@ startSimulation(name := false) {
 stopSimulation() {
 	local simulator := SimulatorController.Instance.ActiveSimulator
 
-	if (simulator != false) {
+	if (simulator != false)
 		withProtection("shutdownSimulator", simulator)
-	}
 }
 
 shutdownSystem() {
+	local title
+
 	SoundPlay *32
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

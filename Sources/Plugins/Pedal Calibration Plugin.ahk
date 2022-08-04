@@ -102,8 +102,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 		fireAction(function, trigger) {
 			local application := SimulatorController.Instance.findPlugin(kPedalCalibrationPlugin).Application
-			windowTitle := application.WindowTitle
-			wasRunning := application.isRunning()
+			local windowTitle := application.WindowTitle
+			local wasRunning := application.isRunning()
+			local xPosition, yPosition
 
 			if !wasRunning
 				application.startup()
@@ -129,11 +130,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 						yPosition := kShapeYPosition
 
 						MouseClick Left, %xPosition%, %yPosition%
+
 						Sleep 500
 
 						yPosition += (this.iSelectionIndex * kShapeYDelta)
 
 						MouseClick Left, %xPosition%, %yPosition%
+
 						Sleep 500
 
 						MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
@@ -144,11 +147,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					yPosition := kShapeYPosition
 
 					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+
 					Sleep 500
 
 					yPosition += (this.iSelectionIndex * kShapeYDelta)
 
 					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+
 					Sleep 500
 
 					ControlClick X%kSaveToPedalX% Y%yPosition%, %kSaveToPedalY%, , , , NA
@@ -177,6 +182,8 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		local smartCtrl, ignore, theAction
+
 		base.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
@@ -205,6 +212,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 	createPedalCalibrationAction(controller, pedalAndShape, descriptor) {
 		local function := this.Controller.findFunction(descriptor)
+		local pedal, shape, label, icon
 
 		pedalAndShape := ConfigurationItem.splitDescriptor(pedalAndShape)
 		pedal := pedalAndShape[1]
@@ -214,6 +222,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 		if (function != false) {
 			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
+
 			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, icon, pedal, shape))
 		}
 		else

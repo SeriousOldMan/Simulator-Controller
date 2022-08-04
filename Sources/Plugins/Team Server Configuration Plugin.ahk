@@ -116,6 +116,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
+		local dllName, dllFile
+
 		this.iEditor := editor
 
 		base.__New(configuration)
@@ -143,7 +145,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	createGui(editor, x, y, width, height) {
-		window := editor.Window
+		local window := editor.Window
+		local x0, x1, w1, w2, x2, w4, x4, w3, x3, x5, w5, x6, x7, lineX, lineW
 
 		Gui %window%:Font, Norm, Arial
 
@@ -262,9 +265,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		local window := this.Editor.Window
+		local tsConfiguration
 
-		window := this.Editor.Window
+		base.saveToConfiguration(configuration)
 
 		Gui %window%:Default
 
@@ -289,6 +293,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	activate() {
+		local window
+
 		if !this.Token {
 			window := this.Editor.Window
 
@@ -304,9 +310,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	connect(message := true) {
-		connector := this.Connector
-
-		window := this.Editor.Window
+		local connector := this.Connector
+		local window := this.Editor.Window
+		local token, availableMinutes, title
 
 		Gui %window%:Default
 
@@ -321,6 +327,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 
 				this.iToken := token
+
 				availableMinutes := connector.GetAvailableMinutes()
 
 				teamServerTokenEdit := token
@@ -389,7 +396,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	parseObject(properties) {
-		result := {}
+		local result := {}
+		local property
 
 		properties := StrReplace(properties, "`r", "")
 
@@ -404,7 +412,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	loadTeams() {
-		connector := this.Connector
+		local window := this.Editor.Window
+		local connector := this.Connector
+		local identifiers, ignore, identifier, team, teams, name
 
 		this.iTeams := {}
 
@@ -427,8 +437,6 @@ class TeamServerConfigurator extends ConfigurationItem {
 				}
 		}
 
-		window := this.Editor.Window
-
 		Gui %window%:Default
 
 		teams := []
@@ -442,9 +450,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	loadDrivers() {
-		connector := this.Connector
-
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local connector := this.Connector
+		local identifiers, ignore, identifier, drivers, driver, name
 
 		Gui %window%:Default
 
@@ -485,9 +493,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	loadSessions() {
-		connector := this.Connector
-
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local connector := this.Connector
+		local identifiers, ignore, identifier, session, sessions, infos, name, stints, laps
 
 		Gui %window%:Default
 
@@ -546,9 +554,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	selectTeam(team) {
-		this.iSelectedTeam := team
+		local window := this.Editor.Window
+		local teams, name, ignore
 
-		window := this.Editor.Window
+		this.iSelectedTeam := team
 
 		Gui %window%:Default
 
@@ -564,9 +573,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	selectDriver(driver) {
-		this.iSelectedDriver := driver
+		local window := this.Editor.Window
+		local drivers, name, ignore
 
-		window := this.Editor.Window
+		this.iSelectedDriver := driver
 
 		Gui %window%:Default
 
@@ -581,9 +591,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	selectSession(session) {
-		this.iSelectedSession := session
+		local window := this.Editor.Window
+		local sessions, name, ignore
 
-		window := this.Editor.Window
+		this.iSelectedSession := session
 
 		Gui %window%:Default
 
@@ -598,9 +609,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	addTeam(name) {
-		identifier := this.Connector.CreateTeam(name)
-
-		teams := this.Teams
+		local identifier := this.Connector.CreateTeam(name)
+		local teams := this.Teams
 
 		teams[name] := identifier
 
@@ -609,7 +619,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	renameTeam(oldName, newName) {
-		identifier := this.Teams[oldName]
+		local identifier := this.Teams[oldName]
 
 		this.Connector.UpdateTeam(this.Teams[oldName], "Name=" . newName)
 
@@ -618,7 +628,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	deleteTeam(name) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:+Disabled
 
@@ -633,9 +643,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	normalizeDriverName(name) {
-		forName := ""
-		surName := ""
-		nickName := ""
+		local forName := ""
+		local surName := ""
+		local nickName := ""
 
 		parseDriverName(name, forName, surName, nickName)
 
@@ -652,11 +662,12 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	addDriver(name) {
-		name := this.normalizeDriverName(name)
+		local forName := ""
+		local surName := ""
+		local nickName := ""
+		local identifier, drivers
 
-		forName := ""
-		surName := ""
-		nickName := ""
+		name := this.normalizeDriverName(name)
 
 		parseDriverName(name, forName, surName, nickName)
 
@@ -671,7 +682,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	renameDriver(oldName, newName) {
-		identifier := this.Drivers[oldName]
+		local identifier := this.Drivers[oldName]
+		local parts
 
 		newName := this.normalizeDriverName(newName)
 
@@ -684,7 +696,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	deleteDriver(name) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:+Disabled
 
@@ -699,9 +711,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	addSession(name) {
-		identifier := this.Connector.CreateSession(this.Teams[this.SelectedTeam], name)
-
-		sessions := this.Sessions
+		local identifier := this.Connector.CreateSession(this.Teams[this.SelectedTeam], name)
+		local sessions := this.Sessions
 
 		sessions[name] := identifier
 
@@ -710,7 +721,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	renameSession(oldName, newName) {
-		identifier := this.Sessions[oldName]
+		local identifier := this.Sessions[oldName]
 
 		this.Connector.UpdateSession(this.Sessions[oldName], "Name=" . newName)
 
@@ -719,7 +730,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	deleteSession(name) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:+Disabled
 
@@ -734,6 +745,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	withExceptionHandler(function, arguments*) {
+		local title
+
 		try {
 			return %function%(arguments*)
 		}
@@ -753,6 +766,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 chooseSessionStorePath() {
+	local directory
+
+
 	GuiControlGet sessionStorePathEdit
 
 	Gui +OwnDialogs
@@ -776,9 +792,9 @@ copyURL() {
 }
 
 changePassword() {
-	configurator := TeamServerConfigurator.Instance
-
-	errorTitle := translate("Error")
+	local configurator := TeamServerConfigurator.Instance
+	local errorTitle := translate("Error")
+	local title, errorTitle, prompt, window, locale, password, firstPassword, secondPassword
 
 	if configurator.Token {
 		title := translate("Team Server")
@@ -833,10 +849,8 @@ changePassword() {
 			GuiControl, , teamServerPasswordEdit, % firstPassword
 		}
 		catch exception {
-			title := translate("Error")
-
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
+			MsgBox 262160, %errorTitle%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
 		}
 	}
@@ -862,9 +876,9 @@ copyToken() {
 }
 
 selectTeam() {
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local teams, name, ignore
 
 	Gui %window%:Default
 
@@ -879,12 +893,11 @@ selectTeam() {
 }
 
 newTeam() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the name of the new team:")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the name of the new team:")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -897,24 +910,23 @@ newTeam() {
 }
 
 deleteTeam() {
+	local configurator := TeamServerConfigurator.Instance
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected team?")
 	OnMessage(0x44, "")
-
-	configurator := TeamServerConfigurator.Instance
 
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteTeam"), TeamServerConfigurator.Instance.SelectedTeam)
 }
 
 renameTeam() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the new name for the selected team:")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the new name for the selected team:")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -927,9 +939,9 @@ renameTeam() {
 }
 
 selectDriver() {
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local drivers, name, ignore
 
 	Gui %window%:Default
 
@@ -944,12 +956,11 @@ selectDriver() {
 }
 
 newDriver() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -962,24 +973,23 @@ newDriver() {
 }
 
 deleteDriver() {
+	local configurator := TeamServerConfigurator.Instance
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected driver?")
 	OnMessage(0x44, "")
-
-	configurator := TeamServerConfigurator.Instance
 
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteDriver"), TeamServerConfigurator.Instance.SelectedDriver)
 }
 
 renameDriver() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -992,9 +1002,9 @@ renameDriver() {
 }
 
 selectSession() {
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local sessions, name, ignore
 
 	Gui %window%:Default
 
@@ -1009,12 +1019,11 @@ selectSession() {
 }
 
 newSession() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the name of the new session:")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the name of the new session:")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -1027,12 +1036,11 @@ newSession() {
 }
 
 renameSession() {
-	title := translate("Team Server")
-	prompt := translate("Please enter the new name for the selected session:")
-
-	configurator := TeamServerConfigurator.Instance
-
-	window := configurator.Editor.Window
+	local title := translate("Team Server")
+	local prompt := translate("Please enter the new name for the selected session:")
+	local configurator := TeamServerConfigurator.Instance
+	local window := configurator.Editor.Window
+	local locale, name
 
 	Gui %window%:Default
 
@@ -1045,18 +1053,20 @@ renameSession() {
 }
 
 deleteSession() {
+	local configurator := TeamServerConfigurator.Instance
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected session?")
 	OnMessage(0x44, "")
-
-	configurator := TeamServerConfigurator.Instance
 
 	IfMsgBox Yes
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "deleteSession"), TeamServerConfigurator.Instance.SelectedSession)
 }
 
 initializeTeamServerConfigurator() {
+	local editor
+
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 

@@ -131,6 +131,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
+		local steps
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.sendCommand(this.NextChoiceHotkey)
 
@@ -163,6 +165,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	deselectPitstopOption(option) {
+		local steps
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			steps := false
 
@@ -271,6 +275,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local delta
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
@@ -335,6 +341,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
+		local standings
+
 		base.updatePositionsData(data)
 
 		standings := readSimulatorData(this.Code, "-Standings")

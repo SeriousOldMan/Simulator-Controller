@@ -76,7 +76,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	SettingsDatabase[] {
 		Get {
-			settingsDB := this.iSettingsDatabase
+			local settingsDB := this.iSettingsDatabase
 
 			if !settingsDB {
 				settingsDB := new SettingsDatabase()
@@ -133,6 +133,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
+		local standings
+
 		base.updatePositionsData(data)
 
 		standings := readSimulatorData(this.Code, "-Standings")
@@ -141,6 +143,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSessionData(data) {
+		local forName, surName, nickName, name
+
 		base.updateSessionData(data)
 
 		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
@@ -170,9 +174,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getCarMetaData(meta, default := 0) {
-		car := (this.Car ? this.Car : "*")
-		track := (this.Track ? this.Track : "*")
-		key := (car . "." . meta)
+		local car := (this.Car ? this.Car : "*")
+		local track := (this.Track ? this.Track : "*")
+		local key := (car . "." . meta)
+		local value, settings
 
 		if this.CarMetaData.HasKey(key)
 			return this.CarMetaData[key]
@@ -324,6 +329,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changePitstopOption(option, action := "Increase", steps := 1) {
+		local ignore, tyre
+
 		if (this.OpenPitstopMFDHotkey != "Off")
 			if (option = "All Around") {
 				for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
@@ -368,6 +375,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local delta
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {

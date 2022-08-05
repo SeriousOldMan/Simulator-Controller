@@ -121,8 +121,10 @@ global spWetRearRightEdit
 ;;;-------------------------------------------------------------------------;;;
 
 loginDialog(connectorOrCommand := false, teamServerURL := false) {
-	static result := false
+	local window := "TSL"
+	local title
 
+	static result := false
 	static nameEdit := ""
 	static passwordEdit := ""
 
@@ -132,7 +134,6 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 		result := kCancel
 	else {
 		result := false
-		window := "TSL"
 
 		Gui %window%:New
 
@@ -232,8 +233,10 @@ openSettingsDocumentation() {
 }
 
 isPositiveFloat(numbers*) {
+	local ignore, value
+
 	for ignore, value in numbers
-		if value is not float
+		if value is not Float
 			return false
 		else if (value < 0)
 			return false
@@ -242,8 +245,10 @@ isPositiveFloat(numbers*) {
 }
 
 isPositiveNumber(numbers*) {
+	local ignore, value
+
 	for ignore, value in numbers
-		if value is not number
+		if value is not Number
 			return false
 		else if (value < 0)
 			return false
@@ -328,6 +333,8 @@ updateChangeTyreState() {
 }
 
 readTyreSetup(settings) {
+	local color
+
 	if (vCompound && vCompoundColor) {
 		spSetupTyreCompoundDropDown := vCompound
 		color := vCompoundColor
@@ -353,7 +360,7 @@ readTyreSetup(settings) {
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
-	value := getConfigurationValue(data, newSection, key, kUndefined)
+	local value := getConfigurationValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)
 		return value
@@ -362,7 +369,8 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 }
 
 parseObject(properties) {
-	result := {}
+	local result := {}
+	local property
 
 	properties := StrReplace(properties, "`r", "")
 
@@ -377,7 +385,8 @@ parseObject(properties) {
 }
 
 loadTeams(connector) {
-	teams := {}
+	local teams := {}
+	local identifiers, ignore, identifier, team
 
 	try {
 		identifiers := string2Values(";", connector.GetAllTeams())
@@ -396,7 +405,8 @@ loadTeams(connector) {
 }
 
 loadDrivers(connector, team) {
-	drivers := {}
+	local drivers := {}
+	local identifiers, ignore, identifier, driver, name
 
 	if team {
 		try {
@@ -419,7 +429,8 @@ loadDrivers(connector, team) {
 }
 
 loadSessions(connector, team) {
-	sessions := {}
+	local sessions := {}
+	local identifiers, ignore, identifier, session
 
 	if team {
 		try {
@@ -445,6 +456,9 @@ loadSessions(connector, team) {
 }
 
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
+	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
+	local dirName, simulatorCode, title, file
+
 	static result
 	static newSettings
 
@@ -1173,9 +1187,9 @@ restart:
 		Gui RES:Show, AutoSize Center
 
 		Loop {
-			Loop {
+			Loop
 				Sleep 1000
-			} until result
+			until result
 
 			if (result == kLoad) {
 				result := false
@@ -1250,7 +1264,7 @@ restart:
 }
 
 validateNumber(field) {
-	oldValue := %field%
+	local oldValue := %field%
 
 	GuiControlGet %field%
 
@@ -1347,8 +1361,9 @@ validatePitstopRefuelService() {
 }
 
 readSimulatorData(simulator) {
-	dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
+	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local data, compound, compoundColor
 
 	FileCreateDir %kTempDirectory%%simulator% Data
 
@@ -1385,9 +1400,8 @@ readSimulatorData(simulator) {
 }
 
 openSessionDatabase() {
-	local pid
-
-	exePath := kBinariesDirectory . "Session Database.exe"
+	local exePath := kBinariesDirectory . "Session Database.exe"
+	local pid, options, ignore, arg
 
 	try {
 		options := []
@@ -1414,6 +1428,8 @@ openSessionDatabase() {
 }
 
 importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
+	local candidate, ignore, data, compound, compoundColor
+
 	if (message != "Import") {
 		settings := false
 
@@ -1455,10 +1471,10 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			spDryRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)
 
 			if settings {
-				color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", color)
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
@@ -1466,7 +1482,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
-					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
+					message := (translate("Tyre setup imported: ") . translate(compound(compound, compoundColor)))
 
 					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
 							  . Round(spDryFrontLeftEdit, 1) . translate(", ") . Round(spDryFrontRightEdit, 1) . translate(", ")
@@ -1524,7 +1540,8 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 }
 
 showRaceSettingsEditor() {
-	icon := kIconsDirectory . "Race Settings.ico"
+	local icon := kIconsDirectory . "Race Settings.ico"
+	local index, fileName, settings
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings

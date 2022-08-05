@@ -42,25 +42,19 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRemotePID = 0
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
+	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local logo := kResourcesDirectory . "Rotating Brain.gif"
+	local image := "1:" . logo
+	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
+
 	static videoPlayer
 
-	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
-	logo := kResourcesDirectory . "Rotating Brain.gif"
-	image := "1:" . logo
-
 	SysGet mainScreen, MonitorWorkArea
-	
+
 	x := mainScreenRight - 299
 	y := mainScreenBottom - 234
 
@@ -68,7 +62,7 @@ showLogo(name) {
 	title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
-	Gui Logo:-Border -Caption 
+	Gui Logo:-Border -Caption
 	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
 
 	videoPlayer.Navigate("about:blank")
@@ -89,17 +83,28 @@ hideLogo() {
 	Gui Logo:Destroy
 	SplashImage 1:Off
 }
-	
-checkRemoteProcessAlive() {
-	Process Exist, %vRemotePID%
-	
+
+checkRemoteProcessAlive(pid) {
+	Process Exist, %pid%
+
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceEngineer() {
-	icon := kIconsDirectory . "Artificial Intelligence.ico"
-	
+	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local remotePID := false
+	local engineerName := "Jona"
+	local engineerLogo := false
+	local engineerLanguage := false
+	local engineerSynthesizer := true
+	local engineerSpeaker := false
+	local engineerSpeakerVocalics := false
+	local engineerRecognizer := true
+	local engineerListener := false
+	local debug := false
+	local voiceServer, index
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Engineer
 
@@ -107,24 +112,13 @@ startRaceEngineer() {
 	Menu Tray, Add, Exit, Exit
 
 	installSupportMenu()
-	
-	remotePID := 0
-	engineerName := "Jona"
-	engineerLogo := false
-	engineerLanguage := false
-	engineerSynthesizer := true
-	engineerSpeaker := false
-	engineerSpeakerVocalics := false
-	engineerRecognizer := true
-	engineerListener := false
-	debug := false
-	
+
 	Process Exist, Voice Server.exe
-	
+
 	voiceServer := ErrorLevel
-	
+
 	index := 1
-	
+
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Remote":
@@ -164,42 +158,39 @@ startRaceEngineer() {
 				index += 1
 		}
 	}
-	
+
 	if (engineerSpeaker = kTrue)
 		engineerSpeaker := true
 	else if (engineerSpeaker = kFalse)
 		engineerSpeaker := false
-	
+
 	if (engineerListener = kTrue)
 		engineerListener := true
 	else if (engineerListener = kFalse)
 		engineerListener := false
-	
+
 	if debug
 		setDebug(true)
-	
+
 	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
 											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 											, engineerName, engineerLanguage
 											, engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
 											, engineerRecognizer, engineerListener, voiceServer)
-	
+
 	registerMessageHandler("Race Engineer", "handleEngineerMessage")
-	
+
 	if (debug && engineerSpeaker) {
 		RaceEngineer.Instance.getSpeaker()
-		
+
 		RaceEngineer.Instance.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
 	}
-	
+
 	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)
-	
-	if (remotePID != 0) {
-		vRemotePID := remotePID
-		
-		Task.startTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
-	}
+
+	if remotePID
+		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
 
 	return
 
@@ -220,17 +211,17 @@ shutdownRaceEngineer(shutdown := false) {
 		Task.startTask(Func("shutdownRaceEngineer").Bind(true), 10000, kLowPriority)
 	else
 		Task.startTask("shutdownRaceEngineer", 1000, kLowPriority)
-	
+
 	return false
 }
 
 handleEngineerMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
-		
+
 		if (data[1] = "Shutdown") {
 			Task.startTask("shutdownRaceEngineer", 20000, kLowPriority)
-			
+
 			return true
 		}
 		else

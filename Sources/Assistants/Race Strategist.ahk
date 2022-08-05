@@ -42,25 +42,19 @@ ListLines Off					; Disable execution history
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRemotePID = 0
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
+	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local logo := kResourcesDirectory . "Rotating Brain.gif"
+	local image := "1:" . logo
+	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
+
 	static videoPlayer
 
-	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
-	logo := kResourcesDirectory . "Rotating Brain.gif"
-	image := "1:" . logo
-
 	SysGet mainScreen, MonitorWorkArea
-	
+
 	x := mainScreenLeft
 	y := mainScreenBottom - 234
 
@@ -68,7 +62,7 @@ showLogo(name) {
 	title2 := substituteVariables(translate("%name% - The Virtual Race Strategist"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
-	Gui Logo:-Border -Caption 
+	Gui Logo:-Border -Caption
 	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
 
 	videoPlayer.Navigate("about:blank")
@@ -90,16 +84,27 @@ hideLogo() {
 	SplashImage 1:Off
 }
 
-checkRemoteProcessAlive() {
-	Process Exist, %vRemotePID%
-	
+checkRemoteProcessAlive(pid) {
+	Process Exist, %pid%
+
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceStrategist() {
-	icon := kIconsDirectory . "Artificial Intelligence.ico"
-	
+	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local remotePID := false
+	local strategistName := "Cato"
+	local strategistLogo := false
+	local strategistLanguage := false
+	local strategistSynthesizer := true
+	local strategistSpeaker := false
+	local strategistSpeakerVocalics := false
+	local strategistRecognizer := true
+	local strategistListener := false
+	local debug := false
+	local voiceServer, index
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Strategist
 
@@ -107,24 +112,13 @@ startRaceStrategist() {
 	Menu Tray, Add, Exit, Exit
 
 	installSupportMenu()
-	
-	remotePID := 0
-	strategistName := "Cato"
-	strategistLogo := false
-	strategistLanguage := false
-	strategistSynthesizer := true
-	strategistSpeaker := false
-	strategistSpeakerVocalics := false
-	strategistRecognizer := true
-	strategistListener := false
-	debug := false
-	
+
 	Process Exist, Voice Server.exe
-	
+
 	voiceServer := ErrorLevel
-	
+
 	index := 1
-	
+
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Remote":
@@ -164,20 +158,20 @@ startRaceStrategist() {
 				index += 1
 		}
 	}
-	
+
 	if (strategistSpeaker = kTrue)
 		strategistSpeaker := true
 	else if (strategistSpeaker = kFalse)
 		strategistSpeaker := false
-	
+
 	if (strategistListener = kTrue)
 		strategistListener := true
 	else if (strategistListener = kFalse)
 		strategistListener := false
-	
+
 	if debug
 		setDebug(true)
-	
+
 	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration
 												, remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
 												, strategistName, strategistLanguage
@@ -185,21 +179,18 @@ startRaceStrategist() {
 												, strategistRecognizer, strategistListener, voiceServer)
 
 	registerMessageHandler("Race Strategist", "handleStrategistMessage")
-	
+
 	if (debug && strategistSpeaker) {
 		RaceStrategist.Instance.getSpeaker()
-		
+
 		RaceStrategist.Instance.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
 	}
-	
+
 	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)
-	
-	if (remotePID != 0) {
-		vRemotePID := remotePID
-		
-		Task.startTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
-	}
+
+	if remotePID
+		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
 
 	return
 
@@ -220,17 +211,17 @@ shutdownRaceStrategist(shutdown := false) {
 		Task.startTask(Func("shutdownRaceStrategist").Bind(true), 10000, kLowPriority)
 	else
 		Task.startTask("shutdownRaceStrategist", 1000, kLowPriority)
-	
+
 	return false
 }
 
 handleStrategistMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
-		
+
 		if (data[1] = "Shutdown") {
 			Task.startTask("shutdownRaceStrategist", 20000, kLowPriority)
-			
+
 			return true
 		}
 		else

@@ -164,9 +164,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local stepWizard
-
-		window := this.Window
+		local window := this.Window
+		local stepWizard, simulators, simulator
 
 		Gui %window%:Default
 
@@ -239,7 +238,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	show() {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Show
 	}
@@ -392,7 +391,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		simulators := []
+		local simulators := []
+		local ignore, simulator, hasReports
 
 		for ignore, simulator in new SessionDatabase().getSimulators() {
 			hasReports := false
@@ -420,7 +420,9 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	getCars(simulator) {
-		cars := {}
+		local result := []
+		local cars := {}
+		local raceData, car, ignore
 
 		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
@@ -430,8 +432,6 @@ class RaceReports extends ConfigurationItem {
 			cars[car] := car
 		}
 
-		result := []
-
 		for car, ignore in cars
 			result.Push(car)
 
@@ -439,7 +439,9 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	getTracks(simulator, car) {
-		tracks := {}
+		local result := []
+		local tracks := {}
+		local raceData, track, ignore
 
 		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
@@ -461,7 +463,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	getReports(simulator, car, track) {
-		reports := []
+		local reports := []
+		local raceData
 
 		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
@@ -475,6 +478,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
+		local window, sessionDB, cars, carNames, index, car
+
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 
@@ -498,6 +503,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
+		local window, tracks
+
 		if (force || (car != this.SelectedCar)) {
 			window := this.Window
 
@@ -515,6 +522,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
+		local window, simulator, ignore, report, fileName, raceData, date, time
+
 		if (force || (track != this.SelectedTrack)) {
 			window := this.Window
 
@@ -593,8 +602,10 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	deleteRace() {
+		local title := translate("Delete")
+		local raceDirectory, simulators, window
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Delete")
 		MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")
 		OnMessage(0x44, "")
 
@@ -630,6 +641,8 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadReport(report) {
+		local reportDirectory, raceData, drivers
+
 		if (report != this.SelectedReport) {
 			if report {
 				GuiControlGet simulatorDropDown
@@ -696,7 +709,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	reportSettings(report) {
-		reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+		local reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 
 		switch report {
 			case "Drivers":
@@ -736,7 +749,7 @@ openReportsDocumentation() {
 }
 
 chooseSimulator() {
-	reports := RaceReports.Instance
+	local reports := RaceReports.Instance
 
 	GuiControlGet simulatorDropDown
 
@@ -744,9 +757,10 @@ chooseSimulator() {
 }
 
 chooseCar() {
-	sessionDB := new SessionDatabase()
-	reports := RaceReports.Instance
-	simulator := reports.SelectedSimulator
+	local sessionDB := new SessionDatabase()
+	local reports := RaceReports.Instance
+	local simulator := reports.SelectedSimulator
+	local index, car
 
 	GuiControlGet carDropDown
 
@@ -756,13 +770,12 @@ chooseCar() {
 }
 
 chooseTrack() {
-	reports := RaceReports.Instance
+	local reports := RaceReports.Instance
+	local simulator := reports.SelectedSimulator
+	local tracks := reports.getTracks(simulator, reports.SelectedCar)
+	local trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
 
 	GuiControlGet trackDropDown
-
-	simulator := reports.SelectedSimulator
-	tracks := reports.getTracks(simulator, reports.SelectedCar)
-	trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
 
 	reports.loadTrack(tracks[inList(trackNames, trackDropDown)])
 }
@@ -773,7 +786,7 @@ chooseRace() {
 }
 
 chooseReport() {
-	reports := RaceReports.Instance
+	local reports := RaceReports.Instance
 
 	GuiControlGet reportsDropDown
 
@@ -798,7 +811,10 @@ exitFixIE(previous) {
 
 
 runRaceReports() {
-	icon := kIconsDirectory . "Chart.ico"
+	local icon := kIconsDirectory . "Chart.ico"
+	local reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
+	local title := translate("Configuration")
+	local reports, simulators, current
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Reports
@@ -808,11 +824,8 @@ runRaceReports() {
 
 	installSupportMenu()
 
-	reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
-
 	if !reportsDirectory {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Configuration")
 		MsgBox 262436, %title%, % translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?")
 		OnMessage(0x44, "")
 

@@ -45,13 +45,7 @@ ListLines Off					; Disable execution history
 global kClose = "Close"
 global kConnect = "Connect"
 global kEvent = "Event"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vToken := false
+global kToken = "Token"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -59,8 +53,9 @@ global vToken := false
 ;;;-------------------------------------------------------------------------;;;
 
 generatePassword(length) {
-	valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-	result := ""
+	local valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	local result := ""
+	local index
 
 	while (0 < length--) {
 		Random index, 1, % StrLen(valid)
@@ -72,7 +67,8 @@ generatePassword(length) {
 }
 
 parseObject(properties) {
-	result := {}
+	local result := {}
+	local property
 
 	properties := StrReplace(properties, "`r", "")
 
@@ -87,13 +83,14 @@ parseObject(properties) {
 }
 
 loadAccounts(connector, listView) {
-	accounts := {}
+	local accounts := {}
+	local ignore, identifier, account, index
 
 	Gui ListView, % listView
 
 	LV_Delete()
 
-	if vToken {
+	if administrationEditor(kToken) {
 		for ignore, identifier in string2Values(";", connector.GetAllAccounts()) {
 			account := parseObject(connector.GetAccount(identifier))
 
@@ -142,13 +139,17 @@ global teamServerNameEdit = ""
 global teamServerPasswordEdit = ""
 
 administrationEditor(configurationOrCommand, arguments*) {
-	local task
+	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
+	local dllName, dllFile
+	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 
 	static connector := false
 	static done := false
 	static accounts := {}
 	static tasks := {}
 	static account := false
+
+	static token := false
 
 	static teamServerURLEdit = "https://localhost:5001"
 	static changePasswordButton
@@ -187,24 +188,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		try {
 			connector.Connect(teamServerURLEdit)
-			vToken := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 
-			if (vToken = "")
-				vToken := false
+			if (token = "")
+				token := false
 
-			if vToken {
+			if token {
 				accounts := loadAccounts(connector, accountsListView)
 
 				administrationEditor(kEvent, "TasksLoad")
 				administrationEditor(kEvent, "AccountClear")
 
-				GuiControl, , teamServerTokenEdit, % vToken
+				GuiControl, , teamServerTokenEdit, % token
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
 		catch exception {
-			vToken := false
+			token := false
 
 			GuiControl, , teamServerTokenEdit, % ""
 
@@ -221,6 +222,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			OnMessage(0x44, "")
 		}
 	}
+	else if (configurationOrCommand = kToken)
+		return token
 	else if (configurationOrCommand == kEvent) {
 		try {
 			if (arguments[1] = "TasksReset") {
@@ -240,7 +243,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 				for ignore, identifier in string2Values(";", connector.GetAllTasks()) {
 					task := parseObject(connector.GetTask(identifier))
-
 
 					if ((task.Which = "Account") && (task.What = "Renew"))
 						type := "Quota"
@@ -397,7 +399,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "UpdateState") {
 				GuiControl Disable, copyPasswordButton
 
-				if vToken {
+				if token {
 					GuiControl Enable, changePasswordButton
 					GuiControl Enable, addAccountButton
 
@@ -538,8 +540,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		w2 := w1 - 70
 
-		x2 := x + 172
-
 		x2 := x1 - 25
 
 		w4 := w1 - 25
@@ -631,9 +631,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationEditor(kEvent, "AccountClear")
 
-		Loop {
+		Loop
 			Sleep 1000
-		} until done
+		until done
 	}
 }
 
@@ -654,11 +654,12 @@ renewToken() {
 }
 
 changePassword() {
-	errorTitle := translate("Error")
+	local errorTitle := translate("Error")
 
-	if vToken {
-		title := translate("Team Server")
-		prompt := translate("Please enter your current password:")
+	if administrationEditor(kToken) {
+		local title := translate("Team Server")
+		local prompt := translate("Please enter your current password:")
+		local locale, password, firstPassword, secondPassword
 
 		Gui ADM:Default
 
@@ -737,8 +738,9 @@ newAccount() {
 }
 
 deleteAccount() {
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected account?")
 	OnMessage(0x44, "")
 
@@ -767,7 +769,7 @@ updateAccountTask() {
 }
 
 startupServerAdministration() {
-	icon := kIconsDirectory . "Server Administration.ico"
+	local icon := kIconsDirectory . "Server Administration.ico"
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Server Administration

@@ -44,24 +44,21 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 createTrackImage(trackMap) {
-	mapWidth := getConfigurationValue(trackMap, "Map", "Width")
-	mapHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-	offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-	offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-
-	margin := Min(mapWidth / 20, mapHeight / 20)
-	marginX := margin
-	marginY := margin
+	local mapWidth := getConfigurationValue(trackMap, "Map", "Width")
+	local mapHeight := getConfigurationValue(trackMap, "Map", "Height")
+	local offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+	local offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+	local margin := Min(mapWidth / 20, mapHeight / 20)
+	local marginX := margin
+	local marginY := margin
+	local width := (mapWidth + 2 * marginX)
+	local height := (mapHeight + 2 * marginY)
+	local scale := Min(1000 / width, 1000 / height)
+	local token, bitmap, graphics, pen
+	local firstX, firstY, lastX, lastY, x, y
 
 	setConfigurationValue(trackMap, "Map", "Margin.X", marginX)
 	setConfigurationValue(trackMap, "Map", "Margin.Y", marginY)
-
-	width := (mapWidth + 2 * marginX)
-	height := (mapHeight + 2 * marginY)
-
-	scale := Min(1000 / width, 1000 / height)
-
 	setConfigurationValue(trackMap, "Map", "Scale", scale)
 
 	token := Gdip_Startup()
@@ -111,8 +108,10 @@ createTrackImage(trackMap) {
 }
 
 createTrackMap(simulator, track, fileName) {
-	trackMap := newConfiguration()
-	coordinates := []
+	local trackMap := newConfiguration()
+	local coordinates := []
+	local exact, xIndex, yIndex, xMin, xMax, yMin, yMax, points, ignore, coordinate, width, height
+	local sessionDB, trackData, normalized
 
 	setConfigurationValue(trackMap, "General", "Simulator", simulator)
 	setConfigurationValue(trackMap, "General", "Track", track)
@@ -253,16 +252,16 @@ createTrackMap(simulator, track, fileName) {
 }
 
 recreateTrackMap(simulator, track) {
-	sessionDB := new SessionDatabase()
-
-	trackMap := sessionDB.getTrackMap(simulator, track)
-	fileName := createTrackImage(trackMap)
+	local sessionDB := new SessionDatabase()
+	local trackMap := sessionDB.getTrackMap(simulator, track)
+	local fileName := createTrackImage(trackMap)
 
 	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
 }
 
 recreateTrackMaps() {
-	sessionDB := new SessionDatabase()
+	local sessionDB := new SessionDatabase()
+	local code, simulator, track
 
 	Loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
 	{
@@ -280,7 +279,12 @@ recreateTrackMaps() {
 }
 
 startTrackMapper() {
-	icon := kIconsDirectory . "Track.ico"
+	local icon := kIconsDirectory . "Track.ico"
+	local simulator := false
+	local track := false
+	local data := false
+	local recreate := false
+	local index
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Track Mapper
@@ -289,11 +293,6 @@ startTrackMapper() {
 	Menu Tray, Add, Exit, Exit
 
 	installSupportMenu()
-
-	simulator := false
-	track := false
-	data := false
-	recreate := false
 
 	index := 1
 

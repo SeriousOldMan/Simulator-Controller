@@ -42,22 +42,16 @@ SetBatchLines -1				; Maximize CPU utilization
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRemotePID = 0
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	static videoPlayer
+	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local logo := kResourcesDirectory . "Rotating Brain.gif"
+	local image := "1:" . logo
+	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
 
-	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
-	logo := kResourcesDirectory . "Rotating Brain.gif"
-	image := "1:" . logo
+	static videoPlayer
 
 	SysGet mainScreen, MonitorWorkArea
 
@@ -90,15 +84,26 @@ hideLogo() {
 	SplashImage 1:Off
 }
 
-checkRemoteProcessAlive() {
-	Process Exist, %vRemotePID%
+checkRemoteProcessAlive(pid) {
+	Process Exist, %pid%
 
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceSpotter() {
-	icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local remotePID := false
+	local spotterName := "Elisa"
+	local spotterLogo := false
+	local spotterLanguage := false
+	local spotterSynthesizer := true
+	local spotterSpeaker := false
+	local spotterSpeakerVocalics := false
+	local spotterRecognizer := true
+	local spotterListener := false
+	local debug := false
+	local voiceServer, index
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
@@ -107,17 +112,6 @@ startRaceSpotter() {
 	Menu Tray, Add, Exit, Exit
 
 	installSupportMenu()
-
-	remotePID := 0
-	spotterName := "Elisa"
-	spotterLogo := false
-	spotterLanguage := false
-	spotterSynthesizer := true
-	spotterSpeaker := false
-	spotterSpeakerVocalics := false
-	spotterRecognizer := true
-	spotterListener := false
-	debug := false
 
 	Process Exist, Voice Server.exe
 
@@ -195,11 +189,8 @@ startRaceSpotter() {
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)
 
-	if (remotePID != 0) {
-		vRemotePID := remotePID
-
-		Task.startTask(new PeriodicTask("checkRemoteProcessAlive", 10000), kLowPriority)
-	}
+	if remotePIP
+		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
 
 	return
 
@@ -220,7 +211,7 @@ shutdownRaceSpotter(shutdown := false) {
 		Task.startTask(Func("shutdownRaceSpotter").Bind(true), 10000, kLowPriority)
 	else
 		Task.startTask("shutdownRaceSpotter", 1000, kLowPriority)
-		
+
 	return false
 }
 

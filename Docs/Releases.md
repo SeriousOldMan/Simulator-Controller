@@ -1,3 +1,9 @@
+## 4.2.6.1-release 08/05/22
+
+  1. Fixed "Setup Advisor" not loading the Google chart library in rare cases.
+  2. Fixed an unbound variable error message when switching back to the General tab in "Simulator Configuration".
+
+
 ## 4.2.6.0-release 07/29/22
 
   1. Bugfixes, as always

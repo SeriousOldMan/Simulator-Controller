@@ -83,6 +83,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	__New(controller, name, configuration := false) {
+		local trackAutomation, arguments
+
 		base.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
@@ -121,7 +123,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, descriptor
 
 		function := controller.findFunction(actionFunction)
 
@@ -139,6 +141,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateActions(sessionState) {
+		local ignore, theAction
+
 		base.updateActions(sessionState)
 
 		for ignore, theAction in this.Actions
@@ -162,6 +166,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		local data
+
 		if !telemetryData
 			telemetryData := true
 
@@ -183,6 +189,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateAutomationTrayLabel(label, enabled) {
+		local callback
+
 		static hasTrayMenu := false
 
 		label := StrReplace(label, "`n", A_Space)
@@ -231,6 +239,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	selectTrackAutomation(name := false, label := false) {
+		local trackAutomation, ignore, candidate, enabled
+
 		if this.Simulator {
 			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
 																		, this.Simulator.Car, this.Simulator.Track)
@@ -258,6 +268,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	startupTrackAutomation() {
+		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath
+
 		if !this.iAutomationPID && this.Simulator {
 			trackAutomation := this.Simulator.TrackAutomation
 
@@ -305,7 +317,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	shutdownTrackAutomation(force := false) {
-		automationPID := this.iAutomationPID
+		local automationPID := this.iAutomationPID
+		local processName, tries
 
 		if automationPID {
 			Process Close, %automationPID%
@@ -346,6 +359,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid
+
 		static sessionDB := false
 
 		if !sessionDB
@@ -387,9 +402,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						try {
 							this.iMapperPhase := "Collect"
 
-							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, mapperPID
+							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, pid
 
-							this.iMapperPID := mapperPID
+							this.iMapperPID := pid
 						}
 						catch exception {
 							logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -423,10 +438,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	createTrackMap(simulator, track, dataFile) {
-		mapperPID := this.iMapperPID
+		local pid := this.iMapperPID
 
-		if mapperPID {
-			Process Exist, %mapperPID%
+		if pid {
+			Process Exist, %pid%
 
 			if ErrorLevel
 				Task.startTask(Task.CurrentTask, 10000)
@@ -434,7 +449,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				try {
 					this.iMapperPhase := "Map"
 
-					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, UserErrorLevel Hide, mapperPID
+					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, UserErrorLevel Hide, pid
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
@@ -442,11 +457,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-					mapperPID := false
+					pid := false
 				}
 
-				if ((ErrorLevel != "Error") && mapperPID) {
-					this.iMapperPID := mapperPID
+				if ((ErrorLevel != "Error") && pid) {
+					this.iMapperPID := pid
 
 					Task.startTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
 				}
@@ -455,10 +470,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	finalizeTrackMap() {
-		mapperPID := this.iMapperPID
+		local pid := this.iMapperPID
 
-		if mapperPID {
-			Process Exist, %mapperPID%
+		if pid {
+			Process Exist, %pid%
 
 			if ErrorLevel
 				Task.startTask(Task.CurrentTask, 10000)
@@ -470,15 +485,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	shutdownTrackMapper(force := false) {
-		if (this.iMapperPID && (this.iMapperPhase = "Collect")) {
-			mapperPID := this.iMapperPID
+		local pid, processName, tries
 
-			if mapperPID {
-				Process Close, %mapperPID%
+		if (this.iMapperPID && (this.iMapperPhase = "Collect")) {
+			pid := this.iMapperPID
+
+			if pid {
+				Process Close, %pid%
 
 				Sleep 500
 
-				Process Exist, %mapperPID%
+				Process Exist, %pid%
 
 				if (force && ErrorLevel) {
 					processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
@@ -548,10 +565,8 @@ initializeRaceSpotterPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 enableTrackAutomation() {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kRaceSpotterPlugin)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	protectionOn()
 
@@ -565,10 +580,8 @@ enableTrackAutomation() {
 }
 
 disableTrackAutomation() {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kRaceSpotterPlugin)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	protectionOn()
 
@@ -582,10 +595,8 @@ disableTrackAutomation() {
 }
 
 selectTrackAutomation(name := false) {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kRaceSpotterPlugin)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kRaceSpotterPlugin)
 
 	protectionOn()
 

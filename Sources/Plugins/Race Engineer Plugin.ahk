@@ -99,7 +99,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, descriptor
 
 		if inList(["PitstopPlan", "PitstopPrepare"], action) {
 			function := controller.findFunction(actionFunction)
@@ -123,22 +123,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	prepareSettings(data) {
-		settings := base.prepareSettings(data)
-
-		tyresDB := new TyresDatabase()
-
-		simulator := getConfigurationValue(data, "Session Data", "Simulator")
-		car := getConfigurationValue(data, "Session Data", "Car")
-		track := getConfigurationValue(data, "Session Data", "Track")
-
-		simulatorName := tyresDB.getSimulatorName(simulator)
-
-		duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
-		weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-		compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-		compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
-
-		tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+		local settings := base.prepareSettings(data)
+		local tyresDB := new TyresDatabase()
+		local simulator := getConfigurationValue(data, "Session Data", "Simulator")
+		local car := getConfigurationValue(data, "Session Data", "Car")
+		local track := getConfigurationValue(data, "Session Data", "Track")
+		local simulatorName := tyresDB.getSimulatorName(simulator)
+		local duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+		local weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+		local compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
+		local compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
+		local tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+		local airTemperature, trackTemperature, pressures, certainty
 
 		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
@@ -177,6 +173,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	checkPitstopPlan() {
+		local pitstopSettings, requestDriver
+
 		if (this.TeamSession && this.RaceEngineer) {
 			pitstopSettings := this.TeamServer.getSessionValue("Pitstop Plan", false)
 
@@ -274,7 +272,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {
-		data := newConfiguration()
+		local data := newConfiguration()
 
 		setConfigurationValue(data, "Pitstop Data", "Pitstop", pitstopNumber)
 		setConfigurationValue(data, "Pitstop Data", "Tyre.Driver", driver)
@@ -321,7 +319,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	updatePitstopState(data) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive) {
 			teamServer.setLapValue(this.LastLap, this.Plugin . " Pitstop State", printConfiguration(data))
@@ -332,7 +330,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 				   , compound, compoundColor, coldPressures, hotPressures) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
@@ -345,9 +343,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateTyresDatabase() {
-		tyresDB := new TyresDatabase()
-		teamServer := this.TeamServer
-		session := this.TeamSession
+		local tyresDB := new TyresDatabase()
+		local teamServer := this.TeamServer
+		local session := this.TeamSession
+		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
 
 		if (teamServer && teamServer.Active && session) {
 			lastStint := false

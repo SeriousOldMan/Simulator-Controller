@@ -100,7 +100,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, descriptor
 
 		if inList(["PitstopRecommend", "StrategyCancel"], action) {
 			function := controller.findFunction(actionFunction)
@@ -128,6 +128,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	checkStrategy() {
+		local strategyUpdate
+
 		if (this.TeamSession && this.RaceStrategist) {
 			strategyUpdate := this.TeamServer.getSessionValue("Strategy Update", false)
 
@@ -192,7 +194,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	activeSession(data) {
-		sessionState := getDataSessionState(data)
+		local sessionState := getDataSessionState(data)
+		local simualator, car, track, weather, sessiom, default
 
 		if (sessionState == kSessionRace)
 			return true
@@ -219,7 +222,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
-		data := base.acquireSessionData(telemetryData, positionsData)
+		local data := base.acquireSessionData(telemetryData, positionsData)
 
 		this.updatePositionsData(data)
 
@@ -232,7 +235,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures, wear) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if !wear
 			wear := "null,null,null,null"
@@ -252,11 +255,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateTelemetryDatabase() {
-		telemetryDB := false
-		teamServer := this.TeamServer
-		session := this.TeamSession
-
-		runningLap := 0
+		local telemetryDB := false
+		local teamServer := this.TeamServer
+		local session := this.TeamSession
+		local runningLap := 0
+		local stint, newStint, lastStint, driverID, ignore, telemetryData, pitstop, pressures, temperatures, wear
 
 		if (teamServer && teamServer.Active && session) {
 			lastStint := false
@@ -344,7 +347,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	setLapValue(lapNumber, name, fileName) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local currentEncoding, lapData
 
 		if (teamServer && teamServer.SessionActive) {
 			currentEncoding := A_FileEncoding
@@ -369,7 +373,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	saveStandingsData(lapNumber, fileName) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive)
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
@@ -383,7 +387,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	saveRaceInfo(lapNumber, fileName) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
@@ -410,7 +414,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	saveRaceLap(lapNumber, fileName) {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
@@ -442,7 +446,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	restoreRaceInfo() {
-		teamServer := this.TeamServer
+		local teamServer := this.TeamServer
+		local raceInfo, postfix, fileName
 
 		if (teamServer && teamServer.Active) {
 			try {
@@ -466,18 +471,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	restoreSessionState() {
-		if this.RaceStrategist {
-			teamServer := this.TeamServer
+		local teamServer := this.TeamServer
 
-			if (teamServer && teamServer.Active)
-				this.restoreRaceInfo()
-		}
+		if (this.RaceStrategist && teamServer && teamServer.Active)
+			this.restoreRaceInfo()
 
 		base.restoreSessionState()
 	}
 
 	createRaceReport(targetDirectory := false) {
-		reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		local reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
+		local times, positions, laps, drivers, newLine, line, fileName, directory, simulatorCode
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
@@ -646,6 +651,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	reviewRace() {
+		local postfix, report, reader, raceData, drivers, positions, times, cars, driver, laps, position
+		local leader, car, candidate, min, max, leaderAvgLapTime, stdDev
+		local driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev
+
 		Random postfix, 1, 1000000
 
 		report := (kTempDirectory . this.Plugin . " Race Report" . postfix)

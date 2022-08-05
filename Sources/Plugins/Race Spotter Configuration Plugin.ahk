@@ -58,7 +58,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	createGui(editor, x, y, width, height) {
-		window := editor.Window
+		local window := editor.Window
+		local x0, x1, x2, x3, w1, w3, w2, x4, x5, choices, chosen
 
 		Gui %window%:Font, Norm, Arial
 
@@ -157,6 +158,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local ignore, simulator, simulatorConfiguration, ignore, key, default
+
 		base.loadFromConfiguration(configuration)
 
 		if (this.Simulators.Length() = 0)
@@ -183,6 +186,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local simulator, simulatorConfiguration, ignore, key
+
 		base.saveToConfiguration(configuration)
 
 		this.saveSimulatorConfiguration()
@@ -204,7 +209,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	loadSimulatorConfiguration(simulator := false) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local configuration
 
 		Gui %window%:Default
 
@@ -247,7 +253,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	saveSimulatorConfiguration() {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local configuration
 
 		Gui %window%:Default
 
@@ -292,7 +299,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	setSimulators(simulators) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:Default
 
@@ -318,7 +325,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 validateRSPDampingFactor() {
-	oldValue := rspDampingFactorEdit
+	local oldValue := rspDampingFactorEdit
 
 	GuiControlGet rspDampingFactorEdit
 
@@ -331,13 +338,15 @@ validateRSPDampingFactor() {
 }
 
 chooseRaceSpotterSimulator() {
-	configurator := RaceSpotterConfigurator.Instance
+	local configurator := RaceSpotterConfigurator.Instance
 
 	configurator.saveSimulatorConfiguration()
 	configurator.loadSimulatorConfiguration()
 }
 
 initializeRaceSpotterConfigurator() {
+	local editor
+
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 

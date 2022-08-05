@@ -53,7 +53,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	createGui(editor, x, y, width, height) {
-		window := editor.Window
+		local window := editor.Window
+		local x0, x1, x2, x3, x4, x5, w1, w2, w3, choices, chosen, lineX, lineW
 
 		Gui %window%:Font, Norm, Arial
 
@@ -142,6 +143,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local ignore, simulator, simulatorConfiguration
+
 		base.loadFromConfiguration(configuration)
 
 		raceReportsPathEdit := getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
@@ -167,6 +170,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local simulator, simulatorConfiguration, ignore, key
+
 		base.saveToConfiguration(configuration)
 
 		this.saveSimulatorConfiguration()
@@ -194,7 +199,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	loadSimulatorConfiguration(simulator := false) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local configuration
 
 		Gui %window%:Default
 
@@ -223,7 +229,8 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	saveSimulatorConfiguration() {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local configuration
 
 		Gui %window%:Default
 
@@ -247,7 +254,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	}
 
 	setSimulators(simulators) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:Default
 
@@ -273,7 +280,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 validateRSDampingFactor() {
-	oldValue := rsDampingFactorEdit
+	local oldValue := rsDampingFactorEdit
 
 	GuiControlGet rsDampingFactorEdit
 
@@ -286,6 +293,8 @@ validateRSDampingFactor() {
 }
 
 chooseRaceReportsPath() {
+	local directory
+
 	GuiControlGet raceReportsPathEdit
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
@@ -297,13 +306,15 @@ chooseRaceReportsPath() {
 }
 
 chooseRaceStrategistSimulator() {
-	configurator := RaceStrategistConfigurator.Instance
+	local configurator := RaceStrategistConfigurator.Instance
 
 	configurator.saveSimulatorConfiguration()
 	configurator.loadSimulatorConfiguration()
 }
 
 initializeRaceStrategistConfigurator() {
+	local editor
+
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 

@@ -331,7 +331,7 @@ closeApplication(application) {
 }
 
 launchPad(command := false, arguments*) {
-	local ignore, application, startupConfig, closeOnStartup
+	local ignore, application, startupConfig, closeOnStartup, x, y
 
 	static result := false
 
@@ -499,7 +499,13 @@ launchPad(command := false, arguments*) {
 
 		OnMessage(0x0200, "WM_MOUSEMOVE")
 
-		Gui LP:Show
+		x := false
+		y := false
+
+		if getWindowPosition("Simulator Startup", x, y)
+			Gui LP:Show, x%x% y%y%
+		else
+			Gui LP:Show
 
 		Loop
 			Sleep 100
@@ -527,7 +533,7 @@ closeAll() {
 }
 
 moveLaunchPad() {
-	moveByMouse("LP")
+	moveByMouse("LP", "Simulator Startup")
 }
 
 closeOnStartup() {

@@ -193,7 +193,7 @@ cancelLogin() {
 }
 
 moveRaceSettingsEditor() {
-	moveByMouse("RES")
+	moveByMouse("RES", "Race Settings")
 }
 
 loadRaceSettings() {
@@ -458,7 +458,8 @@ loadSessions(connector, team) {
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, title, file
-
+	local x, y
+	
 	static result
 	static newSettings
 
@@ -1184,7 +1185,10 @@ restart:
 			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
 		}
 
-		Gui RES:Show, AutoSize Center
+		if getWindowPosition("Race Settings", x, y)
+			Gui RES:Show, x%x% y%y%
+		else
+			Gui RES:Show
 
 		Loop {
 			Loop

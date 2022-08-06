@@ -406,7 +406,7 @@ class GuiFunctionController extends FunctionController {
 
 	moveByMouse(window, button := "LButton") {
 		local curCoordMode := A_CoordModeMouse
-		local anchorX, anchorY, winX, winY, newX, newY, w, h
+		local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h, settings
 
 		CoordMode Mouse, Screen
 
@@ -574,7 +574,8 @@ class SimulatorController extends ConfigurationItem {
 
 		base.__New(configuration)
 
-		this.initializeBackgroundTasks()
+		if !inList(A_Args, "-NoStartup")
+			this.initializeBackgroundTasks()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -2025,7 +2026,10 @@ initializeSimulatorController() {
 
 	settings := readConfiguration(kSimulatorSettingsFile)
 
-	updateTrayMessageState(settings)
+	if inList(A_Args, "-NoStartup")
+		disableTrayMessages()
+	else
+		updateTrayMessageState(settings)
 
 	argIndex := inList(A_Args, "-Voice")
 	voice := false

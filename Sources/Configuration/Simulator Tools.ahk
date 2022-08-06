@@ -1142,10 +1142,12 @@ cancelTargets() {
 }
 
 moveEditor() {
-	moveByMouse("TE")
+	moveByMouse("TE", "Simulator Tools")
 }
 
 editTargets(command := "") {
+	local x, y
+	
 	static result
 
 	static updateVariable1
@@ -1406,8 +1408,12 @@ editTargets(command := "") {
 		Gui TE:Add, Button, X+10 w100 gcancelTargets, % translate("&Cancel")
 
 		Gui TE:Margin, 10, 10
-		Gui TE:Show, AutoSize Center
 
+		if getWindowPosition("Simulator Tools", x, y)
+			Gui TE:Show, x%x% y%y%
+		else
+			Gui TE:Show
+			
 		Loop
 			Sleep 1000
 		until result

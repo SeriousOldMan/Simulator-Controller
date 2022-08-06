@@ -109,11 +109,11 @@ computeStartupSongs() {
 }
 
 moveSettingsEditor() {
-	moveByMouse("SE")
+	moveByMouse("SE", "Simulator Settings")
 }
 
 moveModesEditor() {
-	moveByMouse("ME")
+	moveByMouse("ME", "Simulator Settings.Automation")
 }
 
 openModesEditor() {
@@ -297,7 +297,11 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		LV_ModifyCol(3, "AutoHdr")
 	
 		Gui ME:Margin, 10, 10
-		Gui ME:Show, AutoSize Center
+		
+		if getWindowPosition("Simulator Settings.Automation", x, y)
+			Gui ME:Show, x%x% y%y%
+		else
+			Gui ME:Show
 		
 		Gui ME:+OwnerSE
 		Gui SE:+Disabled
@@ -320,7 +324,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "Center", y := "Center") {
+editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
 	static modeSettings
 	static configuration
 	
@@ -604,7 +608,15 @@ restartSettings:
 		}
 		
 		Gui SE:Margin, 10, 10
-		Gui SE:Show, AutoSize x%x% y%y%
+		
+		if ((x = kUndefined) || (y = kUndefined)) {
+			if getWindowPosition("Simulator Settings", x, y)
+				Gui SE:Show, x%x% y%y%
+			else
+				Gui SE:Show
+		}
+		else
+			Gui SE:Show, AutoSize x%x% y%y%
 		
 		if (!fromSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0))
 			startConfiguration()

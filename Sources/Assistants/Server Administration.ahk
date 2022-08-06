@@ -625,7 +625,10 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
 		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 
-		Gui ADM:Show, AutoSize Center
+		if getWindowPosition("Server Administration", x, y)
+			Gui ADM:Show, x%x% y%y%
+		else
+			Gui ADM:Show
 
 		ControlFocus, , ahk_id %loginHandle%
 
@@ -638,7 +641,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 }
 
 moveAdministrationEditor() {
-	moveByMouse("ADM")
+	moveByMouse("ADM", "Server Administration")
 }
 
 closeAdministrationEditor() {

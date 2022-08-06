@@ -60,7 +60,7 @@ global vHasSupportMenu = false
 ;;;-------------------------------------------------------------------------;;;
 
 moveHTMLViewer() {
-	moveByMouse("HV")
+	moveByMouse("HV", "HTML Viewer")
 }
 
 dismissHTMLViewer() {
@@ -68,7 +68,7 @@ dismissHTMLViewer() {
 }
 
 consentDialog(id, consent := false) {
-	local language, texts, chosen
+	local language, texts, chosen, x, y
 
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
@@ -118,7 +118,11 @@ consentDialog(id, consent := false) {
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
 	Gui CNS:+AlwaysOnTop
-	Gui CNS:Show, Center AutoSize
+	
+	if getWindowPosition("Consent", x, y)
+		Gui CNS:Show, x%x% y%y%
+	else
+		Gui CNS:Show
 
 	Gui CNS:Default
 
@@ -139,7 +143,7 @@ closeConsentDialog() {
 }
 
 moveConsentDialog() {
-	moveByMouse("CNS")
+	moveByMouse("CNS", "Consent")
 }
 
 changeProtection(up, critical := false, block := false) {
@@ -865,7 +869,7 @@ installSupportMenu() {
 	vHasSupportMenu := true
 }
 
-viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400) {
 	local html, innerWidth, editHeight, buttonX
 	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
@@ -906,7 +910,12 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not Integer
+	if !getWindowPosition("HTML Viewer", x, y) {
+		x := kUndefined
+		y := kUndefined
+	}
+	
+	if (x = kUndefined)
 		switch x {
 			case "Left":
 				x := 25
@@ -916,7 +925,7 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 				x := "Center"
 		}
 
-	if y is not Integer
+	if (y = kUndefined)
 		switch y {
 			case "Top":
 				y := 25
@@ -1227,13 +1236,14 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	Gui SM:Destroy
 }
 
-moveByMouse(window) {
-	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY
+moveByMouse(window, descriptor := false) {
+	local curCoordMode := A_CoordModeMouse
+	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
 
-	if window is not alpha
+	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
+
+	if window is not Alpha
 		window := A_Gui
-
-	curCoordMode := A_CoordModeMouse
 
 	CoordMode Mouse, Screen
 
@@ -1252,9 +1262,33 @@ moveByMouse(window) {
 
 			Gui %window%:Show, X%newX% Y%newY%
 		}
+
+		if descriptor {
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Window Positions", descriptor . ".X", newX)
+			setConfigurationValue(settings, "Window Positions", descriptor . ".Y", newY)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
 	}
 	finally {
 		CoordMode Mouse, curCoordMode
+	}
+}
+
+getWindowPosition(descriptor, ByRef x, ByRef y) {
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
+	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+
+	if ((posX == kUndefined) || (posY == kUndefined))
+		return false
+	else {
+		x := posX
+		y := posY
+
+		return true
 	}
 }
 

@@ -239,8 +239,12 @@ class RaceReports extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-
-		Gui %window%:Show
+		local x, y
+		
+		if getWindowPosition("Race Reports", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 	}
 
 	showOverviewReport(reportDirectory) {
@@ -741,7 +745,7 @@ closeReports() {
 }
 
 moveReports() {
-	moveByMouse(RaceReports.Instance.Window)
+	moveByMouse(RaceReports.Instance.Window, "Race Reports")
 }
 
 openReportsDocumentation() {

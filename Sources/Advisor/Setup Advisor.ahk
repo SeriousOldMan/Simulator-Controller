@@ -511,8 +511,12 @@ class SetupAdvisor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-
-		Gui %window%:Show
+		local x, y
+		
+		if getWindowPosition("Setup Advisor", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 	}
 
 	showSettingsChart(content) {
@@ -1971,8 +1975,12 @@ class SetupEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-
-		Gui %window%:Show
+		local x, y
+		
+		if getWindowPosition("Setup Advisor.Setup Editor", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 
 		this.loadSetup()
 	}
@@ -2514,9 +2522,13 @@ class SetupComparator extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-
-		Gui %window%:Show
-
+		local x, y
+		
+		if getWindowPosition("Setup Advisor.Setup Comparator", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
+			
 		this.loadSetups()
 	}
 
@@ -2979,7 +2991,7 @@ closeAdvisor() {
 }
 
 moveAdvisor() {
-	moveByMouse(SetupAdvisor.Instance.Window)
+	moveByMouse(SetupAdvisor.Instance.Window, "Setup Advisor")
 }
 
 openAdvisorDocumentation() {
@@ -2991,7 +3003,7 @@ closeEditor() {
 }
 
 moveEditor() {
-	moveByMouse(SetupAdvisor.Instance.Editor.Window)
+	moveByMouse(SetupAdvisor.Instance.Editor.Window, "Setup Advisor.Setup Editor")
 }
 
 openEditorDocumentation() {
@@ -3007,7 +3019,7 @@ closeComparator() {
 }
 
 moveComparator() {
-	moveByMouse(SetupAdvisor.Instance.Editor.Comparator.Window)
+	moveByMouse(SetupAdvisor.Instance.Editor.Comparator.Window, "Setup Advisor.Setup Comparator")
 }
 
 openComparatorDocumentation() {

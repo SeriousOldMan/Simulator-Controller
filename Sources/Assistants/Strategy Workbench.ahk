@@ -920,9 +920,13 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	show() {
-		window := this.Window
+		local window := this.Window
+		local x, y
 
-		Gui %window%:Show
+		if getWindowPosition("Strategy Workbench", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 	}
 
 	showTelemetryChart(drawChartFunction) {
@@ -3045,7 +3049,7 @@ closeWorkbench() {
 }
 
 moveWorkbench() {
-	moveByMouse(StrategyWorkbench.Instance.Window)
+	moveByMouse(StrategyWorkbench.Instance.Window, "Strategy Workbench")
 }
 
 openWorkbenchDocumentation() {

@@ -95,9 +95,14 @@ class ThemesEditor extends ConfigurationItem {
 	}
 	
 	editThemes() {
+		local x, y
+		
 		this.iThemesList.clearEditor()
 		
-		Gui TE:Show, AutoSize Center
+		if getWindowPosition("Themes Editor", x, y)
+			Gui TE:Show, x%x% y%y%
+		else
+			Gui TE:Show
 		
 		Loop
 			Sleep 200
@@ -500,7 +505,7 @@ cancelThemesEditor() {
 }
 
 moveThemesEditor() {
-	moveByMouse("TE")
+	moveByMouse("TE", "Themes Editor")
 }
 
 openThemesDocumentation() {

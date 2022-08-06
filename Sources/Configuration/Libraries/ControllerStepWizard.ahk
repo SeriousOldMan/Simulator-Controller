@@ -234,7 +234,7 @@ class ControllerStepWizard extends StepWizard {
 															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
 															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
 
-		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450))
+		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450), "Center")
 
 		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 						 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"), true)

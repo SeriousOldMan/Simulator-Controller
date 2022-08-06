@@ -367,7 +367,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		window := this.Window
+		local window := this.Window
+		local x, y
 
 		Gui %window%:Default
 
@@ -667,7 +668,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	show() {
 		window := this.Window
 
-		Gui %window%:Show
+		if getWindowPosition("Session Database", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 	}
 
 	getSimulators() {
@@ -3180,6 +3184,8 @@ cancelAction() {
 global importSelectCheck
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
+	local x, y
+	
 	static importListViewHandle := false
 	static result := false
 
@@ -3353,7 +3359,10 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		Gui %owner%:+Disabled
 
 		try {
-			Gui IDS:Show
+			if getWindowPosition("Session Database.Import", x, y)
+				Gui IDS:Show, x%x% y%y%
+			else
+				Gui IDS:Show
 
 			Loop
 				Sleep 100
@@ -3466,7 +3475,7 @@ selectImportEntry() {
 }
 
 moveImport() {
-	moveByMouse("IDS")
+	moveByMouse("IDS", "Session Database.Import")
 }
 
 openImportDocumentation() {
@@ -3474,7 +3483,7 @@ openImportDocumentation() {
 }
 
 moveSessionDatabaseEditor() {
-	moveByMouse(SessionDatabaseEditor.Instance.Window)
+	moveByMouse(SessionDatabaseEditor.Instance.Window, "Session Database")
 }
 
 closeSessionDatabaseEditor() {

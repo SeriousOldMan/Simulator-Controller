@@ -209,8 +209,15 @@ class ControllerEditor extends ConfigurationItem {
 			}
 	}
 
-	open(x := "Center", y := "Center") {
-		Gui CTRLE:Show, AutoSize x%x% y%y%
+	open(x := "__Undefined__", y := "__Undefined__") {
+		if ((x = kUndefined) || (y = kUndefined)) {
+			if getWindowPosition("Controller Editor", x, y)
+				Gui CTRLE:Show, x%x% y%y%
+			else
+				Gui CTRLE:Show
+		}
+		else
+			Gui CTRLE:Show, AutoSize x%x% y%y%
 
 		name := this.Name
 		
@@ -1974,7 +1981,7 @@ cancelControllerEditor() {
 }
 
 moveControllerEditor() {
-	moveByMouse(A_Gui)
+	moveByMouse(A_Gui, "Controller Editor")
 }
 
 openControllerDocumentation() {

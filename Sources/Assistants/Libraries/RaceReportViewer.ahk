@@ -1044,6 +1044,8 @@ global rangeLapsEdit
 global driverSelectCheck
 
 editReportSettings(raceReport, report := false, options := false) {
+	local x, y
+	
 	static allLapsRadio
 	static rangeLapsRadio
 
@@ -1203,7 +1205,12 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Add, Button, x108 yp+10 w80 h23 Default GacceptSettings, % translate("Ok")
 		Gui RRS:Add, Button, x196 yp w80 h23 GcancelSettings, % translate("&Cancel")
-
+	
+		if getWindowPosition("Race Reports.Settings", x, y)
+			Gui RRS:Show, x%x% y%y%
+		else
+			Gui RRS:Show
+			
 		Gui RRS:Show
 
 		Loop
@@ -1329,7 +1336,7 @@ selectDrivers() {
 }
 
 moveSettings() {
-	moveByMouse("RRS")
+	moveByMouse("RRS", "Race Reports.Settings")
 }
 
 openReportSettingsDocumentation() {

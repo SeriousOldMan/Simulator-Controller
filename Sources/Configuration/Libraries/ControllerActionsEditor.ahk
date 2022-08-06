@@ -257,9 +257,14 @@ class ControllerActionsEditor extends ConfigurationItem {
 	}
 	
 	editPluginActions(plugin := false) {
+		local x, y
+		
 		this.selectLanguage(this.SelectedLanguage, true, plugin)
 		
-		Gui PAE:Show, AutoSize Center
+		if getWindowPosition("Plugin Actions Editor", x, y)
+			Gui PAE:Show, x%x% y%y%
+		else
+			Gui PAE:Show
 
 restart:
 		Loop
@@ -590,7 +595,7 @@ cancelControllerActionsEditor() {
 }
 
 moveControllerActionsEditor() {
-	moveByMouse("PAE")
+	moveByMouse("PAE", "Plugin Actions Editor")
 }
 
 openPluginActionsDocumentation() {

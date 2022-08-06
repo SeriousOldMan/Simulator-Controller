@@ -219,8 +219,14 @@ Closes the currently open progress window.
 ## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 Miscellaneous helper functions for GUI programming.
 
-#### *moveByMouse(guiPrefix :: String)*
-You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command.
+#### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
+You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](*).
+
+#### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
+Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+
+#### *setButtonIcon(buttonHandle :: Handle, file :: String)*
+Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
 
 ***
 

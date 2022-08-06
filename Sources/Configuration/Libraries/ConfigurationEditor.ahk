@@ -331,21 +331,17 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	show() {
-		static first := true
+		local window := this.Window
+		local x, y
 
-		window := this.Window
-
-		if first {
-			first := false
-
-			Gui %window%:Show, AutoSize Center
-		}
+		if getWindowPosition("Simulator Configuration", x, y)
+			Gui %window%:Show, x%x% y%y%
 		else
 			Gui %window%:Show
 	}
 
 	hide() {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Hide
 	}
@@ -383,7 +379,7 @@ saveAndStay() {
 }
 
 moveConfigurationEditor() {
-	moveByMouse(ConfigurationEditor.Instance.Window)
+	moveByMouse(ConfigurationEditor.Instance.Window, "Simulator Configuration")
 }
 
 updateSaveMode() {

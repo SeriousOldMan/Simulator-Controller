@@ -108,7 +108,12 @@ class TranslationsEditor extends ConfigurationItem {
 	}
 	
 	editTranslations() {
-		Gui TE:Show, AutoSize Center
+		local x, y
+		
+		if getWindowPosition("Translations Editor", x, y)
+			Gui TE:Show, x%x% y%y%
+		else
+			Gui TE:Show
 		
 		GuiControlGet isoCodeEdit
 		
@@ -515,7 +520,7 @@ closeTranslationsEditor() {
 }
 
 moveTranslationsEditor() {
-	moveByMouse("TE")
+	moveByMouse("TE", "Translations Editor")
 }
 
 chooseTranslationLanguage() {

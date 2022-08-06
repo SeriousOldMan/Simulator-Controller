@@ -511,29 +511,24 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	show(reset := false) {
-		static first := true
-
-		if reset
-			first := true
+		local wizardWindow := this.WizardWindow
+		local helpWindow := this.HelpWindow
+		local x, y
+		
+		if getWindowPosition("Simulator Setup", x, y)
+			Gui %wizardWindow%:Show, x%x% y%y%
 		else {
-			wizardWindow := this.WizardWindow
-			helpWindow := this.HelpWindow
+			posX := Round((A_ScreenWidth - 720 - 400) / 2)
 
-			if first {
-				posX := Round((A_ScreenWidth - 720 - 400) / 2)
+			Gui %wizardWindow%:Show, x%posX% yCenter h610
+		}
+		
+		if getWindowPosition("Simulator Setup.Help", x, y)
+			Gui %helpWindow%:Show, x%x% y%y%
+		else {
+			posX := (Round((A_ScreenWidth - 720 - 400) / 2) + 750)
 
-				first := false
-
-				Gui %wizardWindow%:Show, x%posX% yCenter h610
-
-				posX := posX + 750
-
-				Gui %helpWindow%:Show, x800 x%posX% yCenter h610
-			}
-			else {
-				Gui %wizardWindow%:Show
-				Gui %helpWindow%:Show
-			}
+			Gui %helpWindow%:Show, x800 x%posX% yCenter h610
 		}
 	}
 
@@ -2159,7 +2154,9 @@ class FinishStepWizard extends StepWizard {
 
 			configuration := this.SetupWizard.getSimulatorConfiguration()
 
-			editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
+			editSettings(settings, false, configuration
+					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
+					   , "Center")
 
 			vSettingsReady := true
 		}
@@ -2244,11 +2241,11 @@ chooseLanguage() {
 }
 
 moveSetupWizard() {
-	moveByMouse(SetupWizard.Instance.WizardWindow)
+	moveByMouse(SetupWizard.Instance.WizardWindow, "Simulator Setup")
 }
 
 moveSetupHelp() {
-	moveByMouse(SetupWizard.Instance.HelpWindow)
+	moveByMouse(SetupWizard.Instance.HelpWindow, "Simulator Setup.Help")
 }
 
 openSetupDocumentation() {

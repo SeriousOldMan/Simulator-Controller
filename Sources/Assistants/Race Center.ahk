@@ -2123,6 +2123,7 @@ class RaceCenter extends ConfigurationItem {
 	copySetup() {
 		local window := this.Window
 		local driver, conditions, compound, pressures
+		local currentListView
 
 		Gui %window%:Default
 
@@ -2161,7 +2162,7 @@ class RaceCenter extends ConfigurationItem {
 
 	deleteSetup() {
 		local window := this.Window
-		local selected
+		local currentListView, selected
 
 		Gui %window%:Default
 
@@ -8277,10 +8278,17 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createLapStandings(lap) {
-		sessionStore := this.SessionStore
-		telemetryDB := this.TelemetryDatabase
-
-		html := "<table class=""table-std"">"
+		local sessionStore := this.SessionStore
+		local telemetryDB := this.TelemetryDatabase
+		local html := "<table class=""table-std"">"
+		local cars := true
+		local positions := true
+		local carNumbers := true
+		local carNames := true
+		local driverFornames := true
+		local driverSurnames := true
+		local driverNicknames := true
+		local index, position, lapTime, laps, delta
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
@@ -8290,14 +8298,6 @@ class RaceCenter extends ConfigurationItem {
 			   . "<th class=""th-std"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
 			   . "</tr>")
-
-		cars := true
-		positions := true
-		carNumbers := true
-		carNames := true
-		driverFornames := true
-		driverSurnames := true
-		driverNicknames := true
 
 		this.getStandings(lap, cars, positions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
@@ -8336,9 +8336,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showLapDetailsAsync(lap) {
-		this.initializeReports()
+		local html := ("<div id=""header""><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
 
-		html := ("<div id=""header""><b>" . translate("Lap: ") . lap.Nr . "</b></div>")
+		this.initializeReports()
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
 
@@ -8356,15 +8356,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createPitstopPlanDetails(pitstopNr) {
-		local compound
-
-		pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-
-		pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
+		local html := "<table>"
+		local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
+		local pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
 									   , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"])
-
-		repairBodywork := pitstopData["Repair.Bodywork"]
-		repairSuspension := pitstopData["Repair.Suspension"]
+		local repairBodywork := pitstopData["Repair.Bodywork"]
+		local repairSuspension := pitstopData["Repair.Suspension"]
+		local compound, repairs, tyreSet
 
 		if (repairBodywork && repairSuspension)
 			repairs := (translate("Bodywork") . ", " . translate("Suspension"))
@@ -8375,7 +8373,6 @@ class RaceCenter extends ConfigurationItem {
 		else
 			repairs := "-"
 
-		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . (pitstopData.Lap + 1) . "</td></tr>")
 
 		if (pitstopData.Fuel > 0)
@@ -8403,9 +8400,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createPitstopServiceDetails(pitstopNr) {
-		local compound
-
-		serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
+		local html := "<table>"
+		local serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
+		local pitstopData, compound, tyreSet, repairs, name, key
 
 		if (serviceData.Length() > 0) {
 			serviceData := serviceData[1]
@@ -8419,8 +8416,6 @@ class RaceCenter extends ConfigurationItem {
 
 					repairs .= translate(name)
 				}
-
-			html := "<table>"
 
 			if serviceData.Lap
 				html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . serviceData.Lap . "</td></tr>")
@@ -8494,30 +8489,28 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createTyreWearDetails(pitstopNr) {
+		local html := "<table>"
+		local driver := false
+		local laps := false
+		local compound := false
+		local tyreSet := false
+		local tyreNames := []
+		local treadData := []
+		local wearData := []
+		local grainData := []
+		local blisterData := []
+		local flatSpotData := []
+		local hasTread := false
+		local hasWear := false
+		local hasGrain := false
+		local hasBlister := false
+		local hasFlatSpot := false
+		local tyres := {}
 		local compound
-
-		tyres := {}
+		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData.Tyre] := tyreData
-
-		driver := false
-		laps := false
-		compound := false
-		tyreSet := false
-
-		tyreNames := []
-		treadData := []
-		wearData := []
-		grainData := []
-		blisterData := []
-		flatSpotData := []
-
-		hasTread := false
-		hasWear := false
-		hasGrain := false
-		hasBlister := false
-		hasFlatSpot := false
 
 		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"} {
 			if !driver
@@ -8569,8 +8562,6 @@ class RaceCenter extends ConfigurationItem {
 				hasFlatSpot := true
 		}
 
-		html := "<table>"
-
 		if driver
 			html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . driver . "</td></tr>")
 
@@ -8614,7 +8605,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showPitstopDetailsAsync(pitstopNr) {
-		html := ("<div id=""header""><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
+		local html := ("<div id=""header""><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
 
@@ -8633,18 +8624,20 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createPitstopsServiceDetails() {
-		local compound
-
-		pitstopNRs := []
-		lapData := []
-		timeData := []
-		previousDriverData := []
-		nextDriverData := []
-		refuelData := []
-		tyreCompoundData := []
-		tyreSetData := []
-		tyrePressuresData := []
-		repairsData := []
+		local html := "<table class=""table-std"">"
+		local headers := []
+		local pitstopNRs := []
+		local lapData := []
+		local timeData := []
+		local previousDriverData := []
+		local nextDriverData := []
+		local refuelData := []
+		local tyreCompoundData := []
+		local tyreSetData := []
+		local tyrePressuresData := []
+		local repairsData := []
+		local compound, tyreSet, ignore, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs
+		local name, key, tyrePressures, header
 
 		for ignore, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
 			pitstopNRs.Push("<th class=""th-std"">" . A_Index . "</th>")
@@ -8730,10 +8723,6 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		html := "<table class=""table-std"">"
-
-		headers := []
-
 		for ignore, header in ["Pitstop", "Lap", "Service Time", "Last Driver", "Next Driver", "Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures", "Repairs"]
 			headers.Push("<th class=""th-std"">" . translate(header) . "</th>")
 
@@ -8758,7 +8747,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showPitstopsDetailsAsync() {
-		html := ("<div id=""header""><b>" . translate("Pitstops Summary") . "</b></div>")
+		local html := ("<div id=""header""><b>" . translate("Pitstops Summary") . "</b></div>")
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
 
@@ -8776,13 +8765,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createDriverDetails(drivers) {
-		driverData := []
-		stintsData := []
-		lapsData := []
-		drivingTimesData := []
-		avgLapTimesData := []
-		avgFuelConsumptionsData := []
-		accidentsData := []
+		local driverData := []
+		local stintsData := []
+		local lapsData := []
+		local drivingTimesData := []
+		local avgLapTimesData := []
+		local avgFuelConsumptionsData := []
+		local accidentsData := []
+		local ignore, driver, drivingTime, lapAccidents, lapTimes, fuelConsumptions, ignore, lap
 
 		for ignore, driver in drivers {
 			driverData.Push("<th class=""th-std"">" . StrReplace(driver.FullName, "'", "\'") . "</th>")
@@ -8823,19 +8813,17 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createDriverPaceChart(chartID, width, height, drivers) {
-		drawChartFunction := "function drawChart" . chartID . "() {`nvar array = [`n"
-
-		length := 2000000
+		local drawChartFunction := "function drawChart" . chartID . "() {`nvar array = [`n"
+		local length := 2000000
+		local lapTimes := []
+		local validDriverTimes := []
+		local ignore, driver, lap, value, driverTimes, avg, stdDev, index, time, validTimes, text, seconds
 
 		for ignore, driver in drivers
 			length := Min(length, driver.Laps.Length())
 
 		if (length = 2000000)
 			return ""
-
-		lapTimes := []
-
-		validDriverTimes := []
 
 		for ignore, driver in drivers {
 			driverTimes := []
@@ -8939,12 +8927,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createDriverPerformanceChart(chartID, width, height, drivers) {
-		driverNames := []
-		potentialsData := []
-		raceCraftsData := []
-		speedsData := []
-		consistenciesData := []
-		carControlsData := []
+		local drawChartFunction := "function drawChart" . chartID . "() {"
+		local driverNames := []
+		local potentialsData := []
+		local raceCraftsData := []
+		local speedsData := []
+		local consistenciesData := []
+		local carControlsData := []
+		local ignore, driver, minValue, maxValue
 
 		for ignore, driver in drivers {
 			driverNames.Push(StrReplace(driver.FullName, "'", "\'"))
@@ -8955,9 +8945,6 @@ class RaceCenter extends ConfigurationItem {
 			carControlsData.Push(driver.CarControl)
 		}
 
-		drawChartFunction := ""
-
-		drawChartFunction .= "function drawChart" . chartID . "() {"
 		drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 		drawChartFunction .= "`n['" . values2String("', '", translate("Category"), driverNames*) . "'],"
 		drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Potential") . "'", potentialsData*) . "],"
@@ -8978,10 +8965,11 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showDriverStatistics() {
+		local html := ("<div id=""header""><b>" . translate("Driver Statistics") . "</b></div>")
+		local ignore, driver, width, chart1, chart2
+
 		for ignore, driver in this.Drivers
 			this.updateDriverStatistics(driver)
-
-		html := ("<div id=""header""><b>" . translate("Driver Statistics") . "</b></div>")
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Overview") . "</i></div>")
 
@@ -9005,8 +8993,10 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
-		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
+		local drawChartFunction := ("function drawChart" . chartID . "() {")
+		local ignore, time
 
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Position") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
@@ -9032,21 +9022,26 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showRaceSummary() {
-		html := ("<div id=""header""><b>" . translate("Race Summary") . "</b></div>")
+		local html := ("<div id=""header""><b>" . translate("Race Summary") . "</b></div>")
+		local stints := []
+		local drivers := []
+		local laps := []
+		local durations := []
+		local numLaps := []
+		local positions := []
+		local avgLapTimes := []
+		local fuelConsumptions := []
+		local accidents := []
+		local currentStint := this.CurrentStint
+		local laps := []
+		local positions := []
+		local remainingFuels := []
+		local tyreLaps := []
+		local lastLap := this.LastLap
+		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
+		local stint, duration, ignore, lap, width, chart1
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
-
-		stints := []
-		drivers := []
-		laps := []
-		durations := []
-		numLaps := []
-		positions := []
-		avgLapTimes := []
-		fuelConsumptions := []
-		accidents := []
-
-		currentStint := this.CurrentStint
 
 		if currentStint
 			Loop % currentStint.Nr
@@ -9084,15 +9079,6 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Race Course") . "</i></div>")
 
-		laps := []
-		positions := []
-		remainingFuels := []
-		tyreLaps := []
-
-		lastLap := this.LastLap
-
-		lapDataTable := this.SessionStore.Tables["Lap.Data"]
-
 		if lastLap
 			Loop % lastLap.Nr
 			{
@@ -9114,7 +9100,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showPlanDetails() {
-		window := this.Window
+		local html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
+		local window := this.Window
+		local currentListView, stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange
 
 		Gui %window%:Default
 
@@ -9122,8 +9110,6 @@ class RaceCenter extends ConfigurationItem {
 
 		try {
 			Gui ListView, % this.PlanListView
-
-			html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
 
 			html .= "<br><br><table class=""table-std"">"
 
@@ -9169,7 +9155,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showSetupsDetails() {
-		window := this.Window
+		local html := ("<div id=""header""><b>" . translate("Setups Summary") . "</b></div>")
+		local window := this.Window
+		local currentListView, driver, conditions, compound, pressures
 
 		Gui %window%:Default
 
@@ -9177,8 +9165,6 @@ class RaceCenter extends ConfigurationItem {
 
 		try {
 			Gui ListView, % this.SetupsListView
-
-			html := ("<div id=""header""><b>" . translate("Setups Summary") . "</b></div>")
 
 			html .= "<br><br><table class=""table-std"">"
 
@@ -9220,20 +9206,25 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeCarStatistics(car, laps, ByRef lapTime, ByRef potential, ByRef raceCraft, ByRef speed, ByRef consistency, ByRef carControl) {
-		raceData := true
-		drivers := false
-		positions := true
-		times := true
+		local raceData := true
+		local drivers := false
+		local positions := true
+		local times := true
+		local cars := []
+		local count := 0
+		local potentials := false
+		local raceCrafts := false
+		local speeds := false
+		local consistencies := false
+		local carControls := false
+		local oldLapSettings
+
+		lapTime := 0
 
 		this.ReportViewer.loadReportData(laps, raceData, drivers, positions, times)
 
-		cars := []
-
 		Loop % getConfigurationValue(raceData, "Cars", "Count")
 			cars.Push(A_Index)
-
-		lapTime := 0
-		count := 0
 
 		Loop % laps.Length()
 			if times[A_Index].HasKey(car) {
@@ -9243,12 +9234,6 @@ class RaceCenter extends ConfigurationItem {
 
 		if (count > 0)
 			lapTime := ((lapTime / count) / 1000)
-
-		potentials := false
-		raceCrafts := false
-		speeds := false
-		consistencies := false
-		carControls := false
 
 		count := laps.Length()
 		laps := []
@@ -9278,7 +9263,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
-		lastLap := this.LastLap
+		local lastLap := this.LastLap
+		local positions, startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
+		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
+		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
+		local lapTime, potential, raceCraft, speed, consistency, carControl
+		local rnd, delta, running, nr, position, ignore
 
 		if (this.SessionActive && lastLap) {
 			positions := lastLap.Positions
@@ -9445,9 +9435,9 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 
 	class TrafficPitstop extends Strategy.Pitstop {
 		getPosition() {
-			driver := true
-			positions := true
-			runnings := true
+			local driver := true
+			local positions := true
+			local runnings := true
 
 			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
 
@@ -9455,9 +9445,10 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 		}
 
 		getTrafficDensity() {
-			driver := true
-			positions := true
-			runnings := true
+			local driver := true
+			local positions := true
+			local runnings := true
+			local begin, end, wrap, numCars
 
 			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
 
@@ -9490,7 +9481,7 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 	}
 
 	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		pitstop := new this.TrafficPitstop(this, id, driver, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
+		local pitstop := new this.TrafficPitstop(this, id, driver, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
 
 		if ((id == 1) && !this.TrafficScenario)
 			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
@@ -9499,7 +9490,8 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 	}
 
 	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
+		local targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
+		local variationWindow, moreLaps, rnd
 
 		if ((pitstopNr = 1) && IsObject(this.PitstopRule))
 			return targetLap
@@ -9590,8 +9582,9 @@ class TrafficSimulation extends StrategySimulation {
 	}
 
 	compareScenarios(scenario1, scenario2) {
-		pitstops1 := scenario1.Pitstops.Length()
-		pitstops2 := scenario2.Pitstops.Length()
+		local pitstops1 := scenario1.Pitstops.Length()
+		local pitstops2 := scenario2.Pitstops.Length()
+		local pitstop1, pitstop2, position1, position2, density1, density2
 
 		if ((pitstops1 > 0) && (pitstops2 > 0)) {
 			if (pitstops1 < pitstops2)
@@ -9630,47 +9623,65 @@ class TrafficSimulation extends StrategySimulation {
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
-		local strategy
-
-		simulator := false
-		car := false
-		track := false
-		weather := false
-		airTemperature := false
-		trackTemperature := false
-		sessionType := false
-		sessionLength := false
-		maxTyreLaps := false
-		tyreCompound := false
-		tyreCompoundColor := false
-		tyrePressures := false
+		local simulator := false
+		local car := false
+		local track := false
+		local weather := false
+		local airTemperature := false
+		local trackTemperature := false
+		local sessionType := false
+		local sessionLength := false
+		local maxTyreLaps := false
+		local tyreCompound := false
+		local tyreCompoundColor := false
+		local tyrePressures := false
+		local stintLength := false
+		local formationLap := false
+		local postRaceLap := false
+		local fuelCapacity := false
+		local safetyFuel := false
+		local pitstopDelta := false
+		local pitstopFuelService := false
+		local pitstopTyreService := false
+		local pitstopServiceOrder := "Simultaneous"
+		local randomFactor := false
+		local numScenarios := false
+		local variationWindow := false
+		local useLapTimeVariation := false
+		local useDriverErrors := false
+		local usePitstops := false
+		local overTakeDelta := false
+		local consideredTraffic := false
+		local initialStint := false
+		local initialLap := false
+		local initialStintTime := false
+		local initialTyreLaps := false
+		local initialFuelAmount := false
+		local map := false
+		local fuelConsumption := false
+		local avgLapTime := false
+		local useInitialConditions := false
+		local useTelemetryData := false
+		local consumption := 0
+		local tyreUsage := 0
+		local tyreCompoundVariation := 0
+		local initialFuel := 0
+		local strategy, consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
+		local scenarios, variation, first, tyreCompoundColors
+		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound
+		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption, rnd
+		local startFuel, startFuelAmount, lapTime
+		local scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
 
-		stintLength := false
-		formationLap := false
-		postRaceLap := false
-		fuelCapacity := false
-		safetyFuel := false
-		pitstopDelta := false
-		pitstopFuelService := false
-		pitstopTyreService := false
-		pitstopServiceOrder := "Simultaneous"
-
-		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
-
-		randomFactor := false
-		numScenarios := false
-		variationWindow := false
-		useLapTimeVariation := false
-		useDriverErrors := false
-		usePitstops := false
-		overTakeDelta := false
-		consideredTraffic := false
+		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
+							  , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 
 		this.StrategyManager.getTrafficSettings(randomFactor, numScenarios, variationWindow
-											  , useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta, consideredTraffic)
+											  , useLapTimeVariation, useDriverErrors, usePitstops
+											  , overTakeDelta, consideredTraffic)
 
 		if ((randomFactor == 0) && (variationWindow == 0) && !useLapTimeVariation && !useDriverErrors && !usePitstops)
 			numScenarios := 1
@@ -9679,26 +9690,11 @@ class TrafficSimulation extends StrategySimulation {
 							  , useLapTimeVariation, useDriverErrors, usePitstops
 							  , overTakeDelta, consideredTraffic)
 
-		initialStint := false
-		initialLap := false
-		initialStintTime := false
-		initialTyreLaps := false
-		initialFuelAmount := false
-		map := false
-		fuelConsumption := false
-		avgLapTime := false
-
-		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+							  , map, fuelConsumption, avgLapTime)
 
 		if initialLap
 			formationLap := false
-
-		useInitialConditions := false
-		useTelemetryData := false
-		consumption := 0
-		tyreUsage := 0
-		tyreCompoundVariation := 0
-		initialFuel := 0
 
 		this.getSimulationSettings(useInitialConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
 
@@ -9903,7 +9899,7 @@ exitFixIE(previous) {
 }
 
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
-	local x, y
+	local x, y, row, driver, owner, ignore, name
 
 	static result := false
 
@@ -10135,6 +10131,8 @@ openTeamManagerDocumentation() {
 }
 
 loginDialog(connectorOrCommand := false, teamServerURL := false) {
+	local title, window
+
 	static result := false
 
 	static nameEdit := ""
@@ -10206,7 +10204,7 @@ cancelLogin() {
 }
 
 validateNumber(field) {
-	oldValue := %field%
+	local oldValue := %field%
 
 	GuiControlGet %field%
 
@@ -10259,7 +10257,8 @@ positionsOrder(a, b) {
 }
 
 parseObject(properties) {
-	result := {}
+	local result := {}
+	local property
 
 	properties := StrReplace(properties, "`r", "")
 
@@ -10274,7 +10273,8 @@ parseObject(properties) {
 }
 
 loadTeams(connector) {
-	teams := {}
+	local teams := {}
+	local ignore, identifier, team
 
 	try {
 		for ignore, identifier in string2Values(";", connector.GetAllTeams()) {
@@ -10291,7 +10291,8 @@ loadTeams(connector) {
 }
 
 loadSessions(connector, team) {
-	sessions := {}
+	local sessions := {}
+	local ignore, identifier, session
 
 	if team
 		for ignore, identifier in string2Values(";", connector.GetTeamSessions(team)) {
@@ -10309,7 +10310,8 @@ loadSessions(connector, team) {
 }
 
 loadDrivers(connector, team) {
-	drivers := {}
+	local drivers := {}
+	local ignore, identifier, driver, name
 
 	if team
 		for ignore, identifier in string2Values(";", connector.GetTeamDrivers(team)) {
@@ -10337,7 +10339,7 @@ closeRaceCenter() {
 }
 
 connectServer() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	GuiControlGet serverURLEdit
 	GuiControlGet serverTokenEdit
@@ -10349,7 +10351,7 @@ connectServer() {
 }
 
 chooseTeam() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	GuiControlGet teamDropDownMenu
 
@@ -10358,7 +10360,7 @@ chooseTeam() {
 }
 
 chooseSession() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	GuiControlGet sessionDropDownMenu
 
@@ -10367,7 +10369,7 @@ chooseSession() {
 }
 
 chooseChartType() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	GuiControlGet chartTypeDropDown
 
@@ -10411,7 +10413,7 @@ openDashboardDocumentation() {
 }
 
 updateDate() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	GuiControlGet sessionDateCal
 
@@ -10419,19 +10421,17 @@ updateDate() {
 }
 
 updateTime() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local time := rCenter.Time
+	local currentListView := A_DefaultListView
 
 	GuiControlGet sessionTimeEdit
-
-	time := rCenter.Time
 
 	EnvSub time, %sessionTimeEdit%, Minutes
 
 	rCenter.iTime := sessionTimeEdit
 
 	rCenter.updatePlan(-time)
-
-	currentListView := A_DefaultListView
 
 	try {
 		Gui ListView, % rCenter.PlanListView
@@ -10449,7 +10449,8 @@ updateTime() {
 }
 
 addSetup() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local title
 
 	if (rCenter.SessionDrivers.Count() > 0)
 		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "addSetup"))
@@ -10463,9 +10464,9 @@ addSetup() {
 }
 
 copySetup() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row
 
 	Gui %window%:Default
 
@@ -10492,9 +10493,9 @@ copySetup() {
 }
 
 deleteSetup() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row, title
 
 	Gui %window%:Default
 
@@ -10529,6 +10530,9 @@ deleteSetup() {
 }
 
 chooseSetup() {
+	local rCenter, window, currentListView
+	local driver, conditions, compound, pressures, temperatures
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		rCenter := RaceCenter.Instance
 
@@ -10583,7 +10587,8 @@ chooseSetup() {
 }
 
 releaseSetups() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local title
 
 	if rCenter.SessionActive
 		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "releaseSetups"))
@@ -10601,9 +10606,9 @@ updateSetup() {
 }
 
 updateSetupAsync() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row
 
 	Gui %window%:Default
 
@@ -10654,6 +10659,9 @@ updateSetupAsync() {
 }
 
 choosePlan() {
+	local rCenter, window, currentListView
+	local stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange, time, currentTime
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		rCenter := RaceCenter.Instance
 
@@ -10720,9 +10728,9 @@ updatePlan() {
 }
 
 updatePlanAsync() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row, stint
 
 	Gui %window%:Default
 
@@ -10777,9 +10785,9 @@ updatePlanAsync() {
 }
 
 addPlan() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row, title
 
 	Gui %window%:Default
 
@@ -10822,9 +10830,9 @@ addPlan() {
 }
 
 deletePlan() {
-	rCenter := RaceCenter.Instance
-
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView, row, title
 
 	Gui %window%:Default
 
@@ -10859,25 +10867,26 @@ deletePlan() {
 }
 
 releasePlan() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "releasePlan"))
 }
 
 updateState() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "updateState"))
 }
 
 planPitstop() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "planPitstop"))
 }
 
 chooseStint() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local currentListView, stint
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		currentListView := A_DefaultListView
@@ -10896,7 +10905,8 @@ chooseStint() {
 }
 
 chooseLap() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local currentListView, lap
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		currentListView := A_DefaultListView
@@ -10915,7 +10925,8 @@ chooseLap() {
 }
 
 choosePitstop() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local currentListView, pitstop
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		currentListView := A_DefaultListView
@@ -10934,7 +10945,8 @@ choosePitstop() {
 }
 
 chooseReport() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
+	local currentListView
 
 	if rCenter.isWorking()
 		return
@@ -10958,8 +10970,8 @@ chooseReport() {
 }
 
 chooseDriver() {
-	rCenter := RaceCenter.Instance
-	window := rCenter.Window
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
 
 	Gui %window%:Default
 
@@ -10970,25 +10982,25 @@ chooseDriver() {
 }
 
 chooseAxis() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "showTelemetryReport"))
 }
 
 reportSettings() {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "reportSettings", rCenter.SelectedReport))
 }
 
 
 chooseSimulationSettings() {
+	local rCenter := RaceCenter.Instance
+
 	GuiControlGet useSessionDataDropDown
 	GuiControlGet useTelemetryDataDropDown
 	GuiControlGet keepMapDropDown
 	GuiControlGet considerTrafficDropDown
-
-	rCenter := RaceCenter.Instance
 
 	rCenter.iUseSessionData := (useSessionDataDropDown == 1)
 	rCenter.iUseTelemetryDatabase := (useTelemetryDataDropDown == 1)
@@ -10999,7 +11011,7 @@ chooseSimulationSettings() {
 }
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	rCenter := RaceCenter.Instance
+	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure))
 
@@ -11007,7 +11019,8 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 }
 
 startupRaceCenter() {
-	icon := kIconsDirectory . "Console.ico"
+	local icon := kIconsDirectory . "Console.ico"
+	local current, rCenter
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center

@@ -54,15 +54,6 @@ global kSetupNames = {DQ: "Qualification (Dry)", DR: "Race (Dry)", WQ: "Qualific
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRequestorPID = false
-
-global vSettingDescriptors = newConfiguration()
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -166,6 +157,9 @@ global rrPressure5
 global transferPressuresButton
 
 class SessionDatabaseEditor extends ConfigurationItem {
+	iRequestorPID := false
+	iSettingDescriptors := newConfiguration()
+
 	iSessionDatabase := new SessionDatabase()
 
 	iSelectedSimulator := false
@@ -213,6 +207,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	Window[] {
 		Get {
 			return "SDE"
+		}
+	}
+
+	RequestorPID[] {
+		Get {
+			return this.iRequestorPID
+		}
+	}
+
+	SettingDescriptors[] {
+		Get {
+			return this.iSettingDescriptors
 		}
 	}
 
@@ -347,7 +353,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	__New(simulator := false, car := false, track := false
-		, weather := false, airTemperature := false, trackTemperature := false, compound := false, compoundColor := false) {
+		, weather := false, airTemperature := false, trackTemperature := false
+		, compound := false, compoundColor := false, requestorPID := false) {
 		if simulator {
 			this.iSelectedSimulator := this.SessionDatabase.getSimulatorName(simulator)
 			this.iSelectedCar := car
@@ -359,6 +366,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iTyreCompoundColor := compoundColor
 		}
 
+		this.iRequestorPID := requestorPID
+
 		base.__New(kSimulatorConfiguration)
 
 		SessionDatabaseEditor.Instance := this
@@ -368,7 +377,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	createGui(configuration) {
 		local window := this.Window
-		local x, y
+		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs
 
 		Gui %window%:Default
 
@@ -590,7 +599,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure4, 0.0
 		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure5, 0.0
 
-		if vRequestorPID
+		if this.RequestorPID
 			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
 		Gui Tab, 4
@@ -659,14 +668,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.updateState()
 
-		if (vRequestorPID && this.moduleAvailable("Pressures"))
+		if (this.RequestorPID && this.moduleAvailable("Pressures"))
 			this.selectModule("Pressures")
 		else
 			this.selectModule("Settings")
 	}
 
 	show() {
-		window := this.Window
+		local window := this.Window
 
 		if getWindowPosition("Session Database", x, y)
 			Gui %window%:Show, x%x% y%y%
@@ -683,6 +692,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getTracks(simulator, car := false) {
+		local tracks, ignore, track
+
 		if !car
 			return []
 		else if ((car == true) || (car = "*")) {
@@ -722,7 +733,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateState() {
-		window := this.Window
+		local window := this.Window
+		local simulator, car, track, defaultListView, selected, selectedEntries, row, type
 
 		Gui %window%:Default
 
@@ -935,6 +947,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
+		local window, choices, index, car
+
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 
@@ -959,6 +973,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
+		local window, tracks, trackNames
+
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
 
@@ -984,6 +1000,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
+		local window
+
 		if (force || (track != this.SelectedTrack)) {
 			this.iSelectedTrack := track
 
@@ -1004,6 +1022,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadWeather(weather, force := false) {
+		local window
+
 		if (force || (weather != this.SelectedWeather)) {
 			this.iSelectedWeather := weather
 
@@ -1021,6 +1041,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSetups(setupType, force := false) {
+		local window, defaultListView, userSetups, communitySetups, ignore, name
+
 		if (force || (setupType != this.SelectedSetupType)) {
 			window := this.Window
 
@@ -1033,7 +1055,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				LV_Delete()
 
-				this.SelectedSetupType := setupType
+				this.iSelectedSetupType := setupType
 
 				GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
 
@@ -1068,7 +1090,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSettings() {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore, setting, type, value
 
 		Gui %window%:Default
 
@@ -1113,7 +1136,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectSettings(load := true) {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore, column, references, setting, reference, count
 
 		Gui %window%:Default
 
@@ -1190,8 +1214,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, threshold := 40) {
-		trackMap := this.TrackMap
-		trackImage := this.TrackImage
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
+		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
 
 		if (this.SelectedTrackAutomation && trackMap && trackImage) {
 			scale := getConfigurationValue(trackMap, "Map", "Scale")
@@ -1253,8 +1279,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	findTrackAction(coordinateX, coordinateY, threshold := 40) {
-		trackMap := this.TrackMap
-		trackImage := this.TrackImage
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local candidate, deltaX, deltaY, dX, dY
 
 		if (this.SelectedTrackAutomation && trackMap && trackImage) {
 			candidate := false
@@ -1282,7 +1309,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	trackClicked(coordinateX, coordinateY) {
-		oldCoordMode := A_CoordModeMouse
+		local oldCoordMode := A_CoordModeMouse
+		local x, y, action
 
 		CoordMode Mouse, Screen
 
@@ -1301,7 +1329,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	actionClicked(coordinateX, coordinateY, action) {
-		oldCoordMode := A_CoordModeMouse
+		local oldCoordMode := A_CoordModeMouse
+		local x, y
 
 		CoordMode Mouse, Screen
 
@@ -1323,6 +1352,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateTrackAction(action) {
+		local index, candidate
+
 		for index, candidate in this.SelectedTrackAutomation.Actions
 			if ((action.X = candidate.X) && (action.Y = candidate.Y)) {
 				this.SelectedTrackAutomation.Actions[index] := action
@@ -1335,6 +1366,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteTrackAction(action) {
+		local index, candidate
+
 		for index, candidate in this.SelectedTrackAutomation.Actions
 			if ((action.X = candidate.X) && (action.Y = candidate.Y)) {
 				this.SelectedTrackAutomation.Actions.RemoveAt(index)
@@ -1347,13 +1380,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	addTrackAutomation() {
+		local window := this.Window
+
 		this.readTrackAutomations()
 
 		this.iSelectedTrackAutomation := {Name: "...", Actions: []}
 
 		this.updateState()
-
-		window := this.Window
 
 		Gui %window%:Default
 
@@ -1380,7 +1413,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	saveTrackAutomation() {
-		window := this.Window
+		local window := this.Window
+		local trackAutomation, origin, defaultListView, newTrackAutomation
 
 		Gui %window%:Default
 
@@ -1437,7 +1471,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	clearTrackAutomationEditor() {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Default
 
@@ -1446,6 +1480,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	readTrackAutomations() {
+		local defaultListView, trackAutomations, ignore, trackAutomation, option
+
 		this.clearTrackAutomationEditor()
 
 		this.TrackAutomations := []
@@ -1491,23 +1527,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	createTrackMap(actions := false) {
-		trackMap := this.TrackMap
-		trackImage := this.TrackImage
-
-		scale := getConfigurationValue(trackMap, "Map", "Scale")
-
-		width := this.iTrackDisplayArea[3]
-		height := this.iTrackDisplayArea[4]
-
-		offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-		offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-		marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
-		marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
-
-		imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
-		imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
-
-		imgScale := Min(width / imgWidth, height / imgHeight)
+		local trackMap := this.TrackMap
+		local trackImage := this.TrackImage
+		local scale := getConfigurationValue(trackMap, "Map", "Scale")
+		local width := this.iTrackDisplayArea[3]
+		local height := this.iTrackDisplayArea[4]
+		local offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+		local offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+		local marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
+		local marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
+		local imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+		local imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+		local imgScale := Min(width / imgWidth, height / imgHeight)
+		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
+		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY
 
 		if actions {
 			token := Gdip_Startup()
@@ -1578,11 +1611,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateTrackAutomationInfo() {
-		window := this.Window
+		local window := this.Window
+		local info := ""
+		local index, action
 
 		Gui %window%:Default
-
-		info := ""
 
 		for index, action in this.SelectedTrackAutomation.Actions {
 			if (index > 1)
@@ -1597,7 +1630,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrackMap(trackMap, trackImage) {
-		directory := kTempDirectory . "Track Images"
+		local directory := kTempDirectory . "Track Images"
 
 		try {
 			FileRemoveDir %directory%, 1
@@ -1615,7 +1648,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	unloadTrackMap() {
-		display :=  this.iTrackDisplay
+		local display :=  this.iTrackDisplay
 
 		GuiControl, , %display%, % (kIconsDirectory . "Empty.png")
 
@@ -1624,12 +1657,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectAutomation() {
+		local window := this.Window
+		local defaultListView, ignore, column
+
 		if this.TrackMap
 			this.unloadTrackMap()
 
 		this.readTrackAutomations()
-
-		window := this.Window
 
 		Gui %window%:Default
 
@@ -1660,7 +1694,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteData() {
-		window := this.Window
+		local window := this.Window
+		local x, y, progressWindow, defaultListView, simulator, count, row, type, data, car, track
+		local driver, telemetryDB, tyresDB, code, candidate
 
 		Gui %window%:Default
 
@@ -1782,14 +1818,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	exportData(directory) {
+		local window := this.Window
+		local x := Round((A_ScreenWidth - 300) / 2)
+		local y := A_ScreenHeight - 150
+		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Exporting Data")})
+		local defaultListView, simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
+		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
+		local trackAutomations, info, id, name, schema, fields
+
 		directory := normalizePath(directory)
-
-		window := this.Window
-
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Exporting Data")})
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -1943,12 +1980,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	importData(directory, selection) {
+		local window := this.Window
+		local simulator := this.SelectedSimulator
+		local info := readConfiguration(directory . "\Export.info")
+		local x, y, progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
+		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
+		local tyresDB, data, code, targetName, name, fileName, automations, automation, trackAutomations
+
 		directory := normalizePath(directory)
-
-		window := this.Window
-
-		simulator := this.SelectedSimulator
-		info := readConfiguration(directory . "\Export.info")
 
 		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
 			x := Round((A_ScreenWidth - 300) / 2)
@@ -2122,12 +2161,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadData() {
-		window := this.Window
-
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		local window := this.Window
+		local x := Round((A_ScreenWidth - 300) / 2)
+		local y := A_ScreenHeight - 150
+		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
+		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, cound, strategies
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -2255,7 +2294,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectData(load := true) {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
+		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory
 
 		Gui %window%:Default
 
@@ -2367,7 +2408,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectSetups() {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
 
 		Gui %window%:Default
 
@@ -2408,7 +2450,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectPressures() {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore, column, info
 
 		Gui %window%:Default
 
@@ -2443,9 +2486,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	moduleAvailable(module) {
-		simulator := this.SelectedSimulator
-		car := this.SelectedCar
-		track := this.SelectedTrack
+		local simulator := this.SelectedSimulator
+		local car := this.SelectedCar
+		local track := this.SelectedTrack
 
 		if simulator {
 			this.iAvailableModules["Settings"] := true
@@ -2474,6 +2517,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectModule(module, force := false) {
+		local window
+
 		if this.moduleAvailable(module) {
 			if (force || (this.SelectedModule != module)) {
 				this.iSelectedModule := module
@@ -2525,6 +2570,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getSettingLabel(section := false, key := false) {
+		local window, defaultListView, selected
+
 		if !section {
 			window := this.Window
 
@@ -2547,10 +2594,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
-		return getConfigurationValue(vSettingDescriptors, section . ".Labels", key, "")
+		return getConfigurationValue(this.SettingDescriptors, section . ".Labels", key, "")
 	}
 
 	getSettingType(section := false, key := false, ByRef default := false) {
+		local window, defaultListView, selected, type
+
 		if !section {
 			window := this.Window
 
@@ -2575,7 +2624,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
-		type := getConfigurationValue(vSettingDescriptors, section . ".Types", key, "Text")
+		type := getConfigurationValue(this.SettingDescriptors, section . ".Types", key, "Text")
 
 		type := string2Values(";", type)
 
@@ -2594,22 +2643,27 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getAvailableSettings(selection := false) {
-		if (vSettingDescriptors.Count() = 0) {
+		local fileName, settingDescriptors, section, values, key, value, settings, skip, ignore
+		local available, index, candidate
+
+		if (this.SettingDescriptors.Count() = 0) {
 			fileName := ("Settings." . getLanguage())
 
 			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory))
 				fileName := "Settings.en"
 
-			vSettingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+			settingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+
+			this.iSettingDescriptors := settingDescriptors
 
 			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
 				for key, value in values
-					setConfigurationValue(vSettingDescriptors, section, key, value)
+					setConfigurationValue(settingDescriptors, section, key, value)
 		}
 
 		settings := []
 
-		for section, values in vSettingDescriptors
+		for section, values in this.SettingDescriptors
 			if InStr(section, ".Types") {
 				section := StrReplace(section, ".Types", "")
 
@@ -2639,7 +2693,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	addSetting(section, key, value) {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, ignore
 
 		Gui %window%:Default
 
@@ -2650,7 +2705,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.iSettings.Push(Array(section, key))
 
-			LV_Add("Select Vis", this.getSettingLabel(section, key), IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
+			ignore := false
+
+			LV_Add("Select Vis", this.getSettingLabel(section, key)
+				 , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
 
 			LV_ModifyCol()
 
@@ -2670,7 +2728,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteSetting(section, key) {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, selected
 
 		Gui %window%:Default
 
@@ -2703,7 +2762,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateSetting(section, key, value) {
-		window := this.Window
+		local window := this.Window
+		local defaultListView, selected, type, ignore, display, settingsDB
 
 		Gui %window%:Default
 
@@ -2713,6 +2773,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui ListView, % this.SettingsListView
 
 			selected := LV_GetNext(0)
+
+			ignore := false
 
 			type := this.getSettingType(section, key, ignore)
 
@@ -2754,6 +2816,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
+		local window, compounds, chosen, compound, compoundColor, pressureInfos
+		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
+
 		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
@@ -2817,7 +2882,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							GuiControl Disable, %tyre%Pressure%postfix%
 						}
 
-					if vRequestorPID
+					if this.RequestorPID
 						GuiControl Disable, transferPressuresButton
 				}
 				else {
@@ -2858,7 +2923,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							pressure += 0.1
 						}
 
-						if vRequestorPID
+						if this.RequestorPID
 							GuiControl Enable, transferPressuresButton
 					}
 				}
@@ -2870,12 +2935,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	uploadSetup(setupType) {
-		window := this.Window
+		local window := this.Window
+		local title := translate("Upload Setup File...")
+		local fileName, file, size, setup
 
 		Gui %window%:Default
-
-		title := translate("Upload Setup File...")
-
 		Gui +OwnDialogs
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
@@ -2899,12 +2963,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	downloadSetup(setupType, setupName) {
-		window := this.Window
+		local window := this.Window
+		local title := translate("Download Setup File...")
+		local fileName, setupData, file, size
 
 		Gui %window%:Default
-
-		title := translate("Download Setup File...")
-
 		Gui +OwnDialogs
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
@@ -2912,6 +2975,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 
 		if (fileName != "") {
+			size := false
+
 			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 
 			try {
@@ -2931,12 +2996,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteSetup(setupType, setupName) {
-		window := this.Window
+		local window := this.Window
+		local title := translate("Delete")
 
 		Gui %window%:Default
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Delete")
 		MsgBox 262436, %title%, % translate("Do you really want to delete the selected setup?")
 		OnMessage(0x44, "")
 
@@ -2949,16 +3014,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	renameSetup(setupType, setupName) {
-		window := this.Window
+		local window := this.Window
+		local title := translate("Delete")
+		local prompt := translate("Please enter the new name for the selected setup:")
+		local locale := ((getLanguage() = "en") ? "" : "Locale")
+		local newName
 
 		Gui %window%:Default
 
 		SplitPath setupName, , , curExtension, curName
-
-		title := translate("Delete")
-		prompt := translate("Please enter the new name for the selected setup:")
-
-		locale := ((getLanguage() = "en") ? "" : "Locale")
 
 		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
 
@@ -2979,11 +3043,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 WM_MOUSEMOVE() {
+	local editor := SessionDatabaseEditor.Instance
+	local x, y, coordinateX, coordinateY
+
 	static currentAction := false
 	static previousAction := false
 	static actionInfo := ""
-
-	editor := SessionDatabaseEditor.Instance
 
 	if (editor.SelectedModule = "Automation") {
 		window := editor.Window
@@ -3060,6 +3125,8 @@ WM_MOUSEMOVE() {
 }
 
 actionDialog(xOrCommand := false, y := false, action := false) {
+	local window, title, fileName, chosen, x
+
 	static result := false
 
 	static actionTypeDropDown
@@ -3184,8 +3251,10 @@ cancelAction() {
 global importSelectCheck
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
-	local x, y
-	
+	local x, y, editor, owner, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
+	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
+	local strategies, automations, row, selection, data, type
+
 	static importListViewHandle := false
 	static result := false
 
@@ -3453,9 +3522,8 @@ selectAllImportEntries() {
 }
 
 selectImportEntry() {
-	selected := 0
-
-	row := 0
+	local selected := 0
+	local row := 0
 
 	Loop {
 		row := LV_GetNext(row, "C")
@@ -3499,9 +3567,10 @@ normalizePath(path) {
 }
 
 copyDirectory(source, destination, progressStep, ByRef count) {
-	FileCreateDir %destination%
+	local files := []
+	local ignore, fileName, file, subDirectory
 
-	files := []
+	FileCreateDir %destination%
 
 	Loop Files, %source%\*.*, DF
 		files.Push(A_LoopFilePath)
@@ -3524,8 +3593,9 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 }
 
 copyFiles(source, destination) {
-	count := 0
-	progress := 0
+	local count := 0
+	local progress := 0
+	local step := 0
 
 	showProgress({color: "Blue"})
 
@@ -3543,12 +3613,12 @@ copyFiles(source, destination) {
 
 	showProgress({progress: 50, color: "Green"})
 
-	step := 0
-
 	copyDirectory(source, destination, 50 / count, step)
 }
 
 chooseDatabasePath() {
+	local directory, title, empty, original, x, y, configuration
+
 	protectionOn()
 
 	try {
@@ -3641,8 +3711,8 @@ chooseDatabasePath() {
 }
 
 chooseSimulator() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
 
 	Gui %window%:Default
 
@@ -3652,9 +3722,10 @@ chooseSimulator() {
 }
 
 chooseCar() {
-	editor := SessionDatabaseEditor.Instance
-	simulator := editor.SelectedSimulator
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local simulator := editor.SelectedSimulator
+	local window := editor.Window
+	local index, car
 
 	Gui %window%:Default
 
@@ -3672,8 +3743,9 @@ chooseCar() {
 }
 
 chooseTrack() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local simulator, tracks, trackNames
 
 	Gui %window%:Default
 
@@ -3691,8 +3763,8 @@ chooseTrack() {
 }
 
 chooseWeather() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
 
 	Gui %window%:Default
 
@@ -3702,8 +3774,8 @@ chooseWeather() {
 }
 
 updateNotes() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
 
 	Gui %window%:Default
 
@@ -3713,6 +3785,9 @@ updateNotes() {
 }
 
 chooseSetting() {
+	local editor, window, defaultListView, selected, setting, value, settings, section, key, ignore, candidate
+	local labels, descriptor, type
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		editor := SessionDatabaseEditor.Instance
 		window := editor.Window
@@ -3754,6 +3829,8 @@ chooseSetting() {
 
 			GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 			GuiControl Choose, settingDropDown, % inList(labels, setting)
+
+			ignore := false
 
 			type := editor.getSettingType(section, key, ignore)
 
@@ -3821,8 +3898,9 @@ chooseSetting() {
 }
 
 addSetting() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, settings, labels, ignore, setting, type, value, default
 
 	Gui %window%:Default
 
@@ -3841,6 +3919,8 @@ addSetting() {
 		GuiControl Enable, settingDropDown
 		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 		GuiControl Choose, settingDropDown, 1
+
+		default := false
 
 		type := editor.getSettingType(settings[1][1], settings[1][2], default)
 
@@ -3901,8 +3981,9 @@ addSetting() {
 }
 
 deleteSetting() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, selected, settings, section, key, ignore, setting
 
 	Gui %window%:Default
 
@@ -3939,8 +4020,9 @@ deleteSetting() {
 }
 
 selectSetting() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, selected, settings, section, key, ignore, setting, type, value, default, labels
 
 	Gui %window%:Default
 
@@ -3968,6 +4050,8 @@ selectSetting() {
 
 				break
 			}
+
+		default := false
 
 		type := editor.getSettingType(section, key, default)
 
@@ -4028,7 +4112,8 @@ selectSetting() {
 }
 
 changeSetting() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
+	local window, defaultListView, selected, settings, section, key, ignore, setting, type, value
 
 	if (editor.SelectedModule = "Settings") {
 		window := editor.Window
@@ -4059,6 +4144,8 @@ changeSetting() {
 
 					break
 				}
+
+			ignore := false
 
 			type := editor.getSettingType(section, key, ignore)
 
@@ -4117,8 +4204,8 @@ changeSetting() {
 }
 
 chooseSetupType() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
 
 	Gui %window%:Default
 
@@ -4133,8 +4220,8 @@ chooseSetup() {
 }
 
 uploadSetup() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
 
 	Gui %window%:Default
 
@@ -4144,8 +4231,9 @@ uploadSetup() {
 }
 
 downloadSetup() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
 
 	Gui %window%:Default
 
@@ -4166,8 +4254,9 @@ downloadSetup() {
 }
 
 renameSetup() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
 
 	Gui %window%:Default
 
@@ -4188,8 +4277,9 @@ renameSetup() {
 }
 
 deleteSetup() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
 
 	Gui %window%:Default
 
@@ -4210,13 +4300,15 @@ deleteSetup() {
 }
 
 loadPressures() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if (editor.SelectedModule = "Pressures")
 		Task.startTask(new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100))
 }
 
 noSelect() {
+	local editor, window, defaultListView
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		editor := SessionDatabaseEditor.Instance
 		window := editor.Window
@@ -4237,9 +4329,10 @@ noSelect() {
 }
 
 selectTrackAction() {
-	MouseGetPos x, y
+	local editor := SessionDatabaseEditor.Instance
+	local x, y, coordinateX, coordinateY, action, title, originalX, originalY, currentX, currentY
 
-	editor := SessionDatabaseEditor.Instance
+	MouseGetPos x, y
 
 	coordinateX := false
 	coordinateY := false
@@ -4300,8 +4393,9 @@ selectTrackAction() {
 }
 
 selectTrackAutomation() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local index, trackAutomation, checkedRows, checked, changed, ignore, row
 
 	Gui %window%:Default
 
@@ -4377,8 +4471,9 @@ addTrackAutomation() {
 }
 
 deleteTrackAutomation() {
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected automation?")
 	OnMessage(0x44, "")
 
@@ -4412,7 +4507,8 @@ selectAllData() {
 }
 
 exportData() {
-	title := translate("Select target folder...")
+	local title := translate("Select target folder...")
+	local folder
 
 	Gui +OwnDialogs
 
@@ -4425,7 +4521,8 @@ exportData() {
 }
 
 importData() {
-	title := translate("Select export folder...")
+	local title := translate("Select export folder...")
+	local folder, info, selection
 
 	Gui +OwnDialogs
 
@@ -4461,8 +4558,9 @@ importData() {
 }
 
 deleteData() {
+	local title := translate("Delete")
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Delete")
 	MsgBox 262436, %title%, % translate("Do you really want to delete the selected data?")
 	OnMessage(0x44, "")
 
@@ -4471,43 +4569,44 @@ deleteData() {
 }
 
 chooseTab1() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Settings")
 		editor.selectModule("Settings")
 }
 
 chooseTab2() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Setups")
 		editor.selectModule("Setups")
 }
 
 chooseTab3() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Pressures")
 		editor.selectModule("Pressures")
 }
 
 chooseTab4() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Automation")
 		editor.selectModule("Automation")
 }
 
 chooseTab5() {
-	editor := SessionDatabaseEditor.Instance
+	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Data")
 		editor.selectModule("Data")
 }
 
 chooseDatabaseScope() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local persistent, title
 
 	Gui %window%:Default
 
@@ -4533,8 +4632,9 @@ chooseDatabaseScope() {
 }
 
 transferPressures() {
-	editor := SessionDatabaseEditor.Instance
-	window := editor.Window
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo
 
 	Gui %window%:Default
 
@@ -4557,13 +4657,14 @@ transferPressures() {
 																			, compound, compoundColor)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 
-	sendMessage(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), vRequestorPID)
+	sendMessage(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
 }
 
 testSettings() {
-	editor := SessionDatabaseEditor.Instance
-	exePath := kBinariesDirectory . "Race Settings.exe"
-	fileName := kTempDirectory . "Temp.settings"
+	local editor := SessionDatabaseEditor.Instance
+	local exePath := kBinariesDirectory . "Race Settings.exe"
+	local fileName := kTempDirectory . "Temp.settings"
+	local settings, section, values, key, value, options
 
 	try {
 		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
@@ -4588,7 +4689,18 @@ testSettings() {
 }
 
 showSessionDatabaseEditor() {
-	icon := kIconsDirectory . "Session Database.ico"
+	local icon := kIconsDirectory . "Session Database.ico"
+	local simulator := false
+	local car := false
+	local track := false
+	local weather := false
+	local airTemperature := 23
+	local trackTemperature:= 27
+	local compound := false
+	local compoundColor := false
+	local requestorPID := false
+	local index := 1
+	local editor
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Session Database
@@ -4597,17 +4709,6 @@ showSessionDatabaseEditor() {
 	Menu Tray, Add, Exit, Exit
 
 	installSupportMenu()
-
-	simulator := false
-	car := false
-	track := false
-	weather := false
-	airTemperature := 23
-	trackTemperature:= 27
-	compound := false
-	compoundColor := false
-
-	index := 1
 
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
@@ -4636,7 +4737,7 @@ showSessionDatabaseEditor() {
 				compoundColor := A_Args[index + 1]
 				index += 2
 			case "-Setup":
-				vRequestorPID := A_Args[index + 1]
+				requestorPID := A_Args[index + 1]
 				index += 2
 			default:
 				index += 1
@@ -4652,7 +4753,7 @@ showSessionDatabaseEditor() {
 	protectionOn()
 
 	try {
-		editor := new SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
+		editor := new SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
 
 		editor.createGui(editor.Configuration)
 

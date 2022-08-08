@@ -132,18 +132,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updatePositionsData(data) {
-		local standings := readSimulatorData(this.Code, "-Standings")
-
-		base.updatePositionsData(data)
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
-	}
-
-	updateSessionData(data) {
+	updateTelemetryData(data) {
 		local forName, surName, nickName, name
 
-		base.updateSessionData(data)
+		base.updateTelemetryData(data)
 
 		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))

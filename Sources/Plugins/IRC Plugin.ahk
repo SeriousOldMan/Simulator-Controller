@@ -259,15 +259,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local standings := readSimulatorData(this.Code, "-Standings")
-
 		base.updatePositionsData(data)
 
-		Loop % getConfigurationValue(standings, "Position Data", "Car.Count", 0)
-			setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr"
+		Loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
+			setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"
 								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

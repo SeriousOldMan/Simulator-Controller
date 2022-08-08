@@ -339,14 +339,6 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.iRepairBodyworkChosen := true
 		}
 	}
-
-	updatePositionsData(data) {
-		local standings := readSimulatorData(this.Code, "-Standings")
-
-		base.updatePositionsData(data)
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
-	}
 }
 
 

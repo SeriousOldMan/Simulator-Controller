@@ -9,7 +9,6 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\RaceReportReader.ahk
@@ -88,17 +87,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
-
-		if (this.Active || isDebug()) {
-			if (this.RaceAssistantName)
-				Task.startTask(new PeriodicTask("collectRaceStrategistSessionData", 10000, kLowPriority))
-			else
-				Task.startTask(new PeriodicTask("updateRaceStrategistSessionState", 5000, kLowPriority))
-		}
-	}
-
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
@@ -158,14 +146,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	addLap(lapNumber, dataFile, telemetryData, positionsData) {
-		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+	addLap(lap, update, data) {
+		base.addLap(lap, update, data)
 
 		this.checkStrategy()
 	}
 
-	updateLap(lapNumber, dataFile) {
-		base.updateLap(lapNumber, dataFile)
+	updateLap(lap, update, data) {
+		base.updateLap(lap, update, data)
 
 		this.checkStrategy()
 	}
@@ -219,17 +207,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			return getConfigurationValue(new SettingsDatabase().loadSettings(simulator, car, track, weather)
 									   , "Session Settings", "Telemetry." . session, default)
 		}
-	}
-
-	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
-		local data := base.acquireSessionData(telemetryData, positionsData)
-
-		this.updatePositionsData(data)
-
-		if positionsData
-			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
-
-		return data
 	}
 
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
@@ -726,28 +703,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-collectRaceStrategistSessionData() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceStrategistPlugin).collectSessionData()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-updateRaceStrategistSessionState() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceStrategistPlugin).updateSessionState()
-	}
-	finally {
-		protectionOff()
-	}
-}
 
 initializeRaceStrategistPlugin() {
 	local controller := SimulatorController.Instance

@@ -107,11 +107,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else
 				this.iTrackAutomationEnabled := false
 
-			if (this.RaceAssistantName)
-				Task.startTask(new PeriodicTask("collectRaceSpotterSessionData", 10000, kLowPriority))
-			else
-				Task.startTask(new PeriodicTask("updateRaceSpotterSessionState", 5000, kLowPriority))
-
 			OnExit(ObjBindMethod(this, "shutdownTrackAutomation", true))
 			OnExit(ObjBindMethod(this, "shutdownTrackMapper", true))
 
@@ -163,22 +158,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 		else
 			return false
-	}
-
-	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
-		local data
-
-		if !telemetryData
-			telemetryData := true
-
-		data := base.acquireSessionData(telemetryData, positionsData)
-
-		this.updatePositionsData(data)
-
-		if positionsData
-			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(data, "Position Data", Object()))
-
-		return data
 	}
 
 	toggleTrackAutomation() {
@@ -358,7 +337,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		base.finishSession(arguments*)
 	}
 
-	addLap(lapNumber, dataFile, telemetryData, positionsData) {
+	addLap(lap, update, data) {
 		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid
 
 		static sessionDB := false
@@ -366,7 +345,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if !sessionDB
 			sessionDB := new SessionDatabase()
 
-		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+		base.addLap(lap, update, data)
 
 		if (this.RaceAssistant && this.Simulator) {
 			simulator := this.Simulator.Simulator[true]
@@ -390,7 +369,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
-				if (lapNumber > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+				if (lap > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
 					track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
 
 					code := sessionDB.getSimulatorCode(simulator)
@@ -427,14 +406,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	updateLap(lapNumber, dataFile) {
-		base.updateLap(lapNumber, dataFile)
+	updateLap(lap, update, data) {
+		base.updateLap(lap, update, data)
 
-		if this.TeamSessionActive {
-			FileRead data, %dataFile%
-
-			this.TeamServer.setLapValue(lapNumber, "Track Data", data)
-		}
+		if this.TeamSessionActive
+			this.TeamServer.setLapValue(lap, "Track Data", data)
 	}
 
 	createTrackMap(simulator, track, dataFile) {
@@ -530,28 +506,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateRaceSpotterSessionState() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceSpotterPlugin).updateSessionState()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-collectRaceSpotterSessionData() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceSpotterPlugin).collectSessionData()
-	}
-	finally {
-		protectionOff()
-	}
-}
 
 initializeRaceSpotterPlugin() {
 	local controller := SimulatorController.Instance

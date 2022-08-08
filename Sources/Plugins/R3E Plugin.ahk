@@ -638,39 +638,22 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local standings := readSimulatorData(this.Code, "-Standings")
-
 		base.updatePositionsData(data)
 
 		Loop {
-			carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 			if (carID == kUndefined)
 				break
 			else
-				setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
+				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
 		}
-
-		/*
-		positions := []
-
-		Loop % getConfigurationValue(standings, "Position Data", "Car.Count")
-			positions.Push(Array(A_Index, getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Lap")
-										+ getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Lap.Running")))
-
-		bubbleSort(positions, "positionOrder")
-
-		Loop % positions.Length()
-			setConfigurationValue(standings, "Position Data", "Car." . positions[A_Index][1] . ".Position", A_Index)
-		*/
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 
-	updateSessionData(data) {
+	updateTelemetryData(data) {
 		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
 
-		base.updateSessionData(data)
+		base.updateTelemetryData(data)
 	}
 
 	getImageFileNames(imageNames*) {

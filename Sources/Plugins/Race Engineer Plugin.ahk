@@ -29,7 +29,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
 
-	iCollectorTask := false
 	iPitstopPending := false
 
 	iLapDatabase := false
@@ -81,20 +80,6 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	PitstopPending[] {
 		Get {
 			return this.iPitstopPending
-		}
-	}
-
-	__New(controller, name, configuration := false) {
-		base.__New(controller, name, configuration)
-
-		if (this.Active || isDebug()) {
-			if (this.RaceAssistantName) {
-				this.iCollectorTask := new PeriodicTask("collectRaceEngineerSessionData", 10000, kLowPriority)
-
-				Task.startTask(this.iCollectorTask)
-			}
-			else
-				Task.startTask(new PeriodicTask("updateRaceEngineerSessionState", 5000, kLowPriority))
 		}
 	}
 
@@ -204,14 +189,14 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	addLap(lapNumber, dataFile, telemetryData, positionsData) {
-		base.addLap(lapNumber, dataFile, telemetryData, positionsData)
+	addLap(lap, update, data) {
+		base.addLap(lap, update, data)
 
 		this.checkPitstopPlan()
 	}
 
-	updateLap(lapNumber, dataFile) {
-		base.updateLap(lapNumber, dataFile)
+	updateLap(lap, update, data) {
+		base.updateLap(lap, update, data)
 
 		this.checkPitstopPlan()
 	}
@@ -243,7 +228,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.iPitstopPending := false
 
-		this.iCollectorTask.Sleep := 10000
+		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
 	pitstopOptionChanged(option, values*) {
@@ -260,7 +245,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.Simulator.pitstopPrepared(pitstopNumber)
 
-		this.iCollectorTask.Sleep := 5000
+		RaceAssistantPlugin.CollectorTask.Sleep := 5000
 	}
 
 	pitstopFinished(pitstopNumber) {
@@ -268,7 +253,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		this.Simulator.pitstopFinished(pitstopNumber)
 
-		this.iCollectorTask.Sleep := 10000
+		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 	}
 
 	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {
@@ -437,28 +422,6 @@ preparePitstop() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateRaceEngineerSessionState() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).updateSessionState()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-collectRaceEngineerSessionData() {
-	protectionOn()
-
-	try {
-		SimulatorController.Instance.findPlugin(kRaceEngineerPlugin).collectSessionData()
-	}
-	finally {
-		protectionOff()
-	}
-}
 
 initializeRaceEngineerPlugin() {
 	local controller := SimulatorController.Instance

@@ -282,20 +282,12 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateSessionData(data) {
-		base.updateSessionData(data)
+	updateTelemetryData(data) {
+		base.updateTelemetryData(data)
 
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setConfigurationValue(data, "Session Data", "Paused", true)
-	}
-
-	updatePositionsData(data) {
-		local standings := readSimulatorData(this.Code, "-Standings")
-
-		base.updatePositionsData(data)
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

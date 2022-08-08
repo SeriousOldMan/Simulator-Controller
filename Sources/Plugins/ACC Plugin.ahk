@@ -301,16 +301,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updatePositionsData(data) {
+	acquirePositionsData() {
+		local data
 		local lap, restart, fileName, tries
 		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
-
-		base.updatePositionsData(data)
 
 		static carIDs := false
 		static lastDriverCar := false
 		static lastRead := false
-		static standings := false
 		static sessionID := 0
 		static lastLap := 0
 
@@ -354,7 +352,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (tries > 0) {
 				fileName := kTempDirectory . "ACCUDP.out"
 
-				standings := readConfiguration(fileName)
+				data := readConfiguration(fileName)
 
 				try {
 					FileDelete %fileName%
@@ -364,7 +362,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				}
 			}
 			else {
-				standings := false
+				data := false
 
 				try {
 					FileDelete %fileName%
@@ -377,7 +375,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		if standings {
+		if data {
 			if (lap <= 1)
 				lastDriverCar := false
 
@@ -391,7 +389,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			driverCarCandidate := false
 
 			Loop {
-				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+				carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID == kUndefined)
 					break
@@ -401,16 +399,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if ((car = "Unknown") && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
-					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", car)
+					setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", car)
 
 					if !driverCar
-						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+						if ((getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
 						}
-						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						else if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 							driverCarCandiate := A_Index
 				}
 			}
@@ -418,9 +416,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if !driverCar
 				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
 
-			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
-			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+			setConfigurationValue(data, "Position Data", "Driver.Car", driverCar)
+
+			return data
 		}
+		else
+			return newConfiguration()
 	}
 
 	computeBrakePadWear(location, compound, thickness) {
@@ -448,10 +449,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	updateSessionData(data) {
+	updateTelemetryData(data) {
 		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
 
-		base.updateSessionData(data)
+		base.updateTelemetryData(data)
 
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)

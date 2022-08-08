@@ -740,40 +740,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorStartup(simulator) {
-		local raceEngineer, raceStrategist, raceSpotter
+		local ignore, assistant
 
 		base.simulatorStartup(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
-				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			RaceAssistantPlugin.startSimulation(this)
 
-				if (raceEngineer && raceEngineer.isActive()) {
-					raceEngineer.startSimulation(this)
-
-					this.iRaceEngineer := raceEngineer
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
-				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
-
-				if (raceStrategist && raceStrategist.isActive()) {
-					raceStrategist.startSimulation(this)
-
-					this.iRaceStrategist := raceStrategist
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
-				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
-
-				if (raceSpotter && raceSpotter.isActive()) {
-					raceSpotter.startSimulation(this)
-
-					this.iRaceSpotter := raceSpotter
-				}
-			}
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if isInstance(assistant, RaceEngineerPlugin)
+					this.iRaceEngineer := assistantv
+				else if isInstance(assistant, RaceStrategistPlugin)
+					this.iRaceStrategist := assistant
+				else if isInstance(assistant, RaceSpotterPlugin)
+					this.iRaceSpotter := assistant
 		}
 	}
 
@@ -783,35 +763,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		base.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
-				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			RaceAssistantPlugin.stopSimulation(this)
 
-				if (raceEngineer && raceEngineer.isActive()) {
-					raceEngineer.stopSimulation(this)
-
-					this.iRaceEngineer := false
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
-				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
-
-				if (raceStrategist && raceStrategist.isActive()) {
-					raceStrategist.stopSimulation(this)
-
-					this.iRaceStrategist := false
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
-				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
-
-				if (raceSpotter && raceSpotter.isActive()) {
-					raceSpotter.stopSimulation(this)
-
-					this.iRaceSpotter := false
-				}
-			}
+			this.iRaceEngineer := false
+			this.iRaceStrategist := false
+			this.iRaceSpotter := false
 		}
 	}
 
@@ -846,8 +802,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return
-		else if (this.RaceEngineer && this.RaceStrategist.requestInformation(arguments*))
-			this.RaceEngineer.requestInformation(arguments*)
+		else if (this.RaceEngineer && this.RaceEngineer.requestInformation(arguments*))
+			return
 		else if this.RaceSpotter
 			this.RaceSpotter.requestInformation(arguments*)
 	}
@@ -989,9 +945,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	requestPitstopDriver(pitstopNumber, driver) {
 	}
 
-	updatePositionsData(data) {
-	}
-
 	updateTyreCompound(data) {
 		local compound, compoundColor
 
@@ -1009,13 +962,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	updateSessionData(data) {
+	updateTelemetryData(data) {
 		this.updateTyreCompound(data)
 
 		if (this.SessionState != kSessionFinished) {
 			this.Car := getConfigurationValue(data, "Session Data", "Car")
 			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}
+	}
+
+	updatePositionsData(data) {
 	}
 
 	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
@@ -1063,8 +1019,86 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
 																				 , "Simulator Settings", "Tyre.Compound.Color.Requested"))
 	}
+
+	acquireTelemetryData() {
+		local simulator, code, trackData, data
+
+		static sessionDB := false
+
+		if !sessionDB
+			sessionDB := new SessionDatabase()
+
+		code := this.Code
+		trackData := sessionDB.getTrackData(code, this.Track)
+
+		return (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
+	}
+
+	acquirePositionsData() {
+		return readSimulatorData(this.Code, "-Standings")
+	}
+
+	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		local data := newConfiguration()
+
+		telemetryData := this.acquireTelemetryData()
+		positionsData := this.acquirePositionsData()
+
+		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
+		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
+
+		for section, values in telemetryData
+			setConfigurationSectionValues(data, section, values)
+
+		for section, values in positionsData
+			setConfigurationSectionValues(data, section, values)
+
+		return data
+	}
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+readSimulatorData(simulator, options := "", protocol := "SHM") {
+	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	local postfix, dataFile, data
+
+	Random postfix, 1, 1000000
+
+	FileCreateDir %kTempDirectory%%simulator% Data
+
+	dataFile := (kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data")
+
+	try {
+		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
+	}
+	catch exception {
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+												   , {simulator: simulator, protocol: protocol})
+							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+							   . kBinariesDirectory . translate(")"))
+
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+									  , {exePath: exePath, simulator: simulator, protocol: protocol})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+
+	data := readConfiguration(dataFile)
+
+	try {
+		FileDelete %dataFile%
+	}
+	catch exception {
+		; ignore
+	}
+
+	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+
+	return data
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;

@@ -80,7 +80,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		updateActions(sessionState) {
+		updateActions(session) {
 		}
 	}
 
@@ -270,33 +270,33 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !ErrorLevel
 			this.iUDPClient := false
 
-		if (this.SessionState == kSessionRace)
+		if (this.Session == kSessionRace)
 			this.startupUDPClient(restart)
 	}
 
-	updateSessionState(sessionState) {
-		local lastSessionState := this.SessionState
+	updateSession(session) {
+		local lastSession := this.Session
 		local activeModes
 
-		base.updateSessionState(sessionState)
+		base.updateSession(session)
 
 		activeModes := this.Controller.ActiveModes
 
 		if (inList(activeModes, this.iChatMode))
-			this.iChatMode.updateActions(sessionState)
+			this.iChatMode.updateActions(session)
 
 		if (inList(activeModes, this.iPitstopMode))
-			this.iPitstopMode.updateActions(sessionState)
+			this.iPitstopMode.updateActions(session)
 
-		if (sessionState == kSessionRace)
-			this.startupUDPClient((lastSessionState != kSessionRace) && (lastSessionState != kSessionPaused))
+		if (session == kSessionRace)
+			this.startupUDPClient((lastSession != kSessionRace) && (lastSession != kSessionPaused))
 		else {
-			if (sessionState == kSessionFinished) {
+			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
 				this.iRepairBodyworkChosen := true
 			}
 
-			if (sessionState != kSessionPaused)
+			if (session != kSessionPaused)
 				this.shutdownUDPClient(true)
 		}
 	}
@@ -325,7 +325,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		lastLap := lap
 
-		if (this.SessionState == kSessionRace)
+		if (this.Session == kSessionRace)
 			this.requireUDPClient(restart)
 		else if !this.UDPClient
 			return

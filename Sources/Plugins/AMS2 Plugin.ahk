@@ -330,10 +330,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
+	updateSession(session) {
+		base.updateSession(session)
 
-		if (sessionState == kSessionFinished) {
+		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true

@@ -332,7 +332,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.updateActions(kSessionFinished)
 	}
 
-	updateActions(sessionState) {
+	updateActions(session) {
 		local ignore, theAction
 
 		for ignore, theAction in this.Actions

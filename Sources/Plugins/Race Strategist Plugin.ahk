@@ -182,10 +182,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	activeSession(data) {
-		local sessionState := getDataSessionState(data)
+		local session := getDataSession(data)
 		local simualator, car, track, weather, sessiom, default
 
-		if (sessionState == kSessionRace)
+		if (session == kSessionRace)
 			return true
 		else {
 			simulator := getConfigurationValue(data, "Session Data", "Simulator")
@@ -196,7 +196,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			session := "Other"
 			default := false
 
-			switch sessionState {
+			switch session {
 				case kSessionPractice:
 					session := "Practice"
 					default := true

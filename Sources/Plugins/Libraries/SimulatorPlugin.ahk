@@ -32,8 +32,8 @@ global kAssistantMode = "Assistant"
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessionStates = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
-global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
+global kSessions = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
+global kSessionNames = ["Other", "Practice", "Qualification", "Race"]
 
 global kAssistantAnswerActions = ["Accept", "Reject"]
 global kAssistantRaceActions = ["PitstopPlan", "PitstopPrepare", "PitstopRecommend", "StrategyCancel"]
@@ -53,18 +53,18 @@ class AssistantMode extends ControllerMode {
 	activate() {
 		base.activate()
 
-		this.updateActions(this.Plugin.SessionState)
+		this.updateActions(this.Plugin.Session)
 	}
 
-	updateActions(sessionState) {
-		this.updateRaceAssistantActions(sessionState)
+	updateActions(session) {
+		this.updateRaceAssistantActions(session)
 	}
 
-	updateRaceAssistantActions(sessionState) {
+	updateRaceAssistantActions(session) {
 		local ignore, theAction
 
 		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
-			sessionState := kSessionFinished
+			session := kSessionFinished
 
 		for ignore, theAction in this.Actions
 			if (isInstance(theAction, RaceAssistantAction) && inList(this.Controller.ActiveModes, this))
@@ -72,7 +72,7 @@ class AssistantMode extends ControllerMode {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
-				else if inList([kSessionPractice, kSessionRace], sessionState) {
+				else if inList([kSessionPractice, kSessionRace], session) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -90,18 +90,18 @@ class PitstopMode extends AssistantMode {
 		}
 	}
 
-	updateActions(sessionState) {
-		this.updatePitstopActions(sessionState)
+	updateActions(session) {
+		this.updatePitstopActions(session)
 
-		base.updateActions(sessionState)
+		base.updateActions(session)
 	}
 
-	updatePitstopActions(sessionState) {
+	updatePitstopActions(session) {
 		local ignore, theAction
 
 		for ignore, theAction in this.Actions
 			if (isInstance(theAction, PitstopAction) && inList(this.Controller.ActiveModes, this))
-				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
+				if ((session != kSessionFinished) && (session != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -204,7 +204,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	iCommandDelay := kUndefined
 
 	iSimulator := false
-	iSessionState := kSessionFinished
+	iSession := kSessionFinished
 
 	iCar := false
 	iTrack := false
@@ -319,26 +319,26 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	SessionState[asText := false] {
+	Session[asText := false] {
 		Get {
-			local sessionState
+			local session
 
 			if asText {
-				sessionState := this.iSessionState
+				session := this.iSession
 
-				if (sessionState >= kSessionOther)
-					return kSessionStateNames[sessionState]
+				if (session >= kSessionOther)
+					return kSessionNames[session]
 				else
-					return ((sessionState == kSessionFinished) ? "Finished" : "Paused")
+					return ((session == kSessionFinished) ? "Finished" : "Paused")
 			}
 			else
-				return this.iSessionState
+				return this.iSession
 		}
 	}
 
-	SessionStates[asText := false] {
+	Sessions[asText := false] {
 		Get {
-			return (asText ? kSessionStateNames : kSessionStates)
+			return (asText ? kSessionNames : kSessions)
 		}
 	}
 
@@ -491,7 +491,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			if SimulatorPlugin.ActiveSimulator
 				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
 
-			this.updateSessionState(kSessionFinished)
+			this.updateSession(kSessionFinished)
 
 			SimulatorPlugin.sActiveSimulator := this
 			SimulatorPlugin.sActiveSimulation := simulator
@@ -502,38 +502,38 @@ class SimulatorPlugin extends ControllerPlugin {
 		base.simulatorShutdown(simulator)
 
 		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
-			this.updateSessionState(kSessionFinished)
+			this.updateSession(kSessionFinished)
 
 			SimulatorPlugin.sActiveSimulator := false
 			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
 
-	updateSessionState(sessionState) {
+	updateSession(session) {
 		local mode
 
-		if ((sessionState != this.SessionState) && (sessionState != kSessionPaused)) {
-			this.iSessionState := sessionState
+		if ((session != this.Session) && (session != kSessionPaused)) {
+			this.iSession := session
 
-			if (sessionState == kSessionFinished) {
+			if (session == kSessionFinished) {
 				this.Car := false
 				this.Track := false
 
 				this.Controller.setModes()
 			}
 			else
-				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][sessionState])
+				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][session])
 		}
 
 		mode := this.findMode(kPitstopMode)
 
 		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(sessionState)
+			mode.updateActions(session)
 
 		mode := this.findMode(kAssistantMode)
 
 		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(sessionState)
+			mode.updateActions(session)
 	}
 
 	updatePitstopOption(option, action, steps := 1) {
@@ -792,10 +792,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
+	updateSession(session) {
+		base.updateSession(session)
 
-		if (sessionState = kSessionFinished)
+		if (session = kSessionFinished)
 			this.iTyreCompound := false
 	}
 
@@ -965,7 +965,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updateTelemetryData(data) {
 		this.updateTyreCompound(data)
 
-		if (this.SessionState != kSessionFinished) {
+		if (this.Session != kSessionFinished) {
 			this.Car := getConfigurationValue(data, "Session Data", "Car")
 			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}

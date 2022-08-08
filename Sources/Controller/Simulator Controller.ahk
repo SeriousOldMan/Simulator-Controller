@@ -1170,7 +1170,7 @@ class SimulatorController extends ConfigurationItem {
 				if isInstance(thePlugin, SimulatorPlugin) {
 					states := []
 
-					for ignore, name in thePlugin.SessionStates[true]
+					for ignore, name in thePlugin.Sessions[true]
 						states.Push(name)
 
 					setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application

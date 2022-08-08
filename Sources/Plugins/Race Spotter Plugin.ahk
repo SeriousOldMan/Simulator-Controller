@@ -135,10 +135,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceSpotter(this, pid)
 	}
 
-	updateActions(sessionState) {
+	updateActions(session) {
 		local ignore, theAction
 
-		base.updateActions(sessionState)
+		base.updateActions(session)
 
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {

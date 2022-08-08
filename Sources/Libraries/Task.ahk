@@ -97,6 +97,10 @@ class Task {
 		Get {
 			return this.iPriority
 		}
+
+		Set {
+			return (this.iPriority := value)
+		}
 	}
 
 	NextExecution[] {

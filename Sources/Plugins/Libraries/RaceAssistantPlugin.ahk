@@ -21,9 +21,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceAssistantPlugin extends ControllerPlugin  {
-	static sAssistants := []
-
 	static sCollectorTask := false
+
+	static sAssistants := []
 
 	static sSession := kSessionFinished
 	static sLastLap := 0
@@ -299,15 +299,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	Assistants[] {
-		Get {
-			return RaceAssistantPlugin.sAssistants
-		}
-	}
-
 	CollectorTask[] {
 		Get {
 			return RaceAssistantPlugin.sCollectorTask
+		}
+	}
+
+	Assistants[] {
+		Get {
+			return RaceAssistantPlugin.sAssistants
 		}
 	}
 
@@ -774,8 +774,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled
 				assistant.performPitstop(lapNumber)
-
-		RaceAssistantPlugin.sInPit := lapNumber
 	}
 
 	restoreAssistantsSessionState() {
@@ -1462,8 +1460,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
 						; Car is in the Pit
 
-						if !RaceAssistantPlugin.InPit
+						if !RaceAssistantPlugin.InPit {
 							RaceAssistantPlugin.performAssistantsPitstop(dataLastLap)
+
+							RaceAssistantPlugin.sInPit := lapNumber
+						}
 					}
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time

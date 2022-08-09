@@ -270,9 +270,9 @@ bool checkPositions(const SharedMemory* sharedData) {
 		carBehind = false;
 		carBehindLeft = false;
 		carBehindRight = false;
-
+		
 		for (int id = 0; id < sharedData->mNumParticipants; id++) {
-			if (id != carID) {
+			if ((id != carID) && (sharedData->mPitModes[id] == PIT_MODE_NONE)) {
 				bool faster = false;
 
 				if (hasLastCoordinates)

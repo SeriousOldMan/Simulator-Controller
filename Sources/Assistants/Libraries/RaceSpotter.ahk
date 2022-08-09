@@ -45,6 +45,7 @@ class CarInfo {
 
 	iPitstops := []
 	iLastPitstop := false
+	iInPit := false
 
 	iLapTimes := []
 
@@ -93,6 +94,12 @@ class CarInfo {
 	LastPitstop[] {
 		Get {
 			return this.iLastPitstop
+		}
+	}
+
+	InPit[] {
+		Get {
+			return this.iInPit
 		}
 	}
 
@@ -200,7 +207,7 @@ class CarInfo {
 		this.iCar := car
 	}
 
-	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, pitstop := false) {
+	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
 		this.iDriver := driver
 		this.iPosition := position
 
@@ -235,10 +242,16 @@ class CarInfo {
 			this.iLastDeltas[sector] := delta
 		}
 
-		if (pitstop && !inList(this.Pitstops, lastLap)) {
-			this.Pitstops.Push(lastLap)
-			this.iLastPitstop := lastLap
+		if inPit {
+			if !inList(this.Pitstops, lastLap) {
+				this.Pitstops.Push(lastLap)
+				this.iLastPitstop := lastLap
+			}
+
+			this.iInPit := true
 		}
+		else
+			this.iInPit := false
 	}
 
 	isFaster(sector) {
@@ -388,6 +401,10 @@ class PositionInfo {
 			return ((difference < 0) && (Abs(difference) > threshold))
 	}
 
+	isLeader() {
+		return (this.Car.Position == 1)
+	}
+
 	inFront(standings := true) {
 		local knowledgeBase := this.Spotter.KnowledgeBase
 
@@ -431,14 +448,16 @@ class PositionInfo {
 			return false
 	}
 
-	reset(sector, full := false) {
+	reset(sector, full := false, inPit := false) {
 		if full {
 			this.Reported := false
 			this.iBaseLap := this.Car.LastLap
 		}
 
 		this.iInitialDeltas := {}
-		this.iInitialDeltas[sector] := this.Delta[sector]
+
+		if !inPit
+			this.iInitialDeltas[sector] := this.Delta[sector]
 	}
 
 	calibrate(sector) {
@@ -449,20 +468,24 @@ class PositionInfo {
 	}
 
 	checkpoint(sector) {
-		position := this.forPosition()
-		observed := ((this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
-				   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
+		if (this.Spotter.DriverCar.InPit || this.Car.InPit)
+			this.reset(sector, true, true)
+		else {
+			position := this.forPosition()
+			observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
+					   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
 
-		if (observed != this.Observed) {
-			if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
-				this.reset(sector, true)
-			else
-				this.Reported := false
+			if (observed != this.Observed) {
+				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
+					this.reset(sector, true)
+				else
+					this.Reported := false
 
-			this.iObserved := observed
+				this.iObserved := observed
+			}
+			else if (observed = "")
+				this.calibrate(sector)
 		}
-		else if (observed = "")
-			this.calibrate(sector)
 	}
 }
 
@@ -484,6 +507,7 @@ class RaceSpotter extends RaceAssistant {
 
 	iRaceStartSummarized := false
 	iFinalLapsAnnounced := false
+	iReportedPitstops := {}
 
 	iPendingAlerts := []
 
@@ -640,6 +664,7 @@ class RaceSpotter extends RaceAssistant {
 
 			this.iRaceStartSummarized := false
 			this.iFinalLapsAnnounced := false
+			this.iReportedPitstops := {}
 		}
 	}
 
@@ -930,6 +955,7 @@ class RaceSpotter extends RaceAssistant {
 						  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 						  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
 						  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
+						  , knowledgeBase.getValue("Car." . A_Index . ".InPitlane", false)
 			}
 		}
 	}
@@ -1013,11 +1039,13 @@ class RaceSpotter extends RaceAssistant {
 			return false
 	}
 
-	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind, ByRef trackAhead, ByRef trackBehind) {
+	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind
+				   , ByRef trackAhead, ByRef trackBehind, ByRef leader) {
 		standingsAhead := false
 		standingsBehind := false
 		trackAhead := false
 		trackBehind := false
+		leader := false
 
 		for nr, candidate in this.PositionInfos {
 			observed := candidate.Observed
@@ -1031,6 +1059,9 @@ class RaceSpotter extends RaceAssistant {
 				standingsAhead := candidate
 			else if InStr(observed, "SB")
 				standingsBehind := candidate
+
+			if InStr(observed, "L")
+				leader := candidate
 		}
 	}
 
@@ -1041,8 +1072,45 @@ class RaceSpotter extends RaceAssistant {
 		standingsBehind := false
 		trackAhead := false
 		trackBehind := false
+		leader := false
 
-		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind)
+		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
+
+		if (standingsAhead.InPit && (standingsAhead != leader)) {
+			situation := ("AheadPitting " . standingsAhead.Car.Nr . A_Space . standingsAhead.Car.LastLap)
+
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
+
+				speaker.speakPhrase("AheadPitting")
+
+				return true
+			}
+		}
+
+		if standingsBehind.InPit {
+			situation := ("BehindPitting " . standingsBehind.Car.Nr . A_Space . standingsBehind.Car.LastLap)
+
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
+
+				speaker.speakPhrase("BehindPitting")
+
+				return true
+			}
+		}
+
+		if (leader.InPit && (leader.Car.Nr != this.DriverCar.Nr)) {
+			situation := ("LeaderPitting " . leader.Car.Nr . A_Space . leader.Car.LastLap)
+
+			if !this.Advices.HasKey(situation) {
+				this.Advices[situation] := true
+
+				speaker.speakPhrase("LeaderPitting")
+
+				return true
+			}
+		}
 
 		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
@@ -1057,10 +1125,11 @@ class RaceSpotter extends RaceAssistant {
 				return true
 			}
 		}
-		else if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
-			  && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
-			  && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-			  && (trackBehind.OpponentType = "LapDown")) {
+
+		if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
+		 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
+		 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
+		 && (trackBehind.OpponentType = "LapDown")) {
 			situation := ("ProtectFaster " . trackBehind . A_Space . opponent)
 
 			if !this.Advices.HasKey(situation) {
@@ -1071,8 +1140,9 @@ class RaceSpotter extends RaceAssistant {
 				return true
 			}
 		}
-		else if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-			  && (trackBehind.OpponentType = "LapDown")) {
+
+		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
+		 && (trackBehind.OpponentType = "LapDown")) {
 			situation := ("LapDownFaster " . trackBehind)
 
 			if !this.Advices.HasKey(situation) {
@@ -1092,9 +1162,10 @@ class RaceSpotter extends RaceAssistant {
 				return true
 			}
 		}
-		else if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-			  && (trackBehind.OpponentType = "LapUp")
-			  && (Abs(trackBehind.LapTimeDifference[true]) < (this.DriverCar.LapTime[true] * 0.005))) {
+
+		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
+		 && (trackBehind.OpponentType = "LapUp")
+		 && (Abs(trackBehind.LapTimeDifference[true]) < (this.DriverCar.LapTime[true] * 0.005))) {
 			situation := ("LapUpFaster " . trackBehind)
 
 			if !this.Advices.HasKey(situation) {
@@ -1145,8 +1216,9 @@ class RaceSpotter extends RaceAssistant {
 		standingsBehind := false
 		trackAhead := false
 		trackBehind := false
+		leader := false
 
-		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind)
+		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
 
 		if this.Debug[kDebugPositions] {
 			info := ("=================================`n" . regular . (standingsAhead != false) . (standingsBehind != false) . (trackAhead != false) . (trackBehind != false) . "`n=================================`n`n")
@@ -1331,7 +1403,7 @@ class RaceSpotter extends RaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector)
 
-			if !this.SpotterSpeaking {
+			if (!this.SpotterSpeaking && !this.DriverCar.InPit) {
 				this.SpotterSpeaking := true
 
 				try {
@@ -1345,23 +1417,23 @@ class RaceSpotter extends RaceAssistant {
 							this.iRaceStartSummarized := true
 					}
 					else if this.hasEnoughData(false) {
-						deltaInformation := this.Announcements["DeltaInformation"]
 						tacticalAdvices := this.Announcements["TacticalAdvices"]
 
-						if (tacticalAdvices && this.tacticalAdvice(sector, true))
-							deltaInformation := false
+						if (!tacticalAdvices || !this.tacticalAdvice(sector, true)) {
+							deltaInformation := this.Announcements["DeltaInformation"]
 
-						if deltaInformation {
-							if (deltaInformation = "S")
-								regular := "S"
-							else {
-								regular := (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
+							if deltaInformation {
+								if (deltaInformation = "S")
+									regular := "S"
+								else {
+									regular := (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
 
-								if regular
-									this.iLastDeltaInformationLap := lastLap
+									if regular
+										this.iLastDeltaInformationLap := lastLap
+								}
+
+								this.deltaInformation(lastLap, sector, regular)
 							}
-
-							this.deltaInformation(lastLap, sector, regular)
 						}
 					}
 				}
@@ -1755,6 +1827,7 @@ class RaceSpotter extends RaceAssistant {
 		this.Advices := {}
 		this.iLastDeltaInformationLap := false
 		this.iRaceStartSummarized := false
+		this.iReportedPitstops := {}
 
 		if !this.GridPosition
 			this.initializeGridPosition(data)

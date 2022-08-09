@@ -405,7 +405,7 @@ namespace RF2SHMSpotter {
 				{
 					var vehicle = scoring.mVehicles[i];
 
-					if (vehicle.mIsPlayer == 0)
+					if ((vehicle.mIsPlayer == 0) && (vehicle.mInPits == 0))
 					{
 						// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
 						// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);

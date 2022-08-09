@@ -394,8 +394,10 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 
 	if (newSituation == CLEAR) {
 		char* trackPositions;
+		char* pitLaneStates;
 
-		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct") &&
+				getRawDataValue(pitLaneStates, header, data, "CarIdxOnPitRoad")) {
 			float playerRunning = ((float*)trackPositions)[playerCarIndex];
 
 			for (int i = 1; ; i++) {
@@ -406,8 +408,8 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 
 				if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
 					int carIndex = atoi(carIdx);
-
-					if (carIndex != playerCarIndex) {
+					
+					if ((carIndex != playerCarIndex) && !((bool*)pitLaneStates)[carIndex]) {
 						float carRunning = ((float*)trackPositions)[carIndex];
 
 						if (carRunning < playerRunning)

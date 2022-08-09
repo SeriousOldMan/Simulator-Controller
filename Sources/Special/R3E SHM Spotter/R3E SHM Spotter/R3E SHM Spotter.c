@@ -324,7 +324,8 @@ BOOL checkPositions(int playerID) {
 		carBehindRight = FALSE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++) {
-			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) {
+			if ((map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) &&
+					(map_buffer->all_drivers_data_1[id].in_pitlane == 0)) {
 				BOOL faster = FALSE;
 
 				if (hasLastCoordinates)

@@ -147,8 +147,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		getGrammars(language) {
-			prefix := this.RaceAssistant.AssistantType . ".grammars."
-			fileName := (prefix . language)
+			local prefix := this.RaceAssistant.AssistantType . ".grammars."
+			local fileName := (prefix . language)
+			local grammars, section, values, key, value
 
 			if !FileExist(getFileName(fileName, kUserGrammarsDirectory, kGrammarsDirectory))
 				fileName := (prefix . "en")
@@ -361,6 +362,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
 	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+		local options
+
 		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
@@ -385,6 +388,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
+		local options
+
 		base.loadFromConfiguration(configuration)
 
 		options := this.iOptions
@@ -515,16 +520,18 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	timeRecognized(words) {
+		local time
+
 		FormatTime time, %A_Now%, Time
 
 		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
 
 	activateAnnouncement(words, active) {
-		speaker := this.getSpeaker()
-		fragments := speaker.Fragments
-
-		announcements := []
+		local speaker := this.getSpeaker()
+		local fragments := speaker.Fragments
+		local announcements := []
+		local key, value, announcement, score, ignore, fragment, fragmentScore
 
 		for key, value in this.Announcements
 			announcements.Push(key)
@@ -601,6 +608,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
+		local rnd, joke, speaker, html, index
+
 		Random rnd, 0, 4
 
 		hasJoke := (rnd > 1)
@@ -673,6 +682,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	isNumber(word, ByRef number) {
+		local fragments, index, fragment
+
 		static numberFragmentsLookup := false
 
 		if word is Number
@@ -713,7 +724,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createKnowledgeBase(facts) {
-		local rules
+		local rules, productions, reductions, engine
 
 		FileRead rules, % getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory)
 
@@ -750,6 +761,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	prepareSession(ByRef settings, ByRef data) {
+		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
+
 		if (settings && !IsObject(settings))
 			settings := readConfiguration(settings)
 
@@ -786,7 +799,9 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createSession(ByRef settings, ByRef data) {
-		local facts
+		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
+		local lapTime, settingsLapTime, sessionForma, sessionTimeRemaining, sessionLapsRemaining
+		local dataDuration, duration, laps, settingsDuration
 
 		if (settings && !IsObject(settings))
 			settings := readConfiguration(settings)
@@ -852,25 +867,23 @@ class RaceAssistant extends ConfigurationItem {
 				duration := settingsDuration
 		}
 
-		facts := {"Session.Simulator": simulator
-				, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
-				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
-				, "Session.Duration": duration
-				, "Session.Laps": laps
-				, "Session.Type": this.Session
-				, "Session.Format": sessionFormat
-				, "Session.Time.Remaining": sessionTimeRemaining
-				, "Session.Lap.Remaining": sessionLapsRemaining
-				, "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
-				, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
-				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
-				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
-				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
-				, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
-				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
-
-		return facts
+		return {"Session.Simulator": simulator
+			  , "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
+			  , "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
+			  , "Session.Duration": duration
+			  , "Session.Laps": laps
+			  , "Session.Type": this.Session
+			  , "Session.Format": sessionFormat
+			  , "Session.Time.Remaining": sessionTimeRemaining
+			  , "Session.Lap.Remaining": sessionLapsRemaining
+			  , "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
+			  , "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
+			  , "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
+			  , "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
+			  , "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
+			  , "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
+			  , "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
+			  , "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
 	}
 
 	updateSession(settings) {
@@ -907,6 +920,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	restoreSessionState(settingsFile, stateFile) {
+		local sessionState, sessionSettings
+
 		if stateFile {
 			sessionState := readConfiguration(stateFile)
 
@@ -948,6 +963,10 @@ class RaceAssistant extends ConfigurationItem {
 
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
+		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result
+		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemparatures, tyreWear, brakeTemparatures, brakeWear
+
 		static baseLap := false
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1127,6 +1146,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
+		local result
 
 		data := this.prepareData(lapNumber, data)
 
@@ -1149,6 +1169,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	finishPitstop(lapNumber := false) {
+		local savedKnowledgeBase, postfix, settingsFile, stateFile
+
 		if this.RemoteHandler {
 			savedKnowledgeBase := newConfiguration()
 
@@ -1168,7 +1190,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	saveSessionSettings() {
 		local knowledgeBase := this.KnowledgeBase
-		local compound
+		local compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
+		local loadSettings, lapTime, fileName, settings
 
 		if knowledgeBase {
 			settingsDB := this.SettingsDatabase
@@ -1211,7 +1234,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	dumpKnowledge(knowledgeBase) {
-		prefix := this.AssistantType
+		local prefix := this.AssistantType
+		local key, value, text
 
 		try {
 			FileDelete %kTempDirectory%%prefix%.knowledge
@@ -1234,6 +1258,8 @@ class RaceAssistant extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 printNumber(number, precision) {
+	local pos
+
 	number := (Format("{:." . precision . "f}", Round(number, precision)) . "")
 
 	pos := InStr(number, ".")
@@ -1249,7 +1275,7 @@ printNumber(number, precision) {
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
-	value := getConfigurationValue(data, newSection, key, kUndefined)
+	local value := getConfigurationValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)
 		return value
@@ -1263,9 +1289,9 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 ;;;-------------------------------------------------------------------------;;;
 
 matchFragment(words, fragment) {
-	score := 0
-
-	fragmentWords := string2Values(A_Space, fragment)
+	local score := 0
+	local fragmentWords := string2Values(A_Space, fragment)
+	local ignore, word, wordScore, candidate
 
 	for ignore, word in fragmentWords {
 		wordScore := 0

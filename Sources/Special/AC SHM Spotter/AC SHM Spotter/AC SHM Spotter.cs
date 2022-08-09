@@ -480,7 +480,7 @@ namespace ACSHMSpotter {
 
 				for (int id = 0; id < cars.numVehicles; id++)
 				{
-					if (id != carID)
+					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
 						bool faster = false;
 

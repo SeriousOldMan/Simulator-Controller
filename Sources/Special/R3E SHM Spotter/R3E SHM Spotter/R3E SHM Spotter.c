@@ -593,6 +593,22 @@ BOOL checkPitWindow() {
 	return FALSE;
 }
 
+BOOL greenFlagReported = FALSE;
+
+BOOL greenFlag() {
+	if (!greenFlagReported && (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN)) {
+		greenFlagReported = TRUE;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
@@ -720,15 +736,18 @@ int main(int argc, char* argv[])
 			else if (positionTrigger)
 				checkCoordinates(playerID);
 			else {
+				BOOL startGo = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
+				
 				if (!running)
-					running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));
+					running = (startGo || (countdown-- <= 0));
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-						if (!checkFlagState() && !checkPositions(playerID))
-							wait = !checkPitWindow();
-						else
-							wait = FALSE;
+						if (!startGo || !greenFlag())
+							if (!checkFlagState() && !checkPositions(playerID))
+								wait = !checkPitWindow();
+							else
+								wait = FALSE;
 					}
 					else {
 						longitudinalRearDistance = 5;

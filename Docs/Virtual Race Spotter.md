@@ -112,13 +112,14 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
 | ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
 | Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2)  | Yes                        | Yes       | Yes            |
+| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
 | Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        | No             |
 | Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
+| Race Start (Green Flag)   | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |

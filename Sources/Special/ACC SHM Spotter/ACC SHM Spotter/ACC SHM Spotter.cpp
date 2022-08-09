@@ -579,6 +579,22 @@ bool checkPitWindow() {
 	return false;
 }
 
+bool greenFlagReported = false;
+
+bool greenFlag() {
+	if (!greenFlagReported && (((SPageFileGraphic*)m_graphics.mapFileBuffer)->flag == AC_GREEN_FLAG)) {
+		greenFlagReported = true;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return true;
+	}
+	else
+		return false;
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
@@ -714,8 +730,10 @@ int main(int argc, char* argv[])
 		else if (positionTrigger)
 			checkCoordinates();
 		else {
+			bool startGo = (gf->flag == AC_GREEN_FLAG);
+			
 			if (!running)
-				running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
+				running = (startGo || (countdown-- <= 0) || (pf->speedKmh >= 200));
 
 			if (running) {
 				if (pf->speedKmh > 120)
@@ -734,10 +752,11 @@ int main(int argc, char* argv[])
 					sessionDuration = gf->sessionTimeLeft;
 
 				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-					if (!checkFlagState() && !checkPositions())
-						wait = !checkPitWindow();
-					else
-						wait = false;
+					if (!startGo || !greenFlag())
+						if (!checkFlagState() && !checkPositions())
+							wait = !checkPitWindow();
+						else
+							wait = false;
 				}
 				else {
 					longitudinalRearDistance = 5;
@@ -765,5 +784,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-

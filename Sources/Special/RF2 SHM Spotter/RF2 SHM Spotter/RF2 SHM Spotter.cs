@@ -654,6 +654,22 @@ namespace RF2SHMSpotter {
 			return false;
 		}
 
+		bool greenFlagReported = false;
+
+		bool greenFlag() {
+			if (!greenFlagReported && (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)) {
+				greenFlagReported = true;
+				
+				SendSpotterMessage("greenFlag");
+				
+				Thread.Sleep(2000);
+				
+				return true;
+			}
+			else
+				return false;
+		}
+
 		double initialX = 0.0d;
 		double initialY = 0.0d;
 		int coordCount = 0;
@@ -795,8 +811,10 @@ namespace RF2SHMSpotter {
 							checkCoordinates(ref playerScoring);
 						else
 						{
+							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
+							
 							if (!running)
-								if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
+								if (startGo || (countdown-- <= 0))
 									running = true;
 
 							if (running)
@@ -804,10 +822,11 @@ namespace RF2SHMSpotter {
 								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
 									playerScoring.mPitState < (byte)Entering)
 								{
-									if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-										wait = !checkPitWindow(ref playerScoring);
-									else
-										wait = false;
+									if (!startGo || !greenFlag())
+										if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+											wait = !checkPitWindow(ref playerScoring);
+										else
+											wait = false;
 								}
 								else
 								{

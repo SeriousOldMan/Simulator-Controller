@@ -561,6 +561,32 @@ bool checkPitWindow(const irsdk_header* header, const char* data) {
 	return false;
 }
 
+bool greenFlagReported = false;
+
+bool greenFlag(const irsdk_header* header, const char* data) {
+	if (greenFlagReported)
+		return false;
+	else {
+		char result[64];
+		
+		getDataValue(result, header, data, "SessionFlags");
+
+		int flags = atoi(result);
+
+		if (flags & irsdk_startGo) {
+			greenFlagReported = true;
+			
+			sendSpotterMessage("greenFlag");
+			
+			Sleep(2000);
+			
+			return true;
+		}
+		else
+			return false;
+	}
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 float lastX = 0.0;
@@ -874,7 +900,7 @@ int main(int argc, char* argv[])
 							*/
 
 							if (onTrack && !inPit) {
-								if (!checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
+								if (!greenFlag(pHeader, g_data) && !checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
 									wait = !checkPitWindow(pHeader, g_data);
 								else
 									wait = false;

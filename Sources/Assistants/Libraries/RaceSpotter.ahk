@@ -1401,7 +1401,7 @@ class RaceSpotter extends RaceAssistant {
 	skipAlert(alert) {
 		result := false
 
-		if ((alert = "Hold") && this.pendingAlerts(["ClearAll", "ClearLeft", "ClearRight"]))
+		if ((alert = "Hold") && this.pendingAlert("Clear", true))
 			result := true
 		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlerts(["Left", "Three"])))
 			result := true
@@ -1478,6 +1478,21 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		return false
+	}
+
+	greenFlag(arguments*) {
+		if this.Speaker[false] { ; && !this.SpotterSpeaking) {
+			this.SpotterSpeaking := true
+
+			try {
+				speaker := this.getSpeaker(true)
+
+				speaker.speakPhrase("Green", false, false, "Green")
+			}
+			finally {
+				this.SpotterSpeaking := false
+			}
+		}
 	}
 
 	yellowFlag(alert, arguments*) {

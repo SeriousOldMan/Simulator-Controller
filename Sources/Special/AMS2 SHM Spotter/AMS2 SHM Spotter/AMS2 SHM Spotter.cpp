@@ -452,6 +452,22 @@ bool checkPitWindow(const SharedMemory* sharedData) {
 	return false;
 }
 
+bool greenFlagReported = false;
+
+bool greenFlag(SharedMemory* shm) {
+	if (!greenFlagReported && (shm->mHighestFlagColour == FLAG_COLOUR_GREEN)) {
+		greenFlagReported = true;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return true;
+	}
+	else
+		return false;
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
@@ -597,15 +613,18 @@ int main(int argc, char* argv[]) {
 			else if (positionTrigger)
 				checkCoordinates(sharedData);
 			else {
+				bool startGo = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
+				
 				if (!running)
-					running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
+					running = (startGo || (countdown-- <= 0));
 
-				if (running) {
+				if (running)
 					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-						if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-							wait = !checkPitWindow(localCopy);
-						else
-							wait = false;
+						if (!startGo || !greenFlag(localCopy))
+							if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+								wait = !checkPitWindow(localCopy);
+							else
+								wait = false;
 					}
 					else {
 						longitudinalRearDistance = 5;
@@ -618,7 +637,6 @@ int main(int argc, char* argv[]) {
 
 						lastFlagState = 0;
 					}
-				}
 			}
 
 			if (positionTrigger)

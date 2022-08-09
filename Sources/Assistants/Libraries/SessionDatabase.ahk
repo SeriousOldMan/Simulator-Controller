@@ -925,7 +925,7 @@ parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
 	fullName := StrSplit(fullName, A_Space, " `t", 2)
 
 	forName := fullName[1]
-	surName := fullName[2]
+	surName := ((fullName.Length() > 1) ? fullName[2] . "")
 }
 
 computeDriverName(forName, surName, nickName) {

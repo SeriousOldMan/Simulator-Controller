@@ -35,7 +35,7 @@ class RaceReportReader {
 	}
 
 	getLaps(raceData) {
-		laps := []
+		local laps := []
 
 		Loop % getConfigurationValue(raceData, "Laps", "Count")
 			laps.Push(A_Index)
@@ -44,7 +44,7 @@ class RaceReportReader {
 	}
 
 	getDrivers(raceData) {
-		cars := []
+		local cars := []
 
 		Loop % getConfigurationValue(raceData, "Cars", "Count")
 			cars.Push(A_Index)
@@ -87,6 +87,7 @@ class RaceReportReader {
 		local drivers := true
 		local tPositions := true
 		local times := false
+		local forName, surName, nickName
 
 		this.loadData(Array(lap), raceData, drivers, tPositions, times)
 
@@ -124,23 +125,27 @@ class RaceReportReader {
 				if carNames
 					carNames.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-				parts := string2Values(A_Space, drivers[1][A_Index])
+				forName := false
+				surName := false
+				nickName := false
+
+				parseDriverName(drivers[1][A_Index], forName, surName, nickName)
 
 				if driverFornames
-					driverFornames.Push(parts[1])
+					driverFornames.Push(forName)
 
 				if driverSurnames
-					driverSurnames.Push(parts[2])
+					driverSurnames.Push(surName)
 
 				if driverNicknames
-					driverNicknames.Push(StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+					driverNicknames.Push(nickName)
 			}
 	}
 
 	getDriverPositions(raceData, positions, car) {
-		result := []
-
-		gridPosition := getConfigurationValue(raceData, "Cars", "Car." . car . ".Position", kUndefined)
+		local result := []
+		local gridPosition := getConfigurationValue(raceData, "Cars", "Car." . car . ".Position", kUndefined)
+		local ignore, lap
 
 		if (gridPosition != kUndefined)
 			if (StrLen(Trim(gridPosition)) == 0)
@@ -156,12 +161,12 @@ class RaceReportReader {
 	}
 
 	getDriverTimes(raceData, times, car) {
-		min := false
-		max := false
-		avg := false
-		stdDev := false
-
-		result := []
+		local min := false
+		local max := false
+		local avg := false
+		local stdDev := false
+		local result := []
+		local ignore, lap, time
 
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			for ignore, lap in this.getLaps(raceData)
@@ -183,7 +188,8 @@ class RaceReportReader {
 	}
 
 	getDriverPace(raceData, times, car, ByRef min, ByRef max, ByRef avg, ByRef stdDev) {
-		validTimes := []
+		local validTimes := []
+		local ignore, lap, time, invalidTimes
 
 		for ignore, lap in this.getLaps(raceData)
 			if times.HasKey(lap) {
@@ -224,19 +230,20 @@ class RaceReportReader {
 	}
 
 	getDriverPotential(raceData, positions, car) {
-		cars := getConfigurationValue(raceData, "Cars", "Count")
+		local cars := getConfigurationValue(raceData, "Cars", "Count")
+
 		positions := this.getDriverPositions(raceData, positions, car)
 
 		return Max(0, cars - positions[1]) + Max(0, cars - positions[positions.Length()])
 	}
 
 	getDriverRaceCraft(raceData, positions, car) {
-		cars := getConfigurationValue(raceData, "Cars", "Count")
-		result := 0
+		local cars := getConfigurationValue(raceData, "Cars", "Count")
+		local result := 0
+		local lastPosition := false
+		local position
 
 		positions := this.getDriverPositions(raceData, positions, car)
-
-		lastPosition := false
 
 		Loop % positions.Length()
 		{
@@ -260,10 +267,10 @@ class RaceReportReader {
 	}
 
 	getDriverSpeed(raceData, times, car) {
-		min := false
-		max := false
-		avg := false
-		stdDev := false
+		local min := false
+		local max := false
+		local avg := false
+		local stdDev := false
 
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			return min
@@ -272,10 +279,10 @@ class RaceReportReader {
 	}
 
 	getDriverConsistency(raceData, times, car) {
-		min := false
-		max := false
-		avg := false
-		stdDev := false
+		local min := false
+		local max := false
+		local avg := false
+		local stdDev := false
 
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev)
 			return ((stdDev == 0) ? 0.1 : (1 / stdDev))
@@ -284,10 +291,11 @@ class RaceReportReader {
 	}
 
 	getDriverCarControl(raceData, times, car) {
-		min := false
-		max := false
-		avg := false
-		stdDev := false
+		local min := false
+		local max := false
+		local avg := false
+		local stdDev := false
+		local carControl, threshold, ignore, lap, time
 
 		if this.getDriverPace(raceData, times, car, min, max, avg, stdDev) {
 			carControl := 1
@@ -310,7 +318,8 @@ class RaceReportReader {
 	}
 
 	normalizeValues(values, target) {
-		factor := (target / maximum(values))
+		local factor := (target / maximum(values))
+		local index, value
 
 		for index, value in values
 			values[index] *= factor
@@ -319,6 +328,8 @@ class RaceReportReader {
 	}
 
 	normalizeSpeedValues(values, target) {
+		local index, value, halfTarget, min, max, factor
+
 		for index, value in values
 			values[index] := - value
 
@@ -354,6 +365,8 @@ class RaceReportReader {
 	}
 
 	loadData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times) {
+		local report, oldEncoding
+
 		if drivers
 			drivers := []
 
@@ -411,6 +424,8 @@ class RaceReportReader {
 ;;;-------------------------------------------------------------------------;;;
 
 correctEmptyValues(table, default := "__Undefined__") {
+	local line
+
 	Loop % table.Length()
 	{
 		line := A_Index

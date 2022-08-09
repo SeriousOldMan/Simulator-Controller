@@ -1430,8 +1430,9 @@ class RaceEngineer extends RaceAssistant {
 		local confirm := true
 		local options := optionsOrLap
 		local plannedLap := false
-		local result, pitstopNumber, speaker, fragments, fuel, compound, color, debug
-		local incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection, temperatureDelta
+		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel
+		local compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
+		local temperatureDelta, debug
 
 		if (optionsOrLap != true)
 			if optionsOrLap is Number
@@ -1456,8 +1457,21 @@ class RaceEngineer extends RaceAssistant {
 
 		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
 
-		if (refuelAmount != kUndefined)
-			knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
+		correctedFuel := false
+
+		if (refuelAmount != kUndefined) {
+			targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
+
+			if (targetFuel && (targetFuel != refuelAmount)) {
+				if ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining") + targetFuel)
+				  < knowledgeBase.getValue("Session.Settings.Fuel.Max"))
+					correctedFuel := true
+				else
+					knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
+			}
+			else
+				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
+		}
 
 		if (changeTyres != kUndefined) {
 			knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
@@ -1518,6 +1532,9 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("NoRefuel")
 					else
 						speaker.speakPhrase("Refuel", {litres: fuel})
+
+					if correctedFuel
+						speaker.speakPhrase("RefuelAdjusted")
 				}
 
 				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)

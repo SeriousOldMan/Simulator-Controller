@@ -83,6 +83,8 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	lapTimeDisplayValue(lapTime) {
+		local seconds, fraction, minutes
+
 		if lapTime is Number
 		{
 			seconds := Floor(lapTime)
@@ -103,6 +105,8 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showReportChart(drawChartFunction) {
+		local window, before, after, width, height, html
+
 		if this.ChartViewer {
 			window := this.Window
 
@@ -158,6 +162,8 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showReportInfo(raceData) {
+		local window, infoText, conditions, descriptor, info, html
+
 		if this.InfoViewer {
 			window := this.Window
 
@@ -218,6 +224,8 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	getReportDrivers(raceData, drivers := false) {
+		local result
+
 		if drivers {
 			result := []
 
@@ -235,7 +243,8 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editReportSettings(settings*) {
-		result := editReportSettings(this, this.Report, settings)
+		local result := editReportSettings(this, this.Report, settings)
+		local setting, values
 
 		if result
 			for setting, values in result
@@ -248,7 +257,10 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showOverviewReport() {
-		report := this.Report
+		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+		local report := this.Report
+		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, sessionDB, car, valid
+		local ignore, lap, rows, hasDNF, result, lapTimes, hasNull, lapTime, min, avg, filteredLapTimes, nr, row
 
 		if report {
 			raceData := true
@@ -346,9 +358,6 @@ class RaceReportViewer extends RaceReportReader {
 				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
 			}
 
-			drawChartFunction := ""
-
-			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
@@ -372,9 +381,9 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showCarReport() {
-		local compound
-
-		report := this.Report
+		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+		local report := this.Report
+		local compound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
 
 		if report {
 			raceData := readConfiguration(report . "\Race.data")
@@ -420,9 +429,6 @@ class RaceReportViewer extends RaceReportReader {
 				rows.Push("[" . row	. "]")
 			}
 
-			drawChartFunction := ""
-
-			drawChartFunction .= "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Weather") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Tyres") . "');"
@@ -449,7 +455,10 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showDriverReport() {
-		report := this.Report
+		local drawChartFunction := "function drawChart() {"
+		local report := this.Report
+		local raceData, drivers, positions, times, allDrivers, cars, ignore, car, ignore
+		local potentials, raceCrafts, speeds, consistencies, carControls
 
 		if report {
 			raceData := true
@@ -480,10 +489,6 @@ class RaceReportViewer extends RaceReportReader {
 
 			this.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
 
-			drawChartFunction := ""
-
-			drawChartFunction .= "function drawChart() {"
-
 			if (potentials && (potentials.Length() > 0)) {
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 				drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
@@ -494,7 +499,7 @@ class RaceReportViewer extends RaceReportReader {
 				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Consistency") . "'", consistencies*) . "],"
 				drawChartFunction .= "`n[" . values2String(", ", "'" . translate("Car Control") . "'", carControls*) . "]"
 
-				drawChartFunction .= ("`n]);")
+				drawChartFunction .= "`n]);"
 
 				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {gridlines: {count: 0}}, vAxis: {gridlines: {count: 0}} };"
 				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -516,7 +521,10 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showPositionsReport() {
-		report := this.Report
+		local drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
+		local report := this.Report
+		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB, carIndices, maxPosition
+		local car, valid, ignore, lap, hasData, position, lapPositions
 
 		if report {
 			raceData := true
@@ -564,10 +572,7 @@ class RaceReportViewer extends RaceReportReader {
 							positions[lap].RemoveAt(car)
 			}
 
-			drawChartFunction := ""
 			hasData := false
-
-			drawChartFunction .= ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 
 			if !this.Settings.HasKey("Laps")
 				if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
@@ -630,7 +635,10 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showLapTimesReport() {
-		report := this.Report
+		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
+		local report := this.Report
+		local raceData, drivers, positions, times, selectedCars, laps, driverTimes, ignore, lap, time, lapTimes
+		local rows, car
 
 		if report {
 			raceData := true
@@ -669,7 +677,6 @@ class RaceReportViewer extends RaceReportReader {
 			for ignore, lap in laps
 				rows.Push("[" . values2String(", ", lap, driverTimes[lap]*) . "]")
 
-			drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . "');"
 
 			for ignore, car in selectedCars
@@ -695,7 +702,11 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showConsistencyReport() {
-		report := this.Report
+		local drawChartFunction := "function drawChart() {"
+		local report := this.Report
+		local raceData, drivers, positions, times, selectedCars, laps, driverTimes, allTimes, ignore, lap, lapTimes
+		local time, invalidCars, carTimes, avg, cars, offset, singleCar, min, avg, max, window
+		local series, title, consistency
 
 		if report {
 			raceData := true
@@ -755,8 +766,6 @@ class RaceReportViewer extends RaceReportReader {
 							drivertimes[lap][car] := avg
 				}
 			}
-
-			drawChartFunction := "function drawChart() {"
 
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 
@@ -853,7 +862,10 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showPaceReport() {
-		report := this.Report
+		local drawChartFunction := "function drawChart() {`nvar array = [`n"
+		local report := this.Report
+		local raceData, drivers, positions, times, selectedCars, cars, laps, lapTimes, driverTimes, length
+		local ignore, car, carTimes, index, dIndex, time, text
 
 		if report {
 			raceData := true
@@ -865,8 +877,6 @@ class RaceReportViewer extends RaceReportReader {
 
 			selectedCars := this.getReportDrivers(raceData)
 			cars := []
-
-			drawChartFunction := "function drawChart() {`nvar array = [`n"
 
 			laps := this.getReportLaps(raceData)
 			lapTimes := []
@@ -969,6 +979,8 @@ class RaceReportViewer extends RaceReportReader {
 ;;;-------------------------------------------------------------------------;;;
 
 getPaceJSFunctions() {
+	local script
+
 	script =
 	(
 	/**
@@ -1044,8 +1056,11 @@ global rangeLapsEdit
 global driverSelectCheck
 
 editReportSettings(raceReport, report := false, options := false) {
-	local x, y
-	
+	local x, y, raceData, drivers, laps, oldEncoding, owner
+	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
+	local sessionDB, simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
+	local newLaps, newDrivers, rowNumber
+
 	static allLapsRadio
 	static rangeLapsRadio
 
@@ -1205,12 +1220,12 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Add, Button, x108 yp+10 w80 h23 Default GacceptSettings, % translate("Ok")
 		Gui RRS:Add, Button, x196 yp w80 h23 GcancelSettings, % translate("&Cancel")
-	
+
 		if getWindowPosition("Race Reports.Settings", x, y)
 			Gui RRS:Show, x%x% y%y%
 		else
 			Gui RRS:Show
-			
+
 		Gui RRS:Show
 
 		Loop
@@ -1243,7 +1258,7 @@ editReportSettings(raceReport, report := false, options := false) {
 											laps[index] := index
 										} Until (index = endLap)
 						}
-						else if lap is integer
+						else if lap is Integer
 							if laps.HasKey(lap)
 								laps[lap] := lap
 
@@ -1301,9 +1316,8 @@ chooseLapSelection() {
 }
 
 selectDriver() {
-	selected := 0
-
-	row := 0
+	local selected := 0
+	local row := 0
 
 	Loop {
 		row := LV_GetNext(row, "C")

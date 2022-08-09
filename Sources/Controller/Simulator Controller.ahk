@@ -121,7 +121,7 @@ class FunctionController extends ConfigurationItem {
 	}
 
 	hasFunction(function) {
-		Throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
+		throw "Virtual method FunctionController.hasFunction must be implemented in a subclass..."
 	}
 
 	setControlLabel(function, text, color := "Black", overlay := false) {
@@ -187,7 +187,7 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	createGui() {
-		Throw "Virtual method GuiFunctionController.createGui must be implemented in a subclass..."
+		throw "Virtual method GuiFunctionController.createGui must be implemented in a subclass..."
 	}
 
 	associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials) {
@@ -266,7 +266,7 @@ class GuiFunctionController extends FunctionController {
 			else
 				distance += fnController.iWindowHeight
 
-		Throw "Internal error detected in GuiFunctionController.distanceFromTop..."
+		throw "Internal error detected in GuiFunctionController.distanceFromTop..."
 	}
 
 	distanceFromBottom() {
@@ -279,7 +279,7 @@ class GuiFunctionController extends FunctionController {
 
 		index := controller.Length()
 
-		Loop {
+		loop {
 			fnController := controller[index]
 
 			distance += fnController.iWindowHeight
@@ -288,7 +288,7 @@ class GuiFunctionController extends FunctionController {
 				return distance
 		} until (--index = 0)
 
-		Throw "Internal error detected in GuiFunctionController.distanceFromBottom..."
+		throw "Internal error detected in GuiFunctionController.distanceFromBottom..."
 	}
 
 	show(makeVisible := true) {
@@ -366,7 +366,7 @@ class GuiFunctionController extends FunctionController {
 								x := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.X", mainScreenRight - width)
 								y := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.Y", mainScreenBottom - height)
 							default:
-								Throw "Unhandled position for " . type " (" . position . ") encountered in GuiFunctionController.show..."
+								throw "Unhandled position for " . type " (" . position . ") encountered in GuiFunctionController.show..."
 						}
 
 						Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
@@ -613,7 +613,7 @@ class SimulatorController extends ConfigurationItem {
 			case kCustomType:
 				return new ControllerCustomFunction(this, descriptor[2], configuration)
 			default:
-				Throw "Unknown controller function type (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
+				throw "Unknown controller function type (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
 		}
 	}
 
@@ -829,7 +829,7 @@ class SimulatorController extends ConfigurationItem {
 
 						started := false
 
-						Loop {
+						loop {
 							if (A_Index >= 100)
 								break
 
@@ -970,7 +970,7 @@ class SimulatorController extends ConfigurationItem {
 					action.fireAction(function, trigger)
 				}
 				else
-					Throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
+					throw "Cannot find action for " . function.Descriptor . ".trigger " . " in SimulatorController.fireAction..."
 	}
 
 	setMode(newMode) {
@@ -1035,7 +1035,7 @@ class SimulatorController extends ConfigurationItem {
 		targetMode := false
 		index := position + delta
 
-		Loop {
+		loop {
 			if (index > modes.Length())
 				index := 1
 			else if (index < 1)
@@ -1624,7 +1624,7 @@ class ControllerMode {
 
 	Mode[] {
 		Get {
-			Throw "Virtual property ControllerMode.Mode must be implemented in a subclass..."
+			throw "Virtual property ControllerMode.Mode must be implemented in a subclass..."
 		}
 	}
 
@@ -1773,7 +1773,7 @@ class ControllerAction {
 	}
 
 	fireAction(function, trigger) {
-		Throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
+		throw "Virtual method ControllerAction.fireAction must be implemented in a subclass..."
 	}
 
 	connectFunction(plugin, function) {
@@ -2004,7 +2004,7 @@ externalCommandManager() {
 				case kDialType:
 					rotateDial(descriptor[2], command[2])
 				default:
-					Throw "Unknown controller function type (" . descriptor[1] . ") detected in externalCommand..."
+					throw "Unknown controller function type (" . descriptor[1] . ") detected in externalCommand..."
 			}
 		}
 	}
@@ -2107,7 +2107,7 @@ rotateDial(dialNumber, direction) {
 	else {
 		logMessage(kLogWarn, translate("Unsupported argument (") . direction . translate(") detected in rotateDial - please check the configuration"))
 
-		Throw "Unsupported argument (" . direction . ") detected in rotateDial..."
+		throw "Unsupported argument (" . direction . ") detected in rotateDial..."
 	}
 
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
@@ -2131,7 +2131,7 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 		else {
 			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))
 
-			Throw "Unsupported argument (" . mode . ") detected in switchToggle..."
+			throw "Unsupported argument (" . mode . ") detected in switchToggle..."
 		}
 	}
 	else

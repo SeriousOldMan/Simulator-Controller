@@ -99,7 +99,7 @@ class ACSetupEditor extends FileSetupEditor {
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			Loop Files, %directory%\*.*, D
+			loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
@@ -179,7 +179,7 @@ class ACSetupComparator extends FileSetupComparator {
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			Loop Files, %directory%\*.*, D
+			loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 

@@ -76,7 +76,7 @@ createTrackImage(trackMap) {
 	lastX := 0
 	lastY := 0
 
-	Loop % getConfigurationValue(trackMap, "Map", "Points")
+	loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
 		x := Round((marginX + offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
 		y := Round((marginY + offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
@@ -116,7 +116,7 @@ createTrackMap(simulator, track, fileName) {
 	setConfigurationValue(trackMap, "General", "Simulator", simulator)
 	setConfigurationValue(trackMap, "General", "Track", track)
 
-	Loop Read, %fileName%
+	loop Read, %fileName%
 	{
 		coordinates.Push(string2Values(",", A_LoopReadLine))
 
@@ -174,7 +174,7 @@ createTrackMap(simulator, track, fileName) {
 		else {
 			normalized := []
 
-			Loop 1000
+			loop 1000
 				normalized.Push(false)
 
 			normalized[1] := [0.0, 0.0]
@@ -187,7 +187,7 @@ createTrackMap(simulator, track, fileName) {
 
 			trackData := ""
 
-			Loop 1000 {
+			loop 1000 {
 				coordinate := normalized[A_Index]
 
 				if !coordinate {
@@ -215,7 +215,7 @@ createTrackMap(simulator, track, fileName) {
 		setConfigurationValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
 		setConfigurationValue(trackMap, "Map", "Points", points)
 
-		Loop %points% {
+		loop %points% {
 			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
 			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
@@ -263,13 +263,13 @@ recreateTrackMaps() {
 	local sessionDB := new SessionDatabase()
 	local code, simulator, track
 
-	Loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
+	loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
 	{
 		code := A_LoopFileName
 
 		simulator := sessionDB.getSimulatorName(code)
 
-		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 

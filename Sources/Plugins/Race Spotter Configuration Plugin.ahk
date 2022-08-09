@@ -151,7 +151,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 		Gui %window%:Font, Norm, Arial
 
-		Loop 33
+		loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()

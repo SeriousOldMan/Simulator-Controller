@@ -136,7 +136,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget27 Hidden, % translate("@ Session End")
 
-		Loop 28
+		loop 28
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()

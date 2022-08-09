@@ -103,7 +103,7 @@ downloadSimulatorController() {
 		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 
 		if ErrorLevel
-			Throw "No valid installation file..."
+			throw "No valid installation file..."
 	}
 	catch exception {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -137,7 +137,7 @@ downloadSimulatorController() {
 				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
 
 				if ErrorLevel
-					Throw "No valid installation file..."
+					throw "No valid installation file..."
 			}
 			catch exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))

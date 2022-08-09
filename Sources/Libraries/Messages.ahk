@@ -159,7 +159,7 @@ class MessageManager extends PeriodicTask {
 			pipeName := "\\.\pipe\SC." . category
 
 			if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
-				Loop Read, %pipeName%
+				loop Read, %pipeName%
 				{
 					data := StrSplit(A_LoopReadLine, ":", , 2)
 					category := data[1]
@@ -334,7 +334,7 @@ class MessageManager extends PeriodicTask {
 
 				this.OutgoingMessages.Push(ObjBindMethod(this, "sendFileMessage", target, category, data))
 			default:
-				Throw "Unknown message type (" . messageType . ") detected in sendMessage..."
+				throw "Unknown message type (" . messageType . ") detected in sendMessage..."
 		}
 	}
 }
@@ -363,7 +363,7 @@ unknownMessageHandler(category, data) {
 encodeDWORD(string) {
 	local result := 0
 
-	Loop % StrLen(string) {
+	loop % StrLen(string) {
         result <<= 8
         result += Asc(SubStr(string, A_Index, 1))
     }
@@ -374,7 +374,7 @@ encodeDWORD(string) {
 decodeDWORD(data) {
 	local result := ""
 
-    Loop 4 {
+    loop 4 {
         result := Chr(data & 0xFF) . result
         data >>= 8
     }
@@ -453,7 +453,7 @@ receiveWindowMessage(wParam, lParam) {
 		data    := StrGet(lpData, length, "")       ; DATA string from pointer
 	}
 	else
-		Throw % "Unhandled message received: " . request . " in receiveWindowMessage..."
+		throw % "Unhandled message received: " . request . " in receiveWindowMessage..."
 
 	data := StrSplit(data, ":", , 2)
 	category := data[1]

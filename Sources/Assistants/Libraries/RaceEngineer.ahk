@@ -176,7 +176,7 @@ class RaceEngineer extends RaceAssistant {
 
 					Task.yield()
 
-					Loop 10
+					loop 10
 						Sleep 500
 
 					this.planPitstopRecognized(words)
@@ -444,7 +444,7 @@ class RaceEngineer extends RaceAssistant {
 
 		Task.yield()
 
-		Loop 10
+		loop 10
 			Sleep 500
 
 		this.preparePitstop()
@@ -1782,7 +1782,7 @@ class RaceEngineer extends RaceAssistant {
 
 				Task.yield()
 
-				Loop 10
+				loop 10
 					Sleep 500
 			}
 
@@ -1802,7 +1802,7 @@ class RaceEngineer extends RaceAssistant {
 
 			Task.yield()
 
-			Loop 10
+			loop 10
 				Sleep 500
 
 			if lap

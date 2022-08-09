@@ -126,7 +126,7 @@ installOptions(options) {
 				valid := false
 			}
 		else if (InStr(kHomeDirectory, directory) != 1)
-			Loop Files, %directory%\*.*, FD
+			loop Files, %directory%\*.*, FD
 			{
 				empty := false
 
@@ -211,7 +211,7 @@ installOptions(options) {
 		Gui Install:Margin, 10, 10
 		Gui Install:Show, AutoSize Center
 
-		Loop {
+		loop {
 			Sleep 200
 		} until result
 
@@ -280,7 +280,7 @@ uninstallOptions(options) {
 		Gui Uninstall:Margin, 10, 10
 		Gui Uninstall:Show, AutoSize Center
 
-		Loop {
+		loop {
 			Sleep 200
 		} until result
 
@@ -346,7 +346,7 @@ chooseInstallLocationPath() {
 				valid := false
 			}
 		else if (InStr(kHomeDirectory, directory) != 1)
-			Loop Files, %directory%\*.*, FD
+			loop Files, %directory%\*.*, FD
 			{
 				empty := false
 
@@ -739,7 +739,7 @@ copyFiles(source, destination, deleteOrphanes) {
 	count := 0
 	progress := 0
 
-	Loop Files, %source%\*, DFR
+	loop Files, %source%\*, DFR
 	{
 		if (Mod(count, 100) == 0)
 			progress += 1
@@ -781,7 +781,7 @@ deleteFiles(installLocation) {
 	count := 0
 	progress := 0
 
-	Loop Files, %installLocation%\*, DFR
+	loop Files, %installLocation%\*, DFR
 	{
 		if (Mod(count, 100) == 0)
 			progress += 1
@@ -812,7 +812,7 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 
 	files := []
 
-	Loop Files, %source%\*.*, DF
+	loop Files, %source%\*.*, DF
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
@@ -835,7 +835,7 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 deleteDirectory(directory, progressStep, ByRef count) {
 	files := []
 
-	Loop Files, %directory%\*.*, DF
+	loop Files, %directory%\*.*, DF
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
@@ -863,7 +863,7 @@ deleteDirectory(directory, progressStep, ByRef count) {
 }
 
 cleanupDirectory(source, destination, maxStep, ByRef count) {
-	Loop Files, %destination%\*.*, DF
+	loop Files, %destination%\*.*, DF
 	{
 		SplitPath A_LoopFilePath, fileName
 
@@ -1269,16 +1269,16 @@ editTargets(command := "") {
 		result := false
 
 		if (vUpdateSettings.Count() > 16)
-			Throw "Too many update targets detected in editTargets..."
+			throw "Too many update targets detected in editTargets..."
 
 		if (vCleanupSettings.Count() > 8)
-			Throw "Too many cleanup targets detected in editTargets..."
+			throw "Too many cleanup targets detected in editTargets..."
 
 		if (vCopySettings.Count() > 16)
-			Throw "Too many copy targets detected in editTargets..."
+			throw "Too many copy targets detected in editTargets..."
 
 		if (vBuildSettings.Count() > 24)
-			Throw "Too many build targets detected in editTargets..."
+			throw "Too many build targets detected in editTargets..."
 
 		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0, D8D8D8
@@ -1414,7 +1414,7 @@ editTargets(command := "") {
 		else
 			Gui TE:Show
 
-		Loop
+		loop
 			Sleep 1000
 		until result
 
@@ -1545,7 +1545,7 @@ updateCustomCalls(startNumber, endNumber) {
 
 		customCallIndex := startNumber
 
-		Loop {
+		loop {
 			key := "Custom." . customCallIndex . ".Call"
 
 			if (getConfigurationValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
@@ -1691,11 +1691,11 @@ updateConfigurationForV426() {
 	}
 
 	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"]
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
@@ -1718,7 +1718,7 @@ updateConfigurationForV425() {
 		; ignore
 	}
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D
+	loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
 
@@ -1749,7 +1749,7 @@ updateConfigurationForV424() {
 
 	simulator := "rFactor 2"
 
-	Loop Files, %kDatabaseDirectory%User\RF2\*.*, D
+	loop Files, %kDatabaseDirectory%User\RF2\*.*, D
 		if InStr(A_LoopFileName, "#") {
 			car := string2Values("#", A_LoopFileName)[1]
 
@@ -1758,7 +1758,7 @@ updateConfigurationForV424() {
 			else {
 				oldCar := A_LoopFileName
 
-				Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
+				loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
 				{
 					track := A_LoopFileName
 
@@ -1812,7 +1812,7 @@ updateConfigurationForV424() {
 
 					FileCreateDir %targetDirectory%
 
-					Loop Files, %sourceDirectory%Race Strategies\*.*, F
+					loop Files, %sourceDirectory%Race Strategies\*.*, F
 					{
 						fileName := A_LoopFileName
 						targetName := fileName
@@ -1851,22 +1851,22 @@ updateConfigurationForV423() {
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
 	}
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
 		if (simulator = "ACC")
-			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 
-				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+				loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 				{
 					track := A_LoopFileName
 
 					empty := true
 
-					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
+					loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
 					{
 						empty := false
 
@@ -1899,15 +1899,15 @@ updateConfigurationForV422() {
 
 	tyresDB := new TyresDatabase()
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
@@ -1931,7 +1931,7 @@ updateConfigurationForV422() {
 }
 
 updateConfigurationForV420() {
-	Loop Files, %kDatabaseDirectory%User\*.*, D
+	loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
 			changed := false
@@ -2015,15 +2015,15 @@ updateConfigurationForV398() {
 			; ignore
 		}
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
@@ -2118,7 +2118,7 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
@@ -2130,7 +2130,7 @@ updateConfigurationForV384() {
 				; ignore
 			}
 		else
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
+			loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
 			{
 				car := A_LoopFileName
 
@@ -2142,7 +2142,7 @@ updateConfigurationForV384() {
 						; ignore
 					}
 				else
-					Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
+					loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
 					{
 						track := A_LoopFileName
 
@@ -2270,7 +2270,7 @@ checkDirectoryDependency(directory, modification) {
 
 	files := []
 
-	Loop Files, % directory . "*.ahk", R
+	loop Files, % directory . "*.ahk", R
 	{
 		files.Push(A_LoopFilePath)
 	}
@@ -2328,7 +2328,7 @@ runSpecialTargets(ByRef buildProgress) {
 						FileRead text, %kTempDirectory%build.out
 
 						if (StrLen(Trim(text)) == 0)
-							Throw "Error while compiling..."
+							throw "Error while compiling..."
 					}
 				}
 				catch exception {
@@ -2417,7 +2417,7 @@ runCleanTargets(ByRef buildProgress) {
 				SetWorkingDir %fileOrFolder%
 
 				try {
-					Loop Files, *.*, FDR
+					loop Files, *.*, FDR
 					{
 						try {
 							if InStr(FileExist(A_LoopFilePath), "D")
@@ -2452,7 +2452,7 @@ runCleanTargets(ByRef buildProgress) {
 			SetWorkingDir %directory%
 
 			try {
-				Loop Files, %pattern%, %options%
+				loop Files, %pattern%, %options%
 				{
 					FileDelete %A_LoopFilePath%
 
@@ -2493,7 +2493,7 @@ runCopyTargets(ByRef buildProgress) {
 		if InStr(targetSource, "*") {
 			FileCreateDir %targetDestination%
 
-			Loop Files, %targetSource%
+			loop Files, %targetSource%
 			{
 				targetFile := (targetDestination . A_LoopFileName)
 
@@ -2614,7 +2614,7 @@ runBuildTargets(ByRef buildProgress) {
 
 			try {
 				if !FileExist(targetSource)
-					Throw "Source file not found..."
+					throw "Source file not found..."
 
 				RunWait % kCompiler . " /in """ . targetSource . """"
 			}

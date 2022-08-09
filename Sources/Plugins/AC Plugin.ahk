@@ -235,7 +235,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	selectPitstopOption(option) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			Loop 20
+			loop 20
 				this.sendCommand(this.PreviousOptionHotkey)
 
 			if ((option = "Strategy") || (option = "All Around"))
@@ -252,43 +252,43 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if (option = "Front Left") {
-				Loop 3
+				loop 3
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Front Right") {
-				Loop 4
+				loop 4
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Rear Left") {
-				Loop 5
+				loop 5
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Rear Right") {
-				Loop 6
+				loop 6
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Bodywork") {
-				Loop % 7 + this.getCarMetaData("CarSettings")
+				loop % 7 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
-				Loop % 8 + this.getCarMetaData("CarSettings")
+				loop % 8 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
-				Loop % 9 + this.getCarMetaData("CarSettings")
+				loop % 9 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -306,15 +306,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				case "Increase":
 					this.activateWindow()
 
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					this.activateWindow()
 
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
+					throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
 			}
 	}
 
@@ -332,23 +332,23 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", action, steps)
 
-				Loop %steps%
+				loop %steps%
 					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 			}
 			else if (option = "Repair Suspension") {
 				this.dialPitstopOption("Repair Suspension", action, steps)
 
-				Loop %steps%
+				loop %steps%
 					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
 			}
 			else if (option = "Repair Engine") {
 				this.dialPitstopOption("Repair Engine", action, steps)
 
-				Loop %steps%
+				loop %steps%
 					this.iRepairEngineChosen := !this.iRepairEngineChosen
 			}
 			else
-				Throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
+				throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
@@ -393,28 +393,28 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			if this.selectPitstopOption("Front Left") {
 				this.dialPitstopOption("Front Left", "Decrease", 30)
 
-				Loop % Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
+				loop % Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
 				this.dialPitstopOption("Front Right", "Decrease", 30)
 
-				Loop % Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
+				loop % Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
 				this.dialPitstopOption("Rear Left", "Decrease", 30)
 
-				Loop % Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
+				loop % Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
 				this.dialPitstopOption("Rear Right", "Decrease", 30)
 
-				Loop % Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
+				loop % Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}

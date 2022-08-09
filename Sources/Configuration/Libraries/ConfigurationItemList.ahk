@@ -181,7 +181,7 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	loadList(items) {
-		Throw "Virtual method ConfigurationItemList.loadList must be implemented in a subclass..."
+		throw "Virtual method ConfigurationItemList.loadList must be implemented in a subclass..."
 	}
 	
 	updateState() {
@@ -225,15 +225,15 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 	
 	loadEditor(item) {
-		Throw "Virtual method ConfigurationItemList.loadEditor must be implemented in a subclass..."
+		throw "Virtual method ConfigurationItemList.loadEditor must be implemented in a subclass..."
 	}
 	
 	clearEditor() {
-		Throw "Virtual method ConfigurationItemList.clearEditor must be implemented in a subclass..."
+		throw "Virtual method ConfigurationItemList.clearEditor must be implemented in a subclass..."
 	}
 	
 	buildItemFromEditor(isNew := false) {
-		Throw "Virtual method ConfigurationItemList.buildItemFromEditor must be implemented in a subclass..."
+		throw "Virtual method ConfigurationItemList.buildItemFromEditor must be implemented in a subclass..."
 	}
 	
 	openEditor(itemNumber) {

@@ -64,13 +64,13 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			; ignore
 		}
 		
-		Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+		loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 		{
 			simulator := A_LoopFileName
 			
 			FileCreateDir %kTempDirectory%Shared Database\%simulator%
 			
-			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 				
@@ -84,7 +84,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 				else {
 					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 					
-					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
+					loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
 					{
 						track := A_LoopFileName
 				

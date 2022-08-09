@@ -84,7 +84,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			this.iSelectionIndex := inList(kCurveShapes, shape)
 
 			if !this.iSelectionIndex
-				Throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
+				throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
 
 			switch pedal {
 				case "Clutch":
@@ -94,7 +94,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				case "Throttle":
 					this.iSelectionXPosition := kThrottleXPosition
 				default:
-					Throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
+					throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
 			}
 
 			base.__New(function, label, icon)

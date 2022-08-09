@@ -107,16 +107,16 @@ class DatabaseCreator {
 		
 		this.iTyresDatabase := database
 		
-		Loop Files, %sourceDirectory%*.*, D
+		loop Files, %sourceDirectory%*.*, D
 			this.loadDatabase(A_LoopFilePath . "\")
 	}
 	
 	loadDatabase(databaseDirectory) {
-		Loop Files, %databaseDirectory%*.*, D									; Simulator
+		loop Files, %databaseDirectory%*.*, D									; Simulator
 		{
 			simulator := A_LoopFileName
 			
-			Loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
+			loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 				
@@ -128,7 +128,7 @@ class DatabaseCreator {
 						; ignore
 					}
 				else
-					Loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
+					loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
 					{
 						track := A_LoopFileName
 						
@@ -148,11 +148,11 @@ class DatabaseCreator {
 							if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 								this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 							
-							Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+							loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
 							{
 								type := A_LoopFileName
 								
-								Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
+								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
 									this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
 							}
 						}

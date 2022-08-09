@@ -89,7 +89,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else if (assistant = "Race Spotter")
 					arguments := "raceAssistantName: Elisa"
 				else
-					Throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
+					throw "Unsupported race assistant detected in AssistantsStepWizard.saveToConfiguration..."
 
 				actions := ""
 
@@ -142,7 +142,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 								case "SetupImport":
 									arguments .= ("; importSetup: " . values2String(A_Space, function*))
 								default:
-									Throw "Unsupported special action detected in AssistantsStepWizard.saveToConfiguration..."
+									throw "Unsupported special action detected in AssistantsStepWizard.saveToConfiguration..."
 							}
 					}
 

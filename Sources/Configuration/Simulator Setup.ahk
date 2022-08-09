@@ -93,12 +93,12 @@ global kDebugRules = 2
 class Preset {
 	Name[] {
 		Get {
-			Throw "Virtual property Preset.Name must be implemented in a subclass..."
+			throw "Virtual property Preset.Name must be implemented in a subclass..."
 		}
 	}
 
 	getArguments() {
-		Throw "Virtual method Preset.getArguments must be implemented in a subclass..."
+		throw "Virtual method Preset.getArguments must be implemented in a subclass..."
 	}
 
 	install(wizard) {
@@ -297,7 +297,7 @@ class SetupWizard extends ConfigurationItem {
 			}
 		}
 
-		Loop %count% {
+		loop %count% {
 			step := this.Steps[A_Index]
 
 			vProgressCount += 2
@@ -498,7 +498,7 @@ class SetupWizard extends ConfigurationItem {
 	reset() {
 		this.show(true)
 
-		Loop % this.Count
+		loop % this.Count
 			if this.Steps.HasKey(A_Index)
 				this.Steps[A_Index].reset()
 	}
@@ -738,7 +738,7 @@ class SetupWizard extends ConfigurationItem {
 			if (index == 1)
 				return false
 			else
-				Loop {
+				loop {
 					if (index == 0)
 						return false
 					else {
@@ -770,7 +770,7 @@ class SetupWizard extends ConfigurationItem {
 			else
 				index := this.Steps[this.Step] + 1
 
-			Loop {
+			loop {
 				if (index > this.Count)
 					return false
 				else {
@@ -900,7 +900,7 @@ class SetupWizard extends ConfigurationItem {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(this.KnowledgeBase)
 
-		Loop % this.Count
+		loop % this.Count
 			if this.Steps.HasKey(A_Index)
 				this.Steps[A_Index].updateState()
 
@@ -955,7 +955,7 @@ class SetupWizard extends ConfigurationItem {
 		presets := []
 		found := false
 
-		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		loop % knowledgeBase.getValue("Preset.Count", 0)
 		{
 			cClass := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			cArguments := knowledgeBase.getValue("Preset." . A_Index . ".Arguments")
@@ -986,7 +986,7 @@ class SetupWizard extends ConfigurationItem {
 
 		presets := []
 
-		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		loop % knowledgeBase.getValue("Preset.Count", 0)
 		{
 			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
@@ -1175,7 +1175,7 @@ class SetupWizard extends ConfigurationItem {
 		local application
 		local function
 
-		Loop % knowledgeBase.getValue("System.Launch.Application.Count", 0)
+		loop % knowledgeBase.getValue("System.Launch.Application.Count", 0)
 		{
 			application := knowledgeBase.getValue("System.Launch.Application." . A_Index, false)
 
@@ -1286,7 +1286,7 @@ class SetupWizard extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local function
 
-		Loop % knowledgeBase.getValue("Controller.Function.Count", 0)
+		loop % knowledgeBase.getValue("Controller.Function.Count", 0)
 		{
 			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
 
@@ -1324,7 +1324,7 @@ class SetupWizard extends ConfigurationItem {
 		local action
 		local count := 0
 
-		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action." . A_Index, false)
 
@@ -1404,7 +1404,7 @@ class SetupWizard extends ConfigurationItem {
 		local action
 		local count := 0
 
-		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Assistant." . assistant . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Assistant." . assistant . ".Action." . A_Index, false)
 
@@ -1500,7 +1500,7 @@ class SetupWizard extends ConfigurationItem {
 
 		count := knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
 
-		Loop % count
+		loop % count
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1528,7 +1528,7 @@ class SetupWizard extends ConfigurationItem {
 
 		modeClause := (mode ? (".Mode." . mode) : "")
 
-		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1570,7 +1570,7 @@ class SetupWizard extends ConfigurationItem {
 
 		modeClause := (mode ? (".Mode." . mode) : "")
 
-		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1707,7 +1707,7 @@ class SetupWizard extends ConfigurationItem {
 
 		production := knowledgeBase.Rules.Productions[false]
 
-		Loop {
+		loop {
 			if !production
 				break
 
@@ -1806,7 +1806,7 @@ class StepWizard extends ConfigurationItem {
 				rules[index] := rule
 			}
 
-		Loop %count%
+		loop %count%
 			if rules.HasKey(A_Index)
 				this.SetupWizard.addRule(rules[A_Index])
 
@@ -1822,7 +1822,7 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		Throw "Virtual method StepWizard.createGui must be implemented in a subclass..."
+		throw "Virtual method StepWizard.createGui must be implemented in a subclass..."
 	}
 
 	registerWidget(page, widget) {
@@ -2316,10 +2316,10 @@ convertVDF2JSON(vdf) {
 }
 
 findInRegistry(collection, filterName, filterValue, valueName) {
-	Loop 2 {
+	loop 2 {
 		exact := (A_Index = 1)
 
-		Loop Reg, %collection%, R
+		loop Reg, %collection%, R
 			if (A_LoopRegName = filterName) {
 				RegRead candidate
 
@@ -2442,7 +2442,7 @@ restartSetup:
 	wizard.show()
 
 	try {
-		Loop {
+		loop {
 			vWorking := false
 
 			Sleep 200
@@ -2601,7 +2601,7 @@ fadeOut() {
 	else {
 		currentVolume := masterVolume
 
-		Loop {
+		loop {
 			currentVolume -= 5
 
 			if (currentVolume <= 0)

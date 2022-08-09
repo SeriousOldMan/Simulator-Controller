@@ -55,7 +55,7 @@ class BasicReporting extends Assert {
 	BasisTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -97,7 +97,7 @@ class BasicReporting extends Assert {
 	StandingsMemoryTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -154,7 +154,7 @@ class GapReporting extends Assert {
 	StandingsGapTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -187,7 +187,7 @@ class GapReporting extends Assert {
 	TrackGapTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -222,7 +222,7 @@ class PositionProjection extends Assert {
 	PositionProjectionTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -265,7 +265,7 @@ class PitstopRecommendation extends Assert {
 	PitstopRecommendationTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -317,10 +317,10 @@ else {
 	if (raceNr == 15) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -358,10 +358,10 @@ else {
 	else if (raceNr == 16) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -393,10 +393,10 @@ else {
 	else if (raceNr == 17) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (lap == 1 && A_Index == 1)

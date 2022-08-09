@@ -131,7 +131,7 @@ class ControllerStepWizard extends StepWizard {
 			}
 
 			if (buttonBoxControllers.Length() > 0) {
-				Loop % buttonBoxControllers.Length()
+				loop % buttonBoxControllers.Length()
 				{
 					buttonBoxControllers[A_Index] := (buttonBoxControllers[A_Index] . ":" . buttonBoxControllers[A_Index])
 				}
@@ -140,7 +140,7 @@ class ControllerStepWizard extends StepWizard {
 			}
 
 			if (streamDeckControllers.Length() > 0) {
-				Loop % streamDeckControllers.Length()
+				loop % streamDeckControllers.Length()
 				{
 					streamDeckControllers[A_Index] := (streamDeckControllers[A_Index] . ":" . streamDeckControllers[A_Index])
 				}
@@ -837,7 +837,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 	}
 
 	controlClick(preview, element, function, row, column, isEmpty) {
-		Throw "Virtual method ControllerPreviewStepWizard.controlClick must be implemented by a subclass..."
+		throw "Virtual method ControllerPreviewStepWizard.controlClick must be implemented by a subclass..."
 	}
 }
 
@@ -1009,11 +1009,11 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	loadActions(load := false) {
-		Throw "Virtual method ActionsStepWizard.loadActions must be implemented in a subclass..."
+		throw "Virtual method ActionsStepWizard.loadActions must be implemented in a subclass..."
 	}
 
 	saveActions() {
-		Throw "Virtual method ActionsStepWizard.saveActions must be implemented in a subclass..."
+		throw "Virtual method ActionsStepWizard.saveActions must be implemented in a subclass..."
 	}
 
 	setActionsListView(actionsListView) {
@@ -1025,11 +1025,11 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	getModes() {
-		Throw "Virtual method ActionsStepWizard.getModes must be implemented in a subclass..."
+		throw "Virtual method ActionsStepWizard.getModes must be implemented in a subclass..."
 	}
 
 	getActions(mode) {
-		Throw "Virtual method ActionsStepWizard.getActions must be implemented in a subclass..."
+		throw "Virtual method ActionsStepWizard.getActions must be implemented in a subclass..."
 	}
 
 	setAction(row, mode, action, actionDescriptor, label, argument := false) {
@@ -1087,7 +1087,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			changed := []
 
 			if (IsObject(oldfunction) && IsObject(function)) {
-				Loop % oldFunction.Length()
+				loop % oldFunction.Length()
 					if (oldFunction[A_Index] != functionDescriptor[A_Index])
 						changed.Push(oldFunction[A_Index])
 			}
@@ -1483,7 +1483,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 updateActionFunction(wizard) {
 	local action
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 
 	if wizard.SetupWizard.isModuleSelected("Controller") {
@@ -1539,7 +1539,7 @@ showSelectorHint() {
 updateFunctionTriggers() {
 	local function
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 
 	if (A_GuiEvent = "Normal") {
@@ -1602,7 +1602,7 @@ updateFunctionTriggers() {
 		}
 	}
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 }
 

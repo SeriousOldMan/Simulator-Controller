@@ -27,7 +27,7 @@ CLR_LoadLibrary(AssemblyName, AppDomain = 0) {
 
 	e := ComObjError(0)
 
-	Loop 1 {
+	loop 1 {
 		if assembly := AppDomain.Load_2(AssemblyName)
 			break
 
@@ -56,7 +56,7 @@ CLR_CreateObject(Assembly, TypeName, Args*) {
 
 	vargs := ComObjArray(0xC, argCount)
 
-	Loop % argCount
+	loop % argCount
 		vargs[A_Index - 1] := Args[A_Index]
 
 	static Array_Empty := ComObjArray(0xC, 0)
@@ -109,7 +109,7 @@ CLR_Start(Version = "") {
 	EnvGet SystemRoot, SystemRoot
 
 	if Version =
-		Loop % SystemRoot "\Microsoft.NET\Framework" (A_PtrSize = 8 ? "64" : "") "\*", 2
+		loop % SystemRoot "\Microsoft.NET\Framework" (A_PtrSize = 8 ? "64" : "") "\*", 2
 			if (FileExist(A_LoopFilePath "\mscorlib.dll") && A_LoopFileName > Version)
 				Version := A_LoopFileName
 
@@ -153,7 +153,7 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 
 	aRefs := ComObjArray(8, Refs0)
 
-	Loop % Refs0
+	loop % Refs0
 		aRefs[A_Index - 1] := Refs%A_Index%
 
 	; Set parameters for compiler.
@@ -170,7 +170,7 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 	if error_count := (errors := compilerRes.Errors).Count {
 		error_text := ""
 
-		Loop % error_count
+		loop % error_count
 			error_text .= ((e := errors.Item[A_Index - 1]).IsWarning ? "Warning " : "Error ") . e.ErrorNumber " on line " e.Line ": " e.ErrorText "`n`n"
 
 		MsgBox, 16, Compilation Failed, %error_text%

@@ -810,7 +810,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		if !isRunning
-			Loop 20
+			loop 20
 				Sleep 500
 			until this.Application.isRunning()
 

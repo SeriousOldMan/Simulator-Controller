@@ -126,7 +126,7 @@ consentDialog(id, consent := false) {
 
 	Gui CNS:Default
 
-	Loop
+	loop
 		Sleep 100
 	until closed
 
@@ -167,7 +167,7 @@ changeProtection(up, critical := false, block := false) {
 				Critical Off
 		}
 		else if (level <= 0)
-			Throw "Nesting error detected in changeProtection..."
+			throw "Nesting error detected in changeProtection..."
 	}
 }
 
@@ -182,7 +182,7 @@ readLanguage(targetLanguageCode) {
 	local translations := {}
 	local translation
 
-	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
+	loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
 	{
 		translation := StrSplit(A_LoopReadLine, "=>")
 
@@ -190,7 +190,7 @@ readLanguage(targetLanguageCode) {
 			return translation[2]
 	}
 
-	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
+	throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
 logError(exception) {
@@ -337,7 +337,7 @@ checkForNews() {
 				URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
 
 				if ErrorLevel
-					Throw "Error while downloading NEWS..."
+					throw "Error while downloading NEWS..."
 			}
 			catch exception {
 				check := false
@@ -353,7 +353,7 @@ checkForNews() {
 						URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
 
 						if ErrorLevel
-							Throw "Error while downloading NEWS..."
+							throw "Error while downloading NEWS..."
 
 						setConfigurationValue(news, "News", nr, true)
 
@@ -391,7 +391,7 @@ checkForUpdates() {
 				URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
 
 				if ErrorLevel
-					Throw "Error while checking VERSION..."
+					throw "Error while checking VERSION..."
 			}
 			catch exception {
 				check := false
@@ -1328,7 +1328,7 @@ logMessage(logLevel, message) {
 			case kLogOff:
 				level := "Off     "
 			default:
-				Throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
+				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
 		fileName := kLogsDirectory . StrSplit(A_ScriptName, ".")[1] . " Logs.txt"
@@ -1384,7 +1384,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 	translations := {}
 
 	for ignore, fileName in fileNames
-		Loop Read, %fileName%
+		loop Read, %fileName%
 		{
 			translation := A_LoopReadLine
 
@@ -1397,7 +1397,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 
 			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
 				if ((A_Index == 1) && (translations.HasKey(enString) && (translations[enString] != translation[2])))
-					Throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
+					throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
 				else
 					translations[enString] := translation[2]
 		}
@@ -1589,7 +1589,7 @@ getFileNames(filePattern, directories*) {
 	for ignore, directory in directories {
 		pattern := directory . filePattern
 
-		Loop Files, %pattern%, FD
+		loop Files, %pattern%, FD
 			result.Push(A_LoopFileLongPath)
 	}
 
@@ -1599,13 +1599,13 @@ getFileNames(filePattern, directories*) {
 normalizeFilePath(filePath) {
 	local position, index
 
-	Loop {
+	loop {
 		position := InStr(filePath, "\..")
 
 		if position {
 			index := position - 1
 
-			Loop {
+			loop {
 				if (index == 0)
 					return filePath
 				else if (SubStr(filePath, index, 1) == "\") {
@@ -1626,7 +1626,7 @@ substituteVariables(string, values := false) {
 	local result := string
 	local variable, startPos, endPos, value
 
-	Loop {
+	loop {
 		startPos := InStr(result, "%")
 
 		if startPos {
@@ -1641,7 +1641,7 @@ substituteVariables(string, values := false) {
 				result := StrReplace(result, "%" . variable . "%", value)
 			}
 			else
-				Throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
+				throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
 		}
 		else
 			break
@@ -1706,7 +1706,7 @@ reverse(list) {
 	local result := []
 	local length := list.Length()
 
-	Loop %length%
+	loop %length%
 		result.Push(list[length - (A_Index - 1)])
 
 	return result
@@ -1863,7 +1863,7 @@ readConfiguration(configFile) {
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	Loop Read, %configFile%
+	loop Read, %configFile%
 	{
 		currentLine := LTrim(A_LoopReadLine)
 

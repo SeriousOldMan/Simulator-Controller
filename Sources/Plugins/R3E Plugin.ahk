@@ -210,7 +210,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.activateWindow()
 
-		Loop 15
+		loop 15
 			this.sendCommand(this.NextOptionHotkey)
 
 		if kUseImageRecognition {
@@ -365,13 +365,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				case "Accept":
 					this.sendCommand(this.AcceptChoiceHotkey)
 				case "Increase":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
+					throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
 			}
 		}
 	}
@@ -392,13 +392,13 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				if index {
 					this.activateWindow()
 
-					Loop 15
+					loop 15
 						this.sendCommand(this.PreviousOptionHotkey)
 
 					index -= 1
 
 					if index
-						Loop %index%
+						loop %index%
 							this.sendCommand(this.NextOptionHotkey)
 
 					return true
@@ -449,7 +449,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Repair Suspension")
 				this.toggleActivity("Repair Suspension", false, false)
 			else
-				Throw "Unsupported change operation """ . action . """ detected in R3EPlugin.changePitstopOption..."
+				throw "Unsupported change operation """ . action . """ detected in R3EPlugin.changePitstopOption..."
 		}
 	}
 
@@ -461,7 +461,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 						this.dialPitstopOption(activity, "Accept")
 			}
 			else
-				Throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
+				throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
 		}
 	}
 
@@ -530,7 +530,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateWindow()
 
-			Loop 10
+			loop 10
 				this.sendCommand(this.NextOptionHotkey)
 
 			this.sendCommand(this.AcceptChoiceHotkey)
@@ -640,7 +640,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
 
-		Loop {
+		loop {
 			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 			if (carID == kUndefined)
@@ -684,7 +684,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if (fileNames.Length() == 0)
-			Throw "Unknown image '" . imageName . "' detected in R3EPlugin.getLabelFileName..."
+			throw "Unknown image '" . imageName . "' detected in R3EPlugin.getLabelFileName..."
 		else {
 			if isDebug()
 				showMessage("Labels: " . values2String(", ", imageNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.png", 5000)
@@ -699,7 +699,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		static kSearchAreaLeft := 0
 		static kSearchAreaRight := 400
 
-		Loop % imageNames.Length()
+		loop % imageNames.Length()
 		{
 			imageName := imageNames[A_Index]
 			pitstopImages := this.getImageFileNames(imageName)
@@ -711,7 +711,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			Loop % pitstopImages.Length()
+			loop % pitstopImages.Length()
 			{
 				pitstopImage := pitstopImages[A_Index]
 

@@ -374,7 +374,7 @@ parseObject(properties) {
 
 	properties := StrReplace(properties, "`r", "")
 
-	Loop Parse, properties, `n
+	loop Parse, properties, `n
 	{
 		property := string2Values("=", A_LoopField)
 
@@ -570,7 +570,7 @@ restart:
 				GuiControl Choose, sessionDropDownMenu, % chosen
 
 				if exception
-					Throw exception
+					throw exception
 			}
 			else if (arguments[1] == "Driver") {
 				GuiControlGet driverDropDownMenu
@@ -641,7 +641,7 @@ restart:
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
 				else
-					Throw Exception("Invalid or missing token...")
+					throw Exception("Invalid or missing token...")
 			}
 			catch exception {
 				title := translate("Error")
@@ -761,7 +761,7 @@ restart:
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 				}
 
 				connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -1190,8 +1190,8 @@ restart:
 		else
 			Gui RES:Show
 
-		Loop {
-			Loop
+		loop {
+			loop
 				Sleep 1000
 			until result
 

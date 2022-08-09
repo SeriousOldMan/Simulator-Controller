@@ -119,7 +119,7 @@ class TranslationsEditor extends ConfigurationItem {
 		
 		this.iTranslationsList.loadTranslations((isoCodeEdit != "") ? isoCodeEdit : "en")
 		
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 		
@@ -319,7 +319,7 @@ class TranslationsList extends ConfigurationItemList {
 				LV_Add("", translation[1], translation[2])
 		
 		if (items.Length() < count)
-			Loop % count - items.Length()
+			loop % count - items.Length()
 				LV_Delete(count - A_Index - 1)
 			
 		if (first || (this.iLanguageCode = "en")) {

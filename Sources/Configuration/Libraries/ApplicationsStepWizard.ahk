@@ -298,7 +298,7 @@ class ApplicationsStepWizard extends StepWizard {
 	
 		row := 0
 		
-		Loop {
+		loop {
 			row := LV_GetNext(row, "C")
 		
 			if row {
@@ -310,7 +310,7 @@ class ApplicationsStepWizard extends StepWizard {
 				break
 		}
 		
-		Loop % LV_GetCount()
+		loop % LV_GetCount()
 		{
 			LV_GetText(name, A_Index, column)
 	
@@ -331,7 +331,7 @@ class ApplicationsStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 updateSelectedApplications() {
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
 	if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick"))

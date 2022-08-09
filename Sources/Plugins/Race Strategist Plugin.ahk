@@ -242,7 +242,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			lastStint := false
 			driverID := kNull
 
-			Loop % teamServer.getCurrentLap(session)
+			loop % teamServer.getCurrentLap(session)
 			{
 				try {
 					stint := teamServer.getLapStint(A_Index, session)
@@ -406,7 +406,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		else {
 			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%, 1
 
-			Loop {
+			loop {
 				lapNumber += 1
 
 				if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
@@ -494,7 +494,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				count := 0
 				pitstops := false
 
-				Loop % teamServer.getCurrentLap(session)
+				loop % teamServer.getCurrentLap(session)
 				{
 					try {
 						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
@@ -569,7 +569,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					; ignore
 				}
 
-				Loop {
+				loop {
 					fileName := (kTempDirectory . "Race Report\Lap." . A_Index)
 
 					if !FileExist(fileName)

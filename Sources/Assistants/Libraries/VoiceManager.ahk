@@ -455,7 +455,7 @@ class VoiceManager {
 
 	User[] {
 		Get {
-			Throw "Virtual property VoiceManager.User must be implemented in a subclass..."
+			throw "Virtual property VoiceManager.User must be implemented in a subclass..."
 		}
 	}
 
@@ -683,7 +683,7 @@ class VoiceManager {
 	}
 
 	getGrammars(language) {
-		Throw "Virtual method VoiceManager.getGrammars must be implemented in a subclass..."
+		throw "Virtual method VoiceManager.getGrammars must be implemented in a subclass..."
 	}
 
 	buildFragments(language) {
@@ -742,7 +742,7 @@ class VoiceManager {
 
 				try {
 					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
-						Throw "Recognizer not running..."
+						throw "Recognizer not running..."
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Error while registering voice command """) . definition . translate(""" - please check the configuration"))
@@ -824,6 +824,6 @@ class VoiceManager {
 	}
 
 	handleVoiceCommand(grammar, words) {
-		Throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
+		throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
 	}
 }

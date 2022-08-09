@@ -73,7 +73,7 @@ class TriggerDetectorTask extends Task {
 	run() {
 		joysticks := []
 
-		Loop 16 { ; Query each joystick number to find out which ones exist.
+		loop 16 { ; Query each joystick number to find out which ones exist.
 			GetKeyState joyName, %A_Index%JoyName
 
 			if (joyName != "")
@@ -120,7 +120,7 @@ class TriggerDetectorContinuation extends Continuation {
 
 			buttons_down := ""
 
-			Loop %joy_buttons%
+			loop %joy_buttons%
 			{
 				GetKeyState joy%A_Index%, %joystickNumber%joy%A_Index%
 

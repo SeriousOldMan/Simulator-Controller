@@ -192,7 +192,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					case "Reject":
 						this.Plugin.reject()
 					default:
-						Throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+						throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
 				}
 		}
 	}
@@ -1124,7 +1124,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			FileCreateDir %kTempDirectory%%code% Data
 
-			Loop Files, %kTempDirectory%%code% Data\%assistant%*.*
+			loop Files, %kTempDirectory%%code% Data\%assistant%*.*
 				try {
 					FileDelete %A_LoopFilePath%
 				}
@@ -1192,7 +1192,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	requestInformation(arguments*) {
-		Throw "Virtual method RaceAssistantPlugin.requestInformation must be implemented in a subclass..."
+		throw "Virtual method RaceAssistantPlugin.requestInformation must be implemented in a subclass..."
 	}
 
 	call() {
@@ -1297,7 +1297,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				sessionSettings := teamServer.getSessionValue(this.Plugin . " Settings")
 
 				if (!sessionSettings || (sessionSettings = ""))
-					Throw "No data..."
+					throw "No data..."
 				else
 					return parseConfiguration(sessionSettings)
 			}
@@ -1317,7 +1317,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				sessionState := teamServer.getSessionValue(this.Plugin . " State")
 
 				if (!sessionState || (sessionState = ""))
-					Throw "No data..."
+					throw "No data..."
 				else
 					return parseConfiguration(sessionState)
 			}

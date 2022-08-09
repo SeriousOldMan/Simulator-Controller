@@ -90,7 +90,7 @@ class TyresDatabase extends SessionDatabase {
 		}
 
 		if ((simulator == true) || (car == true) || (track == true))
-			Throw "Unsupported database specification detected in TyresDatabase.requireDatabase..."
+			throw "Unsupported database specification detected in TyresDatabase.requireDatabase..."
 
 		if !this.iDatabase {
 			this.iLastSimulator := simulator

@@ -229,7 +229,7 @@ class RaceReportViewer extends RaceReportReader {
 		if drivers {
 			result := []
 
-			Loop % getConfigurationValue(raceData, "Cars", "Count")
+			loop % getConfigurationValue(raceData, "Cars", "Count")
 				result.Push(drivers[1][A_Index])
 
 			return result
@@ -278,7 +278,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			sessionDB := new SessionDatabase()
 
-			Loop %carsCount% {
+			loop %carsCount% {
 				car := A_Index
 				valid := false
 
@@ -309,7 +309,7 @@ class RaceReportViewer extends RaceReportReader {
 			rows := []
 			hasDNF := false
 
-			Loop % carsCount
+			loop % carsCount
 			{
 				car := A_Index
 
@@ -317,7 +317,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 				hasNull := false
 
-				Loop % lapsCount
+				loop % lapsCount
 				{
 					lapTime := times[A_Index][car]
 
@@ -348,7 +348,7 @@ class RaceReportViewer extends RaceReportReader {
 							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 
-			Loop % carsCount
+			loop % carsCount
 			{
 				row := rows[A_Index]
 
@@ -543,7 +543,7 @@ class RaceReportViewer extends RaceReportReader {
 			carIndices := []
 			maxPosition := 0
 
-			Loop % carsCount
+			loop % carsCount
 			{
 				car := A_Index
 				valid := false
@@ -578,7 +578,7 @@ class RaceReportViewer extends RaceReportReader {
 				if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
 					drawChartFunction .= ",`n[0"
 
-					Loop % cars.Length() {
+					loop % cars.Length() {
 						position := getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
 
 						if (StrLen(Trim(position)) == 0)
@@ -601,7 +601,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					lapPositions := positions[lap]
 
-					Loop % cars.Length() {
+					loop % cars.Length() {
 						if lapPositions.HasKey(A_Index)
 							drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
 						else
@@ -916,7 +916,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 
-			Loop % Min(length, laps.Length())
+			loop % Min(length, laps.Length())
 				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . laps[A_Index] . "');"
 
 			text =
@@ -1083,12 +1083,12 @@ editReportSettings(raceReport, report := false, options := false) {
 		FileEncoding UTF-8
 
 		try {
-			Loop Read, % report . "\Drivers.CSV"
+			loop Read, % report . "\Drivers.CSV"
 				drivers.Push(string2Values(";", A_LoopReadLine))
 
 			drivers := correctEmptyValues(drivers)
 
-			Loop Read, % report . "\Laps.CSV"
+			loop Read, % report . "\Laps.CSV"
 				laps.Push(string2Values(";", A_LoopReadLine))
 
 			laps := correctEmptyValues(laps)
@@ -1180,7 +1180,7 @@ editReportSettings(raceReport, report := false, options := false) {
 			if raceReport.Settings.HasKey("Drivers")
 				selectedDrivers := raceReport.Settings["Drivers"]
 			else
-				Loop % allDrivers.Length()
+				loop % allDrivers.Length()
 					selectedDrivers.Push(A_Index)
 
 			sessionDB := new SessionDatabase()
@@ -1228,9 +1228,9 @@ editReportSettings(raceReport, report := false, options := false) {
 
 		Gui RRS:Show
 
-		Loop
+		loop
 			Sleep 100
-		Until result
+		until result
 
 		if (result = kOk) {
 			result := {}
@@ -1252,11 +1252,11 @@ editReportSettings(raceReport, report := false, options := false) {
 							if startLap is integer
 								if endLap is integer
 									if (endLap + 0) > (startLap + 0)
-										Loop {
+										loop {
 											index := startLap + A_Index - 1
 
 											laps[index] := index
-										} Until (index = endLap)
+										} until (index = endLap)
 						}
 						else if lap is Integer
 							if laps.HasKey(lap)
@@ -1276,7 +1276,7 @@ editReportSettings(raceReport, report := false, options := false) {
 
 				rowNumber := 0
 
-				Loop {
+				loop {
 					rowNumber := LV_GetNext(rowNumber, "C")
 
 					if !rowNumber
@@ -1319,7 +1319,7 @@ selectDriver() {
 	local selected := 0
 	local row := 0
 
-	Loop {
+	loop {
 		row := LV_GetNext(row, "C")
 
 		if row
@@ -1345,7 +1345,7 @@ selectDrivers() {
 		GuiControl, , driverSelectCheck, 0
 	}
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, driverSelectCheck ? "Check" : "-Check")
 }
 

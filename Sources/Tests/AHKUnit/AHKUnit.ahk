@@ -192,7 +192,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 			StringTrimRight,string,string,1
 		}
 		previousItem := 0
-		Loop,parse,string,`n
+		loop,parse,string,`n
 		{
 			itemString := A_LoopField
 			itemParent := parent

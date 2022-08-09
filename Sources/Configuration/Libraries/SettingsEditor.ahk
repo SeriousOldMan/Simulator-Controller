@@ -130,7 +130,7 @@ getSelectedModes(modesListViewHandle) {
 	rowNumber := 0
 	modes := []
 	
-	Loop {
+	loop {
 		rowNumber := LV_GetNext(rowNumber, "C")
 		
 		if !rowNumber
@@ -306,7 +306,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		Gui ME:+OwnerSE
 		Gui SE:+Disabled
 		
-		Loop {
+		loop {
 			Sleep 200
 		} until result
 		
@@ -465,10 +465,10 @@ restartSettings:
 		}
 		
 		if (coreSettings.Length() > 8)
-			Throw "Too many Core Components detected in editSettings..."
+			throw "Too many Core Components detected in editSettings..."
 		
 		if (feedbackSettings.Length() > 8)
-			Throw "Too many Feedback Components detected in editSettings..."
+			throw "Too many Feedback Components detected in editSettings..."
 			
 		coreHeight := 20 + (coreSettings.Length() * 20)
 		
@@ -624,7 +624,7 @@ restartSettings:
 		if fromSetup
 			return false
 		else {
-			Loop {
+			loop {
 				Sleep 200
 			} until (result || vRestart)
 			

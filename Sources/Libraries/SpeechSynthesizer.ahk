@@ -81,7 +81,7 @@ class SpeechSynthesizer {
 				voices := []
 
 				if (this.Synthesizer = "Windows") {
-					Loop % this.iSpeechSynthesizer.GetVoices.Count
+					loop % this.iSpeechSynthesizer.GetVoices.Count
 					{
 						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
 						lcid := voice.GetAttribute("Language")
@@ -157,7 +157,7 @@ class SpeechSynthesizer {
 			this.iSynthesizer := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
 
-			Loop % this.iSpeechSynthesizer.GetVoices.Count
+			loop % this.iSpeechSynthesizer.GetVoices.Count
 				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
 
 			this.setVoice(language, this.computeVoice(voice, language))
@@ -172,7 +172,7 @@ class SpeechSynthesizer {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
@@ -202,7 +202,7 @@ class SpeechSynthesizer {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
@@ -213,7 +213,7 @@ class SpeechSynthesizer {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
 
 				voices := this.iSpeechSynthesizer.GetVoices()
@@ -239,7 +239,7 @@ class SpeechSynthesizer {
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else
-			Throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
+			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
 		OnExit(ObjBindMethod(this, "clearCache"))
 	}
@@ -331,7 +331,7 @@ class SpeechSynthesizer {
 			this.iSoundPlayer := pid
 
 			if wait {
-				Loop {
+				loop {
 					Process Exist, %pid%
 
 					if ErrorLevel
@@ -574,7 +574,7 @@ class SpeechSynthesizer {
 
 			try {
 				if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
-					Throw "Error while speech synthesizing..."
+					throw "Error while speech synthesizing..."
 			}
 			catch exception {
 				if (this.Synthesizer = "Azure")

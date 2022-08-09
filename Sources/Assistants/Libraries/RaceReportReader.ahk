@@ -37,7 +37,7 @@ class RaceReportReader {
 	getLaps(raceData) {
 		local laps := []
 
-		Loop % getConfigurationValue(raceData, "Laps", "Count")
+		loop % getConfigurationValue(raceData, "Laps", "Count")
 			laps.Push(A_Index)
 
 		return laps
@@ -46,7 +46,7 @@ class RaceReportReader {
 	getDrivers(raceData) {
 		local cars := []
 
-		Loop % getConfigurationValue(raceData, "Cars", "Count")
+		loop % getConfigurationValue(raceData, "Cars", "Count")
 			cars.Push(A_Index)
 
 		return cars
@@ -113,7 +113,7 @@ class RaceReportReader {
 			driverNicknames := []
 
 		if cars
-			Loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
+			loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
 				cars.Push(A_Index)
 
 				if positions
@@ -245,7 +245,7 @@ class RaceReportReader {
 
 		positions := this.getDriverPositions(raceData, positions, car)
 
-		Loop % positions.Length()
+		loop % positions.Length()
 		{
 			position := positions[A_Index]
 
@@ -388,7 +388,7 @@ class RaceReportReader {
 
 			try {
 				if drivers {
-					Loop Read, % report . "\Drivers.CSV"
+					loop Read, % report . "\Drivers.CSV"
 						if (!laps || inList(laps, A_Index))
 							drivers.Push(string2Values(";", A_LoopReadLine))
 
@@ -396,7 +396,7 @@ class RaceReportReader {
 				}
 
 				if positions {
-					Loop Read, % report . "\Positions.CSV"
+					loop Read, % report . "\Positions.CSV"
 						if (!laps || inList(laps, A_Index))
 							positions.Push(string2Values(";", A_LoopReadLine))
 
@@ -404,7 +404,7 @@ class RaceReportReader {
 				}
 
 				if times {
-					Loop Read, % report . "\Times.CSV"
+					loop Read, % report . "\Times.CSV"
 						if (!laps || inList(laps, A_Index))
 							times.Push(string2Values(";", A_LoopReadLine))
 
@@ -426,11 +426,11 @@ class RaceReportReader {
 correctEmptyValues(table, default := "__Undefined__") {
 	local line
 
-	Loop % table.Length()
+	loop % table.Length()
 	{
 		line := A_Index
 
-		Loop % table[line].Length()
+		loop % table[line].Length()
 			if (table[line][A_Index] = "-")
 				table[line][A_Index] := ((default == kUndefined) ? ((line > 1) ? table[line - 1][A_Index] : "-") : default)
 	}

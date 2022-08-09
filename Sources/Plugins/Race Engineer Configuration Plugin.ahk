@@ -139,7 +139,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget29 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp-2 w%w3% h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
 
-		Loop 30
+		loop 30
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()

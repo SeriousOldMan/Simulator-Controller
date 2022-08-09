@@ -267,7 +267,7 @@ class ControllerActionsEditor extends ConfigurationItem {
 			Gui PAE:Show
 
 restart:
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 		

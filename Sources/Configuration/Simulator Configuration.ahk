@@ -577,7 +577,7 @@ startupSimulatorConfiguration() {
 	editor.show()
 
 	try {
-		Loop {
+		loop {
 			Sleep 200
 
 			if (vResult == kApply) {

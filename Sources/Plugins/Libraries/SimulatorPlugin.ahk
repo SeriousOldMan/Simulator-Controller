@@ -141,7 +141,7 @@ class PitstopAction extends ControllerAction {
 		this.iSteps := steps
 
 		if (moreArguments.Length() > 0)
-			Throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
+			throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 
 		base.__New(function, label, icon)
 	}
@@ -564,22 +564,22 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	selectPitstopOption(option) {
-		Throw "Virtual method SimulatorPlugin.selectPitstopOption must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.selectPitstopOption must be implemented in a subclass..."
 	}
 
 	changePitstopOption(option, action, steps := 1) {
-		Throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
 	}
 
 	openPitstopMFD(descriptor := false) {
-		Throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
 	}
 
 	resetPitstopMFD(descriptor := false) {
 	}
 
 	closePitstopMFD() {
-		Throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
 	}
 
 	requirePitstopMFD() {
@@ -637,7 +637,7 @@ class RaceAssistantAction extends ControllerAction {
 			case "Reject":
 				plugin.reject()
 			default:
-				Throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+				throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
 		}
 	}
 }

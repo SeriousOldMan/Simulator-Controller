@@ -252,7 +252,7 @@ class SimulatorStartup extends ConfigurationItem {
 						, message: translate("Start: Simulator Controller")
 						, title: translate("Initialize Core System")})
 
-		Loop 50 {
+		loop 50 {
 			if !kSilentMode
 				showProgress({progress: A_Index * 2})
 
@@ -507,9 +507,9 @@ launchPad(command := false, arguments*) {
 		else
 			Gui LP:Show
 
-		Loop
+		loop
 			Sleep 100
-		Until result
+		until result
 
 		Gui LP:Destroy
 

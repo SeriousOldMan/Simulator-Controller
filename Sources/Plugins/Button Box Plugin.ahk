@@ -199,7 +199,7 @@ class GridButtonBox extends ButtonBox {
 
 		rows := []
 
-		Loop % this.Rows
+		loop % this.Rows
 			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
 
 		this.iRowDefinitions := rows
@@ -221,12 +221,12 @@ class GridButtonBox extends ButtonBox {
 
 		height := 0
 
-		Loop % rowHeights.Length()
+		loop % rowHeights.Length()
 			height += rowHeights[A_Index]
 
 		width := 0
 
-		Loop % columnWidths.Length()
+		loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
@@ -245,14 +245,14 @@ class GridButtonBox extends ButtonBox {
 
 		vertical := this.kHeaderHeight
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 
 			horizontal := this.SidesMargin
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				columnWidth := columnWidths[A_Index]
 				descriptor := rowDefinition[A_Index]
@@ -293,7 +293,7 @@ class GridButtonBox extends ButtonBox {
 							case kDialType:
 								numDials += 1
 							default:
-								Throw "Unknown function type (" . function . ") detected in GrindButtonBox.createGui..."
+								throw "Unknown function type (" . function . ") detected in GrindButtonBox.createGui..."
 						}
 
 						function := ConfigurationItem.descriptor(function, number)
@@ -339,16 +339,16 @@ class GridButtonBox extends ButtonBox {
 		columnWidths := []
 		rowHeights := []
 
-		Loop % this.Columns
+		loop % this.Columns
 			columnWidths.Push(0)
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			rowHeight := 0
 
 			rowDefinition := this.RowDefinitions[A_Index]
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				descriptor := rowDefinition[A_Index]
 
@@ -426,7 +426,7 @@ controlEvent() {
 			case k1WayToggleType, k2WayToggleType:
 				switchToggle(descriptor[1], descriptor[2], (y > (function[3] + Round(function[5] / 2))) ? "Off" : "On")
 			default:
-				Throw "Unknown function type (" . descriptor[1] . ") detected in controlEvent..."
+				throw "Unknown function type (" . descriptor[1] . ") detected in controlEvent..."
 		}
 	}
 }

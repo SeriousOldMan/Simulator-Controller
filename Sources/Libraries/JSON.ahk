@@ -129,13 +129,13 @@ class JSON {
 			object := {}
 
 			if (result = -1) {
-				Loop % jsObject.length
+				loop % jsObject.length
 					object[A_Index - 1] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "[" . (A_Index - 1) . "],'','" . indent . "')")
 			}
 			else if (result = 0) {
 				keys := jsObject.GetKeys()
 
-				Loop % keys.length
+				loop % keys.length
 					k := keys[A_Index - 1], object[k] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "['" . k . "'],'','" . indent . "')")
 			}
 
@@ -170,7 +170,7 @@ class JSON {
 
 			for key in object {
 				if IsObject(key)
-					Throw "Invalid key detected in JSON._ObjToString..."
+					throw "Invalid key detected in JSON._ObjToString..."
 
 				if !((key = A_Index) || (isArray := false))
 					break
@@ -245,14 +245,14 @@ class JSON {
 		else if (result = -1) {
 			object := []
 
-			Loop % jsObject.length
+			loop % jsObject.length
 				object[A_Index] := this._CreateObject(jsObject[A_Index - 1])
 		}
 		else if (result = 0) {
 			object := {}
 			keys := jsObject.GetKeys()
 
-			Loop % keys.length
+			loop % keys.length
 				k := keys[A_Index - 1], object[k] := this._CreateObject(jsObject[k])
 		}
 

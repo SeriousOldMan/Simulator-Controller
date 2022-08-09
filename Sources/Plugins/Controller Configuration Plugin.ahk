@@ -425,7 +425,7 @@ class FunctionsList extends ConfigurationItemList {
 
 		LV_Delete()
 
-		Loop {
+		loop {
 			if (++round > 2)
 				break
 
@@ -482,7 +482,7 @@ class FunctionsList extends ConfigurationItemList {
 				functionTypeDropDown := 5
 				onKey := "Call"
 			default:
-				Throw "Unknown function type (" . item.Type . ") detected in FunctionsList.loadEditor..."
+				throw "Unknown function type (" . item.Type . ") detected in FunctionsList.loadEditor..."
 		}
 
 		GuiControl Choose, functionTypeDropDown, %functionTypeDropDown%

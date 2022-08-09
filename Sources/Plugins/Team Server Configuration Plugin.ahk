@@ -129,7 +129,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -241,7 +241,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
 		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Loop 33
+		loop 33
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.updateState()
@@ -401,7 +401,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		properties := StrReplace(properties, "`r", "")
 
-		Loop Parse, properties, `n
+		loop Parse, properties, `n
 		{
 			property := string2Values("=", A_LoopField)
 

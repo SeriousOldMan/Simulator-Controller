@@ -271,7 +271,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		tracks := []
 
-		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 
@@ -289,7 +289,7 @@ class SessionDatabase extends ConfigurationItem {
 		directory := (kDatabaseDirectory . "User\Tracks\" . code . "\")
 		tracks := []
 
-		Loop Files, %directory%*.map, F		; Track
+		loop Files, %directory%*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 
@@ -387,13 +387,13 @@ class SessionDatabase extends ConfigurationItem {
 
 		result := []
 
-		Loop % getConfigurationValue(data, "Automations", "Count", 0)
+		loop % getConfigurationValue(data, "Automations", "Count", 0)
 		{
 			id := A_Index
 
 			actions := []
 
-			Loop % getConfigurationValue(data, "Automations", id . ".Actions", 0)
+			loop % getConfigurationValue(data, "Automations", id . ".Actions", 0)
 				actions.Push({X: getConfigurationValue(data, "Actions", id . "." . A_Index . ".X", 0)
 							, Y: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Y", 0)
 							, Type: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Type", 0)
@@ -434,12 +434,12 @@ class SessionDatabase extends ConfigurationItem {
 	getEntries(filter := "*.*", option := "D") {
 		result := []
 
-		Loop Files, %kDatabaseDirectory%User\%filter%, %option%
+		loop Files, %kDatabaseDirectory%User\%filter%, %option%
 			if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1))
 				result.Push(A_LoopFileName)
 
 		if this.UseCommunity
-			Loop Files, %kDatabaseDirectory%Community\%filter%, %option%
+			loop Files, %kDatabaseDirectory%Community\%filter%, %option%
 				if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1) && !inList(result, A_LoopFileName))
 					result.Push(A_LoopFileName)
 
@@ -777,7 +777,7 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				Loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
 				{
 					SplitPath A_LoopFileName, name
 
@@ -794,7 +794,7 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				Loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
 				{
 					SplitPath A_LoopFileName, name
 

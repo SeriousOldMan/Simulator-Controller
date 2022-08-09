@@ -89,7 +89,7 @@ runTeamSessionLogger() {
 		; ignore
 	}
 	
-	Loop {
+	loop {
 		data := readSimulatorData("ACC")
 	
 		info := values2String("; ", A_Now,

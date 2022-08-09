@@ -64,7 +64,7 @@ global kTraceOff = 4
 class Condition {
 	Type[] {
         Get {
-            Throw "Virtual property Condition.Type must be implemented in a subclass..."
+            throw "Virtual property Condition.Type must be implemented in a subclass..."
         }
     }
 
@@ -72,11 +72,11 @@ class Condition {
 	}
 
 	match(facts, variables) {
-		Throw "Virtual method Condition.match must be implemented in a subclass..."
+		throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 
 	toString(facts := "__NotInitialized__") {
-		Throw "Virtual method Condition.toString must be implemented in a subclass..."
+		throw "Virtual method Condition.toString must be implemented in a subclass..."
 	}
 }
 
@@ -260,7 +260,7 @@ class Predicate extends Condition {
 		this.iRightPrimary := rightPrimary
 
 		if (((operator == kNotInitialized) && (rightPrimary != kNotInitialized)) || ((operator != kNotInitialized) && (rightPrimary == kNotInitialized)))
-			Throw "Inconsistent argument combination detected in Predicate.__New..."
+			throw "Inconsistent argument combination detected in Predicate.__New..."
 	}
 
 	getFacts(ByRef facts) {
@@ -311,7 +311,7 @@ class Predicate extends Condition {
 					else
 						result := inList(leftPrimary, rightPrimary)
 				default:
-					Throw "Unsupported comparison operator """ . this.Operator . """ detected in Predicate.match..."
+					throw "Unsupported comparison operator """ . this.Operator . """ detected in Predicate.match..."
 			}
 
 			if isInstance(this.LeftPrimary, Variable)
@@ -342,7 +342,7 @@ class Primary extends Term {
 	}
 
 	toString(factsOrResultSet := "__NotInitialized__") {
-		Throw "Virtual method Primary.toString must be implemented in a subclass..."
+		throw "Virtual method Primary.toString must be implemented in a subclass..."
 	}
 }
 
@@ -383,10 +383,10 @@ class Variable extends Primary {
 		this.iRootVariable := rootVariable
 
 		if ((!property && rootVariable) || (property && !rootVariable))
-			Throw "Inconsistent argument combination detected in Variable.__New..."
+			throw "Inconsistent argument combination detected in Variable.__New..."
 
 		if (this.base != Variable)
-			Throw "Subclassing of Variable is not allowed..."
+			throw "Subclassing of Variable is not allowed..."
 	}
 
 	getValue(variablesFactsOrResultSet, default := "__NotInitialized__") {
@@ -489,7 +489,7 @@ class Fact extends Primary {
 		this.iFact := name
 
 		if (this.base != Fact)
-			Throw "Subclassing of Fact is not allowed..."
+			throw "Subclassing of Fact is not allowed..."
 	}
 
 	getValue(factsOrResultSet, default := "__NotInitialized__") {
@@ -551,7 +551,7 @@ class Literal extends Primary {
 		this.iLiteral := value
 
 		if (this.base != Literal)
-			Throw "Subclassing of Literal is not allowed..."
+			throw "Subclassing of Literal is not allowed..."
 	}
 
 	getValue(factsOrResultSet := "__NotInitialized__") {
@@ -586,11 +586,11 @@ class Literal extends Primary {
 
 class Action {
 	execute(knowledgeBase, variables) {
-		Throw "Virtual method Action.execute must be implemented in a subclass..."
+		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
 
 	toString(facts := "__NotInitialized__") {
-		Throw "Virtual method Action.toString must be implemented in a subclass..."
+		throw "Virtual method Action.toString must be implemented in a subclass..."
 	}
 }
 
@@ -724,7 +724,7 @@ class ProveAction extends CallAction {
 
 		if resultSet {
 			if this.iProveAll
-				Loop
+				loop
 					if !resultSet.nextResult()
 						break
 
@@ -955,7 +955,7 @@ class Term {
 	}
 
 	toString(factsOrResultSet := "__NotInitialized__") {
-		Throw "Virtual method Term.toString must be implemented in a subclass..."
+		throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 
 	injectValues(resultSet) {
@@ -1026,7 +1026,7 @@ class Compound extends Term {
 		this.iHasVariables := this.hasVariables()
 
 		if ((this.base != Compound) && (this.base != Cut) && (this.base != Fail))
-			Throw "Subclassing of Compound is not allowed..."
+			throw "Subclassing of Compound is not allowed..."
 	}
 
 	toString(resultSet := "__NotInitialized__") {
@@ -1123,7 +1123,7 @@ class Cut extends Compound {
 		base.__New("!", [])
 
 		if (this.base != Cut)
-			Throw "Subclassing of Cut is not allowed..."
+			throw "Subclassing of Cut is not allowed..."
 	}
 
 	toString(resultSet := "__NotInitialized__") {
@@ -1140,7 +1140,7 @@ class Fail extends Compound {
 		base.__New("fail", [])
 
 		if (this.base != Fail)
-			Throw "Subclassing of Fail is not allowed..."
+			throw "Subclassing of Fail is not allowed..."
 	}
 
 	toString(resultSet := "__NotInitialized__") {
@@ -1175,7 +1175,7 @@ class Pair extends Term {
 		this.iHasVariables := this.hasVariables()
 
 		if (this.base != Pair)
-			Throw "Subclassing of Pair is not allowed..."
+			throw "Subclassing of Pair is not allowed..."
 	}
 
 	toString(resultSet := "__NotInitialized__") {
@@ -1183,7 +1183,7 @@ class Pair extends Term {
 		local next := this
 		local left, right, separator
 
-		Loop {
+		loop {
 			left := next.LeftTerm.toString(resultSet)
 			right := next.RightTerm.getValue(resultSet, next.RightTerm)
 
@@ -1252,7 +1252,7 @@ class Pair extends Term {
 class Nil extends Term {
 	__New() {
 		if (this.base != Nil)
-			Throw "Subclassing of Nil is not allowed..."
+			throw "Subclassing of Nil is not allowed..."
 	}
 
 	toString(resultSet := "__NotInitialized__") {
@@ -1271,7 +1271,7 @@ class Nil extends Term {
 class Rule {
 	Type[] {
         Get {
-            Throw "Virtual property Rule.Type must be implemented in a subclass..."
+            throw "Virtual property Rule.Type must be implemented in a subclass..."
         }
     }
 }
@@ -1511,7 +1511,7 @@ class ResultSet {
 			local next
 
 			if retry
-				Loop {
+				loop {
 					next := choicePoint.next()
 
 					if next
@@ -1622,7 +1622,7 @@ class ResultSet {
 
 		choicePoint := this.ChoicePoint[true]
 
-		Loop {
+		loop {
 			if choicePoint.nextChoice() {
 				choicePoint := choicePoint.next()
 
@@ -1666,7 +1666,7 @@ class ResultSet {
 		local last := default
 		local value, root
 
-		Loop {
+		loop {
 			var := var.RootVariable
 
 			if (ruleEngine.TraceLevel <= kTraceFull)
@@ -1798,7 +1798,7 @@ class ChoicePoint {
 	}
 
 	nextChoice() {
-		Throw "Virtual method ChoicePoint.nextChoice must be implemented in a subclass..."
+		throw "Virtual method ChoicePoint.nextChoice must be implemented in a subclass..."
 	}
 
 	saveVariable(var, value) {
@@ -1863,7 +1863,7 @@ class ChoicePoint {
 			if (scpLength > 0) {
 				cp.SubChoicePoints := []
 
-				Loop %scpLength%
+				loop %scpLength%
 					removeables.Push(subChoicePoints[scpLength - A_Index + 1])
 			}
 			else
@@ -1959,7 +1959,7 @@ class RulesChoicePoint extends ChoicePoint {
 
 		reductions := this.Reductions[this.iNextRuleIndex == 1]
 
-		Loop {
+		loop {
 			index := this.iNextRuleIndex++
 
 			if (index > 1)
@@ -2308,7 +2308,7 @@ class CutChoicePoint extends ChoicePoint {
 		local environment := this.Environment
 		local candidate := base.previous()
 
-		Loop {
+		loop {
 			if !candidate
 				return false
 
@@ -2429,7 +2429,7 @@ class KnowledgeBase {
 					facts.deregisterObserver(theFact, fRules)
 			}
 			else
-				Throw "Inconsistency detected in KnowledgeBase.deregisterRuleFacts..."
+				throw "Inconsistency detected in KnowledgeBase.deregisterRuleFacts..."
 		}
 	}
 
@@ -2492,13 +2492,13 @@ class KnowledgeBase {
 
 		tickCount := A_TickCount
 
-		Loop {
+		loop {
 			generation := facts.Generation
 			produced := false
 
 			ruleEntry := rules.Productions
 
-			Loop {
+			loop {
 				if !ruleEntry
 					break
 
@@ -2602,7 +2602,7 @@ class Facts {
 		this.iFacts := initialFacts.Clone()
 
 		if (this.base != Facts)
-			Throw "Subclassing of Facts is not allowed..."
+			throw "Subclassing of Facts is not allowed..."
 	}
 
 	setValue(fact, value, propagate := false) {
@@ -2623,7 +2623,7 @@ class Facts {
 				}
 			}
 			else
-				Throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."
+				throw "Unknown fact """ . fact . """ encountered in Facts.setValue..."
 	}
 
 	getValue(fact, default := "__NotInitialized__") {
@@ -2667,7 +2667,7 @@ class Facts {
 		local facts := this.Facts
 
 		if facts.HasKey(fact)
-			Throw "Duplicate fact """ . fact . """ encountered in Facts.addFact..."
+			throw "Duplicate fact """ . fact . """ encountered in Facts.addFact..."
 		else if (value != kNotInitialized) {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Adding fact " . fact . " as " . value)
@@ -2689,7 +2689,7 @@ class Facts {
 
 	registerObserver(fact, observer) {
 		if this.iObservers.HasKey(fact)
-			Throw "Observer already registered for fact """ . fact . """"
+			throw "Observer already registered for fact """ . fact . """"
 
 		this.iObservers[fact] := observer
 	}
@@ -2961,7 +2961,7 @@ class Rules {
 			last := false
 			candidate := this.Productions[false]
 
-			Loop {
+			loop {
 				if !candidate {
 					if last
 						new this.Production(rule, last)
@@ -3177,7 +3177,7 @@ class RuleCompiler {
 				reductions := []
 		}
 
-		Loop Parse, text, `n, `r
+		loop Parse, text, `n, `r
 		{
 			line := Trim(A_LoopField)
 
@@ -3275,7 +3275,7 @@ class RuleCompiler {
 		local actions
 
 		if (this.readLiteral(text, nextCharIndex) != "=>")
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readProduction..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readProduction..."
 
 		actions := this.readActions(text, nextCharIndex)
 
@@ -3289,7 +3289,7 @@ class RuleCompiler {
 		local head := this.readCompound(text, nextCharIndex)
 
 		if (head == kNotFound)
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readHead..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readHead..."
 		else
 			return head
 	}
@@ -3302,19 +3302,19 @@ class RuleCompiler {
 			if (literal == "<=") {
 				terms := []
 
-				Loop {
+				loop {
 					term := this.readTailTerm(text, nextCharIndex, (A_Index == 1) ? false : ",")
 
 					if (term != kNotFound)
 						terms.Push(term)
 					else if (!this.isEmpty(text, nextCharIndex) || (A_Index == 1))
-						Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
+						throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 					else
 						return terms
 				}
 			}
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTail..."
 		}
 		else
 			return kNotFound
@@ -3336,7 +3336,7 @@ class RuleCompiler {
 			compound := this.readCompound(text, nextCharIndex, literal)
 
 			if (compound == kNotFound)
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
 
 			return compound
 		}
@@ -3412,7 +3412,7 @@ class RuleCompiler {
 		local arguments := []
 		local argument
 
-		Loop {
+		loop {
 			argument := this.readCompoundArgument(text, nextCharIndex)
 
 			if ((argument != kNotFound) || (argument == "0"))
@@ -3420,7 +3420,7 @@ class RuleCompiler {
 			else if (A_Index == 1)
 				return arguments
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readCompoundArguments..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readCompoundArguments..."
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				return arguments
@@ -3468,7 +3468,7 @@ class RuleCompiler {
 				if (argument != kNotFound)
 					return concatenate(["["], arguments, ["|"], Array(argument), ["]"])
 				else
-					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readList..."
+					throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readList..."
 			}
 			else {
 				this.skipDelimiter("]", text, nextCharIndex)
@@ -3482,7 +3482,7 @@ class RuleCompiler {
 		local conditions := []
 		local keyword, leftLiteral, operator, rightLiteral
 
-		Loop {
+		loop {
 			if this.skipDelimiter("{", text, nextCharIndex, false) {
 				keyword := this.readLiteral(text, nextCharIndex)
 
@@ -3511,7 +3511,7 @@ class RuleCompiler {
 				if (this.readLiteral(text, nextCharIndex) = "priority:")
 					priority := this.readLiteral(text, nextCharIndex)
 				else
-					Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readConditions..."
+					throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.readConditions..."
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				return conditions
@@ -3522,7 +3522,7 @@ class RuleCompiler {
 		local actions := []
 		local action, arguments
 
-		Loop {
+		loop {
 			this.skipDelimiter("(", text, nextCharIndex)
 
 			action := this.readLiteral(text, nextCharIndex)
@@ -3532,7 +3532,7 @@ class RuleCompiler {
 			else {
 				arguments := Array(action)
 
-				Loop {
+				loop {
 					if ((A_Index > 1) && !this.skipDelimiter(",", text, nextCharIndex, false))
 						break
 
@@ -3561,7 +3561,7 @@ class RuleCompiler {
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
 		local length := StrLen(text)
 
-		Loop {
+		loop {
 			if (nextCharIndex > length)
 				return
 
@@ -3583,7 +3583,7 @@ class RuleCompiler {
 			return true
 		}
 		else if throwError
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.skipDelimiter..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in RuleCompiler.skipDelimiter..."
 		else
 			return false
 	}
@@ -3598,7 +3598,7 @@ class RuleCompiler {
 		quoted := false
 		hasQuote := false
 
-		Loop {
+		loop {
 			character := SubStr(text, nextCharIndex, 1)
 
 			if ((A_Index == 1) && ((character == """") || (character == "'")))
@@ -3711,7 +3711,7 @@ class RuleCompiler {
 		else if IsObject(term)
 			return this.createCompoundParser(this, variables)
 
-		Throw "Unexpected terms detected in RuleCompiler.createTermParser..."
+		throw "Unexpected terms detected in RuleCompiler.createTermParser..."
 	}
 
 	createCompoundParser(term, variables := "__NotInitialized__") {
@@ -3791,7 +3791,7 @@ class Parser {
 	}
 
 	parse(expression) {
-		Throw "Virtual method Parser.parse must be implemented in a subclass..."
+		throw "Virtual method Parser.parse must be implemented in a subclass..."
 	}
 }
 
@@ -3833,7 +3833,7 @@ class ProductionRuleParser extends RuleParser {
 		if parseActions
 			return this.Compiler.createProductionRule(conditions, actions, priority)
 		else
-			Throw "Syntax error detected in production rule """ . rule.toString() . """ in ProductionRuleParser.parse..."
+			throw "Syntax error detected in production rule """ . rule.toString() . """ in ProductionRuleParser.parse..."
 	}
 }
 
@@ -3848,13 +3848,13 @@ class ReductionRuleParser extends RuleParser {
 
 		if (rule.Length() > 1) {
 			if (rule[2] != "<=")
-				Throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
+				throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
 			else {
 				try {
 					tail := this.parseTail(rule, 3)
 				}
 				catch exception {
-					Throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
+					throw "Syntax error detected in reduction rule """ . rule.toString() . """ in ReductionRuleParser.parse..."
 				}
 			}
 		}
@@ -3979,7 +3979,7 @@ class ActionParser extends Parser {
 						else
 							return new ClearFactAction(argument)
 					default:
-						Throw "Unknown action type """ . action . """ detected in ActionParser.parse..."
+						throw "Unknown action type """ . action . """ detected in ActionParser.parse..."
 				}
 		}
 	}
@@ -4051,7 +4051,7 @@ class ListParser extends Parser {
 		for index, theTerm in terms {
 			if (((theTerm = "[") && (index != 1)) || ((theTerm = "]") && (index != length))
 												  || ((theTerm = "|") && (index != (length - 2))))
-				Throw "Unexpected list structure """ . values2String(", ", terms*) . """ detected in ListParser.parse..."
+				throw "Unexpected list structure """ . values2String(", ", terms*) . """ detected in ListParser.parse..."
 
 			if ((index > 1) && (index < length))
 				if (theTerm == "|")
@@ -4067,7 +4067,7 @@ class ListParser extends Parser {
 
 		index := subTerms.Length()
 
-		Loop {
+		loop {
 			lastTerm := new Pair(subTerms[index], lastTerm)
 		} until (--index == 0)
 

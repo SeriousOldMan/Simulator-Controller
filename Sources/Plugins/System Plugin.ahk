@@ -428,7 +428,7 @@ fadeOut() {
 
 	currentVolume := masterVolume
 
-	Loop {
+	loop {
 		currentVolume -= 5
 
 		if (currentVolume <= 0)
@@ -446,7 +446,7 @@ fadeOut() {
 fadeIn(masterVolume) {
 	local currentVolume := 0
 
-	Loop {
+	loop {
 		currentVolume += 5
 
 		if (currentVolume >= masterVolume)

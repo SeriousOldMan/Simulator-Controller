@@ -2190,7 +2190,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (files != "") {
 					directory := ""
 
-					Loop Parse, files, `n
+					loop Parse, files, `n
 					{
 						if (A_Index = 1)
 							directory := A_LoopField
@@ -2298,7 +2298,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		for ignore, strategy in strategies
 			laps.Push(strategy.getLaps(120))
 
-		Loop {
+		loop {
 			if (A_Index > 1)
 				chart .= ", "
 
@@ -2307,7 +2307,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			exhausted := true
 			index := A_Index
 
-			Loop % strategies.Length()
+			loop % strategies.Length()
 			{
 				sLaps := laps[A_Index]
 
@@ -2480,7 +2480,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		avgLapTime := 0
 		lapTime := false
 
-		Loop %numLaps% {
+		loop %numLaps% {
 			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
 
 			if (!lapTime || !baseLapTime)
@@ -2561,7 +2561,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		translatedCompounds := map(this.TyreCompounds, "translate")
 		tyreSets := []
 
-		Loop % LV_GetCount()
+		loop % LV_GetCount()
 		{
 			LV_GetText(compound, A_Index, 1)
 			LV_GetText(count, A_Index, 2)
@@ -2666,7 +2666,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	setStintDriver(stintNumber, driverID) {
-		Throw "StrategyWorkbench.setStintDriver should never be called..."
+		throw "StrategyWorkbench.setStintDriver should never be called..."
 	}
 
 	runSimulation() {
@@ -2985,7 +2985,7 @@ addSimDriver() {
 
 	numRows := LV_GetCount()
 
-	Loop %numRows%
+	loop %numRows%
 		LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
 
 	sessionDB := new SessionDatabase()
@@ -3029,7 +3029,7 @@ deleteSimDriver() {
 
 			numRows := LV_GetCount()
 
-			Loop %numRows%
+			loop %numRows%
 				LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
 
 			workbench.updateState()

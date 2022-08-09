@@ -401,7 +401,7 @@ class RaceReports extends ConfigurationItem {
 		for ignore, simulator in new SessionDatabase().getSimulators() {
 			hasReports := false
 
-			Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+			loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 			{
 				hasReports := true
 
@@ -428,7 +428,7 @@ class RaceReports extends ConfigurationItem {
 		local cars := {}
 		local raceData, car, ignore
 
-		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
 			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 			car := getConfigurationValue(raceData, "Session", "Car")
@@ -447,7 +447,7 @@ class RaceReports extends ConfigurationItem {
 		local tracks := {}
 		local raceData, track, ignore
 
-		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
 			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 
@@ -470,7 +470,7 @@ class RaceReports extends ConfigurationItem {
 		local reports := []
 		local raceData
 
-		Loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
 		{
 			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
 
@@ -671,7 +671,7 @@ class RaceReports extends ConfigurationItem {
 
 							drivers := []
 
-							Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+							loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers
@@ -690,7 +690,7 @@ class RaceReports extends ConfigurationItem {
 
 							drivers := []
 
-							Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+							loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers

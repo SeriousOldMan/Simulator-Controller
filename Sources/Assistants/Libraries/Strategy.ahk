@@ -153,7 +153,7 @@ class StrategySimulation {
 
 		production := knowledgeBase.Rules.Productions[false]
 
-		Loop {
+		loop {
 			if !production
 				break
 
@@ -433,7 +433,7 @@ class StrategySimulation {
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
-		Throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
+		throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
 	}
 
 	createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
@@ -744,10 +744,10 @@ class VariationSimulation extends StrategySimulation {
 
 		tyreLapsVariation := tyreUsage
 
-		Loop { ; consumption
-			Loop { ; initialFuel
-				Loop { ; tyreUsage
-					Loop { ; tyreCompoundVariation
+		loop { ; consumption
+			loop { ; initialFuel
+				loop { ; tyreUsage
+					loop { ; tyreCompoundVariation
 						if useInitialConditions {
 							if map is number
 							{
@@ -1855,7 +1855,7 @@ class Strategy extends ConfigurationItem {
 
 		tyreSets := string2Values(";", getConfigurationValue(configuration, "Settings", "TyreSets", []))
 
-		Loop % tyreSets.Length()
+		loop % tyreSets.Length()
 			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
 		this.iTyreSets := tyreSets
@@ -2048,8 +2048,8 @@ class Strategy extends ConfigurationItem {
 
 		maxTime := (numLaps * (avgLapTime / 60))
 
-		Loop {
-			Loop
+		loop {
+			loop
 				if (curTime > maxTime)
 					break
 				else {
@@ -2283,7 +2283,7 @@ class Strategy extends ConfigurationItem {
 		else
 			numPitstops := false
 
-		Loop {
+		loop {
 			pitstopNr := (currentStint + A_Index - 1)
 
 			remainingFuel := this.RemainingFuel[true]

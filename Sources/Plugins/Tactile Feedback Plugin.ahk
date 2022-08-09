@@ -141,7 +141,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 						case "toggleRearChassisVibration":
 							return this.Plugin.RearVibrationEnabled
 						default:
-							Throw "Unsupported command detected in FXToggleAction.Active..."
+							throw "Unsupported command detected in FXToggleAction.Active..."
 					}
 				else
 					return false
@@ -161,10 +161,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 						case "toggleRearChassisVibration":
 							return "RearVibration"
 						default:
-							Throw "Unsupported command detected in FXToggleAction.Action..."
+							throw "Unsupported command detected in FXToggleAction.Action..."
 					}
 				else
-					Throw "Inconsistent state detected in FXToggleAction.Action..."
+					throw "Inconsistent state detected in FXToggleAction.Action..."
 			}
 		}
 
@@ -180,7 +180,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 					case "RearVibration":
 						plugin.disableRearVibration()
 					default:
-						Throw "Unsupported action detected in FXToggleAction.Action..."
+						throw "Unsupported action detected in FXToggleAction.Action..."
 				}
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
 				switch this.Action {
@@ -191,7 +191,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 					case "RearVibration":
 						plugin.enableRearVibration()
 					default:
-						Throw "Unsupported action detected in FXToggleAction.Action..."
+						throw "Unsupported action detected in FXToggleAction.Action..."
 				}
 		}
 	}
@@ -459,7 +459,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if !this.Application.isRunning() {
 			this.Application.startup()
 
-			Loop 20
+			loop 20
 				Sleep 500
 			until this.Application.isRunning()
 

@@ -228,7 +228,7 @@ class Task {
 			case kInterruptPriority:
 				Task.sInterruptTasks.Push(theTask)
 			default:
-				Throw "Unexpected priority detected in Task.addTask..."
+				throw "Unexpected priority detected in Task.addTask..."
 		}
 	}
 
@@ -243,7 +243,7 @@ class Task {
 			case kInterruptPriority:
 				Task.sInterruptTasks := remove(Task.sInterruptTasks, theTask)
 			default:
-				Throw "Unexpected priority detected in Task.removeTask..."
+				throw "Unexpected priority detected in Task.removeTask..."
 		}
 	}
 
@@ -299,7 +299,7 @@ class Task {
 
 					visited := {}
 
-					Loop {
+					loop {
 						worked := false
 
 						next := Task.getNextTask(priority, true)

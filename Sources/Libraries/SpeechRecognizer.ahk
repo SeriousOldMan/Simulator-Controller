@@ -196,7 +196,7 @@ class SpeechRecognizer {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
 			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
@@ -215,19 +215,19 @@ class SpeechRecognizer {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-					Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
 
 				choices := []
 
-				Loop 101
+				loop 101
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Number", choices)
 
 				choices := []
 
-				Loop 11
+				loop 11
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Digit", choices)
@@ -239,7 +239,7 @@ class SpeechRecognizer {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-				Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 
 			this.RecognizerList := this.createRecognizerList()
@@ -304,7 +304,7 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Instance {
-			Loop % this.Instance.GetRecognizerCount()
+			loop % this.Instance.GetRecognizerCount()
 			{
 				index := A_Index - 1
 
@@ -327,7 +327,7 @@ class SpeechRecognizer {
 			if (this.iEngine = "Azure")
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
 			else if (id > this.Instance.getRecognizerCount() - 1)
-				Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
 				return this.Instance.Initialize(id)
 	}
@@ -347,7 +347,7 @@ class SpeechRecognizer {
 	getWords(list) {
 		local result := []
 
-		Loop % list.MaxIndex() + 1
+		loop % list.MaxIndex() + 1
 			result.Push(list[A_Index - 1])
 
 		return result
@@ -396,7 +396,7 @@ class SpeechRecognizer {
 
 	loadGrammar(name, grammar, callback) {
 		if (this._grammarCallbacks.HasKey(name))
-			Throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
+			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
 		this._grammarCallbacks[name] := callback
 
@@ -553,7 +553,7 @@ class GrammarCompiler {
 		local incompleteLine := false
 		local line
 
-		Loop Parse, text, `n, `r
+		loop Parse, text, `n, `r
 		{
 			line := Trim(A_LoopField)
 
@@ -582,7 +582,7 @@ class GrammarCompiler {
 		grammar := this.readGrammar(text, nextCharIndex)
 
 		if !grammar
-			Throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
+			throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
 
 		return this.parseGrammar(grammar)
 	}
@@ -594,7 +594,7 @@ class GrammarCompiler {
 			if (level = 0)
 				return this.readGrammars(text, nextCharIndex, level)
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
 		}
 		else
 			return this.readList(text, nextCharIndex)
@@ -605,7 +605,7 @@ class GrammarCompiler {
 
 		this.skipDelimiter("[", text, nextCharIndex)
 
-		Loop {
+		loop {
 			grammars.Push(this.readGrammar(text, nextCharIndex, level + 1))
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
@@ -647,13 +647,13 @@ class GrammarCompiler {
 
 		this.skipDelimiter("{", text, nextCharIndex)
 
-		Loop {
+		loop {
 			literalValue := this.readLiteral(text, nextCharIndex)
 
 			if literalValue
 				grammars.Push(literalValue)
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				break
@@ -675,7 +675,7 @@ class GrammarCompiler {
 		if literalValue
 			builtin := literalValue.Value
 		else
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 
 		this.skipDelimiter(")", text, nextCharIndex)
 
@@ -690,7 +690,7 @@ class GrammarCompiler {
 
 		beginCharIndex := nextCharIndex
 
-		Loop {
+		loop {
 			character := SubStr(text, nextCharIndex, 1)
 
 			if (InStr(delimiters, character) || (nextCharIndex > length)) {
@@ -716,7 +716,7 @@ class GrammarCompiler {
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
 		local length := StrLen(text)
 
-		Loop {
+		loop {
 			if (nextCharIndex > length)
 				return
 
@@ -738,7 +738,7 @@ class GrammarCompiler {
 			return true
 		}
 		else if throwError
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
 		else
 			return false
 	}
@@ -1002,7 +1002,7 @@ class GrammarParser {
 			return newGrammar
 		}
 		else
-			Throw "Grammars may only contain literals, choices or other grammars in GrammarParser.parse..."
+			throw "Grammars may only contain literals, choices or other grammars in GrammarParser.parse..."
 	}
 
 	parseList(grammarList) {
@@ -1016,7 +1016,7 @@ class GrammarParser {
 			else if (isInstance(grammar, GrammarChoices) || isInstance(grammar, GrammarBuiltinChoices))
 				newGrammar.AppendChoices(grammar.parse(this))
 			else
-				Throw "Grammar lists may only contain literals or choices in GrammarParser.parseList..."
+				throw "Grammar lists may only contain literals or choices in GrammarParser.parseList..."
 
 		return newGrammar
 	}
@@ -1105,7 +1105,7 @@ class GrammarChoices {
 
 		for ignore, choice in this.Choices {
 			if !isInstance(choice, GrammarLiteral)
-				Throw "Invalid choice (" . choice.toString() . ") detected in GrammarChoices.parse..."
+				throw "Invalid choice (" . choice.toString() . ") detected in GrammarChoices.parse..."
 
 			choices.Push(choice.Value)
 		}
@@ -1211,7 +1211,7 @@ matchWords(string1, string2) {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
 			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")

@@ -660,7 +660,7 @@ class SetupAdvisor extends ConfigurationItem {
 				if false {
 					drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
 
-					Loop % names.Length()
+					loop % names.Length()
 						drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
 
 					drawChartFunction .= "`n]);"
@@ -698,7 +698,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local hasGeneric := false
 		local simulator
 
-		Loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
+		loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
 		{
 			SplitPath A_LoopFileName, , , , simulator
 
@@ -708,7 +708,7 @@ class SetupAdvisor extends ConfigurationItem {
 				simulators.Push(simulator)
 		}
 
-		Loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
+		loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
 		{
 			SplitPath A_LoopFileName, , , , simulator
 
@@ -729,7 +729,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local car, descriptor
 
 		if ((simulator != true) && (simulator != "*")) {
-			Loop Files, %kResourcesDirectory%Advisor\Definitions\Cars\%simulator%.*.ini, F
+			loop Files, %kResourcesDirectory%Advisor\Definitions\Cars\%simulator%.*.ini, F
 			{
 				SplitPath A_LoopFileName, , , , descriptor
 
@@ -739,7 +739,7 @@ class SetupAdvisor extends ConfigurationItem {
 					cars.Push(car)
 			}
 
-			Loop Files, %kUserHomeDirectory%Advisor\Definitions\Cars\*.ini, F
+			loop Files, %kUserHomeDirectory%Advisor\Definitions\Cars\*.ini, F
 			{
 				SplitPath A_LoopFileName, , , , descriptor
 
@@ -802,7 +802,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		production := knowledgeBase.Rules.Productions[false]
 
-		Loop {
+		loop {
 			if !production
 				break
 
@@ -1293,7 +1293,7 @@ class SetupAdvisor extends ConfigurationItem {
 			for ignore, widget in this.SelectedCharacteristicsWidgets[characteristic]
 				GuiControl Hide, %widget%
 
-			Loop % (numCharacteristics - index)
+			loop % (numCharacteristics - index)
 			{
 				row := (A_Index + index)
 
@@ -1529,7 +1529,7 @@ class Setup {
 
 	Name[] {
 		Get {
-			Throw "Virtual property Setup.Name must be implemented in a subclass..."
+			throw "Virtual property Setup.Name must be implemented in a subclass..."
 		}
 	}
 
@@ -1556,11 +1556,11 @@ class Setup {
 	}
 
 	getValue(setting, original := false, default := false) {
-		Throw "Virtual method Setup.getValue must be implemented in a subclass..."
+		throw "Virtual method Setup.getValue must be implemented in a subclass..."
 	}
 
 	setValue(setting, value) {
-		Throw "Virtual method Setup.setValue must be implemented in a subclass..."
+		throw "Virtual method Setup.setValue must be implemented in a subclass..."
 	}
 }
 
@@ -1624,7 +1624,7 @@ class FileSetup extends Setup {
 
 class SettingHandler {
 	validValue(displayValue) {
-		Throw "Virtual method SettingHandler.validValue must be implemented in a subclass..."
+		throw "Virtual method SettingHandler.validValue must be implemented in a subclass..."
 	}
 
 	formatValue(value) {
@@ -1632,19 +1632,19 @@ class SettingHandler {
 	}
 
 	convertToDisplayValue(value) {
-		Throw "Virtual method SettingHandler.convertToDisplayValue must be implemented in a subclass..."
+		throw "Virtual method SettingHandler.convertToDisplayValue must be implemented in a subclass..."
 	}
 
 	convertToRawValue(value) {
-		Throw "Virtual method SettingHandler.convertToRawValue must be implemented in a subclass..."
+		throw "Virtual method SettingHandler.convertToRawValue must be implemented in a subclass..."
 	}
 
 	increaseValue(displayValue) {
-		Throw "Virtual method SettingHandler.increaseValue must be implemented in a subclass..."
+		throw "Virtual method SettingHandler.increaseValue must be implemented in a subclass..."
 	}
 
 	decreaseValue(displayValue) {
-		Throw "Virtual method SettingHandler.decreaseValue must be implemented in a subclass..."
+		throw "Virtual method SettingHandler.decreaseValue must be implemented in a subclass..."
 	}
 }
 
@@ -1862,7 +1862,7 @@ class SetupEditor extends ConfigurationItem {
 
 	SetupClass[] {
 		Get {
-			Throw "Virtual property FileSetupComparator.SetupClass must be implemented in a subclass..."
+			throw "Virtual property FileSetupComparator.SetupClass must be implemented in a subclass..."
 		}
 	}
 
@@ -2040,11 +2040,11 @@ class SetupEditor extends ConfigurationItem {
 			return new %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
-			Throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
+			throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
 	}
 
 	chooseSetup() {
-		Throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
+		throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
 	}
 
 	loadSetup(ByRef setup := false) {
@@ -2143,7 +2143,7 @@ class SetupEditor extends ConfigurationItem {
 
 		lastCategory := ""
 
-		Loop % LV_getCount()
+		loop % LV_getCount()
 		{
 			LV_GetText(category, A_Index)
 
@@ -2157,7 +2157,7 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	saveSetup() {
-		Throw "Virtual method SetupEditor.saveSetup must be implemented in a subclass..."
+		throw "Virtual method SetupEditor.saveSetup must be implemented in a subclass..."
 	}
 
 	increaseSetting(setting := false) {
@@ -2172,7 +2172,7 @@ class SetupEditor extends ConfigurationItem {
 			label := this.Settings[setting]
 			row := false
 
-			Loop {
+			loop {
 				LV_GetText(candidate, A_Index, 2)
 
 				if (label = candidate) {
@@ -2211,7 +2211,7 @@ class SetupEditor extends ConfigurationItem {
 			label := this.Settings[setting]
 			row := false
 
-			Loop {
+			loop {
 				LV_GetText(candidate, A_Index, 2)
 
 				if (label = candidate) {
@@ -2265,10 +2265,10 @@ class SetupEditor extends ConfigurationItem {
 					increment *= -1
 
 				if (increment < 0)
-					Loop % Abs(increment)
+					loop % Abs(increment)
 						this.decreaseSetting(setting)
 				else
-					Loop % Abs(increment)
+					loop % Abs(increment)
 						this.increaseSetting(setting)
 			}
 		}
@@ -2288,7 +2288,7 @@ class SetupEditor extends ConfigurationItem {
 
 		setup.setValue(setting, newValue)
 
-		Loop {
+		loop {
 			LV_GetText(candidate, A_Index, 2)
 
 			if (label = candidate) {
@@ -2624,7 +2624,7 @@ class SetupComparator extends ConfigurationItem {
 				valueAB := ((valueA < valueB) ? valueA : valueB)
 				lastValueAB := kUndefined
 
-				Loop {
+				loop {
 					if (valueAB >= targetAB) {
 						if (lastValueAB != kUndefined) {
 							delta := (valueAB - lastValueAB)
@@ -2674,7 +2674,7 @@ class SetupComparator extends ConfigurationItem {
 
 		lastCategory := ""
 
-		Loop % LV_getCount()
+		loop % LV_getCount()
 		{
 			LV_GetText(category, A_Index)
 
@@ -2712,7 +2712,7 @@ class SetupComparator extends ConfigurationItem {
 		label := this.Settings[setting]
 		row := false
 
-		Loop {
+		loop {
 			LV_GetText(candidate, A_Index, 2)
 
 			if (label = candidate) {
@@ -2755,7 +2755,7 @@ class SetupComparator extends ConfigurationItem {
 			label := this.Settings[setting]
 			row := false
 
-			Loop {
+			loop {
 				LV_GetText(candidate, A_Index, 2)
 
 				if (label = candidate) {
@@ -2792,7 +2792,7 @@ class SetupComparator extends ConfigurationItem {
 			label := this.Settings[setting]
 			row := false
 
-			Loop {
+			loop {
 				LV_GetText(candidate, A_Index, 2)
 
 				if (label = candidate) {
@@ -2854,7 +2854,7 @@ class FileSetupEditor extends SetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		Throw "Virtual method FileSetupEditor.chooseSetup must be implemented in a subclass..."
+		throw "Virtual method FileSetupEditor.chooseSetup must be implemented in a subclass..."
 	}
 }
 
@@ -2864,7 +2864,7 @@ class FileSetupEditor extends SetupEditor {
 
 class FileSetupComparator extends SetupComparator {
 	chooseSetup(type, load := true) {
-		Throw "Virtual method FileSetupComparator.chooseSetup must be implemented in a subclass..."
+		throw "Virtual method FileSetupComparator.chooseSetup must be implemented in a subclass..."
 	}
 
 	compareSetup(theSetup := false) {
@@ -2937,7 +2937,7 @@ updateSlider(characteristic, slider1, slider2) {
 factPath(path*) {
 	local result := ""
 
-	Loop % path.Length()
+	loop % path.Length()
 		result .= ((StrLen(result) > 0) ? ("." . path[A_Index]) : path[A_Index])
 
 	return result

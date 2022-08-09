@@ -337,7 +337,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			lastStint := false
 			driverID := kNull
 
-			Loop % teamServer.getCurrentLap(session)
+			loop % teamServer.getCurrentLap(session)
 			{
 				try {
 					stint := teamServer.getLapStint(A_Index, session)

@@ -414,7 +414,7 @@ class VoiceServer extends ConfigurationItem {
 
 			try {
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
-					Throw "Recognizer not running..."
+					throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -538,13 +538,13 @@ class VoiceServer extends ConfigurationItem {
 						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
-							Throw "Server speech recognizer engine not installed..."
+							throw "Server speech recognizer engine not installed..."
 					}
 					catch exception {
 						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
-							Throw "Desktop speech recognizer engine not installed..."
+							throw "Desktop speech recognizer engine not installed..."
 					}
 				}
 				catch exception {
@@ -813,7 +813,7 @@ class VoiceServer extends ConfigurationItem {
 				command := recognizer.compileGrammar(activationCommand)
 
 				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
-					Throw "Recognizer not running..."
+					throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))

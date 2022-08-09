@@ -515,7 +515,7 @@ class RaceAssistant extends ConfigurationItem {
 			case "?":
 				this.getSpeaker().speakPhrase("Repeat")
 			default:
-				Throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
+				throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
 		}
 	}
 
@@ -912,11 +912,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	startSession(settings, data) {
-		Throw "Virtual method RaceAssistant.startSession must be implemented in a subclass..."
+		throw "Virtual method RaceAssistant.startSession must be implemented in a subclass..."
 	}
 
 	finishSession(shutdown := true) {
-		Throw "Virtual method RaceAssistant.finishSession must be implemented in a subclass..."
+		throw "Virtual method RaceAssistant.finishSession must be implemented in a subclass..."
 	}
 
 	restoreSessionState(settingsFile, stateFile) {

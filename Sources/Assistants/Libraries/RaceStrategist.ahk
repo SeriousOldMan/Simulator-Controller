@@ -220,7 +220,7 @@ class RaceStrategist extends RaceAssistant {
 
 				Task.yield()
 
-				Loop 10
+				loop 10
 					Sleep 500
 
 				this.recommendPitstopRecognized(words)
@@ -231,7 +231,7 @@ class RaceStrategist extends RaceAssistant {
 
 				Task.yield()
 
-				Loop 10
+				loop 10
 					Sleep 500
 
 				this.simulatePitstopRecognized(words)
@@ -323,7 +323,7 @@ class RaceStrategist extends RaceAssistant {
 
 					Task.yield()
 
-					Loop 10
+					loop 10
 						Sleep 500
 
 					knowledgeBase.setFact("Standings.Extrapolate", lap)
@@ -725,7 +725,7 @@ class RaceStrategist extends RaceAssistant {
 		setConfigurationValue(raceData, "Cars", "Count", carCount)
 		setConfigurationValue(raceData, "Cars", "Driver", getConfigurationValue(data, "Position Data", "Driver.Car"))
 
-		Loop %carCount% {
+		loop %carCount% {
 			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
 			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
@@ -1057,7 +1057,7 @@ class RaceStrategist extends RaceAssistant {
 				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 		}
 
-		Loop % knowledgeBase.getValue("Car.Count")
+		loop % knowledgeBase.getValue("Car.Count")
 		{
 			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
@@ -1289,7 +1289,7 @@ class RaceStrategist extends RaceAssistant {
 							  , "Pitstop.Count", "Pitstop.Next", "Pitstop.Lap", "Pitstop.Lap.Warning"]
 			knowledgeBase.clearFact("Strategy." . theFact)
 
-		Loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
+		loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
 			for index, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Map"]
 				knowledgeBase.clearFact("Strategy.Pitstop." . index . theFact)
 
@@ -1380,7 +1380,7 @@ class RaceStrategist extends RaceAssistant {
 	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__") {
 		Task.yield()
 
-		Loop 10
+		loop 10
 			Sleep 500
 
 		Process Exist, Race Engineer.exe
@@ -1434,7 +1434,7 @@ class RaceStrategist extends RaceAssistant {
 
 		Task.yield()
 
-		Loop 10
+		loop 10
 			Sleep 500
 
 		this.recommendPitstop()
@@ -1566,7 +1566,7 @@ class RaceStrategist extends RaceAssistant {
 		grid := []
 
 
-		Loop % raceInfo["Cars"]
+		loop % raceInfo["Cars"]
 		{
 			carNr := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
 			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
@@ -1613,7 +1613,7 @@ class RaceStrategist extends RaceAssistant {
 				raceInfo := this.RaceInfo
 				grid := (raceInfo ? raceInfo["Grid"] : false)
 
-				Loop %carCount% {
+				loop %carCount% {
 					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
 					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
 
@@ -1650,7 +1650,7 @@ class RaceStrategist extends RaceAssistant {
 			if pitstop {
 				pitstops := []
 
-				Loop %pitstop%
+				loop %pitstop%
 					pitstops.Push(knowledgeBase.getValue("Pitstop." . A_Index . ".Lap"))
 
 				setConfigurationValue(data, "Pitstop", "Laps", values2String(",", pitstops*))
@@ -1684,14 +1684,14 @@ class RaceStrategist extends RaceAssistant {
 			drivers := []
 			laps := []
 
-			Loop %carCount% {
+			loop %carCount% {
 				times.Push("-")
 				positions.Push("-")
 				drivers.Push("-")
 				laps.Push("-")
 			}
 
-			Loop {
+			loop {
 				carPrefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
 				carID := knowledgeBase.getValue(carPrefix . ".ID", kUndefined)
 
@@ -1797,7 +1797,7 @@ updatePositions(context, futureLap) {
 	cars := []
 	count := 0
 
-	Loop % knowledgeBase.getValue("Car.Count", 0)
+	loop % knowledgeBase.getValue("Car.Count", 0)
 	{
 		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . ".Car." . A_Index . ".Laps", kUndefined)
 
@@ -1810,7 +1810,7 @@ updatePositions(context, futureLap) {
 
 	bubbleSort(cars, "comparePositions")
 
-	Loop {
+	loop {
 		if (A_Index > count)
 			break
 
@@ -1819,7 +1819,7 @@ updatePositions(context, futureLap) {
 
 	bubbleSort(cars, "compareSequences")
 
-	Loop {
+	loop {
 		if (A_Index > count)
 			break
 

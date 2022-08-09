@@ -1078,7 +1078,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				LV_ModifyCol()
 
-				Loop 2
+				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
 
 				this.updateState()
@@ -1125,7 +1125,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 3
+			loop 3
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
@@ -1202,7 +1202,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 2
+			loop 2
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			if load
@@ -1249,7 +1249,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			threshold := (threshold / scale)
 
-			Loop % getConfigurationValue(trackMap, "Map", "Points")
+			loop % getConfigurationValue(trackMap, "Map", "Points")
 			{
 				coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
 				coordY := getConfigurationValue(trackMap, "Points", A_Index . ".Y")
@@ -1437,7 +1437,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				LV_Modify(LV_GetNext(0), "", trackAutomationNameEdit, trackAutomation.Actions.Length())
 
-				Loop 2
+				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
 			}
 			finally {
@@ -1459,7 +1459,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
 
-				Loop 2
+				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
 			}
 			finally {
@@ -1506,7 +1506,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 2
+			loop 2
 				LV_ModifyCol(A_Index, "AutoHdr")
 		}
 		finally {
@@ -1685,7 +1685,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 2
+			loop 2
 				LV_ModifyCol(A_Index, "AutoHdr")
 		}
 		finally {
@@ -1774,7 +1774,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						Loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
+						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
 							try {
 								FileDelete %A_LoopFileLongPath%
 							}
@@ -1784,7 +1784,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
+						loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
 						{
 							SplitPath A_LoopFileName, , , , candidate
 
@@ -1921,7 +1921,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						FileCreateDir %targetDirectory%Race Strategies
 
-						Loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
+						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
 							try {
 								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
 							}
@@ -1933,7 +1933,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						FileCreateDir %directory%\.Tracks
 
-						Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
+						loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
 						{
 							SplitPath A_LoopFileName, , , , candidate
 
@@ -2020,7 +2020,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					code := this.SessionDatabase.getSimulatorCode(simulator)
 
-					Loop Files, %directory%\.Tracks\*.*, F	; Track
+					loop Files, %directory%\.Tracks\*.*, F	; Track
 					{
 						SplitPath A_LoopFileName, , , , track
 
@@ -2038,12 +2038,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						}
 				}
 
-				Loop Files, %directory%\*.*, D	; Car
+				loop Files, %directory%\*.*, D	; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
 						car := A_LoopFileName
 						carName := this.getCarName(simulator, car)
 
-						Loop Files, %directory%\%car%\*.*, D	; Track
+						loop Files, %directory%\%car%\*.*, D	; Track
 						{
 							track := A_LoopFileName
 							trackName := this.getTrackName(simulator, track)
@@ -2117,7 +2117,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								FileCreateDir %targetDirectory%
 
-								Loop Files, %sourceDirectory%\Race Strategies\*.*, F
+								loop Files, %sourceDirectory%\Race Strategies\*.*, F
 								{
 									fileName := A_LoopFileName
 									targetName := fileName
@@ -2191,7 +2191,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				tracks := []
 
-				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Tracks
+				loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Tracks
 				{
 					SplitPath A_LoopFileName, , , , track
 
@@ -2203,14 +2203,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					}
 				}
 
-				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
 						car := A_LoopFileName
 
 						if ((selectedCar == true) || (car = selectedCar)) {
 							carName := this.getCarName(selectedSimulator, car)
 
-							Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 							{
 								track := A_LoopFileName
 
@@ -2262,7 +2262,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									strategies := 0
 
-									Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
 										strategies += 1
 
 									if (strategies > 0)
@@ -2280,7 +2280,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 4
+			loop 4
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
@@ -2330,7 +2330,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				tracks := []
 
-				Loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Strategies
+				loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Strategies
 				{
 					SplitPath A_LoopFileName, , , , track
 
@@ -2338,12 +2338,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						tracks.Push(track)
 				}
 
-				Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
 						car := A_LoopFileName
 
 						if ((selectedCar == true) || (car = selectedCar))
-							Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 							{
 								track := A_LoopFileName
 
@@ -2365,7 +2365,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										pressures += 1
 									}
 
-									Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
 									{
 										found := true
 
@@ -2439,7 +2439,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 3
+			loop 3
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			this.loadSetups(this.SelectedSetupType, true)
@@ -2475,7 +2475,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop 6
+			loop 6
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			this.loadPressures()
@@ -3319,7 +3319,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 			tracks := []
 
-			Loop Files, %directory%\.Tracks\*.*, F
+			loop Files, %directory%\.Tracks\*.*, F
 			{
 				SplitPath A_LoopFileName, , , , track
 
@@ -3332,12 +3332,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 			progress := 0
 
-			Loop Files, %directory%\*.*, D	; Car
+			loop Files, %directory%\*.*, D	; Car
 			{
 				car := A_LoopFileName
 				carName := editor.getCarName(simulator, car)
 
-				Loop Files, %directory%\%car%\*.*, D	; Track
+				loop Files, %directory%\%car%\*.*, D	; Track
 				{
 					track := A_LoopFileName
 					trackName := editor.getTrackName(simulator, track)
@@ -3386,7 +3386,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 					strategies := 0
 
-					Loop Files, %sourceDirectory%\Race Strategies\*.*, F		; Strategies
+					loop Files, %sourceDirectory%\Race Strategies\*.*, F		; Strategies
 						strategies += 1
 
 					if (strategies > 0)
@@ -3414,7 +3414,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		LV_ModifyCol()
 
-		Loop 4
+		loop 4
 			LV_ModifyCol(A_Index, "AutoHdr")
 
 		Gui IDS:Font, s8 Norm, Arial
@@ -3433,9 +3433,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 			else
 				Gui IDS:Show
 
-			Loop
+			loop
 				Sleep 100
-			Until result
+			until result
 		}
 		finally {
 			Gui %owner%:-Disabled
@@ -3517,7 +3517,7 @@ selectAllImportEntries() {
 		GuiControl, , importSelectCheck, 0
 	}
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, importSelectCheck ? "Check" : "-Check")
 }
 
@@ -3525,7 +3525,7 @@ selectImportEntry() {
 	local selected := 0
 	local row := 0
 
-	Loop {
+	loop {
 		row := LV_GetNext(row, "C")
 
 		if row
@@ -3572,7 +3572,7 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 
 	FileCreateDir %destination%
 
-	Loop Files, %source%\*.*, DF
+	loop Files, %source%\*.*, DF
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
@@ -3599,7 +3599,7 @@ copyFiles(source, destination) {
 
 	showProgress({color: "Blue"})
 
-	Loop Files, %source%\*, DFR
+	loop Files, %source%\*, DFR
 	{
 		if (Mod(count, 20) == 0)
 			progress += 1
@@ -3657,7 +3657,7 @@ chooseDatabasePath() {
 			{
 				empty := true
 
-				Loop Files, %directory%\*.*, FD
+				loop Files, %directory%\*.*, FD
 				{
 					empty := false
 
@@ -4500,7 +4500,7 @@ selectAllData() {
 
 	Gui ListView, % SessionDatabaseEditor.Instance.AdministrationListView
 
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
 
 	SessionDatabaseEditor.Instance.updateState()

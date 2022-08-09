@@ -51,7 +51,7 @@ class Database {
 					data := []
 
 					if this.Directory
-						Loop Read, % (this.Directory . name . ".CSV")
+						loop Read, % (this.Directory . name . ".CSV")
 						{
 							row := {}
 							values := string2Values(";", A_LoopReadLine)

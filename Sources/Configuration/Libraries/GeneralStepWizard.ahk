@@ -693,7 +693,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 updateApplicationFunction() {
 	local function
 	
-	Loop % LV_GetCount()
+	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
 	
 	wizard := SetupWizard.Instance.StepWizards["General"]
@@ -759,7 +759,7 @@ updateApplicationFunction() {
 			}
 		}
 		
-		Loop % LV_GetCount()
+		loop % LV_GetCount()
 			LV_Modify(A_Index, "-Select")
 	}
 }

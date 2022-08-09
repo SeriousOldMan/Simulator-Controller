@@ -104,7 +104,7 @@ class ThemesEditor extends ConfigurationItem {
 		else
 			Gui TE:Show
 		
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 		
@@ -341,7 +341,7 @@ class ThemesList extends ConfigurationItemList {
 		
 		LV_SetImageList(picturesListViewImages)
 		
-		Loop % pictures.Length()
+		loop % pictures.Length()
 			LV_Add("Check Icon" . A_Index, pictures[A_Index])
 			
 		LV_ModifyCol()
@@ -411,7 +411,7 @@ class ThemesList extends ConfigurationItemList {
 			
 			rowNumber := 0
 			
-			Loop {
+			loop {
 				rowNumber := LV_GetNext(rowNumber, "C")
 				
 				if !rowNumber

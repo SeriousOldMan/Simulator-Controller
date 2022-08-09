@@ -337,7 +337,7 @@ class Function extends ConfigurationItem {
 
 	Type[] {
 		Get {
-			Throw "Virtual property Function.Type must be implemented in a subclass..."
+			throw "Virtual property Function.Type must be implemented in a subclass..."
 		}
 	}
 
@@ -355,7 +355,7 @@ class Function extends ConfigurationItem {
 
 	Trigger[] {
 		Get {
-			Throw "Virtual property Function.Trigger must be implemented in a subclass..."
+			throw "Virtual property Function.Trigger must be implemented in a subclass..."
 		}
 	}
 
@@ -505,7 +505,7 @@ class Function extends ConfigurationItem {
 			case kCustomType:
 				return new CustomFunction(descriptor[2], configuration, onHotkeys, onAction)
 			default:
-				Throw "Unknown controller function (" . descriptor[1] . ") detected in Function.createFunction..."
+				throw "Unknown controller function (" . descriptor[1] . ") detected in Function.createFunction..."
 		}
 	}
 
@@ -765,7 +765,7 @@ class Plugin extends ConfigurationItem {
 		local startPos, endPos, argument, key, result, ignore, value
 		local arguments := {}
 
-		Loop {
+		loop {
 			startPos := InStr(string, """")
 
 			if startPos {
@@ -781,7 +781,7 @@ class Plugin extends ConfigurationItem {
 					string := StrReplace(string, """" . argument . """", key)
 				}
 				else
-					Throw "Second "" not found while parsing (" . string . ") for quoted argument values in Plugin.parseValues..."
+					throw "Second "" not found while parsing (" . string . ") for quoted argument values in Plugin.parseValues..."
 			}
 			else
 				break

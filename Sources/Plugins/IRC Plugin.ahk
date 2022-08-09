@@ -103,7 +103,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			else if (descriptor = "Tyre")
 				key := this.PitstopTyreMFDHotkey
 			else
-				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
+				throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
 
 			if key {
 				if (key != "Off") {
@@ -140,7 +140,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			else {
 				this.iCurrentPitstopMFD := false
 
-				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
+				throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
 			}
 
 			if (key != "Off")
@@ -261,7 +261,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
 
-		Loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
+		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
 			setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"
 								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
 	}

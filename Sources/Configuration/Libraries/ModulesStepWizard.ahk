@@ -447,11 +447,11 @@ class ModulesStepWizard extends StepWizard {
 		labelWidth := width - 30
 
 		if (definition.Length() > 12)
-			Throw "Too many modules detected in ModulesStepWizard.createGui..."
+			throw "Too many modules detected in ModulesStepWizard.createGui..."
 
 		window := this.Window
 			
-		Loop % definition.Length()
+		loop % definition.Length()
 		{
 			iconHandle := false
 			labelHandle := false
@@ -579,7 +579,7 @@ class ModulesStepWizard extends StepWizard {
 
 		definition := this.Definition
 
-		Loop % definition.Length()
+		loop % definition.Length()
 		{
 			variable := this.iModuleSelectors[A_Index]
 			name := definition[A_Index]
@@ -599,7 +599,7 @@ class ModulesStepWizard extends StepWizard {
 
 		definition := this.Definition
 
-		Loop % definition.Length()
+		loop % definition.Length()
 		{
 			variable := this.iModuleSelectors[A_Index]
 			name := definition[A_Index]
@@ -628,7 +628,7 @@ class ModulesStepWizard extends StepWizard {
 
 		LV_Delete()
 
-		Loop % definition.Length()
+		loop % definition.Length()
 		{
 			module := definition[A_Index]
 
@@ -672,7 +672,7 @@ class ModulesStepWizard extends StepWizard {
 
 		definition := this.Definition
 
-		Loop % definition.Length()
+		loop % definition.Length()
 		{
 			module := definition[A_Index]
 

@@ -243,7 +243,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -425,7 +425,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		properties := StrReplace(properties, "`r", "")
 
-		Loop Parse, properties, `n
+		loop Parse, properties, `n
 		{
 			property := string2Values("=", A_LoopField)
 
@@ -933,7 +933,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					Throw Exception("Cannot start add a stint to an inactive session...")
+					throw Exception("Cannot start add a stint to an inactive session...")
 
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
@@ -971,7 +971,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Updating lap for team session: " . lapNumber)
 
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
-						Throw Exception("Driver inconsistency detected...")
+						throw Exception("Driver inconsistency detected...")
 				}
 
 				stint := false

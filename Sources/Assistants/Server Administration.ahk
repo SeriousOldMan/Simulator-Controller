@@ -72,7 +72,7 @@ parseObject(properties) {
 
 	properties := StrReplace(properties, "`r", "")
 
-	Loop Parse, properties, `n
+	loop Parse, properties, `n
 	{
 		property := string2Values("=", A_LoopField)
 
@@ -497,7 +497,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
 			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -634,7 +634,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationEditor(kEvent, "AccountClear")
 
-		Loop
+		loop
 			Sleep 1000
 		until done
 	}

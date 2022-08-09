@@ -238,7 +238,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 
 		this.updateLanguage(false)
 
-		Loop 28
+		loop 28
 			editor.registerWidget(this, widget%A_Index%)
 
 		hideWidgets(this.iTopWidgets)
@@ -557,7 +557,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (this.iSynthesizerMode == false)
 			transposeWidgets(this.iOtherWidgets, 24 * this.iWindowsSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
 
 		showWidgets(this.iOtherWidgets)
 
@@ -578,7 +578,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
 			transposeWidgets(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
 
 		this.iSynthesizerMode := false
 	}
@@ -604,7 +604,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (this.iSynthesizerMode == false)
 			transposeWidgets(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
 
 		if wasOpen
 			this.showAzureRecognizerEditor()
@@ -632,7 +632,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		if (this.iSynthesizerMode == "Azure")
 			transposeWidgets(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length(), this.iCorrection)
 		else
-			Throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
 
 		if wasOpen
 			this.showAzureRecognizerEditor()
@@ -664,7 +664,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				transposeWidgets(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
 			}
 			else
-				Throw "Internal error detected in VoiceControlConfigurator.showAzureRecognizerEditor..."
+				throw "Internal error detected in VoiceControlConfigurator.showAzureRecognizerEditor..."
 
 			this.iBottomAzureCredentialsVisible := true
 		}
@@ -680,7 +680,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				transposeWidgets(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length(), this.iCorrection)
 			}
 			else
-				Throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+				throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
 
 			this.iBottomAzureCredentialsVisible := false
 		}

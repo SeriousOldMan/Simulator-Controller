@@ -199,7 +199,7 @@ class StreamDeck extends FunctionController {
 		if !this.sModes {
 			StreamDeck.sModes := {}
 
-			Loop {
+			loop {
 				special := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
 
 				if (special == kUndefined)
@@ -217,7 +217,7 @@ class StreamDeck extends FunctionController {
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
 
-		Loop {
+		loop {
 			special := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
 
 			if (special == kUndefined)
@@ -231,7 +231,7 @@ class StreamDeck extends FunctionController {
 
 		rows := []
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
 
@@ -268,7 +268,7 @@ class StreamDeck extends FunctionController {
 							this.setControlLabel(function, label)
 					}
 
-					Loop {
+					loop {
 						special := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
 
 						if (special == kUndefined)
@@ -290,7 +290,7 @@ class StreamDeck extends FunctionController {
 						case kDialType:
 							numDials += 1
 						default:
-							Throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
+							throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
 					}
 				}
 
@@ -529,11 +529,11 @@ disabledIcon(fileName) {
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
 
-		Loop % Gdip_GetImageHeight(bitmap)
+		loop % Gdip_GetImageHeight(bitmap)
 		{
 			x := A_Index - 1
 
-			Loop % Gdip_GetImageWidth(bitmap)
+			loop % Gdip_GetImageWidth(bitmap)
 			{
 				y := A_Index - 1
 
@@ -605,7 +605,7 @@ handleStreamDeckMessage(category, data) {
 		case kDialType:
 			rotateDial(descriptor[2], command[2])
 		default:
-			Throw "Unknown controller function type (" . descriptor[1] . ") detected in handleStreamDeckMessage..."
+			throw "Unknown controller function type (" . descriptor[1] . ") detected in handleStreamDeckMessage..."
 	}
 }
 

@@ -128,7 +128,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.sendCommand(this.PreviousOptionHotkey)
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
+				loop 3
 					this.sendCommand(this.PreviousOptionHotkey)
 			}
 
@@ -165,7 +165,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
+				loop 3
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -189,13 +189,13 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}
 	}
 
@@ -250,7 +250,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.closePitstopMFD("Repair Suspension")
 			}
 			else
-				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 

@@ -650,7 +650,7 @@ class RaceCenter extends ConfigurationItem {
 				availableTyreSets := this.AvailableTyreSets
 				translatedCompounds := map(this.TyreCompounds, "translate")
 
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 				{
 					LV_GetText(compound, A_Index, 4)
 
@@ -1098,7 +1098,7 @@ class RaceCenter extends ConfigurationItem {
 			if !FileExist(dllFile) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -1561,7 +1561,7 @@ class RaceCenter extends ConfigurationItem {
 
 		try {
 			if (!this.ServerToken || (this.ServerToken = ""))
-				Throw "Invalid token detected..."
+				throw "Invalid token detected..."
 
 			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
 
@@ -2106,7 +2106,7 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_ModifyCol()
 
-				Loop % LV_GetCount("Col")
+				loop % LV_GetCount("Col")
 					LV_ModifyCol(A_Index, "AutoHdr")
 
 				if (this.SelectedDetailReport = "Setups")
@@ -2146,7 +2146,7 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_ModifyCol()
 
-				Loop % LV_GetCount("Col")
+				loop % LV_GetCount("Col")
 					LV_ModifyCol(A_Index, "AutoHdr")
 
 				if (this.SelectedDetailReport = "Setups")
@@ -2174,7 +2174,7 @@ class RaceCenter extends ConfigurationItem {
 			selected := LV_GetNext(0)
 
 			if (selected != this.SelectedSetup) {
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
 				this.iSelectedSetup := false
@@ -2296,7 +2296,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			Gui ListView, % this.PlanListView
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(stint, A_Index, 1)
 				LV_GetText(driver, A_Index, 2)
@@ -2326,7 +2326,7 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				Gui ListView, % this.PlanListView
 
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
 				this.iSelectedPlanStint := false
@@ -2400,7 +2400,7 @@ class RaceCenter extends ConfigurationItem {
 
 				lastTime := 0
 
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 				{
 					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index -1].DriverName)
 
@@ -2452,7 +2452,7 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_ModifyCol()
 
-				Loop 8
+				loop 8
 					LV_ModifyCol(A_Index, "AutoHdr")
 
 				if (this.SelectedDetailReport = "Plan")
@@ -2523,7 +2523,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			Gui ListView, % this.PlanListView
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 				LV_Modify(A_Index, "-Select")
 
 			this.iSelectedPlanStint := false
@@ -2534,7 +2534,7 @@ class RaceCenter extends ConfigurationItem {
 
 					FormatTime time, %time%, HH:mm
 
-					Loop % LV_GetCount()
+					loop % LV_GetCount()
 					{
 						LV_GetText(stintNr, A_Index)
 
@@ -2549,7 +2549,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 				{
 					LV_GetText(time, A_Index, 3)
 
@@ -2586,7 +2586,7 @@ class RaceCenter extends ConfigurationItem {
 			selected := LV_GetNext(0)
 
 			if (selected != this.SelectedPlanStint) {
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
 				this.iSelectedPlanStint := false
@@ -2638,7 +2638,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_GetText(stintNr, 1)
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 				LV_Modify(A_Index, "", stintNr++)
 
 			if (this.SelectedDetailReport = "Plan")
@@ -2665,7 +2665,7 @@ class RaceCenter extends ConfigurationItem {
 			selected := LV_GetNext(0)
 
 			if (selected != this.SelectedPlanStint) {
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
 				this.iSelectedPlanStint := false
@@ -2679,7 +2679,7 @@ class RaceCenter extends ConfigurationItem {
 				if (selected <= LV_GetCount()) {
 					LV_GetText(stintNr, 1)
 
-					Loop % LV_GetCount()
+					loop % LV_GetCount()
 						LV_Modify(A_Index, "", stintNr++)
 				}
 			}
@@ -2755,7 +2755,7 @@ class RaceCenter extends ConfigurationItem {
 			if currentStint {
 				nextStint := (currentStint.Nr + 1)
 
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 				{
 					LV_GetText(stint, A_Index)
 
@@ -2861,7 +2861,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			Gui ListView, % this.PlanListView
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(stint, A_Index, 1)
 
@@ -3088,7 +3088,7 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			else
-				Throw "Unknown tyre pressure mode detected in RaceCenter.adjustPitstopTyrePressures..."
+				throw "Unknown tyre pressure mode detected in RaceCenter.adjustPitstopTyrePressures..."
 		}
 	}
 
@@ -3713,7 +3713,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	setStintDriver(stintNumber, driverID) {
-		Throw "RaceCenter.setStintDriver should never be called..."
+		throw "RaceCenter.setStintDriver should never be called..."
 	}
 
 	runSimulation(sessionType) {
@@ -3886,7 +3886,7 @@ class RaceCenter extends ConfigurationItem {
 			initialFuelConsumption := lastLap.FuelConsumption
 			initialAvgLapTime := this.CurrentStint.AvgLapTime
 
-			Loop % lastLap.Nr
+			loop % lastLap.Nr
 				initialStintTime += lastLap.Laptime
 
 			tyresTable := telemetryDB.Database.Tables["Tyres"]
@@ -3998,7 +3998,7 @@ class RaceCenter extends ConfigurationItem {
 		avgLapTime := 0
 		lapTime := false
 
-		Loop %numLaps% {
+		loop %numLaps% {
 			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
 
 			if (!lapTime || !baseLapTime)
@@ -4306,7 +4306,7 @@ class RaceCenter extends ConfigurationItem {
 					newStints.Push(newStint)
 				}
 
-			Loop % newStints.Length()
+			loop % newStints.Length()
 			{
 				stint := newStints[A_Index]
 				identifier := stint.Identifier
@@ -4368,7 +4368,7 @@ class RaceCenter extends ConfigurationItem {
 
 		count := newLaps.Length()
 
-		Loop %count% {
+		loop %count% {
 			lap := newLaps[A_Index]
 			identifier := lap.Identifier
 
@@ -4473,7 +4473,7 @@ class RaceCenter extends ConfigurationItem {
 						if (tries <= 0) {
 							this.showMessage(translate("Give up - use default values"))
 
-							Throw "No data..."
+							throw "No data..."
 						}
 						else
 							Sleep 400
@@ -4491,7 +4491,7 @@ class RaceCenter extends ConfigurationItem {
 				if car
 					lap.Position := getConfigurationValue(data, "Position Data", "Car." . car . ".Position")
 				else
-					Throw "No data..."
+					throw "No data..."
 			}
 			catch exception {
 				if (lap.Nr > 1) {
@@ -4654,7 +4654,7 @@ class RaceCenter extends ConfigurationItem {
 					if first {
 						LV_ModifyCol()
 
-						Loop % LV_GetCount("Col")
+						loop % LV_GetCount("Col")
 							LV_ModifyCol(A_Index, "AutoHdr")
 					}
 
@@ -4673,7 +4673,7 @@ class RaceCenter extends ConfigurationItem {
 					if first {
 						LV_ModifyCol()
 
-						Loop % LV_GetCount("Col")
+						loop % LV_GetCount("Col")
 							LV_ModifyCol(A_Index, "AutoHdr")
 					}
 
@@ -4794,7 +4794,7 @@ class RaceCenter extends ConfigurationItem {
 					lapData := parseConfiguration(lapData)
 				}
 				else if (lap = lastLap)
-					Throw "No data..."
+					throw "No data..."
 				else {
 					missingLaps +=1
 					lap += 1
@@ -4830,7 +4830,7 @@ class RaceCenter extends ConfigurationItem {
 				mLaps := laps
 				mDrivers := drivers
 
-				Loop %missingLaps% {
+				loop %missingLaps% {
 					times .= ("`n" . mTimes)
 					positions .= ("`n" . mPositions)
 					laps .= ("`n" . mLaps)
@@ -4947,7 +4947,7 @@ class RaceCenter extends ConfigurationItem {
 							if (tries <= 0) {
 								this.showMessage(translate("Give up - use default values"))
 
-								Throw "No data..."
+								throw "No data..."
 							}
 							else
 								Sleep 400
@@ -5158,7 +5158,7 @@ class RaceCenter extends ConfigurationItem {
 							if (tries <= 0) {
 								this.showMessage(translate("Give up - use default values"))
 
-								Throw "No data..."
+								throw "No data..."
 							}
 							else
 								Sleep 400
@@ -5247,7 +5247,7 @@ class RaceCenter extends ConfigurationItem {
 
 				state := parseConfiguration(state)
 
-				Loop {
+				loop {
 					lap := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 
 					if lap {
@@ -5288,7 +5288,7 @@ class RaceCenter extends ConfigurationItem {
 						if (nextStop = 1) {
 							LV_ModifyCol()
 
-							Loop % LV_GetCount("Col")
+							loop % LV_GetCount("Col")
 								LV_ModifyCol(A_Index, "AutoHdr")
 						}
 
@@ -5338,7 +5338,7 @@ class RaceCenter extends ConfigurationItem {
 
 				startLap := Max(1, sessionStore.Tables["Pitstop.Data"][lastPitstop].Lap - 1)
 
-				Loop {
+				loop {
 					if ((startLap + A_Index) > lastLap)
 						break
 
@@ -5769,7 +5769,7 @@ class RaceCenter extends ConfigurationItem {
 			driverNicknames := []
 
 		if (tCars.Length() > 0)
-			Loop % tPositions.Length()
+			loop % tPositions.Length()
 			{
 				index := inList(tPositions, A_Index)
 
@@ -5840,7 +5840,7 @@ class RaceCenter extends ConfigurationItem {
 		if car {
 			cars := []
 
-			Loop % getConfigurationValue(raceData, "Cars", "Count")
+			loop % getConfigurationValue(raceData, "Cars", "Count")
 				cars.Push(A_Index)
 
 			potentials := false
@@ -5852,7 +5852,7 @@ class RaceCenter extends ConfigurationItem {
 			count := laps.Length()
 			laps := []
 
-			Loop %count%
+			loop %count%
 				laps.Push(A_Index)
 
 			oldLapSettings := (this.ReportViewer.Settings.HasKey("Laps") ? this.ReportViewer.Settings["Laps"] : false)
@@ -5987,7 +5987,7 @@ class RaceCenter extends ConfigurationItem {
 		if currentStint {
 			count := currentStint.Nr
 
-			Loop %count% {
+			loop %count% {
 				showProgress({progress: Round((A_Index / count) * 50), color: "Green", message: translate("Stint: ") . A_Index})
 
 				if this.Stints.HasKey(A_Index) {
@@ -6045,7 +6045,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			Gui ListView, % this.SetupsListView
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(driver, A_Index, 1)
 				LV_GetText(conditions, A_Index, 2)
@@ -6091,7 +6091,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			Gui ListView, % this.PlanListView
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(stint, A_Index, 1)
 				LV_GetText(driver, A_Index, 2)
@@ -6249,7 +6249,7 @@ class RaceCenter extends ConfigurationItem {
 			airTemperatures := []
 			trackTemperatures := []
 
-			Loop {
+			loop {
 				if !this.Laps.HasKey(stintLap)
 					break
 
@@ -6316,7 +6316,7 @@ class RaceCenter extends ConfigurationItem {
 			currentStint := this.CurrentStint
 
 			if currentStint
-				Loop % currentStint.Nr
+				loop % currentStint.Nr
 					if this.Stints.HasKey(A_Index) {
 						stint := this.Stints[A_Index]
 						stint.Row := (LV_GetCount() + 1)
@@ -6331,7 +6331,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop % LV_GetCount("Col")
+			loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			Gui ListView, % this.LapsListView
@@ -6339,7 +6339,7 @@ class RaceCenter extends ConfigurationItem {
 			lastLap := this.LastLap
 
 			if lastLap
-				Loop % lastLap.Nr
+				loop % lastLap.Nr
 					if this.Laps.HasKey(A_Index) {
 						lap := this.Laps[A_Index]
 						lap.Row := (LV_GetCount() + 1)
@@ -6351,7 +6351,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop % LV_GetCount("Col")
+			loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
 		}
 		finally {
@@ -6409,7 +6409,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop % LV_GetCount("Col")
+			loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			if (this.SelectedDetailReport = "Setups")
@@ -6471,7 +6471,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop % LV_GetCount("Col")
+			loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
 
 			if (this.SelectedDetailReport = "Plan")
@@ -6518,7 +6518,7 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_ModifyCol()
 
-			Loop % LV_GetCount("Col")
+			loop % LV_GetCount("Col")
 				LV_ModifyCol(A_Index, "AutoHdr")
 		}
 		finally {
@@ -6899,7 +6899,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iSelectedReport := report
 			}
 			else {
-				Loop % LV_GetCount()
+				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
 				this.iSelectedReport := false
@@ -7046,7 +7046,7 @@ class RaceCenter extends ConfigurationItem {
 						carIndices := {}
 
 						if positions {
-							Loop % getConfigurationValue(positions, "Position Data", "Car.Count")
+							loop % getConfigurationValue(positions, "Position Data", "Car.Count")
 								carIndices[getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".ID", A_Index)] := A_Index
 
 							driverIndex := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
@@ -7065,7 +7065,7 @@ class RaceCenter extends ConfigurationItem {
 
 						r := Round(15 / (imgScale * 3))
 
-						Loop {
+						loop {
 							coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
 							if coordinates {
@@ -7119,7 +7119,7 @@ class RaceCenter extends ConfigurationItem {
 								break
 						}
 
-						Loop
+						loop
 							if (driverID = getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".ID", A_Index)) {
 								coordinates := getConfigurationValue(telemetry, "Track Data", "Car." . A_Index . ".Position", false)
 
@@ -7234,7 +7234,7 @@ class RaceCenter extends ConfigurationItem {
 
 					drivers := []
 
-					Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+					loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
 						drivers.Push(A_Index)
 
 					if !this.ReportViewer.Settings.HasKey("Drivers")
@@ -7254,7 +7254,7 @@ class RaceCenter extends ConfigurationItem {
 
 					drivers := []
 
-					Loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+					loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
 						drivers.Push(A_Index)
 
 					if !this.ReportViewer.Settings.HasKey("Drivers")
@@ -7772,7 +7772,7 @@ class RaceCenter extends ConfigurationItem {
 								if (tries <= 0) {
 									this.showMessage(translate("Give up - use default values"))
 
-									Throw "No data..."
+									throw "No data..."
 								}
 								else
 									Sleep 400
@@ -7811,7 +7811,7 @@ class RaceCenter extends ConfigurationItem {
 
 						prefix := ("Standings.Lap." . lap . ".Car.")
 
-						Loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
+						loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
 						{
 							driver := computeDriverName(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
 													  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
@@ -8097,7 +8097,7 @@ class RaceCenter extends ConfigurationItem {
 			       . "<th class=""th-std"">" . translate("Accident") . "</th>"
 			   . "</tr>")
 
-		Loop % lapData.Length()
+		loop % lapData.Length()
 			html .= ("<tr>" . lapData[A_Index]
 							. mapData[A_Index]
 							. lapTimeData[A_Index]
@@ -8728,7 +8728,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<tr>" . values2String("", headers*) . "</tr>")
 
-		Loop % pitstopNRs.Length()
+		loop % pitstopNRs.Length()
 			html .= ("<tr>" . pitstopNRs[A_Index] . lapData[A_Index] . timeData[A_Index]
 							. previousDriverData[A_Index] . nextDriverData[A_Index] . refuelData[A_Index]
 							. tyreCompoundData[A_Index] . tyreSetData[A_Index] . tyrePressuresData[A_Index]
@@ -8754,7 +8754,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<br>" . this.createPitstopsServiceDetails())
 
 		if (this.SessionStore.Tables["Pitstop.Tyre.Data"].Length() > 0)
-			Loop % this.SessionStore.Tables["Pitstop.Data"].Length()
+			loop % this.SessionStore.Tables["Pitstop.Data"].Length()
 				if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: A_Index}}).Length() > 0) {
 					html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear (Pitstop: ") . A_Index . translate(")") . "</i></div>")
 
@@ -8838,7 +8838,7 @@ class RaceCenter extends ConfigurationItem {
 					driverTimes.Push(value)
 			}
 
-			Loop 2 {
+			loop 2 {
 				avg := average(driverTimes)
 				stdDev := stdDeviation(driverTimes)
 
@@ -8864,7 +8864,7 @@ class RaceCenter extends ConfigurationItem {
 			validTimes := validDriverTimes[index]
 			driverTimes := []
 
-			Loop %length%
+			loop %length%
 				driverTimes.Push(validTimes[A_Index])
 
 			driverTimes.InsertAt(1, "'" . driver.FullName . "'")
@@ -8877,7 +8877,7 @@ class RaceCenter extends ConfigurationItem {
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 		drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver") . "');"
 
-		Loop %length%
+		loop %length%
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . A_Index . "');"
 
 		text =
@@ -9044,7 +9044,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
 
 		if currentStint
-			Loop % currentStint.Nr
+			loop % currentStint.Nr
 			{
 				stint := this.Stints[A_Index]
 
@@ -9080,7 +9080,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<br><br><div id=""header""><i>" . translate("Race Course") . "</i></div>")
 
 		if lastLap
-			Loop % lastLap.Nr
+			loop % lastLap.Nr
 			{
 				lap := this.Laps[A_Index]
 
@@ -9123,7 +9123,7 @@ class RaceCenter extends ConfigurationItem {
 				   . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
 				   . "</tr>")
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(stint, A_Index, 1)
 				LV_GetText(driver, A_Index, 2)
@@ -9177,7 +9177,7 @@ class RaceCenter extends ConfigurationItem {
 				   . "<th class=""th-std"">" . translate("Prs. RR") . "</th>"
 				   . "</tr>")
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(driver, A_Index, 1)
 				LV_GetText(conditions, A_Index, 2)
@@ -9223,10 +9223,10 @@ class RaceCenter extends ConfigurationItem {
 
 		this.ReportViewer.loadReportData(laps, raceData, drivers, positions, times)
 
-		Loop % getConfigurationValue(raceData, "Cars", "Count")
+		loop % getConfigurationValue(raceData, "Cars", "Count")
 			cars.Push(A_Index)
 
-		Loop % laps.Length()
+		loop % laps.Length()
 			if times[A_Index].HasKey(car) {
 				lapTime += times[A_Index][car]
 				count += 1
@@ -9238,7 +9238,7 @@ class RaceCenter extends ConfigurationItem {
 		count := laps.Length()
 		laps := []
 
-		Loop %count%
+		loop %count%
 			laps.Push(A_Index)
 
 		oldLapSettings := (this.ReportViewer.Settings.HasKey("Laps") ? this.ReportViewer.Settings["Laps"] : false)
@@ -9300,7 +9300,7 @@ class RaceCenter extends ConfigurationItem {
 
 				count := getConfigurationValue(positions, "Position Data", "Car.Count", 0)
 
-				Loop %count% {
+				loop %count% {
 					lastPositions.Push(getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Position", 0))
 					lastRunnings.Push(getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Lap", 0)
 									+ getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
@@ -9310,17 +9310,17 @@ class RaceCenter extends ConfigurationItem {
 
 				consideredLaps := []
 
-				Loop % Min(startLap, 10)
+				loop % Min(startLap, 10)
 					consideredLaps.Push(startLap - (A_Index - 1))
 
-				Loop % endLap - startLap
+				loop % endLap - startLap
 				{
 					curLap := A_Index
 
 					carPositions := []
 					nextRunnings := []
 
-					Loop %count% {
+					loop %count% {
 						lapTime := true
 						potential := true
 						raceCraft := true
@@ -9368,7 +9368,7 @@ class RaceCenter extends ConfigurationItem {
 
 					nextPositions := []
 
-					Loop %count%
+					loop %count%
 						nextPositions.Push(false)
 
 					for nr, position in carPositions {
@@ -9466,7 +9466,7 @@ class TrafficStrategy extends RaceCenter.SessionStrategy {
 
 				numCars := 0
 
-				Loop % runnings.Length()
+				loop % runnings.Length()
 					if (A_Index != driver)
 						if (wrap && ((runnings[A_Index] > begin) || (runnings[A_Index] <= end)))
 							numCars += 1
@@ -9709,7 +9709,7 @@ class TrafficSimulation extends StrategySimulation {
 		first := true
 		numScenarios += 1
 
-		Loop {
+		loop {
 			if first {
 				first := false
 
@@ -9747,12 +9747,12 @@ class TrafficSimulation extends StrategySimulation {
 			tyreUsageRound := 0
 			tyreCompoundVariationRound := 0
 
-			Loop { ; consumption
-				Loop { ; initialFuel
-					Loop { ; tyreUsage
+			loop { ; consumption
+				loop { ; initialFuel
+					loop { ; tyreUsage
 						tyreLapsVariation := tyreUsage
 
-						Loop { ; tyreCompoundVariation
+						loop { ; tyreCompoundVariation
 							if useInitialConditions {
 								if map is number
 								{
@@ -10066,9 +10066,9 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		updateTeamManager()
 
-		Loop
+		loop
 			Sleep 100
-		Until result
+		until result
 
 		if (result = kOk) {
 			Gui TE:Default
@@ -10076,7 +10076,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 			result := []
 
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 			{
 				LV_GetText(driver, A_Index)
 
@@ -10262,7 +10262,7 @@ parseObject(properties) {
 
 	properties := StrReplace(properties, "`r", "")
 
-	Loop Parse, properties, `n
+	loop Parse, properties, `n
 	{
 		property := string2Values("=", A_LoopField)
 
@@ -10436,7 +10436,7 @@ updateTime() {
 	try {
 		Gui ListView, % rCenter.PlanListView
 
-		Loop % LV_GetCount()
+		loop % LV_GetCount()
 			LV_Modify(A_Index, "-Select")
 
 		rCenter.iSelectedPlanStint := false
@@ -10961,7 +10961,7 @@ chooseReport() {
 				rCenter.showReport(kSessionReports[A_EventInfo])
 		}
 		else
-			Loop % LV_GetCount()
+			loop % LV_GetCount()
 				LV_Modify(A_Index, "-Select")
 	}
 	finally {

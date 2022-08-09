@@ -80,7 +80,7 @@ class InstallationStepWizard extends StepWizard {
 		startY := y
 
 		if (this.Definition.Count() > 16)
-			Throw "Too many modules detected in InstallationStepWizard.createGui..."
+			throw "Too many modules detected in InstallationStepWizard.createGui..."
 
 		window := this.Window
 

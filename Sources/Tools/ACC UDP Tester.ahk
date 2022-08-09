@@ -227,7 +227,7 @@ runACCUDPTester() {
 
 	Sleep 5000
 
-	Loop
+	loop
 		if !readUDPData()
 			break
 

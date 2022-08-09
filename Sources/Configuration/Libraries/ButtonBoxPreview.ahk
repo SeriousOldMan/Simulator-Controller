@@ -97,11 +97,11 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.computeLayout(rowHeights, columnWidths)
 
 		height := 0
-		Loop % rowHeights.Length()
+		loop % rowHeights.Length()
 			height += rowHeights[A_Index]
 
 		width := 0
-		Loop % columnWidths.Length()
+		loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
@@ -127,7 +127,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 		vertical := this.kHeaderHeight
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
@@ -136,7 +136,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 			horizontal := this.SidesMargin
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -250,7 +250,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 		rows := []
 
-		Loop % this.Rows
+		loop % this.Rows
 			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
 
 		this.iRowDefinitions := rows
@@ -260,16 +260,16 @@ class ButtonBoxPreview extends ControllerPreview {
 		columnWidths := []
 		rowHeights := []
 
-		Loop % this.Columns
+		loop % this.Columns
 			columnWidths.Push(0)
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			rowHeight := 0
 
 			rowDefinition := this.RowDefinitions[A_Index]
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				descriptor := rowDefinition[A_Index]
 
@@ -325,11 +325,11 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.computeLayout(rowHeights, columnWidths)
 
 		height := 0
-		Loop % rowHeights.Length()
+		loop % rowHeights.Length()
 			height += rowHeights[A_Index]
 
 		width := 0
-		Loop % columnWidths.Length()
+		loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
@@ -337,7 +337,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 		vertical := this.kHeaderHeight
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
@@ -346,7 +346,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 			horizontal := this.SidesMargin
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -526,7 +526,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 				count := 1
 
-				Loop 4 {
+				loop 4 {
 					label := (count . " - " . (count + 9))
 
 					menu := ("NumSubMenu" . A_Index)
@@ -538,7 +538,7 @@ class ButtonBoxPreview extends ControllerPreview {
 						; ignore
 					}
 
-					Loop 10 {
+					loop 10 {
 						handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
 						Menu %menu%, Add, %count%, %handler%
 

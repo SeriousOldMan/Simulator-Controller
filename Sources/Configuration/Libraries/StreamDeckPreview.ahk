@@ -94,13 +94,13 @@ class StreamDeckPreview extends ControllerPreview {
 		this.Rows := layout[1]
 		this.Columns := layout[2]
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
 			this.iButtons[row] := Object()
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -141,7 +141,7 @@ class StreamDeckPreview extends ControllerPreview {
 
 		Gui %window%:Font, cWhite
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			this.iLabels[A_Index] := Object()
 			this.iIcons[A_Index] := Object()
@@ -150,7 +150,7 @@ class StreamDeckPreview extends ControllerPreview {
 
 			x := this.kLeftMargin[this.Size]
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -208,11 +208,11 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	updateButtons() {
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -266,14 +266,14 @@ class StreamDeckPreview extends ControllerPreview {
 
 		y := this.kTopMargin
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			if ((clickY > y) && (clickY < (y + this.kButtonHeight))) {
 				row := A_Index
 
 				x := this.kLeftMargin[this.Size]
 
-				Loop % this.Columns
+				loop % this.Columns
 				{
 					if ((clickX > x) && (clickX < (x + this.kButtonWidth))) {
 						column := A_Index
@@ -363,7 +363,7 @@ class StreamDeckPreview extends ControllerPreview {
 
 			count := 1
 
-			Loop 4 {
+			loop 4 {
 				label := (count . " - " . (count + 9))
 
 				menu := ("NumSubMenu" . A_Index)
@@ -375,7 +375,7 @@ class StreamDeckPreview extends ControllerPreview {
 					; ignore
 				}
 
-				Loop 10 {
+				loop 10 {
 					handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
 					Menu %menu%, Add, %count%, %handler%
 

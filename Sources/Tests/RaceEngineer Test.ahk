@@ -195,7 +195,7 @@ class FuelReporting extends Assert {
 
 		vFuelWarnings := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -220,7 +220,7 @@ class FuelReporting extends Assert {
 
 		vFuelWarnings := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -243,7 +243,7 @@ class DamageReporting extends Assert {
 	DamageReportingTest() {
 		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			vSuspensionDamage := kNotInitialized
@@ -286,10 +286,10 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
@@ -353,10 +353,10 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
@@ -431,10 +431,10 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
@@ -522,7 +522,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -568,7 +568,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -614,7 +614,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -671,7 +671,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -725,7 +725,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -771,7 +771,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -837,7 +837,7 @@ class PitstopHandling extends Assert {
 	PitstopMultipleTest() {
 		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 
-		Loop {
+		loop {
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
 
@@ -923,7 +923,7 @@ else {
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
 	if (raceNr == 1) {
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -960,10 +960,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -994,10 +994,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1028,10 +1028,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1063,10 +1063,10 @@ else {
 	else if (raceNr == 5) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 5\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1098,10 +1098,10 @@ else {
 	else if (raceNr == 6) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 6\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1133,10 +1133,10 @@ else {
 	else if ((raceNr = 9) || (raceNr = 11) || (raceNr = 12)) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1209,10 +1209,10 @@ else {
 	else if (raceNr = 18) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1236,10 +1236,10 @@ else {
 	else if (raceNr > 6) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {

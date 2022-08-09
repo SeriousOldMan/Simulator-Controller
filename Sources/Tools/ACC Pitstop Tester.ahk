@@ -270,7 +270,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitstopLabels.Length()
+		loop % pitstopLabels.Length()
 		{
 			pitstopLabel := pitstopLabels[A_Index]
 			
@@ -321,7 +321,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitStrategyLabels.Length()
+		loop % pitStrategyLabels.Length()
 		{
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
@@ -384,7 +384,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % noRefuelLabels.Length()
+		loop % noRefuelLabels.Length()
 		{
 			noRefuelLabel := noRefuelLabels[A_Index]
 			
@@ -450,7 +450,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % wetLabels.Length()
+		loop % wetLabels.Length()
 		{
 			wetLabel := wetLabels[A_Index]
 				
@@ -487,7 +487,7 @@ class ACCPitstopTester extends Plugin {
 			imageX := kUndefined
 			imageY := kUndefined
 			
-			Loop % compoundLabels.Length()
+			loop % compoundLabels.Length()
 			{
 				compoundLabel := compoundLabels[A_Index]
 				
@@ -536,7 +536,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % frontBrakeLabels.Length()
+		loop % frontBrakeLabels.Length()
 		{
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
@@ -580,7 +580,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % selectDriverLabels.Length()
+		loop % selectDriverLabels.Length()
 		{
 			selectDriverLabel := selectDriverLabels[A_Index]
 			

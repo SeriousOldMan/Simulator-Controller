@@ -198,7 +198,7 @@ class CoreEngine extends Assert {
 		engine := new RuleEngine(productions, reductions, {})
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
-		Loop 1 {
+		loop 1 {
 			if (A_Index == 1) {
 				tests := [["oc(?R)", []]]
 

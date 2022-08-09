@@ -251,7 +251,7 @@ class ControllerEditor extends ConfigurationItem {
 	editController() {
 		this.open()
 
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 	}
@@ -718,7 +718,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit hwndbbWidget19, %layoutRowEdit%
 
-		Loop 17
+		loop 17
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
@@ -726,7 +726,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		Gui CTRLE:Add, Button, x102 yp+30 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
 
-		Loop 3
+		loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 
 		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
@@ -808,7 +808,7 @@ class LayoutsList extends ConfigurationItemList {
 				setConfigurationValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
 									, grid . ", " . values2String(", ", layout[2]["Margins"]*))
 
-				Loop % string2Values("x", grid)[1]
+				loop % string2Values("x", grid)[1]
 					setConfigurationValue(buttonBoxConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
@@ -820,7 +820,7 @@ class LayoutsList extends ConfigurationItemList {
 
 				setConfigurationValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
 
-				Loop % string2Values("x", grid)[1]
+				loop % string2Values("x", grid)[1]
 					setConfigurationValue(streamDeckConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
@@ -845,7 +845,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			definition := ""
 
-			Loop % string2Values("x", grid)[1]
+			loop % string2Values("x", grid)[1]
 			{
 				if (A_Index > 1)
 					definition .= "; "
@@ -950,7 +950,7 @@ class LayoutsList extends ConfigurationItemList {
 		choices := []
 		rowDefinitions := []
 
-		Loop %layoutRowsEdit% {
+		loop %layoutRowsEdit% {
 			choices.Push(translate("Row ") . A_Index)
 
 			rowDefinitions.Push(item[2][A_Index])
@@ -1037,7 +1037,7 @@ class LayoutsList extends ConfigurationItemList {
 			else
 				layout := {Type: "Stream Deck", Grid: layoutRowsEdit . " x " . layoutColumnsEdit, Visible: false}
 
-			Loop % this.iRowDefinitions.Length()
+			loop % this.iRowDefinitions.Length()
 				layout[A_Index] := this.iRowDefinitions[A_Index]
 
 			return Array(layoutNameEdit, layout)
@@ -1132,7 +1132,7 @@ class LayoutsList extends ConfigurationItemList {
 		changed := false
 
 		if (layoutRowsEdit > rows) {
-			Loop % layoutRowsEdit - rows
+			loop % layoutRowsEdit - rows
 				this.iRowDefinitions.Push("")
 
 			changed := true
@@ -1143,7 +1143,7 @@ class LayoutsList extends ConfigurationItemList {
 			changed := true
 		}
 
-		Loop %layoutRowsEdit%
+		loop %layoutRowsEdit%
 			this.iRowDefinitions[A_Index] := values2String(";", this.getRowDefinition(A_Index)*)
 
 		if (layoutRowDropDown > 0) {
@@ -1157,7 +1157,7 @@ class LayoutsList extends ConfigurationItemList {
 		if changed {
 			choices := []
 
-			Loop %layoutRowsEdit%
+			loop %layoutRowsEdit%
 				choices.Push(translate("Row ") . A_Index)
 
 			GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
@@ -1196,7 +1196,7 @@ class LayoutsList extends ConfigurationItemList {
 		if (rowDefinition.Length() > layoutColumnsEdit)
 			rowDefinition.RemoveAt(layoutColumnsEdit + 1, rowDefinition.Length() - layoutColumnsEdit)
 		else
-			Loop % layoutColumnsEdit - rowDefinition.Length()
+			loop % layoutColumnsEdit - rowDefinition.Length()
 				rowDefinition.Push("")
 
 		return rowDefinition
@@ -1394,7 +1394,7 @@ class ControllerPreview extends ConfigurationItem {
 
 	Type[] {
 		Get {
-			Throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
+			throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
 		}
 	}
 
@@ -1466,14 +1466,14 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		Throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
 	}
 
 	createBackground(configuration) {
 	}
 
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
-		Throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
 	}
 
 	setControlClickHandler(handler) {
@@ -1481,23 +1481,23 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	controlClick(element, row, column, isEmpty) {
-		Throw "Virtual method ControllerPreview.controlClick must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.controlClick must be implemented in a subclass..."
 	}
 
 	openControlMenu(preview, element, function, row, column, isEmpty) {
-		Throw "Virtual method ControllerPreview.openControlMenu must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.openControlMenu must be implemented in a subclass..."
 	}
 
 	getFunction(row, column) {
-		Throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
 	}
 
 	findFunction(function, ByRef row, ByRef column) {
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			cRow := A_Index
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				if (this.getFunction(cRow, A_Index) = function) {
 					row := cRow
@@ -1514,11 +1514,11 @@ class ControllerPreview extends ConfigurationItem {
 	resetLabels() {
 		local function
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				function := this.getFunction(row, A_Index)
 
@@ -1529,7 +1529,7 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	setLabel(row, column, text) {
-		Throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
 	}
 
 	open() {
@@ -1716,7 +1716,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 	editDisplayRules() {
 		this.open()
 
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 
@@ -1843,7 +1843,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		if button {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
-			Loop {
+			loop {
 				icon := getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
@@ -1855,7 +1855,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
-			Loop {
+			loop {
 				icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
@@ -1872,7 +1872,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		if button {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
-			Loop {
+			loop {
 				if (getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
@@ -1885,7 +1885,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
-			Loop {
+			loop {
 				if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else

@@ -127,7 +127,7 @@ class CarInfo {
 			lapTimes := []
 			numLapTimes := this.LapTimes.Length()
 
-			Loop % Min(count, numLapTimes)
+			loop % Min(count, numLapTimes)
 				lapTimes.Push(this.LapTimes[numLapTimes - A_Index + 1])
 
 			return Round(average(lapTimes), 1)
@@ -166,14 +166,14 @@ class CarInfo {
 			if sector {
 				numDeltas := this.Deltas[sector].Length()
 
-				Loop % Min(count, numDeltas)
+				loop % Min(count, numDeltas)
 					deltas.Push(this.Deltas[sector][numDeltas - A_Index + 1])
 			}
 			else
 				for sector, sDeltas in this.Deltas {
 					numDeltas := sDeltas.Length()
 
-					Loop % Min(count, numDeltas)
+					loop % Min(count, numDeltas)
 						deltas.Push(sDeltas[numDeltas - A_Index + 1])
 				}
 
@@ -284,7 +284,7 @@ class PositionInfo {
 
 	Type[] {
 		Get {
-			Throw "Virtual property PositionInfo.Type must be implemented in a subclass..."
+			throw "Virtual property PositionInfo.Type must be implemented in a subclass..."
 		}
 	}
 
@@ -920,7 +920,7 @@ class RaceSpotter extends RaceAssistant {
 
 			otherCars := this.OtherCars
 
-			Loop % knowledgeBase.getValue("Car.Count", 0)
+			loop % knowledgeBase.getValue("Car.Count", 0)
 			{
 				carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", false)
 
@@ -1519,7 +1519,7 @@ class RaceSpotter extends RaceAssistant {
 			alerting := true
 
 			try {
-				Loop {
+				loop {
 					if (this.iPendingAlerts.Length() > 0)
 						alert := this.iPendingAlerts.RemoveAt(1)
 					else
@@ -1927,7 +1927,7 @@ class RaceSpotter extends RaceAssistant {
 				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 		}
 
-		Loop % knowledgeBase.getValue("Car.Count")
+		loop % knowledgeBase.getValue("Car.Count")
 		{
 			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)

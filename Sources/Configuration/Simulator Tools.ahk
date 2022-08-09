@@ -1147,7 +1147,7 @@ moveEditor() {
 
 editTargets(command := "") {
 	local x, y
-	
+
 	static result
 
 	static updateVariable1
@@ -1413,7 +1413,7 @@ editTargets(command := "") {
 			Gui TE:Show, x%x% y%y%
 		else
 			Gui TE:Show
-			
+
 		Loop
 			Sleep 1000
 		until result
@@ -1674,6 +1674,9 @@ updateConfigurationForV430() {
 
 	if changed
 		writeConfiguration(userConfigurationFile, userConfiguration)
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data")
+		FileAppend `nModule.Team Server.Selected=true, %kUserHomeDirectory%Setup\Setup.data
 }
 
 updateConfigurationForV426() {

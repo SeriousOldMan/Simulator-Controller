@@ -18,7 +18,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceEngineerPlugin = "Race Engineer"
+global kRaceEngineerPlugin := "Race Engineer"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -175,8 +175,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					requestDriver := (requestDriver ? [requestDriver] : [])
 
 					this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
+												, "!" . getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
+												, "!" . getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")

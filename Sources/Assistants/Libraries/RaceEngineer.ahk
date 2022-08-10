@@ -1431,7 +1431,7 @@ class RaceEngineer extends RaceAssistant {
 		local options := optionsOrLap
 		local plannedLap := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel
-		local compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
+		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug
 
 		if (optionsOrLap != true)
@@ -1460,21 +1460,38 @@ class RaceEngineer extends RaceAssistant {
 		correctedFuel := false
 
 		if (refuelAmount != kUndefined) {
-			targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
+			if (InStr(refuelAmount . "", "!") = 1)
+				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", SubStr(refuelAmount, 2) + 0)
+			else {
+				targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)
 
-			if (targetFuel && (targetFuel != refuelAmount)) {
-				if ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining") + targetFuel)
-				  < knowledgeBase.getValue("Session.Settings.Fuel.Max"))
-					correctedFuel := true
+				if (targetFuel && (targetFuel != refuelAmount)) {
+					if ((knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Fuel.Remaining") + targetFuel)
+					  < knowledgeBase.getValue("Session.Settings.Fuel.Max"))
+						correctedFuel := true
+					else
+						knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
+				}
 				else
 					knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
 			}
-			else
-				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
 		}
 
+		correctedTyres := false
+
 		if (changeTyres != kUndefined) {
-			knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
+			if (InStr(changeTyres . "", "!") = 1) {
+				changeTyres := (SubStr(changeTyres, 2) + 0)
+
+				knowledgeBase.addFact("Pitstop.Plan.Tyre.Change", changeTyres)
+			}
+			else {
+				if (changeTyres != (knowledgeBase.getValue("Tyre.Compound.Target", false) != false)) {
+					changeTyres := !changeTyres
+
+					correctedTyres := true
+				}
+			}
 
 			if changeTyres {
 				if (tyreSet != kUndefined)

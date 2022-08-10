@@ -1515,7 +1515,7 @@ class RaceStrategist extends RaceAssistant {
 					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
-					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, tyreChange))
+					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, "!" . tyreChange))
 				}
 			}
 			finally {

@@ -14,10 +14,10 @@
 ;;; ChatMessagesConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global chatMessagesListView = false
-global chatMessageNumberEdit = 1
-global chatMessageLabelEdit = ""
-global chatMessageMessageEdit = ""
+global chatMessagesListView := false
+global chatMessageNumberEdit := 1
+global chatMessageLabelEdit := ""
+global chatMessageMessageEdit := ""
 global chatMessageAddButton
 global chatMessageDeleteButton
 global chatMessageUpdateButton

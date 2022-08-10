@@ -52,34 +52,34 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "ok"
-global kCancel = "cancel"
-global kNext = "next"
-global kPrevious = "previous"
-global kLanguage = "language"
+global kOk := "ok"
+global kCancel := "cancel"
+global kNext := "next"
+global kPrevious := "previous"
+global kLanguage := "language"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vProgressCount = 0
+global vProgressCount := 0
 
-global vResult = false
-global vWorking = false
+global vResult := false
+global vWorking := false
 
-global vPageSwitch = false
+global vPageSwitch := false
 
-global vSettingsReady = false
+global vSettingsReady := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDebugOff = 0
-global kDebugKnowledgeBase = 1
-global kDebugRules = 2
+global kDebugOff := 0
+global kDebugKnowledgeBase := 1
+global kDebugRules := 2
 
 
 ;;;-------------------------------------------------------------------------;;;

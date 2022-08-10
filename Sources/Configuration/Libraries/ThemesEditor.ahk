@@ -28,8 +28,8 @@
 ;;; ThemesEditor                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global windowTitleEdit = ""
-global windowSubtitleEdit = ""
+global windowTitleEdit := ""
+global windowSubtitleEdit := ""
 
 class ThemesEditor extends ConfigurationItem {
 	iClosed := false
@@ -138,15 +138,15 @@ class ThemesEditor extends ConfigurationItem {
 ;;; ThemesList                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global themesListView = false
-global themeNameEdit = ""
-global themeTypeDropDown = 0
+global themesListView := false
+global themeNameEdit := ""
+global themeTypeDropDown := 0
 
 global playSoundButtonHandle
-global soundFilePathEdit = ""
+global soundFilePathEdit := ""
 
 global videoFilePathLabel
-global videoFilePathEdit = ""
+global videoFilePathEdit := ""
 global videoFilePathButton
 
 global picturesListLabel
@@ -155,7 +155,7 @@ global picturesListView
 global picturesListViewHandle
 global picturesListViewImages
 global picturesDurationLabel
-global picturesDurationEdit = 3000
+global picturesDurationEdit := 3000
 global picturesDurationPostfix
 
 global themeAddButton

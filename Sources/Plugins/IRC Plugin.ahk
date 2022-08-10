@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kIRCApplication = "iRacing"
+global kIRCApplication := "iRacing"
 
-global kIRCPlugin = "IRC"
+global kIRCPlugin := "IRC"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -25,7 +25,7 @@
 ;;;                    Public Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+global kTelemetrySchemas := {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"]
 						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"

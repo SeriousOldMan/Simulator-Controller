@@ -9,10 +9,10 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kIcon = "Icon"
-global kLabel = "Label"
-global kIconAndLabel = "IconAndLabel"
-global kIconOrLabel = "IconOrLabel"
+global kIcon := "Icon"
+global kLabel := "Label"
+global kIconAndLabel := "IconAndLabel"
+global kIconOrLabel := "IconOrLabel"
 
 
 ;;;-------------------------------------------------------------------------;;;

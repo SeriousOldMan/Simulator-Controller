@@ -23,22 +23,22 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
+global kWeatherOptions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
-global kTyreCompounds = ["Wet", "Intermediate", "Dry"
+global kTyreCompounds := ["Wet", "Intermediate", "Dry"
 					   , "Wet (S)", "Wet (M)", "Wet (H)"
 					   , "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
 					   , "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
 					   , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
-global kDryQualificationSetup = "DQ"
-global kDryRaceSetup = "DR"
-global kWetQualificationSetup = "WQ"
-global kWetRaceSetup = "WR"
+global kDryQualificationSetup := "DQ"
+global kDryRaceSetup := "DR"
+global kWetQualificationSetup := "WQ"
+global kWetRaceSetup := "WR"
 
-global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
+global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSessionSchemas = {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
+global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
 
 
 ;;;-------------------------------------------------------------------------;;;

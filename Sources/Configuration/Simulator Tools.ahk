@@ -45,48 +45,48 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kToolsConfigurationFile = "Simulator Tools.ini"
-global kToolsTargetsFile = "Simulator Tools.targets"
+global kToolsConfigurationFile := "Simulator Tools.ini"
+global kToolsTargetsFile := "Simulator Tools.targets"
 
-global kUpdateMessages = {updateTranslations: "Updating translations to "
+global kUpdateMessages := {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updateActionLabels: "Updating action labels to "
 						, updateActionIcons: "Updating action icons to "
 						, updatePhraseGrammars: "Updating phrase grammars to "}
 
-global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
+global kCompiler := kAHKDirectory . "Compiler\ahk2exe.exe"
 
-global kSave = "save"
-global kRevert = "revert"
+global kSave := "save"
+global kRevert := "revert"
 
-global kOk = "ok"
-global kCancel = "cancel"
+global kOk := "ok"
+global kCancel := "cancel"
 
-global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kInstallDirectory = (A_ProgramFiles . "\Simulator Controller\")
+global kInstallDirectory := (A_ProgramFiles . "\Simulator Controller\")
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vUpdateTargets = []
-global vCleanupTargets = []
-global vCopyTargets = []
-global vBuildTargets = []
-global vSpecialTargets = []
+global vUpdateTargets := []
+global vCleanupTargets := []
+global vCopyTargets := []
+global vBuildTargets := []
+global vSpecialTargets := []
 
-global vSplashTheme = false
+global vSplashTheme := false
 
-global vTargetsCount = 0
+global vTargetsCount := 0
 
-global vUpdateSettings = Object()
-global vCleanupSettings = Object()
-global vCopySettings = Object()
-global vBuildSettings = Object()
+global vUpdateSettings := Object()
+global vCleanupSettings := Object()
+global vCopySettings := Object()
+global vBuildSettings := Object()
 
-global vProgressCount = 0
+global vProgressCount := 0
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -20,7 +20,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kControlTypes = {}
+global kControlTypes := {}
 
 kControlTypes[k1WayToggleType] := "1-way Toggle"
 kControlTypes[k2WayToggleType] := "2-way Toggle"
@@ -33,7 +33,7 @@ kControlTypes[kCustomType] := "Custom"
 ;;;                         Private Variables Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vControllerPreviews = {}
+global vControllerPreviews := {}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -293,11 +293,11 @@ class ControllerEditor extends ConfigurationItem {
 
 global controlsListView := "|"
 
-global controlNameEdit = ""
-global controlTypeDropDown = 0
-global imageFilePathEdit = ""
-global imageWidthEdit = 0
-global imageHeightEdit = 0
+global controlNameEdit := ""
+global controlTypeDropDown := 0
+global imageFilePathEdit := ""
+global imageWidthEdit := 0
+global imageHeightEdit := 0
 
 global controlAddButton
 global controlDeleteButton
@@ -457,9 +457,9 @@ class ControlsList extends ConfigurationItemList {
 
 global labelsListView := "|"
 
-global labelNameEdit = ""
-global labelWidthEdit = 0
-global labelHeightEdit = 0
+global labelNameEdit := ""
+global labelWidthEdit := 0
+global labelHeightEdit := 0
 
 global labelAddButton
 global labelDeleteButton
@@ -606,21 +606,21 @@ class LabelsList extends ConfigurationItemList {
 
 global layoutsListView := "|"
 
-global layoutNameEdit = ""
+global layoutNameEdit := ""
 global layoutTypeDropDown
 global layoutDropDown
 
-global layoutRowsEdit = ""
-global layoutColumnsEdit = ""
-global layoutRowMarginEdit = ""
-global layoutColumnMarginEdit = ""
-global layoutSidesMarginEdit = ""
-global layoutBottomMarginEdit = ""
+global layoutRowsEdit := ""
+global layoutColumnsEdit := ""
+global layoutRowMarginEdit := ""
+global layoutColumnMarginEdit := ""
+global layoutSidesMarginEdit := ""
+global layoutBottomMarginEdit := ""
 
-global layoutRowDropDown = 0
-global layoutRowEdit = ""
+global layoutRowDropDown := 0
+global layoutRowEdit := ""
 
-global layoutVisibleCheck = true
+global layoutVisibleCheck := true
 
 global layoutAddButton
 global layoutDeleteButton
@@ -1783,7 +1783,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 
 global displayRulesListView := "|"
 
-global iconFilePathEdit = ""
+global iconFilePathEdit := ""
 global displayRuleDropDown
 global displayRuleAddButton
 global displayRuleDeleteButton

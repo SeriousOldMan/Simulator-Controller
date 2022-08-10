@@ -54,12 +54,12 @@ ListLines Off					; Disable execution history
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kClose = "Close"
-global kConnect = "Connect"
-global kEvent = "Event"
+global kClose := "Close"
+global kConnect := "Connect"
+global kEvent := "Event"
 
-global kSessionReports = concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
-global kDetailReports = ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy"]
+global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
+global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
@@ -227,9 +227,9 @@ global planTyreCompoundDropDown
 global addPlanButton
 global deletePlanButton
 
-global numScenariosEdit = 20
-global variationWindowEdit = 3
-global randomFactorEdit = 5
+global numScenariosEdit := 20
+global variationWindowEdit := 3
+global randomFactorEdit := 5
 
 global useSessionDataDropDown
 global useTelemetryDataDropDown
@@ -239,8 +239,8 @@ global considerTrafficDropDown
 global lapTimeVariationDropDown
 global driverErrorsDropDown
 global pitstopsDropDown
-global overtakeDeltaEdit = 2
-global trafficConsideredEdit = 7
+global overtakeDeltaEdit := 2
+global trafficConsideredEdit := 7
 
 global pitstopLapEdit
 global pitstopDriverDropDownMenu

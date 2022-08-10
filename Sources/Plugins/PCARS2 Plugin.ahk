@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPCARS2Application = "Project CARS 2"
+global kPCARS2Application := "Project CARS 2"
 
-global kPCARS2Plugin = "PCARS2"
+global kPCARS2Plugin := "PCARS2"
 
 
 ;;;-------------------------------------------------------------------------;;;

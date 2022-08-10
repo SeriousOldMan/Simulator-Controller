@@ -18,15 +18,15 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports = ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace"]
+global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "Ok"
-global kCancel = "Cancel"
+global kOk := "Ok"
+global kCancel := "Cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;

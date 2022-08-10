@@ -9,7 +9,7 @@
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global ApplicationClass = Application	; Spooky, sometimes the reference to Application is lost
+global ApplicationClass := Application	; Spooky, sometimes the reference to Application is lost
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -43,8 +43,8 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "Ok"
-global kCancel = "Cancel"
+global kOk := "Ok"
+global kCancel := "Cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;

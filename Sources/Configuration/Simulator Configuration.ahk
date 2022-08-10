@@ -311,7 +311,7 @@ class GeneralTab extends ConfigurationItem {
 
 global simulatorsListBox := "|"
 
-global simulatorEdit = ""
+global simulatorEdit := ""
 
 global simulatorUpButton
 global simulatorDownButton

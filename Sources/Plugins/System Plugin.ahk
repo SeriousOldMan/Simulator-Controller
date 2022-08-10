@@ -17,8 +17,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSystemPlugin = "System"
-global kLaunchMode = "Launch"
+global kSystemPlugin := "System"
+global kLaunchMode := "Launch"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -20,13 +20,13 @@
 ;;; PluginsConfigurator                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global pluginsListView = false
+global pluginsListView := false
 
-global pluginEdit = ""
-global pluginActivatedCheck = false
+global pluginEdit := ""
+global pluginActivatedCheck := false
 global pluginActivatedCheckHandle
-global pluginSimulatorsEdit = ""
-global pluginArgumentsEdit = ""
+global pluginSimulatorsEdit := ""
+global pluginArgumentsEdit := ""
 
 global pluginAddButton
 global pluginDeleteButton

@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRF2Application = "rFactor 2"
+global kRF2Application := "rFactor 2"
 
-global kRF2Plugin = "RF2"
+global kRF2Plugin := "RF2"
 
 
 ;;;-------------------------------------------------------------------------;;;

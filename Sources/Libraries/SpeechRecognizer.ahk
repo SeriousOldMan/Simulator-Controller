@@ -26,7 +26,7 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAzureLanguages = {"af-ZA": "Afrikaans (South Africa)"
+global kAzureLanguages := {"af-ZA": "Afrikaans (South Africa)"
 						, "am-ET": "Amharic (Ethiopia)"
 						, "ar-DZ": "Arabic (Algeria)"
 						, "ar-BH": "Arabic (Bahrain)"

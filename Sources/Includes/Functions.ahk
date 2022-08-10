@@ -25,34 +25,34 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vDetachedInstallation = false
+global vDetachedInstallation := false
 
-global vDebug = false
-global vLogLevel = kLogWarn
+global vDebug := false
+global vLogLevel := kLogWarn
 
-global vTargetLanguageCode = "en"
+global vTargetLanguageCode := "en"
 
-global vSplashCounter = 0
+global vSplashCounter := 0
 global vLastImage
 global vVideoPlayer
-global vSongIsPlaying = false
+global vSongIsPlaying := false
 
-global vProgressIsOpen = false
+global vProgressIsOpen := false
 global vProgressBar
 global vProgressTitle
 global vProgressMessage
 
-global vPendingTrayMessages = []
-global vTrayMessageDuration = false
+global vPendingTrayMessages := []
+global vTrayMessageDuration := false
 
-global vHasSupportMenu = false
+global vHasSupportMenu := false
 
 
 ;;;-------------------------------------------------------------------------;;;

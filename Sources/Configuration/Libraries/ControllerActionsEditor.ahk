@@ -341,8 +341,8 @@ restart:
 ;;; PluginActionsList                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global pluginActionsListView = false
-global labelEdit = ""
+global pluginActionsListView := false
+global labelEdit := ""
 global iconEdit
 		
 class PluginActionsList extends ConfigurationItemList {

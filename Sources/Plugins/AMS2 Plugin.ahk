@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAMS2Application = "Automobilista 2"
+global kAMS2Application := "Automobilista 2"
 
-global kAMS2Plugin = "AMS2"
+global kAMS2Plugin := "AMS2"
 
 
 ;;;-------------------------------------------------------------------------;;;

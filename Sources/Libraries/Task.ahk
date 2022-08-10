@@ -16,10 +16,10 @@
 ;;;                        Public Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLowPriority = 0
-global kNormalPriority = 1
-global kHighPriority = 2
-global kInterruptPriority = 3
+global kLowPriority := 0
+global kNormalPriority := 1
+global kHighPriority := 2
+global kInterruptPriority := 3
 
 
 ;;;-------------------------------------------------------------------------;;;

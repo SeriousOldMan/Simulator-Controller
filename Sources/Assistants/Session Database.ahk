@@ -46,11 +46,11 @@ ListLines Off					; Disable execution history
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "Ok"
-global kCancel = "Cancel"
-global kClose = "Close"
+global kOk := "Ok"
+global kCancel := "Cancel"
+global kClose := "Close"
 
-global kSetupNames = {DQ: "Qualification (Dry)", DR: "Race (Dry)", WQ: "Qualification (Wet)", WR: "Race (Wet)"}
+global kSetupNames := {DQ: "Qualification (Dry)", DR: "Race (Dry)", WQ: "Qualification (Wet)", WR: "Race (Wet)"}
 
 
 ;;;-------------------------------------------------------------------------;;;

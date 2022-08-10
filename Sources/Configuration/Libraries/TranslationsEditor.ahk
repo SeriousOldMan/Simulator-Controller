@@ -32,8 +32,8 @@ global translationLanguageDropDown
 global addLanguageButton
 global deleteLanguageButton
 
-global isoCodeEdit = ""
-global languageNameEdit = ""
+global isoCodeEdit := ""
+global languageNameEdit := ""
 
 class TranslationsEditor extends ConfigurationItem {
 	iLanguagesChanged := false
@@ -272,8 +272,8 @@ class TranslationsEditor extends ConfigurationItem {
 
 global translationsListView
 
-global originalTextEdit = ""
-global translationTextEdit = ""
+global originalTextEdit := ""
+global translationTextEdit := ""
 
 global nextUntranslatedButtonHandle
 		

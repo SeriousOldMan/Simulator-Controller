@@ -18,9 +18,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kACApplication = "Assetto Corsa"
+global kACApplication := "Assetto Corsa"
 
-global kACPlugin = "AC"
+global kACPlugin := "AC"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -17,7 +17,7 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kVibrationIntensityIncrement = 5
+global kVibrationIntensityIncrement := 5
 
 global kSimHub
 
@@ -26,10 +26,10 @@ global kSimHub
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTactileFeedbackPlugin = "Tactile Feedback"
+global kTactileFeedbackPlugin := "Tactile Feedback"
 
-global kPedalVibrationMode = "Pedal Vibration"
-global kChassisVibrationMode = "Chassis Vibration"
+global kPedalVibrationMode := "Pedal Vibration"
+global kChassisVibrationMode := "Chassis Vibration"
 
 
 ;;;-------------------------------------------------------------------------;;;

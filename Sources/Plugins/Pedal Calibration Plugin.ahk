@@ -9,8 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPedalCalibrationPlugin = "Pedal Calibration"
-global kPedalCalibrationMode = "Pedal Calibration"
+global kPedalCalibrationPlugin := "Pedal Calibration"
+global kPedalCalibrationMode := "Pedal Calibration"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,9 +20,9 @@ global kPedalCalibrationMode = "Pedal Calibration"
 global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End", "Custom"]
 
 /* For SmartControl Version 1.3+ - but not working at the moment, due to an error in SmartControl...
-global kClutchXPosition = 235
-global kBrakeXPosition = 555
-global kThrottleXPosition = 875
+global kClutchXPosition := 235
+global kBrakeXPosition := 555
+global kThrottleXPosition := 875
 
 global kShapeYPosition := 315
 global kShapeYDelta := 20
@@ -31,9 +31,9 @@ global kSaveToPedalX := 940
 global kSaveToPedalY := 785
 */
 
-global kClutchXPosition = 205
-global kBrakeXPosition = 530
-global kThrottleXPosition = 845
+global kClutchXPosition := 205
+global kBrakeXPosition := 530
+global kThrottleXPosition := 845
 
 global kShapeYPosition := 245
 global kShapeYDelta := 20

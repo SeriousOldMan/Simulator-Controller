@@ -44,14 +44,14 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLoad = "Load"
-global kSave = "Save"
-global kOk = "Ok"
-global kCancel = "Cancel"
-global kConnect = "Connect"
-global kUpdate = "Update"
+global kLoad := "Load"
+global kSave := "Save"
+global kOk := "Ok"
+global kCancel := "Cancel"
+global kConnect := "Connect"
+global kUpdate := "Update"
 
-global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
+global kRaceSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;

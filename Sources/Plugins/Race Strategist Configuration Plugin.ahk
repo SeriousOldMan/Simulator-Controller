@@ -23,7 +23,7 @@ global rsSaveRaceReportDropDown
 global rsSaveTelemetryDropDown
 global rsRaceReviewDropDown
 
-global raceReportsPathEdit = ""
+global raceReportsPathEdit := ""
 
 class RaceStrategistConfigurator extends ConfigurationItem {
 	iEditor := false

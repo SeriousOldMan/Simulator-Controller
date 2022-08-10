@@ -42,10 +42,10 @@ ListLines Off					; Disable execution history
 ;;;                   Private Constant Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kClose = "Close"
-global kConnect = "Connect"
-global kEvent = "Event"
-global kToken = "Token"
+global kClose := "Close"
+global kConnect := "Connect"
+global kEvent := "Event"
+global kToken := "Token"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -135,8 +135,8 @@ updateTask(connector, tasks, task, which, operation, frequency) {
 	return tasks
 }
 
-global teamServerNameEdit = ""
-global teamServerPasswordEdit = ""
+global teamServerNameEdit := ""
+global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract

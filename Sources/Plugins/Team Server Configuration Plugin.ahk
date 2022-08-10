@@ -22,11 +22,11 @@
 ;;; TeamServerConfigurator                                                  ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global teamServerURLEdit = "https://localhost:5001"
-global teamServerNameEdit = ""
-global teamServerPasswordEdit = ""
-global teamServerTokenEdit = ""
-global teamServerTimeText = ""
+global teamServerURLEdit := "https://localhost:5001"
+global teamServerNameEdit := ""
+global teamServerPasswordEdit := ""
+global teamServerTokenEdit := ""
+global teamServerTimeText := ""
 
 global teamDropDownList
 global driverListBox
@@ -44,7 +44,7 @@ global addSessionButton
 global deleteSessionButton
 global editSessionButton
 
-global sessionStorePathEdit = ""
+global sessionStorePathEdit := ""
 
 class TeamServerConfigurator extends ConfigurationItem {
 	iEditor := false

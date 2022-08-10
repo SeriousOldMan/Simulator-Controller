@@ -18,18 +18,18 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kR3EApplication = "RaceRoom Racing Experience"
+global kR3EApplication := "RaceRoom Racing Experience"
 
-global kR3EPlugin = "R3E"
+global kR3EPlugin := "R3E"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kBinaryOptions = ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
+global kBinaryOptions := ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
 
-global kUseImageRecognition = true
+global kUseImageRecognition := true
 
 
 ;;;-------------------------------------------------------------------------;;;

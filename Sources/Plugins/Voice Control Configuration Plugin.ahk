@@ -22,38 +22,38 @@
 ;;; VoiceControlConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global voiceLanguageDropDown = 1
-global voiceSynthesizerDropDown = 1
+global voiceLanguageDropDown := 1
+global voiceSynthesizerDropDown := 1
 
 global windowsSpeakerLabel
 global windowsSpeakerDropDown
 global windowsSpeakerVolumeLabel
-global speakerVolumeSlider = 100
+global speakerVolumeSlider := 100
 global windowsSpeakerPitchLabel
-global speakerPitchSlider = 0
+global speakerPitchSlider := 0
 global windowsSpeakerSpeedLabel
-global speakerSpeedSlider = 0
+global speakerSpeedSlider := 0
 
 global azureSubscriptionKeyLabel
-global azureSubscriptionKeyEdit = ""
+global azureSubscriptionKeyEdit := ""
 global azureTokenIssuerLabel
-global azureTokenIssuerEdit = ""
+global azureTokenIssuerEdit := ""
 global azureSpeakerLabel
 global azureSpeakerDropDown
 
 global soXPathLabel1
 global soXPathLabel2
-global soXPathEdit = ""
+global soXPathEdit := ""
 global soXPathButton
 global voiceRecognizerLabel
-global voiceRecognizerDropDown = 1
+global voiceRecognizerDropDown := 1
 global listenerLabel
-global listenerDropDown = ""
+global listenerDropDown := ""
 global pushToTalkLabel
-global pushToTalkEdit = ""
+global pushToTalkEdit := ""
 global pushToTalkButton
 global activationCommandLabel
-global activationCommandEdit = ""
+global activationCommandEdit := ""
 
 class VoiceControlConfigurator extends ConfigurationItem {
 	iEditor := false

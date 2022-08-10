@@ -45,28 +45,28 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "ok"
-global kCancel = "cancel"
+global kOk := "ok"
+global kCancel := "cancel"
 
-global kMaxCharacteristics = 8
-global kCharacteristicHeight = 56
+global kMaxCharacteristics := 8
+global kCharacteristicHeight := 56
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vProgressCount = 0
-global vCharacteristicFinished = true
+global vProgressCount := 0
+global vCharacteristicFinished := true
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDebugOff = 0
-global kDebugKnowledgeBase = 1
-global kDebugRules = 2
+global kDebugOff := 0
+global kDebugKnowledgeBase := 1
+global kDebugRules := 2
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1835,7 +1835,7 @@ global increaseSettingButton
 
 global resetSetupButton
 
-global applyStrengthSlider = 100
+global applyStrengthSlider := 100
 
 class SetupEditor extends ConfigurationItem {
 	iAdvisor := false
@@ -2361,7 +2361,7 @@ global increaseABSettingButton
 global setupNameAViewer
 global setupNameBViewer
 
-global applyMixSlider = 0
+global applyMixSlider := 0
 
 class SetupComparator extends ConfigurationItem {
 	iEditor := false

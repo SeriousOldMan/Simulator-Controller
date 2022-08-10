@@ -50,7 +50,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kClose = "Close"
+global kClose := "Close"
 
 
 ;;;-------------------------------------------------------------------------;;;

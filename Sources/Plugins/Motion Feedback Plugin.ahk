@@ -17,28 +17,28 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kMotionIntensityIncrement = 5
-global kMotionIntensityMin = 0
-global kMotionIntensityMax = 50
-global kMotionIntensityRange = 100
+global kMotionIntensityIncrement := 5
+global kMotionIntensityMin := 0
+global kMotionIntensityMax := 50
+global kMotionIntensityRange := 100
 
-global kMotionSliderY = 231
-global kMotionSliderMinX = 377
-global kMotionSliderMaxX = 450
-global kMotionSliderWidth = kMotionSliderMaxX - kMotionSliderMinX
+global kMotionSliderY := 231
+global kMotionSliderMinX := 377
+global kMotionSliderMaxX := 450
+global kMotionSliderWidth := kMotionSliderMaxX - kMotionSliderMinX
 
-global kEffectIntensityIncrement = 0.1
-global kEffectIntensityMin = 0.2
-global kEffectIntensityMax = 1.8
-global kEffectIntensityRange = 2.0
+global kEffectIntensityIncrement := 0.1
+global kEffectIntensityMin := 0.2
+global kEffectIntensityMax := 1.8
+global kEffectIntensityRange := 2.0
 
-global kEffectMuteToggleX = 276
-global kEffectMuteToggleY = [330, 425, 520, 615, 710, 805, 900]
+global kEffectMuteToggleX := 276
+global kEffectMuteToggleY := [330, 425, 520, 615, 710, 805, 900]
 
-global kEffectsSliderMinX = 730
-global kEffectsSliderMaxX = 950
-global kEffectsSliderWidth = kEffectsSliderMaxX - kEffectsSliderMinX
-global kEffectsSliderY = [305, 400, 495, 590, 685, 780, 875]
+global kEffectsSliderMinX := 730
+global kEffectsSliderMaxX := 950
+global kEffectsSliderWidth := kEffectsSliderMaxX - kEffectsSliderMinX
+global kEffectsSliderY := [305, 400, 495, 590, 685, 780, 875]
 
 global kSimFeedbackConnector := false
 
@@ -47,8 +47,8 @@ global kSimFeedbackConnector := false
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kMotionFeedbackPlugin = "Motion Feedback"
-global kMotionMode = "Motion"
+global kMotionFeedbackPlugin := "Motion Feedback"
+global kMotionMode := "Motion"
 
 
 ;;;-------------------------------------------------------------------------;;;

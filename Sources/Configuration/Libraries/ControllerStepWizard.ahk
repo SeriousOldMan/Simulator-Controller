@@ -16,7 +16,7 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vCurrentRegistrationWizard = false
+global vCurrentRegistrationWizard := false
 
 
 ;;;-------------------------------------------------------------------------;;;

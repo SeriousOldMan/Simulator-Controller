@@ -45,10 +45,10 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLogoBright = kResourcesDirectory . "Logo Bright.gif"
-global kLogoDark = kResourcesDirectory . "Logo Dark.gif"
+global kLogoBright := kResourcesDirectory . "Logo Bright.gif"
+global kLogoDark := kResourcesDirectory . "Logo Dark.gif"
 
-global kAllTrigger = "__All Trigger__"
+global kAllTrigger := "__All Trigger__"
 
 
 ;;;-------------------------------------------------------------------------;;;

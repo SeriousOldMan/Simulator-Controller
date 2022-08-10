@@ -38,8 +38,8 @@ global kTyresSchemas := {"Tyres.Pressures": ["Weather", "Temperature.Air", "Temp
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTemperatureDeltas = [0, 1, -1, 2, -2]
-global kMaxTemperatureDelta = 4
+global kTemperatureDeltas := [0, 1, -1, 2, -2]
+global kMaxTemperatureDelta := 4
 
 
 ;;;-------------------------------------------------------------------------;;;

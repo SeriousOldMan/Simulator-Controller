@@ -18,7 +18,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceSpotterPlugin = "Race Spotter"
+global kRaceSpotterPlugin := "Race Spotter"
 
 
 ;;;-------------------------------------------------------------------------;;;

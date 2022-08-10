@@ -16,7 +16,7 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vCurrentLaunchWizard = false
+global vCurrentLaunchWizard := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,9 +27,9 @@ global vCurrentLaunchWizard = false
 ;;; GeneralStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global uiLanguageDropDown = ""
-global startWithWindowsCheck = 1
-global silentModeCheck = 1
+global uiLanguageDropDown := ""
+global startWithWindowsCheck := 1
+global silentModeCheck := 1
 
 class GeneralStepWizard extends ControllerPreviewStepWizard {
 	iVoiceControlConfigurator := false

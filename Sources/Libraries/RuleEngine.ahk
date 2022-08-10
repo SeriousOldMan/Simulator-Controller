@@ -16,41 +16,41 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAny = "Any:"
-global kAll = "All:"
-global kOne = "One:"
-global kNone = "None:"
-global kPredicate = "Predicate:"
+global kAny := "Any:"
+global kAll := "All:"
+global kOne := "One:"
+global kNone := "None:"
+global kPredicate := "Predicate:"
 
-global kEqual = "="
-global kNotEqual = "!="
-global kIdentical = "=="
-global kLess = "<"
-global kLessOrEqual = "<="
-global kGreater = ">"
-global kGreaterOrEqual = ">="
-global kContains = "contains"
+global kEqual := "="
+global kNotEqual := "!="
+global kIdentical := "=="
+global kLess := "<"
+global kLessOrEqual := "<="
+global kGreater := ">"
+global kGreaterOrEqual := ">="
+global kContains := "contains"
 
-global kCall = "Call:"
-global kProve = "Prove:"
-global kProveAll = "ProveAll:"
-global kSet = "Set:"
-global kClear = "Clear:"
+global kCall := "Call:"
+global kProve := "Prove:"
+global kProveAll := "ProveAll:"
+global kSet := "Set:"
+global kClear := "Clear:"
 
-global kBuiltinFunctors = ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions = ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys = [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
-global kProduction = "Production"
-global kReduction = "Reduction"
+global kProduction := "Production"
+global kReduction := "Reduction"
 
-global kNotInitialized = "__NotInitialized__"
-global kNotFound = "__NotFound__"
+global kNotInitialized := "__NotInitialized__"
+global kNotFound := "__NotFound__"
 
-global kTraceFull = 1
-global kTraceMedium = 2
-global kTraceLight = 3
-global kTraceOff = 4
+global kTraceFull := 1
+global kTraceMedium := 2
+global kTraceLight := 3
+global kTraceOff := 4
 
 
 ;;;-------------------------------------------------------------------------;;;

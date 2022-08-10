@@ -17,18 +17,18 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vResult = false
+global vResult := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kConfigurationEditor = false
+global kConfigurationEditor := false
 
-global kApply = "apply"
-global kOk = "ok"
-global kCancel = "cancel"
+global kApply := "apply"
+global kOk := "ok"
+global kCancel := "cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;

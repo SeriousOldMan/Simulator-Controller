@@ -9,14 +9,14 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
+global kEmptySpaceDescriptor := "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Variables Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vButtonBoxPreviews = {}
+global vButtonBoxPreviews := {}
 
 
 ;;;-------------------------------------------------------------------------;;;

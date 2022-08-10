@@ -13,10 +13,10 @@
 ;;; LaunchpadConfigurator                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global launchpadListView = false
-global launchpadNumberEdit = 1
-global launchpadLabelEdit = ""
-global launchpadApplicationDropDown = 0
+global launchpadListView := false
+global launchpadNumberEdit := 1
+global launchpadLabelEdit := ""
+global launchpadApplicationDropDown := 0
 global launchpadAddButton
 global launchpadDeleteButton
 global launchpadUpdateButton

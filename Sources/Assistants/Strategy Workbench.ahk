@@ -45,8 +45,8 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "Ok"
-global kCancel = "Cancel"
+global kOk := "Ok"
+global kCancel := "Cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -74,18 +74,18 @@ global chartViewer
 global stratViewer
 
 global sessionTypeDropDown
-global sessionLengthEdit = 60
+global sessionLengthEdit := 60
 global sessionLengthLabel
-global stintLengthEdit = 70
-global formationLapCheck = true
-global postRaceLapCheck = true
+global stintLengthEdit := 70
+global formationLapCheck := true
+global postRaceLapCheck := true
 
 global settingsMenuDropDown
 global simulationMenuDropDown
 global strategyMenuDropDown
 
 global pitstopRequirementsDropDown
-global pitstopWindowEdit = "25 - 35"
+global pitstopWindowEdit := "25 - 35"
 global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
 global tyreChangeRequirementsLabel
@@ -97,47 +97,47 @@ global tyreSetCountEdit
 global tyreSetAddButton
 global tyreSetDeleteButton
 
-global pitstopDeltaEdit = 60
-global pitstopTyreServiceEdit = 30
-global pitstopFuelServiceEdit = 1.2
+global pitstopDeltaEdit := 60
+global pitstopTyreServiceEdit := 30
+global pitstopFuelServiceEdit := 1.2
 global pitstopServiceDropDown
-global fuelCapacityEdit = 125
-global safetyFuelEdit = 5
+global fuelCapacityEdit := 125
+global safetyFuelEdit := 5
 
 global simDriverDropDown
 global addDriverButton
 global deleteDriverButton
 
 global simCompoundDropDown
-global simMaxTyreLapsEdit = 40
-global simInitialFuelAmountEdit = 90
-global simMapEdit = 1
-global simAvgLapTimeEdit = 120
-global simFuelConsumptionEdit = 3.8
+global simMaxTyreLapsEdit := 40
+global simInitialFuelAmountEdit := 90
+global simMapEdit := 1
+global simAvgLapTimeEdit := 120
+global simFuelConsumptionEdit := 3.8
 
-global simConsumptionVariation = 0
-global simTyreUsageVariation = 0
-global simtyreCompoundVariation = 0
-global simInitialFuelVariation = 0
+global simConsumptionVariation := 0
+global simTyreUsageVariation := 0
+global simtyreCompoundVariation := 0
+global simInitialFuelVariation := 0
 
 global simInputDropDown
 
-global simNumPitstopResult = ""
-global simNumTyreChangeResult = ""
-global simConsumedFuelResult = ""
-global simPitlaneSecondsResult = ""
-global simSessionResultResult = ""
+global simNumPitstopResult := ""
+global simNumTyreChangeResult := ""
+global simConsumedFuelResult := ""
+global simPitlaneSecondsResult := ""
+global simSessionResultResult := ""
 global simSessionResultLabel
 
-global strategyStartMapEdit = 1
-global strategyStartTCEdit = 1
-global strategyStartABSEdit = 2
+global strategyStartMapEdit := 1
+global strategyStartTCEdit := 1
+global strategyStartABSEdit := 2
 
 global strategyCompoundDropDown
-global strategyPressureFLEdit = 27.7
-global strategyPressureFREdit = 27.7
-global strategyPressureRLEdit = 27.7
-global strategyPressureRREdit = 27.7
+global strategyPressureFLEdit := 27.7
+global strategyPressureFREdit := 27.7
+global strategyPressureRLEdit := 27.7
+global strategyPressureRREdit := 27.7
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false

@@ -20,17 +20,17 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kACCApplication = "Assetto Corsa Competizione"
+global kACCApplication := "Assetto Corsa Competizione"
 
-global kACCPlugin = "ACC"
-global kChatMode = "Chat"
+global kACCPlugin := "ACC"
+global kChatMode := "Chat"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Change Brakes"]
+global kPSMutatingOptions := ["Strategy", "Change Tyres", "Tyre Compound", "Change Brakes"]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -35,20 +35,20 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vFuelWarnings = {}
+global vFuelWarnings := {}
 
-global vSuspensionDamage = kNotInitialized
-global vBodyworkDamage = kNotInitialized
+global vSuspensionDamage := kNotInitialized
+global vBodyworkDamage := kNotInitialized
 
-global vCompletedActions = {}
+global vCompletedActions := {}
 
-global vPitstopFuel = kNotInitialized
-global vPitstopTyreCompound = kNotInitialized
-global vPitstopTyreCompoundColor = kNotInitialized
-global vPitstopTyreSet = kNotInitialized
-global vPitstopTyrePressures = kNotInitialized
-global vPitstopRepairSuspension = kNotInitialized
-global vPitstopRepairBodywork = kNotInitialized
+global vPitstopFuel := kNotInitialized
+global vPitstopTyreCompound := kNotInitialized
+global vPitstopTyreCompoundColor := kNotInitialized
+global vPitstopTyreSet := kNotInitialized
+global vPitstopTyrePressures := kNotInitialized
+global vPitstopRepairSuspension := kNotInitialized
+global vPitstopRepairBodywork := kNotInitialized
 
 global vSuspensionDamage
 global vBodyworkDamage

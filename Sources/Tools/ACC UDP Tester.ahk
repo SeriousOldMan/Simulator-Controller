@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vUDPClient = false
+global vUDPClient := false
 
 
 ;;;-------------------------------------------------------------------------;;;

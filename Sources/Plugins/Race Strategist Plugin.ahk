@@ -18,7 +18,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceStrategistPlugin = "Race Strategist"
+global kRaceStrategistPlugin := "Race Strategist"
 
 
 ;;;-------------------------------------------------------------------------;;;

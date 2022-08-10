@@ -9,18 +9,18 @@
 ;;;                   Public Constant Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSave = "Save"
-global kContinue = "Continue"
-global kCancel = "Cancel"
-global kUpdate = "Update"
-global kEditModes = "Edit"
+global kSave := "Save"
+global kContinue := "Continue"
+global kCancel := "Cancel"
+global kUpdate := "Update"
+global kEditModes := "Edit"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vRestart = false
+global vRestart := false
 
 global trayTipEnabled
 global trayTipDurationInput

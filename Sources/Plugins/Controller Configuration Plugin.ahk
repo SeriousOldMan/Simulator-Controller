@@ -66,8 +66,8 @@ class ControllerConfigurator extends ConfigurationItem {
 
 global controllerListBox := "|"
 
-global controllerEdit = ""
-global controllerLayoutDropDown = 0
+global controllerEdit := ""
+global controllerLayoutDropDown := 0
 global openControllerEditorButton
 
 global controllerUpButton
@@ -281,12 +281,12 @@ class ControllerList extends ConfigurationItemList {
 
 global functionsListView
 
-global functionTypeDropDown = 0
-global functionNumberEdit = ""
-global functionOnHotkeysEdit = ""
-global functionOnActionEdit = ""
-global functionOffHotkeysEdit = ""
-global functionOffActionEdit = ""
+global functionTypeDropDown := 0
+global functionNumberEdit := ""
+global functionOnHotkeysEdit := ""
+global functionOnActionEdit := ""
+global functionOffHotkeysEdit := ""
+global functionOffActionEdit := ""
 
 global functionAddButton
 global functionDeleteButton

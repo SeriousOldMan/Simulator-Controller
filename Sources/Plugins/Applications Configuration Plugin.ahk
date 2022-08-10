@@ -14,15 +14,15 @@
 ;;; ApplicationsConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global applicationsListView = false
+global applicationsListView := false
 
-global applicationNameEdit = ""
-global applicationExePathEdit = ""
-global applicationWorkingDirectoryPathEdit = ""
-global applicationWindowTitleEdit = ""
-global applicationStartupEdit = ""
-global applicationShutdownEdit = ""
-global applicationIsRunningEdit = ""
+global applicationNameEdit := ""
+global applicationExePathEdit := ""
+global applicationWorkingDirectoryPathEdit := ""
+global applicationWindowTitleEdit := ""
+global applicationStartupEdit := ""
+global applicationShutdownEdit := ""
+global applicationIsRunningEdit := ""
 
 global applicationAddButton
 global applicationDeleteButton

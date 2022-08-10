@@ -94,7 +94,7 @@ kRules =
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 )
 
-global kExecutionTestRules = kRules
+global kExecutionTestRules := kRules
 
 
 ;;;-------------------------------------------------------------------------;;;

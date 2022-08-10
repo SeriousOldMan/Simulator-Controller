@@ -23,10 +23,10 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLocalMessage = 0
-global kWindowMessage = 1
-global kPipeMessage = 2
-global kFileMessage = 3
+global kLocalMessage := 0
+global kWindowMessage := 1
+global kPipeMessage := 2
+global kFileMessage := 3
 
 
 ;;;-------------------------------------------------------------------------;;;

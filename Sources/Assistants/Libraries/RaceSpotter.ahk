@@ -124,8 +124,8 @@ class CarInfo {
 
 	AverageLapTime[count := 3] {
 		Get {
-			lapTimes := []
-			numLapTimes := this.LapTimes.Length()
+			local lapTimes := []
+			local numLapTimes := this.LapTimes.Length()
 
 			loop % Min(count, numLapTimes)
 				lapTimes.Push(this.LapTimes[numLapTimes - A_Index + 1])
@@ -161,7 +161,8 @@ class CarInfo {
 
 	AverageDelta[sector, count := 3] {
 		Get {
-			deltas := []
+			local deltas := []
+			local numDeltas, sDeltas
 
 			if sector {
 				numDeltas := this.Deltas[sector].Length()
@@ -208,6 +209,8 @@ class CarInfo {
 	}
 
 	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
+		local deltas
+
 		this.iDriver := driver
 		this.iPosition := position
 
@@ -255,8 +258,9 @@ class CarInfo {
 	}
 
 	isFaster(sector) {
-		xValues := []
-		yValues := []
+		local xValues := []
+		local yValues := []
+		local index, delta, a, b
 
 		for index, delta in this.Deltas[sector] {
 			xValues.Push(index)
@@ -303,9 +307,8 @@ class PositionInfo {
 	OpponentType[] {
 		Get {
 			local knowledgeBase := this.Spotter.KnowledgeBase
-
-			lastLap := knowledgeBase.getValue("Lap")
-			position := knowledgeBase.getValue("Position")
+			local lastLap := knowledgeBase.getValue("Lap")
+			local position := knowledgeBase.getValue("Position")
 
 			if ((Abs(position - this.Car.Position) == 1)
 			 || (lastLap == this.LastLap)
@@ -326,6 +329,8 @@ class PositionInfo {
 
 	InitialDelta[sector] {
 		Get {
+			local delta
+
 			if this.iInitialDeltas.HasKey(sector)
 				return this.iInitialDeltas[sector]
 			else {
@@ -384,7 +389,7 @@ class PositionInfo {
 	}
 
 	closingIn(sector, threshold := 0.5) {
-		difference := this.DeltaDifference[sector]
+		local difference := this.DeltaDifference[sector]
 
 		if this.inFront()
 			return ((difference < 0) && (Abs(difference) > threshold))
@@ -393,7 +398,7 @@ class PositionInfo {
 	}
 
 	runningAway(sector, threshold := 2) {
-		difference := this.DeltaDifference[sector]
+		local difference := this.DeltaDifference[sector]
 
 		if this.inFront()
 			return ((difference > 0) && (difference > threshold))
@@ -407,6 +412,7 @@ class PositionInfo {
 
 	inFront(standings := true) {
 		local knowledgeBase := this.Spotter.KnowledgeBase
+		local frontCar
 
 		if standings
 			return (this.Car.Position < knowledgeBase.getValue("Position"))
@@ -422,6 +428,7 @@ class PositionInfo {
 
 	atBehind(standings := true) {
 		local knowledgeBase := this.Spotter.KnowledgeBase
+		local behindCar
 
 		if standings
 			return (this.Car.Position > knowledgeBase.getValue("Position"))
@@ -437,8 +444,7 @@ class PositionInfo {
 
 	forPosition() {
 		local knowledgeBase := this.Spotter.KnowledgeBase
-
-		position := knowledgeBase.getValue("Position")
+		local position := knowledgeBase.getValue("Position")
 
 		if ((position - this.Car.Position) == 1)
 			return "Ahead"
@@ -468,6 +474,9 @@ class PositionInfo {
 	}
 
 	checkpoint(sector) {
+		local position
+		local observed
+
 		if (this.Spotter.DriverCar.InPit || this.Car.InPit)
 			this.reset(sector, true, true)
 		else {
@@ -483,7 +492,7 @@ class PositionInfo {
 
 				this.iObserved := observed
 			}
-			else if (observed = "")
+			else if ((observed = "") || (observed = "L"))
 				this.calibrate(sector)
 		}
 	}
@@ -533,6 +542,8 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		getSpeaker(fast := false) {
+			local synthesizer
+
 			if fast {
 				if !this.iFastSpeechSynthesizer {
 					synthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
@@ -691,9 +702,8 @@ class RaceSpotter extends RaceAssistant {
 
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-
-		speaker := this.getSpeaker()
-		position := Round(knowledgeBase.getValue("Position", 0))
+		local speaker := this.getSpeaker()
+		local position := Round(knowledgeBase.getValue("Position", 0))
 
 		if (position == 0)
 			speaker.speakPhrase("Later")
@@ -728,9 +738,9 @@ class RaceSpotter extends RaceAssistant {
 
 	trackGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		speaker := this.getSpeaker()
-
-		delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
+		local speaker := this.getSpeaker()
+		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
+		local lap, driverLap, otherLap
 
 		if (delta != 0) {
 			speaker.startTalk()
@@ -755,6 +765,7 @@ class RaceSpotter extends RaceAssistant {
 
 	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local delta
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
@@ -779,9 +790,9 @@ class RaceSpotter extends RaceAssistant {
 
 	trackGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		speaker := this.getSpeaker()
-
-		delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
+		local speaker := this.getSpeaker()
+		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
+		local lap, driverLap, otherLap
 
 		if (delta != 0) {
 			speaker.startTalk()
@@ -806,6 +817,7 @@ class RaceSpotter extends RaceAssistant {
 
 	standingsGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local delta
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")
@@ -818,6 +830,7 @@ class RaceSpotter extends RaceAssistant {
 
 	gapToLeaderRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local delta
 
 		if !this.hasEnoughData()
 			return
@@ -832,7 +845,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	reportLapTime(phrase, driverLapTime, car) {
-		lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+		local lapTime := this.KnowledgeBase.getValue("Car." . car . ".Time", false)
+		local speaker, fragments, minute, seconds, delta
 
 		if lapTime {
 			lapTime /= 1000
@@ -855,6 +869,7 @@ class RaceSpotter extends RaceAssistant {
 
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local car, lap, position, cars, driverLapTime, speaker
 
 		if !this.hasEnoughData()
 			return
@@ -912,6 +927,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updateCarInfos(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
+		local driver, otherCars, carNr, info, lap
 
 		lastLap := knowledgeBase.getValue("Lap", 0)
 
@@ -961,6 +977,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updatePositionInfos(lastLap, sector) {
+		local positionInfos, position, info
+
 		this.updateCarInfos(lastLap, sector)
 
 		positionInfos := this.PositionInfos
@@ -997,6 +1015,7 @@ class RaceSpotter extends RaceAssistant {
 
 	reviewRaceStart(lastLap) {
 		local knowledgeBase = this.KnowledgeBase
+		local speaker, driver, currentPosition
 
 		if (this.Session == kSessionRace) {
 			speaker := this.getSpeaker(true)
@@ -1041,6 +1060,8 @@ class RaceSpotter extends RaceAssistant {
 
 	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind
 				   , ByRef trackAhead, ByRef trackBehind, ByRef leader) {
+		local nr, observed
+
 		standingsAhead := false
 		standingsBehind := false
 		trackAhead := false
@@ -1066,13 +1087,13 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	tacticalAdvice(sector, regular) {
-		speaker := this.getSpeaker(true)
-
-		standingsAhead := false
-		standingsBehind := false
-		trackAhead := false
-		trackBehind := false
-		leader := false
+		local speaker := this.getSpeaker(true)
+		local standingsAhead := false
+		local standingsBehind := false
+		local trackAhead := false
+		local trackBehind := false
+		local leader := false
+		local situation
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
 
@@ -1191,6 +1212,8 @@ class RaceSpotter extends RaceAssistant {
 
 	deltaInformation(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
+		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
+		local opponentType, delta, deltaDifference, lapTimeDifference, car, remaining
 
 		static lapUpRangeThreshold := "__Undefined__"
 		static lapDownRangeThreshold := false
@@ -1371,9 +1394,8 @@ class RaceSpotter extends RaceAssistant {
 
 	announceFinalLaps(lastLap) {
 		local knowledgeBase = this.KnowledgeBase
-
-		speaker := this.getSpeaker(true)
-		position := Round(knowledgeBase.getValue("Position", 0))
+		local speaker := this.getSpeaker(true)
+		local position := Round(knowledgeBase.getValue("Position", 0))
 
 		speaker.startTalk()
 
@@ -1398,6 +1420,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updateDriver(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
+		local tacticalAdvices, deltaInformation, regular
 
 		if (this.Speaker[false] && (this.Session = kSessionRace)) {
 			if (lastLap > 1)
@@ -1445,6 +1468,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pendingAlert(alert, match := false) {
+		local ignore, candidate
+
 		if match {
 			for ignore, candidate in this.iPendingAlerts
 				if InStr(candidate, alert)
@@ -1457,6 +1482,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pendingAlerts(alerts, match := false) {
+		local ignore, alert, candidate
+
 		for ignore, alert in alerts
 			if match {
 				for ignore, candidate in this.iPendingAlerts
@@ -1471,31 +1498,31 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	skipAlert(alert) {
-		result := false
-
 		if ((alert = "Hold") && this.pendingAlert("Clear", true))
-			result := true
+			return true
 		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlerts(["Left", "Three"])))
-			result := true
+			return true
 		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight"]) || this.pendingAlerts(["Right", "Three"])))
-			result := true
+			return true
 		else if ((alert = "Three") && this.pendingAlert("Clear", true))
-			result := true
+			return true
 		else if ((alert = "Side") && this.pendingAlert("Clear", true))
-			result := true
+			return true
 		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
-			result := true
+			return true
 		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"]) || this.pendingAlert("Clear", true)))
-			result := true
+			return true
 		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
-			result := true
+			return true
 		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
-			result := true
+			return true
 
-		return result
+		return false
 	}
 
 	proximityAlert(alert) {
+		local speaker, type
+
 		static alerting := false
 
 		if this.Speaker[false] {
@@ -1553,6 +1580,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	greenFlag(arguments*) {
+		local speaker
+
 		if this.Speaker[false] { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
@@ -1568,6 +1597,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	yellowFlag(alert, arguments*) {
+		local speaker, sectors
+
 		if (this.Announcements["YellowFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
@@ -1597,6 +1628,7 @@ class RaceSpotter extends RaceAssistant {
 
 	blueFlag() {
 		local knowledgeBase := this.KnowledgeBase
+		local position, delta
 
 		if (this.Announcements["BlueFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
@@ -1633,6 +1665,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	startupSpotter(forceShutdown := false) {
+		local code, exePath
+
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
@@ -1664,7 +1698,8 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	shutdownSpotter(force := false) {
-		spotterPID := this.iSpotterPID
+		local spotterPID := this.iSpotterPID
+		local processName, tries
 
 		if spotterPID {
 			Process Close, %spotterPID%
@@ -1699,9 +1734,9 @@ class RaceSpotter extends RaceAssistant {
 
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
+		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
+		local configuration := this.Configuration
 
-		simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
-		configuration := this.Configuration
 		settings := this.Settings
 
 		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
@@ -1713,7 +1748,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updateSession(settings) {
 		local knowledgeBase := this.KnowledgeBase
-		local facts
+		local facts, key, value
 
 		if knowledgeBase {
 			if !IsObject(settings)
@@ -1729,12 +1764,11 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	initializeAnnouncements(data) {
-		simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
-
-		configuration := this.Configuration
-
-		announcements := {}
+		local simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
+		local configuration := this.Configuration
+		local announcements := {}
+		local ignore, key, default
 
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 						  , "StartSummary", "FinalLaps", "PitWindow"]
@@ -1749,7 +1783,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	initializeGridPosition(data) {
-		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
 		if driver
 			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
@@ -1770,7 +1804,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	startSession(settings, data) {
-		local facts
+		local facts, joined, simulatorName, configuration, saveSettings
 
 		if this.Debug[kDebugPositions]
 			try {
@@ -1843,6 +1877,7 @@ class RaceSpotter extends RaceAssistant {
 
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
+		local asked
 
 		if knowledgeBase {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
@@ -1890,10 +1925,9 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	prepareData(lapNumber, data) {
-		local knowledgeBase
+		local knowledgeBase, key, value
 
 		data := base.prepareData(lapNumber, data)
-
 		knowledgeBase := this.KnowledgeBase
 
 		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
@@ -1903,13 +1937,10 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	addLap(lapNumber, data) {
-		local knowledgeBase
-
-		result := base.addLap(lapNumber, data)
-
-		knowledgeBase := this.KnowledgeBase
-
-		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+		local result := base.addLap(lapNumber, data)
+		local knowledgeBase := this.KnowledgeBase
+		local gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+		local gapBehind, validLaps, lap, lastPitstop
 
 		if (gapAhead != kUndefined) {
 			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
@@ -1956,6 +1987,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updateLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
+		local update, sector, gapAhead, gapBehind, result
 
 		static lastSector := 1
 
@@ -2002,6 +2034,7 @@ class RaceSpotter extends RaceAssistant {
 
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local result
 
 		this.PositionInfos := {}
 		this.Advices := {}

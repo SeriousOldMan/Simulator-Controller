@@ -634,45 +634,41 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		initializeAvailableTyreSets() {
-			local rCenter := RaceCenter.Instance
-			local window := rCenter.Window
-			local currentListView, compound, availableTyreSets, translatedCompounds, index, count
-
 			base.initializeAvailableTyreSets()
 
-			Gui %window%:Default
+			RaceCenter.Instance.initializeAvailableTyreSets(this)
+		}
+	}
 
-			currentListView := A_DefaultListView
+	class SessionTrafficStrategy extends TrafficStrategy {
+		iVersion := false
 
-			try {
-				Gui ListView, % rCenter.PitstopsListView
-
-				availableTyreSets := this.AvailableTyreSets
-				translatedCompounds := map(this.TyreCompounds, "translate")
-
-				loop % LV_GetCount()
-				{
-					LV_GetText(compound, A_Index, 4)
-
-					index := inList(translatedCompounds, compound)
-
-					if index {
-						compound := this.TyreCompounds[index]
-
-						if availableTyreSets.HasKey(compound) {
-							count := (availableTyreSets[compound] - 1)
-
-							if (count > 0)
-								availableTyreSets[compound] := count
-							else
-								availableTyreSets.Delete(compound)
-						}
-					}
-				}
+		Version[] {
+			Get {
+				return this.iVersion
 			}
-			finally {
-				Gui ListView, %currentListView%
-			}
+		}
+
+		setVersion(version) {
+			this.iVersion := (version . "")
+		}
+
+		loadFromConfiguration(configuration) {
+			base.loadFromConfiguration(configuration)
+
+			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
+		}
+
+		saveToConfiguration(configuration) {
+			base.saveToConfiguration(configuration)
+
+			setConfigurationValue(configuration, "General", "Version", this.iVersion)
+		}
+
+		initializeAvailableTyreSets() {
+			base.initializeAvailableTyreSets()
+
+			RaceCenter.Instance.initializeAvailableTyreSets(this)
 		}
 	}
 
@@ -3666,7 +3662,7 @@ class RaceCenter extends ConfigurationItem {
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := (this.UseTraffic ? new TrafficStrategy(this, nameOrConfiguration, driver)
+		theStrategy := (this.UseTraffic ? new this.SessionTrafficStrategy(this, nameOrConfiguration, driver)
 										: new this.SessionStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !IsObject(name))
@@ -4020,6 +4016,45 @@ class RaceCenter extends ConfigurationItem {
 			avgLapTime := (avgLapTime / count)
 
 		return avgLapTime ? avgLapTime : (default ? default : this.Strategy.AvgLapTime)
+	}
+
+	initializeAvailableTyreSets(strategy) {
+		local window := this.Window
+		local currentListView, compound, availableTyreSets, translatedCompounds, index, count
+
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.PitstopsListView
+
+			availableTyreSets := strategy.AvailableTyreSets
+			translatedCompounds := map(strategy.TyreCompounds, "translate")
+
+			loop % LV_GetCount()
+			{
+				LV_GetText(compound, A_Index, 4)
+
+				index := inList(translatedCompounds, compound)
+
+				if index {
+					compound := strategy.TyreCompounds[index]
+
+					if availableTyreSets.HasKey(compound) {
+						count := (availableTyreSets[compound] - 1)
+
+						if (count > 0)
+							availableTyreSets[compound] := count
+						else
+							availableTyreSets.Delete(compound)
+					}
+				}
+			}
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
 	}
 
 	chooseScenario(strategy) {
@@ -9262,7 +9297,7 @@ class RaceCenter extends ConfigurationItem {
 		carControl := Round(carControls[car], 2)
 	}
 
-	createTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
+	getTrafficScenario(strategy, targetLap, randomFactor, numScenarios, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta) {
 		local lastLap := this.LastLap
 		local positions, startLap, endLap, avgLapTime, driver, stintLength, formationLap, postRaceLap
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
@@ -9421,469 +9456,6 @@ class RaceCenter extends ConfigurationItem {
 
 			return false
 		}
-	}
-}
-
-class TrafficStrategy extends RaceCenter.SessionStrategy {
-	iTrafficScenario := false
-
-	TrafficScenario[] {
-		Get {
-			return this.iTrafficScenario
-		}
-	}
-
-	class TrafficPitstop extends Strategy.Pitstop {
-		getPosition() {
-			local driver := true
-			local positions := true
-			local runnings := true
-
-			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
-
-			return (driver ? positions[driver] : false)
-		}
-
-		getTrafficDensity() {
-			local driver := true
-			local positions := true
-			local runnings := true
-			local begin, end, wrap, numCars
-
-			RaceCenter.Instance.getTrafficPositions(this.Strategy.TrafficScenario, this.Lap + 1, driver, positions, runnings)
-
-			if driver {
-				begin := runnings[driver]
-				end := (begin + (this.Strategy.StrategyManager.ConsideredTraffic / 100))
-
-				wrap := false
-
-				if (end > 1) {
-					wrap := true
-
-					end -= 1
-				}
-
-				numCars := 0
-
-				loop % runnings.Length()
-					if (A_Index != driver)
-						if (wrap && ((runnings[A_Index] > begin) || (runnings[A_Index] <= end)))
-							numCars += 1
-						else if (!wrap && (runnings[A_Index] > begin) && (runnings[A_Index] < end))
-							numCars += 1
-
-				return (numCars / runnings.Length())
-			}
-			else
-				return 0.0
-		}
-	}
-
-	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		local pitstop := new this.TrafficPitstop(this, id, driver, lap, tyreCompound, tyreCompoundColor, configuration, adjustments)
-
-		if ((id == 1) && !this.TrafficScenario)
-			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)
-
-		return pitstop
-	}
-
-	calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel) {
-		local targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingLaps, remainingTyreLaps, remainingFuel)
-		local variationWindow, moreLaps, rnd
-
-		if ((pitstopNr = 1) && IsObject(this.PitstopRule))
-			return targetLap
-		else {
-			variationWindow := this.StrategyManager.VariationWindow
-			moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
-
-			Random rnd, -1.0, 1.0
-
-			return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
-		}
-	}
-}
-
-class TrafficSimulation extends StrategySimulation {
-	iRandomFactor := false
-	iNumScenarios := false
-	iVariationWindow := false
-	iUseLapTimeVariation := false
-	iUseDriverErrors := false
-	iUsePitstops := false
-	iOverTakeDelta := false
-	iConsideredTraffic := false
-
-	RandomFactor[] {
-		Get {
-			return this.iRandomFactor
-		}
-	}
-
-	NumScenarios[] {
-		Get {
-			return this.iNumScenarios
-		}
-	}
-
-	VariationWindow[] {
-		Get {
-			return this.iVariationWindow
-		}
-	}
-
-	UseLapTimeVariation[] {
-		Get {
-			return this.iUseLapTimeVariation
-		}
-	}
-
-	UseDriverErrors[] {
-		Get {
-			return this.iUseDriverErrors
-		}
-	}
-
-	UsePitstops[] {
-		Get {
-			return this.iUsePitstops
-		}
-	}
-
-	OverTakeDelta[] {
-		Get {
-			return this.iOverTakeDelta
-		}
-	}
-
-	ConsideredTraffic[] {
-		Get {
-			return this.iConsideredTraffic
-		}
-	}
-
-	setTrafficSettings(randomFactor, numScenarios, variationWindow, useLapTimeVariation, useDriverErrors, usePitstops, overTakeDelta, consideredTraffic) {
-		this.iRandomFactor := randomFactor
-		this.iNumScenarios := numScenarios
-		this.iVariationWindow := variationWindow
-		this.iUseLapTimeVariation := useLapTimeVariation
-		this.iUseDriverErrors := useDriverErrors
-		this.iUsePitstops := usePitstops
-		this.iOverTakeDelta := overTakeDelta
-		this.iConsideredTraffic := consideredTraffic
-	}
-
-	getTrafficScenario(strategy, pitstop) {
-		return this.StrategyManager.createTrafficScenario(strategy, pitstop.Lap + 1, this.RandomFactor, this.NumScenarios
-														, this.UseLapTimeVariation, this.UseDriverErrors, this.UsePitstops
-														, this.OverTakeDelta)
-	}
-
-	compareScenarios(scenario1, scenario2) {
-		local pitstops1 := scenario1.Pitstops.Length()
-		local pitstops2 := scenario2.Pitstops.Length()
-		local pitstop1, pitstop2, position1, position2, density1, density2
-
-		if ((pitstops1 > 0) && (pitstops2 > 0)) {
-			if (pitstops1 < pitstops2)
-				return scenario1
-			else if (pitstops1 > pitstops2)
-				return scenario2
-			else {
-				pitstop1 := scenario1.Pitstops[1]
-				pitstop2 := scenario2.Pitstops[1]
-				position1 := pitstop1.getPosition()
-				position2 := pitstop2.getPosition()
-
-				if (position1 < position2)
-					return scenario1
-				else if (position1 > position2)
-					return scenario2
-				else if (pitstop1.Lap < pitstop2.Lap)
-					return scenario1
-				else if (pitstop1.Lap > pitstop2.Lap)
-					return scenario2
-				else {
-					density1 := pitstop1.getTrafficDensity()
-					density2 := pitstop1.getTrafficDensity()
-
-					if (density1 < density2)
-						return scenario1
-					else if (density1 > density2)
-						return scenario2
-					else
-						return base.compareScenarios(scenario1, scenario2)
-				}
-			}
-		}
-		else
-			return base.compareScenarios(scenario1, scenario2)
-	}
-
-	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
-		local simulator := false
-		local car := false
-		local track := false
-		local weather := false
-		local airTemperature := false
-		local trackTemperature := false
-		local sessionType := false
-		local sessionLength := false
-		local maxTyreLaps := false
-		local tyreCompound := false
-		local tyreCompoundColor := false
-		local tyrePressures := false
-		local stintLength := false
-		local formationLap := false
-		local postRaceLap := false
-		local fuelCapacity := false
-		local safetyFuel := false
-		local pitstopDelta := false
-		local pitstopFuelService := false
-		local pitstopTyreService := false
-		local pitstopServiceOrder := "Simultaneous"
-		local randomFactor := false
-		local numScenarios := false
-		local variationWindow := false
-		local useLapTimeVariation := false
-		local useDriverErrors := false
-		local usePitstops := false
-		local overTakeDelta := false
-		local consideredTraffic := false
-		local initialStint := false
-		local initialLap := false
-		local initialStintTime := false
-		local initialTyreLaps := false
-		local initialFuelAmount := false
-		local map := false
-		local fuelConsumption := false
-		local avgLapTime := false
-		local useInitialConditions := false
-		local useTelemetryData := false
-		local consumption := 0
-		local tyreUsage := 0
-		local tyreCompoundVariation := 0
-		local initialFuel := 0
-		local strategy, consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
-		local scenarios, variation, first, tyreCompoundColors
-		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound
-		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption, rnd
-		local startFuel, startFuelAmount, lapTime
-		local scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
-
-		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
-							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
-
-		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
-							  , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
-
-		this.StrategyManager.getTrafficSettings(randomFactor, numScenarios, variationWindow
-											  , useLapTimeVariation, useDriverErrors, usePitstops
-											  , overTakeDelta, consideredTraffic)
-
-		if ((randomFactor == 0) && (variationWindow == 0) && !useLapTimeVariation && !useDriverErrors && !usePitstops)
-			numScenarios := 1
-
-		this.setTrafficSettings(randomFactor, numScenarios, variationWindow
-							  , useLapTimeVariation, useDriverErrors, usePitstops
-							  , overTakeDelta, consideredTraffic)
-
-		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-							  , map, fuelConsumption, avgLapTime)
-
-		if initialLap
-			formationLap := false
-
-		this.getSimulationSettings(useInitialConditions, useTelemetryData, consumption, initialFuel, tyreUsage, tyreCompoundVariation)
-
-		consumptionSteps := 1
-		tyreUsageSteps := tyreUsage
-		tyreCompoundVariationSteps := tyreCompoundVariation / 4
-		initialFuelSteps := initialFuel / 10
-
-		scenarios := {}
-		variation := 1
-
-		first := true
-		numScenarios += 1
-
-		loop {
-			if first {
-				first := false
-
-				this.iRandomFactor := 0
-			}
-			else
-				this.iRandomFactor := randomFactor
-
-			if (variation > numScenarios)
-				break
-
-			if (tyreCompoundVariation > 0) {
-				if (useInitialConditions && useTelemetryData) {
-					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
-
-					if !inList(tyreCompoundColors, tyreCompoundColor)
-						tyreCompoundColors.Push(tyreCompoundColor)
-				}
-				else if useTelemetryData
-					tyreCompoundColors := this.getTyreCompoundColors(weather, tyreCompound)
-				else
-					tyreCompoundColors := [tyreCompoundColor]
-			}
-			else
-				tyreCompoundColors := [tyreCompoundColor]
-
-			this.TyreCompoundColors := tyreCompoundColors
-
-			this.TyreCompound := tyreCompound
-			this.TyreCompoundColor := tyreCompoundColor
-			this.TyreCompoundVariation := tyreCompoundVariation
-
-			consumptionRound := 0
-			initialFuelRound := 0
-			tyreUsageRound := 0
-			tyreCompoundVariationRound := 0
-
-			loop { ; consumption
-				loop { ; initialFuel
-					loop { ; tyreUsage
-						tyreLapsVariation := tyreUsage
-
-						loop { ; tyreCompoundVariation
-							if useInitialConditions {
-								if map is number
-								{
-									message := (translate("Creating Initial Scenario with Map ") . simMapEdit  . translate(":") . variation++ . translate("..."))
-
-									showProgress({progress: progress, message: message})
-
-									stintLaps := Floor((stintLength * 60) / avgLapTime)
-
-									name := (translate("Initial Conditions - Map ") . map)
-									driverID := false
-									driverName := false
-
-									this.getStintDriver(initialStint, driverID, driverName)
-
-									this.setStintDriver(initialStint, driverID)
-
-									this.setFixedLapTime(avgLapTime)
-
-									try {
-										strategy := this.createStrategy(name, driverID)
-
-										currentConsumption := (fuelConsumption - ((fuelConsumption / 100) * consumption))
-
-										Random rnd, 0, 1
-
-										if (Round(rnd) = 1)
-											startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
-										else
-											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
-
-										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
-
-										if formationLap
-											startFuelAmount -= currentConsumption
-
-										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
-																	, tyreCompound, tyreCompoundColor, 0, avgLapTime)
-
-										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-														, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
-									}
-									finally {
-										this.setFixedLapTime(false)
-									}
-
-									scenarios[name . translate(":") . variation] := strategy
-
-									progress += 1
-								}
-							}
-
-							if useTelemetryData {
-								driverID := false
-								driverName := false
-
-								this.getStintDriver(initialStint, driverID, driverName)
-
-								this.setStintDriver(initialStint, driverID)
-
-								for ignore, mapData in this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
-									this.getStintDriver(initialStint, driverID, driverName)
-
-									this.setStintDriver(initialStint, driverID)
-
-									scenarioMap := mapData["Map"]
-									scenarioFuelConsumption := mapData["Fuel.Consumption"]
-									scenarioAvgLapTime := mapData["Lap.Time"]
-
-									if scenarioMap is number
-									{
-										message := (translate("Creating Telemetry Scenario with Map ") . scenarioMap . translate(":") . variation++ . translate("..."))
-
-										showProgress({progress: progress, message: message})
-
-										stintLaps := Floor((stintLength * 60) / scenarioAvgLapTime)
-
-										name := (translate("Telemetry - Map ") . scenarioMap)
-
-										strategy := this.createStrategy(name, driverID)
-
-										currentConsumption := (scenarioFuelConsumption - ((scenarioFuelConsumption / 100) * consumption))
-
-										Random rnd, 0, 1
-
-										if (Round(rnd) = 1)
-											startFuel := initialFuelAmount + (initialFuel / 100 * fuelCapacity)
-										else
-											startFuel := initialFuelAmount - (initialFuel / 100 * fuelCapacity)
-
-										startFuelAmount := Min(fuelCapacity, Max(startFuel, initialFuelAmount / 2))
-
-										if formationLap
-											startFuelAmount -= currentConsumption
-
-										lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
-																	, tyreCompound, tyreCompoundColor, 0, scenarioAvgLapTime)
-
-										this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
-														, stintLaps, maxTyreLaps, tyreLapsVariation, scenarioMap, currentConsumption, lapTime)
-
-										scenarios[name . translate(":") . variation] := strategy
-
-										progress += 1
-									}
-								}
-							}
-
-							if (++tyreCompoundVariationRound >= tyreCompoundVariationSteps)
-								break
-						}
-
-						if (++tyreUsageRound >= tyreUsageSteps)
-							break
-					}
-
-					if (++initialFuelRound >= initialFuelSteps)
-						break
-				}
-
-				if (++consumptionRound >= consumptionSteps)
-					break
-			}
-
-			if (scenarios.Count() == 0)
-				break
-		}
-
-		progress := Floor(progress + 10)
-
-		return scenarios
 	}
 }
 

@@ -25,7 +25,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static sAssistants := []
 
-	static sSession := kSessionFinished
+	static sSession := 0 ; kSessionFinished
 	static sLastLap := 0
 	static sLastLapUpdate := 0
 	static sWaitForShutdown := 0

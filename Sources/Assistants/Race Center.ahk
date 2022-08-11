@@ -375,12 +375,12 @@ class RaceCenter extends ConfigurationItem {
 		__New(raceCenter, simulator := false, car := false, track := false) {
 			this.iRaceCenter := raceCenter
 
-			base.__New(raceCenter)
+			base.__New()
 
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
-				this.iTelemetryDatabase := new this.TelemetryDatabase(this, simulator, car, track)
+				this.iTelemetryDatabase := new TelemetryDatabase(simulator, car, track)
 		}
 
 		setDrivers(drivers) {
@@ -523,7 +523,7 @@ class RaceCenter extends ConfigurationItem {
 			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
-				for ignore, entry in this.iTelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
+				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
 					found := false
 
 					for ignore, candidate in entries
@@ -3855,9 +3855,9 @@ class RaceCenter extends ConfigurationItem {
 		consideredTraffic := trafficConsideredEdit
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
-		local lastLap, tyresTable, lap
+		local lastLap, tyresTable, lap, ignore, stint
 
 		this.syncSessionStore()
 
@@ -3865,7 +3865,7 @@ class RaceCenter extends ConfigurationItem {
 
 		initialStint := 1
 		initialLap := 0
-		initialStintTime := 0
+		initialSessionTime := 0
 		initialTyreLaps := 0
 		initialFuelAmount := 0
 		initialMap := "n/a"
@@ -3882,8 +3882,12 @@ class RaceCenter extends ConfigurationItem {
 			initialFuelConsumption := lastLap.FuelConsumption
 			initialAvgLapTime := this.CurrentStint.AvgLapTime
 
+			loop % this.CurrentStint.Nr
+				if this.Stints.HasKey(A_Index)
+					initialSessionTime += this.computeDuration(this.Stints[A_Index])
+
 			loop % lastLap.Nr
-				initialStintTime += lastLap.Laptime
+				initialSessionTime += lastLap.Laptime
 
 			tyresTable := telemetryDB.Database.Tables["Tyres"]
 
@@ -3897,7 +3901,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
-						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariationVariation) {
+						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
 		local strategy := this.Strategy
 		local window
 
@@ -3908,13 +3912,13 @@ class RaceCenter extends ConfigurationItem {
 			consumptionVariation := strategy.ConsumptionVariation
 			initialFuelVariation := strategy.InitialFuelVariation
 			tyreUsageVariation := strategy.TyreUsageVariation
-			tyreCompoundVariationVariation := strategy.TyreCompoundVariation
+			tyreCompoundVariation := strategy.TyreCompoundVariation
 		}
 		else {
 			consumptionVariation := 0
 			initialFuelVariation := 0
 			tyreUsageVariation := 0
-			tyreCompoundVariationVariation := 0
+			tyreCompoundVariation := 0
 		}
 
 		if !this.UseTraffic {
@@ -3925,7 +3929,7 @@ class RaceCenter extends ConfigurationItem {
 			GuiControlGet randomFactorEdit
 
 			tyreUsageVariation := randomFactorEdit
-			tyreCompoundVariationVariation := randomFactorEdit
+			tyreCompoundVariation := randomFactorEdit
 		}
 
 		return (strategy != false)
@@ -5065,8 +5069,8 @@ class RaceCenter extends ConfigurationItem {
 				telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , telemetryData[7], telemetryData[8], telemetryData[9]
 									   , wear[1], wear[2], wear[3], wear[4]
+									   , telemetryData[7], telemetryData[8], telemetryData[9]
 									   , driverID)
 
 				currentListView := A_DefaultListView
@@ -5829,6 +5833,24 @@ class RaceCenter extends ConfigurationItem {
 				if driverNicknames
 					driverNicknames.Push(tDriverNicknames[index])
 			}
+	}
+
+	computeDuration(stint) {
+		local duration, lastStint, duration, ignore, lap
+
+		if stint.Duration
+			return stint.Duration
+		else {
+			duration := 0
+
+			for ignore, lap in lastStint.Laps
+				duration += lap.LapTime
+
+			if (stint != this.CurrentStint)
+				stint.Duration := duration
+
+			return duration
+		}
 	}
 
 	computeStartTime(stint) {

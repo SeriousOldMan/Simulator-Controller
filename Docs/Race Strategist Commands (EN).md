@@ -108,3 +108,5 @@ Announcements=weather warnings
 	[(CanYou) {suspend, cancel} the strategy, {Suspend, Cancel} the strategy, The strategy no longer makes sense, The strategy makes no sense anymore]
 
 	[When is the next pitstop, In which {lap is the pitstop planned, should I come to the pit}, When should I come to the pit, (TellMe) {the lap for the next pitstop, when I should I come to the pit}]
+	
+	[(CanYou) develop a new strategy, (CanYou) adjust the strategy, (CanYou) plan a new strategy, We need a new strategy]

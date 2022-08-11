@@ -52,6 +52,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.callRemote("cancelStrategy", arguments*)
 		}
 
+		recommendStrategy(arguments*) {
+			this.callRemote("callRecommendStrategy", arguments*)
+		}
+
 		restoreRaceInfo(arguments*) {
 			this.callRemote("restoreRaceInfo", arguments*)
 		}
@@ -67,6 +71,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.Plugin.recommendPitstop()
 			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyCancel"))
 				this.Plugin.cancelStrategy()
+			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyRecommend"))
+				this.Plugin.recommendStrategy()
 			else
 				base.fireAction(function, trigger)
 		}
@@ -90,7 +96,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
-		if inList(["PitstopRecommend", "StrategyCancel"], action) {
+		if inList(["PitstopRecommend", "StrategyCancel", "StrategyRecommend"], action) {
 			function := controller.findFunction(actionFunction)
 
 			if (function != false) {
@@ -286,8 +292,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 											   , pressures[1], pressures[2], pressures[4], pressures[4]
 											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-											   , telemetryData[7], telemetryData[8], telemetryData[9]
-											   , wear[1], wear[2], wear[3], wear[4], driverID)
+											   , wear[1], wear[2], wear[3], wear[4]
+											   , telemetryData[7], telemetryData[8], telemetryData[9], driverID)
 					}
 				}
 				catch exception {
@@ -318,8 +324,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 									   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
 									   , pressures[1], pressures[2], pressures[4], pressures[4]
 									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime
-									   , wear[1], wear[2], wear[3], wear[4])
+									   , wear[1], wear[2], wear[3], wear[4]
+									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
 			}
 	}
 

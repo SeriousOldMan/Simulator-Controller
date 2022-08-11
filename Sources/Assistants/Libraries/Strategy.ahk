@@ -334,16 +334,16 @@ class StrategySimulation {
 													 , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
-		return this.StrategyManager.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+		return this.StrategyManager.getStartConditions(initialStint, initialLap, initialSessionTime, initialTyreLaps, initialFuelAmount
 													 , initialMap, initialFuelConsumption, initialAvgLapTime)
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData, ByRef consumptionVariation, ByRef initialFuelVariation
-						, ByRef tyreUsageVariation, ByRef tyreCompoundVariationVariation) {
+						, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
 		return this.StrategyManager.getSimulationSettings(useInitialConditions, useTelemetryData, consumptionVariation, initialFuelVariation
-														, tyreUsageVariation, tyreCompoundVariationVariation)
+														, tyreUsageVariation, tyreCompoundVariation)
 	}
 
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
@@ -434,7 +434,7 @@ class StrategySimulation {
 		throw "Virtual method StrategySimulation.createScenarios must be implemented in a subclass..."
 	}
 
-	createScenarioStrategy(name, initialStint, initialLap, initialStintTime
+	createScenarioStrategy(name, initialStint, initialLap, initialSessionTime
 						 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 						 , stintLaps, formationLap, avgLapTime
 						 , map, fuelConsumption, consumptionVariation
@@ -467,15 +467,15 @@ class StrategySimulation {
 		lapTime := this.getAvgLapTime(stintLaps, map, startFuelAmount, currentConsumption
 									, tyreCompound, tyreCompoundColor, 0, avgLapTime)
 
-		this.createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, startFuelAmount
+		this.createStints(strategy, initialStint, initialLap, initialSessionTime, initialTyreLaps, startFuelAmount
 						, stintLaps, maxTyreLaps, tyreLapsVariation, map, currentConsumption, lapTime)
 
 		return strategy
 	}
 
-	createStints(strategy, initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+	createStints(strategy, initialStint, initialLap, initialSessionTime, initialTyreLaps, initialFuelAmount
 			   , stintLaps, maxTyreLaps, tyreLapsVariation, map, consumption, lapTime) {
-		strategy.createStints(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+		strategy.createStints(initialStint, initialLap, initialSessionTime, initialTyreLaps, initialFuelAmount
 							, stintLaps, maxTyreLaps, tyreLapsVariation, map, consumption, lapTime)
 	}
 
@@ -711,7 +711,7 @@ class VariationSimulation extends StrategySimulation {
 		local pitstopServiceOrder := "Simultaneous"
 		local initialStint := false
 		local initialLap := false
-		local initialStintTime := false
+		local initialSessionTime := false
 		local initialTyreLaps := false
 		local initialFuelAmount := false
 		local map := false
@@ -734,7 +734,7 @@ class VariationSimulation extends StrategySimulation {
 
 		this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 
-		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+		this.getStartConditions(initialStint, initialLap, initialSessionTime, initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
 
 		if initialLap
 			formationLap := false
@@ -795,7 +795,7 @@ class VariationSimulation extends StrategySimulation {
 							try {
 								scenarios[name . translate(":") . variation]
 									:= this.createScenarioStrategy(name
-																 , initialStint, initialLap, initialStintTime
+																 , initialStint, initialLap, initialSessionTime
 																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																 , stintLaps, formationLap, avgLapTime
 																 , map, fuelConsumption, consumption
@@ -832,7 +832,7 @@ class VariationSimulation extends StrategySimulation {
 
 								scenarios[name . translate(":") . variation]
 									:= this.createScenarioStrategy(name
-																 , initialStint, initialLap, initialStintTime
+																 , initialStint, initialLap, initialSessionTime
 																 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																 , stintLaps, formationLap, scenarioAvgLapTime
 																 , scenarioMap, scenarioFuelConsumption, consumption
@@ -1030,7 +1030,7 @@ class TrafficSimulation extends StrategySimulation {
 		local consideredTraffic := false
 		local initialStint := false
 		local initialLap := false
-		local initialStintTime := false
+		local initialSessionTime := false
 		local initialTyreLaps := false
 		local initialFuelAmount := false
 		local map := false
@@ -1065,7 +1065,7 @@ class TrafficSimulation extends StrategySimulation {
 							  , useLapTimeVariation, useDriverErrors, usePitstops
 							  , overTakeDelta, consideredTraffic)
 
-		this.getStartConditions(initialStint, initialLap, initialStintTime, initialTyreLaps, initialFuelAmount
+		this.getStartConditions(initialStint, initialLap, initialSessionTime, initialTyreLaps, initialFuelAmount
 							  , map, fuelConsumption, avgLapTime)
 
 		if initialLap
@@ -1142,7 +1142,7 @@ class TrafficSimulation extends StrategySimulation {
 								try {
 									scenarios[name . translate(":") . variation]
 										:= this.createScenarioStrategy(name
-																	 , initialStint, initialLap, initialStintTime
+																	 , initialStint, initialLap, initialSessionTime
 																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, avgLapTime
 																	 , map, fuelConsumption, consumption
@@ -1183,7 +1183,7 @@ class TrafficSimulation extends StrategySimulation {
 
 									scenarios[name . translate(":") . variation]
 										:= this.createScenarioStrategy(name
-																	 , initialStint, initialLap, initialStintTime
+																	 , initialStint, initialLap, initialSessionTime
 																	 , initialTyreLaps, maxTyreLaps, tyreLapsVariation
 																	 , stintLaps, formationLap, scenarioAvgLapTime
 																	 , scenarioMap, scenarioFuelConsumption, consumption

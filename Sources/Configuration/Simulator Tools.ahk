@@ -1480,52 +1480,99 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 		}
 }
 
-updateActionDefinitions(fileName := "Controller Plugin Labels") {
-	/* Obsolete since 4.0.4...
-	languages := availableLanguages()
-	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false) {
+	if preset {
+		languages := availableLanguages()
+		enDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . ".en")
 
-	for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
-		SplitPath userDefinitionsFile, , , languageCode
+		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory) {
+			SplitPath userDefinitionsFile, , , languageCode
 
-		if !languages.HasKey(languageCode)
-			bundledDefinitions := enDefinitions
-		else {
-			bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
-
-			if (bundledDefinitions.Count() == 0)
+			if (!languages.HasKey(languageCode) || (languageCode = "en"))
 				bundledDefinitions := enDefinitions
+			else {
+				bundledDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . "." . languageCode)
+
+				if (bundledDefinitions.Count() == 0)
+					bundledDefinitions := enDefinitions
+			}
+
+			userDefinitions := readConfiguration(userDefinitionsFile)
+			changed := false
+
+			for section, keyValues in bundledDefinitions
+				for key, value in keyValues
+					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setConfigurationValue(userDefinitions, section, key, value)
+
+						changed := true
+					}
+
+			for section, keyValues in userDefinitions {
+				keys := []
+
+				for key, value in keyValues
+					if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
+						keys.Push(key)
+
+						changed := true
+					}
+
+				for ignore, key in keys
+					removeConfigurationValue(userDefinitions, section, key)
+			}
+
+			if changed
+				writeConfiguration(userDefinitionsFile, userDefinitions)
 		}
-
-		userDefinitions := readConfiguration(userDefinitionsFile)
-		changed := false
-
-		for section, keyValues in bundledDefinitions
-			for key, value in keyValues
-				if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
-					setConfigurationValue(userDefinitions, section, key, value)
-
-					changed := true
-				}
-
-		for section, keyValues in userDefinitions {
-			keys := []
-
-			for key, value in keyValues
-				if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
-					keys.Push(key)
-
-					changed := true
-				}
-
-			for ignore, key in keys
-				removeConfigurationValue(userDefinitions, section, key)
-		}
-
-		if changed
-			writeConfiguration(userDefinitionsFile, userDefinitions)
 	}
-	*/
+	else {
+		/* Obsolete since 4.0.4...
+		languages := availableLanguages()
+		enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+
+		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
+			SplitPath userDefinitionsFile, , , languageCode
+
+			if (!languages.HasKey(languageCode) || (languageCode = "en"))
+				bundledDefinitions := enDefinitions
+			else {
+				bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
+
+				if (bundledDefinitions.Count() == 0)
+					bundledDefinitions := enDefinitions
+			}
+
+			userDefinitions := readConfiguration(userDefinitionsFile)
+			changed := false
+
+			for section, keyValues in bundledDefinitions
+				for key, value in keyValues
+					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setConfigurationValue(userDefinitions, section, key, value)
+
+						changed := true
+					}
+
+			for section, keyValues in userDefinitions {
+				keys := []
+
+				for key, value in keyValues
+					if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
+						keys.Push(key)
+
+						changed := true
+					}
+
+				for ignore, key in keys
+					removeConfigurationValue(userDefinitions, section, key)
+			}
+
+			if changed
+				writeConfiguration(userDefinitionsFile, userDefinitions)
+		}
+		*/
+	}
 }
 
 updateActionLabels() {
@@ -1534,6 +1581,10 @@ updateActionLabels() {
 
 updateActionIcons() {
 	updateActionDefinitions("Controller Action Icons")
+}
+
+updateStreamDeckIcons() {
+	updateActionDefinitions("Controller Action Icons", true)
 }
 
 updateCustomCalls(startNumber, endNumber) {

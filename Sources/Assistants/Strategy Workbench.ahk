@@ -2602,7 +2602,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local window := this.Window
 
@@ -2616,7 +2616,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		initialStint := 1
 		initialLap := 0
-		initialStintTime := 0
+		initialSessionTime := 0
 		initialTyreLaps := 0
 		initialFuelAmount := simInitialFuelAmountEdit
 		initialMap := simMapEdit
@@ -2625,7 +2625,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
-						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariationVariation) {
+						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
 		local window := this.Window
 
 		Gui %window%:Default
@@ -2643,7 +2643,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		consumptionVariation := simConsumptionVariation
 		initialFuelVariation := simInitialFuelVariation
 		tyreUsageVariation := simTyreUsageVariation
-		tyreCompoundVariationVariation := simtyreCompoundVariation
+		tyreCompoundVariation := simtyreCompoundVariation
 	}
 
 	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {

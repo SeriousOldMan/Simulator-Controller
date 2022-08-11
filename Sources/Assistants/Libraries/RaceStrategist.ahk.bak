@@ -1695,7 +1695,7 @@ class RaceStrategist extends RaceAssistant {
 			}
 		}
 
-		Task.startTask(new this.RaceStrategySimulationTask(this, pitstopHistory))
+		Task.startTask(new this.RaceStrategySimulationTask(this, pitstopHistory)
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

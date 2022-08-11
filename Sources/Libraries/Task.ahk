@@ -34,6 +34,7 @@ class Task {
 	static sInterrupt := -50
 	static sHigh := -200
 	static sNormal := -500
+	static sLow := -2000
 
 	static sLowTasks := []
 	static sNormalTasks := []
@@ -50,6 +51,16 @@ class Task {
 	iNextExecution := false
 
 	iCallable := false
+
+	LowTimer[] {
+		Get {
+			return (- Task.sLow)
+		}
+
+		Set {
+			return (Task.sLow := - value)
+		}
+	}
 
 	NormalTimer[] {
 		Get {
@@ -196,7 +207,7 @@ class Task {
 
 						return candidate
 					}
-			default:
+			case kNormalPriority:
 				for index, candidate in Task.sNormalTasks
 					if candidate.Runnable {
 						if remove
@@ -204,7 +215,7 @@ class Task {
 
 						return candidate
 					}
-
+			default:
 				for index, candidate in Task.sLowTasks
 					if candidate.Runnable {
 						if remove
@@ -276,7 +287,7 @@ class Task {
 	}
 
 	schedule(priority := 1) {
-		local interrupt := (priority > kNormalPriority)
+		local interrupt := (priority > kLowPriority)
 		local next, worked, interrupt, oldScheduling, visited, schedule
 
 		static scheduling := false
@@ -324,7 +335,7 @@ class Task {
 		finally {
 			schedule := ObjBindMethod(Task, "schedule", priority)
 
-			SetTimer %schedule%, % ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : Task.sNormal))
+			SetTimer %schedule%, % ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow)))
 		}
 	}
 
@@ -454,6 +465,10 @@ class Continuation extends Task {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeTasks() {
+	schedule := ObjBindMethod(Task, "schedule", kLowPriority)
+
+	SetTimer %schedule%, % Task.sLow
+
 	schedule := ObjBindMethod(Task, "schedule", kNormalPriority)
 
 	SetTimer %schedule%, % Task.sNormal

@@ -1734,12 +1734,15 @@ class RaceEngineer extends RaceAssistant {
 	performPitstop(lapNumber := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastLap, flWear, frWear, rlWear, rrWear, driver, tyreCompound, tyreCompoundColor, tyreSet, result
+		local lastPitstop, pitstop
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
 
 		if !lapNumber
 			lapNumber := knowledgeBase.getValue("Lap")
+
+		lastPitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
 		if this.RemoteHandler {
 			lastLap := (lapNumber - 1)
@@ -1775,8 +1778,10 @@ class RaceEngineer extends RaceAssistant {
 		if result {
 			this.finishPitstop(lapNumber)
 
-			if (this.RemoteHandler && (flWear != kUndefined))
-				this.RemoteHandler.updateTyreSet(knowledgeBase.getValue("Pitstop.Last", 0), driver, false
+			pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
+
+			if (this.RemoteHandler && (flWear != kUndefined) && (pitstop != lastPitstop))
+				this.RemoteHandler.updateTyreSet(pitstop, driver, false
 											   , tyreCompound, tyreCompoundColor, tyreSet
 											   , flWear, frWear, rlWear, rrWear)
 		}
@@ -1844,6 +1849,75 @@ class RaceEngineer extends RaceAssistant {
 			else
 				this.preparePitstop()
 		}
+	}
+
+	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID) {
+		local knowledgeBase := this.KnowledgeBase
+		local pitstopHistory := newConfiguration()
+		local numPitstops := 0
+		local numTyreSets := 1
+		local lastLap := 0
+		local postfix, fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
+
+		setConfigurationValue(pitstopHistory, "TyreSets", "1.Compound"
+											, knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
+		setConfigurationValue(pitstopHistory, "TyreSets", "1.CompoundColor"
+											, knowledgeBase.getValue("Session.Setup.Tyre.Compound.Color"))
+		setConfigurationValue(pitstopHistory, "TyreSets", "1.Set"
+											, knowledgeBase.getValue("Session.Setup.Tyre.Set"))
+
+		loop % knowledgeBase.getValue("Pitstop.Last")
+		{
+			numPitstops += 1
+
+			pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
+
+			setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
+			setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
+												, knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel"))
+
+			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound")
+			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color")
+			tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set")
+
+			if tyreCompound {
+				setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", pitstopLap - lastLap)
+
+				numTyreSets += 1
+				lastLap := pitstopLap
+
+				setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".Compound", tyreCompound)
+				setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".CompoundColor", tyreCompoundColor)
+				setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
+
+				setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", tyreCompound)
+				setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", tyreCompoundColor)
+				setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
+				setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+			}
+			else
+				setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
+
+			setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
+												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork"))
+			setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
+												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension"))
+			setConfigurationValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
+												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
+		}
+
+		setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", knowledgeBase.getValue("Lap") - lastLap)
+
+		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numPitstops)
+		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numTyreSets)
+
+		Random postfix, 1, 1000000
+
+		fileName := (kTempDirectory . "Pitstop_" . postfix . ".history")
+
+		writeConfiguration(filename, pitstopHistory)
+
+		sendMessage(kFileMessage, callbackCategory, callbackMessage . ":" . fileName, callbackPID)
 	}
 
 	lowFuelWarning(remainingLaps) {

@@ -1900,7 +1900,7 @@ readConfiguration(configFile) {
 parseConfiguration(text) {
 	local fileName, configuration, postfix
 
-	Random postfix, 1, 100000
+	Random postfix, 1, 1000000
 
 	fileName := (kTempDirectory . "Config " . postFix . ".ini")
 
@@ -1953,7 +1953,7 @@ writeConfiguration(configFile, configuration) {
 printConfiguration(configuration) {
 	local fileName, text, postfix
 
-	Random postfix, 1, 100000
+	Random postfix, 1, 1000000
 
 	fileName := (kTempDirectory . "Config " . postFix . ".ini")
 
@@ -2043,7 +2043,7 @@ getControllerConfiguration(configuration := false) {
 	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
-				Random postfix, 1, 100000
+				Random postfix, 1, 1000000
 
 				fileName := (kTempDirectory . "Config " . postFix . ".ini")
 

@@ -304,16 +304,18 @@ class RaceStrategist extends RaceAssistant {
 
 			loop % getConfigurationValue(configuration, "Pitstops", "Count")
 				pitstops.Push({Lap: getConfigurationValue(configuration, "Pitstops", A_Index . ".Lap")
-							 , Refuel: getConfigurationValue(configuration, "Pitstops", A_Index . ".Refuel")
+							 , Refuel: getConfigurationValue(configuration, "Pitstops", A_Index . ".Refuel", 0)
 							 , TyreChange: getConfigurationValue(configuration, "Pitstops", A_Index . ".TyreChange")
-							 , Compound: getConfigurationValue(configuration, "Pitstops", A_Index . ".Compound")
-							 , CompoundColor: getConfigurationValue(configuration, "Pitstops", A_Index . ".CompoundColor")
-							 , RepairBodywork: getConfigurationValue(configuration, "Pitstops", A_Index . ".RepairBodywork")
-							 , RepairSuspension: getConfigurationValue(configuration, "Pitstops", A_Index . ".RepairSuspension")
+							 , TyreCompound: getConfigurationValue(configuration, "Pitstops", A_Index . ".TyreCompound", false)
+							 , TyreCompoundColor: getConfigurationValue(configuration, "Pitstops", A_Index . ".TyreCompoundColor", false)
+							 , TyreSet: getConfigurationValue(configuration, "Pitstops", A_Index . ".TyreSet", false)
+							 , RepairBodywork: getConfigurationValue(configuration, "Pitstops", A_Index . ".RepairBodywork", false)
+							 , RepairSuspension: getConfigurationValue(configuration, "Pitstops", A_Index . ".RepairSuspension", false)
 							 , RepairEngine: getConfigurationValue(configuration, "Pitstops", A_Index . ".RepairEngine")})
 
 			loop % getConfigurationValue(configuration, "TyreSets", "Count")
 				tyreSets.Push({Laps: getConfigurationValue(configuration, "TyreSets", A_Index . ".Laps")
+							 , Set: getConfigurationValue(configuration, "TyreSets", A_Index . ".Set")
 							 , Compound: getConfigurationValue(configuration, "TyreSets", A_Index . ".Compound")
 							 , CompoundColor: getConfigurationValue(configuration, "TyreSets", A_Index . ".CompoundColor")})
 
@@ -1627,28 +1629,24 @@ class RaceStrategist extends RaceAssistant {
 
 	recommendStrategy(options := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, engineerPID
+		local engineerPID
 
-		if this.Speaker {
-			speaker := this.getSpeaker()
+		if knowledgeBase.getValue("Strategy.Name", false) {
+			Process Exist, Race Engineer.exe
 
-			if knowledgeBase.getValue("Strategy.Name", false) {
-				Process Exist, Race Engineer.exe
+			if ErrorLevel {
+				engineerPID := ErrorLevel
 
-				if ErrorLevel {
-					engineerPID := ErrorLevel
+				Process Exist
 
-					Process Exist
-
-					sendMessage(kFileMessage, "Race Engineer"
-							  , "requestPitstopHistory:strategySimulation;" . ErrorLevel, engineerPID)
-				}
-				else
-					speaker.speakPhrase("NoStrategyRecommendation")
+				sendMessage(kFileMessage, "Race Engineer"
+						  , "requestPitstopHistory:Race Strategist;runSimulation;" . ErrorLevel, engineerPID)
 			}
-			else
-				speaker.speakPhrase("NoStrategy")
+			else if this.Speaker
+				this.getSpeaker().speakPhrase("NoStrategyRecommendation")
 		}
+		else if this.Speaker
+			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
 	updateStrategy(strategy) {
@@ -1683,7 +1681,7 @@ class RaceStrategist extends RaceAssistant {
 		this.updateDynamicValues({StrategyReported: false})
 	}
 
-	strategySimulation(pitstopHistory) {
+	runSimulation(pitstopHistory) {
 		if !IsObject(pitstopHistory) {
 			pitstopHistory := readConfiguration(pitstopHistory)
 
@@ -1705,7 +1703,7 @@ class RaceStrategist extends RaceAssistant {
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := new this.RaceStrategy(this, nameOrConfiguration, driver))
+		theStrategy := new this.RaceStrategy(this, nameOrConfiguration, driver)
 
 		if (name && !IsObject(name))
 			theStrategy.setName(name)

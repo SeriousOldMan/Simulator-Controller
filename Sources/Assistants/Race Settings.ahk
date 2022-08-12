@@ -84,6 +84,11 @@ global repairBodyworkThresholdEdit
 global repairBodyworkGreaterLabel
 global repairBodyworkThresholdLabel
 
+global repairEngineDropDown
+global repairEngineThresholdEdit
+global repairEngineGreaterLabel
+global repairEngineThresholdLabel
+
 global changeTyreDropDown
 global changeTyreThresholdEdit
 global changeTyreGreaterLabel
@@ -304,6 +309,30 @@ updateRepairBodyworkState() {
 	}
 }
 
+updateRepairEngineState() {
+	GuiControlGet repairEngineDropDown
+
+	if ((repairEngineDropDown == 1) || (repairEngineDropDown == 2)) {
+		GuiControl Hide, repairEngineGreaterLabel
+		GuiControl Hide, repairEngineThresholdEdit
+		GuiControl Hide, repairEngineThresholdLabel
+
+		repairEngineThresholdEdit := 0
+
+		GuiControl, , repairEngineThresholdEdit, 0
+	}
+	else if (repairEngineDropDown == 3) {
+		GuiControl Show, repairEngineGreaterLabel
+		GuiControl Show, repairEngineThresholdEdit
+		GuiControl Hide, repairEngineThresholdLabel
+	}
+	else if (repairEngineDropDown == 4) {
+		GuiControl Show, repairEngineGreaterLabel
+		GuiControl Show, repairEngineThresholdEdit
+		GuiControl Show, repairEngineThresholdLabel
+	}
+}
+
 updateChangeTyreState() {
 	GuiControlGet changeTyreDropDown
 
@@ -459,7 +488,7 @@ editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, title, file
 	local x, y
-	
+
 	static result
 	static newSettings
 
@@ -662,7 +691,8 @@ restart:
 						   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
 						   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
 						   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
-		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
+		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit
+							, repairBodyworkThresholdEdit, repairEngineThresholdEdit)
 		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
@@ -681,6 +711,10 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", Round(repairBodyworkThresholdEdit, 1))
+
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair"
+							, ["Never", "Always", "Threshold", "Impact"][repairEngineDropDown])
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", Round(repairEngineThresholdEdit, 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change"
 							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
@@ -784,6 +818,9 @@ restart:
 		repairBodyworkDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact")
 		repairBodyworkThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1)
 
+		repairEngineDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact")
+		repairEngineThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1)
+
 		changeTyreDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never")
 		changeTyreThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0)
 
@@ -847,21 +884,21 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		if !vTestMode {
-			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptRaceSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y450 w80 h23 gcancelRaceSettings, % translate("&Cancel")
+			Gui RES:Add, Button, x228 y475 w80 h23 Default gacceptRaceSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y475 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
-			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelRaceSettings, % translate("Close")
+			Gui RES:Add, Button, x316 y475 w80 h23 Default gcancelRaceSettings, % translate("Close")
 
-		Gui RES:Add, Button, x8 y450 w77 h23 gloadRaceSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y450 w77 h23 gsaveRaceSettings, % translate("&Save...")
+		Gui RES:Add, Button, x8 y475 w77 h23 gloadRaceSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y475 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
 			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
 		else
 			tabs := map(["Race", "Pitstop", "Strategy"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h420 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 2
 
@@ -895,6 +932,21 @@ restart:
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairBodyworkState()
+
+		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Engine")
+
+		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
+
+		repairEngineDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairEngineDropDown)
+
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairEngineDropDown% VrepairEngineDropDown gupdateRepairEngineState, % values2String("|", choices*)
+		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairEngineGreaterLabel, % translate(">")
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairEngineThresholdEdit gvalidateRepairEngineThreshold, %repairEngineThresholdEdit%
+		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairEngineThresholdLabel, % translate("Sec. p. Lap")
+
+		updateRepairEngineState()
+
+
 
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 
@@ -1286,6 +1338,10 @@ validateRepairSuspensionThreshold() {
 
 validateRepairBodyworkThreshold() {
 	validateNumber("repairBodyworkThresholdEdit")
+}
+
+validateRepairEngineThreshold() {
+	validateNumber("repairEngineThresholdEdit")
 }
 
 validateTPDryFrontLeft() {

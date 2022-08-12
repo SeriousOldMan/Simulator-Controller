@@ -546,7 +546,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		if this.RaceEngineer
 			switch option {
-				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork":
+				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues

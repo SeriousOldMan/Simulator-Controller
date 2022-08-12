@@ -3153,11 +3153,6 @@ runSetupAdvisor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Simulator":
@@ -3209,9 +3204,6 @@ runSetupAdvisor() {
 		Task.startTask(ObjBindMethod(advisor, "restoreState"), 100)
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

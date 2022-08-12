@@ -56,11 +56,6 @@ downloadSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	if !A_IsAdmin {
 		options := ""
 
@@ -224,9 +219,6 @@ downloadSimulatorController() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 	}
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

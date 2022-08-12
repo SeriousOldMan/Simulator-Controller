@@ -765,11 +765,6 @@ runACCPitstopTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, ACC Pitstop Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	while true {
 		pitstopTester := new ACCPitstopTester()
@@ -803,9 +798,6 @@ runACCPitstopTester() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

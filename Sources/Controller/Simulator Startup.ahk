@@ -388,7 +388,7 @@ launchPad(command := false, arguments*) {
 		Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-		 	exit()
+		 	ExitApp 0
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
@@ -612,6 +612,19 @@ watchStartupSemaphore() {
 		exitStartup()
 }
 
+clearStartupSemaphore() {
+	local fileName := (kTempDirectory . "Startup.semaphore")
+
+	try {
+		FileDelete %fileName%
+	}
+	catch exception {
+		; ignore
+	}
+	
+	return false
+}
+
 startupSimulator() {
 	local fileName
 
@@ -631,6 +644,8 @@ startupSimulator() {
 
 	if !FileExist(fileName)
 		FileAppend Startup, %fileName%
+		
+	OnExit("clearStartupSemaphore")
 
 	Task.startTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
 }
@@ -642,11 +657,6 @@ startSimulator() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Startup
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	noLaunch := inList(A_Args, "-NoLaunchPad")
 
 	if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
@@ -655,12 +665,9 @@ startSimulator() {
 		launchPad()
 
 	if (!vStartupManager || vStartupManager.Finished)
-		exit()
+		ExitApp 0
 
 	return
-
-Exit:
-	exit()
 }
 
 playSong(songFile) {
@@ -672,19 +679,6 @@ playSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-exit() {
-	local fileName := (kTempDirectory . "Startup.semaphore")
-
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
-
-	ExitApp 0
-}
 
 exitStartup(sayGoodBye := false) {
 	local fileName
@@ -710,7 +704,7 @@ exitStartup(sayGoodBye := false) {
 		}
 
 		if !vStartupStayOpen
-			exit()
+			ExitApp 0
 	}
 }
 

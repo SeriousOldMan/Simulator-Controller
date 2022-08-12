@@ -990,11 +990,6 @@ initializeVoiceServer() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	debug := false
 
 	index := 1
@@ -1017,9 +1012,6 @@ initializeVoiceServer() {
 	registerMessageHandler("Voice", "handleVoiceMessage")
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

@@ -10610,11 +10610,6 @@ startupRaceCenter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	current := fixIE(11)
 
 	OnExit(Func("exitFixIE").Bind(current))
@@ -10629,9 +10624,6 @@ startupRaceCenter() {
 
 	rCenter.show()
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

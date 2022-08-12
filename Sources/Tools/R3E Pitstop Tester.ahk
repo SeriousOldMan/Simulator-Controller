@@ -460,11 +460,6 @@ runR3EPitstopTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, R3E Pitstop Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	while true {
 		pitstopTester := new R3EPitstopTester()
@@ -491,9 +486,6 @@ runR3EPitstopTester() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

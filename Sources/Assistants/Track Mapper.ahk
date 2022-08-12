@@ -289,11 +289,6 @@ startTrackMapper() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Track Mapper
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	index := 1
 
 	while (index < A_Args.Length()) {
@@ -329,9 +324,6 @@ startTrackMapper() {
 	if recreate
 		recreateTrackMaps()
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

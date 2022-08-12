@@ -2798,17 +2798,11 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 }
 
 startSimulatorTools() {
-	updateOnly := false
-
-	icon := kIconsDirectory . "Tools.ico"
+	local updateOnly := false
+	local icon := kIconsDirectory . "Tools.ico"
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
 
@@ -2875,9 +2869,6 @@ startSimulatorTools() {
 			hideSplashTheme()
 	}
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

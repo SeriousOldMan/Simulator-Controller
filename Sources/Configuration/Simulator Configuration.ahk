@@ -528,11 +528,6 @@ initializeSimulatorConfiguration() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Configuration
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	kConfigurationEditor := true
 
 	protectionOn()
@@ -561,9 +556,6 @@ initializeSimulatorConfiguration() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 startupSimulatorConfiguration() {

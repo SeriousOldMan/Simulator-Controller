@@ -2017,11 +2017,6 @@ initializeSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	SetKeyDelay 5, 25
 
 	settings := readConfiguration(kSimulatorSettingsFile)
@@ -2062,9 +2057,6 @@ initializeSimulatorController() {
 	registerMessageHandler("Voice", "methodMessageHandler", SimulatorController.Instance)
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 startupSimulatorController() {

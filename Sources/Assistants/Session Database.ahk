@@ -4705,11 +4705,6 @@ showSessionDatabaseEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Session Database
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Simulator":
@@ -4764,9 +4759,6 @@ showSessionDatabaseEditor() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

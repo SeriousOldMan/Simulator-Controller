@@ -1606,11 +1606,6 @@ showRaceSettingsEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	vSimulator := false
 	vCar := false
 	vTrack := false
@@ -1700,9 +1695,6 @@ showRaceSettingsEditor() {
 		}
 	}
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

@@ -777,16 +777,8 @@ startupServerAdministration() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Server Administration
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	administrationEditor(kSimulatorConfiguration)
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

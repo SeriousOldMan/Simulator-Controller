@@ -241,11 +241,6 @@ updateSessionDatabase() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Database Synchronizer
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)
@@ -259,9 +254,6 @@ updateSessionDatabase() {
 		downloadSessionDatabase(id, usePressures, useSetups)
 	}
 	
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

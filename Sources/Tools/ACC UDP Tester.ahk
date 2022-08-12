@@ -217,11 +217,6 @@ runACCUDPTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, ACC UDP Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	startUDPClient()
 
@@ -232,9 +227,6 @@ runACCUDPTester() {
 			break
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

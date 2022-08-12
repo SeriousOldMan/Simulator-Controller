@@ -43,24 +43,16 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 showSettingsEditor() {
-	icon := kIconsDirectory . "Settings.ico"
-	
+	local icon := kIconsDirectory . "Settings.ico"
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Settings
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-	
 	settings := readConfiguration(kSimulatorSettingsFile)
-	
+
 	if (editSettings(settings) == kSave)
 		writeConfiguration(kSimulatorSettingsFile, settings)
-	
-	ExitApp 0
 
-Exit:
 	ExitApp 0
 }
 

@@ -203,10 +203,7 @@ cleanupACCDatabase() {
 		Menu Tray, Icon, %icon%, , 1
 		Menu Tray, Tip, ACC Database Adjustment
 
-		Menu Tray, NoStandard
-		Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
+		installTrayMenu()
 		
 		cleanupTyrePressures()
 		cleanupTelemetryData()
@@ -216,9 +213,6 @@ cleanupACCDatabase() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

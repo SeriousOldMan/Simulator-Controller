@@ -108,11 +108,6 @@ startRaceSpotter() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	Process Exist, Voice Server.exe
 
 	voiceServer := ErrorLevel
@@ -193,9 +188,6 @@ startRaceSpotter() {
 		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

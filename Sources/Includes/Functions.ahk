@@ -118,7 +118,7 @@ consentDialog(id, consent := false) {
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
 	Gui CNS:+AlwaysOnTop
-	
+
 	if getWindowPosition("Consent", x, y)
 		Gui CNS:Show, x%x% y%y%
 	else
@@ -519,11 +519,9 @@ loadSimulatorConfiguration() {
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 
 	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
-		vTargetLanguageCode := getSystemLanguage()
+		setLanguage(getSystemLanguage())
 	else
-		vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
-
-	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+		setLanguage(getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
 	version := readConfiguration(kHomeDirectory . "VERSION")
 	section := getConfigurationValue(version, "Current", "Type", false)
@@ -816,10 +814,25 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 
 	return previousValue
+
+Exit:
+	ExitApp 0
 }
 
-installSupportMenu() {
-	local levels, level, ignore, label, handler
+installTrayMenu(update := false) {
+	local levels, level, ignore, oldLabel, label, handler
+
+	local label := translate("Exit")
+
+	if (update && vHasSupportMenu) {
+		oldLabel := translate("Exit", vHasSupportMenu)
+
+		Menu Tray, Rename, %oldLabel%, %label%
+	}
+	else {
+		Menu Tray, NoStandard
+		Menu Tray, Add, %label%, Exit
+	}
 
 	try {
 		Menu LogMenu, DeleteAll
@@ -863,10 +876,18 @@ installSupportMenu() {
 
 	label := translate("Support")
 
-	Menu Tray, Insert, 1&
-	Menu Tray, Insert, 1&, %label%, :SupportMenu
+	if (update && vHasSupportMenu) {
+		oldLabel := translate("Support", vHasSupportMenu)
 
-	vHasSupportMenu := true
+		Menu Tray, Delete, %oldLabel%
+		Menu Tray, Insert, 1&, %label%, :SupportMenu
+	}
+	else {
+		Menu Tray, Insert, 1&
+		Menu Tray, Insert, 1&, %label%, :SupportMenu
+	}
+
+	vHasSupportMenu := getLanguage()
 }
 
 viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400) {
@@ -914,7 +935,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 		x := kUndefined
 		y := kUndefined
 	}
-	
+
 	if (x = kUndefined)
 		switch x {
 			case "Left":
@@ -1460,13 +1481,24 @@ writeTranslations(languageCode, languageName, translations) {
 	}
 }
 
-translate(string) {
-	local translation
+translate(string, targetLanguageCode := false) {
+	local theTranslations, translation
 
 	static currentLanguageCode := "en"
 	static translations := false
 
-	if (vTargetLanguageCode != "en") {
+	if (targetLanguageCode && (targetLanguageCode != currentLanguageCode)) {
+		theTranslations := readTranslations(targetLanguageCode)
+
+		if theTranslations.HasKey(string) {
+			translation := theTranslations[string]
+
+			return ((translation != "") ? translation : string)
+		}
+		else
+			return string
+	}
+	else if (vTargetLanguageCode != "en") {
 		if (vTargetLanguageCode != currentLanguageCode) {
 			currentLanguageCode := vTargetLanguageCode
 
@@ -1487,6 +1519,9 @@ translate(string) {
 
 setLanguage(languageCode) {
 	vTargetLanguageCode := languageCode
+
+	if vHasSupportMenu
+		installTrayMenu(true)
 }
 
 getLanguageFromLCID(lcid) {
@@ -2135,7 +2170,7 @@ setDebug(debug) {
 setLogLevel(level) {
 	local ignore, label, title, state
 
-	if vHasSupportMenu
+	if (vHasSupportMenu = getLanguage())
 		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
 			label := translate(label)
 
@@ -2168,7 +2203,7 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	if vHasSupportMenu
+	if (vHasSupportMenu = getLanguage())
 		Menu LogMenu, Check, %state%
 
 	title := translate("Modular Simulator Controller System")
@@ -2203,3 +2238,4 @@ if !vDetachedInstallation {
 }
 
 initializeLoggingSystem()
+installTrayMenu()

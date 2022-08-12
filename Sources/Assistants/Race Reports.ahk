@@ -823,11 +823,6 @@ runRaceReports() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Reports
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
 	if !reportsDirectory {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		MsgBox 262436, %title%, % translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?")
@@ -854,9 +849,6 @@ runRaceReports() {
 		reports.loadSimulator(simulators[1])
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

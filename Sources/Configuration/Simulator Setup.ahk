@@ -65,7 +65,6 @@ global kLanguage := "language"
 
 global vProgressCount := 0
 
-global vResult := false
 global vWorking := false
 
 global vPageSwitch := false
@@ -139,6 +138,8 @@ class SetupWizard extends ConfigurationItem {
 
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
+	
+	iResult := false
 
 	iStepWizards := {}
 
@@ -169,6 +170,16 @@ class SetupWizard extends ConfigurationItem {
 	HelpWindow[] {
 		Get {
 			return this.iHelpWindow
+		}
+	}
+	
+	Result[] {
+		Get {
+			return this.iResult
+		}
+		
+		Set {
+			return (this.iResult := value)
 		}
 	}
 
@@ -2216,18 +2227,17 @@ nextPage() {
 }
 
 chooseLanguage() {
+	local wizard := SetupWizard.Instance
 	local code
 
 	GuiControlGet languageDropDown
 
-	languages := string2Values("|", getConfigurationValue(SetupWizard.Instance.Definition, "Setup", "Languages"))
-
 	for code, language in availableLanguages()
 		if (language = languageDropDown) {
-			if SetupWizard.Instance.finishSetup(false) {
+			if wizard.finishSetup(false) {
 				setLanguage(code)
 
-				vResult := kLanguage
+				wizard.Result := kLanguage
 			}
 			else
 				for code, language in availableLanguages()
@@ -2440,7 +2450,7 @@ restartSetup:
 
 			Sleep 200
 
-			if (vResult == kLanguage)
+			if (wizard.Result == kLanguage)
 				done := true
 		} until done
 	}
@@ -2448,8 +2458,8 @@ restartSetup:
 		wizard.hide()
 	}
 
-	if (vResult == kLanguage) {
-		vResult := false
+	if (wizard.Result == kLanguage) {
+		wizard.Result := false
 
 		wizard.close()
 		wizard.reset()

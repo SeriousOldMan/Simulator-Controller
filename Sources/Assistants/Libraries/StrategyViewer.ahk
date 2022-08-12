@@ -17,14 +17,13 @@
 ;;;                        Private Variables Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vChartID := 1
-
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class StrategyViewer {
+	static sChartID := 1
+
 	iWindow := false
 	iStrategyViewer := false
 
@@ -217,13 +216,11 @@ class StrategyViewer {
 	}
 
 	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
-		vChartID += 1
-
-		chartID := vChartID
+		chartID := StrategyViewer.sChartID++
 
 		durationSession := (strategy.SessionType = "Duration")
 
-		drawChartFunction := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 
 		if durationSession
 			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
@@ -246,9 +243,9 @@ class StrategyViewer {
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . vChartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=""chart_" . vChartID . """ style=""width: " . width . "px; height: " . height . "px"">")
+		return ("<div id=""chart_" . chartID . """ style=""width: " . width . "px; height: " . height . "px"">")
 	}
 
 	showStrategyInfo(strategy) {

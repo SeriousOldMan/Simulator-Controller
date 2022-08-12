@@ -14,13 +14,6 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vResult := false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -207,6 +200,8 @@ global configuratorTabView
 
 class ConfigurationEditor extends ConfigurationItem {
 	iWindow := "CFGE"
+	iResult := false
+	
 	iGeneralTab := false
 
 	iConfigurators := []
@@ -229,6 +224,16 @@ class ConfigurationEditor extends ConfigurationItem {
 	Window[] {
 		Get {
 			return this.iWindow
+		}
+	}
+	
+	Result[] {
+		Get {
+			return this.iResult
+		}
+		
+		Set {
+			return (this.iResult := value)
 		}
 	}
 
@@ -367,15 +372,15 @@ class ConfigurationEditor extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 saveAndExit() {
-	vResult := kOk
+	ConfigurationEditor.Instance.Result := kOk
 }
 
 cancelAndExit() {
-	vResult := kCancel
+	ConfigurationEditor.Instance.Result := kCancel
 }
 
 saveAndStay() {
-	vResult := kApply
+	ConfigurationEditor.Instance.Result := kApply
 }
 
 moveConfigurationEditor() {

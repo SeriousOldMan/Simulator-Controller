@@ -49,7 +49,6 @@ global vProgressBar
 global vProgressTitle
 global vProgressMessage
 
-global vPendingTrayMessages := []
 global vTrayMessageDuration := false
 
 global vHasSupportMenu := false
@@ -1487,7 +1486,7 @@ translate(string, targetLanguageCode := false) {
 	static currentLanguageCode := "en"
 	static translations := false
 
-	if (targetLanguageCode && (targetLanguageCode != currentLanguageCode)) {
+	if (targetLanguageCode && (targetLanguageCode != vTargetLanguageCode)) {
 		theTranslations := readTranslations(targetLanguageCode)
 
 		if theTranslations.HasKey(string) {
@@ -2170,7 +2169,7 @@ setDebug(debug) {
 setLogLevel(level) {
 	local ignore, label, title, state
 
-	if (vHasSupportMenu = getLanguage())
+	if vHasSupportMenu
 		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
 			label := translate(label)
 
@@ -2203,7 +2202,7 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	if (vHasSupportMenu = getLanguage())
+	if vHasSupportMenu
 		Menu LogMenu, Check, %state%
 
 	title := translate("Modular Simulator Controller System")

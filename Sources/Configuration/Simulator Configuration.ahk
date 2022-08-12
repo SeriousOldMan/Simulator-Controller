@@ -571,16 +571,19 @@ startupSimulatorConfiguration() {
 	try {
 		loop {
 			Sleep 200
+			
+			result := ConfigurationEditor.Instance.Result
 
-			if (vResult == kApply) {
+			if (result == kApply) {
 				saved := true
-				vResult := false
+				
+				ConfigurationEditor.Instance.Result := false
 
 				saveConfiguration(kSimulatorConfigurationFile, editor)
 			}
-			else if (vResult == kCancel)
+			else if (result == kCancel)
 				done := true
-			else if (vResult == kOk) {
+			else if (result == kOk) {
 				saved := true
 				done := true
 

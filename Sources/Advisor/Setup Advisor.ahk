@@ -56,7 +56,6 @@ global kCharacteristicHeight := 56
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vProgressCount := 0
 global vCharacteristicFinished := true
 
 
@@ -91,6 +90,8 @@ global characteristicsButton
 class SetupAdvisor extends ConfigurationItem {
 	iDebug := kDebugOff
 
+	iProgressCount := 0
+
 	iCharacteristicsArea := false
 
 	iDefinition := false
@@ -117,6 +118,16 @@ class SetupAdvisor extends ConfigurationItem {
 	Window[] {
 		Get {
 			return "Advisor"
+		}
+	}
+
+	ProgressCount[] {
+		Get {
+			return this.iProgressCount
+		}
+
+		Set {
+			return (this.iProgressCount := value)
 		}
 	}
 
@@ -471,14 +482,14 @@ class SetupAdvisor extends ConfigurationItem {
 					x := Round((A_ScreenWidth - 300) / 2)
 					y := A_ScreenHeight - 150
 
-					vProgressCount := 0
+					this.ProgressCount := 0
 
 					showProgress({x: x, y: y, color: "Green", title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
 
 					Sleep 200
 
 					for ignore, characteristic in characteristics {
-						showProgress({progress: (vProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+						showProgress({progress: (this.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
 
 						this.addCharacteristic(characteristic, getConfigurationValue(state, "Characteristics", characteristic . ".Weight")
 															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value")
@@ -512,7 +523,7 @@ class SetupAdvisor extends ConfigurationItem {
 	show() {
 		local window := this.Window
 		local x, y
-		
+
 		if getWindowPosition("Setup Advisor", x, y)
 			Gui %window%:Show, x%x% y%y%
 		else
@@ -890,7 +901,7 @@ class SetupAdvisor extends ConfigurationItem {
 						characteristic := factPath(group, groupOption[1], option)
 
 						if !simulator {
-							showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 
@@ -902,7 +913,7 @@ class SetupAdvisor extends ConfigurationItem {
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
 																	   . ")")) {
-							showProgress({progress: ++vProgressCount})
+							showProgress({progress: ++this.ProgressCount})
 
 							this.Characteristics.Push(characteristic)
 						}
@@ -912,7 +923,7 @@ class SetupAdvisor extends ConfigurationItem {
 					characteristic := factPath(group, groupOption)
 
 					if !simulator {
-						showProgress({progress: ++vProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
 
 						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 
@@ -924,7 +935,7 @@ class SetupAdvisor extends ConfigurationItem {
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
 																   . ")")) {
-						showProgress({progress: ++vProgressCount})
+						showProgress({progress: ++this.ProgressCount})
 
 						this.Characteristics.Push(characteristic)
 					}
@@ -952,7 +963,7 @@ class SetupAdvisor extends ConfigurationItem {
 						setting := factPath(group, groupOption[1], option)
 
 						if !simulator {
-							showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -964,7 +975,7 @@ class SetupAdvisor extends ConfigurationItem {
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
 																	   . ")")) {
-							showProgress({progress: ++vProgressCount})
+							showProgress({progress: ++this.ProgressCount})
 
 							this.Settings.Push(setting)
 						}
@@ -974,7 +985,7 @@ class SetupAdvisor extends ConfigurationItem {
 					setting := factPath(group, groupOption)
 
 					if !simulator {
-						showProgress({progress: ++vProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
 
 						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -986,7 +997,7 @@ class SetupAdvisor extends ConfigurationItem {
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
 																   . ")")) {
-						showProgress({progress: ++vProgressCount})
+						showProgress({progress: ++this.ProgressCount})
 
 						this.Settings.Push(setting)
 					}
@@ -1029,7 +1040,7 @@ class SetupAdvisor extends ConfigurationItem {
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
 
-		vProgressCount := 0
+		this.ProgressCount := 0
 
 		showProgress({x: x, y: y, color: "Blue", title: translate(phase1), message: translate("Clearing Problems...")})
 
@@ -1037,7 +1048,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		this.clearCharacteristics()
 
-		showProgress({progress: vProgressCount++, message: translate("Preparing Knowledgebase...")})
+		showProgress({progress: this.ProgressCount++, message: translate("Preparing Knowledgebase...")})
 
 		Sleep 200
 
@@ -1056,7 +1067,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.loadCharacteristics(this.Definition, false, false, false, fast)
 		this.loadSettings(this.Definition, false, false, fast)
 
-		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase2), message: translate("Starting AI Kernel...")})
+		showProgress({progress: this.ProgressCount++, color: "Green", title: translate(phase2), message: translate("Starting AI Kernel...")})
 
 		knowledgeBase.addFact("Initialize", true)
 
@@ -1064,7 +1075,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Sleep 200
 
-		showProgress({progress: vProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
+		showProgress({progress: this.ProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
 
 		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"], fast)
 
@@ -1085,7 +1096,7 @@ class SetupAdvisor extends ConfigurationItem {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledge(knowledgeBase)
 
-		showProgress({progress: vProgressCount++, message: translate("Initializing Car Setup...")})
+		showProgress({progress: this.ProgressCount++, message: translate("Initializing Car Setup...")})
 
 		Sleep 200
 
@@ -1976,7 +1987,7 @@ class SetupEditor extends ConfigurationItem {
 	show() {
 		local window := this.Window
 		local x, y
-		
+
 		if getWindowPosition("Setup Advisor.Setup Editor", x, y)
 			Gui %window%:Show, x%x% y%y%
 		else
@@ -2523,12 +2534,12 @@ class SetupComparator extends ConfigurationItem {
 	show() {
 		local window := this.Window
 		local x, y
-		
+
 		if getWindowPosition("Setup Advisor.Setup Comparator", x, y)
 			Gui %window%:Show, x%x% y%y%
 		else
 			Gui %window%:Show
-			
+
 		this.loadSetups()
 	}
 

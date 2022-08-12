@@ -232,6 +232,7 @@ int main(int argc, char* argv[]) {
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
+		printf("EngineDamage=%f\n", normalizeDamage(localCopy->mEngineDamage));
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],

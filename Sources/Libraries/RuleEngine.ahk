@@ -21,6 +21,7 @@ global kAll := "All:"
 global kOne := "One:"
 global kNone := "None:"
 global kPredicate := "Predicate:"
+global kProve := "Prove:"
 
 global kEqual := "="
 global kNotEqual := "!="
@@ -71,7 +72,7 @@ class Condition {
 	getFacts(ByRef facts) {
 	}
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
 		throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 
@@ -136,11 +137,11 @@ class ExistQuantor extends Quantor {
         }
     }
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts, variables)
+			if theCondition.match(knowledgeBase, variables)
 				return true
 
 		return false
@@ -158,11 +159,11 @@ class NotExistQuantor extends Quantor {
         }
     }
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts, variables)
+			if theCondition.match(knowledgeBase, variables)
 				return false
 
 		return true
@@ -180,12 +181,12 @@ class OneQuantor extends Quantor {
         }
     }
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
 		local matched := 0
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts, variables)
+			if theCondition.match(knowledgeBase, variables)
 				matched += 1
 
 		return (matched == 1)
@@ -203,12 +204,12 @@ class AllQuantor extends Quantor {
         }
     }
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
 		local matched := 0
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(facts, variables)
+			if theCondition.match(knowledgeBase, variables)
 				matched += 1
 
 		return (matched == this.Conditions.Length())
@@ -274,7 +275,8 @@ class Predicate extends Condition {
 			facts.Push(right.Variable[true])
 	}
 
-	match(facts, variables) {
+	match(knowledgeBase, variables) {
+		local facts := knowledgeBase.Facts
 		local leftPrimary := this.LeftPrimary[facts]
 		local rightPrimary, result
 
@@ -329,6 +331,71 @@ class Predicate extends Condition {
 			return ("[" . this.LeftPrimary.toString(facts) . "]")
 		else
 			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    Goal                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Goal extends Condition {
+	iGoal := false
+
+	Type[] {
+		Get {
+			return kProve
+		}
+	}
+
+	Goal[] {
+		Get {
+			return this.iGoal
+		}
+	}
+
+	__New(goal) {
+		this.iGoal := goal
+	}
+
+	getFacts(ByRef facts) {
+		local ignore, term
+
+		for ignore, term in this.Goal.Arguments
+			if (term.base == Variable)
+				facts.Push(term.Variable[true])
+			else if (term.base == Fact)
+				facts.Push(term.Fact)
+	}
+
+	match(knowledgeBase, variables) {
+		local arguments := []
+		local resultSet, arguments, ignore, argument, goal
+
+		for ignore, argument in this.Goal.Arguments
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(new Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
+			else
+				arguments.Push(argument.substituteVariables(variables))
+
+		goal := new Compound(this.Goal.Functor, arguments)
+
+		resultSet := knowledgeBase.prove(goal)
+
+		if resultSet {
+			resultSet.dispose()
+
+			return true
+		}
+		else
+			return false
+	}
+
+	toString(facts := "__NotInitialized__") {
+		return ("{" . kProve . A_Space . this.Goal.toString() . "}")
 	}
 }
 
@@ -710,8 +777,12 @@ class ProveAction extends CallAction {
 		arguments := []
 
 		for ignore, argument in this.Arguments
-			if isInstance(argument, Variable)
-				arguments.Push(new Literal(argument.toString(variables)))
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(new Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
 			else
 				arguments.Push(argument.substituteVariables(variables))
 
@@ -1342,12 +1413,12 @@ class ProductionRule extends Rule {
 		return facts
 	}
 
-	match(facts) {
+	match(knowledgeBase) {
 		local variables := new this.Variables()
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if !theCondition.match(facts, variables)
+			if !theCondition.match(knowledgeBase, variables)
 				return false
 
 		return variables
@@ -1369,7 +1440,7 @@ class ProductionRule extends Rule {
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
 			knowledgeBase.RuleEngine.trace(kTraceLight, "Trying rule " . this.toString())
 
-		variables := this.match(knowledgeBase.Facts)
+		variables := this.match(knowledgeBase)
 
 		if variables {
 			this.fire(knowledgeBase, variables)
@@ -3486,7 +3557,10 @@ class RuleCompiler {
 			if this.skipDelimiter("{", text, nextCharIndex, false) {
 				keyword := this.readLiteral(text, nextCharIndex)
 
-				conditions.Push(Array(keyword, this.readConditions(text, nextCharIndex)*))
+				if (keyword == kProve)
+					conditions.Push(Array(keyword, this.readCompound(text, nextCharIndex)))
+				else
+					conditions.Push(Array(keyword, this.readConditions(text, nextCharIndex)*))
 
 				this.skipDelimiter("}", text, nextCharIndex)
 			}
@@ -3889,6 +3963,8 @@ class ConditionParser extends Parser {
 				return new ExistQuantor(this.parseArguments(expressions, 2))
 			case kNone:
 				return new NotExistQuantor(this.parseArguments(expressions, 2))
+			case kProve:
+				return new Goal(this.parseCompound(expressions, 2))
 			default:
 				return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
 		}
@@ -3903,6 +3979,10 @@ class ConditionParser extends Parser {
 				result.Push(this.Compiler.createConditionParser(theCondition, this.Variables).parse(theCondition))
 
 		return result
+	}
+
+	parseCompound(conditions, start) {
+		return this.Compiler.createCompoundParser(conditions[2], this.Variables).parse(conditions[2])
 	}
 }
 

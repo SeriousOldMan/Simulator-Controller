@@ -256,6 +256,7 @@ int main(int argc, char* argv[])
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
+			wprintf_s(L"EngineDamage=%f\n", normalizeDamage(map_buffer->car_damage.engine));
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
 			char tyreCompoundRaw[11] = "Unknown";

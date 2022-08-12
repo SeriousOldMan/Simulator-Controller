@@ -118,3 +118,5 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 	[(KannstDu) die Aufhängung {reparieren, reparieren bitte}, (KannstDu) die Aufhängung {bitte nicht, nicht} {reparieren, reparieren bitte}]
 
 	[(KannstDu) die Verkleidung {reparieren, reparieren bitte}, (KannstDu) die Verkleidung {bitte nicht, nicht} {reparieren, reparieren bitte}]
+	
+	[(KannstDu) den Motor {reparieren, reparieren bitte}, (KannstDu) den Motor {bitte nicht, nicht} {reparieren, reparieren bitte}]

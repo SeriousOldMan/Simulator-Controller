@@ -49,6 +49,7 @@ global vPitstopTyreSet := kNotInitialized
 global vPitstopTyrePressures := kNotInitialized
 global vPitstopRepairSuspension := kNotInitialized
 global vPitstopRepairBodywork := kNotInitialized
+global vPitstopRepairEngine := kNotInitialized
 
 global vSuspensionDamage
 global vBodyworkDamage
@@ -174,13 +175,14 @@ class TestPitstopHandler {
 		vPitstopTyrePressures := [pressureFL, pressureFR, pressureRL, pressureRR]
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		this.showAction("requestPitstopRepairs", pitstopNumber, repairSuspension, repairBodywork)
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
+		this.showAction("requestPitstopRepairs", pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		vCompletedActions["requestPitstopRepairs"] := pitstopNumber
 
 		vPitstopRepairSuspension := repairSuspension
 		vPitstopRepairBodywork := repairBodywork
+		vPitstopRepairEngine := repairEngine
 	}
 }
 
@@ -670,6 +672,7 @@ class PitstopHandling extends Assert {
 		vPitstopTyrePressures := kNotInitialized
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
+		vPitstopRepairEngine := kNotInitialized
 
 		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -706,6 +709,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(false, vPitstopRepairSuspension, "Expected no suspension repair...")
 		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
+		this.AssertEqual(false, vPitstopRepairEngine, "Expected no engine repair...")
 
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.4, 26.6, 26.1]), "Unexpected tyre pressures...")
 
@@ -724,6 +728,7 @@ class PitstopHandling extends Assert {
 		vPitstopTyrePressures := kNotInitialized
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
+		vPitstopRepairEngine := kNotInitialized
 
 		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -760,6 +765,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(true, vPitstopRepairSuspension, "Expected suspension repair...")
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
+		this.AssertEqual(false, vPitstopRepairEngine, "Expected no engine repair...")
 
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.1]), "Unexpected tyre pressures...")
 
@@ -913,7 +919,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms; Garbage: [RS: " . vActiveResultSets . ", CP: " . vActiveChoicePoints . "]"
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))

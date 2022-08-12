@@ -1365,6 +1365,7 @@ class SetupWizard extends ConfigurationItem {
 
 	simulatorActionAvailable(simulator, mode, action) {
 		local knowledgeBase := this.KnowledgeBase
+		local goal
 
 		goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 
@@ -1445,6 +1446,7 @@ class SetupWizard extends ConfigurationItem {
 
 	assistantActionAvailable(assistant, action) {
 		local knowledgeBase := this.KnowledgeBase
+		local goal
 
 		goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 
@@ -1453,8 +1455,7 @@ class SetupWizard extends ConfigurationItem {
 
 	assistantSimulators(assistant) {
 		local knowledgeBase := this.KnowledgeBase
-		local resultSet
-		local variable
+		local resultSet, variable, goal
 
 		goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, A_Space, "\ ") . ", ?simulator)")
 		variable := goal.Arguments[2]
@@ -1593,6 +1594,7 @@ class SetupWizard extends ConfigurationItem {
 
 	moduleActionAvailable(module, mode, action) {
 		local knowledgeBase := this.KnowledgeBase
+		local goal
 
 		if mode
 			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
@@ -1606,8 +1608,7 @@ class SetupWizard extends ConfigurationItem {
 
 	moduleAvailableActions(module, mode) {
 		local knowledgeBase := this.KnowledgeBase
-		local resultSet
-		local variable
+		local resultSet, variable, goal
 
 		if mode
 			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"

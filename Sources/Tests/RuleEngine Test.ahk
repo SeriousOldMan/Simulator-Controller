@@ -85,6 +85,8 @@ kRules =
 				unhappy(Peter) <= mood(!Peter), !, fail
 				mood(happy)
 
+				isHappy(?mood, Paul) <= mood(?mood)
+
 				empty() <= father(Mara, Willy)
 
 				complexClause(?x, ?y) <= ?x = [1, 2, 3], ?y = complex(A, foo([1, 2]))
@@ -92,6 +94,8 @@ kRules =
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate())
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
+
+				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Call: celebrate())
 )
 
 global kExecutionTestRules := kRules
@@ -180,15 +184,15 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, productions, reductions)
 
-		this.AssertEqual(3, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(25, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(4, productions.Length(), "Not all production rules compiled...")
+		this.AssertEqual(26, reductions.Length(), "Not all reduction rules compiled...")
 	}
 }
 
 class CoreEngine extends Assert {
 	OccurCheck_Test() {
 		local compiler := new RuleCompiler()
-		local resultSet
+		local resultSet, goal
 
 		productions := false
 		reductions := false
@@ -232,7 +236,7 @@ class CoreEngine extends Assert {
 
 	Deterministic_Test() {
 		local compiler := new RuleCompiler()
-		local resultSet
+		local resultSet, goal
 
 		productions := false
 		reductions := false
@@ -267,7 +271,7 @@ class CoreEngine extends Assert {
 class Unification extends Assert {
 	executeTests(tests, trace := false) {
 		local compiler := new RuleCompiler()
-		local resultSet
+		local resultSet, goal
 
 		productions := false
 		reductions := false
@@ -352,7 +356,7 @@ class Unification extends Assert {
 class HybridEngine extends Assert {
 	executeTests(tests, trace := false) {
 		local compiler := new RuleCompiler()
-		local resultSet
+		local resultSet, goal
 
 		productions := false
 		reductions := false
@@ -431,7 +435,7 @@ class HybridEngine extends Assert {
 
 	Fact_Unification_Test() {
 		local compiler := new RuleCompiler()
-		local resultSet
+		local resultSet, goal
 
 		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]],
 				, ["happy(Peter)", ["happy(Peter)"]]
@@ -589,6 +593,8 @@ else {
 		weatherIndex(?weather, ?index) <= index([Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm], ?weather, ?index)
 
 		weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
+
+		{Any: [?Peter.grandchild], [?Peter.son], {Prove: grandFather(?A, ?Peter.grandchild)}} => (Call: celebrate())
 	)
 
 	productions := false

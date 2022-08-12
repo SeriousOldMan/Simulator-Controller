@@ -835,6 +835,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");
+			printf("EngineDamage=0\n");
 
 			printf("FuelRemaining=%f\n", getDataFloat(header, data, "FuelLevel"));
 

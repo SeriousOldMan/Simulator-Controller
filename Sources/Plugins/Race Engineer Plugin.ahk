@@ -183,6 +183,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
 												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
+												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Engine", false)
 												, requestDriver*)
 				}
 			}
@@ -295,8 +296,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.Simulator.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork)
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
+		this.Simulator.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {

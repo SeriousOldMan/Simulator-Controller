@@ -221,7 +221,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		local teamServer := this.TeamServer
 
 		if !wear
-			wear := "null,null,null,null"
+			wear := values2String(",", kNull, kNull, kNull, kNull)
 
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"

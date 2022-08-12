@@ -291,7 +291,8 @@ class RaceStrategist extends RaceAssistant {
 			this.iRaceStrategist := strategist
 			this.iLap := knowledgeBase.getValue("Lap")
 			this.iTelemetryDatabase
-				:= new RaceStrategist.SessionTelemetryDatabase(strategist.Simulator
+				:= new RaceStrategist.SessionTelemetryDatabase(strategist
+															 , strategist.Simulator
 															 , knowledgeBase.getValue("Session.Car")
 															 , knowledgeBase.getValue("Session.Track"))
 
@@ -1023,6 +1024,8 @@ class RaceStrategist extends RaceAssistant {
 			facts["Strategy.Pitstop." . A_Index . ".Lap"] := pitstopLap
 			facts["Strategy.Pitstop." . A_Index . ".Fuel.Amount"] := pitstop.RefuelAmount
 			facts["Strategy.Pitstop." . A_Index . ".Tyre.Change"] := pitstop.TyreChange
+			facts["Strategy.Pitstop." . A_Index . ".Tyre.Compound"] := pitstop.TyreCompound
+			facts["Strategy.Pitstop." . A_Index . ".Tyre.Compound.Color"] := pitstop.TyreCompoundColor
 			facts["Strategy.Pitstop." . A_Index . ".Map"] := pitstop.Map
 		}
 
@@ -1061,23 +1064,24 @@ class RaceStrategist extends RaceAssistant {
 	createSession(settings, data) {
 		local facts := base.createSession(settings, data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
-		local strategy, applicableStrategy, simulator, car, track, sessionType, sessionLength, duration, laps, configuration
+		local theStrategy, applicableStrategy, simulator, car, track
+		local sessionType, sessionLength, duration, laps, configuration
 
 		if ((this.Session == kSessionRace) && FileExist(kUserConfigDirectory . "Race.strategy")) {
-			strategy := new Strategy(this, readConfiguration(kUserConfigDirectory . "Race.strategy"))
+			theStrategy := new Strategy(this, readConfiguration(kUserConfigDirectory . "Race.strategy"))
 
 			applicableStrategy := false
 
-			simulator := strategy.Simulator
-			car := strategy.Car
-			track := strategy.Track
+			simulator := theStrategy.Simulator
+			car := theStrategy.Car
+			track := theStrategy.Track
 
 			if ((simulator = simulatorName) && (car = facts["Session.Car"]) && (track = facts["Session.Track"]))
 				applicableStrategy := true
 
 			if applicableStrategy {
-				sessionType := strategy.SessionType
-				sessionLength := strategy.SessionLength
+				sessionType := theStrategy.SessionType
+				sessionLength := theStrategy.SessionLength
 
 				if ((sessionType = "Duration") && (facts["Session.Format"] = "Time")) {
 					duration := (facts["Session.Duration"] / 60)
@@ -1093,9 +1097,9 @@ class RaceStrategist extends RaceAssistant {
 				}
 
 				if applicableStrategy {
-					this.loadStrategy(facts, strategy)
+					this.loadStrategy(facts, theStrategy)
 
-					this.updateSessionValues({BaseStrategy: strategy, Strategy: strategy})
+					this.updateSessionValues({BaseStrategy: theStrategy, Strategy: theStrategy})
 				}
 			}
 		}
@@ -1176,7 +1180,7 @@ class RaceStrategist extends RaceAssistant {
 									  , RaceReview: (getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
-		telemetryDB := new this.SessionTelemetryDatabase()
+		telemetryDB := new this.SessionTelemetryDatabase(this)
 
 		telemetryDB.Database.clear("Electronics")
 		telemetryDB.Database.clear("Tyres")
@@ -1427,23 +1431,23 @@ class RaceStrategist extends RaceAssistant {
 				tc := knowledgeBase.getValue(prefix . ".TC")
 				abs := knowledgeBase.getValue(prefix . ".ABS")
 
-				pressures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-											  , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1))
+				pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+						    , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+						    , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+						    , Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)]
 
-				temperatures := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-												 , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1))
+				temperatures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)]
 
 				wear := false
 
 				if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
-					wear := values2String(",", Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
-											 , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR")))
+					wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
 
 				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
@@ -1621,7 +1625,7 @@ class RaceStrategist extends RaceAssistant {
 			knowledgeBase.clearFact("Strategy." . theFact)
 
 		loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
-			for index, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Map"]
+			for index, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
 				knowledgeBase.clearFact("Strategy.Pitstop." . index . theFact)
 
 		knowledgeBase.clearFact("Strategy.Pitstop.Count")
@@ -1986,7 +1990,8 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__") {
+	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__"
+			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__") {
 		Task.yield()
 
 		loop 10
@@ -1997,7 +2002,7 @@ class RaceStrategist extends RaceAssistant {
 		if ErrorLevel
 			if plannedLap {
 				if (refuel != kUndefined)
-					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange), ErrorLevel)
+					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
 				else
 					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . plannedLap, ErrorLevel)
 			}
@@ -2105,7 +2110,7 @@ class RaceStrategist extends RaceAssistant {
 
 	reportUpcomingPitstop(plannedPitstopLap) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, plannedLap, laps, nextPitstop, refuel, tyreChange
+		local speaker, plannedLap, laps, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
 		if this.Speaker[false] {
 			speaker := this.getSpeaker()
@@ -2140,8 +2145,11 @@ class RaceStrategist extends RaceAssistant {
 
 					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+					tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+					tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
 
-					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap, refuel, "!" . tyreChange))
+					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap
+													 , refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
 				}
 			}
 			finally {
@@ -2401,7 +2409,8 @@ class RaceStrategist extends RaceAssistant {
 			telemetryDB.addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 								   , pressures[1], pressures[2], pressures[3], pressures[4]
 								   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-								   , wear[1], wear[2], wear[3], wear[4]
+								   , wear ? wear[1] : kNull, wear ? wear[2] : kNull
+								   , wear ? wear[3] : kNull, wear ? wear[4] : kNull
 								   , fuelConsumption, fuelRemaining, lapTime)
 
 		if (this.RemoteHandler && this.collectTelemetryData()) {
@@ -2409,7 +2418,9 @@ class RaceStrategist extends RaceAssistant {
 
 			this.RemoteHandler.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 											   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-											   , compound, compoundColor, pressures, temperatures, wear)
+											   , compound, compoundColor
+											   , values2String(",", pressures*), values2String(",", temperatures*)
+											   , wear ? values2String(",", wear*) : false)
 		}
 	}
 

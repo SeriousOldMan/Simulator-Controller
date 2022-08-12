@@ -294,12 +294,15 @@ updateTargetPressureIncrement(?compound, ?tyreType) <=
 
 priority: 5, [?Damage.Update.Suspension] => (Clear: Lap, !Lap, Damage.Suspension)
 priority: 5, [?Damage.Update.Bodywork] => (Clear: Lap, !Lap, Damage.Bodywork)
+priority: 5, [?Damage.Update.Engine] => (Clear: Lap, !Lap, Damage.Engine)
 
 {Any: [?Lap], {None: [?Damage.Repair.Suspension.Target]}, [?Damage.Update.Suspension = ?Lap]} => (Prove: updateSuspensionRepair(!Lap))
 {Any: [?Lap], {None: [?Damage.Repair.Bodywork.Target]}, [?Damage.Update.Bodywork = ?Lap]} => (Prove: updateBodyworkRepair(!Lap))
+{Any: [?Lap], {None: [?Damage.Repair.Engine.Target]}, [?Damage.Update.Engine = ?Lap]} => (Prove: updateEngineRepair(!Lap))
 
 updateSuspensionRepair(?lap) <= lapDamage(?lap, Suspension, ?damage), Set(Damage.Suspension, ?damage)
 updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bodywork, ?damage)
+updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine, ?damage)
 
 {Any: {All: [?Session.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},
 	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],
@@ -325,8 +328,21 @@ updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bod
 	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],
 			[?Damage.Bodywork.Lap.Delta < ?Session.Settings.Damage.Bodywork.Repair.Threshold]}} => (Clear: Damage.Repair.Bodywork.Target)
 
-{All: [?Lap], [?Damage.Suspension]} => (Set: Lap, ?Lap, Damage.Suspension, ?Damage.Suspension)
+{Any: {All: [?Session.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],
+			[?Damage.Suspension >= ?Session.Settings.Damage.Suspension.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],
+			[?Damage.Suspension.Lap.Delta >= ?Session.Settings.Damage.Suspension.Repair.Threshold]}} => (Set: Damage.Repair.Suspension.Target)
+			
+{Any: [?Session.Settings.Damage.Engine.Repair = Never], [?Damage.Engine = 0],
+	  {All: [?Session.Settings.Damage.Engine.Repair = Threshold],
+			[?Damage.Engine < ?Session.Settings.Damage.Engine.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Engine.Repair = Impact],
+			[?Damage.Engine.Lap.Delta < ?Session.Settings.Damage.Engine.Repair.Threshold]}} => (Clear: Damage.Repair.Engine.Target)
+
+{All: [?Lap], [?Damage.Engine]} => (Set: Lap, ?Lap, Damage.Engine, ?Damage.Engine)
 {All: [?Lap], [?Damage.Bodywork]} => (Set: Lap, ?Lap, Damage.Bodywork, ?Damage.Bodywork)
+{All: [?Lap], [?Damage.Engine]} => (Set: Lap, ?Lap, Damage.Engine, ?Damage.Engine)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -338,9 +354,11 @@ updateBodyworkRepair(?lap) <= lapDamage(?lap, Bodywork, ?damage), Set(Damage.Bod
 
 priority: 5, {Any: [?Damage.Suspension = 0], {None: [?Damage.Suspension]}} => (Clear: Damage.Suspension.Lap.Delta)
 priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear: Damage.Bodywork.Lap.Delta)
+priority: 5, {Any: [?Damage.Engine = 0], {None: [?Damage.Engine]}} => (Clear: Damage.Engine.Lap.Delta)
 
 {All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact(?Lap, Suspension, !Damage.Supsension))
 {All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact(?Lap, Bodywork, !Damage.Bodywork))
+{All: [?Lap], [?Damage.Engine > 0]} => (Prove: lapTimeDamageImpact(?Lap, Engine, !Damage.Engine))
 
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <= recentPitstopLap(?lap), !, fail
 lapTimeDamageImpact(?lap, ?damageType, ?damage) <=
@@ -380,28 +398,30 @@ lapTimeStdDeviation(?lap, ?deviation) <= weightedLapTimes(?lap, ?lapTimes), stdD
 priority: 5, {All: {Any: [?Damage.Suspension.Lap.Delta = 0], {None: [?Damage.Suspension.Lap.Delta]},
 						 [?Damage.Suspension = 0], {None: [?Damage.Suspension]}},
 				   {Any: [?Damage.Bodywork.Lap.Delta = 0], {None: [?Damage.Bodywork.Lap.Delta]},
-						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
+						 [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}},
+				   {Any: [?Damage.Engine.Lap.Delta = 0], {None: [?Damage.Engine.Lap.Delta]},
+						 [?Damage.Engine = 0], {None: [?Damage.Engine]}}} => (Clear: Damage.Analysis.Reported), (Clear: Damage.Reported)
 				   
 priority: -5, {All: [?Lap], [?Damage.Reported],
 					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},
 					{Any: {None: [?Damage.Analysis.Reported]},
 						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},
-					{Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0]}} =>
-		(Prove: reportAnalysis(!Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta))
+					{Any: [?Damage.Suspension.Lap.Delta > 0], [?Damage.Bodywork.Lap.Delta > 0], [?Damage.Engine.Lap.Delta > 0]}} =>
+		(Prove: reportAnalysis(!Damage.Suspension.Lap.Delta, !Damage.Bodywork.Lap.Delta, !Damage.Engine.Lap.Delta))
 				   
 priority: -5, {All: [?Lap], [?Damage.Reported],
 					{None: [?Damage.Analysis.Reported > ?Damage.Reported]},
 					{Any: {None: [?Damage.Analysis.Reported]},
 						  {All: [?Damage.Analysis.Reported <= ?Damage.Reported], [?Damage.Analysis.Reported < ?Lap]}},
-					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta]}} =>
-		(Prove: reportAnalysis(0, 0))
+					{None: [?Damage.Suspension.Lap.Delta], [?Damage.Bodywork.Lap.Delta], [?Damage.Engine.Lap.Delta]}} =>
+		(Prove: reportAnalysis(0, 0, 0))
 
-reportAnalysis(?, ?) <= recentPitstopLap(!Lap), !, fail
-reportAnalysis(?sDelta, ?bDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
-reportAnalysis(?sDelta, ?bDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
-reportAnalysis(?sDelta, ?bDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
-									max(?sDelta, ?bDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),
-									?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
+reportAnalysis(?, ?, ?) <= recentPitstopLap(!Lap), !, fail
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
+											  max(?sDelta, ?bDelta, ?temp), max(?temp, ?eDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),
+											  ?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
 												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),
@@ -421,34 +441,43 @@ reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.P
 {Any: {Any: {All: [?Damage.Update.Suspension], {None: [?Damage.Suspension.Reported]}},
 			[?Damage.Update.Suspension > ?Damage.Suspension.Reported]},
 	  {Any: {All: [?Damage.Update.Bodywork], {None: [?Damage.Bodywork.Reported]}},
-			[?Damage.Update.Bodywork > ?Damage.Bodywork.Reported]}} => (Prove: reportNewDamage(!Lap))
-priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork]} =>
-		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork)
+			[?Damage.Update.Bodywork > ?Damage.Bodywork.Reported]},
+	  {Any: {All: [?Damage.Update.Engine], {None: [?Damage.Engine.Reported]}},
+			[?Damage.Update.Engine > ?Damage.Engine.Reported]}} => (Prove: reportNewDamage(!Lap))
+priority: -20, {Any: [?Damage.Update.Suspension], [?Damage.Update.Bodywork], [?Damage.Update.Engine]} =>
+		(Clear: Damage.Update.Suspension), (Clear: Damage.Update.Bodywork), (Clear: Damage.Update.Engine)
 
-reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), reportNewDamage(0, ?lSDamage, 0, ?lBDamage)
+reportNewDamage(1) <= !, lapDamage(1, Suspension, ?lSDamage), lapDamage(1, Bodywork, ?lBDamage), lapDamage(1, Engine, ?lEDamage),
+					  reportNewDamage(0, ?lSDamage, 0, ?lBDamage, 0, ?lEDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
 						 lastPitstopDamageRepair(Suspension, ?suspensionRepaired), lastPitstopDamageRepair(Bodywork, ?bodyworkRepaired),
-						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
-						 newDamageAfterRepair(?lsDamage, ?suspensionRepaired, ?newSDamage),
+						 lastPitstopDamageRepair(Engine, ?engineRepaired),
+						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage), lapDamage(?lap, Engine, ?lEDamage),
+						 newDamageAfterRepair(?lSDamage, ?suspensionRepaired, ?newSDamage),
 						 newDamageAfterRepair(?lBDamage, ?bodyworkRepaired, ?newBDamage),
-						 any?(true, [?newSDamage, ?newBDamage]), Call(damageWarning, ?newSDamage, ?newBDamage),
-						 setDamageReported(Suspension, ?newSDamage), setDamageReported(Bodywork, ?newBDamage)
+						 newDamageAfterRepair(?lEDamage, ?engineRepaired, ?newEDamage),
+						 any?(true, [?newSDamage, ?newBDamage, ?newEDamage]), Call(damageWarning, ?newSDamage, ?newBDamage, ?newEDamage),
+						 setDamageReported(Suspension, ?newSDamage), setDamageReported(Bodywork, ?newBDamage),
+						 setDamageReported(Engine, ?newEDamage)
 reportNewDamage(?lap) <= pitstopLap(?pitstopLap), ?pitstopLap = ?lap - 1,
-						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
+						 lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage), lapDamage(?lap, Engine, ?lEDamage),
 						 ?pLap = ?lap - 2, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),
-						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
-reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage),
+						 lapDamage(?pLap, Engine, ?pEDamage),
+						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage, ?pEDamage, ?lEDamage)
+reportNewDamage(?lap) <= lapDamage(?lap, Suspension, ?lSDamage), lapDamage(?lap, Bodywork, ?lBDamage), lapDamage(?lap, Engine, ?lEDamage),
 						 ?pLap = ?lap - 1, lapDamage(?pLap, Suspension, ?pSDamage), lapDamage(?pLap, Bodywork, ?pBDamage),
-						 reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage)
+						 lapDamage(?pLap, Engine, ?pEDamage), reportNewDamage(?pSDamage, ?lSDamage, ?pBDamage, ?lBDamage, ?pEDamage, ?lEDamage)
 						 
-reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=
+reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage, ?oldEDamage, ?newEDamage) <=
 						 bound?(!Damage.Reported), !Damage.Reported > !Damage.Analysis.Reported, !,
-						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater),
-						 any?(true, [?sGreater, ?bGreater]), setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
-reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage) <=
-						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater),
-						 any?(true, [?sGreater, ?bGreater]), Call(damageWarning, ?sGreater, ?bGreater),
-						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater)
+						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), >(?newEDamage, ?oldEDamage, ?eGreater),
+						 any?(true, [?sGreater, ?bGreater, ?eGreater]),
+						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater),
+						 setDamageReported(Engine, ?eGreater)
+reportNewDamage(?oldSDamage, ?newSDamage, ?oldBDamage, ?newBDamage, ?oldEDamage, ?newEDamage) <=
+						 >(?newSDamage, ?oldSDamage, ?sGreater), >(?newBDamage, ?oldBDamage, ?bGreater), >(?newEDamage, ?oldEDamage, ?eGreater),
+						 any?(true, [?sGreater, ?bGreater, ?eGreater]), Call(damageWarning, ?sGreater, ?bGreater, ?eGreater),
+						 setDamageReported(Suspension, ?sGreater), setDamageReported(Bodywork, ?bGreater), setDamageReported(Engine, ?eGreater)
 
 newDamageAfterRepair(0, ?, false)
 newDamageAfterRepair(?damage, true, true) <= ?damage > 0
@@ -602,7 +631,7 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
 		(Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
 		(Clear: Pitstop.Planned.Tyre.Pressure.Correction),
-		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
+		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
 		(Clear: Pitstop.Planned.Driver.Request)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
@@ -627,10 +656,12 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 	  {None: [?Pitstop.Planned.Tyre.Pressure.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.RR, ?Pitstop.Plan.Tyre.Pressure.RR)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Suspension],
 	  {None: [?Pitstop.Planned.Repair.Suspension]}} => (Set: Pitstop.Planned.Repair.Suspension, ?Pitstop.Plan.Repair.Suspension)
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Driver.Request],
-	  {None: [?Pitstop.Planned.Driver.Request]}} => (Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Bodywork],
 	  {None: [?Pitstop.Planned.Repair.Bodywork]}} => (Set: Pitstop.Planned.Repair.Bodywork, ?Pitstop.Plan.Repair.Bodywork)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Repair.Engine],
+	  {None: [?Pitstop.Planned.Repair.Engine]}} => (Set: Pitstop.Planned.Repair.Engine, ?Pitstop.Plan.Repair.Engine)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Driver.Request],
+	  {None: [?Pitstop.Planned.Driver.Request]}} => (Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target), (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>
@@ -654,6 +685,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 		(Set: Pitstop.Planned.Repair.Suspension, ?Damage.Repair.Suspension.Target)
 {All: [?Pitstop.Plan], [?Damage.Repair.Bodywork.Target], {None: [?Pitstop.Planned.Repair.Bodywork]}} =>
 		(Set: Pitstop.Planned.Repair.Bodywork, ?Damage.Repair.Bodywork.Target)
+{All: [?Pitstop.Plan], [?Damage.Repair.Engine.Target], {None: [?Pitstop.Planned.Repair.Engine]}} =>
+		(Set: Pitstop.Planned.Repair.Engine, ?Damage.Repair.Engine.Target)
 {All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}, {None: [?Pitstop.Plan.Fuel.Amount]}} => (Set: Pitstop.Planned.Fuel, 0)
 {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Tyre.Change = false], [?Tyre.Compound.Target], [?Pitstop.Plan.Tyre.Compound]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, !Session.Setup.Tyre.Compound),
@@ -679,6 +712,8 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 		(Set: Pitstop.Planned.Repair.Suspension, false)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Bodywork.Target], [?Pitstop.Plan.Repair.Bodywork]}} =>
 		(Set: Pitstop.Planned.Repair.Bodywork, false)
+{All: [?Pitstop.Plan], {None: [?Damage.Repair.Engine.Target], [?Pitstop.Plan.Repair.Engine]}} =>
+		(Set: Pitstop.Planned.Repair.Engine, false)
 {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Driver.Request]}} =>
 		(Set: Pitstop.Planned.Driver.Request, false)
 
@@ -691,7 +726,7 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.FL), (Clear: Pitstop.Plan.Tyre.Pressure.FR),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
-								  (Clear: Pitstop.Plan.Driver.Request)
+								  (Clear: Pitstop.Plan.Repair.Engine), (Clear: Pitstop.Plan.Driver.Request)
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
 planPitstop() <= Set(Pitstop.Planned.Nr, 1)
@@ -726,7 +761,9 @@ setTyrePressures(?pitstopNumber) <=
 									  !Pitstop.Planned.Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RR)
 
 requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
-															  !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Bodywork)
+															  !Pitstop.Planned.Repair.Suspension,
+															  !Pitstop.Planned.Repair.Bodywork,
+															  !Pitstop.Planned.Repair.Engine)
 
 requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber,
 															!Pitstop.Planned.Driver.Request)
@@ -750,7 +787,8 @@ priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),
 								 (Clear: Pitstop.Planned.Tyre.Pressure.FL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.FR.Increment),
 								 (Clear: Pitstop.Planned.Tyre.Pressure.RL.Increment), (Clear: Pitstop.Planned.Tyre.Pressure.RR.Increment),
 								 (Clear: Pitstop.Planned.Tyre.Pressure.Correction),
-								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork)
+								 (Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork),
+								 (Clear: Pitstop.Planned.Repair.Engine)
 priority: -20, {All: [?Pitstop.Lap], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Nr)
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared)
 
@@ -771,6 +809,7 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RR, !P
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.Correction, !Pitstop.Planned.Tyre.Pressure.Correction)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Engine, !Pitstop.Planned.Repair.Engine)
 
 
 ;;;-------------------------------------------------------------------------;;;

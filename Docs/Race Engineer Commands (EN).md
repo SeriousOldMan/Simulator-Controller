@@ -118,3 +118,5 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 	[(CanWe) repair the suspension, {Please} do not repair the suspension]
 
 	[(CanWe) repair the bodywork, {Please} do not repair the bodywork]
+	
+	[(CanWe) repair the engine, {Please} do not repair the engine]

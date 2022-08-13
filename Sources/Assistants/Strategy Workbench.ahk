@@ -1264,7 +1264,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, sessionDB, drivers, ignore, id, index, car, carNames
+		local window, sessionDB, drivers, ignore, id, index, car, carNames, cars
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window

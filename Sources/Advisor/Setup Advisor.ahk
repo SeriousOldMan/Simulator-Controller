@@ -1003,13 +1003,10 @@ class SetupAdvisor extends ConfigurationItem {
 
 	initializeSimulator(name) {
 		local definition := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . name . ".ini")
-		local simulator, cars, tracks
+		local simulator := getConfigurationValue(definition, "Simulator", "Simulator")
+		local cars, tracks
 
 		this.iSimulatorDefinition := definition
-
-		simulator := getConfigurationValue(definition, "Simulator", "Simulator")
-		; cars := string2Values(",", getConfigurationValue(definition, "Simulator", "Cars"))
-		; tracks := string2Values(",", getConfigurationValue(definition, "Simulator", "Tracks"))
 
 		cars := this.getCars(simulator)
 		tracks := this.getTracks(simulator, true)

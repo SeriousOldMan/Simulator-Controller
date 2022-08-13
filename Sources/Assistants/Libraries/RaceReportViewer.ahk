@@ -521,10 +521,9 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	showPositionsReport() {
-		local drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 		local report := this.Report
 		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB, carIndices, maxPosition
-		local car, valid, ignore, lap, hasData, position, lapPositions
+		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions
 
 		if report {
 			raceData := true
@@ -571,6 +570,8 @@ class RaceReportViewer extends RaceReportReader {
 						if positions.HasKey(lap)
 							positions[lap].RemoveAt(car)
 			}
+			
+			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 
 			hasData := false
 

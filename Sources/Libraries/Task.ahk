@@ -46,6 +46,7 @@ class Task {
 	iStopped := false
 	iRunnable := true
 	iSleep := false
+	iRunning := false
 
 	iPriority := kNormalPriority
 	iNextExecution := false
@@ -154,6 +155,12 @@ class Task {
 		}
 	}
 
+	Running[] {
+		Get {
+			return this.iRunning
+		}
+	}
+
 	Callable[] {
 		Get {
 			return this.iCallable
@@ -176,7 +183,14 @@ class Task {
 	}
 
 	execute() {
-		return this.run()
+		this.iRunning := true
+
+		try {
+			return this.run()
+		}
+		finally {
+			this.iRunning := false
+		}
 	}
 
 	resume() {
@@ -416,7 +430,7 @@ class WindowTask extends Task {
 
 class WindowPeriodicTask extends WindowTask {
 	execute() {
-		base.lanch()
+		base.execute()
 
 		this.NextExecution := (A_TickCount + this.Sleep)
 

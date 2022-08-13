@@ -133,6 +133,8 @@ class VoiceManager {
 		}
 
 		finishTalk() {
+			local text, focus
+
 			if this.Talking {
 				text := this.iText
 				focus := this.iFocus
@@ -156,7 +158,8 @@ class VoiceManager {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
-			phrases := this.Phrases
+			local phrases := this.Phrases
+			local index
 
 			if phrases.HasKey(phrase) {
 				phrases := phrases[phrase]
@@ -236,6 +239,8 @@ class VoiceManager {
 		}
 
 		finishTalk() {
+			local text, focus
+
 			if this.Talking {
 				text := this.iText
 				focus := this.iFocus
@@ -250,6 +255,8 @@ class VoiceManager {
 		}
 
 		speak(text, focus := false, cache := false) {
+			local stopped
+
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -275,7 +282,8 @@ class VoiceManager {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
-			phrases := this.Phrases
+			local phrases := this.Phrases
+			local index
 
 			if phrases.HasKey(phrase) {
 				phrases := phrases[phrase]
@@ -315,9 +323,7 @@ class VoiceManager {
 		}
 
 		continue() {
-			local continuation
-
-			continuation := this.Continuation
+			local continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.VoiceContinuation)
 				continuation.continue()
@@ -488,15 +494,15 @@ class VoiceManager {
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 
-			processID := ErrorLevel
-
-			sendMessage(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
+			sendMessage(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ErrorLevel), this.VoiceServer)
 		}
 
 		return false
 	}
 
 	initialize(options) {
+		local vocalics
+
 		if options.HasKey("Vocalics") {
 			vocalics := options["Vocalics"]
 
@@ -542,7 +548,7 @@ class VoiceManager {
 	}
 
 	listen() {
-		theHotkey := this.PushToTalk
+		local theHotkey := this.PushToTalk
 
 		if !this.Speaking && GetKeyState(theHotKey, "P")
 			this.startListening()
@@ -571,28 +577,34 @@ class VoiceManager {
 	}
 
 	getSpeaker() {
+		local pid, activationCommand
+
 		if (this.Speaker && !this.iSpeechSynthesizer) {
 			if this.VoiceServer {
 				Process Exist
 
-				processID := ErrorLevel
+				pid := ErrorLevel
 
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
 				sendMessage(kFileMessage, "Voice"
-						 , "registerVoiceClient:" . values2String(";", this.Name, processID
-																, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized"
-																, this.Language, this.Synthesizer, this.Speaker
-																, this.Recognizer, this.Listener
-																, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed), this.VoiceServer)
+						  , "registerVoiceClient:" . values2String(";", this.Name, pid
+																 , activationCommand
+																 , "remoteActivationRecognized", "remoteDeactivationRecognized"
+																 , this.Language, this.Synthesizer, this.Speaker
+																 , this.Recognizer, this.Listener
+																 , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+						  , this.VoiceServer)
 
 				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+																, this.buildFragments(this.Language)
+																, this.buildPhrases(this.Language))
 			}
 			else {
 				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-															   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+															   , this.buildFragments(this.Language)
+															   , this.buildPhrases(this.Language))
 
 				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -606,6 +618,8 @@ class VoiceManager {
 	}
 
 	startListener() {
+		local recognizer
+
 		static initialized := false
 
 		if (!initialized && this.Listener && !this.iSpeechRecognizer) {
@@ -687,9 +701,9 @@ class VoiceManager {
 	}
 
 	buildFragments(language) {
-		fragments := {}
-
-		grammars := this.getGrammars(language)
+		local fragments := {}
+		local grammars := this.getGrammars(language)
+		local fragment, word
 
 		for fragment, word in getConfigurationSectionValues(grammars, "Fragments", {})
 			fragments[fragment] := word
@@ -698,9 +712,9 @@ class VoiceManager {
 	}
 
 	buildPhrases(language, section := "Speaker Phrases") {
-		phrases := {}
-
-		grammars := this.getGrammars(language)
+		local phrases := {}
+		local grammars := this.getGrammars(language)
+		local key, value
 
 		for key, value in getConfigurationSectionValues(grammars, section, {}) {
 			key := ConfigurationItem.splitDescriptor(key)[1]
@@ -718,9 +732,8 @@ class VoiceManager {
 	}
 
 	buildGrammars(speechRecognizer, language) {
-		local grammar
-
-		grammars := this.getGrammars(language)
+		local grammars := this.getGrammars(language)
+		local grammar, definition, name, choices, nextCharIndex
 
 		for name, choices in getConfigurationSectionValues(grammars, "Choices", {})
 			if speechRecognizer

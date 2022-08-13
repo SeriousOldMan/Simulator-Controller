@@ -60,19 +60,6 @@ global kLanguage := "language"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vProgressCount := 0
-
-global vWorking := false
-
-global vPageSwitch := false
-
-global vSettingsReady := false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -138,7 +125,11 @@ class SetupWizard extends ConfigurationItem {
 
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
-	
+
+	iProgressCount := false
+	iWorking := false
+	iPageSwitch := false
+	iSettingsOpen := false
 	iResult := false
 
 	iStepWizards := {}
@@ -172,14 +163,54 @@ class SetupWizard extends ConfigurationItem {
 			return this.iHelpWindow
 		}
 	}
-	
+
 	Result[] {
 		Get {
 			return this.iResult
 		}
-		
+
 		Set {
 			return (this.iResult := value)
+		}
+	}
+
+	ProgressCount[] {
+		Get {
+			return SetupWizard.sProgressCount
+		}
+
+		Set {
+			return (SetupWizard.sProgressCount := value)
+		}
+	}
+
+	Working[] {
+		Get {
+			return this.iWorking
+		}
+
+		Set {
+			return (this.iWorking := value)
+		}
+	}
+
+	PageSwitch[] {
+		Get {
+			return this.iPageSwitch
+		}
+
+		Set {
+			return (this.iPageSwitch := value)
+		}
+	}
+
+	SettingsOpen[] {
+		Get {
+			return this.iSettingsOpen
+		}
+
+		Set {
+			return (this.iSettingsOpen := value)
 		}
 	}
 
@@ -311,9 +342,9 @@ class SetupWizard extends ConfigurationItem {
 		loop %count% {
 			step := this.Steps[A_Index]
 
-			vProgressCount += 2
+			this.ProgressCount += 2
 
-			showProgress({progress: vProgressCount})
+			showProgress({progress: this.ProgressCount})
 
 			if step {
 				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
@@ -340,7 +371,7 @@ class SetupWizard extends ConfigurationItem {
 		else
 			initialize  := false
 
-		showProgress({progress: ++vProgressCount, message: translate("Initializing AI Kernel...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Initializing AI Kernel...")})
 
 		if initialize {
 			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
@@ -369,7 +400,7 @@ class SetupWizard extends ConfigurationItem {
 			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
 		}
 
-		showProgress({progress: ++vProgressCount, message: translate("Starting AI Kernel...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
 		this.KnowledgeBase.produce()
 
@@ -489,9 +520,9 @@ class SetupWizard extends ConfigurationItem {
 		this.getWorkArea(x, y, width, height)
 
 		for step, stepWizard in this.StepWizards {
-			vProgressCount += 2
+			this.ProgressCount += 2
 
-			showProgress({progress: vProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
+			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
 
 			stepWizard.createGui(this, x, y, width, height)
 		}
@@ -525,7 +556,7 @@ class SetupWizard extends ConfigurationItem {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
 		local x, y
-		
+
 		if getWindowPosition("Simulator Setup", x, y)
 			Gui %wizardWindow%:Show, x%x% y%y%
 		else {
@@ -533,7 +564,7 @@ class SetupWizard extends ConfigurationItem {
 
 			Gui %wizardWindow%:Show, x%posX% yCenter h610
 		}
-		
+
 		if getWindowPosition("Simulator Setup.Help", x, y)
 			Gui %helpWindow%:Show, x%x% y%y%
 		else {
@@ -560,14 +591,14 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	startSetup() {
-		showProgress({progress: ++vProgressCount, message: translate("Initializing Settings && Options...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Initializing Settings && Options...")})
 
 		this.updateState()
 
 		this.iStep := false
 		this.iPage := false
 
-		showProgress({progress: ++vProgressCount, color: "Green", title: translate("Starting Setup Wizard"), message: translate("Starting Configuration Engine...")})
+		showProgress({progress: ++this.ProgressCount, color: "Green", title: translate("Starting Setup Wizard"), message: translate("Starting Configuration Engine...")})
 
 		this.nextPage()
 	}
@@ -628,7 +659,7 @@ class SetupWizard extends ConfigurationItem {
 			GuiControl Disable, nextPageButton
 			GuiControl Disable, finishButton
 
-			vWorking := true
+			this.Working := true
 
 			try {
 				if save {
@@ -717,7 +748,7 @@ class SetupWizard extends ConfigurationItem {
 				}
 			}
 			finally {
-				vWorking := false
+				this.Working := false
 			}
 
 			return true
@@ -825,13 +856,13 @@ class SetupWizard extends ConfigurationItem {
 		GuiControl Disable, nextPageButton
 		GuiControl Disable, finishButton
 
-		oldPageSwitch := vPageSwitch
-		vPageSwitch := true
+		oldPageSwitch := this.PageSwitch
+		this.PageSwitch := true
 
 		try {
 			if this.Step {
 				if !this.hidePage(this.Step, this.Page) {
-					vPageSwitch := oldPageSwitch
+					this.PageSwitch := oldPageSwitch
 
 					this.updateState()
 
@@ -849,7 +880,7 @@ class SetupWizard extends ConfigurationItem {
 			this.iPage := page
 		}
 		finally {
-			vPageSwitch := oldPageSwitch
+			this.PageSwitch := oldPageSwitch
 		}
 
 		this.updateState()
@@ -867,7 +898,7 @@ class SetupWizard extends ConfigurationItem {
 
 	previousPage() {
 		try {
-			vWorking := true
+			this.Working := true
 
 			try {
 				step := false
@@ -877,7 +908,7 @@ class SetupWizard extends ConfigurationItem {
 					this.showPage(step, page)
 			}
 			finally {
-				vWorking := false
+				this.Working := false
 			}
 		}
 		catch exception {
@@ -887,7 +918,7 @@ class SetupWizard extends ConfigurationItem {
 
 	nextPage() {
 		try {
-			vWorking := true
+			this.Working := true
 
 			try {
 				step := false
@@ -897,7 +928,7 @@ class SetupWizard extends ConfigurationItem {
 					this.showPage(step, page)
 			}
 			finally {
-				vWorking := false
+				this.Working := false
 			}
 		}
 		catch exception {
@@ -919,7 +950,7 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Default
 
-		if !vPageSwitch {
+		if !this.PageSwitch {
 			if this.isFirstPage()
 				GuiControl Disable, previousPageButton
 			else
@@ -2119,29 +2150,16 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
-		vSettingsReady := false
+		this.SetupWizard.SettingsOpen := true
 
 		base.showPage(page)
 
-		/*
-		settingsEditor := ObjBindMethod(this, "settingsEditor")
-
-		SetTimer %settingsEditor%, -200
-		*/
-
-		Task.startTask(ObjBindMethod(this, "settingsEditor"), 200, kHighPriority)
+		Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200, kLowPriority)
 	}
 
 	hidePage(page) {
 		if base.hidePage(page) {
-			try {
-				settings := editSettings(kSave, false, true)
-
-				writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
-			}
-			catch exception {
-				; ignore
-			}
+			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
 			return true
 		}
@@ -2149,15 +2167,9 @@ class FinishStepWizard extends StepWizard {
 			return false
 	}
 
-	settingsEditor() {
-		if vWorking {
-			/*
-			settingsEditor := ObjBindMethod(this, "settingsEditor")
-
-			SetTimer %settingsEditor%, -200
-			*/
-			Task.startTask(ObjBindMethod(this, "settingsEditor"), 200, kHighPriority)
-		}
+	openSettingsEditor() {
+		if this.SetupWizard.Working
+			Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200)
 		else {
 			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
 				settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
@@ -2170,8 +2182,14 @@ class FinishStepWizard extends StepWizard {
 					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
 					   , "Center")
 
-			vSettingsReady := true
+			this.SetupWizard.SettingsOpen := false
 		}
+	}
+
+	closeSettingsEditor() {
+		local settings := editSettings(kSave, false, true)
+
+		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
 	}
 }
 
@@ -2182,15 +2200,12 @@ class FinishStepWizard extends StepWizard {
 
 finishSetup(finish := false, save := false) {
 	if (finish = "Finish") {
-		if !vSettingsReady {
+		if (SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
 			; Let other threads finish...
 
 			Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
-
-			return
 		}
-
-		if SetupWizard.Instance.finishSetup(save)
+		else if SetupWizard.Instance.finishSetup(save)
 			ExitApp 0
 	}
 	else {
@@ -2389,7 +2404,7 @@ initializeSimulatorSetup() {
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150
 
-	vProgressCount := 0
+	wizard.ProgressCount := 0
 
 	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 
@@ -2427,8 +2442,8 @@ restartSetup:
 
 	wizard.startSetup()
 
-	while (vProgressCount < 100) {
-		showProgress({progress: ++vProgressCount, message: translate("Starting UI...")})
+	while (wizard.ProgressCount < 100) {
+		showProgress({progress: ++wizard.ProgressCount, message: translate("Starting UI...")})
 
 		Sleep 5
 	}
@@ -2446,7 +2461,7 @@ restartSetup:
 
 	try {
 		loop {
-			vWorking := false
+			wizard.Working := false
 
 			Sleep 200
 
@@ -2466,7 +2481,7 @@ restartSetup:
 
 		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 
-		vProgressCount := 0
+		wizard.ProgressCount := 0
 
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150

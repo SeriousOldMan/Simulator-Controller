@@ -208,8 +208,26 @@ class CarInfo {
 		this.iCar := car
 	}
 
+	reset() {
+		this.iLastLap := false
+		this.iLastSector := false
+		this.iPosition := false
+
+		this.iLapTimes := []
+		this.iDeltas := {}
+		this.iLastDeltas := {}
+	}
+
 	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
+		local avgLapTime := this.AverageLapTime
+		local result := true
 		local deltas
+
+		if (avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) {
+			this.reset()
+
+			result := false
+		}
 
 		this.iDriver := driver
 		this.iPosition := position
@@ -255,6 +273,8 @@ class CarInfo {
 		}
 		else
 			this.iInPit := false
+
+		return result
 	}
 
 	isFaster(sector) {
@@ -961,17 +981,20 @@ class RaceSpotter extends RaceAssistant {
 
 				lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 
-				info.update(computeDriverName(knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
-											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")
-											, knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
-						  , knowledgeBase.getValue("Car." . A_Index . ".Position")
-						  , knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Laps")
-						  , sector
-						  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
-						  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
-						  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
-						  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
-						  , knowledgeBase.getValue("Car." . A_Index . ".InPitlane", false)
+				if !info.update(computeDriverName(knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
+												, knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")
+												, knowledgeBase.getValue("Car." . A_Index . ".Driver.Nickname", "JD"))
+							  , knowledgeBase.getValue("Car." . A_Index . ".Position")
+							  , knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Laps")
+							  , sector
+							  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
+							  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
+							  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
+							  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
+							  , knowledgeBase.getValue("Car." . A_Index . ".InPitlane", false)
+					if (A_Index != driver)
+						if this.PositionInfos.HasKey(info.Nr)
+							this.PositionInfos.reset(sector, true)
 			}
 		}
 	}

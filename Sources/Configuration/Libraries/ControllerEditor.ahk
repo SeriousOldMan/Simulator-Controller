@@ -30,13 +30,6 @@ kControlTypes[kCustomType] := "Custom"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Private Variables Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vControllerPreviews := {}
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -45,6 +38,8 @@ global vControllerPreviews := {}
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerEditor extends ConfigurationItem {
+	static sPreviewCenters := {}
+
 	iControlsList := false
 	iLabelsList := false
 	iLayoutsList := false
@@ -181,14 +176,25 @@ class ControllerEditor extends ConfigurationItem {
 		this.iLayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
 	}
 
-	setPreviewCenter(centerX, centerY) {
+	setPreviewCenter(descriptor, centerX, centerY) {
+		if descriptor
+			ControllerEditor.sPreviewCenters[descriptor] := [centerX, centerY]
+
 		this.iPreviewCenterX := centerX
 		this.iPreviewCenterY := centerY
 	}
 
-	getPreviewCenter(ByRef centerX, ByRef centerY) {
-		centerX := this.iPreviewCenterX
-		centerY := this.iPreviewCenterY
+	getPreviewCenter(descriptor, ByRef centerX, ByRef centerY) {
+		if (descriptor && ControllerEditor.sPreviewCenters.HasKey(descriptor)) {
+			center := ControllerEditor.sPreviewCenters[descriptor]
+
+			centerX := center[1]
+			centerY := center[2]
+		}
+		else {
+			centerX := this.iPreviewCenterX
+			centerY := this.iPreviewCenterY
+		}
 	}
 
 	getPreviewMover() {
@@ -220,7 +226,7 @@ class ControllerEditor extends ConfigurationItem {
 			Gui CTRLE:Show, AutoSize x%x% y%y%
 
 		name := this.Name
-		
+
 		Task.startTask(ObjBindMethod(this, "selectLayout", name), 1000)
 	}
 
@@ -1366,6 +1372,7 @@ class LayoutsList extends ConfigurationItemList {
 
 class ControllerPreview extends ConfigurationItem {
 	static sCurrentWindow := 0
+	static sControllerPreviews := {}
 
 	iPreviewManager := false
 	iName := ""
@@ -1389,6 +1396,12 @@ class ControllerPreview extends ConfigurationItem {
 	Name[] {
 		Get {
 			return this.iName
+		}
+	}
+
+	Descriptor[] {
+		Get {
+			return this.Name
 		}
 	}
 
@@ -1447,6 +1460,16 @@ class ControllerPreview extends ConfigurationItem {
 	CurrentWindow[] {
 		Get {
 			return ("CTRLP" . ControllerPreview.sCurrentWindow)
+		}
+	}
+
+	ControllerPreviews[key := false] {
+		Get {
+			return (key ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
+		}
+
+		Set {
+			return (key ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
 		}
 	}
 
@@ -1539,7 +1562,7 @@ class ControllerPreview extends ConfigurationItem {
 		centerX := 0
 		centerY := 0
 
-		this.PreviewManager.getPreviewCenter(centerX, centerY)
+		this.PreviewManager.getPreviewCenter(this.Descriptor, centerX, centerY)
 
 		SysGet mainScreen, MonitorWorkArea
 
@@ -1554,7 +1577,7 @@ class ControllerPreview extends ConfigurationItem {
 
 		window := this.Window
 
-		vControllerPreviews[window] := this
+		this.ControllerPreviews[window] := this
 
 		Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
 	}
@@ -1562,7 +1585,7 @@ class ControllerPreview extends ConfigurationItem {
 	close() {
 		window := this.Window
 
-		vControllerPreviews.Delete(window)
+		this.ControllerPreviews.Delete(window)
 
 		Gui %window%:Destroy
 	}
@@ -1954,10 +1977,10 @@ controlClick() {
 		column := 0
 		isEmpty := false
 
-		element := vControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
+		element := ControllerPreview.ControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
 
 		if element
-			vControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
+			ControllerPreview.ControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
 	}
 	finally {
 		CoordMode Mouse, curCoordMode
@@ -1965,6 +1988,18 @@ controlClick() {
 }
 
 controlMenuIgnore() {
+}
+
+moveControllerPreview() {
+	window := ControllerPreview.CurrentWindow
+
+	moveByMouse(window)
+
+	WinGetPos x, y, width, height, A
+
+	preview := ControllerPreview.ControllerPreviews[A_Gui]
+
+	preview.PreviewManager.setPreviewCenter(preview.Descriptor, x + Round(width / 2), y + Round(height / 2))
 }
 
 
@@ -2071,16 +2106,6 @@ openControllerActionsEditor() {
 	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
 
 	Gui CTRLE:-Disabled
-}
-
-moveControllerPreview() {
-	window := ControllerPreview.CurrentWindow
-
-	moveByMouse(window)
-
-	WinGetPos x, y, width, height, A
-
-	vControllerPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
 }
 
 saveDisplayRulesEditor() {

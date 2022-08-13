@@ -13,13 +13,6 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vCurrentRegistrationWizard := false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -709,6 +702,8 @@ class ControllerStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerPreviewStepWizard extends StepWizard {
+	static sControllerPreviewCenters := {}
+
 	iControllerPreviews := []
 	iControllerPreviewCenterY := 0
 
@@ -742,13 +737,26 @@ class ControllerPreviewStepWizard extends StepWizard {
 			return false
 	}
 
-	getPreviewCenter(ByRef centerX, ByRef centerY) {
-		centerX := false
-		centerY := this.iControllerPreviewCenterY
+	setPreviewCenter(descriptor, centerX, centerY) {
+		if descriptor
+			ControllerPreviewStepWizard.sControllerPreviewCenters[descriptor] := [centerX, centerY]
+	}
+
+	getPreviewCenter(descriptor, ByRef centerX, ByRef centerY) {
+		if (descriptor && ControllerPreviewStepWizard.sControllerPreviewCenters.HasKey(descriptor)) {
+			center := ControllerPreviewStepWizard.sControllerPreviewCenters[descriptor]
+
+			centerX := center[1]
+			centerY := center[2]
+		}
+		else {
+			centerX := false
+			centerY := this.iControllerPreviewCenterY
+		}
 	}
 
 	getPreviewMover() {
-		return "moveByMouse"
+		return "moveControllerPreview"
 	}
 
 	createControllerPreview(type, controller, configuration) {
@@ -759,7 +767,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 	}
 
 	openControllerPreviews() {
-		local function
+		local function, index, controller
 
 		if this.SetupWizard.isModuleSelected("Controller") {
 			staticFunctions := this.SetupWizard.getModuleStaticFunctions()
@@ -846,6 +854,8 @@ class ControllerPreviewStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ActionsStepWizard extends ControllerPreviewStepWizard {
+	static sCurrentActionsStep := false
+
 	iPendingFunctionRegistration := false
 	iPendingActionRegistration := false
 
@@ -971,6 +981,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
+	CurrentActionsStep[] {
+		Get {
+			return ActionsStepWizard.sCurrentActionsStep
+		}
+	}
+
 	reset() {
 		base.reset()
 
@@ -982,7 +998,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	showPage(page) {
-		vCurrentRegistrationWizard := this
+		ActionsStepWizard.sCurrentActionsStep := this
 
 		base.showPage(page)
 
@@ -994,7 +1010,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 	hidePage(page) {
 		if base.hidePage(page) {
-			vCurrentRegistrationWizard := false
+			ActionsStepWizard.sCurrentActionsStep := false
 
 			if this.SetupWizard.isModuleSelected("Controller")
 				this.saveActions()
@@ -1516,20 +1532,20 @@ updateControllerLabels() {
 }
 
 showSelectorHint() {
-	if (GetKeyState("Esc", "P") || !vCurrentRegistrationWizard) {
+	if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
 		SetTimer showSelectorHint, Off
 
-		vCurrentRegistrationWizard.iPendingFunctionRegistration := false
-		vCurrentRegistrationWizard.iPendingActionRegistration := false
+		ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
+		ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
 
 		ToolTip, , , 1
 	}
-	else if vCurrentRegistrationWizard.iPendingFunctionRegistration {
+	else if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration {
 		hint := translate("Click on a controller function...")
 
 		ToolTip %hint%, , , 1
 	}
-	else if vCurrentRegistrationWizard.iPendingActionRegistration {
+	else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration {
 		hint := translate("Click on an action...")
 
 		ToolTip %hint%, , , 1

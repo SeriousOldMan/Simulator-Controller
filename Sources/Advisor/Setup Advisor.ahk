@@ -53,13 +53,6 @@ global kCharacteristicHeight := 56
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vCharacteristicFinished := true
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -494,9 +487,6 @@ class SetupAdvisor extends ConfigurationItem {
 						this.addCharacteristic(characteristic, getConfigurationValue(state, "Characteristics", characteristic . ".Weight")
 															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value")
 															 , false)
-
-						while !vCharacteristicFinished
-							Sleep 50
 					}
 
 					this.updateRecommendations()
@@ -1226,71 +1216,64 @@ class SetupAdvisor extends ConfigurationItem {
 		local window, x, y, characteristicLabels, callback
 
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
-			vCharacteristicFinished := false
+			window := this.Window
 
-			try {
-				window := this.Window
+			Gui %window%:Default
+			Gui %window%:Color, D0D0D0, D8D8D8
 
-				Gui %window%:Default
-				Gui %window%:Color, D0D0D0, D8D8D8
+			x := (this.CharacteristicsArea.X + 8)
+			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-				x := (this.CharacteristicsArea.X + 8)
-				y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
+			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
 
-				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
+			if (characteristicLabels.Count() == 0)
+				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
 
-				if (characteristicLabels.Count() == 0)
-					characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+			this.SelectedCharacteristics.Push(characteristic)
 
-				this.SelectedCharacteristics.Push(characteristic)
+			Gui %window%:Font, s10 Italic, Arial
 
-				Gui %window%:Font, s10 Italic, Arial
+			Gui %window%:Add, Button, x%X% y%Y% w20 h20 HWNDdeleteButton
+			setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-				Gui %window%:Add, Button, x%X% y%Y% w20 h20 HWNDdeleteButton
-				setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+			callback := ObjBindMethod(this, "deleteCharacteristic", characteristic)
 
-				callback := ObjBindMethod(this, "deleteCharacteristic", characteristic)
+			GuiControl +g, %deleteButton%, %callback%
 
-				GuiControl +g, %deleteButton%, %callback%
+			x := x + 25
 
-				x := x + 25
+			Gui %window%:Add, Text, x%X% y%Y% w300 h26 HWNDlabel1, % characteristicLabels[characteristic]
 
-				Gui %window%:Add, Text, x%X% y%Y% w300 h26 HWNDlabel1, % characteristicLabels[characteristic]
+			x := x - 25
 
-				x := x - 25
+			Gui %window%:Font, s8 Norm, Arial
 
-				Gui %window%:Font, s8 Norm, Arial
+			x := x + 8
+			y := y + 26
 
-				x := x + 8
-				y := y + 26
+			Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
 
-				Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
+			x := x + 120
 
-				x := x + 120
+			Gui %window%:Add, Slider, Center Thick15 x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
 
-				Gui %window%:Add, Slider, Center Thick15 x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
+			x := x + 123
 
-				x := x + 123
+			Gui %window%:Add, Slider, Center Thick15 x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
 
-				Gui %window%:Add, Slider, Center Thick15 x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
+			callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
 
-				callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
+			GuiControl +g, %slider1%, %callback%
+			GuiControl +g, %slider2%, %callback%
 
-				GuiControl +g, %slider1%, %callback%
-				GuiControl +g, %slider2%, %callback%
+			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
 
-				this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
+			initializeSlider(slider1, weight, slider2, value)
 
-				initializeSlider(slider1, weight, slider2, value)
+			if draw {
+				this.updateRecommendations()
 
-				if draw {
-					this.updateRecommendations()
-
-					this.updateState()
-				}
-			}
-			finally {
-				vCharacteristicFinished := true
+				this.updateState()
 			}
 		}
 	}

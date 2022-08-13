@@ -369,7 +369,7 @@ checkForNews() {
 
 checkForUpdates() {
 	local check, lastModified, release, version, current, releasePostFix, currentPostFix, title, automaticUpdates
-	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments
+	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix
 
 	if vDetachedInstallation
 		return

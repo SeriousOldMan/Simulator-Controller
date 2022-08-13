@@ -180,7 +180,7 @@ class MessageManager extends PeriodicTask {
 
 	receiveFileMessages() {
 		local result := []
-		local messageHandler, result, pid, fileName, file, line, data, category
+		local messageHandlers, messageHandler, result, pid, fileName, file, line, data, category
 
 		Process Exist
 

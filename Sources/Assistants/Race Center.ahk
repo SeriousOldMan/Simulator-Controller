@@ -2739,6 +2739,7 @@ class RaceCenter extends ConfigurationItem {
 	initializePitstopSettings(ByRef lap, ByRef refuel, ByRef compound, ByRef compoundColor) {
 		local window := this.Window
 		local currentListView, currentStint, nextStint, plannedLap, lastLap, refuelAmount, tyreChange, index, pitstop
+		local stint
 
 		Gui %window%:Default
 
@@ -4336,7 +4337,7 @@ class RaceCenter extends ConfigurationItem {
 	loadNewStints(currentStint) {
 		local session := this.SelectedSession[true]
 		local newStints := []
-		local ignore, identifier, newStint, time, identifier, driver, message
+		local ignore, identifier, newStint, time, identifier, driver, message, stint
 
 		if (!this.CurrentStint || (currentStint.Nr > this.CurrentStint.Nr)) {
 			for ignore, identifier in string2Values(";", this.Connector.GetSessionStints(session))
@@ -5124,7 +5125,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTyrePressures(load := false) {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
 		local currentListView, row, session, pressuresDB, message, newData, lap, flush, driverID, tries
-		local lapPressures, coldPressures, hotPressures
+		local lapPressures, coldPressures, hotPressures, pressuresTable
 
 		if load {
 			lastLap := this.LastLap
@@ -8697,7 +8698,7 @@ class RaceCenter extends ConfigurationItem {
 		local tyrePressuresData := []
 		local repairsData := []
 		local compound, tyreSet, ignore, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs
-		local name, key, tyrePressures, header
+		local name, key, tyrePressures, header, repairEngine
 
 		for ignore, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
 			pitstopNRs.Push("<th class=""th-std"">" . A_Index . "</th>")
@@ -9316,7 +9317,7 @@ class RaceCenter extends ConfigurationItem {
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
-		local rnd, delta, running, nr, position, ignore
+		local rnd, delta, running, nr, position, ignore, nextPositions, runnings
 
 		if (this.SessionActive && lastLap) {
 			positions := lastLap.Positions

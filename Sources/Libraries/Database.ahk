@@ -83,6 +83,7 @@ class Database {
 
 	query(name, query) {
 		local predicate, schema, transform, rows, needsClone, predicate, selection, ignore, row, projection, projectedRows
+		local column, projectedRow
 
 		schema := this.Schemas[name]
 		rows := this.Tables[name]
@@ -142,7 +143,7 @@ class Database {
 	}
 
 	add(name, values, flush := false) {
-		local row, directory, fileName
+		local row, directory, fileName, ignore, column
 
 		this.Tables[name].Push(values)
 
@@ -285,7 +286,7 @@ constraintColumns(constraints, row) {
 groupRows(groupedByColumns, groupedColumns, rows) {
 	local values := {}
 	local function, ignore, row, column, key, result, group, groupedRows, columnValues
-	local resultRow, valueColumn, resultColumn
+	local resultRow, valueColumn, resultColumn, columnDescriptor
 
 	if !IsObject(groupedByColumns)
 		groupedByColumns := Array(groupedByColumns)

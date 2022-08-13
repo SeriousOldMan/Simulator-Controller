@@ -1985,7 +1985,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local info := readConfiguration(directory . "\Export.info")
 		local x, y, progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
-		local tyresDB, data, code, targetName, name, fileName, automations, automation, trackAutomations
+		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations
 
 		directory := normalizePath(directory)
 

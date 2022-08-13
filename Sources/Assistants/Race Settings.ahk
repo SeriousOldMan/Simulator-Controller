@@ -486,8 +486,8 @@ loadSessions(connector, team) {
 
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
-	local dirName, simulatorCode, title, file
-	local x, y
+	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
+	local x, y, e
 
 	static result
 	static newSettings

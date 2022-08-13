@@ -2160,7 +2160,7 @@ class RaceStrategist extends RaceAssistant {
 
 	saveLapStandings(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, carCount, fileName, data, prefix, key, value
+		local driver, carCount, fileName, data, prefix, key, value, postfix
 
 		if this.RemoteHandler {
 			Random postfix, 1, 1000000

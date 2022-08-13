@@ -654,7 +654,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompounds(simulator, car, track, codes := false) {
-		local code, cache, key, compounds, data, cds, nms, ignore, compound
+		local code, cache, key, compounds, data, cds, nms, ignore, compound, candidate
 
 		static settingsDB := false
 		static sNames := {}

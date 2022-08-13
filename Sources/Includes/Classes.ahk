@@ -55,6 +55,7 @@ class ConfigurationItem {
 
 	descriptor(values*) {
 		local result := ""
+		local index, value
 
 		for index, value in values {
 			if (index > 1)
@@ -150,7 +151,7 @@ class Application extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local exePath, workinDirectory
+		local exePath, workingDirectory
 
 		base.loadFromConfiguration(configuration)
 
@@ -361,7 +362,7 @@ class Function extends ConfigurationItem {
 
 	Hotkeys[trigger := false, asText := false] {
 		Get {
-			local result
+			local result, hotkeys
 
 			if trigger {
 				result := this.iHotkeys[trigger]
@@ -386,7 +387,7 @@ class Function extends ConfigurationItem {
 
 	Actions[trigger := false, asText := false] {
 		Get {
-			local action, arguments
+			local action, arguments, index, argument, theAction, result
 
 			if trigger {
 				action := this.iActions[trigger]
@@ -439,9 +440,8 @@ class Function extends ConfigurationItem {
 	}
 
 	__New(functionNumber, configuration := false, hotkeyActions*) {
-		local trigger := this.Trigger
 		local index := 1
-		local ignore
+		local ignore, trigger
 
 		this.iNumber := functionNumber
 
@@ -481,6 +481,7 @@ class Function extends ConfigurationItem {
 
 	saveToConfiguration(configuration) {
 		local descriptor := this.Descriptor
+		local ignore, trigger
 
 		base.saveToConfiguration(configuration)
 

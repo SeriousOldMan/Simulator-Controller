@@ -3858,7 +3858,7 @@ class RaceCenter extends ConfigurationItem {
 
 	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime, ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
-		local lastLap, tyresTable, lap, ignore, stint
+		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
 
 		this.syncSessionStore()
 
@@ -7652,7 +7652,7 @@ class RaceCenter extends ConfigurationItem {
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, field, brakeWears
 		local currentListView, lapPressures, entry, standingsData, prefix, driver
-		local currentStint, newStint, stint, stintData
+		local currentStint, newStint, stint, stintData, tries
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -10315,7 +10315,7 @@ updatePlan() {
 updatePlanAsync() {
 	local rCenter := RaceCenter.Instance
 	local window := rCenter.Window
-	local currentListView, row, stint
+	local currentListView, row, stint, time
 
 	Gui %window%:Default
 

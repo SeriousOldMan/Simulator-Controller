@@ -1083,7 +1083,7 @@ class RaceSpotter extends RaceAssistant {
 
 	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind
 				   , ByRef trackAhead, ByRef trackBehind, ByRef leader) {
-		local nr, observed
+		local nr, observed, candidate
 
 		standingsAhead := false
 		standingsBehind := false

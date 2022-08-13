@@ -82,7 +82,7 @@ linRegression(xValues, yValues, ByRef a, ByRef b) {
 	local yAverage := average(yValues)
 	local dividend := 0
 	local divisor := 0
-	local index, xValue
+	local index, xValue, xDelta, yDelta
 
 	for index, xValue in xValues {
 		if xValue is Number

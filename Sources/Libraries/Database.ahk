@@ -82,7 +82,7 @@ class Database {
 	}
 
 	query(name, query) {
-		local predicate, schema, rows, needsClone, predicate, selection, ignore, row, projection, projectedRows
+		local predicate, schema, transform, rows, needsClone, predicate, selection, ignore, row, projection, projectedRows
 
 		schema := this.Schemas[name]
 		rows := this.Tables[name]

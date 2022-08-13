@@ -2064,7 +2064,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 
 	addSubChoicePoints(goals) {
-		local choicePoint, previous
+		local choicePoint, previous, ignore, theGoal
 
 		this.SubChoicePoints := []
 
@@ -3664,7 +3664,7 @@ class RuleCompiler {
 
 	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{[()]}|`, `t") {
 		local length := StrLen(text)
-		local literal, beginCharIndex, quoted, hasQuote, character, isDelimiter
+		local literal, beginCharIndex, quoted, hasQuote, character, isDelimiter, rnd
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -3703,9 +3703,9 @@ class RuleCompiler {
 				else if (literal = kFalse)
 					return false
 				else if (!hasQuote && quoted) {
-					Random rand, 1, 100000
+					Random rnd, 1, 100000
 
-					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rand . "###"), "\", ""), "###" . rand . "###", "\")
+					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rnd . "###"), "\", ""), "###" . rnd . "###", "\")
 				}
 				else
 					return literal
@@ -3887,7 +3887,7 @@ class ProductionRuleParser extends RuleParser {
 		local conditions := []
 		local actions := []
 		local priority := 0
-		local ignore, expressions
+		local ignore, expression
 
 		for ignore, expression in rule
 			if parseActions

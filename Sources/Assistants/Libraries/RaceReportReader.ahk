@@ -68,11 +68,7 @@ class RaceReportReader {
 		carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
 		if (drivers.Length() > 0) {
-			parts := string2Values(A_Space, drivers[1][car])
-
-			driverForname := parts[1]
-			driverSurname := parts[2]
-			driverNickname := StrReplace(StrReplace(parts[3], "(", ""), ")", "")
+			parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
 		}
 		else {
 			driverForname := "John"

@@ -176,7 +176,7 @@ class StrategySimulation {
 	scenarioValid(strategy, validator) {
 		local reqPitstops := strategy.PitstopRule
 		local knowledgeBase, rules, rule, resultSet, refuelRule, valid, ignore, pitstop, tyreChangeRule
-		local number, pitstop, tyreCompound, tyreCompoundColor
+		local number, pitstop, tyreCompound, tyreCompoundColor, productions, reductions
 
 		if IsObject(reqPitstops)
 			reqPitstops := 1
@@ -1043,9 +1043,9 @@ class TrafficSimulation extends StrategySimulation {
 		local tyreCompoundVariation := 0
 		local initialFuel := 0
 		local consumptionSteps, tyreUsageSteps, tyreCompoundVariationSteps, initialFuelSteps
-		local scenarios, variation, first, tyreCompoundColors
+		local scenarios, variation, first, tyreCompoundColors, tyreLapsVariation
 		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound
-		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption, rnd
+		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption
 		local ignore, mapData, scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
@@ -1444,7 +1444,7 @@ class Strategy extends ConfigurationItem {
 
 		__New(strategy, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
 			local pitstopRule, refuelRule, tyreChangeRule, remainingFuel, remainingLaps, fuelConsumption, lastStintLaps
-			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, variation, freshTyreLaps, lastPitstop, delta
+			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, variation, freshTyreLaps, lastPitstop, delta, rnd
 
 			this.iStrategy := strategy
 			this.iNr := nr

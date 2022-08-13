@@ -278,7 +278,7 @@ class TyresDatabase extends SessionDatabase {
 			   , compound, compoundColor, driver := false) {
 		local weatherBaseIndex, weatherCandidateOffsets, localTyresDatabase, globalTyresDatabase
 		local ignore, weatherOffset, airDelta, trackDelta, distributions, thePressures, index, tyre
-		local bestPressure, bestCount, pressure, pressureCount
+		local bestPressure, bestCount, pressure, pressureCount, tyrePressures
 
 		if !driver
 			driver := this.ID

@@ -274,7 +274,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 shareSessionDatabase() {
-	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options
+	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
 
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
@@ -747,7 +747,7 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
-	local ptrSize, button_il, normal_il, L, T, R, B, A
+	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 
 ;   Parameters:
 ;   1) {Handle} 	HWND handle of Gui button
@@ -819,9 +819,8 @@ Exit:
 }
 
 installTrayMenu(update := false) {
-	local levels, level, ignore, oldLabel, label, handler
-
 	local label := translate("Exit")
+	local levels, level, ignore, oldLabel, label, handler
 
 	if (update && vHasSupportMenu) {
 		oldLabel := translate("Exit", vHasSupportMenu)
@@ -1727,7 +1726,7 @@ listEqual(list1, list2) {
 
 concatenate(lists*) {
 	local result := []
-	local ignore, list
+	local ignore, list, value
 
 	for ignore, list in lists
 		for ignore, value in list
@@ -2056,7 +2055,7 @@ removeConfigurationSection(configuration, section) {
 }
 
 getControllerConfiguration(configuration := false) {
-	local pid, tries, options, exePath, fileName
+	local pid, tries, options, exePath, fileName, postfix
 
 	Process Exist, Simulator Controller.exe
 

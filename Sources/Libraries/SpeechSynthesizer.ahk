@@ -391,9 +391,7 @@ class SpeechSynthesizer {
 			if !this.iCacheDirectory {
 				Random postfix, 1, 1000000
 
-				postfix := Round(postfix)
-
-				dirName := ("PhraseCache" . postfix)
+				dirName := ("PhraseCache" . Round(postfix))
 
 				FileCreateDir %kTempDirectory%%dirName%
 

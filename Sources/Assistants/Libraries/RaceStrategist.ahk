@@ -347,9 +347,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	Strategy[base := false] {
+	Strategy[original := false] {
 		Get {
-			return (base ? this.BaseStrategy : this.iStrategy)
+			return (original ? this.OriginalStrategy : this.iStrategy)
 		}
 	}
 
@@ -447,8 +447,8 @@ class RaceStrategist extends RaceAssistant {
 		if values.HasKey("TelemetryDatabase")
 			this.iTelemetryDatabase := values["TelemetryDatabase"]
 
-		if values.HasKey("BaseStrategy")
-			this.iBaseStrategy := values["BaseStrategy"]
+		if values.HasKey("OriginalStrategy")
+			this.iBaseStrategy := values["OriginalStrategy"]
 
 		if values.HasKey("Strategy")
 			this.iStrategy := values["Strategy"]
@@ -1099,7 +1099,7 @@ class RaceStrategist extends RaceAssistant {
 				if applicableStrategy {
 					this.loadStrategy(facts, theStrategy)
 
-					this.updateSessionValues({BaseStrategy: theStrategy, Strategy: theStrategy})
+					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
 				}
 			}
 		}
@@ -1255,7 +1255,7 @@ class RaceStrategist extends RaceAssistant {
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false
 								, StrategyReported: false, HasTelemetryData: false})
-		this.updateSessionValues({Simulator: "", Session: kSessionFinished, BaseStrategy: false, Strategy: false, SessionTime: false})
+		this.updateSessionValues({Simulator: "", Session: kSessionFinished, OriginalStrategy: false, Strategy: false, SessionTime: false})
 	}
 
 	forceFinishSession() {
@@ -1673,13 +1673,13 @@ class RaceStrategist extends RaceAssistant {
 
 				this.dumpKnowledge(knowledgeBase)
 
-				this.updateSessionValues({BaseStrategy: strategy, Strategy: strategy})
+				this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
 			}
 		}
 		else {
 			this.cancelStrategy(false)
 
-			this.updateSessionValues({BaseStrategy: false, Strategy: false})
+			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
 		}
 
 		this.updateDynamicValues({StrategyReported: false})
@@ -1719,7 +1719,7 @@ class RaceStrategist extends RaceAssistant {
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.BaseStrategy
+		local strategy := this.OriginalStrategy
 		local lap := Task.CurrentTask.Lap
 
 		if strategy {
@@ -1768,7 +1768,7 @@ class RaceStrategist extends RaceAssistant {
 
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
 					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
-		local strategy := this.BaseStrategy
+		local strategy := this.OriginalStrategy
 
 		if strategy {
 			stintLength := strategy.StintLength
@@ -1819,7 +1819,7 @@ class RaceStrategist extends RaceAssistant {
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
 						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
-		local strategy := this.BaseStrategy
+		local strategy := this.OriginalStrategy
 
 		useInitialConditions := false
 		useTelemetryData := true
@@ -1933,8 +1933,8 @@ class RaceStrategist extends RaceAssistant {
 
 	chooseScenario(strategy) {
 		if strategy {
-			if this.BaseStrategy
-				strategy.iPitstopRule := this.BaseStrategy.PitstopRule
+			if this.OriginalStrategy
+				strategy.iPitstopRulse := this.OriginalStrategy.PitstopRule
 
 			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy), 1000)
 		}

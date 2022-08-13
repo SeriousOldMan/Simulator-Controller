@@ -598,7 +598,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarName(simulator, car) {
-		name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 									, "Car Names", car, car)
 
 		if (!name || (name = ""))
@@ -608,8 +608,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarCode(simulator, car) {
-		code := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Codes", car, car)
+		local code := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+										  , "Car Codes", car, car)
 
 		if (!code || (code = ""))
 			code := car
@@ -618,8 +618,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	registerTrack(simulator, track, shortName, longName) {
-		fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
-		trackData := readConfiguration(fileName)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
+		local trackData := readConfiguration(fileName)
 
 		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
 			setConfigurationValue(trackData, "Track Names Long", track, longName)
@@ -634,8 +634,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackName(simulator, track, long := true) {
-		name := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									, long ? "Track Names Long" : "Track Names Short", track, track)
+		local name := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+										  , long ? "Track Names Long" : "Track Names Short", track, track)
 
 		if (!name || (name = ""))
 			name := track
@@ -644,8 +644,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackCode(simulator, track) {
-		code := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									, "Track Codes", track, track)
+		local code := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+										  , "Track Codes", track, track)
 
 		if (!code || (code = ""))
 			code := track
@@ -654,6 +654,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompounds(simulator, car, track, codes := false) {
+		local code, cache, key, compounds, data, cds, nms, ignore, compound
+
 		static settingsDB := false
 		static sNames := {}
 		static sCodes := {}
@@ -704,11 +706,11 @@ class SessionDatabase extends ConfigurationItem {
 			cds := []
 			nms := []
 
-			for ignore, tyre in string2Values(";", compounds) {
-				tyre := string2Values("->", tyre)
+			for ignore, compound in string2Values(";", compounds) {
+				compound := string2Values("->", compound)
 
-				cds.Push(tyre[1])
-				nms.Push(tyre[2])
+				cds.Push(compound[1])
+				nms.Push(compound[2])
 			}
 
 			if codes
@@ -723,6 +725,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+		local index, code
+
 		for index, code in this.getTyreCompounds(simulator, car, track, true)
 			if (code = compound)
 				return this.getTyreCompounds(simulator, car, track)[index]
@@ -731,6 +735,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
+		local index, name
+
 		for index, name in this.getTyreCompounds(simulator, car, track)
 			if (name = compound) {
 				code := this.getTyreCompounds(simulator, car, track, true)[index]
@@ -742,7 +748,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readNotes(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local notes
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -761,7 +769,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeNotes(simulator, car, track, notes) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -798,7 +807,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSetupNames(simulator, car, track, ByRef userSetups, ByRef communitySetups) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local ignore, type, setups, name
+
 		car := this.getCarCode(simulator, car)
 
 		if userSetups {
@@ -837,7 +848,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readSetup(simulator, car, track, type, name, ByRef size) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local data, fileName, file
+
 		car := this.getCarCode(simulator, car)
 
 		data := false
@@ -864,7 +877,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -888,7 +903,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -900,7 +916,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	removeSetup(simulator, car, track, type, name) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -959,7 +976,7 @@ parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
 }
 
 computeDriverName(forName, surName, nickName) {
-	name := ""
+	local name := ""
 
 	if (forName != "")
 		name .= (forName . A_Space)

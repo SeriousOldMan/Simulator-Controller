@@ -294,6 +294,7 @@ class GuiFunctionController extends FunctionController {
 	show(makeVisible := true) {
 		local duration, window, width, height, type, position, x, y, count
 		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+		local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
 
 		static hideTask := false
 

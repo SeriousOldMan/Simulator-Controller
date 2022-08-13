@@ -58,6 +58,8 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	__New(simulator := false, car := false, track := false, drivers := false) {
+		local simulatorCode
+
 		this.iDrivers := drivers
 
 		base.__New()
@@ -84,7 +86,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getSchema(table, includeVirtualColumns := false) {
-		schema := kTelemetrySchemas[table].Clone()
+		local schema := kTelemetrySchemas[table].Clone()
 
 		if (includeVirtualColumns && (table = "Tyres")) {
 			schema.Push("Tyre.Pressure")
@@ -126,17 +128,17 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getElectronicsCount(drivers := "__Undefined__") {
-		result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
-													, Transform: "removeInvalidLaps"
-													, Where: {}}, drivers)
+		local result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
+														  , Transform: "removeInvalidLaps"
+														  , Where: {}}, drivers)
 
 		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
 
 	getTyresCount(drivers := "__Undefined__") {
-		result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
-											  , Transform: "removeInvalidLaps"
-											  , Where: {}}, drivers)
+		local result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
+													, Transform: "removeInvalidLaps"
+													, Where: {}}, drivers)
 
 		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
@@ -220,6 +222,8 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	cleanupData(weather, compound, compoundColor, drivers := "__Undefined__") {
+		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows
+
 		if this.Database {
 			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
 
@@ -289,7 +293,9 @@ class TelemetryDatabase extends SessionDatabase {
 ;;;-------------------------------------------------------------------------;;;
 
 countValues(groupedColumn, countColumn, rows) {
-	values := {}
+	local values := {}
+	local result := []
+	local ignore, row, value, count, object
 
 	for ignore, row in rows {
 		value := row[groupedColumn]
@@ -299,8 +305,6 @@ countValues(groupedColumn, countColumn, rows) {
 		else
 			values[value] := 1
 	}
-
-	result := []
 
 	for value, count in values {
 		object := Object()
@@ -319,7 +323,7 @@ combine(functions*) {
 }
 
 callFunctions(functions, rows) {
-	local function
+	local ignore, function
 
 	for ignore, function in functions
 		rows := %function%(rows)
@@ -328,6 +332,8 @@ callFunctions(functions, rows) {
 }
 
 computePressures(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.Front.Left"], row["Tyre.Pressure.Front.Right"]
 											 , row["Tyre.Pressure.Rear.Left"], row["Tyre.Pressure.Rear.Right"]]), 1)
@@ -339,6 +345,8 @@ computePressures(rows) {
 }
 
 computeTemperatures(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.Front.Left"], row["Tyre.Temperature.Front.Right"]
 												, row["Tyre.Temperature.Rear.Left"], row["Tyre.Temperature.Rear.Right"]]), 1)
@@ -350,6 +358,8 @@ computeTemperatures(rows) {
 }
 
 computeWear(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Wear"] := averageWear([row["Tyre.Wear.Front.Left"], row["Tyre.Wear.Front.Right"]
 									   , row["Tyre.Wear.Rear.Left"], row["Tyre.Wear.Rear.Right"]])
@@ -361,7 +371,8 @@ computeWear(rows) {
 }
 
 averageWear(wears) {
-	result := 0
+	local result := 0
+	local ignore, wear
 
 	for ignore, wear in wears
 		if (wear = kNull)
@@ -373,8 +384,9 @@ averageWear(wears) {
 }
 
 computeFilterValues(rows, ByRef lapTimeAverage, ByRef lapTimeStdDev, ByRef consumptionAverage, ByRef consumptionStdDev) {
-	lapTimes := []
-	consumption := []
+	local lapTimes := []
+	local consumption := []
+	local ignore, row
 
 	for ignore, row in rows {
 		lapTimes.Push(row["Lap.Time"])
@@ -403,14 +415,15 @@ invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
 }
 
 removeInvalidLaps(rows) {
-	ltAvg := false
-	ltStdDev := false
-	cAvg := false
-	cStdDev := false
+	local ltAvg := false
+	local ltStdDev := false
+	local cAvg := false
+	local cStdDev := false
+	local count := rows.Length()
+	local result := []
+	local ignore, row
 
 	computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
-
-	count := rows.Length()
 
 	if (count < 5) {
 		ltStdDev *= 2
@@ -425,12 +438,9 @@ removeInvalidLaps(rows) {
 		cStdDev *= 1.2
 	}
 
-	result := []
-
 	for ignore, row in rows
 		if validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
 			result.Push(row)
 
 	return result
 }
-

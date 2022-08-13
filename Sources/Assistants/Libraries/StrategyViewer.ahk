@@ -45,6 +45,8 @@ class StrategyViewer {
 	}
 
 	lapTimeDisplayValue(lapTime) {
+		local seconds, fraction, minutes
+
 		if lapTime is Number
 		{
 			seconds := Floor(lapTime)
@@ -65,13 +67,12 @@ class StrategyViewer {
 	}
 
 	createStrategyInfo(strategy) {
-		sessionDB := new SessionDatabase()
+		local sessionDB := new SessionDatabase()
+		local simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
+		local car := (strategy.Car ? strategy.Car : translate("Unknown"))
+		local track := (strategy.Track ? strategy.Track : translate("Unknown"))
+		local html := "<table>"
 
-		simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
-		car := (strategy.Car ? strategy.Car : translate("Unknown"))
-		track := (strategy.Track ? strategy.Track : translate("Unknown"))
-
-		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . simulator . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . sessionDB.getCarName(simulator, car) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . sessionDB.getTrackName(simulator, track) . "</td></tr>")
@@ -92,7 +93,8 @@ class StrategyViewer {
 	}
 
 	createSetupInfo(strategy) {
-		html := "<table>"
+		local html := "<table>"
+
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
@@ -105,17 +107,18 @@ class StrategyViewer {
 	}
 
 	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
+		local startStint := strategy.StartStint
+		local html := "<table class=""table-std"">"
+		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges
+		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
+		local lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
+
 		timeSeries := [strategy.StartTime / 60]
 		lapSeries := [strategy.StartLap]
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]
 
-		startStint := strategy.StartStint
-
-		html := ""
-
 		if !strategy.LastPitstop {
-			html .= "<table class=""table-std"">"
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
@@ -216,9 +219,10 @@ class StrategyViewer {
 	}
 
 	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
-		chartID := StrategyViewer.sChartID++
+		local durationSession := (strategy.SessionType = "Duration")
+		local ignore, time, xAxis
 
-		durationSession := (strategy.SessionType = "Duration")
+		chartID := StrategyViewer.sChartID++
 
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 
@@ -249,7 +253,9 @@ class StrategyViewer {
 	}
 
 	showStrategyInfo(strategy) {
-		html := ""
+		local html := ""
+		local timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID, width, chartArea
+		local before, after, tableCSS
 
 		if !this.StrategyViewer
 			strategy := false
@@ -279,10 +285,7 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 
-			width := 555
-
-			if this.StrategyViewer
-				width := (this.StrategyViewer.Width - 10)
+			width := (this.StrategyViewer.Width - 10)
 
 			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
 
@@ -331,6 +334,8 @@ class StrategyViewer {
 ;;;-------------------------------------------------------------------------;;;
 
 getTableCSS() {
+	local script
+
 	script =
 	(
 		.table-std, .th-std, .td-std {

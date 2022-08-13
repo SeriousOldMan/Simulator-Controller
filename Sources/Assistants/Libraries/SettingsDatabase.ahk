@@ -49,11 +49,11 @@ class SettingsDatabase extends SessionDatabase {
 
 	querySettings(simulator, car, track, weather, ByRef userSettings, ByRef communitySettings) {
 		local database
+		local id := this.ID
+		local result, ignore, setting
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
-
-		id := this.ID
 
 		if userSettings {
 			result := {}
@@ -93,6 +93,8 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	doSettings(simulator, car, track, weather, function, userSettings := true, communitySettings := true) {
+		local ignore, setting
+
 		this.querySettings(simulator, car, track, weather, userSettings, communitySettings)
 
 		car := this.getCarCode(simulator, car)
@@ -108,15 +110,14 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
+		local settings := newConfiguration()
+		local id := this.ID
+
 		if (community = kUndefined)
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
-
-		settings := newConfiguration()
-
-		id := this.ID
 
 		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*")
 		loadSettings(this, simulator, settings, id, true, community, car, "*", "*")
@@ -131,15 +132,16 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
+		local result := {}
+		local id := this.ID
+		local settings := []
+		local ignore, setting
+
 		if (community = kUndefined)
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
-
-		result := {}
-
-		id := this.ID
 
 		if inherited {
 			readSettings(this, simulator, result, id, true, community, "*", "*", "*")
@@ -153,8 +155,6 @@ class SettingsDatabase extends SessionDatabase {
 
 		readSettings(this, simulator, result, id, true, community, car, track, weather)
 
-		settings := []
-
 		for ignore, setting in result
 			settings.Push(setting)
 
@@ -163,13 +163,14 @@ class SettingsDatabase extends SessionDatabase {
 
 	readSettingValue(simulator, car, track, weather, section, key
 				   , default := false, inherited := true, community := "__Undefined__") {
+		local id := this.ID
+		local value
+
 		if (community = kUndefined)
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
-
-		id := this.ID
 
 		value := readSetting(this, simulator, id, true, community
 						   , car, track, weather, section, key, kUndefined)
@@ -208,6 +209,8 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	getSettingValue(simulator, car, track, weather, section, key, default := false) {
+		local rows
+
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
@@ -249,6 +252,8 @@ class SettingsDatabase extends SessionDatabase {
 ;;;-------------------------------------------------------------------------;;;
 
 constraintSettings(constraints, row) {
+	local column, value
+
 	for column, value in constraints
 		if (row[column] != value)
 			return false
@@ -258,6 +263,8 @@ constraintSettings(constraints, row) {
 
 readSetting(database, simulator, owner, user, community, car, track, weather
 		  , section, key, default := false) {
+	local rows, ignore, row
+
 	if user {
 		rows := database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
 																						 , Weather: weather
@@ -280,7 +287,8 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 }
 
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
-	result := []
+	local result := []
+	local ignore, row, filtered, visited
 
 	if community
 		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
@@ -308,7 +316,8 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 }
 
 loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
-	values := {}
+	local values := {}
+	local ignore, setting
 
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 

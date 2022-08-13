@@ -1515,6 +1515,8 @@ class Setup {
 	iOriginalSetup := ""
 	iModifiedSetup := ""
 
+	iEnabledSettings := {}
+
 	Editor[] {
 		Get {
 			return this.iEditor
@@ -1524,6 +1526,12 @@ class Setup {
 	Name[] {
 		Get {
 			throw "Virtual property Setup.Name must be implemented in a subclass..."
+		}
+	}
+
+	Enabled[setting] {
+		Get {
+			return this.iEnabledSettings.HasKey(setting)
 		}
 	}
 
@@ -1555,6 +1563,17 @@ class Setup {
 
 	setValue(setting, value) {
 		throw "Virtual method Setup.setValue must be implemented in a subclass..."
+	}
+
+	enable(setting) {
+		this.iEnabledSettings[setting] := true
+	}
+
+	disable(setting) {
+		if setting
+			this.iEnabledSettings.Delete(setting)
+		else
+			this.iEnabledSettings := {}
 	}
 }
 
@@ -1945,7 +1964,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameViewer
 		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 
-		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 CHecked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
 
 		this.iSettingsListView := settingsListView
 
@@ -2007,6 +2026,10 @@ class SetupEditor extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
+		local setup := this.Setup
+		local enabled := []
+		local changed := false
+		local row, label, sIndex, sEnabled
 
 		Gui %window%:Default
 
@@ -2019,6 +2042,37 @@ class SetupEditor extends ConfigurationItem {
 		else {
 			GuiControl Disable, increaseSettingButton
 			GuiControl Disable, decreaseSettingButton
+		}
+
+		if setup {
+			row := LV_GetNext(0, "C")
+
+			while row {
+				LV_GetText(label, row, 2)
+
+				enabled.Push(this.Settings[label])
+
+				row := LV_GetNext(row, "C")
+			}
+
+			for ignore, setting in this.Advisor.Settings {
+				sIndex := inList(enabled, setting)
+				sEnabled := setup.Enabled[setting]
+
+				if (sIndex && !sEnabled) {
+					setup.enable(setting)
+
+					changed := true
+				}
+				else if (!sIndex && sEnabled) {
+					setup.disable(setting)
+
+					changed := true
+				}
+			}
+
+			if changed
+				GuiControl Text, setupViewer, % this.Setup.Setup
 		}
 	}
 
@@ -2091,6 +2145,8 @@ class SetupEditor extends ConfigurationItem {
 
 		this.Settings := {}
 
+		setup.disable(false)
+
 		for ignore, setting in this.Advisor.Settings {
 			handler := this.createSettingHandler(setting)
 
@@ -2100,10 +2156,16 @@ class SetupEditor extends ConfigurationItem {
 
 				if (originalValue = modifiedValue)
 					value := originalValue
-				else if (modifiedValue > originalValue)
+				else if (modifiedValue > originalValue) {
 					value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
-				else
+
+					setup.enable(setting)
+				}
+				else {
 					value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+
+					setup.enable(setting)
+				}
 
 				category := ""
 
@@ -2121,7 +2183,7 @@ class SetupEditor extends ConfigurationItem {
 
 				label := settingsLabels[setting]
 
-				LV_Add("", categoriesLabels[category], label, value, settingsUnits[setting])
+				LV_Add((originalValue = modifiedValue) ? "" : "Check", categoriesLabels[category], label, value, settingsUnits[setting])
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
@@ -2130,7 +2192,7 @@ class SetupEditor extends ConfigurationItem {
 
 		LV_ModifyCol()
 
-		LV_ModifyCol(1, "AutoHdr Sort")
+		LV_ModifyCol(1, "AutoHdr Sort 80")
 		LV_ModifyCol(2, "AutoHdr")
 		LV_ModifyCol(3, "AutoHdr")
 		LV_ModifyCol(4, "AutoHdr")
@@ -2302,14 +2364,24 @@ class SetupEditor extends ConfigurationItem {
 		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
-		if (originalValue = modifiedValue)
+		if (originalValue = modifiedValue) {
 			value := originalValue
-		else if (modifiedValue > originalValue)
+
+			setup.disable(setting)
+		}
+		else if (modifiedValue > originalValue) {
 			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
-		else
+
+			setup.enable(setting)
+		}
+		else {
 			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 
+			setup.enable(setting)
+		}
+
 		LV_Modify(row, "+Vis Col3", value)
+		LV_Modify(row, (originalValue = modifiedValue) ? "-Check" : "Check")
 		LV_ModifyCol(3, "AutoHdr")
 	}
 

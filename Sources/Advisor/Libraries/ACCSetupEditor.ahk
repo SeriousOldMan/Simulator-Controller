@@ -32,8 +32,6 @@ class ACCSetup extends FileSetup {
 	}
 
 	__New(editor, originalFileName := false) {
-		iEditor := editor
-
 		base.__New(editor, originalFileName)
 
 		this.iOriginalData := JSON.parse(this.Setup[true])
@@ -68,8 +66,8 @@ class ACCSetup extends FileSetup {
 		return data
 	}
 
-	setValue(setting, value) {
-		local data := this.Data
+	setValue(setting, value, display := false) {
+		local data := (display ? display : this.Data)
 		local elements := string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting))
 		local length := elements.Length()
 		local index, path, last
@@ -109,8 +107,30 @@ class ACCSetup extends FileSetup {
 			return (this.iModifiedData := value)
 		}
 		finally {
-			this.Setup := JSON.print(this.Data, false, "  ")
+			if !display
+				this.Setup := this.printSetup()
 		}
+	}
+
+	printSetup() {
+		local display := JSON.parse(this.Setup[true])
+
+		for ignore, setting in this.Editor.Advisor.Settings
+			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
+
+		return JSON.print(display, false, "  ")
+	}
+
+	enable(setting) {
+		base.enable(setting)
+
+		this.setValue(setting, this.getValue(setting))
+	}
+
+	disable(setting) {
+		base.disable(setting)
+
+		this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {

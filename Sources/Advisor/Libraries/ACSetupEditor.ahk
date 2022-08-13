@@ -62,12 +62,35 @@ class ACSetup extends FileSetup {
 		return getConfigurationValue(this.Data[original], getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE")
 	}
 
-	setValue(setting, value) {
-		setConfigurationValue(this.Data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
+	setValue(setting, value, display := false) {
+		local data := (display ? display : this.Data)
 
-		this.Setup := printConfiguration(this.Data)
+		setConfigurationValue(data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
+
+		this.Setup := this.printSetup()
 
 		return value
+	}
+
+	printSetup() {
+		local display := newConfiguration()
+
+		for ignore, setting in this.Editor.Advisor.Settings
+			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
+
+		return printConfiguration(display)
+	}
+
+	enable(setting) {
+		base.enable(setting)
+
+		this.setValue(setting, this.getValue(setting))
+	}
+
+	disable(setting) {
+		base.disable(setting)
+
+		this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {

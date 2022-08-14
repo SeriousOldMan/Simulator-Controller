@@ -708,7 +708,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	startAssistantsSession(data) {
 		local first := true
-		local ignore, assistant
+		local ignore, assistant, settings
 
 		if RaceAssistantPlugin.Simulator {
 			RaceAssistantPlugin.sSession := RaceAssistantPlugin.getSession(data)

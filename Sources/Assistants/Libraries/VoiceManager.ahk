@@ -550,9 +550,9 @@ class VoiceManager {
 	listen() {
 		local theHotkey := this.PushToTalk
 
-		if !this.Speaking && GetKeyState(theHotKey, "P")
+		if !this.Speaking && GetKeyState(theHotkey, "P")
 			this.startListening()
-		else if !GetKeyState(theHotKey, "P")
+		else if !GetKeyState(theHotkey, "P")
 			this.stopListening()
 	}
 

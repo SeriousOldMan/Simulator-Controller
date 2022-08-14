@@ -3183,6 +3183,7 @@ class RaceCenter extends ConfigurationItem {
 
 	planPitstop() {
 		local window, pitstopPlan, stint, drivers, currentDriver, nextDriver, currentNr, nextNr, session, lap, title
+		local compound, compoundColor
 
 		if this.SessionActive {
 			window := this.Window
@@ -9317,7 +9318,7 @@ class RaceCenter extends ConfigurationItem {
 		local fuelCapacity, safetyFuel, pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder
 		local lastPositions, lastRunnings, count, laps, consideredLaps, curLap, carPositions, nextRunnings
 		local lapTime, potential, raceCraft, speed, consistency, carControl
-		local rnd, delta, running, nr, position, ignore, nextPositions, runnings
+		local rnd, delta, running, nr, position, ignore, nextPositions, runnings, car
 
 		if (this.SessionActive && lastLap) {
 			positions := lastLap.Positions

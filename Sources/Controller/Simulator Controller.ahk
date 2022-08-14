@@ -1354,7 +1354,7 @@ class ControllerFunction {
 
 	disconnectAction(plugin, action) {
 		local controller := this.Controller
-		local ignore, trigger
+		local ignore, trigger, theHotkey
 
 		this.iEnabledActions.Delete(action)
 

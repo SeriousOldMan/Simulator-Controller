@@ -1225,9 +1225,8 @@ matchWords(string1, string2) {
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-			if !silent
-				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 

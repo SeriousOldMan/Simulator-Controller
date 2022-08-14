@@ -218,7 +218,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	selectTrackAutomation(name := false, label := false) {
-		local trackAutomation, ignore, candidate, enabled
+		local trackAutomation, ignore, candidate, enabled, trackAutomations
 
 		if this.Simulator {
 			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
@@ -370,7 +370,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
 				if (lap > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
-					track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
+					track := getConfigurationValue(data, "Session Data", "Track", false)
 
 					code := sessionDB.getSimulatorCode(simulator)
 					dataFile := (kTempDirectory . code . " Data\" . track . ".data")

@@ -894,7 +894,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		if compound {
 			index := this.tyreCompoundIndex(compound, compoundColor)
 
-			return (index ? sessionDB.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+			return (index ? new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
 		}
 		else
 			return false
@@ -1021,7 +1021,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquireTelemetryData() {
-		local simulator, code, trackData, data
+		local code, trackData, data
 
 		static sessionDB := false
 

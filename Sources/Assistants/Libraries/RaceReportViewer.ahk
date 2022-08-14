@@ -707,7 +707,7 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local raceData, drivers, positions, times, selectedCars, laps, driverTimes, allTimes, ignore, lap, lapTimes
 		local time, invalidCars, carTimes, avg, cars, offset, singleCar, min, avg, max, window
-		local series, title, consistency
+		local series, title, consistency, delta, car
 
 		if report {
 			raceData := true

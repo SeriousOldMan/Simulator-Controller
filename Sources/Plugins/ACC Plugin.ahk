@@ -711,7 +711,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.sendCommand("{Left}")
 
 			if listEqual(currentPressures, modifiedPressures)
-				return := false
+				return false
 		}
 
 		return true
@@ -1776,7 +1776,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	pitstopFinished(pitstopNumber, async := false) {
 		local retry, updateTime, carState, pitstopState, currentDriver, currentTyreSet, tyreStates, pitstopData
 		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot
-		local data, tyre, key, value
+		local data, tyre, key, value, wear
 
 		static updateTask := false
 

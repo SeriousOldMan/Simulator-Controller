@@ -1158,7 +1158,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 startSimFeedback(stayOpen := false) {
 	local simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
-	local pid
+	local pid, windowTitle
 
 	if simFeedback.isRunning()
 		pid := simFeedback.CurrentPID

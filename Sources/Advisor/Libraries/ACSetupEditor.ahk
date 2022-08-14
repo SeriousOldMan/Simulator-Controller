@@ -74,6 +74,7 @@ class ACSetup extends FileSetup {
 
 	printSetup() {
 		local display := newConfiguration()
+		local ignore, setting
 
 		for ignore, setting in this.Editor.Advisor.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)

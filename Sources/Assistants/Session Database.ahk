@@ -676,6 +676,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
+		local x, y
 
 		if getWindowPosition("Session Database", x, y)
 			Gui %window%:Show, x%x% y%y%
@@ -1282,6 +1283,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
 		local candidate, deltaX, deltaY, dX, dY
+		local index, action
 
 		if (this.SelectedTrackAutomation && trackMap && trackImage) {
 			candidate := false
@@ -1540,7 +1542,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local imgScale := Min(width / imgWidth, height / imgHeight)
 		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
-		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY
+		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY, rnd
 
 		if actions {
 			token := Gdip_Startup()
@@ -1696,7 +1698,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteData() {
 		local window := this.Window
 		local x, y, progressWindow, defaultListView, simulator, count, row, type, data, car, track
-		local driver, telemetryDB, tyresDB, code, candidate
+		local driver, telemetryDB, tyresDB, code, candidate, progress
 
 		Gui %window%:Default
 
@@ -1985,7 +1987,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local info := readConfiguration(directory . "\Export.info")
 		local x, y, progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
-		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations
+		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName
 
 		directory := normalizePath(directory)
 
@@ -2166,7 +2168,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local y := A_ScreenHeight - 150
 		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
 		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
-		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, cound, strategies
+		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
+		local automations, trackName
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -2296,7 +2299,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	selectData(load := true) {
 		local window := this.Window
 		local defaultListView, ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
-		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory
+		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, count
 
 		Gui %window%:Default
 
@@ -2816,7 +2819,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
-		local window, compounds, chosen, compound, compoundColor, pressureInfos
+		local window, compounds, chosen, compound, compoundColor, pressureInfos, index
 		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
 
 		static lastSimulator := false
@@ -3018,7 +3021,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local title := translate("Delete")
 		local prompt := translate("Please enter the new name for the selected setup:")
 		local locale := ((getLanguage() = "en") ? "" : "Locale")
-		local newName
+		local newName, curExtension, curName
 
 		Gui %window%:Default
 
@@ -3253,7 +3256,7 @@ global importSelectCheck
 selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 	local x, y, editor, owner, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, automations, row, selection, data, type
+	local strategies, automations, row, selection, data, type, count
 
 	static importListViewHandle := false
 	static result := false
@@ -4113,7 +4116,8 @@ selectSetting() {
 
 changeSetting() {
 	local editor := SessionDatabaseEditor.Instance
-	local window, defaultListView, selected, settings, section, key, ignore, setting, type, value
+	local window, defaultListView, selected, settings, section, key, ignore, setting
+	local type, value, oldValue
 
 	if (editor.SelectedModule = "Settings") {
 		window := editor.Window
@@ -4330,13 +4334,12 @@ noSelect() {
 
 selectTrackAction() {
 	local editor := SessionDatabaseEditor.Instance
-	local x, y, coordinateX, coordinateY, action, title, originalX, originalY, currentX, currentY
+	local coordinateX := false
+	local coordinateY := false
+	local action := false
+	local x, y, title, originalX, originalY, currentX, currentY
 
 	MouseGetPos x, y
-
-	coordinateX := false
-	coordinateY := false
-	action := false
 
 	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
 								, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
@@ -4395,7 +4398,7 @@ selectTrackAction() {
 selectTrackAutomation() {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local index, trackAutomation, checkedRows, checked, changed, ignore, row
+	local index, trackAutomation, checkedRows, checked, changed, ignore, row, defaultListView
 
 	Gui %window%:Default
 

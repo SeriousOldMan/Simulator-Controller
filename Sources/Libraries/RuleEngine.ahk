@@ -3036,7 +3036,7 @@ class Rules {
 					if last
 						new this.Production(rule, last)
 					else
-						this.iProductions := new Production(rule)
+						this.iProductions := new this.sProduction(rule)
 
 					this.iGeneration += 1
 

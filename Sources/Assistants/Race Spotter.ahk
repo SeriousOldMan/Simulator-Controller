@@ -184,7 +184,7 @@ startRaceSpotter() {
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)
 
-	if remotePIP
+	if remotePID
 		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
 
 	return

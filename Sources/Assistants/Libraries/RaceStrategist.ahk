@@ -692,6 +692,7 @@ class RaceStrategist extends RaceAssistant {
 
 	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local delta
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
@@ -989,7 +990,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	loadStrategy(facts, strategy, lap := false) {
-		local pitstop, count, ignore, pitstopLap
+		local pitstop, count, ignore, pitstopLap, first
 
 		facts["Strategy.Name"] := strategy.Name
 
@@ -1602,7 +1603,7 @@ class RaceStrategist extends RaceAssistant {
 				this.setContinuation(ObjBindMethod(this, "cancelStrategy", false))
 			}
 			else
-				speaker.speakPhrase("NoStrategy")
+				this.getSpeaker().speakPhrase("NoStrategy")
 
 			return
 		}

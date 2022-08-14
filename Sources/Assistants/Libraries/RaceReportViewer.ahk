@@ -570,7 +570,7 @@ class RaceReportViewer extends RaceReportReader {
 						if positions.HasKey(lap)
 							positions[lap].RemoveAt(car)
 			}
-			
+
 			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 
 			hasData := false
@@ -707,7 +707,7 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local raceData, drivers, positions, times, selectedCars, laps, driverTimes, allTimes, ignore, lap, lapTimes
 		local time, invalidCars, carTimes, avg, cars, offset, singleCar, min, avg, max, window
-		local series, title, consistency, delta, car
+		local series, title, consistency, delta, car, index
 
 		if report {
 			raceData := true

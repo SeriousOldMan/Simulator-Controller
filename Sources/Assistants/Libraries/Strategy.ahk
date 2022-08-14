@@ -401,6 +401,7 @@ class StrategySimulation {
 		local tyreCompound := false
 		local tyreCompoundColor := false
 		local tyrePressures := false
+		local message
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
@@ -480,7 +481,7 @@ class StrategySimulation {
 	}
 
 	optimizeScenarios(scenarios, verbose, ByRef progress) {
-		local strategy, name, avgLapTime, targetTime, sessionTime, superfluousLaps, reqPitstops
+		local strategy, name, avgLapTime, targetTime, sessionTime, superfluousLaps, reqPitstops, message
 
 		if (this.SessionType = "Duration")
 			for name, strategy in scenarios {

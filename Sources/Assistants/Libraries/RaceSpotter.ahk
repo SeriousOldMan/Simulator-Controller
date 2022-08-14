@@ -889,7 +889,7 @@ class RaceSpotter extends RaceAssistant {
 
 	lapTimesRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local car, lap, position, cars, driverLapTime, speaker
+		local car, lap, position, cars, driverLapTime, speaker, minute, seconds
 
 		if !this.hasEnoughData()
 			return
@@ -1001,6 +1001,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updatePositionInfos(lastLap, sector) {
 		local positionInfos, position, info
+		local nr, car
 
 		this.updateCarInfos(lastLap, sector)
 
@@ -1174,7 +1175,7 @@ class RaceSpotter extends RaceAssistant {
 		 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
 		 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
 		 && (trackBehind.OpponentType = "LapDown")) {
-			situation := ("ProtectFaster " . trackBehind . A_Space . opponent)
+			situation := ("ProtectFaster " . trackBehind . A_Space . standingsBehind)
 
 			if !this.Advices.HasKey(situation) {
 				this.Advices[situation] := true
@@ -1236,7 +1237,7 @@ class RaceSpotter extends RaceAssistant {
 	deltaInformation(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
-		local opponentType, delta, deltaDifference, lapTimeDifference, car, remaining
+		local opponentType, delta, deltaDifference, lapTimeDifference, car, remaining, speaker
 
 		static lapUpRangeThreshold := "__Undefined__"
 		static lapDownRangeThreshold := false
@@ -1688,7 +1689,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	startupSpotter(forceShutdown := false) {
-		local code, exePath
+		local code, exePath, pid
 
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
@@ -1699,7 +1700,7 @@ class RaceSpotter extends RaceAssistant {
 				this.shutdownSpotter(forceShutdown)
 
 				try {
-					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, spotterPID
+					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, pid
 				}
 				catch exception {
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -1712,8 +1713,8 @@ class RaceSpotter extends RaceAssistant {
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
-				if ((ErrorLevel != "Error") && spotterPID)
-					this.iSpotterPID := spotterPID
+				if ((ErrorLevel != "Error") && pid)
+					this.iSpotterPID := pid
 			}
 		}
 
@@ -1721,15 +1722,15 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	shutdownSpotter(force := false) {
-		local spotterPID := this.iSpotterPID
+		local pid := this.iSpotterPID
 		local processName, tries
 
-		if spotterPID {
-			Process Close, %spotterPID%
+		if pid {
+			Process Close, %pid%
 
 			Sleep 500
 
-			Process Exist, %spotterPID%
+			Process Exist, %pid%
 
 			if (force && ErrorLevel) {
 				processName := (this.SettingsDatabase.getSimulatorCode(this.Simulator) . " SHM Spotter.exe")

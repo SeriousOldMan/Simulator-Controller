@@ -608,7 +608,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	jokeRecognized(words) {
-		local rnd, joke, speaker, html, index
+		local rnd, joke, speaker, html, index, hasJoke
 
 		Random rnd, 0, 4
 
@@ -801,7 +801,7 @@ class RaceAssistant extends ConfigurationItem {
 	createSession(ByRef settings, ByRef data) {
 		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 		local lapTime, settingsLapTime, sessionForma, sessionTimeRemaining, sessionLapsRemaining
-		local dataDuration, duration, laps, settingsDuration
+		local dataDuration, duration, laps, settingsDuration, sessionFormat
 
 		if (settings && !IsObject(settings))
 			settings := readConfiguration(settings)
@@ -888,7 +888,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateSession(settings) {
 		local knowledgeBase := this.KnowledgeBase
-		local facts
+		local facts, key, value
 
 		if knowledgeBase {
 			if !IsObject(settings)
@@ -965,7 +965,7 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result
-		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemparatures, tyreWear, brakeTemparatures, brakeWear
+		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
 		static baseLap := false
 

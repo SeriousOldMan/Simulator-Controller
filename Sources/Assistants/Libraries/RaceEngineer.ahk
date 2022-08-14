@@ -1474,7 +1474,7 @@ class RaceEngineer extends RaceAssistant {
 		local confirm := true
 		local options := optionsOrLap
 		local plannedLap := false
-		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel
+		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug
 
@@ -1752,7 +1752,7 @@ class RaceEngineer extends RaceAssistant {
 
 	pitstopOptionChanged(option, values*) {
 		local knowledgeBase := this.KnowledgeBase
-		local prssKey, incrKey, targetPressure
+		local prssKey, incrKey, targetPressure, index, suffix
 
 		if this.hasPreparedPitstop() {
 			switch option {

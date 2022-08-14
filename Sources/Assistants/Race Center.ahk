@@ -2120,7 +2120,7 @@ class RaceCenter extends ConfigurationItem {
 	copySetup() {
 		local window := this.Window
 		local driver, conditions, compound, pressures
-		local currentListView
+		local currentListView, row
 
 		Gui %window%:Default
 
@@ -5677,7 +5677,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	syncSession() {
-		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished
+		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished, message
 
 		static hadLastLap := false
 
@@ -5771,7 +5771,9 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			catch exception {
-				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: "))
+				message := (IsObject(exception) ? exception.Message : exception)
+				
+				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
 
 				if (getLogLevel() <= kLogWarn)
 					logMessage(kLogWarn, message)
@@ -6914,7 +6916,7 @@ class RaceCenter extends ConfigurationItem {
 	showDetails(report, details, charts*) {
 		local chartID := 1
 		local html := (details ? details : "")
-		local tableCSS, script, ignore, chart, html
+		local tableCSS, script, ignore, chart
 
 		this.iSelectedDetailReport := report
 
@@ -8092,7 +8094,7 @@ class RaceCenter extends ConfigurationItem {
 		local drawChartFunction := "function drawChart" . chartID . "() {"
 		local validLaps := []
 		local validTimes := []
-		local ignore, lap, time, min, avg, max, delta, window, consistency, time
+		local ignore, lap, time, min, avg, max, delta, window, consistency, time, title
 
 		for ignore, lap in laps {
 			if (A_Index > 1) { ; skip out lap
@@ -8149,7 +8151,7 @@ class RaceCenter extends ConfigurationItem {
 		local lapTimeData := []
 		local fuelConsumptionData := []
 		local accidentData := []
-		local ignore, lap, html
+		local ignore, lap
 
 		html .= ("<tr><td><b>" . translate("Average:") . "</b></td><td>" . lapTimeDisplayValue(stint.AvgLapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Best:") . "</b></td><td>" . lapTimeDisplayValue(stint.BestLapTime) . "</td></tr>")
@@ -8363,7 +8365,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta
+		local index, position, lapTime, laps, delta, result
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
@@ -8822,7 +8824,7 @@ class RaceCenter extends ConfigurationItem {
 		local avgLapTimesData := []
 		local avgFuelConsumptionsData := []
 		local accidentsData := []
-		local ignore, driver, drivingTime, lapAccidents, lapTimes, fuelConsumptions, ignore, lap
+		local ignore, driver, drivingTime, lapAccidents, lapTimes, fuelConsumptions, ignore, lap, html
 
 		for ignore, driver in drivers {
 			driverData.Push("<th class=""th-std"">" . StrReplace(driver.FullName, "'", "\'") . "</th>")

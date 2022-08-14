@@ -114,6 +114,7 @@ class ACCSetup extends FileSetup {
 
 	printSetup() {
 		local display := JSON.parse(this.Setup[true])
+		local ignore, setting
 
 		for ignore, setting in this.Editor.Advisor.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
@@ -186,7 +187,7 @@ class ACCSetupEditor extends FileSetupEditor {
 
 	saveSetup() {
 		local fileName := this.Setup.FileName
-		local directory, title, fileName
+		local directory, title, fileName, text
 
 		if fileName = this.Setup.FileName[true]
 			SplitPath fileName, , directory

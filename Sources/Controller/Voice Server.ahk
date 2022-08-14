@@ -736,7 +736,7 @@ class VoiceServer extends ConfigurationItem {
 
 	muteVoiceClients() {
 		local ignore, client
-		
+
 		if FileExist(kTempDirectory . "Voice.mute")
 			for ignore, client in this.VoiceClients
 				client.mute()
@@ -763,7 +763,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
-		local grammar, client, nextCharIndex, command
+		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1
 
@@ -856,7 +856,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterStaleVoiceClients() {
-		local descriptor, voiceClient
+		local descriptor, voiceClient, pid
 
 		protectionOn()
 

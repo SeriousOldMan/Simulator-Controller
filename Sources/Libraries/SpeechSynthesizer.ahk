@@ -179,7 +179,7 @@ class SpeechSynthesizer {
 
 				voices := this.iSpeechSynthesizer.GetVoices()
 			}
-			catch exceptions {
+			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
 
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")

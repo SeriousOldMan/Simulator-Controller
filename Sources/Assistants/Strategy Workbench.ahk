@@ -366,7 +366,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	createGui(configuration) {
 		local window := this.Window
 		local compound, simulators, simulator, car, track, weather, choices, chosen, schema
-		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, w12
+		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, w12, w3
+		local airTemperature, trackTemperature
 
 		Gui %window%:Default
 
@@ -1144,7 +1145,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	showDataPlot(data, xAxis, yAxises) {
 		local drawChartFunction := "function drawChart() {"
 		local double := (yAxises.Length() > 1)
-		local ignore, yAxis, minValue, maxValue, value, series, vAxis, index
+		local ignore, yAxis, minValue, maxValue, value, series, vAxis, index, values
 
 		this.iSelectedChart := "LapTimes"
 
@@ -1378,7 +1379,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	loadDataType(dataType, force := false, reload := false) {
 		local window, compound, compoundColor, telemetryDB, ignore, column, categories, field, category, value
-		local sessionDB, driverNames, index, names, schema
+		local sessionDB, driverNames, index, names, schema, availableCompounds
 
 		if (force || (this.SelectedDataType != dataType)) {
 			this.showTelemetryChart(false)
@@ -1556,7 +1557,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	loadCompound(compound, force := false) {
 		local window
-		local comopoundColor
+		local compoundColor
 
 		if (force || (this.SelectedCompound[true] != compound)) {
 			window := this.Window
@@ -2105,7 +2106,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator := this.SelectedSimulator
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
-		local strategy, simulatorCode, dirName, fileName, configuration, title, name, files, directory
+		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
 
 		if (simulator && car && track) {
 			simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
@@ -2261,7 +2262,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	compareStrategies(strategies*) {
-		local strategy, before, after, chart, ignore, laps, exhausted, index
+		local strategy, before, after, chart, ignore, laps, exhausted, index, hasData
 		local sLaps, html, timeSeries, lapSeries, fuelSeries, tyreSeries, width, chartArea, tableCSS
 
 		before =
@@ -2328,7 +2329,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		html := ""
 
 		for ignore, strategy in strategies {
-			timesSeries := []
+			timeSeries := []
 			lapSeries := []
 			fuelSeries := []
 			tyreSeries := []
@@ -2507,7 +2508,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		local window := this.Window
 		local result := true
-		local compound, translatedCompounds, count
+		local compound, compoundColor, translatedCompounds, count
 
 		Gui %window%:Default
 
@@ -2897,7 +2898,7 @@ validatePitstopFuelService() {
 }
 
 chooseSimDriver() {
-	local workbench, window, sessionDB, ignore, id
+	local workbench, window, sessionDB, ignore, id, driver
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		workbench := StrategyWorkbench.Instance
@@ -3085,7 +3086,7 @@ chooseCar() {
 chooseTrack() {
 	local workbench := StrategyWorkbench.Instance
 	local window := workbench.Window
-	local simulator, track, trackNames
+	local simulator, tracks, trackNames
 
 	Gui %window%:Default
 
@@ -3237,7 +3238,7 @@ choosePitstopRequirements() {
 }
 
 chooseTyreSet() {
-	local compound, workbench, window
+	local compound, workbench, window, count
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		workbench := StrategyWorkbench.Instance
@@ -3419,8 +3420,7 @@ runStrategyWorkbench() {
 
 	OnExit(Func("exitFixIE").Bind(current))
 
-	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature
-									 , compound, compoundColor, map, tc, abs)
+	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 	workbench.createGui(workbench.Configuration)
 	workbench.show()

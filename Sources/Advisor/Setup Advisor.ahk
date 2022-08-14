@@ -1211,6 +1211,7 @@ class SetupAdvisor extends ConfigurationItem {
 	addCharacteristic(characteristic, weight := 50, value := 33, draw := true) {
 		local numCharacteristics := this.SelectedCharacteristics.Length()
 		local window, x, y, characteristicLabels, callback
+		local label1, label2, slider1, slider2
 
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
 			window := this.Window
@@ -1278,7 +1279,7 @@ class SetupAdvisor extends ConfigurationItem {
 	deleteCharacteristic(characteristic, draw := true) {
 		local numCharacteristics := this.SelectedCharacteristics.Length()
 		local index := inList(this.SelectedCharacteristics, characteristic)
-		local ignore, widget, row, y, widgets
+		local ignore, widget, row, y, widgets, pos, poxX, posY
 
 		if index {
 			for ignore, widget in this.SelectedCharacteristicsWidgets[characteristic]
@@ -1311,8 +1312,8 @@ class SetupAdvisor extends ConfigurationItem {
 
 	chooseCharacteristic() {
 		local window := this.Window
-		local characteristicLabels, menuIndex, groups, translatedGroups, ignore, group, definition
-		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, handler, label
+		local characteristicLabels, menuIndex, groups, translatedGroups, ignore, group, definition, option
+		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, handler, label, characteristic
 
 		Gui %window%:Default
 
@@ -1415,7 +1416,7 @@ class SetupAdvisor extends ConfigurationItem {
 	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local window, noProblem, ignore, characteristic, widgets, value1, value2, settingsLabels, settings
-		local ignore, setting, delta
+		local setting, delta
 
 		window := this.Window
 
@@ -2026,7 +2027,7 @@ class SetupEditor extends ConfigurationItem {
 		local setup := this.Setup
 		local enabled := []
 		local changed := false
-		local row, label, sIndex, sEnabled
+		local row, label, sIndex, sEnabled, ignore, setting
 
 		Gui %window%:Default
 

@@ -694,7 +694,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchMFDImage(imageNames*) {
-		local imageName, pitstopImages, curTickCount, imageX, imageY, pitsopImage
+		local imageName, pitstopImages, curTickCount, imageX, imageY, pitstopImage
 
 		static kSearchAreaLeft := 0
 		static kSearchAreaRight := 400

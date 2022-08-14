@@ -685,7 +685,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startupAssistants() {
-		activeAssistant := false
+		local activeAssistant := false
+		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled {
@@ -801,6 +802,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	updateAssistantsTelemetryData(data) {
 		local simulator, car, track, maxFuel, compound, compoundColor
+		local ignore, assistant
 
 		static settingsDB := false
 
@@ -990,7 +992,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startupRaceAssistant() {
-		local pid, options
+		local pid, options, exePath
 
 		if (!this.RaceAssistant && this.RaceAssistantEnabled) {
 			Process Exist
@@ -1385,7 +1387,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	collectSessionData() {
-		local telemetryData, positionsData, data, dataFile, settings, settingsFile, dataLastLap
+		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
 		local newLap, firstLap, ignore, assistant
 
@@ -1463,7 +1465,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if !RaceAssistantPlugin.InPit {
 							RaceAssistantPlugin.performAssistantsPitstop(dataLastLap)
 
-							RaceAssistantPlugin.sInPit := lapNumber
+							RaceAssistantPlugin.sInPit := dataLastLap
 						}
 					}
 					else if (dataLastLap == 0) {

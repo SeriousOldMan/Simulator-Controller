@@ -735,6 +735,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	muteVoiceClients() {
+		local ignore, client
+		
 		if FileExist(kTempDirectory . "Voice.mute")
 			for ignore, client in this.VoiceClients
 				client.mute()

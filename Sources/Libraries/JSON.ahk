@@ -87,7 +87,7 @@ class JSON {
 	}
 
 	removeKey(script, key, indent := "") {
-		local sign, result
+		local sign, result, match, match1, match2
 
 		if !this.verify(script)
 			return false
@@ -112,7 +112,7 @@ class JSON {
 	}
 
 	enum(script, key := "", indent := "") {
-		local jsObject, object, result, concatenated, keys
+		local jsObject, object, result, concatenated, keys, k
 
 		if !this.verify(script)
 			return false

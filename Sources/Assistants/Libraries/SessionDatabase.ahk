@@ -735,7 +735,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
-		local index, name
+		local index, name, code
 
 		for index, name in this.getTyreCompounds(simulator, car, track)
 			if (name = compound) {
@@ -878,7 +878,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeSetup(simulator, car, track, type, name, setup, size) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName
+		local fileName, file
 
 		car := this.getCarCode(simulator, car)
 

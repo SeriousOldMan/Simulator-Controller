@@ -1114,7 +1114,7 @@ hideSplashTheme() {
 		try {
 			SoundPlay NonExistent.avi
 		}
-		catch ignore {
+		catch exception {
 			; Ignore
 		}
 

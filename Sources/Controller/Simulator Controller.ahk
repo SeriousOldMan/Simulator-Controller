@@ -716,7 +716,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	computeControllerModes() {
-		local function, ignore, mode, action, fnController
+		local function, ignore, mode, action, fnController, controllers
 
 		for ignore, mode in this.Modes {
 			controllers := []
@@ -855,7 +855,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getVoiceCommandDescriptor(command) {
-		local descriptor, pid
+		local descriptor, pid, activationCommand
 
 		static registered := false
 
@@ -975,7 +975,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	setMode(newMode) {
-		local modeSwitched, controllers, deactivatedModes, ignore, mode
+		local modeSwitched, controllers, deactivatedModes, ignore, mode, controller
 
 		if !this.isActive(newMode)
 			return
@@ -1054,7 +1054,8 @@ class SimulatorController extends ConfigurationItem {
 			if !this.isActive(targetMode) {
 				index += delta
 				targetMode := false
-			} else if controller {
+			}
+			else if controller {
 				found := false
 
 				for ignore, modeController in targetMode.FunctionController
@@ -1099,7 +1100,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	showLogo(show := "__Undefined__") {
-		local info, logo, image, x, y, title1, title2
+		local info, logo, image, x, y, title1, title2, html
 		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
 		if (show != kUndefined)

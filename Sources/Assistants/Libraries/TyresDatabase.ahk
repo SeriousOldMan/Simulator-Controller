@@ -174,8 +174,8 @@ class TyresDatabase extends SessionDatabase {
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature
 			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, driver := "__Undefined__") {
-		local condition, weatherIndex, visited, compounds, ignore, condition, theCompound, conditionIndex, valid
-		local settings, correctionAir, correctionTrack, thePressures, theCertainty, ignore, compoundInfo
+		local condition, weatherIndex, visited, compounds, theCompound, conditionIndex, valid
+		local settings, correctionAir, correctionTrack, thePressures, theCertainty, compoundInfo
 		local theCompound, theCompoundColor, ignore, pressureInfo, deltaAir, deltaTrack
 
 		simulator := this.getSimulatorName(simulator)

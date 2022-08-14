@@ -398,7 +398,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	__New(controller, name, configuration := false, register := true) {
 		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
-		local effectFunctions, ignore, effect, descriptor, motionMode, increaseAction, decreaseAction
+		local effectFunctions, ignore, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
 
 		base.__New(controller, name, configuration, false)
 
@@ -629,7 +629,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
 		else
-			this.logFunctionNotFound(descriptor)
+			this.logFunctionNotFound(functionDescriptor)
 	}
 
 	activate() {
@@ -934,7 +934,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	resetEffectIntensities() {
-		local index, effect
+		local index, effect, initialIntensity
 
 		for index, effect in this.kEffects {
 			initialIntensity := this.kInitialEffectIntensities[index]

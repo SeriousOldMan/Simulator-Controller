@@ -192,7 +192,7 @@ class StreamDeck extends FunctionController {
 		local numDials := 0
 		local num1WayToggles := 0
 		local num2WayToggles := 0
-		local function, special, rows, row, ignore, label, icon, mode, isRunning
+		local function, special, rows, row, ignore, label, icon, mode, isRunning, layout
 
 		base.loadFromConfiguration(configuration)
 
@@ -379,7 +379,7 @@ class StreamDeck extends FunctionController {
 
 	setControlIcon(function, icon) {
 		local controller := this.Controller
-		local enabled, displayMode, iconMode
+		local enabled, displayMode, iconMode, ignore, theAction
 
 		if !IsObject(function)
 			function := controller.findFunction(function)

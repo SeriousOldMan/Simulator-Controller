@@ -409,7 +409,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							lastDriverCar := driverCar
 						}
 						else if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCarCandiate := A_Index
+							driverCarCandidate := A_Index
 				}
 			}
 
@@ -675,7 +675,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	isStrategyAvailable(options, currentPressures) {
-		local index := inList(options, "Change Tyres")
 		local modifiedPressures
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
@@ -719,7 +718,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	isTyreChangeSelected(options, currentPressures) {
-		local index := inList(options, "Change Tyres")
 		local modifiedPressures
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
@@ -740,8 +738,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		local index, modifiedPressures, pressure
 
 		if this.iPSChangeTyres {
-			index := inList(options, "Change Tyres")
-
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			loop % inList(options, "Change Tyres") - 1 + 4
@@ -1586,7 +1582,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	searchDriverLabel(ByRef lastY, images) {
 		local curTickCount := A_TickCount
 		local reload := false
-		local imageX, imageY, position, selectedDriverLabel
+		local imageX, imageY, position, selectDriverLabel
 
 		static selectDriverLabels := false
 

@@ -158,7 +158,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local ignore, simulator, simulatorConfiguration, ignore, key, default
+		local ignore, simulator, simulatorConfiguration, key, default
 
 		base.loadFromConfiguration(configuration)
 

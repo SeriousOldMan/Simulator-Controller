@@ -247,7 +247,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	startupTrackAutomation() {
-		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath
+		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath, pid
 
 		if !this.iAutomationPID && this.Simulator {
 			trackAutomation := this.Simulator.TrackAutomation
@@ -273,9 +273,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					try {
 						if data
-							Run "%exePath%" -Trigger "%data%" %positions%, %kBinariesDirectory%, Hide, automationPID
+							Run "%exePath%" -Trigger "%data%" %positions%, %kBinariesDirectory%, Hide, pid
 						else
-							Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, automationPID
+							Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, pid
 					}
 					catch exception {
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -288,23 +288,23 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 					}
 
-					if ((ErrorLevel != "Error") && automationPID)
-						this.iAutomationPID := automationPID
+					if ((ErrorLevel != "Error") && pid)
+						this.iAutomationPID := pid
 				}
 			}
 		}
 	}
 
 	shutdownTrackAutomation(force := false) {
-		local automationPID := this.iAutomationPID
+		local pid := this.iAutomationPID
 		local processName, tries
 
-		if automationPID {
-			Process Close, %automationPID%
+		if pid {
+			Process Close, %pid%
 
 			Sleep 500
 
-			Process Exist, %automationPID%
+			Process Exist, %pid%
 
 			if (force && ErrorLevel) {
 				processName := (new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
@@ -338,7 +338,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lap, update, data) {
-		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid
+		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile
 
 		static sessionDB := false
 
@@ -355,7 +355,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else if this.iMapperPID
 				hasTrackMap := false
 			else {
-				track := getConfigurationValue(telemetryData ? telemetryData : readConfiguration(dataFile), "Session Data", "Track", false)
+				track := getConfigurationValue(data, "Session Data", "Track", false)
 
 				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
 			}

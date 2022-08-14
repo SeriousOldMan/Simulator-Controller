@@ -2828,8 +2828,7 @@ class FactRules {
 
 	removeRule(rule) {
 		local rules := this.Rules
-
-		index := inList(rules, rule)
+		local index := inList(rules, rule)
 
 		if index
 			rules.RemoveAt(index)

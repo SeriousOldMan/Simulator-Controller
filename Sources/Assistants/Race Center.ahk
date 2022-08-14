@@ -6793,7 +6793,7 @@ class RaceCenter extends ConfigurationItem {
 		local maxValue := kUndefined
 		local drawChartFunction := ""
 		local ignore, yAxis, settingsLaps, laps, ignore, lap, first, values, value, minValue, maxValue
-		local series, vAxis
+		local series, vAxis, index
 
 		drawChartFunction .= "function drawChart() {"
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
@@ -7429,7 +7429,7 @@ class RaceCenter extends ConfigurationItem {
 	updateSeriesSelector(report, force := false) {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
-		local sessionDB, selected, names, ignore, id, found
+		local sessionDB, selected, names, ignore, id, found, index
 
 		Gui %window%:Default
 

@@ -396,7 +396,7 @@ class SystemPlugin extends ControllerPlugin {
 		try {
 			SoundPlay NonExistent.avi
 		}
-		catch ignore {
+		catch exception {
 			; Ignore
 		}
 

@@ -675,7 +675,7 @@ class SpeechSynthesizer {
 
 	computeVoice(voice, language, randomize := true) {
 		local voices := this.Voices
-		local availableVoices, count, index, locale
+		local availableVoices, count, index, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {

@@ -368,7 +368,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
-		local function, decreaseFunction, mode, label, icon
+		local function, decreaseFunction, mode, label, icon, actions, selectActions, descriptor
 
 		this.getPitstopActions(actions, selectActions)
 
@@ -749,7 +749,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
 				if isInstance(assistant, RaceEngineerPlugin)
-					this.iRaceEngineer := assistantv
+					this.iRaceEngineer := assistant
 				else if isInstance(assistant, RaceStrategistPlugin)
 					this.iRaceStrategist := assistant
 				else if isInstance(assistant, RaceSpotterPlugin)
@@ -1040,6 +1040,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
 		local data := newConfiguration()
+		local section, values
 
 		telemetryData := this.acquireTelemetryData()
 		positionsData := this.acquirePositionsData()

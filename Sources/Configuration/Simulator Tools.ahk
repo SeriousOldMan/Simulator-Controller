@@ -12,7 +12,7 @@
 #SingleInstance Force			; Ony one instance allowed
 #NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+; #Warn LocalSameAsGlobal, Off
 
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
@@ -96,6 +96,8 @@ global vProgressCount := 0
 global installLocationPathEdit
 
 installOptions(options) {
+	local directory, valid, empty, title, innerWidth, chosen, disabled, checked
+
 	static installationTypeDropDown
 	static automaticUpdatesCheck
 	static startMenuShortcutsCheck
@@ -211,9 +213,9 @@ installOptions(options) {
 		Gui Install:Margin, 10, 10
 		Gui Install:Show, AutoSize Center
 
-		loop {
+		loop
 			Sleep 200
-		} until result
+		until result
 
 		if (result == kOk) {
 			Gui Install:Submit
@@ -233,9 +235,10 @@ installOptions(options) {
 }
 
 uninstallOptions(options) {
-	static keepUserFilesCheck
+	local innerWidth, checked
 
 	static result := false
+	static keepUserFilesCheck
 
 	if (options == kOk)
 		result := kOk
@@ -280,9 +283,9 @@ uninstallOptions(options) {
 		Gui Uninstall:Margin, 10, 10
 		Gui Uninstall:Show, AutoSize Center
 
-		loop {
+		loop
 			Sleep 200
-		} until result
+		until result
 
 		if (result == kOk) {
 			Gui Uninstall:Submit
@@ -321,6 +324,8 @@ moveUninstallEditor() {
 }
 
 chooseInstallLocationPath() {
+	local valid, empty, title
+
 	GuiControlGet installLocationPathEdit
 
 	Gui +OwnDialogs
@@ -369,9 +374,11 @@ openInstallDocumentation() {
 }
 
 exitProcesses(silent := false, force := false) {
+	local pid, hasFGProcesses, hasBGProcesses, ignore, app, title
+
 	Process Exist
 
-	self := ErrorLevel
+	pid := ErrorLevel
 
 	while true {
 		hasFGProcesses := false
@@ -390,7 +397,7 @@ exitProcesses(silent := false, force := false) {
 		for ignore, app in kBackgroundApps {
 			Process Exist, %app%.exe
 
-			if (ErrorLevel && (ErrorLevel != self)) {
+			if (ErrorLevel && (ErrorLevel != pid)) {
 				hasBGProcesses := true
 
 				break
@@ -428,7 +435,7 @@ exitProcesses(silent := false, force := false) {
 			for ignore, app in kBackgroundApps {
 				Process Exist, %app%.exe
 
-				if (ErrorLevel && (ErrorLevel != self)) {
+				if (ErrorLevel && (ErrorLevel != pid)) {
 					Process Close, %ErrorLevel%
 
 					if !ErrorLevel
@@ -441,6 +448,9 @@ exitProcesses(silent := false, force := false) {
 }
 
 checkInstallation() {
+	local installLocation, installOptions, quiet, options, x, y
+	local install, title, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 
 	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
@@ -736,8 +746,9 @@ normalizePath(path) {
 }
 
 copyFiles(source, destination, deleteOrphanes) {
-	count := 0
-	progress := 0
+	local count := 0
+	local progress := 0
+	local step, stepCount
 
 	loop Files, %source%\*, DFR
 	{
@@ -778,8 +789,9 @@ copyFiles(source, destination, deleteOrphanes) {
 }
 
 deleteFiles(installLocation) {
-	count := 0
-	progress := 0
+	local count := 0
+	local progress := 0
+	local step, stepCount
 
 	loop Files, %installLocation%\*, DFR
 	{
@@ -808,9 +820,10 @@ deleteFiles(installLocation) {
 }
 
 copyDirectory(source, destination, progressStep, ByRef count) {
-	FileCreateDir %destination%
+	local files := []
+	local ignore, fileName, file, subDirectory
 
-	files := []
+	FileCreateDir %destination%
 
 	loop Files, %source%\*.*, DF
 		files.Push(A_LoopFilePath)
@@ -833,7 +846,8 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 }
 
 deleteDirectory(directory, progressStep, ByRef count) {
-	files := []
+	local files := []
+	local ignore, fileName, subDirectory
 
 	loop Files, %directory%\*.*, DF
 		files.Push(A_LoopFilePath)
@@ -863,6 +877,8 @@ deleteDirectory(directory, progressStep, ByRef count) {
 }
 
 cleanupDirectory(source, destination, maxStep, ByRef count) {
+	local fileName
+
 	loop Files, %destination%\*.*, DF
 	{
 		SplitPath A_LoopFilePath, fileName
@@ -905,6 +921,8 @@ rmdir "%directory%" /s /q
 }
 
 createShortcuts(location, installLocation) {
+	local ignore, name
+
 	if (location = A_StartMenu) {
 		FileCreateDir %location%\Simulator Controller
 
@@ -924,7 +942,8 @@ createShortcuts(location, installLocation) {
 }
 
 deleteShortcuts(location) {
-	deleteFolder := false
+	local deleteFolder := false
+	local ignore, name
 
 	if (location = A_StartMenu) {
 		location := (A_StartMenu . "\Simulator Controller")
@@ -990,7 +1009,7 @@ deleteAppPaths() {
 }
 
 writeUninstallerInfo(installLocation) {
-	version := StrSplit(kVersion, "-", , 2)[1]
+	local version := StrSplit(kVersion, "-", , 2)[1]
 
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % installLocation
@@ -1009,9 +1028,10 @@ deleteUninstallerInfo() {
 }
 
 readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings, ByRef splashTheme) {
-	targets := readConfiguration(kToolsTargetsFile)
-	configuration := readConfiguration(kToolsConfigurationFile)
-	updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+	local targets := readConfiguration(kToolsTargetsFile)
+	local configuration := readConfiguration(kToolsConfigurationFile)
+	local updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+	local target, rule
 
 	updateSettings := Object()
 	cleanupSettings := Object()
@@ -1048,7 +1068,8 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySe
 }
 
 writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme) {
-	configuration := newConfiguration()
+	local configuration := newConfiguration()
+	local target, setting
 
 	for target, setting in cleanupSettings
 		setConfigurationValue(configuration, "Cleanup", target, setting)
@@ -1065,6 +1086,9 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 }
 
 viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
+	local text, innerWidth, editHeight, buttonX
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 	static dismissed := false
 
 	dismissed := false
@@ -1092,7 +1116,7 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if x is not Integer
 		switch x {
 			case "Left":
 				x := 25
@@ -1102,7 +1126,7 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 				x := "Center"
 		}
 
-	if y is not integer
+	if y is not Integer
 		switch y {
 			case "Top":
 				y := 25
@@ -1144,7 +1168,7 @@ cancelTargets() {
 moveEditor() {
 	moveByMouse("TE", "Simulator Tools")
 }
-
+bis hier hin
 editTargets(command := "") {
 	local x, y
 

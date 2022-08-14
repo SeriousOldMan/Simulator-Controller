@@ -44,6 +44,7 @@ ListLines Off					; Disable execution history
 
 showSettingsEditor() {
 	local icon := kIconsDirectory . "Settings.ico"
+	local settings
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Settings

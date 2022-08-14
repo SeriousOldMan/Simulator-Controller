@@ -123,7 +123,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Tactical Advices (4)      | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 
 ##### Notes
 
@@ -132,6 +132,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
+
+(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, and so on.
 
 ## Track Mapping
 

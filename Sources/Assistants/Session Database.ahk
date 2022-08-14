@@ -12,7 +12,7 @@
 #SingleInstance Force			; Ony one instance allowed
 #NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+; #Warn LocalSameAsGlobal, Off
 
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
@@ -2555,7 +2555,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateModules() {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Default
 		Gui %window%:Color, D0D0D0, D8D8D8

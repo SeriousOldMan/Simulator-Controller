@@ -12,7 +12,7 @@
 #SingleInstance Force			; Ony one instance allowed
 #NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+; #Warn LocalSameAsGlobal, Off
 
 #MaxMem 128
 
@@ -5772,7 +5772,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 			catch exception {
 				message := (IsObject(exception) ? exception.Message : exception)
-				
+
 				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
 
 				if (getLogLevel() <= kLogWarn)

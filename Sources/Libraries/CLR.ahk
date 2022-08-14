@@ -123,6 +123,8 @@ CLR_Start(Version = "") {
 }
 
 CLR_GetDefaultDomain() {
+	local RtHst
+
 	static defaultDomain := 0
 
 	if !defaultDomain {

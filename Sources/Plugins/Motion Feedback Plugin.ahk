@@ -1102,7 +1102,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateTrayLabel(label, this.MotionActive)
 
-			action.Function.setLabel(label, "Gray")
+			if action
+				action.Function.setLabel(label, "Gray")
 		}
 	}
 

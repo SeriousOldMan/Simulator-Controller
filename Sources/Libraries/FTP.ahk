@@ -65,7 +65,7 @@ class FTP {
 	}
 
 	getCurrentDirectory(hConnect) {
-		local BUFFER_SIZE
+		local BUFFER_SIZE, currentDirectory
 
 		static MAX_PATH := 260 + 8
 
@@ -155,7 +155,7 @@ class FTP {
 	}
 
 	getFileSize(hConnect, fileName, sizeFormat := "auto", sizeSuffix := false) {
-		local hFile
+		local hFile, fileSizeHigh, fileSizeLow
 
 		static GENERIC_READ := 0x80000000
 

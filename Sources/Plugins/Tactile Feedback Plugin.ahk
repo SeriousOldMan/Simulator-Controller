@@ -516,7 +516,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	enableFX(label, action, command, call := true) {
-		local actionLabel
+		local actionLabel, theAction
 
 		if (call && !this.Application.isRunning()) {
 			this.requireSimHub()
@@ -533,7 +533,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		this.updateActions()
 
-		action := this.findAction(actionLabel).Function.setLabel(actionLabel, "Green")
+		theAction := this.findAction(actionLabel)
+
+		if theAction
+			theAction.Function.setLabel(actionLabel, "Green")
 
 		this["i" . action . "Enabled"] := true
 
@@ -546,7 +549,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	disableFX(label, action, command, call := true) {
-		local actionLabel
+		local actionLabel, theAction
 
 		if (call && !this.Application.isRunning()) {
 			this.requireSimHub()
@@ -561,7 +564,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 		trayMessage(label, translate("State: Off"))
 
-		this.findAction(actionLabel).Function.setLabel(actionLabel, "Black")
+		theAction := this.findAction(actionLabel)
+
+		if theAction
+			theAction.Function.setLabel(actionLabel, "Black")
 
 		this["i" . action . "Enabled"] := false
 

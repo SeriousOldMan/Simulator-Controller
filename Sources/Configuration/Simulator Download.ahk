@@ -12,7 +12,7 @@
 #SingleInstance Force			; Ony one instance allowed
 #NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+; #Warn LocalSameAsGlobal, Off
 
 SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
@@ -51,7 +51,9 @@ updateProgress(max) {
 }
 
 downloadSimulatorController() {
-	icon := kIconsDirectory . "Installer.ico"
+	local icon := kIconsDirectory . "Installer.ico"
+	local options, index, title, cState, sState, devVersion, release, version, download, x, y, updateTask
+	local directory, currentDirectory, start
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
@@ -125,7 +127,7 @@ downloadSimulatorController() {
 			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
-			
+
 			Task.startTask(updateTask)
 
 			try {
@@ -144,9 +146,9 @@ downloadSimulatorController() {
 			}
 
 			Task.stopTask(updateTask)
-			
+
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(90), 1000)
-			
+
 			Task.startTask(updateTask)
 
 			showProgress({message: translate("Extracting installation files...")})
@@ -204,7 +206,7 @@ downloadSimulatorController() {
 				else
 					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			}
-			catch exeception {
+			catch exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")

@@ -53,12 +53,11 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	saveToConfiguration(configuration) {
-		local application
-		local function
+		local wizard := this.SetupWizard
+		local application, function, path, directory, voiceControlConfiguration, ignore, section, subConfiguration
+		local modeSelectors, arguments, launchApplications, descriptor, label
 
 		base.saveToConfiguration(configuration)
-
-		wizard := this.SetupWizard
 
 		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
 		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
@@ -131,24 +130,37 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
+		local window := this.Window
+		local generalIconHandle := false
+		local generalLabelHandle := false
+		local generalInfoTextHandle := false
+		local languageLabelHandle := false
+		local languageDropDownHandle := false
+		local startWithWindowsHandle := false
+		local silentModeHandle := false
+		local labelWidth := width - 30
+		local labelX := x + 35
+		local labelY := y + 8
+		local colummLabel1Handle := false
+		local colummLine1Handle := false
+		local colummLabel2Handle := false
+		local colummLine2Handle := false
+		local colummLabel3Handle := false
+		local colummLine3Handle := false
+		local modeSelectorsLabelHandle := false
+		local modeSelectorsListHandle := false
+		local launchApplicationsLabelHandle := false
+		local launchApplicationsListHandle := false
+		local secondX := x + 105
+		local secondWidth := width - 105
+		local col1Width := (secondX - x) + 120
+		local col2X := secondX + 140
+		local col2Width := width - 140 - secondX + x
+		local choices, code, language, info, html, configurator
+
 		static generalInfoText
 
-		window := this.Window
-
 		Gui %window%:Default
-
-		generalIconHandle := false
-		generalLabelHandle := false
-		generalInfoTextHandle := false
-
-		languageLabelHandle := false
-		languageDropDownHandle := false
-		startWithWindowsHandle := false
-		silentModeHandle := false
-
-		labelWidth := width - 30
-		labelX := x + 35
-		labelY := y + 8
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -156,23 +168,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDgeneralLabelHandle Hidden, % translate("General Configuration")
 
 		Gui %window%:Font, s8 Norm, Arial
-
-		colummLabel1Handle := false
-		colummLine1Handle := false
-		colummLabel2Handle := false
-		colummLine2Handle := false
-		colummLabel3Handle := false
-		colummLine3Handle := false
-
-		modeSelectorsLabelHandle := false
-		modeSelectorsListHandle := false
-		launchApplicationsLabelHandle := false
-		launchApplicationsListHandle := false
-
-		secondX := x + 105
-		secondWidth := width - 105
-
-		col1Width := (secondX - x) + 120
 
 		Gui %window%:Font, Bold, Arial
 
@@ -216,9 +211,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		generalInfoText.Navigate("about:blank")
 		generalInfoText.Document.Write(html)
-
-		col2X := secondX + 140
-		col2Width := width - 140 - secondX + x
 
 		Gui %window%:Font, Bold, Arial
 
@@ -265,12 +257,16 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	showPage(page) {
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local chosen := 0
+		local enIndex := 0
+		local code, language, configuration, voiceControlConfiguration, ignore, section, subConfiguration
+		local path, directory, widget, listBox
+
 		GeneralStepWizard.sCurrentGeneralStep := this
 
 		base.showPage(page)
-
-		wizard := this.SetupWizard
-		window := this.Window
 
 		Gui %window%:Default
 
@@ -289,9 +285,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		GuiControl Choose, uiLanguageDropDown, %chosen%
 		GuiControl, , startWithWindowsCheck, % startWithWindows
 		GuiControl, , silentModeCheck, % silentMode
-
-		chosen := 0
-		enIndex := 0
 
 		this.iModeSelectors := wizard.getModeSelectors()
 
@@ -338,6 +331,9 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	hidePage(page) {
+		local wizard, window, languageCode, code, language, configuration, voiceControlConfiguration
+		local ignore, section, subConfiguration
+
 		this.iVoiceControlConfigurator.hideWidgets()
 
 		if base.hidePage(page) {
@@ -399,11 +395,9 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	loadApplications(load := false) {
-		local application
-		local function
-
-		window := this.Window
-		wizard := this.SetupWizard
+		local window := this.Window
+		local wizard := this.SetupWizard
+		local application, function, row, column, ignore, section, application, descriptor
 
 		if load
 			this.iLaunchApplications := {}
@@ -446,16 +440,12 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	loadControllerLabels() {
-		local application
-		local function
-		local action
+		local wizard := this.SetupWizard
+		local row := false
+		local column := false
+		local application, function, action, ignore, preview, section, application, descriptor, label
 
 		base.loadControllerLabels()
-
-		wizard := this.SetupWizard
-
-		row := false
-		column := false
 
 		for ignore, preview in this.ControllerPreviews {
 			for ignore, section in string2Values(",", this.Definition[3])
@@ -480,6 +470,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	addModeSelector(preview, function, control, row, column) {
+		local listBox
+
 		if !inList(this.iModeSelectors, function) {
 			this.iModeSelectors.Push(function)
 
@@ -496,7 +488,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	removeModeSelector(preview, function, control, row, column) {
-		index := inList(this.iModeSelectors, function)
+		local index := inList(this.iModeSelectors, function)
+		local listBox
 
 		if index {
 			this.iModeSelectors.RemoveAt(index)
@@ -520,10 +513,9 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	clearLaunchApplication(preview, function, control, row, column) {
-		local application
-
-		changed := false
-		found := true
+		local changed := false
+		local found := true
+		local application, candidate
 
 		while found {
 			found := false
@@ -544,6 +536,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	setApplicationFunction(row) {
+		local arguments
+
 		if this.iPendingApplicationRegistration {
 			arguments := this.iPendingApplicationRegistration
 
@@ -560,10 +554,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	clearApplicationFunction(row) {
-		local application
-		local function
-
-		window := this.Window
+		local window := this.Window
+		local application, function
 
 		Gui %window%:Default
 		Gui ListView, % this.iLaunchApplicationsListHandle
@@ -582,7 +574,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	controlClick(preview, element, function, row, column, isEmpty, applicationRegistration := false) {
-		local application
+		local application, menuItem, window, handler, count, ignore, candidate, wizard, descriptor
 
 		if (element[1] = "Control") {
 			if (!this.iPendingFunctionRegistration && !applicationRegistration) {
@@ -692,7 +684,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 updateApplicationFunction() {
-	local function
+	local function, wizard, row, curCoordMode, menuItem, window, handler
 
 	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
@@ -766,12 +758,10 @@ updateApplicationFunction() {
 }
 
 inputLabel(wizard, row) {
-	local function
-
-	title := translate("Modular Simulator Controller System")
-	prompt := translate("Please enter a label:")
-
-	window := wizard.Window
+	local window := wizard.Window
+	local title := translate("Modular Simulator Controller System")
+	local prompt := translate("Please enter a label:")
+	local function, locale, application, label, function
 
 	Gui %window%:Default
 	Gui ListView, % wizard.iLaunchApplicationsListHandle
@@ -799,6 +789,8 @@ inputLabel(wizard, row) {
 }
 
 showLaunchHint() {
+	local hint
+
 	if (GetKeyState("Esc", "P") || !GeneralStepWizard.CurrentGeneralStep) {
 		SetTimer showSelectorHint, Off
 

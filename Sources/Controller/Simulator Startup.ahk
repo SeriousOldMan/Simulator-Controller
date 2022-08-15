@@ -54,31 +54,33 @@ global kClose := "Close"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vSimulatorControllerPID := 0
-
-global vStartupStayOpen := false
-
-global vStartupManager := false
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class SimulatorStartup extends ConfigurationItem {
+	static sStayOpen := false
+
 	iCoreComponents := []
 	iFeedbackComponents := []
 	iSettings := false
 	iSimulators := false
 	iSplashTheme := false
 	iStartupOption := false
-	iSimulatorControllerPID := 0
 
 	iFinished := false
 	iCanceled := false
+
+	iControllerPID := false
+
+	StayOpen[] {
+		Get {
+			return SimulatorStartup.sStayOpen
+		}
+
+		Set {
+			return (SimulatorStartup.sStayOpen := value)
+		}
+	}
 
 	Settings[] {
 		Get {
@@ -95,6 +97,12 @@ class SimulatorStartup extends ConfigurationItem {
 	Canceled[] {
 		Get {
 			return this.iCanceled
+		}
+	}
+
+	ControllerPID[] {
+		Get {
+			return this.iControllerPID
 		}
 	}
 
@@ -189,7 +197,7 @@ class SimulatorStartup extends ConfigurationItem {
 	startComponent(component) {
 		logMessage(kLogInfo, translate("Starting component ") . component)
 
-		sendMessage(kFileMessage, "Startup", "startupComponent:" . component, vSimulatorControllerPID)
+		sendMessage(kFileMessage, "Startup", "startupComponent:" . component, this.ControllerPID)
 	}
 
 	startComponents(section, components, ByRef startSimulator, ByRef runningIndex) {
@@ -227,7 +235,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.iStartupOption := this.iSimulators[1]
 
 		if this.iStartupOption
-			sendMessage(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, vSimulatorControllerPID)
+			sendMessage(kFileMessage, "Startup", "startupSimulator:" . this.iStartupOption, this.ControllerPID)
 	}
 
 	startup() {
@@ -237,10 +245,9 @@ class SimulatorStartup extends ConfigurationItem {
 
 		startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
 
-		vSimulatorControllerPID := this.startSimulatorController()
-		this.iSimulatorControllerPID := vSimulatorControllerPID
+		this.iControllerPID := this.startSimulatorController()
 
-		if (this.iSimulatorControllerPID == 0)
+		if (this.ControllerPID == 0)
 			exitStartup(true)
 
 		if (!kSilentMode && this.iSplashTheme)
@@ -393,11 +400,11 @@ launchPad(command := false, arguments*) {
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
 
-		vStartupStayOpen := !closeCheckBox
+		SimulatorStartup.StayOpen := !closeCheckBox
 
 		startupSimulator()
 
-		if !vStartupStayOpen
+		if !SimulatorStartup.StayOpen
 			launchPad(kClose)
 	}
 	else {
@@ -608,7 +615,7 @@ WM_MOUSEMOVE() {
 }
 
 watchStartupSemaphore() {
-	if (!vStartupStayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
+	if (!SimulatorStartup.StayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
 		exitStartup()
 }
 
@@ -630,9 +637,9 @@ startupSimulator() {
 
 	Hotkey Escape, On
 
-	vStartupManager := new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile))
+	SimulatorStartup.Instance := new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile))
 
-	vStartupManager.startup()
+	SimulatorStartup.Instance.startup()
 
 	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 	;
@@ -664,7 +671,7 @@ startSimulator() {
 	else
 		launchPad()
 
-	if (!vStartupManager || vStartupManager.Finished)
+	if (!SimulatorStartup.Instance || SimulatorStartup.Instance.Finished)
 		ExitApp 0
 
 	return
@@ -672,7 +679,44 @@ startSimulator() {
 
 playSong(songFile) {
 	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-		sendMessage(kFileMessage, "Startup", "playStartupSong:" . songFile, vSimulatorControllerPID)
+		sendMessage(kFileMessage, "Startup", "playStartupSong:" . songFile, SimulatorStartup.Instance.ControllerPID)
+}
+
+cancelStartup() {
+	local startupManager := SimulatorStartup.Instance
+	local title
+
+	protectionOn()
+
+	try {
+		if startupManager
+			if !startupManager.Finished {
+				SoundPlay *32
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				title := translate("Startup")
+				MsgBox 262180, %title%, % translate("Cancel Startup?")
+				OnMessage(0x44, "")
+
+				IfMsgBox Yes
+				{
+					if (startupManager.ControllerPID != 0)
+						sendMessage(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
+
+					startupManager.cancelStartup()
+				}
+			}
+			else {
+				if (startupManager.ControllerPID != 0)
+					sendMessage(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
+
+				SimulatorStartup.Instance.hideSplashTheme()
+
+				exitStartup(true)
+			}
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 
@@ -683,16 +727,16 @@ playSong(songFile) {
 exitStartup(sayGoodBye := false) {
 	local fileName
 
-	if (sayGoodBye && (vSimulatorControllerPID != false)) {
-		sendMessage(kFileMessage, "Startup", "startupExited", vSimulatorControllerPID)
+	if (sayGoodBye && (SimulatorStartup.Instance.ControllerPID != false)) {
+		sendMessage(kFileMessage, "Startup", "startupExited", SimulatorStartup.Instance.ControllerPID)
 
 		Task.startTask("exitStartup", 2000)
 	}
 	else {
 		Hotkey Escape, Off
 
-		if vStartupManager
-			vStartupManager.cancelStartup()
+		if SimulatorStartup.Instance
+			SimulatorStartup.Instance.cancelStartup()
 
 		fileName := (kTempDirectory . "Startup.semaphore")
 
@@ -703,7 +747,7 @@ exitStartup(sayGoodBye := false) {
 			; ignore
 		}
 
-		if !vStartupStayOpen
+		if !SimulatorStartup.StayOpen
 			ExitApp 0
 	}
 }
@@ -726,38 +770,6 @@ startSimulator()
 ;;; Escape::                   Cancel Startup                               ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 Escape::
-protectionOn()
-
-try {
-	if vStartupManager
-		if !vStartupManager.Finished {
-			SoundPlay *32
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-
-			_title := translate("Startup")
-
-			MsgBox 262180, %_title%, % translate("Cancel Startup?")
-			OnMessage(0x44, "")
-
-			IfMsgBox Yes
-			{
-				if (vSimulatorControllerPID != 0)
-					sendMessage(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
-
-				vStartupManager.cancelStartup()
-			}
-		}
-		else {
-			if (vSimulatorControllerPID != 0)
-				sendMessage(kFileMessage, "Startup", "stopStartupSong", vSimulatorControllerPID)
-
-			vStartupManager.hideSplashTheme()
-
-			exitStartup(true)
-		}
-}
-finally {
-	protectionOff()
-}
+cancelStartup()
 
 return

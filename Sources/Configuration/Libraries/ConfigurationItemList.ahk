@@ -15,31 +15,31 @@
 
 class ConfigurationItemList extends ConfigurationItem {
 	static sListControls := {}
-	
+
 	iListHandle := false
 	iAddButton := ""
 	iDeleteButton := ""
 	iUpdateButton := ""
 	iUpButton := false
 	iDownButton := false
-	
+
 	iItemList := []
 	iCurrentItem := 0
-	
+
 	iWindow := false
-	
+
 	Window[] {
 		Get {
 			return this.iWindow
 		}
 	}
-	
+
 	ListHandle[] {
 		Get {
 			return this.iListHandle
 		}
 	}
-	
+
 	AutoSave[] {
 		Get {
 ; #Warn UseUnsetLocal, Off
@@ -54,7 +54,7 @@ class ConfigurationItemList extends ConfigurationItem {
 			}
 		}
 	}
-	
+
 	ItemList[index := "__Undefined__"] {
 		Get {
 			if (index != kUndefined)
@@ -62,7 +62,7 @@ class ConfigurationItemList extends ConfigurationItem {
 			else
 				return this.iItemList
 		}
-		
+
 		Set {
 			if (index != kUndefined)
 				return this.iItemList[index] := value
@@ -70,104 +70,102 @@ class ConfigurationItemList extends ConfigurationItem {
 				return this.iItemList := value
 		}
 	}
-	
+
 	CurrentItem[] {
 		Get {
 			return this.iCurrentItem
 		}
-		
+
 		Set {
 			return this.iCurrentItem := value
 		}
 	}
-	
+
 	initializeList(listHandle, listVariable, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
 		this.iWindow := (A_DefaultGui ? A_DefaultGui : (A_Gui ? A_Gui : false))
-		
+
 		this.iListHandle := listHandle
 		this.iAddButton := addButton
 		this.iDeleteButton := deleteButton
 		this.iUpdateButton := updateButton
 		this.iUpButton := upButton
 		this.iDownButton := downButton
-		
+
 		ConfigurationItemList.associateList(listVariable, this)
-		
+
 		if addButton
 			ConfigurationItemList.associateList(addButton, this)
-		
+
 		if deleteButton
 			ConfigurationItemList.associateList(deleteButton, this)
-		
+
 		if updateButton
 			ConfigurationItemList.associateList(updateButton, this)
-		
+
 		if upButton
 			ConfigurationItemList.associateList(upButton, this)
-		
+
 		if downButton
 			ConfigurationItemList.associateList(downButton, this)
-		
+
 		this.loadList(this.ItemList)
 		this.updateState()
 	}
-	
+
 	saveToConfiguration(configuration) {
 		if this.AutoSave {
-			if (this.CurrentItem != 0) {
+			if (this.CurrentItem != 0)
 				this.updateItem()
-			}
 		}
 	}
 
 	associateList(variable, itemList) {
 		ConfigurationItemList.sListControls[variable] := itemList
 	}
-	
+
 	getList(variable) {
 		return ConfigurationItemList.sListControls[variable]
 	}
-	
+
 	clickEvent(line, count) {
 		if (line != 0)
 			this.openEditor(line)
 	}
-	
+
 	selectEvent(line) {
 		if (line != 0)
 			this.openEditor(line)
 	}
-	
+
 	processListEvent() {
-		local event
-		
+		local event := (A_GuiEvent . A_Space . A_GuiControl . A_Space . A_EventInfo)
+		local editor
+
 		static lastEvent := false
 		static lastEditor := false
-		
-		event := (A_GuiEvent . A_Space . A_GuiControl . A_Space . A_EventInfo)
-		
+
 		if (event = lastEvent)
 			return false
 		else {
 			lastEvent := event
-		
+
 			return true
 		}
-		
+
 		editor := (A_GuiControl . "." . A_EventInfo)
-		
+
 		if (editor = lastEditor)
 			return false
 		else {
 			lastEditor := editor
-		
+
 			return true
 		}
 	}
-	
+
 	listEvent() {
-		info := ErrorLevel
-		
+		local info := ErrorLevel
+
 		if this.processListEvent() {
 			if (A_GuiEvent == "DoubleClick")
 				this.clickEvent(A_EventInfo, 2)
@@ -179,31 +177,31 @@ class ConfigurationItemList extends ConfigurationItem {
 			}
 		}
 	}
-	
+
 	loadList(items) {
 		throw "Virtual method ConfigurationItemList.loadList must be implemented in a subclass..."
 	}
-	
+
 	updateState() {
-		window := this.Window
-		
+		local window := this.Window
+
 		if window
 			window .= ":"
 		else
 			window := ""
-		
+
 		if (this.CurrentItem != 0) {
 			if (this.iDeleteButton != false)
 				GuiControl %window%Enable, % this.iDeleteButton
 			if (this.iUpdateButton != false)
 				GuiControl %window%Enable, % this.iUpdateButton
-			
+
 			if (this.iUpButton != false)
 				if (this.CurrentItem > 1)
 					GuiControl %window%Enable, % this.iUpButton
 				else
 					GuiControl %window%Disable, % this.iUpButton
-			
+
 			if (this.iDownButton != false)
 				if (this.CurrentItem < this.ItemList.Length())
 					GuiControl %window%Enable, % this.iDownButton
@@ -213,99 +211,101 @@ class ConfigurationItemList extends ConfigurationItem {
 		else {
 			if (this.iUpButton != false)
 				GuiControl %window%Disable, % this.iUpButton
-			
+
 			if (this.iDownButton != false)
 				GuiControl %window%Disable, % this.iDownButton
-			
+
 			if (this.iDeleteButton != false)
 				GuiControl %window%Disable, % this.iDeleteButton
 			if (this.iUpdateButton != false)
 				GuiControl %window%Disable, % this.iUpdateButton
 		}
 	}
-	
+
 	loadEditor(item) {
 		throw "Virtual method ConfigurationItemList.loadEditor must be implemented in a subclass..."
 	}
-	
+
 	clearEditor() {
 		throw "Virtual method ConfigurationItemList.clearEditor must be implemented in a subclass..."
 	}
-	
+
 	buildItemFromEditor(isNew := false) {
 		throw "Virtual method ConfigurationItemList.buildItemFromEditor must be implemented in a subclass..."
 	}
-	
+
 	openEditor(itemNumber) {
 		if (itemNumber != this.CurrentItem) {
 			if this.AutoSave {
 				if (this.CurrentItem != 0)
 					this.updateItem()
-					
+
 				this.selectItem(itemNumber)
 			}
-						
+
 			this.CurrentItem := itemNumber
-			
+
 			this.loadEditor(this.ItemList[this.CurrentItem])
-			
+
 			this.updateState()
 		}
 	}
-	
+
 	selectItem(itemNumber) {
 		this.CurrentItem := itemNumber
-		
+
 		Gui ListView, % this.ListHandle
-			
+
 		if itemNumber
 			LV_Modify(itemNumber, "Vis +Select +Focus")
-		
+
 		this.updateState()
 	}
-	
+
 	addItem() {
-		item := this.buildItemFromEditor(true)
-		
+		local item := this.buildItemFromEditor(true)
+
 		if item {
 			this.ItemList.Push(item)
-		
+
 			this.loadList(this.ItemList)
-			
+
 			this.selectItem(inList(this.ItemList, item))
 		}
 	}
-	
+
 	deleteItem() {
 		this.ItemList.RemoveAt(this.CurrentItem)
-		
+
 		this.CurrentItem := 0
-		
+
 		this.loadList(this.ItemList)
-		
+
 		this.clearEditor()
-		
+
 		this.CurrentItem := 0
-		
+
 		this.updateState()
 	}
 
 	updateItem() {
+		local item
+
 		static recurse := false
-		
+
 		if recurse
 			return
 		else {
 			recurse := true
-		
+
 			try {
 				item := this.buildItemFromEditor()
-				
+
 				if item {
 					this.ItemList[this.CurrentItem] := item
-					
+
 					this.loadList(this.ItemList)
-					
+
 					this.selectItem(this.CurrentItem)
 				}
 			}
@@ -316,28 +316,28 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 
 	upItem() {
-		item := this.ItemList[this.CurrentItem]
-		
+		local item := this.ItemList[this.CurrentItem]
+
 		this.ItemList[this.CurrentItem] := this.ItemList[this.CurrentItem - 1]
 		this.ItemList[this.CurrentItem - 1] := item
-		
+
 		this.loadList(this.ItemList)
-			
+
 		this.selectItem(this.CurrentItem - 1)
-		
+
 		this.updateState()
 	}
 
 	downItem() {
-		item := this.ItemList[this.CurrentItem]
-		
+		local item := this.ItemList[this.CurrentItem]
+
 		this.ItemList[this.CurrentItem] := this.ItemList[this.CurrentItem + 1]
 		this.ItemList[this.CurrentItem + 1] := item
-		
+
 		this.loadList(this.ItemList)
-			
+
 		this.selectItem(this.CurrentItem + 1)
-		
+
 		this.updateState()
 	}
 }
@@ -349,7 +349,7 @@ class ConfigurationItemList extends ConfigurationItem {
 
 listEvent() {
 	protectionOn()
-	
+
 	try {
 		ConfigurationItemList.getList(A_GuiControl).listEvent()
 	}
@@ -360,7 +360,7 @@ listEvent() {
 
 addItem() {
 	protectionOn()
-	
+
 	try{
 		ConfigurationItemList.getList(A_GuiControl).addItem()
 	}
@@ -371,7 +371,7 @@ addItem() {
 
 deleteItem() {
 	protectionOn()
-	
+
 	try{
 		ConfigurationItemList.getList(A_GuiControl).deleteItem()
 	}
@@ -382,7 +382,7 @@ deleteItem() {
 
 updateItem() {
 	protectionOn()
-	
+
 	try{
 		ConfigurationItemList.getList(A_GuiControl).updateItem()
 	}
@@ -393,7 +393,7 @@ updateItem() {
 
 upItem() {
 	protectionOn()
-	
+
 	try{
 		ConfigurationItemList.getList(A_GuiControl).upItem()
 	}
@@ -404,7 +404,7 @@ upItem() {
 
 downItem() {
 	protectionOn()
-	
+
 	try{
 		ConfigurationItemList.getList(A_GuiControl).downItem()
 	}

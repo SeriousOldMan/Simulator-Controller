@@ -64,7 +64,8 @@ class TriggerDetectorTask extends Task {
 	}
 
 	run() {
-		joysticks := []
+		local joysticks := []
+		local joyName
 
 		loop 16 { ; Query each joystick number to find out which ones exist.
 			GetKeyState joyName, %A_Index%JoyName
@@ -89,6 +90,11 @@ class TriggerDetectorContinuation extends Continuation {
 	}
 
 	run() {
+		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down
+		local joy1, joy2, joy3, joy4, joy5, joy6, joy7, joy8, joy9, joy10, joy11, joy12, joy13, joy14, joy15, joy16
+		local joyX, joyY, joyZ, joyU, joyV, joyP, joyR, axis_info
+		local buttonsDown, callback
+
 		if !this.Task.Stopped {
 			found := false
 
@@ -162,9 +168,9 @@ class TriggerDetectorContinuation extends Continuation {
 
 			IfInString joy_info, P
 			{
-				GetKeyState joyp, %joystickNumber%JoyPOV
+				GetKeyState joyP, %joystickNumber%JoyPOV
 
-				axis_info = %axis_info%%A_Space%%A_Space%POV%joyp%
+				axis_info = %axis_info%%A_Space%%A_Space%POV%joyP%
 			}
 
 			buttonsDown := translate("Buttons Down:")
@@ -201,7 +207,7 @@ global configuratorTabView
 class ConfigurationEditor extends ConfigurationItem {
 	iWindow := "CFGE"
 	iResult := false
-	
+
 	iGeneralTab := false
 
 	iConfigurators := []
@@ -226,12 +232,12 @@ class ConfigurationEditor extends ConfigurationItem {
 			return this.iWindow
 		}
 	}
-	
+
 	Result[] {
 		Get {
 			return this.iResult
 		}
-		
+
 		Set {
 			return (this.iResult := value)
 		}
@@ -251,6 +257,8 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	unregisterConfigurator(labelOrConfigurator) {
+		local ignore, configurator
+
 		for ignore, configurator in this.Configurators
 			if ((configurator[1] = labelOrConfigurator) || (configurator[2] = labelOrConfigurator)) {
 				this.Configurators.RemoveAt(A_Index)
@@ -260,7 +268,8 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		window := this.Window
+		local window := this.Window
+		local choices, chosen, labels, ignore, configurator, tab
 
 		Gui %window%:Default
 
@@ -321,6 +330,8 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local ignore, configurator
+
 		base.saveToConfiguration(configuration)
 
 		GuiControlGet saveModeDropDown
@@ -352,7 +363,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	close() {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Destroy
 	}
@@ -398,6 +409,8 @@ openConfigurationDocumentation() {
 }
 
 selectTab() {
+	local configurator
+
 	GuiControlGet configuratorTabView
 
 	configurator := ((configuratorTabView == 1) ? ConfigurationEditor.Instance.iGeneralTab : ConfigurationEditor.Instance.Configurators[configuratorTabView - 1][2])

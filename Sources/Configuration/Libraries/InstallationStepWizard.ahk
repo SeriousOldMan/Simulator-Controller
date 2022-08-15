@@ -24,6 +24,13 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
+		local window := this.Window
+		local definition := this.Definition
+		local startY := y
+		local iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle
+		local ignore, software, installer, folder, locatable, info, label, installed, buttonX
+		local labelWidth, labelX, labelY, buttonY, page, html
+
 		static infoText1
 		static infoText2
 		static infoText3
@@ -75,14 +82,8 @@ class InstallationStepWizard extends StepWizard {
 		static locateButton15
 		static locateButton16
 
-		definition := this.Definition
-
-		startY := y
-
 		if (this.Definition.Count() > 16)
 			throw "Too many modules detected in InstallationStepWizard.createGui..."
-
-		window := this.Window
 
 		for ignore, software in this.Definition
 		{
@@ -167,6 +168,8 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	loadStepDefinition(definition) {
+		local ignore, software
+
 		base.loadStepDefinition(definition)
 
 		for ignore, software in this.Definition
@@ -174,9 +177,9 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	installSoftware(software) {
-		wizard := this.SetupWizard
-
-		folder := getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+		local wizard := this.SetupWizard
+		local folder := getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+		local locatable, installer, extension, buttons, button
 
 		if folder {
 			folder := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
@@ -218,6 +221,8 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	locateSoftware(software, executable) {
+		local buttons, button
+
 		this.SetupWizard.locateSoftware(software, executable)
 
 		buttons := this.iSoftwareLocators[software]
@@ -231,6 +236,8 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
+		local software, widgets, ignore, widget, buttons, button
+
 		base.showPage(page)
 
 		for software, widgets in this.iPages[page]
@@ -262,8 +269,9 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
-		wizard := this.SetupWizard
-		done := true
+		local wizard := this.SetupWizard
+		local done := true
+		local software, ignore, title
 
 		for software, ignore in this.iPages[page]
 			if (wizard.isSoftwareRequested(software) && !wizard.isSoftwareOptional(software) && !wizard.isSoftwareInstalled(software)) {
@@ -292,22 +300,18 @@ class InstallationStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 installSoftware() {
-	local stepWizard
-
-	stepWizard := SetupWizard.Instance.StepWizards["Installation"]
-
-	definition := stepWizard.Definition
+	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
+	local definition := stepWizard.Definition
 
 	stepWizard.installSoftware(definition[StrReplace(A_GuiControl, "installButton", "")])
 }
 
 locateSoftware() {
 	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
-
-	definition := stepWizard.Definition
-	name := definition[StrReplace(A_GuiControl, "locateButton", "")]
-
-	folder := getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name . ".Folder", false)
+	local definition := stepWizard.Definition
+	local name := definition[StrReplace(A_GuiControl, "locateButton", "")]
+	local folder := getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name . ".Folder", false)
+	local title, file
 
 	if folder {
 		folder := substituteVariables(getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name))

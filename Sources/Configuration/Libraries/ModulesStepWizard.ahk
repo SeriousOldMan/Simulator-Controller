@@ -58,6 +58,8 @@ class MutedAssistant extends NamedPreset {
 	}
 
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		local assistant
+
 		if wizard.isModuleSelected(this.Assistant)
 			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
 				assistant := new Plugin(this.Assistant, simulatorConfiguration)
@@ -72,6 +74,8 @@ class MutedAssistant extends NamedPreset {
 
 class PassiveEngineer extends NamedPreset {
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		local definition, name, assistant
+
 		if wizard.isModuleSelected("Race Engineer") {
 			definition := wizard.Definition
 
@@ -92,6 +96,8 @@ class PassiveEngineer extends NamedPreset {
 
 class DifferentVoices extends NamedPreset {
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		local synthesizer, language, speaker, voices, ignore, voice, found, candidate, voice1, voice2, assistant
+
 		if wizard.isModuleSelected("Voice Control") {
 			synthesizer := getConfigurationValue(simulatorConfiguration, "Voice Control", "Synthesizer")
 			language := getConfigurationValue(simulatorConfiguration, "Voice Control", "Language")
@@ -161,7 +167,8 @@ class DefaultButtonBox extends NamedPreset {
 	}
 
 	install(wizard) {
-		file := this.iFile
+		local file := this.iFile
+		local config, section, values, key, value
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini") {
@@ -203,7 +210,8 @@ class DefaultStreamDeck extends NamedPreset {
 	}
 
 	install(wizard) {
-		file := this.iFile
+		local file := this.iFile
+		local config, section, values, key, value
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini") {
@@ -235,6 +243,8 @@ class StreamDeckIcons extends NamedPreset {
 	}
 
 	__New(name, files*) {
+		local index, file
+
 		base.__New(name)
 
 		for index, file in files
@@ -248,6 +258,8 @@ class StreamDeckIcons extends NamedPreset {
 	}
 
 	install(wizard) {
+		local ignore, file
+
 		for ignore, file in this.Files
 			try {
 				FileCopy %file%, %kUserTranslationsDirectory%, 1
@@ -258,6 +270,8 @@ class StreamDeckIcons extends NamedPreset {
 	}
 
 	uninstall(wizard) {
+		local ignore, file, name
+
 		for ignore, file in this.Files {
 			SplitPath file, name
 
@@ -291,7 +305,8 @@ class PitstopImages extends NamedPreset {
 	}
 
 	install(wizard) {
-		directory := this.Directory
+		local directory := this.Directory
+		local name
 
 		SplitPath directory, , , , name
 
@@ -306,7 +321,8 @@ class PitstopImages extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		directory := this.Directory
+		local directory := this.Directory
+		local name
 
 		SplitPath directory, , , , name
 
@@ -321,6 +337,8 @@ class PitstopImages extends NamedPreset {
 
 class TeamServerAlwaysOn extends NamedPreset {
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
+		local thePlugin
+
 		if (wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
 			if (getConfigurationValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
 				thePlugin := new Plugin("Team Server", simulatorConfiguration)
@@ -352,7 +370,8 @@ class SetupPatch extends NamedPreset {
 	}
 
 	install(wizard) {
-		file := this.File
+		local file := this.File
+		local name
 
 		SplitPath file, name
 
@@ -367,7 +386,8 @@ class SetupPatch extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		file := this.File
+		local file := this.File
+		local name
 
 		SplitPath file, name
 
@@ -414,6 +434,27 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
+		local definition := this.Definition
+		local window := this.Window
+		local startY := y
+		local checkX := x + width - 20
+		local labelWidth := width - 30
+		local presetsIconHandle := false
+		local presetsLabelHandle := false
+		local availablePresetsLabelHandle := false
+		local availablePresetsListViewHandle := false
+		local selectedPresetsListViewHandle := false
+		local selectedPresetsLabelHandle := false
+		local moveLeftButtonHandle := false
+		local moveRightButtonHandle := false
+		local presetsInfoTextHandle := false
+		local listWidth := Round((width - 50) / 2)
+		local x2 := x + listWidth + 50
+		local buttonWidth := 40
+		local x3 := x + listWidth + 5
+		local iconHandle, labelHandle, checkBoxHandle, infoTextHandle
+		local module, selected, info, label, labelX, labelY, html
+
 		static infoText1
 		static infoText2
 		static infoText3
@@ -440,17 +481,9 @@ class ModulesStepWizard extends StepWizard {
 		static moduleCheck11
 		static moduleCheck12
 
-		definition := this.Definition
-
-		startY := y
-		checkX := x + width - 20
-		labelWidth := width - 30
-
 		if (definition.Length() > 12)
 			throw "Too many modules detected in ModulesStepWizard.createGui..."
 
-		window := this.Window
-			
 		loop % definition.Length()
 		{
 			iconHandle := false
@@ -494,25 +527,9 @@ class ModulesStepWizard extends StepWizard {
 				y := startY
 		}
 
-		presetsIconHandle := false
-		presetsLabelHandle := false
-		availablePresetsLabelHandle := false
-		availablePresetsListViewHandle := false
-		selectedPresetsListViewHandle := false
-		selectedPresetsLabelHandle := false
-		moveLeftButtonHandle := false
-		moveRightButtonHandle := false
-		presetsInfoTextHandle := false
-
 		y := startY
 		labelX := x + 35
 		labelY := y + 8
-
-		listWidth := Round((width - 50) / 2)
-		x2 := x + listWidth + 50
-
-		buttonWidth := 40
-		x3 := x + listWidth + 5
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -569,11 +586,10 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	updateState() {
-		local variable
+		local window := this.Window
+		local variable, definition, name, chosen
 
 		base.updateState()
-
-		window := this.Window
 
 		Gui %window%:Default
 
@@ -591,9 +607,8 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	updateSelectedModules() {
-		local variable
-
-		window := this.Window
+		local window := this.Window
+		local variable, definition, name, checked
 
 		Gui %window%:Default
 
@@ -615,9 +630,8 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	loadAvailablePresets() {
-		local preset
-
-		window := this.Window
+		local window := this.Window
+		local preset, definition, presets, module, modulePresets, ignore
 
 		Gui %window%:Default
 
@@ -648,13 +662,11 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	loadSelectedPresets() {
-		local preset
-
-		window := this.Window
+		local window := this.Window
+		local presets := []
+		local ignore, preset
 
 		Gui %window%:Default
-
-		presets := []
 
 		Gui, ListView, % this.SelectedPresetsListView
 
@@ -668,9 +680,8 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	presetName(label) {
-		local preset
-
-		definition := this.Definition
+		local definition := this.Definition
+		local preset, module, modulePresets, ignore, preset
 
 		loop % definition.Length()
 		{
@@ -691,10 +702,9 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	updatePresetState() {
-		local preset
-
-		window := this.Window
-		info := false
+		local window := this.Window
+		local info := false
+		local preset, selected, enable, ignore, candidate, info, html
 
 		Gui %window%:Default
 
@@ -754,9 +764,8 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	installPreset() {
-		local preset
-
-		window := this.Window
+		local window := this.Window
+		local preset, selected, label, class, arguments
 
 		Gui %window%:Default
 
@@ -781,7 +790,8 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	uninstallPreset() {
-		window := this.Window
+		local window := this.Window
+		local selected
 
 		Gui %window%:Default
 
@@ -805,9 +815,9 @@ class ModulesStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 choosePreset(list1, list2) {
-	step := SetupWizard.Instance.StepWizards["Modules"]
-
-	window := step.Window
+	local step := SetupWizard.Instance.StepWizards["Modules"]
+	local window := step.Window
+	local next, selected
 
 	Gui %window%:Default
 
@@ -832,6 +842,8 @@ choosePreset(list1, list2) {
 }
 
 chooseAvailablePreset() {
+	local step
+
 	if (A_GuiEvent = "Normal") {
 		step := SetupWizard.Instance.StepWizards["Modules"]
 
@@ -840,6 +852,8 @@ chooseAvailablePreset() {
 }
 
 chooseSelectedPreset() {
+	local step
+
 	if (A_GuiEvent = "Normal") {
 		step := SetupWizard.Instance.StepWizards["Modules"]
 

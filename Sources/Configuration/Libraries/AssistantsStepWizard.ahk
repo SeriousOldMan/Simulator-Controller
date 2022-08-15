@@ -32,8 +32,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 	Pages[] {
 		Get {
-			wizard := this.SetupWizard
-			count := 0
+			local wizard := this.SetupWizard
+			local count := 0
+			local ignore, assistant
 
 			for ignore, assistant in this.Definition
 				if wizard.isModuleSelected(assistant)
@@ -45,8 +46,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 	TransposePage[page] {
 		Get {
-			wizard := this.SetupWizard
-			count := 0
+			local wizard := this.SetupWizard
+			local count := 0
+			local index, assistant
 
 			for index, assistant in this.Definition
 				if (wizard.isModuleSelected(assistant) && (++count == page))
@@ -57,14 +59,12 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	saveToConfiguration(configuration) {
-		local function
-		local action
+		local wizard := this.SetupWizard
+		local assistantActive := false
+		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments
+		local actions
 
 		base.saveToConfiguration(configuration)
-
-		wizard := this.SetupWizard
-
-		assistantActive := false
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
@@ -155,16 +155,18 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		local application
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local application, page, assistant, labelWidth, labelX, labelY, label
+		local actionsIconHandle, actionsIconLabelHandle, actionsListViewHandle, actionsInfoTextHandle
+		local colummLabel1Handle, colummLine1Handle, colummLabel2Handle, colummLine2Handle, listX, listY, listWidth
+		local info, html, configurator, colWidth
 
 		static actionsInfoText1
 		static actionsInfoText2
 		static actionsInfoText3
 		static actionsInfoText4
 		static actionsInfoText5
-
-		wizard := this.SetupWizard
-		window := this.Window
 
 		Gui %window%:Default
 
@@ -251,7 +253,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	registerWidget(page, widget) {
-		index := inList(this.iAssistantConfigurators, page)
+		local index := inList(this.iAssistantConfigurators, page)
 
 		if index
 			base.registerWidget(index, widget)
@@ -270,7 +272,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	showPage(page) {
-		page := this.TransposePage[page]
+		local page := this.TransposePage[page]
+		local ignore, widget, configuration, assistantConfiguration, section, subConfiguration
 
 		this.iCurrentAssistant := this.Definition[page]
 
@@ -299,7 +302,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	hidePage(page) {
-		page := this.TransposePage[page]
+		local page := this.TransposePage[page]
+		local ignore, configurator, configuration, assistantConfiguration, section, subConfiguration
 
 		if base.hidePage(page) {
 			configurator := this.iAssistantConfigurators[page]
@@ -344,6 +348,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	getActions(mode := false) {
+		local wizard, actions
+
 		if this.iCachedActions
 			return this.iCachedActions
 		else {
@@ -361,9 +367,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	setAction(row, mode, action, actionDescriptor, label, argument := false) {
-		local function
-
-		wizard := this.SetupWizard
+		local wizard := this.SetupWizard
+		local function, functions, ignore
 
 		base.setAction(row, mode, action, actionDescriptor, label, argument)
 
@@ -372,7 +377,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		if functions
 			for ignore, function in functions
 				if (function && (function != ""))
-				wizard.addModuleStaticFunction(this.iCurrentAssistant, function, label)
+					wizard.addModuleStaticFunction(this.iCurrentAssistant, function, label)
 	}
 
 	clearActionFunction(mode, action, function) {
@@ -392,12 +397,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	loadAssistantActions(assistant, load := false) {
-		local function
-		local action
-		local count
-
-		window := this.Window
-		wizard := this.SetupWizard
+		local window := this.Window
+		local wizard := this.SetupWizard
+		local function, ignore, action, subAction, count, pluginLabels, count, isInformationRequest, isBinary
 
 		if load {
 			this.iCachedActions := false
@@ -482,11 +484,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	saveAssistantActions(assistant) {
-		local function
-		local action
-
-		wizard := this.SetupWizard
-		functions := {}
+		local wizard := this.SetupWizard
+		local functions := {}
+		local function, ignore, action
 
 		for ignore, action in this.getActions()
 			if wizard.assistantActionAvailable(assistant, action) {

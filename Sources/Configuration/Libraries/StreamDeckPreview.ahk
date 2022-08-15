@@ -519,6 +519,6 @@ class StreamDeckPreview extends ControllerPreview {
 ;;;-------------------------------------------------------------------------;;;
 
 streamDeckContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
-	if (isRightClick && vControllerPreviews.HasKey(A_Gui))
+	if (isRightClick && ControllerPreview.ControllerPreviews.HasKey(A_Gui))
 		controlClick()
 }

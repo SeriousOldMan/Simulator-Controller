@@ -55,7 +55,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local application, function, path, directory, voiceControlConfiguration, ignore, section, subConfiguration
-		local modeSelectors, arguments, launchApplications, descriptor, label
+		local modeSelectors, arguments, launchApplications, descriptor, label, language, startWithWindows, silentMode
 
 		base.saveToConfiguration(configuration)
 
@@ -262,7 +262,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local chosen := 0
 		local enIndex := 0
 		local code, language, configuration, voiceControlConfiguration, ignore, section, subConfiguration
-		local path, directory, widget, listBox
+		local path, directory, widget, listBox, uiLanguage, startWithWindows, silentMode
 
 		GeneralStepWizard.sCurrentGeneralStep := this
 

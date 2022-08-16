@@ -65,9 +65,9 @@ class ConfigurationItemList extends ConfigurationItem {
 
 		Set {
 			if (index != kUndefined)
-				return this.iItemList[index] := value
+				return (this.iItemList[index] := value)
 			else
-				return this.iItemList := value
+				return (this.iItemList := value)
 		}
 	}
 
@@ -77,7 +77,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		}
 
 		Set {
-			return this.iCurrentItem := value
+			return (this.iCurrentItem := value)
 		}
 	}
 

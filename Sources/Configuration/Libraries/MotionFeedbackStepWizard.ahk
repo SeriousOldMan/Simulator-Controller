@@ -49,7 +49,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local function, action, connector, arguments, parameters, actionArguments, motionIntensity
-		local effectSelector, effectIntensity, ignore, more, actions
+		local effectSelector, effectIntensity, ignore, mode, actions
 
 		base.saveToConfiguration(configuration)
 
@@ -312,7 +312,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	hidePage(page) {
 		local wizard := this.SetupWizard
-		local function, action, title
+		local function, action, title, ignore
 
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
@@ -445,7 +445,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	setAction(row, mode, action, actionDescriptor, label, argument := false) {
 		local wizard := this.SetupWizard
-		local function, ignore
+		local function, ignore, functions
 
 		base.setAction(row, mode, action, actionDescriptor, label, argument)
 
@@ -467,7 +467,6 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	loadControllerLabels() {
-		local wizard := this.SetupWizard
 		local window := this.Window
 		local function, action, row, column, ignore, preview, mode
 
@@ -660,7 +659,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	setMotionIntensityDial(preview, function, control, row, column) {
 		local window := this.Window
-		local cRow, cColumn, ignore, preview
+		local cRow, cColumn, ignore
 
 		Gui %window%:Default
 
@@ -706,7 +705,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	setEffectSelector(preview, function, control, row, column) {
 		local window := this.Window
-		local cRow, cColumn, ignore, preview
+		local cRow, cColumn, ignore
 
 		Gui %window%:Default
 
@@ -752,7 +751,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	setEffectIntensityDial(preview, function, control, row, column) {
 		local window := this.Window
-		local cRow, cColumn, ignore, preview
+		local cRow, cColumn, ignore
 
 		Gui %window%:Default
 

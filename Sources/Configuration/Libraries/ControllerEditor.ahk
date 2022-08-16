@@ -1452,7 +1452,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iRows := value
+			return (this.iRows := value)
 		}
 	}
 
@@ -1462,7 +1462,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iColumns := value
+			return (this.iColumns := value)
 		}
 	}
 
@@ -1472,7 +1472,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iWidth := value
+			return (this.iWidth := value)
 		}
 	}
 
@@ -1482,7 +1482,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iHeight := value
+			return (this.iHeight := value)
 		}
 	}
 

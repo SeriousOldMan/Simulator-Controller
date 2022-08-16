@@ -61,7 +61,6 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		local wizard := this.SetupWizard
 		local window := this.Window
 		local pedalCalibrationIconHandle := false
 		local pedalCalibrationLabelHandle := false

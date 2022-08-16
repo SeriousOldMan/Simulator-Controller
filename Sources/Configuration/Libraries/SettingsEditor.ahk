@@ -326,7 +326,7 @@ global buttonBoxSimulationDurationInput
 
 editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
-	local descriptor, value, simulators, margin, value, choices, chosen, themes
+	local descriptor, value, simulators, margin, choices, chosen, themes
 	local descriptor, applicationName, enabled, disabled, coreHeight, index, coreDescriptor
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
 

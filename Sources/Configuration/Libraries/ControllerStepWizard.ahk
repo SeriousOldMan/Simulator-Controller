@@ -65,15 +65,14 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	saveToConfiguration(configuration) {
-		local buttonBoxConfiguration, streamDeckConfiguration, wizard, streamDeckControllers, controller, definition
+		local wizard := this.SetupWizard
+		local buttonBoxConfiguration, streamDeckConfiguration, streamDeckControllers, controller, definition
 		local ignore, theFunction, controls, buttonBoxControllers, control, descriptor, functionTriggers
 
 		base.saveToConfiguration(configuration)
 
 		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
-
-		wizard := this.SetupWizard
 
 		if wizard.isModuleSelected("Controller") {
 			streamDeckControllers := []
@@ -375,16 +374,15 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	loadFunctions(buttonBoxConfiguration, streamDeckConfiguration, load := false) {
+		local wizard := this.SetupWizard
+		local window := this.Window
 		local controls := {}
 		local lastController := false
-		local function, ignore, control, descriptor, window, wizard, first, conflict, trigger, triggers
-		local functionConflicts, triggerConflicts, controller, definition
+		local function, ignore, control, descriptor, first, conflict, trigger, triggers
+		local functionConflicts, triggerConflicts, controller, definition, functionTriggers
 
 		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
-
-		window := this.Window
-		wizard := this.SetupWizard
 
 		Gui %window%:Default
 
@@ -482,12 +480,11 @@ class ControllerStepWizard extends StepWizard {
 
 	updateFunctionTriggers(row) {
 		local wizard := this.SetupWizard
-		local function, window, trigger, type, number, callback
+		local window := this.Window
+		local function, trigger, type, number, callback
 
 		if triggerDetector("Active")
 			wizard.toggleTriggerDetector()
-
-		window := this.Window
 
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
@@ -514,19 +511,19 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	updateFunctionHotkeys(row) {
-		local wizard := this.SetupWizard
 		local window := this.Window
-		local function, trigger, type, key, double, title, prompt, locale
+		local function, trigger, type, number, double, title, prompt, locale
 		local key1, key2, buttonBoxConfiguration, streamDeckConfiguration
 
 		Gui %window%:Default
+		
 		Gui ListView, % this.iFunctionsListView
 
 		LV_GetText(trigger, row, 5)
 
 		if (trigger != translate("n/a")) {
 			LV_GetText(type, row, 3)
-			LV_GetText(key, row, 4)
+			LV_GetText(number, row, 4)
 
 			double := false
 
@@ -599,9 +596,8 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	clearFunctionTriggerAndHotkey(row) {
-		local wizard := this.SetupWizard
 		local window := this.Window
-		local function, trigger, double, type, key
+		local function, trigger, double, type, number
 
 		Gui %window%:Default
 		Gui ListView, % this.iFunctionsListView
@@ -610,7 +606,7 @@ class ControllerStepWizard extends StepWizard {
 
 		if (trigger != translate("n/a")) {
 			LV_GetText(type, row, 3)
-			LV_GetText(key, row, 4)
+			LV_GetText(number, row, 4)
 
 			double := false
 
@@ -1180,6 +1176,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	loadControllerLabels() {
+		local wizard := this.SetupWizard
 		local function, action, module, row, column, ignore, preview, targetMode, mode, partFunction
 
 		base.loadControllerLabels()

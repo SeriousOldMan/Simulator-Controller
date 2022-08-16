@@ -168,7 +168,7 @@ class ControllerActionsEditor extends ConfigurationItem {
 
 	loadPluginActions() {
 		local plugins := []
-		local language, ignore, fileName, labels, section, values, key, value, icons, thePlugin, ignore
+		local language, ignore, fileName, labels, section, values, key, value, icons, thePlugin
 
 		for language, ignore in availableLanguages() {
 			fileName := ("Controller Action Labels." . language)

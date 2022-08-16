@@ -261,7 +261,7 @@ class ThemesList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
-		local ignore, theme, songFile, nameNoExt, mediaFiles, ignore, mediaFile
+		local ignore, theme, songFile, nameNoExt, mediaFiles, mediaFile
 
 		static first := true
 

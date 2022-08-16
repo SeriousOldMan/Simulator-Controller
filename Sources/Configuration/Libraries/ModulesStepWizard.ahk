@@ -74,7 +74,7 @@ class MutedAssistant extends NamedPreset {
 
 class PassiveEngineer extends NamedPreset {
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
-		local definition, name, assistant
+		local definition, name, assistant, ignore, descriptor
 
 		if wizard.isModuleSelected("Race Engineer") {
 			definition := wizard.Definition

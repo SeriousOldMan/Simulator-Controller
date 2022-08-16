@@ -155,7 +155,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		local wizard := this.SetupWizard
 		local window := this.Window
 		local page, assistant, labelWidth, labelX, labelY, label
 		local actionsIconHandle, actionsIconLabelHandle, actionsListViewHandle, actionsInfoTextHandle
@@ -272,8 +271,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	showPage(page) {
-		local page := this.TransposePage[page]
 		local ignore, widget, configuration, assistantConfiguration, section, subConfiguration
+
+		page := this.TransposePage[page]
 
 		this.iCurrentAssistant := this.Definition[page]
 
@@ -302,8 +302,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	hidePage(page) {
-		local page := this.TransposePage[page]
 		local ignore, configurator, configuration, assistantConfiguration, section, subConfiguration
+
+		page := this.TransposePage[page]
 
 		if base.hidePage(page) {
 			configurator := this.iAssistantConfigurators[page]

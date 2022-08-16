@@ -171,10 +171,12 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
+		local wizard := this.SetupWizard
+		local definition := this.Definition
 		local icons := []
 		local rows := []
-		local application, wizard, definition, simulator, descriptor, executable, iconFile
-		local listViewIcons, ignore, icon, row, first1, ignore, section, category, descriptor, first2
+		local application, simulator, descriptor, executable, iconFile
+		local listViewIcons, ignore, icon, row, ignore, section, category, descriptor
 
 		this.updateAvailableApplications()
 
@@ -187,9 +189,6 @@ class ApplicationsStepWizard extends StepWizard {
 			Gui ListView, % this.iSimulatorsListView
 
 			LV_Delete()
-
-			wizard := this.SetupWizard
-			definition := this.Definition
 
 			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
 				if wizard.isApplicationInstalled(simulator) {

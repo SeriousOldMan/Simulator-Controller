@@ -693,7 +693,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		local languageCode := "en"
 		local languages := availableLanguages()
 		local found := false
-		local code, language, ignore, grammarFile
+		local code, language, ignore, grammarFile, grammarLanguageCode
 
 		Gui %window%:Default
 

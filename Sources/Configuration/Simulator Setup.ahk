@@ -373,7 +373,8 @@ class SetupWizard extends ConfigurationItem {
 		showProgress({progress: ++this.ProgressCount, message: translate("Initializing AI Kernel...")})
 
 		if initialize {
-			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
+			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini"
+								   , "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
 				try {
 					FileDelete %kUserHomeDirectory%Setup\%fileName%
 				}
@@ -635,7 +636,7 @@ class SetupWizard extends ConfigurationItem {
 				for key, deletion in values {
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
 
-					if (currentValue != kUndefinedd)
+					if (currentValue != kUndefined)
 						setConfigurationValue(configuration, section, key, StrReplace(currentValue, deletion, ""))
 				}
 			}
@@ -1166,7 +1167,7 @@ class SetupWizard extends ConfigurationItem {
 
 	locateApplication(application, executable := false, update := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local ignore, section, descriptor, executable
+		local ignore, section, descriptor
 
 		if !this.isApplicationInstalled(application) {
 			if !executable
@@ -1326,7 +1327,7 @@ class SetupWizard extends ConfigurationItem {
 		for index, descriptor in functions {
 			parts := string2Values("###", descriptor)
 
-			if wizard.isModuleSelected(parts[1])
+			if this.isModuleSelected(parts[1])
 				result.Push(Array(parts[2], parts[3]))
 		}
 
@@ -1682,9 +1683,10 @@ class SetupWizard extends ConfigurationItem {
 
 	setInfo(html) {
 		local window := this.HelpWindow
-		local html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		Gui %window%:Default
+
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		infoViewer.Document.Open()
 		infoViewer.Document.Write(html)
@@ -1731,7 +1733,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	dumpRules(knowledgeBase) {
-		local rules, reduction, production, text
+		local rules, reduction, production, text, ignore
 
 		try {
 			FileDelete %kTempDirectory%Simulator Setup.rules
@@ -2196,7 +2198,7 @@ class FinishStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 finishSetup(finish := false, save := false) {
-	local window, title, message, save
+	local window, title, message
 
 	if (finish = "Finish") {
 		if (SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
@@ -2423,7 +2425,7 @@ initializeSimulatorSetup() {
 
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
-	local preset, previous
+	local preset, previous, x, y
 
 	wizard.loadDefinition()
 
@@ -2510,7 +2512,7 @@ openLabelsAndIconsEditor() {
 
 findSoftware(definition, software) {
 	local ignore, section, name, descriptor, ignore, locator, value, folder, installPath, folders
-	local fileName, exePath
+	local fileName, exePath, jsScript, script
 
 	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {

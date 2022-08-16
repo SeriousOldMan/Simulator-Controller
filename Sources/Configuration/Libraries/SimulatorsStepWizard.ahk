@@ -34,7 +34,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 	Pages[] {
 		Get {
-			wizard := this.SetupWizard
+			local wizard := this.SetupWizard
+			local ignore, simulator
 
 			if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
 				for ignore, simulator in this.Definition
@@ -46,14 +47,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	saveToConfiguration(configuration) {
-		local function
-		local action
+		local wizard := this.SetupWizard
+		local simulators := []
+		local function, action, ignore, simulator, code, arguments, descriptor, key, value, mode, actions
 
 		base.saveToConfiguration(configuration)
-
-		wizard := this.SetupWizard
-
-		simulators := []
 
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
@@ -109,23 +107,33 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		local application
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local actionsIconHandle := false
+		local actionsIconLabelHandle := false
+		local actionsListViewHandle := false
+		local actionsInfoTextHandle := false
+		local labelWidth := width - 30
+		local labelX := x + 35
+		local labelY := y + 8
+		local simulatorLabelHandle := false
+		local simulatorDropDownHandle := false
+		local columnLabel1Handle := false
+		local columnLine1Handle := false
+		local columnLabel2Handle := false
+		local columnLine2Handle := false
+		local secondX := x + 80
+		local secondWidth := 160
+		local col1Width := (secondX - x) + secondWidth
+		local labelHandle := false
+		local editHandle := false
+		local listX := x + 250
+		local listWidth := width - 250
+		local ignore, simulator, code, keys, keyY, ignore, key, default, label, info, html
 
 		static actionsInfoText
 
-		wizard := this.SetupWizard
-		window := this.Window
-
 		Gui %window%:Default
-
-		actionsIconHandle := false
-		actionsIconLabelHandle := false
-		actionsListViewHandle := false
-		actionsInfoTextHandle := false
-
-		labelWidth := width - 30
-		labelX := x + 35
-		labelY := y + 8
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -133,19 +141,6 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden, % translate("Simulator Configuration")
 
 		Gui %window%:Font, s8 Norm, Arial
-
-		simulatorLabelHandle := false
-		simulatorDropDownHandle := false
-
-		columnLabel1Handle := false
-		columnLine1Handle := false
-		columnLabel2Handle := false
-		columnLine2Handle := false
-
-		secondX := x + 80
-		secondWidth := 160
-
-		col1Width := (secondX - x) + secondWidth
 
 		Gui %window%:Add, Text, x%x% yp+30 w105 h23 +0x200 HWNDsimulatorLabelHandle Hidden, % translate("Simulator")
 		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% Choose%chosen% HWNDsimulatorDropDownHandle gchooseSimulator vsimulatorDropDown Hidden
@@ -156,9 +151,6 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
 
 		Gui %window%:Font, Norm, Arial
-
-		labelHandle := false
-		editHandle := false
 
 		secondX := x + 150
 
@@ -229,10 +221,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	updateState() {
-		base.updateState()
+		local wizard := this.SetupWizard
+		local simulators := []
+		local ignore, simulator
 
-		wizard := this.SetupWizard
-		simulators := []
+		base.updateState()
 
 		for ignore, simulator in this.Definition
 			if wizard.isApplicationSelected(simulator)
@@ -242,7 +235,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	showPage(page) {
-		chosen := (this.iSimulators.Length() > 0) ? 1 : 0
+		local chosen := (this.iSimulators.Length() > 0) ? 1 : 0
+		local ignore, widget
 
 		this.iCurrentSimulator := ((chosen > 0) ? this.iSimulators[chosen] : false)
 
@@ -273,6 +267,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	getActions(mode, simulator := false) {
+		local wizard, code, actions
+
 		if !simulator
 			simulator := this.iCurrentSimulator
 
@@ -321,12 +317,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	loadSimulatorActions(simulator, load := false) {
-		local function
-		local action
-		local count
-
-		window := this.Window
-		wizard := this.SetupWizard
+		local window := this.Window
+		local wizard := this.SetupWizard
+		local function, action, count, pluginLabels, count, ignore, mode, first, lastMode
+		local subAction, isInformationRequest, label, isToggle, isBinary, isDial, onLabel, offLabel
 
 		if load {
 			this.iCachedActions := {}
@@ -445,11 +439,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	saveSimulatorActions(simulator) {
-		local function
-		local action
-
-		wizard := this.SetupWizard
-		code := getApplicationDescriptor(simulator)[1]
+		local wizard := this.SetupWizard
+		local code := getApplicationDescriptor(simulator)[1]
+		local function, action, mode, modeFunctions, ignore
 
 		for ignore, mode in ["Pitstop", "Assistant"] {
 			modeFunctions := {}
@@ -467,7 +459,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	loadSimulatorMFDKeys(simulator) {
-		wizard := this.SetupWizard
+		local wizard := this.SetupWizard
+		local ignore, descriptors, descriptor, value, widget
 
 		for ignore, descriptors in this.iSimulatorMFDKeys
 			for ignore, descriptor in descriptors {
@@ -491,7 +484,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	saveSimulatorMFDKeys(simulator) {
-		wizard := this.SetupWizard
+		local wizard := this.SetupWizard
+		local ignore, descriptor
 
 		for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
 			GuiControlGet value, , % descriptor[2]
@@ -501,13 +495,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	loadControllerLabels() {
-		local function
-		local action
+		local wizard := this.SetupWizard
+		local simulator := this.iCurrentSimulator
+		local function, action, ignore, preview, targetMode, mode, partFunction
 
 		base.loadControllerLabels()
-
-		wizard := this.SetupWizard
-		simulator := this.iCurrentSimulator
 
 		for ignore, preview in this.ControllerPreviews {
 			targetMode := preview.Mode

@@ -646,6 +646,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		local forName := ""
 		local surName := ""
 		local nickName := ""
+		local initialForName, initialSurName
 
 		parseDriverName(name, forName, surName, nickName)
 

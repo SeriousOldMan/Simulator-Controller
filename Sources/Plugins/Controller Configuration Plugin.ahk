@@ -415,7 +415,7 @@ class FunctionsList extends ConfigurationItemList {
 
 	loadList(items) {
 		local round := 0
-		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA
+		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA, hotkeys, action
 
 		static first := true
 

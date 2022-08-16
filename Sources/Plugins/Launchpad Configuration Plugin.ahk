@@ -114,6 +114,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	loadApplicationChoices(application := false) {
 		local launchpadApplicationsList := []
 		local currentApplication := (this.CurrentItem ? this.ItemList[this.CurrentItem][3] : false)
+		local ignore, launchpadApplication
 
 		if ApplicationsConfigurator.Instance
 			for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]

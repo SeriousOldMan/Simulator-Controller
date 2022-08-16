@@ -157,7 +157,7 @@ class ControllerStepWizard extends StepWizard {
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local application, info, html
+		local info, html
 
 		static functionsInfoText
 

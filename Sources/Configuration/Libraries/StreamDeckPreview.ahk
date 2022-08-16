@@ -59,7 +59,8 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	loadFromConfiguration(configuration) {
-		layout := getConfigurationValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
+		local layout := getConfigurationValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
+		local row, column, button, icon, label, mode
 
 		switch layout {
 			case "Mini":
@@ -120,7 +121,12 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	createGui(configuration) {
-		window := this.Window
+		local window := this.Window
+		local row := 0
+		local column := 0
+		local isEmpty := true
+		local y := this.kTopMargin
+		local x, column, posX, posY
 
 		Gui %window%:Default
 
@@ -132,12 +138,6 @@ class StreamDeckPreview extends ControllerPreview {
 
 		Gui %window%:Color, 0x000000
 		Gui %window%:Font, s8 Norm, Arial
-
-		row := 0
-		column := 0
-		isEmpty := true
-
-		y := this.kTopMargin
 
 		Gui %window%:Font, cWhite
 
@@ -173,9 +173,9 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	createBackground(configuration) {
-		window := this.Window
+		local window := this.Window
+		local previewMover := this.PreviewManager.getPreviewMover()
 
-		previewMover := this.PreviewManager.getPreviewMover()
 		previewMover := (previewMover ? ("g" . previewMover) : "")
 
 		Gui %window%:Add, Picture, x0 y0 %previewMover% 0x4000000, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
@@ -190,24 +190,26 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	getLabel(row, column) {
-		button := this.getButton(row, column)
+		local button := this.getButton(row, column)
 
 		return (button ? button.Label : true)
 	}
 
 	getIcon(row, column) {
-		button := this.getButton(row, column)
+		local button := this.getButton(row, column)
 
 		return (button ? button.Icon : true)
 	}
 
 	getMode(row, column) {
-		button := this.getButton(row, column)
+		local button := this.getButton(row, column)
 
 		return (button ? button.Mode : false)
 	}
 
 	updateButtons() {
+		local row, column, handle, button, label, handle, icon
+
 		loop % this.Rows
 		{
 			row := A_Index
@@ -241,13 +243,13 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	getFunction(row, column) {
-		button := this.getButton(row, column)
+		local button := this.getButton(row, column)
 
 		return (button ? ("Button." . button.Button) : false)
 	}
 
 	setLabel(row, column, text) {
-		handle := this.iLabels[row][column]
+		local handle := this.iLabels[row][column]
 
 		if handle
 			GuiControl Text, %handle%, %text%
@@ -255,16 +257,15 @@ class StreamDeckPreview extends ControllerPreview {
 
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
 		local function
-
-		descriptor := "Empty.0"
-		name := "Empty"
-		number := 0
+		local descriptor := "Empty.0"
+		local name := "Empty"
+		local number := 0
+		local y := this.kTopMargin
+		local x, button, name, number, previewMover
 
 		row := 0
 		column := 0
 		isEmpty := true
-
-		y := this.kTopMargin
 
 		loop % this.Rows
 		{
@@ -306,13 +307,14 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	controlClick(element, row, column, isEmpty) {
-		handler := this.iControlClickHandler
+		local handler := this.iControlClickHandler
 
 		return %handler%(this, element, element[2], row, column, isEmpty)
 	}
 
 	openControlMenu(preview, element, function, row, column, isEmpty) {
-		local count
+		local count, menuItem, window, label, handler, count
+		local button, labelMode, iconMode, mode, menu
 
 		if (GetKeyState("Ctrl", "P") && !isEmpty)
 			LayoutsList.Instance.changeControl(row, column, "__Number__", false)

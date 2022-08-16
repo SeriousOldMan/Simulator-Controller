@@ -214,7 +214,8 @@ class ButtonBoxPreview extends ControllerPreview {
 	createBackground(configuration) {
 		local window := this.Window
 		local previewMover := this.PreviewManager.getPreviewMover()
-		local previewMover := (previewMover ? ("g" . previewMover) : "")
+		
+		previewMover := (previewMover ? ("g" . previewMover) : "")
 
 		Gui %window%:Add, Picture, x-10 y-10 %previewMover% 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 	}
@@ -312,7 +313,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		local rowHeights := false
 		local columnWidths := false
 		local function, height, width, vertical, horizontal, rowHeight, rowDefinition, columnWidth
-		local descriptor, name, number, image, imageWidth, imageHeight, x, y
+		local descriptor, name, number, image, imageWidth, imageHeight, x, y, labelHeight, label, labelWidth
 
 		this.computeLayout(rowHeights, columnWidths)
 

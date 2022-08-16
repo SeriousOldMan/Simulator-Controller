@@ -17,20 +17,6 @@ global kEditModes := "Edit"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Variable Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global trayTipEnabled
-global trayTipDurationInput
-global trayTipSimulationEnabled
-global trayTipSimulationDurationInput
-global buttonBoxEnabled
-global buttonBoxDurationInput
-global buttonBoxSimulationEnabled
-global buttonBoxSimulationDurationInput
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -64,18 +50,19 @@ setInputState(input, enabled) {
 }
 
 startConfiguration() {
+	local title
+
 	try {
 		RunWait % kBinariesDirectory . "Simulator Configuration.exe"
+
+		editSettings("Restart")
 	}
 	catch exception {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		error := translate("Error")
-		MsgBox 262160, %error%, % translate("Cannot start the configuration tool - please check the installation...")
+		title := translate("Error")
+		MsgBox 262160, %title%, % translate("Cannot start the configuration tool - please check the installation...")
 		OnMessage(0x44, "")
 	}
-
-	if ErrorLevel
-		editSettings("Restart")
 }
 
 checkTrayTipDuration() {
@@ -95,7 +82,9 @@ checkButtonBoxSimulationDuration() {
 }
 
 computeStartupSongs() {
-	files := concatenate(getFileNames("*.wav", kUserSplashMediaDirectory, kSplashMediaDirectory), getFileNames("*.mp3", kUserSplashMediaDirectory, kSplashMediaDirectory))
+	local files := concatenate(getFileNames("*.wav", kUserSplashMediaDirectory, kSplashMediaDirectory)
+							 , getFileNames("*.mp3", kUserSplashMediaDirectory, kSplashMediaDirectory))
+	local index, fileName, soundFile
 
 	for index, fileName in files {
 		SplitPath fileName, soundFile
@@ -123,10 +112,11 @@ openSettingsDocumentation() {
 }
 
 getSelectedModes(modesListViewHandle) {
-	Gui ListView, % modesListViewHandle
+	local rowNumber := 0
+	local modes := []
+	local thePlugin, theMode
 
-	rowNumber := 0
-	modes := []
+	Gui ListView, % modesListViewHandle
 
 	loop {
 		rowNumber := LV_GetNext(rowNumber, "C")
@@ -148,6 +138,9 @@ updateModes() {
 }
 
 editModes(ByRef settingsOrCommand, globalConfiguration := false) {
+	local modes, row, thePlugin, pluginConfiguration, ignore, mode, simulator, options
+	Local defaultModes, pluginSimulators, x, y
+
 	static newSettings
 	static result := false
 
@@ -322,7 +315,21 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global trayTipEnabled
+global trayTipDurationInput
+global trayTipSimulationEnabled
+global trayTipSimulationDurationInput
+global buttonBoxEnabled
+global buttonBoxDurationInput
+global buttonBoxSimulationEnabled
+global buttonBoxSimulationDurationInput
+
 editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
+	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
+	local descriptor, value, simulators, margin, value, choices, chosen, themes
+	local descriptor, applicationName, enabled, disabled, coreHeight, index, coreDescriptor
+	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
+
 	static modeSettings
 	static configuration
 
@@ -348,7 +355,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static lastPositions
 
 	static startup
-	static startOption
+	static startupOption
 
 	static splashTheme
 
@@ -406,7 +413,7 @@ restartSettings:
 			setConfigurationValue(newSettings, "Button Box", descriptor, value)
 
 		setConfigurationValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
-		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startOption : false))
+		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startupOption : false))
 
 		Gui SE:Destroy
 

@@ -90,7 +90,7 @@ class TriggerDetectorContinuation extends Continuation {
 	}
 
 	run() {
-		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down
+		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down, joy_info
 		local joy1, joy2, joy3, joy4, joy5, joy6, joy7, joy8, joy9, joy10, joy11, joy12, joy13, joy14, joy15, joy16
 		local joyX, joyY, joyZ, joyU, joyV, joyP, joyR, axis_info
 		local buttonsDown, callback

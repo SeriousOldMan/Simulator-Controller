@@ -211,7 +211,7 @@ class ControllerActionsEditor extends ConfigurationItem {
 
 	saveModifiedPluginActions(actions, type, language) {
 		local fileName := ("Controller Action " . type "." . language)
-		local cofiguration, stdConfiguration, section, values, key, value
+		local configuration, stdConfiguration, section, values, key, value
 
 		if FileExist(kTranslationsDirectory . fileName) {
 			configuration := newConfiguration()
@@ -426,7 +426,7 @@ class PluginActionsList extends ConfigurationItemList {
 
 	savePluginActions(language, plugin) {
 		local editor := ControllerActionsEditor.Instance
-		local action, actionLabels, actionIcons, changed, ignore, action, descriptor
+		local actionLabels, actionIcons, changed, ignore, action, descriptor
 
 		this.selectEvent(false)
 
@@ -498,7 +498,7 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
-		local action, length, picturesListViewImages, ignore, item
+		local action, length, picturesListViewImages, ignore, item, picture
 
 		Gui PAE:Default
 		Gui ListView, % this.ListHandle
@@ -641,7 +641,7 @@ deleteIcon() {
 
 clickIcon() {
 	local actionsList := PluginActionsList.Instance
-	local title, pictureFile
+	local title, pictureFile, icon
 
 	if actionsList.CurrentItem
 		if GetKeyState("Ctrl", "P")

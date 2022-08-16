@@ -43,9 +43,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 	Plugins[] {
 		Get {
+			local result := []
 			local index, thePlugin
-
-			result := []
 
 			for index, thePlugin in this.ItemList
 				result.Push(thePlugin[2])

@@ -157,7 +157,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	createGui(wizard, x, y, width, height) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local application, page, assistant, labelWidth, labelX, labelY, label
+		local page, assistant, labelWidth, labelX, labelY, label
 		local actionsIconHandle, actionsIconLabelHandle, actionsListViewHandle, actionsInfoTextHandle
 		local colummLabel1Handle, colummLine1Handle, colummLabel2Handle, colummLine2Handle, listX, listY, listWidth
 		local info, html, configurator, colWidth
@@ -399,7 +399,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	loadAssistantActions(assistant, load := false) {
 		local window := this.Window
 		local wizard := this.SetupWizard
-		local function, ignore, action, subAction, count, pluginLabels, count, isInformationRequest, isBinary
+		local function, ignore, action, subAction, count, pluginLabels, count, isInformationRequest, isBinary, label
 
 		if load {
 			this.iCachedActions := false

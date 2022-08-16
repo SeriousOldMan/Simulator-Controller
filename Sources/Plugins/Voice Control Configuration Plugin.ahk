@@ -492,7 +492,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	showWidgets() {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:Default
 
@@ -522,7 +522,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	hideWidgets() {
-		window := this.Editor.Window
+		local window := this.Editor.Window
 
 		Gui %window%:Default
 
@@ -588,7 +588,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	showAzureSynthesizerEditor() {
-		wasOpen := false
+		local wasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
 			wasOpen := true
@@ -615,7 +615,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	hideAzureSynthesizerEditor() {
-		wasOpen := false
+		local wasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
 			wasOpen := true
@@ -689,16 +689,15 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	getCurrentLanguage() {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local languageCode := "en"
+		local languages := availableLanguages()
+		local found := false
+		local code, language, ignore, grammarFile
 
 		Gui %window%:Default
 
 		GuiControlGet voiceLanguageDropDown
-
-		languageCode := "en"
-		languages := availableLanguages()
-
-		found := false
 
 		for code, language in availableLanguages()
 			if (language = voiceLanguageDropDown) {
@@ -727,7 +726,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	}
 
 	updateLanguage(recognizer := true) {
-		window := this.Editor.Window
+		local window := this.Editor.Window
+		local recognizers, chosen
 
 		Gui %window%:Default
 

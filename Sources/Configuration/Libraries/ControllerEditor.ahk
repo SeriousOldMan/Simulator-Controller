@@ -1128,7 +1128,7 @@ class LayoutsList extends ConfigurationItemList {
 
 	openDisplayRulesEditor() {
 		local name := false
-		local result
+		local result, configuration
 
 		if this.CurrentItem {
 			GuiControlGet layoutNameEdit
@@ -1256,7 +1256,7 @@ class LayoutsList extends ConfigurationItemList {
 	changeControl(row, column, control, argument := false) {
 		local number := argument
 		local oldButton := false
-		local rowDefinition, definition, oldLabel, title, prompt, locale, oldImage, newImage
+		local rowDefinition, definition, oldLabel, title, prompt, locale, oldImage, newImage, oldNumber
 
 		Gui CTRLE:Default
 
@@ -2015,7 +2015,7 @@ class DisplayRulesList extends ConfigurationItemList {
 
 controlClick() {
 	local curCoordMode := A_CoordModeMouse
-	local row, column, isEmpty, element
+	local row, column, isEmpty, element, clickX, clickY
 
 	CoordMode Mouse, Window
 
@@ -2041,7 +2041,7 @@ controlMenuIgnore() {
 
 moveControllerPreview() {
 	local window := ControllerPreview.CurrentWindow
-	local preview
+	local preview, x, y, width, height
 
 	moveByMouse(window)
 

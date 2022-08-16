@@ -443,7 +443,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local wizard := this.SetupWizard
 		local row := false
 		local column := false
-		local application, function, action, ignore, preview, section, application, descriptor, label
+		local function, action, ignore, preview, section, application, descriptor, label
 
 		base.loadControllerLabels()
 

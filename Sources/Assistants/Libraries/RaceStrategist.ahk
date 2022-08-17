@@ -692,14 +692,32 @@ class RaceStrategist extends RaceAssistant {
 
 	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local delta
+		local delta, lap, car, speaker
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
-			delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
+			speaker := this.getSpeaker()
 
-			this.getSpeaker().speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
+			speaker.startTalk()
+
+			try {
+				lap := knowledgeBase.getValue("Lap")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
+				car := knowledgeBase.getValue("Position.Standings.Ahead.Car")
+
+				if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
+					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
+					speaker.speakPhrase("StandingsAheadLapped")
+				else
+					speaker.speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
+
+				if knowledgeBase.getValue("Car." . car . ".InPitLane")
+					speaker.speakPhrase("GapCarInPit")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 
@@ -744,14 +762,36 @@ class RaceStrategist extends RaceAssistant {
 
 	standingsGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local delta
+		local delta, car, speaker, driver, lap, lapped
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")
 		else {
-			delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
+			speaker := this.getSpeaker()
 
-			this.getSpeaker().speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
+			speaker.startTalk()
+
+			try {
+				lap := knowledgeBase.getValue("Lap")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
+				car := knowledgeBase.getValue("Position.Standings.Behind.Car")
+				lapped := false
+
+				if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
+					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
+					speaker.speakPhrase("StandingsBehindLapped")
+
+					lapped := true
+				}
+				else
+					speaker.speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
+
+				if (!lapped && knowledgeBase.getValue("Car." . car . ".InPitLane"))
+					speaker.speakPhrase("GapCarInPit")
+			}
+			finally {
+				speaker.finishTalk()
+			}
 		}
 	}
 

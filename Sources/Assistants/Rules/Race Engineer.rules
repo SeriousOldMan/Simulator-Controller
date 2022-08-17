@@ -417,18 +417,26 @@ priority: -5, {All: [?Lap], [?Damage.Reported],
 		(Prove: reportAnalysis(0, 0, 0))
 
 reportAnalysis(?, ?, ?) <= recentPitstopLap(!Lap), !, fail
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0), !
-reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
-											  max(?sDelta, ?bDelta, ?temp), max(?temp, ?eDelta, ?delta), remainingStintLaps(!Lap, ?stintLaps),
-											  ?lostTime = ?stintLaps * ?delta, reportAnalysis(?lostTime, ?stintLaps, ?delta)
 
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
-												 Call(reportDamageAnalysis, true, ?stintLaps, ?delta),
-												 Set(Damage.Analysis.Reported, !Lap)
-reportAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta,
-												 Call(reportDamageAnalysis, false, ?stintLaps, ?delta),
-												 Set(Damage.Analysis.Reported, !Lap)
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?eDelta), reportAnalysis(0, ?bDelta, 0), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), unbound?(?bDelta), reportAnalysis(0, 0, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), unbound?(?eDelta), reportAnalysis(?sDelta, 0, 0), !
+
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?sDelta), reportAnalysis(0, ?bDelta, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportAnalysis(?sDelta, 0, ?eDelta), !
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?eDelta), reportAnalysis(?sDelta, ?bDelta, 0), !
+
+reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
+											  max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
+											  remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
+											  reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
+
+reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
+													   Call(reportDamageAnalysis, true, ?stintLaps, ?delta),
+													   Set(Damage.Analysis.Reported, !Lap)
+reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= ?lostTime < !Session.Settings.Pitstop.Delta,
+													   Call(reportDamageAnalysis, false, ?stintLaps, ?delta),
+													   Set(Damage.Analysis.Reported, !Lap)
 
 
 ;;;-------------------------------------------------------------------------;;;

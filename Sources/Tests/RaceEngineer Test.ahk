@@ -39,6 +39,10 @@ global vFuelWarnings := {}
 
 global vSuspensionDamage := kNotInitialized
 global vBodyworkDamage := kNotInitialized
+global vEngineDamage := kNotInitialized
+global vDamageRepair := kNotInitialized
+global vDamageLapDelta := kNotInitialized
+global vDamageStintLaps := kNotInitialized
 
 global vCompletedActions := {}
 
@@ -50,12 +54,6 @@ global vPitstopTyrePressures := kNotInitialized
 global vPitstopRepairSuspension := kNotInitialized
 global vPitstopRepairBodywork := kNotInitialized
 global vPitstopRepairEngine := kNotInitialized
-
-global vSuspensionDamage
-global vBodyworkDamage
-global vDamageRepair
-global vDamageLapDelta
-global vDamageStintLaps
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -82,14 +80,15 @@ class TestRaceEngineer extends RaceEngineer {
 		vFuelWarnings[this.KnowledgeBase.getValue("Lap")] := remainingLaps
 	}
 
-	damageWarning(newSuspensionDamage, newBodyworkDamage) {
-		base.damageWarning(newSuspensionDamage, newBodyworkDamage)
+	damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
+		base.damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage)
 
 		if isDebug()
-			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? "Bodywork" : ""))
+			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? " Bodywork" : "") . (newEngineDamage ? " Engine" : ""))
 
 		vSuspensionDamage := newSuspensionDamage
 		vBodyworkDamage := newBodyworkDamage
+		vEngineDamage := newEngineDamage
 	}
 
 	reportDamageAnalysis(repair, stintLaps, delta) {
@@ -250,6 +249,7 @@ class DamageReporting extends Assert {
 
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
+			vEngineDamage := kNotInitialized
 
 			if (data.Count() == 0)
 				break
@@ -276,12 +276,6 @@ class DamageReporting extends Assert {
 	}
 }
 
-global vSuspensionDamage
-global vBodyworkDamage
-global vDamageRepair
-global vDamageLapDelta
-global vDamageStintLaps
-
 class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
 		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)
@@ -294,6 +288,7 @@ class DamageAnalysis extends Assert {
 			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -361,6 +356,7 @@ class DamageAnalysis extends Assert {
 			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -439,6 +435,7 @@ class DamageAnalysis extends Assert {
 			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -822,6 +819,7 @@ class PitstopHandling extends Assert {
 
 					vSuspensionDamage := kNotInitialized
 					vBodyworkDamage := kNotInitialized
+					vEngineDamage := kNotInitialized
 
 					engineer.planPitstop()
 
@@ -846,6 +844,7 @@ class PitstopHandling extends Assert {
 		loop {
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
+			vEngineDamage := kNotInitialized
 
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 

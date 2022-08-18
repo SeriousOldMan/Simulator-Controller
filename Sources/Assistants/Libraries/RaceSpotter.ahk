@@ -1168,7 +1168,7 @@ class RaceSpotter extends RaceAssistant {
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := knowledgeBase.getValue("Session.Time.Remaining")
 		local remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
-		local remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel
+		local remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel, sessionEnding
 
 		if (lastLap == 2) {
 			situation := "StartSummary"
@@ -1195,7 +1195,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if (sector = 1) {
-				if ((remainingStintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
+				if ((this.Session = kSessionRace) && (remainingStintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
 					situation := ("StintEnding " . Ceil(lastLap + remainingStintLaps))
 
 					if !this.SessionInfos.HasKey(situation) {
@@ -1245,40 +1245,72 @@ class RaceSpotter extends RaceAssistant {
 				this.SessionInfos["AirTemperature"] := airTemperature
 			}
 
-			if (this.OverAllTime > (this.SessionDuration / 2)) {
-				situation := "HalfTime"
+			if (this.Session = kSessionRace) {
+				if (this.OverAllTime > (this.SessionDuration / 2)) {
+					situation := "HalfTime"
 
-				if !this.SessionInfos.HasKey(situation) {
-					this.SessionInfos[situation] := true
+					if !this.SessionInfos.HasKey(situation) {
+						this.SessionInfos[situation] := true
 
-					speaker.startTalk()
+						speaker.startTalk()
 
-					try {
-						speaker.speakPhrase("HalfTimeIntro", {minutes: Round(remainingSessionTime / 60000)
-															, laps: remainingSessionLaps
-															, position: Round(knowledgeBase.getValue("Position", 0))})
+						try {
+							speaker.speakPhrase("HalfTimeIntro", {minutes: Round(remainingSessionTime / 60000)
+																, laps: remainingSessionLaps
+																, position: Round(knowledgeBase.getValue("Position", 0))})
 
-						remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+							remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-						if (remainingStintLaps < remainingSessionLaps) {
-							speaker.speakPhrase("HalfTimeStint", {minutes: Round(remainingStintTime / 60000)
-																, laps: remainingStintLaps})
+							if (remainingStintLaps < remainingSessionLaps) {
+								speaker.speakPhrase("HalfTimeStint", {minutes: Round(remainingStintTime / 60000)
+																	, laps: remainingStintLaps})
 
-							enoughFuel := (remainingStintLaps < remainingFuelLaps)
+								enoughFuel := (remainingStintLaps < remainingFuelLaps)
+							}
+							else {
+								speaker.speakPhrase("HalfTimeSession", {minutes: Round(remainingSessionTime / 60000)
+																	  , laps: remainingStintLaps})
+
+								enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+							}
+
+							speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+											  , {laps: remainingFuelLaps})
 						}
-						else {
-							speaker.speakPhrase("HalfTimeSession", {minutes: Round(remainingSessionTime / 60000)
-																  , laps: remainingStintLaps})
-
-							enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+						finally {
+							speaker.finishTalk()
 						}
+					}
+				}
+			}
+			else {
+				sessionEnding := false
 
-						speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-										  , {laps: remainingFuelLaps})
-					}
-					finally {
-						speaker.finishTalk()
-					}
+				if ((Round(remainingSessionTime / 60000) < 5) && !this.SessionInfos.HasKey("5MinAlert")) {
+					this.SessionInfos["5MinAlert"] := true
+					this.SessionInfos["15MinAlert"] := true
+					this.SessionInfos["30MinAlert"] := true
+
+					sessionEnding := true
+				}
+
+				if ((Round(remainingSessionTime / 60000) < 15) && !this.SessionInfos.HasKey("15MinAlert")) {
+					this.SessionInfos["15MinAlert"] := true
+					this.SessionInfos["30MinAlert"] := true
+
+					sessionEnding := true
+				}
+
+				if ((Round(remainingSessionTime / 60000) < 30) && !this.SessionInfos.HasKey("30MinAlert")) {
+					this.SessionInfos["30MinAlert"] := true
+
+					sessionEnding := true
+				}
+
+				if sessionEnding {
+					speaker.speakPhrase("SessionEnding", {minutes: Round(remainingSessionTime / 60000)})
+
+					return true
 				}
 			}
 		}
@@ -1622,7 +1654,7 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase = this.KnowledgeBase
 		local tacticalAdvices, deltaInformation, regular, sessionInformation
 
-		if (this.Speaker[false] && (this.Session = kSessionRace)) {
+		if this.Speaker[false] {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector)
 
@@ -1633,7 +1665,7 @@ class RaceSpotter extends RaceAssistant {
 					sessionInformation := this.Announcements["SessionInformation"]
 
 					if (!sessionInformation || !this.sessionInformation(lastLap, sector, true)) {
-						if this.hasEnoughData(false) {
+						if (this.hasEnoughData(false) && (this.Session = kSessionRace)) {
 							tacticalAdvices := this.Announcements["TacticalAdvices"]
 
 							if (!tacticalAdvices || !this.tacticalAdvice(lastLap, sector, true)) {

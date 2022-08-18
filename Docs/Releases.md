@@ -1,3 +1,62 @@
+## 4.3.0.0-release 09/02/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Improvements for the Spotter proximity alerts:
+     - Side alerts are more precise in tight corners.
+     - Rear alerts detect the side of the trailing car better in tight corners.
+  4. A lot of new Spotter announcements:
+     - Initial information at the beginning of a race session (duration, position, weather & temperatures, and so on).
+     - Announcement of the Green flag at race start.
+	 - Information when direct opponents or the race leader enter the pit.
+	 - Applause, when a new best lap time has been set.
+	 - Information when the current session (Practice or Qualification) is ending in 30, 15 or 5 minutes.
+	 - Detailed information package, when the first half of a race session has been finished.
+	 - Warning a few laps before the current stint is ending.
+	 - Information when temperatures are rising or falling.
+	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](*) for more information.
+  5. Delta calculation has been imporved again for the Spotter:
+     - The delta history will be reset when a given car is in the pits.
+	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
+	 - Cars that are currently in the pits, will be ignored completely, thereby eliminating disturibing unnecessary gap updates when you have the last valid position on the track.
+  6. Improvements for the Race Strategist and Race Spotter when requesting gap informations:
+     - When you ask for the gap to the car ahead or behind, it will be mentioned when this car is in the pits.
+     - When you ask for the gap to the car ahead or behind, it will be mentioned whether this car is at least one lap up or one lap down.
+  7. A couple of improvements for the automated strategy handling (Race Strategist and Race Engineer):
+     - The Race Strategist can now [recalculate / adjust the currently active strategy](*) anytime during a race.
+	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
+	   - New controller action ["StrategyRecommend"](*) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
+	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be hand over to the Engineer, which will select this specific compound for the tyre change.
+	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
+  8. Improvements for the Race Engineer:
+     - Correct handling of custom tyre compounds for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
+	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
+	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
+	   - Engine repair will be handled automatically during pitstops for ******
+	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
+	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs. See the [revised documentation](*) for more information.
+	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
+  9. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
+  10. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](*) for more information.
+  11. Big performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
+  12. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
+  13. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.
+  14. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
+  15. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
+  16. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
+  17. All application windows remember their position after beeing moved with the mouse.
+  18. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
+  19. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](*) for more information.
+  20. Temp and Logs folders will be cleaned automatically when an update is installed.
+  21. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to use this new Task model.
+  22. New car models for "Setup Advisor":
+      - Assetto Corsa
+	    - ...
+	  - Assetto Corsa Competizione
+	    - ...
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-430), especially, if you want to use the "StrategyRecommend" controller action.
+
 ## 4.2.6.0-release 07/29/22
 
   1. Bugfixes, as always

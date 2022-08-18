@@ -52,25 +52,49 @@ The Spotter will give you critical and in most cases real time information about
 
    Once a lapping car appears behind, you will get a blue flag warning. This typically appears, when the faster car is less than 2 seconds behind. If there is also a direct opponent currently behind you, you will be informed about that as well, so that you can be cautios to not let this car pass together with the lapping car.
 
-4. Pit Window Information
+4. Green Flag (Race Start) Alert
+
+   The Spotter gives you a *push*, when the race has been started.
+
+5. Pit Window Information
 
    Elisa will inform you when the timed window or the designated lap for a required pitstop arrived. Elisa will inform you also, when the pit closes again.
 
-5. Start Performance Summary
+6. Start Performance Summary
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-6. Delta Information
+7. Best Lap Update
+
+   When ypu have scored a new personal best lap, you will get a notification.
+
+8. Delta Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
 
-7. Tactical Advices
+9. Tactical Advices
 
    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
-8. Last Laps Announcement
+10. Weather Updates
 
-   You will get an announcement a few laps before the end of the race.
+    The Spotter will inform you when temperatures (both air and track) are rising or falling and will give you the new temperatures in degrees Celcius.
+
+11. Last Laps Announcement
+
+    You will get an announcement a few laps before the end of the race.
+   
+12. Stint Timer Alert
+
+    During an endurance race, the Spotter will alert you, that the stint time is ending soon and will tell you the number of laps, which you can still go.
+
+13. Session Timer Information
+
+    When you are in a practice or qualification session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
+
+14. Half Time Notification
+
+    Exactly in the middle of the race, the Spotter will give you a couple of informations about the second half of the race, like your current position, the number of remaining minutes and laps, the number of laps which are possible using the remaining fuel, and so on.
 
 All these alerts and announcements can be individually configured or disabled with the configuration tool for each simulator. Please consult the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information. 
 

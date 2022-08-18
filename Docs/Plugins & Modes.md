@@ -1094,7 +1094,8 @@ See the following table for the supported assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. This commadn is most useful, when no strategy is currently active. |
+| StrategyRecommend | Asks the virtual race strategist to [recalculate and adjust the strategy](*) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |

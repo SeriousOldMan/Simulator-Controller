@@ -479,7 +479,15 @@ When a race session starts, Cato looks for a currently defined strategy and chec
 
 The currently active strategy might be dropped, if you do not adhere to the pitstop plan defined in the strategy. To conform to the strategy, you must execute the pitstops in the laps as defined in the strategy +/- a few laps (10% deviation is allowed). If you think, that the predefined strategy is not of any use any more, because of a crash or changing weather conditions, you can cancel it actively with a voice command or by using ["StrategyCancel" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist).
 
-Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event. If there is a need to alter or adopt the selected strategy later on, for example due to accidents or severe wether changes, this can be done using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling).
+Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event, or you musr use the "Instruct Strategist" command of the "Race Center" during the first laps to activate the strategy.
+
+### Adjusting the Strategy during a race
+
+If there is a need to alter or adopt the selected strategy later on, for example due to an accident with an unplanned repair pitstop or also due to severe wether changes, you can instruct the Strategist to recalculate and adjust the currently active strategy using a voice command or the ["StrategyRecommend" controller action](*). In this case, the currently active strategy will be taken as a template incl. all original settings like pitstop rules, available tyre sets, and so on, but other aspects like starting fuel level or the current weather conditions, will be taken from the current race situation. Based on this conditions a new strategy will be derived for the remaining race and will be activated automatically. If it is not possible to calculate a new strategy, for example, when too few laps remain, the currently active strategy will be canceled automatically.
+
+For additional information, how tyre compounds are chosen during weather changes, see the [corresponding documentation](*) about weather specific tyre compounds.
+
+Please note, that if you are running a team race with Team Server support, this can be also done using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which gives you much more control over the recalculation of the strategy.
 
 ## Technical information
 

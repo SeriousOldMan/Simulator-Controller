@@ -73,9 +73,11 @@ class RaceAssistant extends ConfigurationItem {
 
 	iKnowledgeBase := false
 
+	iSessionDuration := 0
 	iOverallTime := 0
 	iBestLapTime := 0
 
+	iBaseLap := false
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
@@ -306,6 +308,18 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	SessionDuration[] {
+		Get {
+			return this.iSessionDuration
+		}
+	}
+
+	SessionLaps[] {
+		Get {
+			return this.iSessionLaps
+		}
+	}
+
 	OverallTime[] {
 		Get {
 			return this.iOverallTime
@@ -315,6 +329,12 @@ class RaceAssistant extends ConfigurationItem {
 	BestLapTime[] {
 		Get {
 			return this.iBestLapTime
+		}
+	}
+
+	BaseLap[] {
+		Get {
+			return this.iBaseLap
 		}
 	}
 
@@ -424,6 +444,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateSessionValues(values) {
+		if values.HasKey("SessionDuration")
+			this.iSessionDuration := values["SessionDuration"]
+
+		if values.HasKey("SessionLaps")
+			this.iSessionLaps := values["SessionLaps"]
+
 		if values.HasKey("SessionTime")
 			this.iSessionTime := values["SessionTime"]
 
@@ -439,8 +465,13 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("Session") {
 			this.iSession := values["Session"]
 
-			if (this.Session == kSessionFinished)
+			if (this.Session == kSessionFinished) {
+				this.iSessionDuration := 0
+				this.iSessionLaps := 0
+
+				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
+			}
 		}
 	}
 
@@ -867,6 +898,8 @@ class RaceAssistant extends ConfigurationItem {
 				duration := settingsDuration
 		}
 
+		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps})
+
 		return {"Session.Simulator": simulator
 			  , "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
 			  , "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
@@ -964,10 +997,8 @@ class RaceAssistant extends ConfigurationItem {
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
-
-		static baseLap := false
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
 			return false
@@ -980,6 +1011,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		if !this.InitialFuelAmount
 			baseLap := lapNumber
+		else
+			baseLap := this.BaseLap
 
 		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
 
@@ -1045,10 +1078,12 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
+		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", this.OverallTime)
+		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
 
 		overallTime := (this.OverallTime + lapTime)
 
@@ -1067,20 +1102,22 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 
 		if (lapNumber == 1) {
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
+			this.updateDynamicValues({BaseLap: 1
+									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
 		}
 		else if (!this.InitialFuelAmount || (fuelRemaining > this.LastFuelAmount)) {
 			; This is the case after a pitstop
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
+			this.updateDynamicValues({BaseLap: lapNumber
+									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
 		}
 		else {
-			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
+			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - this.BaseLap), 2)
 
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))

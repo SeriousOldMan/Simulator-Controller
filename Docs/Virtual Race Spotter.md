@@ -109,21 +109,20 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
-| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
-| Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
-| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
-| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
-| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        | No             |
-| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
-| Race Start (Green Flag)   | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Tactical Advices (4)      | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
+| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
+| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
+| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Full Course Yellow              | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             |
+| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
+| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 
 ##### Notes
 
@@ -134,6 +133,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
 
 (4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, and so on.
+
+(5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
 
 ## Track Mapping
 

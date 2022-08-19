@@ -30,7 +30,7 @@
 	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be hand over to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
-     - Correct handling of custom tyre compounds for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
+     - Correct handling of custom tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
 	   - Engine repair will be handled automatically during pitstops for ******
@@ -45,12 +45,13 @@
   14. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
   15. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
   16. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
-  17. All application windows remember their position after beeing moved with the mouse.
-  18. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
-  19. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](*) for more information.
-  20. Temp and Logs folders will be cleaned automatically when an update is installed.
-  21. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to use this new Task model.
-  22. New car models for "Setup Advisor":
+  17. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context.
+  18. All application windows remember their position after beeing moved with the mouse.
+  19. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
+  20. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](*) for more information.
+  21. Temp and Logs folders will be cleaned automatically when an update is installed.
+  22. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to use this new Task model.
+  23. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

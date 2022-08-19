@@ -1851,6 +1851,10 @@ class Strategy extends ConfigurationItem {
 		Get {
 			return this.iPitstopRule
 		}
+
+		Set {
+			return (this.PitstopRule := value)
+		}
 	}
 
 	RefuelRule[] {

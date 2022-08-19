@@ -105,7 +105,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KoennenWir) (Number) Liter nachtanken, Wir brauchen (Number) Liter]
 
-	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}]
+	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}, (KannstDu) Intermediate Reifen {verwenden, aufziehen}]
 
 	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) Punkt (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) Punkt (Digit) mehr {Druck, Druck bitte}]
 

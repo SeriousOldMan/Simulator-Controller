@@ -1,4 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Strategist              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -31,7 +32,7 @@
 class RaceStrategist extends RaceAssistant {
 	iRaceInfo := false
 
-	iBaseStrategy := false
+	iOriginalStrategy := false
 	iStrategy := false
 	iStrategyReported := false
 
@@ -349,7 +350,7 @@ class RaceStrategist extends RaceAssistant {
 
 	Strategy[original := false] {
 		Get {
-			return (original ? this.OriginalStrategy : this.iStrategy)
+			return (original ? this.iOriginalStrategy : this.iStrategy)
 		}
 	}
 
@@ -448,7 +449,7 @@ class RaceStrategist extends RaceAssistant {
 			this.iTelemetryDatabase := values["TelemetryDatabase"]
 
 		if values.HasKey("OriginalStrategy")
-			this.iBaseStrategy := values["OriginalStrategy"]
+			this.iOriginalStrategy := values["OriginalStrategy"]
 
 		if values.HasKey("Strategy")
 			this.iStrategy := values["Strategy"]
@@ -897,7 +898,7 @@ class RaceStrategist extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		this.reportStrategy({NextPitstop: true})
+		this.reportStrategy({Strategy: false, Pitstops: false, NextPitstop: true})
 	}
 
 	recommendStrategyRecognized(words) {
@@ -1231,7 +1232,7 @@ class RaceStrategist extends RaceAssistant {
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasTelemetryData: false
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
-								, EnoughData: false, StrategyReported: false})
+								, EnoughData: false, StrategyReported: (getConfigurationValue(data, "Stint Data", "Laps", 0) < 2)})
 
 		if this.Speaker
 			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
@@ -1403,7 +1404,7 @@ class RaceStrategist extends RaceAssistant {
 
 		lastLap := lapNumber
 
-		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy) {
+		if (!this.StrategyReported && this.hasEnoughData(false) && this.Strategy && (this.Strategy == this.Strategy[true])) {
 			if this.Speaker[false] {
 				this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
 
@@ -1576,7 +1577,7 @@ class RaceStrategist extends RaceAssistant {
 
 	reportStrategy(options := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategyName, speaker, numPitstops, nextPitstop, lap, refuel, tyreChange, map
+		local strategyName, speaker, nextPitstop, lap, refuel, tyreChange, map
 
 		if this.Speaker {
 			strategyName := knowledgeBase.getValue("Strategy.Name", false)
@@ -1586,34 +1587,33 @@ class RaceStrategist extends RaceAssistant {
 				speaker.startTalk()
 
 				try {
-					if ((options == true) || options.Strategy)
+					if ((options == true) || (options.HasKey("Strategy") && options.Strategy))
 						speaker.speakPhrase("Strategy")
 
-					numPitstops := knowledgeBase.getValue("Strategy.Pitstop.Count")
-
-					if ((options == true) || options.Pitstops)
-						speaker.speakPhrase("Pitstops", {pitstops: numPitstops})
+					if ((options == true) || (options.HasKey("Pitstops") && options.Pitstops))
+						speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
 
 					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
 					if nextPitstop {
-						lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
-						refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
-						tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+						if ((options == true) || (options.HasKey("NextPitstop") && options.NextPitstop)) {
+							lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
+							refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+							tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
-						if ((options == true) || options.NextPitstop)
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
-						if ((options == true) || options.Refuel)
-							speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
+							if ((options == true) || (options.HasKey("Refuel") && options.Refuel))
+								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
 
-						if ((options == true) || options.TyreChange)
-							speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+							if ((options == true) || (options.HasKey("TyreChange") && options.TyreChange))
+								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
+						}
 					}
-					else if ((options == true) || options.NextPitstop || options.Refuel || options.TyreChange)
+					else if ((options == true) || (options.HasKey("NextPitstop") && options.NextPitstop))
 						speaker.speakPhrase("NoNextPitstop")
 
-					if ((options == true) || options.Map) {
+					if ((options == true) || (options.HasKey("Map") && options.Map)) {
 						map := knowledgeBase.getValue("Strategy.Map")
 
 						if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
@@ -1694,7 +1694,7 @@ class RaceStrategist extends RaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy) {
+	updateStrategy(strategy, report := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local facts, fact, value
 
@@ -1714,7 +1714,13 @@ class RaceStrategist extends RaceAssistant {
 
 				this.dumpKnowledge(knowledgeBase)
 
-				this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
+				if !this.Strategy[true]
+					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
+				else
+					this.updateSessionValues({Strategy: strategy})
+
+				if report
+					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true})
 			}
 		}
 		else {
@@ -1723,7 +1729,7 @@ class RaceStrategist extends RaceAssistant {
 			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
 		}
 
-		this.updateDynamicValues({StrategyReported: false})
+		this.updateDynamicValues({StrategyReported: true})
 	}
 
 	runSimulation(pitstopHistory) {
@@ -1760,7 +1766,7 @@ class RaceStrategist extends RaceAssistant {
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.OriginalStrategy
+		local strategy := this.Strategy[true]
 		local lap := Task.CurrentTask.Lap
 		local availableTyreSets, strategyTask, telemetryDB, candidate
 
@@ -1813,7 +1819,7 @@ class RaceStrategist extends RaceAssistant {
 
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
 					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
-		local strategy := this.OriginalStrategy
+		local strategy := this.Strategy[true]
 
 		if strategy {
 			stintLength := strategy.StintLength
@@ -1838,7 +1844,7 @@ class RaceStrategist extends RaceAssistant {
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
-		local strategy := this.OriginalStrategy
+		local strategy := this.Strategy[true]
 		local goal, resultSet, tyreSets, lap, remainingStintTime, telemetryDB
 
 		if strategy {
@@ -1888,7 +1894,7 @@ class RaceStrategist extends RaceAssistant {
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
 						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
-		local strategy := this.OriginalStrategy
+		local strategy := this.Strategy[true]
 
 		useInitialConditions := false
 		useTelemetryData := true
@@ -2009,10 +2015,10 @@ class RaceStrategist extends RaceAssistant {
 
 	chooseScenario(strategy) {
 		if strategy {
-			if this.OriginalStrategy
-				strategy.iPitstopRulse := this.OriginalStrategy.PitstopRule
+			if this.Strategy[true]
+				strategy.PitstopRule := this.Strategy[true].PitstopRule
 
-			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy), 1000)
+			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, true), 1000)
 		}
 		else
 			Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)

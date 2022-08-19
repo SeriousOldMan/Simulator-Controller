@@ -4091,7 +4091,7 @@ class RaceCenter extends ConfigurationItem {
 	chooseScenario(strategy) {
 		if strategy {
 			if this.Strategy
-				strategy.iPitstopRule := this.Strategy.PitstopRule
+				strategy.PitstopRule := this.Strategy.PitstopRule
 
 			this.selectStrategy(strategy, true)
 		}

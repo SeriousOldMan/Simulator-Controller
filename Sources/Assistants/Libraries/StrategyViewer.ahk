@@ -113,7 +113,7 @@ class StrategyViewer {
 		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
 		local lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
 
-		timeSeries := [strategy.StartTime / 60]
+		timeSeries := [strategy.SessionStartTime / 60]
 		lapSeries := [strategy.StartLap]
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]

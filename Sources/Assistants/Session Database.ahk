@@ -435,9 +435,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Weather")
 
-		choices := map(kWeatherOptions, "translate")
+		choices := map(kWeatherConditions, "translate")
 		choices.InsertAt(1, translate("All"))
-		chosen := inList(kWeatherOptions, weather)
+		chosen := inList(kWeatherConditions, weather)
 
 		if (!chosen && (choices.Length() > 0)) {
 			weather := true
@@ -1035,7 +1035,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (weather == true)
 				GuiControl Choose, weatherDropDown, 1
 			else
-				GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather) + 1
+				GuiControl Choose, weatherDropDown, % inList(kWeatherConditions, weather) + 1
 
 			this.updateModules()
 		}
@@ -3773,7 +3773,7 @@ chooseWeather() {
 
 	GuiControlGet weatherDropDown
 
-	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherOptions[weatherDropDown - 1])
+	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
 }
 
 updateNotes() {

@@ -251,7 +251,7 @@ class RaceStrategist extends RaceAssistant {
 		iLap := false
 
 		iPitstops := []
-		iTyreSets := []
+		iUsedTyreSets := []
 
 		RaceStrategist[] {
 			Get {
@@ -277,9 +277,9 @@ class RaceStrategist extends RaceAssistant {
 			}
 		}
 
-		TyreSets[] {
+		UsedTyreSets[] {
 			Get {
-				return this.iTyreSets
+				return this.iUsedTyreSets
 			}
 		}
 
@@ -321,7 +321,7 @@ class RaceStrategist extends RaceAssistant {
 							 , CompoundColor: getConfigurationValue(configuration, "TyreSets", A_Index . ".CompoundColor")})
 
 			this.iPitstops := pitstops
-			this.iTyreSets := tyreSets
+			this.iUsedTyreSets := tyreSets
 		}
 
 		run() {
@@ -1762,40 +1762,46 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.OriginalStrategy
 		local lap := Task.CurrentTask.Lap
+		local availableTyreSets, strategyTask, telemetryDB, candidate
 
 		if strategy {
 			simulator := strategy.Simulator
 			car := strategy.Car
 			track := strategy.Track
-		}
-		else
-			return false
 
-		weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
+			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
-		if weather {
-			airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
-			trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
-		}
-		else if strategy {
-			weather := strategy.Weather
-			airTemperature := strategy.AirTemperature
-			trackTemperature := strategy.TrackTemperature
-		}
-		else
-			return false
+			if weather {
+				airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
+				trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
+			}
+			else {
+				weather := strategy.Weather
+				airTemperature := strategy.AirTemperature
+				trackTemperature := strategy.TrackTemperature
+			}
 
-		tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
-		tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
+			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
+			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
 
-		if (!tyreCompound && strategy) {
-			tyreCompound := strategy.TyreCompound
-			tyreCompoundColor := strategy.TyreCompoundColor
-		}
-		else
-			return false
+			if !tyreCompound {
+				tyreCompound := strategy.TyreCompound
+				tyreCompoundColor := strategy.TyreCompoundColor
+			}
 
-		if strategy {
+			weather := knowledgeBase.getValue("Weather.Weather.10Min", strategy.Weather)
+			strategyTask := Task.CurrentTask
+			telemetryDB := strategyTask.TelemetryDatabase
+
+			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+				candidate := telemetryDD.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
+														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets
+																								 , strategyTask.UsedTyreSets)))
+
+				if candidate
+					splitCompound(candidate, tyreCompound, tyreCompoundColor)
+			}
+
 			sessionType := strategy.SessionType
 			sessionLength := strategy.SessionLength
 			maxTyreLaps := strategy.MaxTyreLaps
@@ -1803,8 +1809,6 @@ class RaceStrategist extends RaceAssistant {
 		}
 		else
 			return false
-
-		return true
 	}
 
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
@@ -1830,32 +1834,56 @@ class RaceStrategist extends RaceAssistant {
 			return false
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
-		local lap := Task.CurrentTask.Lap
-		local goal, resultSet, tyreSets
+		local strategy := this.OriginalStrategy
+		local goal, resultSet, tyreSets, lap, remainingStintTime, telemetryDB
 
-		initialStint := (Task.CurrentTask.Pitstops.Length() + 1)
-		initialLap := lap
-		initialFuelAmount := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining")
-		initialMap := knowledgeBase.getValue("Lap." . lap . ".Map")
-		initialFuelConsumption := knowledgeBase.getValue("Lap." . lap . ".Fuel.AvgConsumption")
+		if strategy {
+			remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
+			lap := Task.CurrentTask.Lap
 
-		goal := new RuleCompiler().compileGoal("lapAvgTime(" . lap . ", ?lapTime)")
-		resultSet := knowledgeBase.prove(goal)
+			initialStint := (Task.CurrentTask.Pitstops.Length() + 1)
+			initialLap := lap
 
-		if resultSet
-			initialAvgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
+			telemetryDB := Task.CurrentTask.TelemetryDatabase
+
+			if !telemetryDB.suitableTyreCompound(strategy.Simulator, strategy.Car, strategy.Track
+											   , knowledgeBase.getValue("Weather.Weather.10Min", strategy.Weather)
+											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
+														, knowledgeBase.getValue("Tyre.Compound.Color", "Black"))) {
+				initialStintTime := strategy.StintLength
+
+				initialTyreLaps := 999
+			}
+			else {
+				initialStintTime := Ceil(strategy.StintLength - (remainingStintTime / 60000))
+
+				tyreSets := Task.CurrentTask.UsedTyreSets
+
+				initialTyreLaps := tyreSets[tyreSets.Length()].Laps
+			}
+
+			initialFuelAmount := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining")
+			initialMap := knowledgeBase.getValue("Lap." . lap . ".Map")
+			initialFuelConsumption := knowledgeBase.getValue("Lap." . lap . ".Fuel.AvgConsumption")
+
+			goal := new RuleCompiler().compileGoal("lapAvgTime(" . lap . ", ?lapTime)")
+			resultSet := knowledgeBase.prove(goal)
+
+			if resultSet
+				initialAvgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
+			else
+				initialAvgLapTime := (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)
+
+			initialSessionTime := (this.OverallTime / 1000)
+
+			return true
+		}
 		else
-			initialAvgLapTime := (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)
-
-		initialSessionTime := (this.OverallTime / 1000)
-
-		tyreSets := Task.CurrentTask.TyreSets
-
-		initialTyreLaps := tyreSets[tyreSets.Length()].Laps
+			return false
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
@@ -1953,12 +1981,12 @@ class RaceStrategist extends RaceAssistant {
 		return avgLapTime ? avgLapTime : (default ? default : this.Strategy.AvgLapTime)
 	}
 
-	initializeAvailableTyreSets(strategy) {
-		local compound, availableTyreSets, ignore, tyreSet, count
+	computeAvailableTyreSets(availableTyreSets, usedTyreSets) {
+		local compound, ignore, tyreSet, count
 
-		availableTyreSets := strategy.AvailableTyreSets
+		availableTyreSets := availableTyreSets.Clone()
 
-		for ignore, tyreSet in Task.CurrentTask.TyreSets {
+		for ignore, tyreSet in usedTyreSets {
 			compound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
 			if availableTyreSets.HasKey(compound) {
@@ -1970,6 +1998,13 @@ class RaceStrategist extends RaceAssistant {
 					availableTyreSets.Delete(compound)
 			}
 		}
+
+		return availableTyreSets
+	}
+
+	initializeAvailableTyreSets(strategy) {
+		strategy.AvailableTyreSets := this.computeAvailableTyreSets(strategy.AvailableTyreSets
+																  , Task.CurrentTask.UsedTyreSets)
 	}
 
 	chooseScenario(strategy) {

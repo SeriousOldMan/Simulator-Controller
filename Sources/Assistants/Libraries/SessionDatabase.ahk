@@ -23,7 +23,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kWeatherOptions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
+global kWeatherConditions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
 global kTyreCompounds := ["Wet", "Intermediate", "Dry"
 					   , "Wet (S)", "Wet (M)", "Wet (H)"
@@ -745,6 +745,66 @@ class SessionDatabase extends ConfigurationItem {
 			}
 
 		return default
+	}
+
+	suitableTyreCompound(simulator, car, track, weather, compound) {
+		local compoundColor := compoundColor(compound)
+
+		compound := compound(compound)
+
+		if ((weather = "Dry") && (compound = "Dry"))
+			return true
+		else if ((weather = "Drizzle") && inList(["Dry", "Intermediate"], compound))
+			return true
+		else if ((weather = "LightRain") && inList(["Intermediate", "Wet"], compound))
+			return true
+		else if (compound = "Wet")
+			return true
+		else
+			return false
+	}
+
+	optimalTyreCompound(simulator, car, track, weather, airTemeperature, trackTemperature, availableTyreCompounds := false) {
+		local compounds, compound, index
+
+		if !availableTyreCompounds
+			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
+
+		compounds := map(availableTyreCompounds, "compound")
+
+		switch weather {
+			case "Dry":
+				compound := "Dry"
+			case "Drizzle", "LightRain":
+				compound := "Intermediate"
+			default:
+				compound := "Wet"
+		}
+
+		index := inList(compounds, compound)
+
+		if index
+			return availableTyreCompounds[index]
+		else if ((compound = "Intermediate") && (weather = "Drizzle")) {
+			index := inList(compounds, "Dry")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+		else if ((compound = "Intermediate") && (weather = "LightRain")) {
+			index := inList(compounds, "Wet")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+		else {
+			index := inList(compounds, "Dry")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+
+		return false
 	}
 
 	readNotes(simulator, car, track) {

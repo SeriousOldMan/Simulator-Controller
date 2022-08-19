@@ -340,8 +340,8 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
 
 		weather := this.SelectedWeather
-		choices := map(kWeatherOptions, "translate")
-		chosen := inList(kWeatherOptions, weather)
+		choices := map(kWeatherConditions, "translate")
+		chosen := inList(kWeatherConditions, weather)
 
 		if (!chosen && (choices.Length() > 0)) {
 			weather := choices[1]
@@ -3197,7 +3197,7 @@ chooseWeather() {
 
 	GuiControlGet weatherDropDown
 
-	advisor.loadWeather(kWeatherOptions[weatherDropDown])
+	advisor.loadWeather(kWeatherConditions[weatherDropDown])
 	*/
 }
 

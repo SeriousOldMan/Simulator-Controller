@@ -422,8 +422,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Conditions")
 
 		weather := this.SelectedWeather
-		choices := map(kWeatherOptions, "translate")
-		chosen := inList(kWeatherOptions, weather)
+		choices := map(kWeatherConditions, "translate")
+		chosen := inList(kWeatherConditions, weather)
 
 		if (!chosen && (choices.Length() > 0)) {
 			weather := choices[1]
@@ -1366,7 +1366,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iSelectedWeather := weather
 
-			GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather)
+			GuiControl Choose, weatherDropDown, % inList(kWeatherConditions, weather)
 
 			this.loadDataType(this.SelectedDataType, true)
 		}
@@ -2441,70 +2441,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		local window := this.Window
-		local a, b, telemetryDB, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
-		local baseLapTime, count, avgLapTime, lapTime, candidate
-
-		Gui %window%:Default
-
-		GuiControlGet simInputDropDown
-		GuiControlGet simAvgLapTimeEdit
-
-		a := false
-		b := false
-
-		if (simInputDropDown > 1) {
-			telemetryDB := this.TelemetryDatabase
-
-			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-
-			if (tyreLapTimes.Length() > 1) {
-				xValues := []
-				yValues := []
-
-				for ignore, entry in tyreLapTimes {
-					xValues.Push(entry["Tyre.Laps"])
-					yValues.Push(entry["Lap.Time"])
-				}
-
-				linRegression(xValues, yValues, a, b)
-			}
-		}
-		else
-			lapTimes := []
-
-		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
-
-		count := 0
-		avgLapTime := 0
-		lapTime := false
-
-		loop %numLaps% {
-			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
-
-			if (!lapTime || !baseLapTime)
-				lapTime := candidate
-			else if (candidate < lapTime)
-				lapTime := candidate
-
-			if lapTime {
-				if baseLapTime
-					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
-				else
-					avgLapTime += lapTime
-
-				count += 1
-			}
-		}
-
-		if (avgLapTime > 0)
-			avgLapTime := (avgLapTime / count)
-
-		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
-	}
-
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
 		local window := this.Window
 		local result := true
@@ -2603,7 +2539,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialSessionTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
+					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local window := this.Window
 
@@ -2617,6 +2554,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		initialStint := 1
 		initialLap := 0
+		initialStintTime := 0
 		initialSessionTime := 0
 		initialTyreLaps := 0
 		initialFuelAmount := simInitialFuelAmountEdit
@@ -2668,6 +2606,70 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	setStintDriver(stintNumber, driverID) {
 		throw "StrategyWorkbench.setStintDriver should never be called..."
+	}
+
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+		local window := this.Window
+		local a, b, telemetryDB, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
+		local baseLapTime, count, avgLapTime, lapTime, candidate
+
+		Gui %window%:Default
+
+		GuiControlGet simInputDropDown
+		GuiControlGet simAvgLapTimeEdit
+
+		a := false
+		b := false
+
+		if (simInputDropDown > 1) {
+			telemetryDB := this.TelemetryDatabase
+
+			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+
+			if (tyreLapTimes.Length() > 1) {
+				xValues := []
+				yValues := []
+
+				for ignore, entry in tyreLapTimes {
+					xValues.Push(entry["Tyre.Laps"])
+					yValues.Push(entry["Lap.Time"])
+				}
+
+				linRegression(xValues, yValues, a, b)
+			}
+		}
+		else
+			lapTimes := []
+
+		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
+
+		count := 0
+		avgLapTime := 0
+		lapTime := false
+
+		loop %numLaps% {
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
+
+			if lapTime {
+				if baseLapTime
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
+
+				count += 1
+			}
+		}
+
+		if (avgLapTime > 0)
+			avgLapTime := (avgLapTime / count)
+
+		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 
 	runSimulation() {
@@ -3107,7 +3109,7 @@ chooseWeather() {
 
 	GuiControlGet weatherDropDown
 
-	workbench.loadWeather(kWeatherOptions[weatherDropDown])
+	workbench.loadWeather(kWeatherConditions[weatherDropDown])
 }
 
 updateTemperatures() {

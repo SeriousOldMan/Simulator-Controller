@@ -181,14 +181,14 @@ class TyresDatabase extends SessionDatabase {
 		simulator := this.getSimulatorName(simulator)
 
 		if !compound {
-			weatherIndex := inList(kWeatherOptions, weather)
+			weatherIndex := inList(kWeatherConditions, weather)
 			visited := []
 			compounds := []
 
 			for ignore, condition in this.getConditions(simulator, car, track, driver) {
 				theCompound := (condition[4] . "." . condition[5])
 
-				conditionIndex := inList(kWeatherOptions, condition[1])
+				conditionIndex := inList(kWeatherConditions, condition[1])
 
 				valid := (weather == true)
 
@@ -284,7 +284,7 @@ class TyresDatabase extends SessionDatabase {
 			driver := this.ID
 
 		if (weather != true) {
-			weatherBaseIndex := inList(kWeatherOptions, weather)
+			weatherBaseIndex := inList(kWeatherConditions, weather)
 
 			if (weatherBaseIndex == 1)
 				weatherCandidateOffsets := [0, 1]
@@ -303,7 +303,7 @@ class TyresDatabase extends SessionDatabase {
 		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Community") : false)
 
 		for ignore, weatherOffset in weatherCandidateOffsets {
-			weather := kWeatherOptions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherOptions.Length()))]
+			weather := kWeatherConditions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherConditions.Length()))]
 
 			for ignore, airDelta in kTemperatureDeltas {
 				for ignore, trackDelta in kTemperatureDeltas {

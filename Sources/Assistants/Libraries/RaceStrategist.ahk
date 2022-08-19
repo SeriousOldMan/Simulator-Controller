@@ -2167,7 +2167,8 @@ class RaceStrategist extends RaceAssistant {
 				speaker.startTalk()
 
 				try {
-					speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
+																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound]})
 
 					Process Exist, Race Engineer.exe

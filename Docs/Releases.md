@@ -30,7 +30,8 @@
 	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be hand over to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
-     - Correct handling of custom tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
+     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
+	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
 	   - Engine repair will be handled automatically during pitstops for ******

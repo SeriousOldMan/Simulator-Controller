@@ -114,9 +114,28 @@ You may have already wondered what all the nonsense is about. There are differen
 
 1. When changing the tyre compound for the next pitstop using one of the controller actions described in [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes), the tyre compound mapping is useed to derive the number of diffent compounds and the correct tyre compound identifier to send to the current simulator, when you choose the next compound.
 2. When the pitstop settings are derived by the Virtual Race Engineer, the same applies.
-3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Race Center" also uses the available tyre compounds when preparing a pitstop.
+3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Race Center" also uses the available tyre compounds when preparing a pitstop or to store the driver specific car setups.
 
-### Default behaviour
+As you have seen above, a tyre compound consists of a tyre category (Dry, Intermediate and Wet) and a suffix, which specifies the mixture or hardness of the compound. As you might expect, the tyre category is most important for the behaviour of the tyre in varying conditions, whereas the mixture determine properties like tyre life time.
+
+### Weather and Tyre Compounds
+
+When a tyre compound will be selected for a given weather condition, the following rules apply:
+
+| Weather      | Suitable Category | Optimal Category |
+| ------------ | ----------------- | ---------------- |
+| Dry          | Dry               | Dry              |
+| Drizzle      | Dry, Intermediate | Intermediate     |
+| Light Rain   | Intermediate, Wet | Intermediate     |
+| Medium Rain  | Wet               | Wet              |
+| Heavy Rain   | Wet               | Wet              |
+| Thunderstorm | Wet               | Wet              |
+
+When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation. A notable exception is the pitstop management in "Race Center", where you can manually select the desired tyre compound for the next pitstop.
+
+Using the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Race Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. But if you go to the pits the tyre compound with the optimal category will be chosen. In the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, a pitstop will be requested and the optimal tyre compound will be chosen, if available.
+
+### Default Tyre Compound
 
 The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behaviour before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.
 

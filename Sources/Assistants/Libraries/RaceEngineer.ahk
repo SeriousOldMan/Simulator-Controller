@@ -18,6 +18,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -495,9 +496,10 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	pitstopAdjustCompoundRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local compound
+		local compound, compoundColor, ignore, candidate
 
 		if !this.hasPlannedPitstop() {
 			speaker.startTalk()
@@ -517,13 +519,24 @@ class RaceEngineer extends RaceAssistant {
 
 			if inList(words, fragments["Wet"])
 				compound := "Wet"
+			else if inList(words, fragments["Intermediate"])
+				compound := "Intermediate"
 			else if inList(words, fragments["Dry"])
 				compound := "Dry"
 
 			if compound {
-				speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound]}, true)
+				for ignore, candidate in new SessionDatabase().getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+																			  , knowledgeBase.getValue("Session.Car")
+																			  , knowledgeBase.getValue("Session.Track"))
+					if (InStr(candidate, compound) = 1) {
+						splitCompound(compound, compound, compoundColor)
 
-				this.setContinuation(ObjBindMethod(this, "updatePitstopTyreCompound", compound))
+						speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound]}, true)
+
+						this.setContinuation(ObjBindMethod(this, "updatePitstopTyreCompound", compound, compoundColor))
+					}
+					else
+						speaker.speakPhrase("CompoundNotAvailable", {compound: fragments[compound]})
 			}
 			else
 				speaker.speakPhrase("Repeat")
@@ -731,7 +744,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	updatePitstopTyreCompound(compound, color := "Black") {
+	updatePitstopTyreCompound(compound, color) {
 		local speaker := this.getSpeaker()
 		local knowledgeBase, ignore, tyreType
 
@@ -2091,7 +2104,8 @@ class RaceEngineer extends RaceAssistant {
 				speaker.startTalk()
 
 				try {
-					speaker.speakPhrase((recommendedCompound = "Wet") ? "WeatherRainChange" : "WeatherDryChange"
+					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
+																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound]})
 
 					if this.supportsPitstop() {

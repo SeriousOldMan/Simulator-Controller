@@ -67,6 +67,13 @@ priority: 1,
 						[?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}},
 			[?Weather.Change.Notified < ?Weather.Weather.30Min.Index]}} =>
 		(Prove: weatherChangeNotification(?Lap, !Weather.Weather.30Min, 30))
+{All: [?Lap > 1], [?Tyre.Compound = Intermediate],
+	  {Any: {All: {None: [?Weather.Change.Notified]},
+				  {Any: [?Weather.Weather.Now = Drizzle], [?Weather.Weather.Now = LightRain]},
+				  {Any: [?Weather.Weather.30Min = Dry], [?Weather.Weather.30Min = MediumRain],
+						[?Weather.Weather.30Min = HeavyRain], [?Weather.Weather.30Min = Thunderstorm]}},
+			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>
+		(Prove: weatherChangeNotification(?Lap, !Weather.Weather.30Min, 30))
 {All: [?Lap > 1], [?Tyre.Compound = Wet],
 	  {Any: {All: {None: [?Weather.Change.Notified]},
 				  {Any: [?Weather.Weather.Now = LightRain], [?Weather.Weather.Now = MediumRain],

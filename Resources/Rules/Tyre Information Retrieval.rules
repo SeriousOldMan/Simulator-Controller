@@ -5,22 +5,38 @@
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;-------------------------------------------------------------------------;;;
+;;;                            Rule Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Rules\Pitstop Information Retrieval.rules
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Public Rules Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
 currentTyreCompound(?compound, ?color) <= Get(Lap, !Lap, Tyre.Compound, ?compound), Get(Lap, !Lap, Tyre.Compound.Color, ?color), !
 currentTyreCompound(?compound, ?color) <= lastPitstopTyreCompound(?compound, ?color), !
 currentTyreCompound(?compound, ?color) <= setupTyreCompound(?compound, ?color)
 
-tyreCompoundColor(Wet, Black)
 tyreCompoundColor(Dry, ?color) <= Get(Lap, !Lap, Tyre.Compound, Dry), Get(Lap, !Lap, Tyre.Compound.Color, ?color)
 tyreCompoundColor(Dry, ?color) <= pitstopTyreCompound(Dry, ?color)
 tyreCompoundColor(Dry, ?color) <= setupTyreCompound(Dry, ?color)
-tyreCompoundColor(Dry, Black)
+tyreCompoundColor(Wet, ?color) <= Get(Lap, !Lap, Tyre.Compound, Wet), Get(Lap, !Lap, Tyre.Compound.Color, ?color)
+tyreCompoundColor(Wet, ?color) <= pitstopTyreCompound(Wet, ?color)
+tyreCompoundColor(Wet, ?color) <= setupTyreCompound(Wet, ?color)
+tyreCompoundColor(Intermediate, ?color) <= Get(Lap, !Lap, Tyre.Compound, Intermediate), Get(Lap, !Lap, Tyre.Compound.Color, ?color)
+tyreCompoundColor(Intermediate, ?color) <= pitstopTyreCompound(Intermediate, ?color)
+tyreCompoundColor(Intermediate, ?color) <= setupTyreCompound(Intermediate, ?color)
+tyreCompoundColor(?compound, ?compoundColor) <= availableTyreCompound(?compound, ?compoundColor)
 
 setupTyreCompound(?compound, ?color) <= Get(Session.Setup.Tyre.Compound, ?compound), Get(Session.Setup.Tyre.Compound.Color, ?color)
 
 setupTyrePressure(?compound, ?tyreType, ?pressure) <= Get(Session.Setup.Tyre, ?compound, Pressure, ?tyreType, ?pressure)
 
 setupTyrePressures(?compound, [], [])
-setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=															\
+setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]) <=
 		setupTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressures(?compound, ?tyreTypes, ?pressures)
 
 tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Session.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?pressure)

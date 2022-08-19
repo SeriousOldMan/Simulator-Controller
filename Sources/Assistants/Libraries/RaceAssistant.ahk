@@ -485,6 +485,9 @@ class RaceAssistant extends ConfigurationItem {
 		if values.HasKey("BestLapTime")
 			this.iBestLapTime := values["BestLapTime"]
 
+		if values.HasKey("BaseLap")
+			this.iBaseLap := values["BaseLap"]
+
 		if values.HasKey("LastFuelAmount")
 			this.iLastFuelAmount := values["LastFuelAmount"]
 
@@ -755,18 +758,31 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createKnowledgeBase(facts) {
-		local rules, productions, reductions, engine
+		local compiler := new RuleCompiler()
+		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 
 		FileRead rules, % getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory)
 
 		productions := false
 		reductions := false
 
-		new RuleCompiler().compileRules(rules, productions, reductions)
+		compiler.compileRules(rules, productions, reductions)
 
 		engine := new RuleEngine(productions, reductions, facts)
 
-		return new this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
+		knowledgeBase := new this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
+
+		for ignore, compound in new SessionDatabase().getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+																	 , knowledgeBase.getValue("Session.Car")
+																	 , knowledgeBase.getValue("Session.Track")) {
+			compoundColor := false
+
+			splitCompound(compound, compound, compoundColor)
+
+			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
+		}
+
+		return knowledgeBase
 	}
 
 	setDebug(option, enabled) {
@@ -1117,7 +1133,7 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
 		}
 		else {
-			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - this.BaseLap), 2)
+			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
 
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))

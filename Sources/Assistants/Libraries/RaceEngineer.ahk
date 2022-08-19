@@ -18,7 +18,6 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1032,7 +1031,7 @@ class RaceEngineer extends RaceAssistant {
 
 	startSession(settings, data) {
 		local facts, simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
-		local knowledgeBase, compiler, ignore, compound, compoundColor
+		local knowledgeBase
 
 		if !IsObject(settings)
 			settings := readConfiguration(settings)
@@ -1055,17 +1054,6 @@ class RaceEngineer extends RaceAssistant {
 
 
 		knowledgeBase := this.createKnowledgeBase(facts)
-		compiler := new RuleCompiler()
-
-		for ignore, compound in new SessionDatabase().getTyreCompounds(simulatorName
-																	 , knowledgeBase.getValue("Session.Car")
-																	 , knowledgeBase.getValue("Session.Track")) {
-			compoundColor := false
-
-			splitCompound(compound, compound, compoundColor)
-
-			knowledgeBase.addRule(compiler.compileRule("tyreCompoundColor(" . compound . "," . compoundColor . ")"))
-		}
 
 		this.updateDynamicValues({KnowledgeBase: knowledgeBase, HasPressureData: false
 								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})

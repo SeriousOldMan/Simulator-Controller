@@ -2019,7 +2019,7 @@ class RaceSpotter extends RaceAssistant {
 	prepareSession(settings, data) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min
+		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 
 		base.prepareSession(settings, data)
 
@@ -2065,6 +2065,12 @@ class RaceSpotter extends RaceAssistant {
 				speaker.speakPhrase("GreetingWeather", {air: airTemperature, track: trackTemperature, weather: weather})
 
 				if (this.Session = kSessionRace) {
+					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+
+					if driver
+						speaker.speakPhrase("GreetingPosition"
+										  , {position: getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")})
+
 					if (facts["Session.Type"] = "Duration")
 						speaker.speakPhrase("GreetingDuration", {minutes: Round(this.SessionDuration / 60000)})
 					else

@@ -120,6 +120,27 @@ If you have configured one or more hardware controllers (Button Boxes and/or Str
 
 Please note, that you can mix voice commands and commands triggered by the controller hardware freely, so choose your weapon depending on the current situation on the track.
 
+### External Commands
+
+There is also the possibility to trigger actions in Simulator Controller from other applications. There are several ways to do this, but the most easy ones are:
+
+1. Keyboard commands
+
+   As you have seen in the chapter about [Installation & Configuration](*), every action or command in Simulator Controller can be activated and controller from hardware controller like Button Boxes or Stream Decks, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
+
+2. Command scripts
+
+   Not every application can easily send keyboard commands to other applications, for example Windows .BAT or .CMD scripts. A second method exists therefore, that uses a script file as an interface. You can create a file named "Controller.cmd" in the *Simulator Controller\Temp* folder which resides in your user *Documents* folder. This file is checked every 100 ms, and if it is not empty, it will be processed and afterwards deleted. Here is in example for a "Controller.cmd":
+   
+	2WayToggle.1 On
+	Button.1
+	Button.2
+	Dial.4 Decrease
+	
+   This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](*) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
+
+   A last note for experienced users: Together with the [*execute* controller action function](*), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
+
 ## And now it's time
 
 ...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...

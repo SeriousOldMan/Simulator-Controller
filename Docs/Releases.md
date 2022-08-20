@@ -49,9 +49,9 @@
   17. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context.
   18. All application windows remember their position after beeing moved with the mouse.
   19. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
-  20. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](*) for more information.
+  20. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   21. Temp and Logs folders will be cleaned automatically when an update is installed.
-  22. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to use this new Task model.
+  22. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   23. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...

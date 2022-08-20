@@ -1538,20 +1538,6 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 						changed := true
 					}
 
-			for section, keyValues in userDefinitions {
-				keys := []
-
-				for key, value in keyValues
-					if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
-						keys.Push(key)
-
-						changed := true
-					}
-
-				for ignore, key in keys
-					removeConfigurationValue(userDefinitions, section, key)
-			}
-
 			if changed
 				writeConfiguration(userDefinitionsFile, userDefinitions)
 		}
@@ -1613,7 +1599,7 @@ updateActionIcons() {
 	updateActionDefinitions("Controller Action Icons")
 }
 
-updateStreamDeckIcons() {
+updateStreamDeckIconPreset() {
 	updateActionDefinitions("Controller Action Icons", true)
 }
 

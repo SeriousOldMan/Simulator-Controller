@@ -330,28 +330,40 @@ class VoiceManager {
 			else if continuation
 				%continuation%()
 		}
+
+		cancel() {
+		}
 	}
 
 	class ReplyContinuation extends VoiceManager.VoiceContinuation {
-		iReply := false
+		iAccept := false
+		iReject := false
 
-		Reply[] {
+		Reject[] {
 			Get {
-				return this.iReply
+				return this.iReject
 			}
 		}
 
-		__New(manager, continuation := false, reply := false) {
-			this.iReply := reply
+		__New(manager, continuation := false, accept := false, reject := false) {
+			this.iAccept := accept
+			this.iReject := reject
 
 			base.__New(manager, continuation)
 		}
 
 		continue() {
-			if (this.Manager.Speaker && this.Reply)
-				this.Manager.getSpeaker().speakPhrase(this.Reply)
+			if (this.Manager.Speaker && this.Accept)
+				this.Manager.getSpeaker().speakPhrase(this.Accept)
 
 			base.continue()
+		}
+
+		cancel() {
+			if (this.Manager.Speaker && this.Reject)
+				this.Manager.getSpeaker().speakPhrase(this.Reject)
+
+			base.cancel()
 		}
 	}
 

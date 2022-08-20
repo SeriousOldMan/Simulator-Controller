@@ -3900,17 +3900,10 @@ class RaceCenter extends ConfigurationItem {
 					initialSessionTime += this.computeDuration(this.Stints[A_Index])
 
 			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
-											   , this.TyreCompound, this.TyreCompoundColor) {
-				initialStintTime := this.Strategy.StintLength
-
+											   , this.TyreCompound, this.TyreCompoundColor)
 				initialTyreLaps := 999
-			}
 			else {
-				initialStintTime := Ceil(strategy.StintLength - (remainingStintTime / 60000))
-
 				tyresTable := telemetryDB.Database.Tables["Tyres"]
-
-				lap := tyresTable.Length()
 
 				if (tyresTable.Length() >= lastLap.Nr)
 					initialTyreLaps := tyresTable[lastLap.Nr]["Tyre.Laps"]

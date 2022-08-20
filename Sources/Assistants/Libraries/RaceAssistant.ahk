@@ -524,7 +524,9 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.clearContinuation()
 
-				if continuation
+				if isInstance(continuation, VoiceManager.VoiceContinuation)
+					continuation.cancel()
+				else if continuation
 					this.getSpeaker().speakPhrase("Okay")
 			case "Call":
 				this.nameRecognized(words)
@@ -586,7 +588,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (score > 0.5) {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
-			this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger"))
+			this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger", "Okay"))
 		}
 		else
 			speaker.speakPhrase("Repeat")
@@ -750,7 +752,7 @@ class RaceAssistant extends ConfigurationItem {
 		if isInstance(continuation, VoiceManager.VoiceContinuation)
 			this.VoiceManager.setContinuation(continuation)
 		else
-			this.VoiceManager.setContinuation(new VoiceManager.ReplyContinuation(this, continuation, "Confirm"))
+			this.VoiceManager.setContinuation(new VoiceManager.ReplyContinuation(this, continuation, "Confirm", "Okay"))
 	}
 
 	clearContinuation() {

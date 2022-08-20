@@ -85,6 +85,20 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
+	class TyreChangeContinuation extends VoiceManager.ReplyContinuation {
+		cancel() {
+			Process Exist, Race Engineer.exe
+
+			if ErrorLevel {
+				speaker.speakPhrase("ConfirmInformEngineerAnyway", false, true)
+
+				this.Manager.setContinuation(ObjBindMethod(this, "planPitstop"))
+			}
+			else
+				base.cancel()
+		}
+	}
+
 	class RaceReviewContinuation extends VoiceManager.VoiceContinuation {
 	}
 
@@ -1072,6 +1086,8 @@ class RaceStrategist extends RaceAssistant {
 		}
 
 		facts["Strategy.Pitstop.Count"] := count
+
+		return facts
 	}
 
 	prepareSession(settings, data) {
@@ -1676,6 +1692,9 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local engineerPID
 
+		if !this.hasEnoughData()
+			return
+
 		if knowledgeBase.getValue("Strategy.Name", false) {
 			Process Exist, Race Engineer.exe
 
@@ -1694,9 +1713,11 @@ class RaceStrategist extends RaceAssistant {
 			this.getSpeaker().speakPhrase("NoStrategy")
 	}
 
-	updateStrategy(strategy, report := false) {
+	updateStrategy(strategy, original := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local facts, fact, value
+		local fact, value
+
+		this.updateDynamicValues({StrategyReported: true})
 
 		if strategy {
 			if (this.Session == kSessionRace) {
@@ -1705,22 +1726,18 @@ class RaceStrategist extends RaceAssistant {
 
 				this.clearStrategy()
 
-				facts := {}
-
-				this.loadStrategy(facts, strategy, knowledgeBase.getValue("Lap") + 1)
-
-				for fact, value in facts
+				for fact, value in this.loadStrategy({}, strategy, knowledgeBase.getValue("Lap") + 1)
 					knowledgeBase.setFact(fact, value)
 
 				this.dumpKnowledge(knowledgeBase)
 
-				if !this.Strategy[true]
+				if original
 					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
-				else
+				else {
 					this.updateSessionValues({Strategy: strategy})
 
-				if report
 					this.reportStrategy({Strategy: true, Pitstops: false, NextPitstop: true, TyreChange: true, Refuel: true})
+				}
 			}
 		}
 		else {
@@ -1728,8 +1745,6 @@ class RaceStrategist extends RaceAssistant {
 
 			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
 		}
-
-		this.updateDynamicValues({StrategyReported: true})
 	}
 
 	runSimulation(pitstopHistory) {
@@ -1845,28 +1860,21 @@ class RaceStrategist extends RaceAssistant {
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy[true]
-		local goal, resultSet, tyreSets, lap, remainingStintTime, telemetryDB
+		local goal, resultSet, tyreSets, telemetryDB
 
 		if strategy {
-			remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
-			lap := Task.CurrentTask.Lap
-
 			initialStint := (Task.CurrentTask.Pitstops.Length() + 1)
-			initialLap := lap
+			initialLap := Task.CurrentTask.Lap
+			initialStintTime := Ceil(strategy.StintLength - (knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000))
 
 			telemetryDB := Task.CurrentTask.TelemetryDatabase
 
 			if !telemetryDB.suitableTyreCompound(strategy.Simulator, strategy.Car, strategy.Track
 											   , knowledgeBase.getValue("Weather.Weather.10Min", strategy.Weather)
 											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
-														, knowledgeBase.getValue("Tyre.Compound.Color", "Black"))) {
-				initialStintTime := strategy.StintLength
-
+														, knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
 				initialTyreLaps := 999
-			}
 			else {
-				initialStintTime := Ceil(strategy.StintLength - (remainingStintTime / 60000))
-
 				tyreSets := Task.CurrentTask.UsedTyreSets
 
 				initialTyreLaps := tyreSets[tyreSets.Length()].Laps
@@ -2177,12 +2185,20 @@ class RaceStrategist extends RaceAssistant {
 																												  : "WeatherDryChange"
 									  , {minutes: minutes, compound: fragments[recommendedCompound]})
 
-					Process Exist, Race Engineer.exe
+					if this.Strategy {
+						speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-					if ErrorLevel {
-						speaker.speakPhrase("ConfirmInformEngineer", false, true)
+						this.setContinuation(new this.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy")
+																		   , "Confirm", "Okay"))
+					}
+					else {
+						Process Exist, Race Engineer.exe
 
-						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						if ErrorLevel {
+							speaker.speakPhrase("ConfirmInformEngineer", false, true)
+
+							this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						}
 					}
 				}
 				finally {

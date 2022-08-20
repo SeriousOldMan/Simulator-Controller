@@ -708,14 +708,9 @@ initializeEnvironment() {
 
 		ID := values2String(".", A_TickCount, major, minor)
 
-		try {
-			FileDelete %kUserConfigDirectory%ID
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kUserConfigDirectory . "ID")
 
-		FileAppend %id%, % kUserConfigDirectory . "ID"
+		FileAppend %ID%, % kUserConfigDirectory . "ID"
 	}
 
 	if !FileExist(kDatabaseDirectory . "ID")
@@ -1446,12 +1441,7 @@ writeTranslations(languageCode, languageName, translations) {
 		translations := temp
 	}
 
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(fileName)
 
 	curEncoding := A_FileEncoding
 
@@ -1652,6 +1642,36 @@ normalizeFilePath(filePath) {
 		}
 		else
 			return filePath
+	}
+}
+
+temporaryFileName(name, extension) {
+	local rnd
+
+	Random rnd, 1, 100000
+
+	return (kTempDirectory . name . "_" . Round(rnd) . "." . extension)
+}
+
+deleteFile(fileName) {
+	try {
+		FileDelete %fileName%
+
+		return !ErrorLevel
+	}
+	catch exception {
+		return false
+	}
+}
+
+deleteDirectory(directoryName) {
+	try {
+		FileRemoveDir %directoryName%, 1
+
+		return !ErrorLevel
+	}
+	catch exception {
+		return false
 	}
 }
 
@@ -1889,6 +1909,10 @@ translateMsgBoxButtons(buttonLabels) {
 	}
 }
 
+newConfiguration() {
+	return {}
+}
+
 readConfiguration(configFile) {
 	local configuration := {}
 	local section := false
@@ -1931,22 +1955,14 @@ readConfiguration(configFile) {
 }
 
 parseConfiguration(text) {
-	local fileName, configuration, postfix
-
-	Random postfix, 1, 1000000
-
-	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	local fileName := temporaryFileName("Config", "ini")
+	local configuration
 
 	FileAppend %text%, %fileName%, UTF-16
 
 	configuration := readConfiguration(fileName)
 
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(fileName)
 
 	return configuration
 }
@@ -1956,12 +1972,7 @@ writeConfiguration(configFile, configuration) {
 
 	configFile := getFileName(configFile, kUserConfigDirectory)
 
-	try {
-		FileDelete %configFile%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(configFile)
 
 	SplitPath configFile, , directory
 	FileCreateDir %directory%
@@ -1984,23 +1995,19 @@ writeConfiguration(configFile, configuration) {
 }
 
 printConfiguration(configuration) {
-	local fileName, text, postfix
-
-	Random postfix, 1, 1000000
-
-	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	local fileName := temporaryFileName("Config", "ini")
+	local text
 
 	writeConfiguration(fileName, configuration)
 
-	text := ""
-
 	try {
 		FileRead text, %fileName%
-		FileDelete %fileName%
 	}
 	catch exception {
-		; ignore
+		text := ""
 	}
+
+	deleteFile(fileName)
 
 	return text
 }
@@ -2020,10 +2027,6 @@ getConfigurationValue(configuration, section, key, default := false) {
 
 getConfigurationSectionValues(configuration, section, default := false) {
 	return configuration.HasKey(section) ? configuration[section].Clone() : default
-}
-
-newConfiguration() {
-	return {}
 }
 
 setConfigurationValue(configuration, section, key, value) {
@@ -2055,7 +2058,7 @@ removeConfigurationSection(configuration, section) {
 }
 
 getControllerConfiguration(configuration := false) {
-	local pid, tries, options, exePath, fileName, postfix
+	local pid, tries, options, exePath, fileName
 
 	Process Exist, Simulator Controller.exe
 
@@ -2076,9 +2079,7 @@ getControllerConfiguration(configuration := false) {
 	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
-				Random postfix, 1, 1000000
-
-				fileName := (kTempDirectory . "Config " . postFix . ".ini")
+				fileName := temporaryFileName("Config", "ini")
 
 				writeConfiguration(fileName, configuration)
 
@@ -2105,12 +2106,7 @@ getControllerConfiguration(configuration := false) {
 			}
 
 			if configuration
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

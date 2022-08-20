@@ -171,12 +171,7 @@ class ACSetupEditor extends FileSetupEditor {
 			if !InStr(fileName, ".ini")
 				fileName := (fileName . ".ini")
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 			text := this.Setup.Setup
 

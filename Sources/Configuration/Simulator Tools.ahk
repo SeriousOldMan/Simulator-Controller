@@ -500,15 +500,10 @@ checkInstallation() {
 			if options["DeleteUserFiles"] {
 				showProgress({message: translate("Removing User files...")})
 
-				FileRemoveDir %kUserHomeDirectory%, true
+				deleteDirectory(kUserHomeDirectory)
 			}
 			else
-				try {
-					FileDelete %kUserConfigDirectory%Simulator Controller.install
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserConfigDirectory . "Simulator Controller.install")
 
 			if options["StartMenuShortcuts"] {
 				showProgress({progress: vProgressCount, message: translate("Removing Start menu shortcuts...")})
@@ -693,13 +688,8 @@ checkInstallation() {
 
 				showProgress({progress: 100, message: translate("Finished...")})
 
-				try {
-					FileRemoveDir %kLogsDirectory%, 1
-					FileRemoveDir %kTempDirectory%, 1
-				}
-				catch exception {
-					; ignore
-				}
+				deleteDirectory(kLogsDirectory)
+				deleteDirectory(kTempDirectory)
 
 				FileCreateDir %kLogsDirectory%
 				FileCreateDir %kTempDirectory%
@@ -812,7 +802,7 @@ deleteFiles(installLocation) {
 	step := (70 / count)
 	stepCount := 0
 
-	deleteDirectory(installLocation, step, stepCount)
+	clearDirectory(installLocation, step, stepCount)
 
 	vProgressCount := (vProgressCount + Round(step * count))
 
@@ -845,7 +835,7 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 	}
 }
 
-deleteDirectory(directory, progressStep, ByRef count) {
+clearDirectory(directory, progressStep, ByRef count) {
 	local files := []
 	local ignore, fileName, subDirectory, file
 
@@ -862,15 +852,10 @@ deleteDirectory(directory, progressStep, ByRef count) {
 		if InStr(FileExist(fileName), "D") {
 			SplitPath fileName, subDirectory
 
-			deleteDirectory(directory . "\" . subDirectory, progressStep, count)
+			clearDirectory(directory . "\" . subDirectory, progressStep, count)
 		}
 		else
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 		Sleep 1
 	}
@@ -886,14 +871,14 @@ cleanupDirectory(source, destination, maxStep, ByRef count) {
 		if InStr(FileExist(A_LoopFilePath), "D") {
 			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
 
-			FileRemoveDir %A_LoopFilePath%, false
+			deleteDirectory(A_LoopFilePath)
 		}
 		else if !FileExist(source . "\" . fileName) {
 			count := Min(count + 1, maxStep)
 
 			showProgress({progress: vProgressCount + count, message: translate("Deleting ") . fileName . translate("...")})
 
-			FileDelete %A_LoopFilePath%
+			deleteFile(A_LoopFilePath)
 
 			Sleep 100
 		}
@@ -901,12 +886,7 @@ cleanupDirectory(source, destination, maxStep, ByRef count) {
 }
 
 removeDirectory(directory) {
-	try {
-		FileDelete %A_Temp%\Cleanup.bat
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(A_Temp . "\Cleanup.bat")
 
 	command =
 (
@@ -950,32 +930,17 @@ deleteShortcuts(location) {
 
 		deleteFolder := true
 
-		try {
-			FileDelete %location%\Uninstall.lnk
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(location . "\Uninstall.lnk")
 	}
 
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
 					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
-		try {
-			FileDelete %location%\%name%.lnk
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(location . "\" . name . ".lnk")
 
-	try {
-		FileDelete %location%\Documentation.lnk
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(location . "\Documentation.lnk")
 
 	if deleteFolder
-		FileRemoveDir %location%
+		deleteDirectory(location)
 }
 
 writeAppPaths(installLocation) {
@@ -1648,9 +1613,9 @@ updateInstallationForV398() {
 	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 
-		try {
-			FileDelete %installLocation%\Binaries\Setup Database.exe
+		deleteFile(installLocation . "\Binaries\Setup Database.exe")
 
+		try {
 			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
 		}
 		catch exception {
@@ -1709,19 +1674,11 @@ updateConfigurationForV430() {
 }
 
 updateConfigurationForV426() {
-	local ignore, simulator, car, track
+	local ignore, simulator, car, track, fileName
 
-	try {
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\AC, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\AMS2, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\PCARS2, 1
-	}
-	catch exception {
-		; ignore
-	}
+	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"] {
+		deleteDirectory(kDatabaseDirectory . "User\Tracks\" . simulator)
 
-	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"]
 		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
@@ -1730,26 +1687,19 @@ updateConfigurationForV426() {
 			{
 				track := A_LoopFileName
 
-				if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
-					try {
-						FileDelete %kDatabaseDirectory%User\%simulator%\%car%\%track%\Track.automations
-					}
-					catch exception {
-						; ignore
-					}
+				fileName := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
+
+				if FileExist(fileName)
+					deleteFile(fileName)
 			}
 		}
+	}
 }
 
 updateConfigurationForV425() {
 	local text, changed
 
-	try {
-		FileRemoveDir %kDatabaseDirectory%User\Tracks, 1
-	}
-	catch exception {
-		; ignore
-	}
+	deleteDirectory(kDatabaseDirectory . "User\Tracks")
 
 	loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
@@ -1764,12 +1714,7 @@ updateConfigurationForV425() {
 			}
 
 			if changed {
-				try {
-					FileDelete %A_LoopFilePath%\Settings.CSV
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(A_LoopFilePath . "\Settings.CSV")
 
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
@@ -1861,13 +1806,14 @@ updateConfigurationForV424() {
 					}
 				}
 
-				FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+				deleteDirectory(kDatabaseDirectory . "User\RF2\" . oldCar)
 			}
 		}
 }
 
 updateConfigurationForV423() {
 	local sessionDB, sessionDBConfig, key, drivers, simulator, id, ignore, driver, car, track, empty
+	local directoryName
 
 	if FileExist(kUserConfigDirectory . "Session Database.ini") {
 		sessionDB := new SessionDatabase()
@@ -1909,13 +1855,11 @@ updateConfigurationForV423() {
 						break
 					}
 
-					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track)))
-						try {
-							FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%
-						}
-						catch exception {
-							; ignore
-						}
+					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track))) {
+						directoryName = %kDatabaseDirectory%User\%simulator%\%car%\%track%
+
+						deleteDirectory(directoryName)
+					}
 				}
 			}
 	}
@@ -2030,12 +1974,7 @@ updateConfigurationForV420() {
 			}
 
 			if changed {
-				try {
-					FileDelete %A_LoopFilePath%\Settings.CSV
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(A_LoopFilePath . "\Settings.CSV")
 
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
@@ -2050,12 +1989,7 @@ updateConfigurationForV402() {
 }
 
 updateConfigurationForV400() {
-	try {
-		FileDelete %kDatabaseDirectory%User\UPLOAD
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 
 updateConfigurationForV398() {
@@ -2077,25 +2011,27 @@ updateConfigurationForV398() {
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
 
-	if FileExist(kDatabaseDirectory . "Local")
+	if FileExist(kDatabaseDirectory . "Local") {
 		try {
 			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
-
-			FileRemoveDir %kDatabaseDirectory%Local, 1
 		}
 		catch exception {
 			; ignore
 		}
 
-	if FileExist(kDatabaseDirectory . "Global")
+		deleteDirectory(kDatabaseDirectory . "Local")
+	}
+
+	if FileExist(kDatabaseDirectory . "Global") {
 		try {
 			FileCopyDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
-
-			FileRemoveDir %kDatabaseDirectory%Global, 1
 		}
 		catch exception {
 			; ignore
 		}
+
+		deleteDirectory(kDatabaseDirectory . "Global")
+	}
 
 	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
@@ -2127,7 +2063,8 @@ updateConfigurationForV398() {
 
 		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
 
-		FileDelete %kUserHomeDirectory%Setup\Setup.data
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
 		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
@@ -2203,43 +2140,37 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	local simulator, car, track
+	local simulator, car, track, directoryName
 
 	loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		if (simulator = "0")
-			try {
-				FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
-			}
-			catch exception {
-				; ignore
-			}
+		if (simulator = "0") {
+			directoryName = %kDatabaseDirectory%Local\%simulator%
+
+			deleteDirectory(directoryName)
+		}
 		else
 			loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
 			{
 				car := A_LoopFileName
 
-				if (car = "0")
-					try {
-						FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
-					}
-					catch exception {
-						; ignore
-					}
+				if (car = "0") {
+					directoryName = %kDatabaseDirectory%Local\%simulator%\%car%
+
+					deleteDirectory(directoryName)
+				}
 				else
 					loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
 					{
 						track := A_LoopFileName
 
-						if (track = "0")
-							try {
-								FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
-							}
-							catch exception {
-								; ignore
-							}
+						if (track = "0") {
+							directoryName = %kDatabaseDirectory%Local\%simulator%\%car%\%track%
+
+							deleteDirectory(directoryName)
+						}
 					}
 			}
 	}
@@ -2416,14 +2347,14 @@ runSpecialTargets(ByRef buildProgress) {
 
 				try {
 					if (InStr(solution, "Speech") || InStr(solution, "AC UDP Provider"))
-						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%build.out"", , Hide
+						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%Special Build.out"", , Hide
 					else
-						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%build.out"", , Hide
+						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%Special Build.out"", , Hide
 
 					if ErrorLevel {
 						success := false
 
-						FileRead text, %kTempDirectory%build.out
+						FileRead text, %kTempDirectory%Special Build.out
 
 						if (StrLen(Trim(text)) == 0)
 							throw "Error while compiling..."
@@ -2439,10 +2370,10 @@ runSpecialTargets(ByRef buildProgress) {
 				}
 
 				if !success
-					viewBuildLog(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+					viewBuildLog(kTempDirectory . "Special Build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 
-				if FileExist(kTempDirectory . "build.out")
-					FileDelete %kTempDirectory%build.out
+				if FileExist(kTempDirectory . "Special Build.out")
+					deleteFile(kTempDirectory . "Special Build.out")
 			}
 		}
 	}
@@ -2523,9 +2454,9 @@ runCleanTargets(ByRef buildProgress) {
 					{
 						try {
 							if InStr(FileExist(A_LoopFilePath), "D")
-								FileRemoveDir %A_LoopFilePath%, 1
+								deleteDirectory(A_LoopFilePath)
 							else
-								FileDelete %A_LoopFilePath%
+								deleteFile(A_LoopFilePath)
 						}
 						catch exception {
 							; ignore
@@ -2541,9 +2472,8 @@ runCleanTargets(ByRef buildProgress) {
 					SetWorkingDir %currentDirectory%
 				}
 			}
-			else if (FileExist(fileOrFolder) != "") {
-				FileDelete %fileOrFolder%
-			}
+			else if (FileExist(fileOrFolder) != "")
+				deleteFile(fileOrFolder)
 		}
 		else {
 			currentDirectory := A_WorkingDir
@@ -2556,7 +2486,7 @@ runCleanTargets(ByRef buildProgress) {
 			try {
 				loop Files, %pattern%, %options%
 				{
-					FileDelete %A_LoopFilePath%
+					deleteFile(A_LoopFilePath)
 
 					if !kSilentMode
 						showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
@@ -2655,12 +2585,7 @@ runCopyTargets(ByRef buildProgress) {
 				logMessage(kLogInfo, translate("Copying ") . targetSource)
 
 				if InStr(FileExist(targetSource), "D") {
-					try {
-						FileRemoveDir %targetDestination%, 1
-					}
-					catch exception {
-						; ignore
-					}
+					deleteDirectory(targetDestination)
 
 					FileCopyDir %targetSource%, %targetDestination%, 1
 				}

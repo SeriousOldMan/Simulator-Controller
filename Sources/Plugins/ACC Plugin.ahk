@@ -213,10 +213,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			try {
 				if FileExist(kTempDirectory . "ACCUDP.cmd")
-					FileDelete %kTempDirectory%ACCUDP.cmd
+					deleteFile(kTempDirectory . "ACCUDP.cmd")
 
 				if FileExist(kTempDirectory . "ACCUDP.out")
-					FileDelete %kTempDirectory%ACCUDP.out
+					deleteFile(kTempDirectory . "ACCUDP.out")
 
 				options := ""
 
@@ -354,22 +354,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				data := readConfiguration(fileName)
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 			}
 			else {
 				data := false
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 
 				this.iUDPClient := false
 			}

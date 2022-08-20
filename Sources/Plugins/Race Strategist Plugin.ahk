@@ -138,7 +138,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					else {
 						try {
 							if FileExist(kTempDirectory . "Race Strategy.update")
-								FileDelete %kTempDirectory%Race Strategy.update
+								deleteFile(kTempDirectory . "Race Strategy.update")
 
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}
@@ -346,12 +346,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 			teamServer.setLapValue(lapNumber, name, lapData)
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 		}
 	}
 
@@ -361,12 +356,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.SessionActive)
 			this.setLapValue(lapNumber, this.Plugin . " Race Standings", fileName)
 
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(fileName)
 	}
 
 	saveRaceInfo(lapNumber, fileName) {
@@ -375,20 +365,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Info", fileName)
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 		}
 		else {
-			try {
-				FileRemoveDir %kTempDirectory%Race Report, 1
-			}
-			catch exception {
-				; ignore
-			}
+			deleteDirectory(kTempDirectory . "Race Report")
 
 			FileCreateDir %kTempDirectory%Race Report
 
@@ -402,12 +382,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.SessionActive) {
 			this.setLapValue(lapNumber, this.Plugin . " Race Lap", fileName)
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 		}
 		else {
 			FileMove %fileName%, %kTempDirectory%Race Report\Lap.%lapNumber%, 1
@@ -416,12 +391,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				lapNumber += 1
 
 				if FileExist(kTempDirectory . "Race Report\Lap." . lapNumber)
-					try {
-						FileDelete %kTempDirectory%Race Report\Lap.%lapNumber%
-					}
-					catch exception {
-						; ignore
-					}
+					deleteFile(kTempDirectory . "Race Report\Lap." . lapNumber)
 				else
 					break
 			}
@@ -430,7 +400,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	restoreRaceInfo() {
 		local teamServer := this.TeamServer
-		local raceInfo, postfix, fileName
+		local raceInfo, fileName
 
 		if (teamServer && teamServer.Active) {
 			try {
@@ -439,9 +409,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				if (!raceInfo || (raceInfo == ""))
 					return
 
-				Random postfix, 1, 1000000
-
-				fileName := (kTempDirectory . this.Plugin . " Race " . postfix . ".info")
+				fileName := temporaryFileName(this.Plugin . " Race", "info")
 
 				FileAppend %raceInfo%, %fileName%
 
@@ -474,12 +442,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			runningLap := 0
 
 			if (teamServer && teamServer.Active && session) {
-				try {
-					FileRemoveDir %kTempDirectory%Race Report, 1
-				}
-				catch exception {
-					; ignore
-				}
+				deleteDirectory(kTempDirectory . "Race Report")
 
 				FileCreateDir %kTempDirectory%Race Report
 
@@ -567,7 +530,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				try {
 					if FileExist(kTempDirectory . "Race Report\Output")
-						FileRemoveDir %kTempDirectory%Race Report\Output, 1
+						deleteDirectory(kTempDirectory . "Race Report\Output")
 
 					FileCreateDir %kTempDirectory%Race Report\Output
 				}
@@ -634,13 +597,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	reviewRace() {
-		local postfix, report, reader, raceData, drivers, positions, times, cars, driver, laps, position
+		local report, reader, raceData, drivers, positions, times, cars, driver, laps, position
 		local leader, car, candidate, min, max, leaderAvgLapTime, stdDev
 		local driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev
 
-		Random postfix, 1, 1000000
-
-		report := (kTempDirectory . this.Plugin . " Race Report" . postfix)
+		report := temporaryFileName(this.Plugin . " Race", "report")
 
 		this.createRaceReport(report)
 
@@ -695,12 +656,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			}
 		}
 		finally {
-			try {
-				FileRemoveDir %report%, 1
-			}
-			catch exception {
-				; ignore
-			}
+			deleteDirectory(report)
 		}
 	}
 }

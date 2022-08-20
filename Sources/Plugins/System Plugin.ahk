@@ -345,12 +345,7 @@ class SystemPlugin extends ControllerPlugin {
 
 			fileName := (kTempDirectory . "Startup.semaphore")
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 		}
 
 		base.simulatorStartup(simulator)

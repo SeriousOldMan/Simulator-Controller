@@ -830,22 +830,20 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeNotes(simulator, car, track, notes) {
 		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
 
 		car := this.getCarCode(simulator, car)
 
-		try {
-			if (car && (car != true)) {
-				if (track && (track != true))
-					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
-				else
-					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
-			}
+		if (car && (car != true)) {
+			if (track && (track != true))
+				fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt)
 			else
-				FileDelete %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
+				fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
 		}
-		catch exception {
-			; ignore
-		}
+		else
+			fileName = %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
+			
+		deleteFile(fileName)
 
 		if (car && (car != true)) {
 			if (track && (track != true)) {
@@ -942,18 +940,13 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 
-		try {
-			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
-		}
-		catch exception {
-			; ignore
-		}
-
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%
-
+		
 		FileCreateDir %fileName%
 
 		fileName := (fileName . "\" . name)
+
+		deleteFile(fileName)
 
 		file := FileOpen(fileName, "w", "")
 
@@ -977,15 +970,13 @@ class SessionDatabase extends ConfigurationItem {
 
 	removeSetup(simulator, car, track, type, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
 
 		car := this.getCarCode(simulator, car)
 
-		try {
-			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
-		}
-		catch exception {
-			; ignore
-		}
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
+		
+		deleteFile(fileName)
 	}
 }
 

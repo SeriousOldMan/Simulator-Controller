@@ -35,12 +35,7 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 class DatabaseTest extends Assert {
 	clearDatabase() {
-		try {
-			FileRemoveDir %kDatabaseDirectory%User\Unknown\TestCar, 1
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kDatabaseDirectory . "User\Unknown\TestCar")
 
 		this.AssertEqual(true, !FileExist(kDatabaseDirectory . "User\Unknown\TestCar"), "Database has not been deleted...")
 	}
@@ -133,12 +128,7 @@ class ClearDatabase extends DatabaseTest {
 	Clear_Test() {
 		this.clearDatabase()
 
-		try {
-			FileRemoveDir %kDatabaseDirectory%User\Unknown, 1
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kDatabaseDirectory . "User\Unknown")
 	}
 }
 

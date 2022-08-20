@@ -18,7 +18,7 @@
   5. Delta calculation has been imporved again for the Spotter:
      - The delta history will be reset when a given car is in the pits.
 	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
-	 - Cars that are currently in the pits, will be ignored completely, thereby eliminating disturibing unnecessary gap updates when you have the last valid position on the track.
+	 - Cars that are currently in the pits, will be ignored completely, thereby eliminating disturbing and unnecessary gap updates when you have the last valid position on the track.
   6. Improvements for the Race Strategist and Race Spotter when requesting gap informations:
      - When you ask for the gap to the car ahead or behind, it will be mentioned when this car is in the pits.
      - When you ask for the gap to the car ahead or behind, it will be mentioned whether this car is at least one lap up or one lap down.
@@ -27,7 +27,7 @@
      - The Race Strategist can now [recalculate / adjust the currently active strategy](*) anytime during a race.
 	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
 	   - New controller action ["StrategyRecommend"](*) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
-	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be hand over to the Engineer, which will select this specific compound for the tyre change.
+	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
      - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
@@ -36,7 +36,7 @@
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
 	   - Engine repair will be handled automatically during pitstops for ******
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
-	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs. See the [revised documentation](*) for more information.
+	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
   9. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   10. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](*) for more information.
@@ -51,8 +51,9 @@
   19. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   20. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   21. Temp and Logs folders will be cleaned automatically when an update is installed.
-  22. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
-  23. New car models for "Setup Advisor":
+  22. New options in the Tray menu allow you to dump knowledgebase and rule set of various applications as well as trace grammaes and recognitions in the "Voice Server".
+  23. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
+  24. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

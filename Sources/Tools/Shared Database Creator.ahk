@@ -121,24 +121,14 @@ class DatabaseCreator {
 				car := A_LoopFileName
 				
 				if (car = "1")
-					try {
-						FileRemoveDir %databaseDirectory%%simulator%\%car%, 1
-					}
-					catch exception {
-						; ignore
-					}
+					deleteDirectory(databaseDirectory . simulator . "\" . car)
 				else
 					loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
 					{
 						track := A_LoopFileName
 						
 						if (track = "1")
-							try {
-								FileRemoveDir %databaseDirectory%%simulator%\%car%\%track%, 1
-							}
-							catch exception {
-								; ignore
-							}
+							deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
 						else {
 							directory = %databaseDirectory%%simulator%\%car%\%track%\
 							
@@ -233,12 +223,7 @@ downloadUserDatabases(directory) {
 		
 		RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%directory%%fileName%' -DestinationPath '%wDirectory%', , Hide
 		
-		try {
-			FileDelete %directory%%fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(directory . fileName)
 		
 		if FileExist(directory . "Shared Database")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
@@ -312,12 +297,7 @@ createSharedDatabases() {
 	
 	databaseDirectory := (kTempDirectory . "Shared Database")
 	
-	try {
-		FileRemoveDir %databaseDirectory%, 1
-	}
-	catch exception {
-		; ignore
-	}
+	deleteDirectory(databaseDirectory)
 	
 	FileCreateDir %databaseDirectory%\Input
 	FileCreateDir %databaseDirectory%\Output

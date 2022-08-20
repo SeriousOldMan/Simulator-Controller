@@ -137,10 +137,10 @@ startUDPClient() {
 			
 	try {
 		if FileExist(kTempDirectory . "ACCUDP.cmd")
-			FileDelete %kTempDirectory%ACCUDP.cmd
+			deleteFile(kTempDirectory . "ACCUDP.cmd")
 			
 		if FileExist(kTempDirectory . "ACCUDP.out")
-			FileDelete %kTempDirectory%ACCUDP.out
+			deleteFile(kTempDirectory . "ACCUDP.out")
 		
 		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide
 		
@@ -189,8 +189,7 @@ readUDPData() {
 				
 				viewFile(traceFile, "Invalid - Error Trace")
 				
-				try
-					FileDelete %traceFile%
+				deleteFile(traceFile)
 			}
 			else
 				viewFile(kTempDirectory . "ACCUDP.out", "Valid - Car Positions")

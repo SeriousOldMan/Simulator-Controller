@@ -1542,7 +1542,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local imgScale := Min(width / imgWidth, height / imgHeight)
 		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
-		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY, rnd
+		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY
 
 		if actions {
 			token := Gdip_Startup()
@@ -1568,9 +1568,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gdip_DeleteBrush(brushHotkey)
 			Gdip_DeleteBrush(brushCommand)
 
-			Random rnd, 1, 10000
-
-			trackImage := (kTempDirectory . "Track Images\TrackMap_" . rnd . ".png")
+			trackImage := temporaryFileName("Track Images\TrackMap", "png")
 
 			Gdip_SaveBitmapToFile(bitmap, trackImage)
 
@@ -1634,12 +1632,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	loadTrackMap(trackMap, trackImage) {
 		local directory := kTempDirectory . "Track Images"
 
-		try {
-			FileRemoveDir %directory%, 1
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(directory)
 
 		FileCreateDir %directory%
 
@@ -1777,12 +1770,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
-							try {
-								FileDelete %A_LoopFileLongPath%
-							}
-							catch exception {
-								; ignore
-							}
+							deleteFile(A_LoopFileLongPath)
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -1791,12 +1779,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							SplitPath A_LoopFileName, , , , candidate
 
 							if (candidate = track)
-								try {
-									FileDelete %A_LoopFileLongPath%
-								}
-								catch exception {
-									; ignore
-								}
+								deleteFile(A_LoopFileLongPath)
 						}
 					case translate("Automations"):
 						if this.SessionDatabase.hasTrackAutomations(simulator, car, track)
@@ -2982,12 +2965,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 			file := FileOpen(fileName, "w", "")
 

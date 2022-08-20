@@ -620,14 +620,7 @@ watchStartupSemaphore() {
 }
 
 clearStartupSemaphore() {
-	local fileName := (kTempDirectory . "Startup.semaphore")
-
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(kTempDirectory . "Startup.semaphore")
 
 	return false
 }
@@ -725,8 +718,6 @@ cancelStartup() {
 ;;;-------------------------------------------------------------------------;;;
 
 exitStartup(sayGoodBye := false) {
-	local fileName
-
 	if (sayGoodBye && (SimulatorStartup.Instance.ControllerPID != false)) {
 		sendMessage(kFileMessage, "Startup", "startupExited", SimulatorStartup.Instance.ControllerPID)
 
@@ -738,14 +729,7 @@ exitStartup(sayGoodBye := false) {
 		if SimulatorStartup.Instance
 			SimulatorStartup.Instance.cancelStartup()
 
-		fileName := (kTempDirectory . "Startup.semaphore")
-
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Startup.semaphore")
 
 		if !SimulatorStartup.StayOpen
 			ExitApp 0

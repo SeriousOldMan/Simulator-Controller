@@ -223,12 +223,7 @@ createTrackMap(simulator, track, fileName) {
 		}
 
 		if trackData {
-			try {
-				FileDelete %kTempDirectory%%track%.data
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(kTempDirectory . track . ".data")
 
 			FileAppend %trackData%, %kTempDirectory%%track%.data
 
@@ -239,15 +234,10 @@ createTrackMap(simulator, track, fileName) {
 
 		sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
 
-		try {
-			FileDelete %fileName%
+		deleteFile(fileName)
 
-			if trackData
-				FileDelete %trackData%
-		}
-		catch exception {
-			; ignore
-		}
+		if trackData
+			deleteFile(fileName)
 	}
 }
 
@@ -313,12 +303,7 @@ startTrackMapper() {
 	if (simulator && track && data) {
 		createTrackMap(simulator, track, data)
 
-		try {
-			FileDelete %data%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(data)
 	}
 
 	if recreate

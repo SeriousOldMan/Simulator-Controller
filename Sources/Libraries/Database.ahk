@@ -226,12 +226,7 @@ class Database {
 
 				FileCreateDir %directory%
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 
 				schema := this.Schemas[name]
 

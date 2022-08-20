@@ -147,9 +147,6 @@ class RaceReportViewer extends RaceReportReader {
 				html := (before . drawChartFunction . after)
 
 				this.ChartViewer.Document.write(html)
-
-				; FileDelete %kTempDirectory%chart.html
-				; FileAppend %html%, %kTempDirectory%chart.html
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"

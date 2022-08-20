@@ -4147,23 +4147,13 @@ class RaceCenter extends ConfigurationItem {
 		if this.SessionActive {
 			directory := this.SessionDirectory
 
-			try {
-				FileRemoveDir %directory%, 1
-			}
-			catch exception {
-				; ignore
-			}
+			deleteDirectory(directory)
 
 			FileCreateDir %directory%
 
 			reportDirectory := (directory . "Race Report")
 
-			try {
-				FileRemoveDir %reportDirectory%, 1
-			}
-			catch exception {
-				; ignore
-			}
+			deleteDirectory(reportDirectory)
 
 			FileCreateDir %reportDirectory%
 
@@ -6486,12 +6476,7 @@ class RaceCenter extends ConfigurationItem {
 			if setups {
 				fileName := (this.SessionDirectory . "Setups.Data.CSV")
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 
 				FileAppend %setups%, %fileName%, UTF-16
 
@@ -6552,12 +6537,7 @@ class RaceCenter extends ConfigurationItem {
 			if plan {
 				fileName := (this.SessionDirectory . "Plan.Data.CSV")
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 
 				FileAppend %plan%, %fileName%, UTF-16
 

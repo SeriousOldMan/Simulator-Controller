@@ -370,14 +370,8 @@ class SpeechSynthesizer {
 	clearCache() {
 		local directory := this.iCacheDirectory
 
-		if directory {
-			try {
-				FileRemoveDir %directory%, 1
-			}
-			catch exception {
-				; ignore
-			}
-		}
+		if directory
+			deleteDirectory(directory)
 
 		return false
 	}
@@ -407,7 +401,7 @@ class SpeechSynthesizer {
 	}
 
 	speak(text, wait := true, cache := false) {
-		local cacheFileName, postfix, tempName, temp1Name, temp2Name, callback
+		local cacheFileName, tempName, temp1Name, temp2Name, callback
 
 		static counter := 1
 
@@ -438,16 +432,12 @@ class SpeechSynthesizer {
 			cacheFileName := false
 
 		if kSoX {
-			Random postfix, 1, 1000000
-
-			postfix := Round(postfix)
-
-			temp1Name := kTempDirectory . "temp1_" . postfix . ".wav"
+			temp1Name := temporaryFileName("temp1", "wav")
 
 			if cacheFileName
 				temp2Name := cacheFileName
 			else
-				temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
+				temp2Name := temporaryFileName("temp2", "wav")
 
 			this.speakToFile(temp1Name, text)
 
@@ -492,10 +482,10 @@ class SpeechSynthesizer {
 			finally {
 				try {
 					if FileExist(temp1Name)
-						FileDelete %temp1Name%
+						deleteFile(temp1Name)
 
 					if (!cache && FileExist(temp2Name))
-						FileDelete %temp2Name%
+						deleteFile(temp2Name)
 				}
 				catch exception {
 					; ignore
@@ -506,11 +496,7 @@ class SpeechSynthesizer {
 			if (this.Synthesizer = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-				Random postfix, 1, 1000000
-
-				postfix := Round(postfix)
-
-				tempName := (cache ? cacheFileName : (kTempDirectory . "temp_" . postfix . ".wav"))
+				tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 				this.SpeakToFile(tempName, text)
 
@@ -520,12 +506,7 @@ class SpeechSynthesizer {
 				this.playSound(tempName, wait || !cache)
 
 				if !cache
-					try {
-						FileDelete %tempName%
-					}
-					catch exception {
-						; ignore
-					}
+					deleteFile(tempName)
 			}
 		}
 	}

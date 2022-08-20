@@ -1065,13 +1065,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
 	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-	local postfix, dataFile, data
-
-	Random postfix, 1, 1000000
+	local dataFile, data
 
 	FileCreateDir %kTempDirectory%%simulator% Data
 
-	dataFile := (kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data")
+	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
@@ -1089,12 +1087,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 
 	data := readConfiguration(dataFile)
 
-	try {
-		FileDelete %dataFile%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(dataFile)
 
 	setConfigurationValue(data, "Session Data", "Simulator", simulator)
 

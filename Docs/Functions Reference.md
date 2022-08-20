@@ -103,8 +103,17 @@ If *fileName* contains an absolute path, itself will be returned. Otherwise, all
 #### *getFileNames*(filePattern :: String, #rest directories :: String)*
 Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
 
-#### *normalizeFilePath(filePath)*
+#### *normalizeFilePath(filePath :: String)*
 Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
+
+#### *temporaryFileName(name :: String, extension :: String)*
+Creates and returns a unique file name in the temporary folder by adding a random number between 1 and 100000 to the name.
+
+#### *deleteFile(fileName :: String)*
+Deletes the file with the given name. Returns *true*, if the file was deleted, otherwise *false*.
+
+#### *deleteDirectory(directoryName :: String)*
+Deletes the directory with the given name incl. all current content. Returns *true*, if the directory was deleted, otherwise *false*.
 
 ***
 

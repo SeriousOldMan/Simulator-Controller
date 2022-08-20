@@ -617,7 +617,7 @@ class RaceReports extends ConfigurationItem {
 		{
 			raceDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
 
-			FileRemoveDir %raceDirectory%, true
+			deleteDirectory(raceDirectory)
 
 			if (this.getReports(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).Length() > 0)
 				this.loadTrack(this.SelectedTrack, true)

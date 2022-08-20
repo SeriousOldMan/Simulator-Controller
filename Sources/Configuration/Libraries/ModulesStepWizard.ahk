@@ -275,12 +275,7 @@ class StreamDeckIcons extends NamedPreset {
 		for ignore, file in this.Files {
 			SplitPath file, name
 
-			try {
-				FileDelete %kUserTranslationsDirectory%%name%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(kUserTranslationsDirectory . name)
 		}
 	}
 }
@@ -325,13 +320,8 @@ class PitstopImages extends NamedPreset {
 		local name
 
 		SplitPath directory, , , , name
-
-		try {
-			FileRemoveDir %kUserHomeDirectory%Screen Images\%name%, 1
-		}
-		catch exception {
-			; ignore
-		}
+		
+		deleteDirectory(kUserHomeDirectory . "Screen Images\" . name)
 	}
 }
 
@@ -391,12 +381,7 @@ class SetupPatch extends NamedPreset {
 
 		SplitPath file, name
 
-		try {
-			FileDelete %kUserHomeDirectory%Setup\%name%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kUserHomeDirectory . "Setup\" . name)
 	}
 }
 

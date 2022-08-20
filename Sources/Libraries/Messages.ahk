@@ -485,7 +485,7 @@ stopMessageManager() {
 	pid := ErrorLevel
 
 	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
+		deleteFile(kTempDirectory . "Messages\" . pid . ".msg")
 
 	return false
 }
@@ -506,7 +506,7 @@ startMessageManager() {
 	pid := ErrorLevel
 
 	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
+		deleteFile(kTempDirectory . "Messages\" . pid . ".msg")
 
 	OnExit("stopMessageManager")
 }

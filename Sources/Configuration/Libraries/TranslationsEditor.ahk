@@ -220,12 +220,7 @@ class TranslationsEditor extends ConfigurationItem {
 
 			if (languageCode != kUndefined)
 				for ignore, fileName in getFileNames("Translations." . languageCode, kUserTranslationsDirectory)
-					try {
-						FileDelete %fileName%
-					}
-					catch exception {
-						; ignore
-					}
+					deleteFile(fileName)
 
 			this.chooseLanguage("en")
 		}

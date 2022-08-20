@@ -700,12 +700,7 @@ class VoiceManager {
 
 	unmute() {
 		if this.VoiceServer
-			try {
-				FileDelete %kTempDirectory%Voice.mute
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(kTempDirectory . "Voice.mute")
 	}
 
 	getGrammars(language) {

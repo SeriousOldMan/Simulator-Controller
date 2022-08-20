@@ -2211,12 +2211,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
 				}
 			case 10: ; "Clear Strategy..."
-				try {
-					FileDelete %kUserConfigDirectory%Race.strategy
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserConfigDirectory . "Race.strategy")
 		}
 	}
 

@@ -128,12 +128,7 @@ class StrategySimulation {
 	dumpKnowledge(knowledgeBase) {
 		local key, value, text
 
-		try {
-			FileDelete %kTempDirectory%Strategy Validation.knowledge
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Strategy Validation.knowledge")
 
 		for key, value in knowledgeBase.Facts.Facts {
 			text := (key . " = " . value . "`n")
@@ -145,12 +140,7 @@ class StrategySimulation {
 	dumpRules(knowledgeBase) {
 		local rules, rule, production, text, ignore
 
-		try {
-			FileDelete %kTempDirectory%Strategy Validation.rules
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Strategy Validation.rules")
 
 		production := knowledgeBase.Rules.Productions[false]
 

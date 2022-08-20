@@ -1127,12 +1127,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			FileCreateDir %kTempDirectory%%code% Data
 
 			loop Files, %kTempDirectory%%code% Data\%assistant%*.*
-				try {
-					FileDelete %A_LoopFilePath%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(A_LoopFilePath)
 
 			if this.RaceAssistant
 				this.finishSession(false)
@@ -1247,12 +1242,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if settingsFile {
 			sessionSettings := readConfiguration(settingsFile)
 
-			try {
-				FileDelete %settingsFile%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(settingsFile)
 		}
 		else
 			sessionSettings := false
@@ -1260,12 +1250,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if stateFile {
 			sessionState := readConfiguration(stateFile)
 
-			try {
-				FileDelete %stateFile%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(stateFile)
 		}
 		else
 			sessionState := false
@@ -1331,22 +1316,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createSessionSettingsFile(sessionSettings) {
-		local postfix, settingsFile
-
-		Random postfix, 1, 1000000
-
-		settingsFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+		local settingsFile := temporaryFileName(this.Plugin, "settings")
+		
 		sessionSettings := printConfiguration(sessionSettings)
 
 		FileAppend %sessionSettings%, %settingsFile%, UTF-16
 	}
 
 	createSessionStateFile(sessionState) {
-		local postfix, stateFile
-
-		Random postfix, 1, 1000000
-
-		stateFile := (kTempDirectory . this.Plugin . A_Space . postfix . ".settings")
+		local stateFile := temporaryFileName(this.Plugin, "state")
+		
 		sessionState := printConfiguration(sessionState)
 
 		FileAppend %sessionState%, %stateFile%, UTF-16

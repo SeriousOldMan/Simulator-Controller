@@ -44,7 +44,7 @@ ListLines Off					; Disable execution history
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	local uploadTimeStamp := kDatabaseDirectory . "UPLOAD"
-	local upload, now, simulator, car, track, distFile
+	local upload, now, simulator, car, track, distFile, directoryName
 
 	if FileExist(uploadTimeStamp) {
 		FileReadLine upload, %uploadTimeStamp%, 1
@@ -58,12 +58,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	}
 
 	try {
-		try {
-			FileRemoveDir %kTempDirectory%Shared Database, 1
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kTempDirectory . "Shared Database")
 
 		loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 		{
@@ -75,13 +70,11 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			{
 				car := A_LoopFileName
 
-				if (car = "1")
-					try {
-						FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%, 1
-					}
-					catch exception {
-						; ignore
-					}
+				if (car = "1") {
+					directoryName = %kDatabaseDirectory%User\%simulator%\%car%
+							
+					deleteDirectory(directoryName)
+				}
 				else {
 					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 
@@ -89,13 +82,11 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 					{
 						track := A_LoopFileName
 
-						if (track = "1")
-							try {
-								FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%, 1
-							}
-							catch exception {
-								; ignore
-							}
+						if (track = "1") {
+							directoryName = %kDatabaseDirectory%User\%simulator%\%car%\%track%
+							
+							deleteDirectory(directoryName)
+						}
 						else {
 							FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 
@@ -124,19 +115,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 		ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Shared Database\Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
 
-		try {
-			FileRemoveDir %kTempDirectory%Shared Database, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-		try {
-			FileDelete %kDatabaseDirectory%UPLOAD
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kTempDirectory . "Shared Database")
+		deleteFile(kDatabaseDirectory . "UPLOAD")
 
 		FileAppend %A_Now%, %kDatabaseDirectory%UPLOAD
 
@@ -186,19 +166,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 
 					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 
-					try {
-						FileDelete %kTempDirectory%%fileName%
-					}
-					catch exception {
-						; ignore
-					}
-
-					try {
-						FileRemoveDir %kDatabaseDirectory%Community, 1
-					}
-					catch exception {
-						; ignore
-					}
+					deleteFile(kTempDirectory . fileName)
+					deleteDirectory(kDatabaseDirectory . "Community")
 
 					if FileExist(kTempDirectory . "Shared Database\" . directory . "\Community")
 						FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
@@ -212,19 +181,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 			}
 		}
 
-		try {
-			FileRemoveDir %kTempDirectory%Shared Database, 1
-		}
-		catch exception {
-			; ignore
-		}
-
-		try {
-			FileDelete %kDatabaseDirectory%DOWNLOAD
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kTempDirectory . "Shared Database")
+		deleteFile(kDatabaseDirectory . "DOWNLOAD")
 
 		FileAppend %A_Now%, %kDatabaseDirectory%DOWNLOAD
 

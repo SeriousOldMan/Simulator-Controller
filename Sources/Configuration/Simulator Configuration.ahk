@@ -504,12 +504,7 @@ saveConfiguration(configurationFile, editor) {
 
 	writeConfiguration(configurationFile, configuration)
 
-	try {
-		FileDelete %kUserConfigDirectory%Simulator Controller.config
-	}
-	catch exception {
-		; Ignore
-	}
+	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
 
 	startupLink := A_Startup . "\Simulator Startup.lnk"
 
@@ -519,12 +514,7 @@ saveConfiguration(configurationFile, editor) {
 		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 	}
 	else
-		try {
-			FileDelete %startupLink%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(startupLink)
 }
 
 initializeSimulatorConfiguration() {

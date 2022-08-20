@@ -206,12 +206,7 @@ class ACCSetupEditor extends FileSetupEditor {
 			if !InStr(fileName, ".json")
 				fileName := (fileName . ".json")
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 			text := this.Setup.Setup
 

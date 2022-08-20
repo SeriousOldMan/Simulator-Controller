@@ -1986,12 +1986,7 @@ externalCommandManager() {
 
 		file.Close()
 
-		try {
-			FileDelete %fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(fileName)
 
 		for ignore, command in commands {
 			command := string2Values(A_Space, command)

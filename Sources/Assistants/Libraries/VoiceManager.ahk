@@ -694,7 +694,7 @@ class VoiceManager {
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 	}
 
@@ -780,7 +780,7 @@ class VoiceManager {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
 			catch exception {
-				; ignore^
+				logError(exception)^
 			}
 		else
 			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)

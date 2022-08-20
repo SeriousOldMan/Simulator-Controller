@@ -584,7 +584,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 					Menu ContextMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				window := SetupWizard.Instance.WizardWindow
@@ -709,7 +709,7 @@ updateApplicationFunction() {
 						Menu ContextMenu, DeleteAll
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
 					window := wizard.Window

@@ -306,7 +306,7 @@ class SpeechSynthesizer {
 						copied := true
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 			}
 
@@ -488,7 +488,7 @@ class SpeechSynthesizer {
 						deleteFile(temp2Name)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 			}
 		}
@@ -614,7 +614,7 @@ class SpeechSynthesizer {
 				SoundPlay NonExistent.avi
 			}
 			catch exception {
-				; Ignore
+				logError(exception)
 			}
 
 			this.iPlaysCacheFile := false

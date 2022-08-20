@@ -566,7 +566,7 @@ checkInstallation() {
 						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				ExitApp 0
@@ -1468,7 +1468,7 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 			FileMove %fName%, %fName%.bak, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 }
 
@@ -1619,7 +1619,7 @@ updateInstallationForV398() {
 			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -1633,7 +1633,7 @@ updateInstallationForV398() {
 			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 }
@@ -2016,7 +2016,7 @@ updateConfigurationForV398() {
 			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		deleteDirectory(kDatabaseDirectory . "Local")

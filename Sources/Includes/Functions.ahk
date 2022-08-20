@@ -192,17 +192,8 @@ readLanguage(targetLanguageCode) {
 	throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 }
 
-logError(exception) {
-	if IsObject(exception)
-		logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
-	else
-		logMessage(kLogCritical, translate("Unhandled exception encountered: ") . exception)
-
-	return (isDebug() ? false : true)
-}
-
 initializeLoggingSystem() {
-	OnError("logError")
+	OnError(Func("logError").Bind(true))
 }
 
 requestShareSessionDatabaseConsent() {
@@ -361,7 +352,7 @@ checkForNews() {
 						viewHTML(kTempDirectory . "NEWS.htm")
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 		}
 	}
@@ -831,14 +822,14 @@ installTrayMenu(update := false) {
 		Menu LogMenu, DeleteAll
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 
 	try {
 		Menu SupportMenu, DeleteAll
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 
 	levels := {Off: kLogOff, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
@@ -1110,7 +1101,7 @@ hideSplashTheme() {
 			SoundPlay NonExistent.avi
 		}
 		catch ignore {
-			; Ignore
+			logError(exception)
 		}
 
 	hideSplash()
@@ -1366,6 +1357,26 @@ logMessage(logLevel, message) {
 			}
 	}
 }
+
+logError(exception, unhandled := false) {
+	local message
+
+	if IsObject(exception) {
+		message := exception.Message
+
+		if message is not Number
+			logMessage(unhandled ? kLogCritical : kLogInfo
+					 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+					 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+	}
+	else if exception is not Number
+		logMessage(unhandled ? kLogCritical : kLogInfo
+				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+
+	return (isDebug() ? false : true)
+}
+
+
 
 availableLanguages() {
 	local translations := {en: "English"}
@@ -1660,6 +1671,8 @@ deleteFile(fileName) {
 		return !ErrorLevel
 	}
 	catch exception {
+		logError(exception)
+
 		return false
 	}
 }
@@ -1671,6 +1684,8 @@ deleteDirectory(directoryName) {
 		return !ErrorLevel
 	}
 	catch exception {
+		logError(exception)
+
 		return false
 	}
 }
@@ -1900,7 +1915,7 @@ translateMsgBoxButtons(buttonLabels) {
 					ControlSetText Button%index%, % translate(label)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 		}
 	}

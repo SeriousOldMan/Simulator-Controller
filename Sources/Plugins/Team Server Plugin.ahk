@@ -945,7 +945,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.Connector.SetStintValue(stint, "ID", this.ID)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				return stint

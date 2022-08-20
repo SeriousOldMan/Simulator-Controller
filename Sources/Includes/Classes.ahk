@@ -234,7 +234,7 @@ class Application extends ConfigurationItem {
 					Process Close, % this.iRunningPID
 				}
 				catch exception {
-					; Ignored
+					logError(exception)
 				}
 			else if (this.ExePath != "")
 				WinClose % "ahk_exe " . this.ExePath

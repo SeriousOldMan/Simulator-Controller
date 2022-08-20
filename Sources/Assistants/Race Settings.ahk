@@ -476,7 +476,7 @@ loadSessions(connector, team) {
 				sessions[session.Name] := session.Identifier
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		}
 	}

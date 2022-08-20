@@ -1878,7 +1878,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					}
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				return false
@@ -2036,7 +2036,7 @@ isACCRunning() {
 			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 

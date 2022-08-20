@@ -2270,7 +2270,7 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(translate("Setups has been saved for this Session."))
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		else if verbose {
 			title := translate("Information")
@@ -2725,7 +2725,7 @@ class RaceCenter extends ConfigurationItem {
 					showMessage(translate("Plan has been saved for this Session."))
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		else if verbose {
 			title := translate("Information")
@@ -4836,7 +4836,7 @@ class RaceCenter extends ConfigurationItem {
 					FileAppend %raceInfo%, %directory%Race.data
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			data := readConfiguration(directory . "Race.data")
@@ -5067,7 +5067,7 @@ class RaceCenter extends ConfigurationItem {
 									this.Connector.SetSessionLapValue(session, lap, "Race Center Pitstop", pitstop)
 								}
 								catch exception {
-									; ignore
+									logError(exception)
 								}
 						}
 					}
@@ -5311,7 +5311,7 @@ class RaceCenter extends ConfigurationItem {
 					state := this.Connector.GetSessionValue(session, "Race Engineer State")
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 			if (state && (state != "")) {
@@ -5420,7 +5420,7 @@ class RaceCenter extends ConfigurationItem {
 						state := this.Connector.GetLapValue(this.Laps[startLap + A_Index].Identifier, "Race Engineer Pitstop State")
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
 					if (state && (state != "")) {
@@ -5520,7 +5520,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -5579,7 +5579,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -5620,7 +5620,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -5679,7 +5679,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -5731,7 +5731,7 @@ class RaceCenter extends ConfigurationItem {
 						this.initializeSimulator(simulator, car, track, true)
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
 				this.syncSetups()
@@ -6613,7 +6613,7 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.ClearSession(session)
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			this.initializeSession()
@@ -9871,7 +9871,7 @@ loadTeams(connector) {
 		}
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 
 	return teams
@@ -9889,7 +9889,7 @@ loadSessions(connector, team) {
 				sessions[session.Name] := session.Identifier
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		}
 
@@ -9910,7 +9910,7 @@ loadDrivers(connector, team) {
 				drivers[name] := driver.Identifier
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		}
 

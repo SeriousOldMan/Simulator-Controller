@@ -185,7 +185,7 @@ class DefaultButtonBox extends NamedPreset {
 				FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 }
@@ -228,7 +228,7 @@ class DefaultStreamDeck extends NamedPreset {
 				FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 }
@@ -265,7 +265,7 @@ class StreamDeckIcons extends NamedPreset {
 				FileCopy %file%, %kUserTranslationsDirectory%, 1
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 	}
 
@@ -311,7 +311,7 @@ class PitstopImages extends NamedPreset {
 			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -371,7 +371,7 @@ class SetupPatch extends NamedPreset {
 			Run notepad %kUserHomeDirectory%Setup\%name%
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 

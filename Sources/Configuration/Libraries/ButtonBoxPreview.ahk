@@ -469,7 +469,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				Menu MainMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			window := this.Window
@@ -484,7 +484,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				Menu ControlMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			label := translate("Empty")
@@ -509,7 +509,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					Menu NumberMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				label := translate("Input...")
@@ -529,7 +529,7 @@ class ButtonBoxPreview extends ControllerPreview {
 						Menu %menu%, DeleteAll
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
 					loop 10 {
@@ -560,7 +560,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					Menu LabelMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				label := translate("Empty")

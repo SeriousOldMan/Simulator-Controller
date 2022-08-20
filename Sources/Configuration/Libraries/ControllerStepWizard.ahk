@@ -1289,7 +1289,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			Menu ContextMenu, DeleteAll
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		Menu ContextMenu, Add, %title%, controlMenuIgnore
@@ -1336,7 +1336,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			Menu ContextMenu, DeleteAll
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		Menu ContextMenu, Add, %title%, controlMenuIgnore
@@ -1570,7 +1570,7 @@ updateFunctionTriggers() {
 				Menu ContextMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			window := SetupWizard.Instance.WizardWindow

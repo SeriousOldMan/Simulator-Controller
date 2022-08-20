@@ -277,6 +277,9 @@ Reduces the current log level.
 #### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
 Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.
 
+#### *logError(exception)*
+Writes information about the exception to the log file and continues.
+
 ***
 
 ## Controller Actions

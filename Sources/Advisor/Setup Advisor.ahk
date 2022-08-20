@@ -1330,7 +1330,7 @@ class SetupAdvisor extends ConfigurationItem {
 			Menu CharacteristicsMenu, DeleteAll
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
@@ -1356,7 +1356,7 @@ class SetupAdvisor extends ConfigurationItem {
 				Menu %groupMenu%, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			for ignore, groupOption in string2Values(";", definition) {
@@ -1369,7 +1369,7 @@ class SetupAdvisor extends ConfigurationItem {
 						Menu %optionMenu%, DeleteAll
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
 					for ignore, option in string2Values(",", groupOption[2]) {

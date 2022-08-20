@@ -377,7 +377,7 @@ class SystemPlugin extends ControllerPlugin {
 				}
 			}
 			catch exception {
-				; Ignore
+				logError(exception)
 			}
 		}
 	}
@@ -392,7 +392,7 @@ class SystemPlugin extends ControllerPlugin {
 			SoundPlay NonExistent.avi
 		}
 		catch exception {
-			; Ignore
+			logError(exception)
 		}
 
 		if this.iStartupSongIsPlaying {

@@ -433,7 +433,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					this.iTeams[team.Name] := team.Identifier
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 		}
 
@@ -477,7 +477,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					this.iDrivers[name] := driver.Identifier
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 			}
 		}
@@ -518,7 +518,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					this.iSessions[session.Name] := session.Identifier
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 			}
 		}
@@ -541,7 +541,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 			sessions.Push(name)

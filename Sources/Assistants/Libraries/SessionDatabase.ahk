@@ -150,7 +150,7 @@ class SessionDatabase extends ConfigurationItem {
 									FileMoveDir %prefix%%carName%, %prefix%%car%, R
 							}
 							catch exception {
-								; ignore
+								logError(exception)
 							}
 
 							return
@@ -167,7 +167,7 @@ class SessionDatabase extends ConfigurationItem {
 										FileMoveDir %prefix%%carName%, %prefix%%car%, R
 								}
 								catch exception {
-									; ignore
+									logError(exception)
 								}
 
 								return
@@ -964,7 +964,7 @@ class SessionDatabase extends ConfigurationItem {
 			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 

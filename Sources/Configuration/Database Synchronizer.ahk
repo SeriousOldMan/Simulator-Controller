@@ -102,7 +102,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
 								}
 								catch exception {
-									; ignore
+									logError(exception)
 								}
 							}
 						}
@@ -150,7 +150,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 			FileRemoveDir %kTempDirectory%Shared Database, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		for ignore, fileName in ftpListFiles("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads") {

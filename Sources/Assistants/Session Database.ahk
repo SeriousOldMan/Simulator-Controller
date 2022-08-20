@@ -1911,7 +1911,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
 							}
 							catch exception {
-								; ignore
+								logError(exception)
 							}
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
@@ -1927,7 +1927,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%A_LoopFileName%
 								}
 								catch exception {
-									; ignore
+									logError(exception)
 								}
 						}
 					case translate("Automations"):
@@ -2915,7 +2915,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		}
 	}

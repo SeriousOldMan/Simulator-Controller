@@ -723,7 +723,7 @@ class SetupWizard extends ConfigurationItem {
 							FileDelete %startupLink%
 						}
 						catch exception {
-							; ignore
+							logError(exception)
 						}
 
 					if this.isModuleSelected("Controller") {
@@ -2051,7 +2051,7 @@ class StartStepWizard extends StepWizard {
 			SoundPlay NonExistent.avi
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		resetVolume(volume)
@@ -2086,7 +2086,7 @@ class StartStepWizard extends StepWizard {
 				SoundPlay NonExistent.avi
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			resetVolume(volume)

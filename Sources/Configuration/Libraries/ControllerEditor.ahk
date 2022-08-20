@@ -2146,7 +2146,7 @@ updateLayoutRowEditor() {
 			list.updateLayoutRowEditor()
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 }
 

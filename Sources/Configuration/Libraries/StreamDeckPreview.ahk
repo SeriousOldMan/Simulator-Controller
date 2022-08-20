@@ -325,7 +325,7 @@ class StreamDeckPreview extends ControllerPreview {
 				Menu MainMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			window := this.Window
@@ -340,7 +340,7 @@ class StreamDeckPreview extends ControllerPreview {
 				Menu ControlMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			label := translate("Empty")
@@ -354,7 +354,7 @@ class StreamDeckPreview extends ControllerPreview {
 				Menu NumberMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			label := translate("Input...")
@@ -374,7 +374,7 @@ class StreamDeckPreview extends ControllerPreview {
 					Menu %menu%, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				loop 10 {
@@ -404,14 +404,14 @@ class StreamDeckPreview extends ControllerPreview {
 					Menu DisplayMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				try {
 					Menu LabelMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				labelMode := this.getLabel(row, column)
@@ -442,7 +442,7 @@ class StreamDeckPreview extends ControllerPreview {
 					Menu IconMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				iconMode := this.getIcon(row, column)
@@ -473,7 +473,7 @@ class StreamDeckPreview extends ControllerPreview {
 					Menu ModeMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				mode := this.getMode(row, column)

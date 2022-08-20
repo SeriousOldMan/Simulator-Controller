@@ -143,7 +143,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}
 						catch exception {
-							; ignore
+							logError(exception)
 						}
 
 						this.RaceStrategist.updateStrategy(kTempDirectory . "Race Strategy.update")
@@ -535,7 +535,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					FileCreateDir %kTempDirectory%Race Report\Output
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				loop {

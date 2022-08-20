@@ -462,7 +462,7 @@ error:
 				SoundPlay NonExistent.avi
 			}
 			catch exception {
-				; Ignore
+				logError(exception)
 			}
 
 			setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
@@ -482,7 +482,7 @@ error:
 				}
 			}
 			catch exception {
-				; Ignore
+				logError(exception)
 			}
 		}
 	}

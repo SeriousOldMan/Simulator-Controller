@@ -688,10 +688,29 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugKnowledgeBase:
+				label := translate("Dump Knowledgebase")
+			case kDebugRules:
+				label := translate("Dump Rules")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	getSimulators() {
@@ -777,12 +796,7 @@ class SetupAdvisor extends ConfigurationItem {
 	dumpKnowledge(knowledgeBase) {
 		local key, value, text
 
-		try {
-			FileDelete %kTempDirectory%Setup Advisor.knowledge
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Setup Advisor.knowledge")
 
 		for key, value in knowledgeBase.Facts.Facts {
 			text := (key . " = " . value . "`n")
@@ -794,12 +808,7 @@ class SetupAdvisor extends ConfigurationItem {
 	dumpRules(knowledgeBase) {
 		local rules, rule, production, text, ignore, rules, rule
 
-		try {
-			FileDelete %kTempDirectory%Setup Advisor.rules
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Setup Advisor.rules")
 
 		production := knowledgeBase.Rules.Productions[false]
 
@@ -3212,7 +3221,7 @@ runSetupAdvisor() {
 	local track := false
 	local weather := false
 	local index := 1
-	local advisor, current
+	local advisor, current, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
@@ -3244,6 +3253,24 @@ runSetupAdvisor() {
 		car := new SessionDatabase().getCarName(simulator, car)
 
 	advisor := new SetupAdvisor(simulator, car, track, weather)
+
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Dump Rules")
+	callback := ObjBindMethod(advisor, "toggleDebug", kDebugRules)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if advisor.Debug[kDebugRules]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Dump Knowledgebase")
+	callback := ObjBindMethod(advisor, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if advisor.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
 
 	advisor.createGui(advisor.Configuration)
 

@@ -687,6 +687,23 @@ class RaceSpotter extends RaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
 
+	setDebug(option, enabled) {
+		local label := false
+
+		base.setDebug(option, enabled)
+
+		switch option {
+			case kDebugPositions:
+				label := translate("Dump Positions")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
 	createVoiceManager(name, options) {
 		return new this.SpotterVoiceManager(this, name, options)
 	}
@@ -2089,12 +2106,7 @@ class RaceSpotter extends RaceAssistant {
 		local facts, joined, simulatorName, configuration, saveSettings
 
 		if this.Debug[kDebugPositions]
-			try {
-				FileDelete %kTempDirectory%Race Spotter.positions
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(kTempDirectory . "Race Spotter.positions")
 
 		joined := !this.iWasStartDriver
 

@@ -1622,7 +1622,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 
-				debug := this.Debug[kDebugPhrases]
+				debug := this.VoiceManager.Debug[kDebugPhrases]
 
 				if (compound && ((options == true) || options.Pressures)) {
 					incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
@@ -1913,7 +1913,7 @@ class RaceEngineer extends RaceAssistant {
 		local numPitstops := 0
 		local numTyreSets := 1
 		local lastLap := 0
-		local postfix, fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
+		local fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
 
 		setConfigurationValue(pitstopHistory, "TyreSets", "1.Compound"
 											, knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
@@ -1967,9 +1967,7 @@ class RaceEngineer extends RaceAssistant {
 		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numPitstops)
 		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numTyreSets)
 
-		Random postfix, 1, 1000000
-
-		fileName := (kTempDirectory . "Pitstop_" . postfix . ".history")
+		fileName := temporaryFileName("Pitstop", "history")
 
 		writeConfiguration(filename, pitstopHistory)
 

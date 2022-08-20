@@ -103,7 +103,7 @@ startRaceStrategist() {
 	local strategistRecognizer := true
 	local strategistListener := false
 	local debug := false
-	local voiceServer, index
+	local voiceServer, index, spotter
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Strategist
@@ -167,18 +167,30 @@ startRaceStrategist() {
 	if debug
 		setDebug(true)
 
-	RaceStrategist.Instance := new RaceStrategist(kSimulatorConfiguration
-												, remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
-												, strategistName, strategistLanguage
-												, strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
-												, strategistRecognizer, strategistListener, voiceServer)
+	strategist := new RaceStrategist(kSimulatorConfiguration
+								   , remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
+								   , strategistName, strategistLanguage
+								   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
+								   , strategistRecognizer, strategistListener, voiceServer)
 
+	RaceStrategist.Instance := strategist
+	
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Dump Knowledgebase")
+	callback := ObjBindMethod(strategist, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if strategist.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
+		
 	registerMessageHandler("Race Strategist", "handleStrategistMessage")
 
 	if (debug && strategistSpeaker) {
-		RaceStrategist.Instance.getSpeaker()
+		strategist.getSpeaker()
 
-		RaceStrategist.Instance.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
+		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
 	}
 
 	if (strategistLogo && !kSilentMode)

@@ -565,16 +565,29 @@ class VoiceServer extends ConfigurationItem {
 		base.__New(configuration)
 
 		VoiceServer.Instance := this
+	
+		Menu SupportMenu, Insert, 1&
+
+		label := translate("Trace Recognitions")
+		callback := ObjBindMethod(this, "toggleDebug", kDebugRecognitions)
+
+		Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+		if this.Debug[kDebugRecognitions]
+			Menu SupportMenu, Check, %label%
+
+		label := translate("Trace Grammars")
+		callback := ObjBindMethod(this, "toggleDebug", kDebugGrammars)
+
+		Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+		if this.Debug[kDebugGrammars]
+			Menu SupportMenu, Check, %label%
 
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500))
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
 
-		try {
-			FileDelete %kTempDirectory%Voice.mute
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Voice.mute")
 
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority))
 	}
@@ -644,10 +657,29 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugRecognitions:
+				label := translate("Trace Recognitions")
+			case kDebugGrammars:
+				label := translate("Trace Grammars")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	getVoiceClient(descriptor := false) {

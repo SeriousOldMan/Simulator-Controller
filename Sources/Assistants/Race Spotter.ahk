@@ -103,7 +103,7 @@ startRaceSpotter() {
 	local spotterRecognizer := true
 	local spotterListener := false
 	local debug := false
-	local voiceServer, index
+	local voiceServer, index, spotter
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
@@ -167,12 +167,32 @@ startRaceSpotter() {
 	if debug
 		setDebug(true)
 
-	RaceSpotter.Instance := new RaceSpotter(kSimulatorConfiguration
+	spotter := new RaceSpotter(kSimulatorConfiguration
 										  , remotePID ? new RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 										  , spotterName, spotterLanguage
 										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
 										  , spotterRecognizer, spotterListener, voiceServer)
 
+	RaceSpotter.Instance := spotter
+	
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Dump Positions")
+	callback := ObjBindMethod(spotter, "toggleDebug", kDebugPositions)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if spotter.Debug[kDebugPositions]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Dump Knowledgebase")
+	callback := ObjBindMethod(spotter, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if spotter.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
+		
 	registerMessageHandler("Race Spotter", "handleSpotterMessage")
 
 	if (debug && spotterSpeaker) {

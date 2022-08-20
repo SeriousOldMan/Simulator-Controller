@@ -428,12 +428,7 @@ class RaceStrategist extends RaceAssistant {
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true}})
 
-		try {
-			FileRemoveDir %kTempDirectory%Race Strategist
-		}
-		catch exception {
-			; ignore
-		}
+		deleteDirectory(kTempDirectory . "Race Strategist")
 
 		FileCreateDir %kTempDirectory%Race Strategist
 
@@ -1751,12 +1746,7 @@ class RaceStrategist extends RaceAssistant {
 		if !IsObject(pitstopHistory) {
 			pitstopHistory := readConfiguration(pitstopHistory)
 
-			try {
-				FileDelete %pitstopHistory%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(pitstopHistory)
 		}
 
 		Task.startTask(new this.RaceStrategySimulationTask(this, pitstopHistory))
@@ -2022,9 +2012,19 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	chooseScenario(strategy) {
+		local configuration
+
 		if strategy {
 			if this.Strategy[true]
 				strategy.PitstopRule := this.Strategy[true].PitstopRule
+
+			if isDebug() {
+				configuration := newConfiguration()
+
+				strategy.saveToConfiguration(configuration)
+
+				writeConfiguration(kTempDirectory . "Race Strategist.strategy", configuration)
+			}
 
 			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, true), 1000)
 		}
@@ -2259,18 +2259,17 @@ class RaceStrategist extends RaceAssistant {
 
 	saveLapStandings(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, carCount, fileName, data, prefix, key, value, postfix
+		local driver, carCount, fileName, data, prefix, key, value
 
 		if this.RemoteHandler {
-			Random postfix, 1, 1000000
-
 			driver := knowledgeBase.getValue("Driver.Car")
 			carCount := knowledgeBase.getValue("Car.Count")
 
 			if ((driver == 0) || (carCount == 0))
 				return
 
-			fileName := (kTempDirectory . "Race Strategist Lap " . postfix . ".standings")
+			fileName := temporaryFileName("Race Strategist Lap", "standings")
+			
 			data := newConfiguration()
 
 			setConfigurationValue(data, "Lap", "Lap", lapNumber)
@@ -2318,13 +2317,11 @@ class RaceStrategist extends RaceAssistant {
 
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local postfix, driver, carCount, data, raceInfo, grid, carNr, carID, key, fileName
+		local driver, carCount, data, raceInfo, grid, carNr, carID, key, fileName
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname
 
 		if this.RemoteHandler {
-			Random postfix, 1, 1000000
-
 			driver := knowledgeBase.getValue("Driver.Car", 0)
 			carCount := knowledgeBase.getValue("Car.Count", 0)
 
@@ -2370,7 +2367,7 @@ class RaceStrategist extends RaceAssistant {
 											, knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
 				}
 
-				fileName := (kTempDirectory . "Race Strategist Race " . postfix . ".info")
+				fileName := temporaryFileName("Race Strategist Race", "info")
 
 				writeConfiguration(fileName, data)
 
@@ -2461,7 +2458,7 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Laps", lapNumber, values2String(";", laps*))
 			setConfigurationValue(data, "Drivers", lapNumber, values2String(";", drivers*))
 
-			fileName := (kTempDirectory . "Race Strategist Race " . postfix . "." . lapNumber . ".lap")
+			fileName := temporaryFileName("Race Strategist Race." . lapNumber, "lap")
 
 			writeConfiguration(fileName, data)
 
@@ -2474,12 +2471,7 @@ class RaceStrategist extends RaceAssistant {
 	restoreRaceInfo(raceInfoFile) {
 		this.updateRaceInfo(readConfiguration(raceInfoFile))
 
-		try {
-			FileDelete %raceInfoFile%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(raceInfoFile)
 	}
 
 	createRaceReport() {

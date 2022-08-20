@@ -103,7 +103,7 @@ startRaceEngineer() {
 	local engineerRecognizer := true
 	local engineerListener := false
 	local debug := false
-	local voiceServer, index
+	local voiceServer, index, engineer
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Engineer
@@ -167,18 +167,30 @@ startRaceEngineer() {
 	if debug
 		setDebug(true)
 
-	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
-											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-											, engineerName, engineerLanguage
-											, engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
-											, engineerRecognizer, engineerListener, voiceServer)
+	engineer := new RaceEngineer(kSimulatorConfiguration
+							   , remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
+							   , engineerName, engineerLanguage
+							   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
+							   , engineerRecognizer, engineerListener, voiceServer)
+							   
+	RaceEngineer.Instance := engineer
+	
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Dump Knowledgebase")
+	callback := ObjBindMethod(engineer, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if engineer.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
 
 	registerMessageHandler("Race Engineer", "handleEngineerMessage")
 
 	if (debug && engineerSpeaker) {
-		RaceEngineer.Instance.getSpeaker()
+		engineer.getSpeaker()
 
-		RaceEngineer.Instance.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
+		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
 	}
 
 	if (engineerLogo && !kSilentMode)

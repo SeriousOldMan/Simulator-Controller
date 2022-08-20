@@ -375,12 +375,7 @@ class SetupWizard extends ConfigurationItem {
 		if initialize {
 			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini"
 								   , "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
-				try {
-					FileDelete %kUserHomeDirectory%Setup\%fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserHomeDirectory . "Setup\" . fileName)
 
 			this.KnowledgeBase.addFact("Initialize", true)
 		}
@@ -544,10 +539,29 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugKnowledgeBase:
+				label := translate("Dump Knowledgebase")
+			case kDebugRules:
+				label := translate("Dump Rules")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	show(reset := false) {
@@ -695,12 +709,7 @@ class SetupWizard extends ConfigurationItem {
 
 					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
-					try {
-						FileDelete %kUserConfigDirectory%Simulator Controller.config
-					}
-					catch exception {
-						; Ignore
-					}
+					deleteFile(kUserConfigDirectory . "Simulator Controller.config")
 
 					startupLink := A_Startup . "\Simulator Startup.lnk"
 
@@ -1718,12 +1727,7 @@ class SetupWizard extends ConfigurationItem {
 	dumpKnowledge(knowledgeBase) {
 		local key, value, text
 
-		try {
-			FileDelete %kTempDirectory%Simulator Setup.knowledge
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Simulator Setup.knowledge")
 
 		for key, value in knowledgeBase.Facts.Facts {
 			text := (key . " = " . value . "`n")
@@ -1735,12 +1739,7 @@ class SetupWizard extends ConfigurationItem {
 	dumpRules(knowledgeBase) {
 		local rules, reduction, production, text, ignore
 
-		try {
-			FileDelete %kTempDirectory%Simulator Setup.rules
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . "Simulator Setup.rules")
 
 		production := knowledgeBase.Rules.Productions[false]
 
@@ -2283,12 +2282,7 @@ elevateAndRestart() {
 	if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
 		try {
 			if SetupWizard.Instance.Initialize
-				try {
-					FileDelete %kUserHomeDirectory%Setup\Setup.data
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserHomeDirectory . "Setup\Setup.data")
 
 			if A_IsCompiled
 				Run *RunAs "%A_ScriptFullPath%" /restart
@@ -2404,6 +2398,24 @@ initializeSimulatorSetup() {
 	setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 
 	wizard := new SetupWizard(kSimulatorConfiguration, definition)
+
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Dump Rules")
+	callback := ObjBindMethod(wizard, "toggleDebug", kDebugRules)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if wizard.Debug[kDebugRules]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Dump Knowledgebase")
+	callback := ObjBindMethod(wizard, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if wizard.Debug[kDebugKnowledgeBase]
+		Menu SupportMenu, Check, %label%
 
 	showSplashTheme("Rotating Brain")
 

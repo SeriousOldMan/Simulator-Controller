@@ -36,7 +36,6 @@ global kSessionQualification := 3
 global kSessionRace := 4
 
 global kDebugKnowledgeBase := 1
-global kDebugLast := 1
 
 global kAsk := "Ask"
 global kAlways := "Always"
@@ -788,10 +787,27 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugKnowledgeBase:
+				label := translate("Dump Knowledgebase")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	getSpeaker() {
@@ -976,12 +992,7 @@ class RaceAssistant extends ConfigurationItem {
 		if stateFile {
 			sessionState := readConfiguration(stateFile)
 
-			try {
-				FileDelete %stateFile%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(stateFile)
 
 			this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
 
@@ -991,12 +1002,7 @@ class RaceAssistant extends ConfigurationItem {
 		if settingsFile {
 			sessionSettings := readConfiguration(settingsFile)
 
-			try {
-				FileDelete %settingsFile%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(settingsFile)
 
 			this.updateSession(sessionSettings)
 		}
@@ -1224,17 +1230,15 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	finishPitstop(lapNumber := false) {
-		local savedKnowledgeBase, postfix, settingsFile, stateFile
+		local savedKnowledgeBase, settingsFile, stateFile
 
 		if this.RemoteHandler {
 			savedKnowledgeBase := newConfiguration()
 
 			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
 
-			Random postfix, 1, 1000000
-
-			settingsFile := (kTempDirectory . "Race Assistant " . postfix . ".settings")
-			stateFile := (kTempDirectory . "Race Assistant " . postfix . ".state")
+			settingsFile := temporaryFileName("Race Assistant",  "settings")
+			stateFile := temporaryFileName("Race Assistant",  "state")
 
 			writeConfiguration(settingsFile, this.Settings)
 			writeConfiguration(stateFile, savedKnowledgeBase)
@@ -1292,12 +1296,7 @@ class RaceAssistant extends ConfigurationItem {
 		local prefix := this.AssistantType
 		local key, value, text
 
-		try {
-			FileDelete %kTempDirectory%%prefix%.knowledge
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kTempDirectory . prefix . ".knowledge")
 
 		for key, value in knowledgeBase.Facts.Facts {
 			text := (key . " = " . value . "`n")

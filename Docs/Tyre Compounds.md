@@ -125,15 +125,17 @@ When a tyre compound will be selected for a given weather condition, the followi
 | Weather      | Suitable Category | Optimal Category |
 | ------------ | ----------------- | ---------------- |
 | Dry          | Dry               | Dry              |
-| Drizzle      | Dry, Intermediate | Intermediate     |
-| Light Rain   | Intermediate, Wet | Intermediate     |
+| Drizzle      | Dry, Intermediate | Intermediate (1) |
+| Light Rain   | Intermediate, Wet | Intermediate (1) |
 | Medium Rain  | Wet               | Wet              |
 | Heavy Rain   | Wet               | Wet              |
 | Thunderstorm | Wet               | Wet              |
 
+(1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
+
 When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation. A notable exception is the pitstop management in "Race Center", where you can manually select the desired tyre compound for the next pitstop.
 
-Looking at the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Race Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. But if you go to the pits the tyre compound with the optimal category will be chosen, as long as available. In the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, a pitstop will be requested and the optimal tyre compound will be chosen, if available.
+Looking at the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Race Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
 
 ### Default Tyre Compound
 

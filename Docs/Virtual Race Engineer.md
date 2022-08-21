@@ -389,15 +389,31 @@ The following statistical models are currently implemented:
 	 
   5. Tyre pressure gambling
   
-     Linear regression models are used here. Depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby propably giving you a good compromise for the upcoming stint.
+     Linear regression models are used here, depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby propably giving you a good compromise for the upcoming stint.
 	 
   6. Weather trend analysis and tyre compound recommendation
   
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* and *rFactor 2* supply current weather information ranging from "Dry" up to full "Thunderstorm". *Assetto Corsa Competizione* goes even further and can supply a full weather forecast from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona will recommend a tyre change. This recomendation will be incorporated into the plan for an upcoming pitstop depending on the settings you have chosen in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings).
 	 
-Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always doublecheck under those circumstances. This will get much better with one of the next major releases	, which will introduce a big data collection of recent races, which in the end will allow Jona to base or at least to secure the decisions on past experiences using neural networks.
+	 All applications of Simulator Controller, incl. the Race Engineer, support three different tyre categories (Dry, Intermediate and Wet), as well as a couple of mixtures for each category. The combination of both is a tyre compound, for example "Dry (M)", a dry tyre (aka Slick) with a medium hardness. Please read the chapter [Tyre Compounds](*) carefully for more information and especially for the mapping of simulator specific tyre compounds to the tyre model of Simulator Controller. Jona uses the tyre model to recommend the best possible tyre compound for the given weather conditions.
+	 
+	 | Weather      | Suitable Category | Optimal Category |
+     | ------------ | ----------------- | ---------------- |
+     | Dry          | Dry               | Dry              |
+     | Drizzle      | Dry, Intermediate | Intermediate (1) |
+     | Light Rain   | Intermediate, Wet | Intermediate (1) |
+     | Medium Rain  | Wet               | Wet              |
+     | Heavy Rain   | Wet               | Wet              |
+     | Thunderstorm | Wet               | Wet              |
+     
+     (1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
+	 
+	 Looking at the above table, you can understand when and why a tyre change will be recommended by the Jona. As long as the currently mounted tyre has a suitable category, no urgent pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
 
-Additional notes for *iRacing* users: It looks like that tyre pressures and also to some extent tyre temperatures for most of the cars are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the Virtual Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to while hunting down your opponent on the long straight.
+	 
+Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always doublecheck under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
+
+Additional notes for *iRacing* users: It looks like that tyre pressures and also to some extent tyre temperatures for most of the cars are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the Virtual Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to while hunting down your opponent on the long straights.
 
 ## Race & Session database
 

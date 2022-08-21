@@ -208,8 +208,6 @@ class ConfigurationEditor extends ConfigurationItem {
 	iWindow := "CFGE"
 	iResult := false
 
-	iGeneralTab := false
-
 	iConfigurators := []
 
 	iDevelopment := false
@@ -233,6 +231,12 @@ class ConfigurationEditor extends ConfigurationItem {
 		}
 	}
 
+	GeneralTab[] {
+		Get {
+			return this.Configurators[1][2]
+		}
+	}
+
 	Result[] {
 		Get {
 			return this.iResult
@@ -245,9 +249,10 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	__New(development, configuration) {
 		this.iDevelopment := development
-		this.iGeneralTab := new GeneralTab(development, configuration)
 
 		base.__New(configuration)
+
+		this.registerConfigurator(translate("General"), new GeneralTab(development, configuration))
 
 		ConfigurationEditor.Instance := this
 	}
@@ -302,13 +307,9 @@ class ConfigurationEditor extends ConfigurationItem {
 		for ignore, configurator in this.Configurators
 			labels.Push(configurator[1])
 
-		Gui %window%:Add, Tab3, x8 y48 w478 h472 AltSubmit -Wrap vconfiguratorTabView gselectTab, % values2String("|", concatenate(Array(translate("General")), labels)*)
+		Gui %window%:Add, Tab3, x8 y48 w478 h472 AltSubmit -Wrap vconfiguratorTabView gselectTab, % values2String("|", labels*)
 
 		tab := 1
-
-		Gui %window%:Tab, % tab++
-
-		this.iGeneralTab.createGui(this, 16, 80, 458, 425)
 
 		for ignore, configurator in this.Configurators {
 			Gui %window%:Tab, % tab++
@@ -339,8 +340,6 @@ class ConfigurationEditor extends ConfigurationItem {
 		this.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
 
 		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
-
-		this.iGeneralTab.saveToConfiguration(configuration)
 
 		for ignore, configurator in this.Configurators
 			configurator[2].saveToConfiguration(configuration)
@@ -373,7 +372,7 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		return this.iGeneralTab.getSimulators()
+		return this.GeneralTab.getSimulators()
 	}
 }
 
@@ -413,7 +412,7 @@ selectTab() {
 
 	GuiControlGet configuratorTabView
 
-	configurator := ((configuratorTabView == 1) ? ConfigurationEditor.Instance.iGeneralTab : ConfigurationEditor.Instance.Configurators[configuratorTabView - 1][2])
+	configurator := ConfigurationEditor.Instance.Configurators[configuratorTabView][2]
 
 	if configurator.base.HasKey("activate")
 		configurator.activate()

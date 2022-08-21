@@ -251,17 +251,34 @@ class RaceEngineer extends RaceAssistant {
 
 	lapInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local laps
+		local speaker, remainingFuelLaps, remainingSessionLaps, remainingStintLaps
 
 		if !this.hasEnoughData()
 			return
 
-		laps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
+		speaker := this.getSpeaker()
+		remainingFuelLaps := Round(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 
-		if (laps == 0)
-			this.getSpeaker().speakPhrase("Later")
-		else
-			this.getSpeaker().speakPhrase("Laps", {laps: laps})
+		if (remainingFuelLaps == 0)
+			speaker.speakPhrase("Later")
+		else {
+			speaker.startTalk()
+
+			try {
+				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
+
+				remainingSessionLaps := Round(knowledgeBase.getValue("Lap.Remaining.Session"))
+				remainingStintLaps := Round(knowledgeBase.getValue("Lap.Remaining.Stint"))
+
+				if ((remainingStintLaps < remainingFuelLaps) && (remainingStintLaps < remainingSessionLaps))
+					speaker.speakPhrase("LapsStint", {laps: remainingSessionLaps})
+				else if (remainingSessionLaps < remainingFuelLaps)
+					speaker.speakPhrase("LapsSession", {laps: remainingSessionLaps})
+			}
+			finally {
+				speaker.finishTalk()
+			}
+		}
 	}
 
 	fuelInfoRecognized(words) {

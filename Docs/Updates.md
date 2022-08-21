@@ -49,7 +49,7 @@ Updates are handled automatically. Beside that:
 
 1. You may want to review the [configuration of the "Race Spotter" plugin](*), since some options have been removed and a new configuration setting has been added.
 
-2. A new controller action ["StrategyRecommend"](*) for the "Race Strategist" plugin to trigger the recalculation of the current race strategy. If you are using a Stream Deck, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icon for this new action is available.
+2. A new controller action ["StrategyRecommend"](*) for the "Race Strategist" plugin to trigger the recalculation of the current race strategy. If you want to use this new command and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icon for this new action is available.
 
 ***
 

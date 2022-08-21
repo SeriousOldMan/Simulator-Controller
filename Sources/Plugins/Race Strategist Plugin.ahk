@@ -152,6 +152,28 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
+	updateStrategy(strategy) {
+		local teamServer := this.TeamServer
+		local text
+
+		if (teamServer && teamServer.SessionActive) {
+			if strategy {
+				FileRead text, %strategy%
+
+				deleteFile(strategy)
+
+				teamServer.setSessionValue("Race Strategy", text)
+				teamServer.setSessionValue("Race Strategy Version", "Force")
+			}
+			else {
+				teamServer.setSessionValue("Race Strategy", "CANCEL")
+				teamServer.setSessionValue("Race Strategy Version", "Force")
+			}
+		}
+		else
+			deleteFile(strategy)
+	}
+
 	addLap(lap, update, data) {
 		base.addLap(lap, update, data)
 

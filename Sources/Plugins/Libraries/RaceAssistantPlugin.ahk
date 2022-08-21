@@ -1317,7 +1317,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	createSessionSettingsFile(sessionSettings) {
 		local settingsFile := temporaryFileName(this.Plugin, "settings")
-		
+
 		sessionSettings := printConfiguration(sessionSettings)
 
 		FileAppend %sessionSettings%, %settingsFile%, UTF-16
@@ -1325,7 +1325,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	createSessionStateFile(sessionState) {
 		local stateFile := temporaryFileName(this.Plugin, "state")
-		
+
 		sessionState := printConfiguration(sessionState)
 
 		FileAppend %sessionState%, %stateFile%, UTF-16

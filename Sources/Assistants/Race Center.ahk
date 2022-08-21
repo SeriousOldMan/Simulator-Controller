@@ -5496,7 +5496,7 @@ class RaceCenter extends ConfigurationItem {
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
-				if (!this.Strategy || (this.Strategy.Version && (version > this.Strategy.Version))) {
+				if (!this.Strategy || (version = "Force") || (this.Strategy.Version && (version > this.Strategy.Version))) {
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))

@@ -79,6 +79,10 @@ class RaceStrategist extends RaceAssistant {
 			this.callRemote("createRaceReport", arguments*)
 		}
 
+		updateStrategy(arguments*) {
+			this.callRemote("updateStrategy", arguments*)
+		}
+
 		reviewRace(arguments*) {
 			this.callRemote("reviewRace", arguments*)
 		}
@@ -2028,13 +2032,13 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	chooseScenario(strategy) {
-		local configuration
+		local configuration, fileName
 
 		if strategy {
 			if this.Strategy[true]
 				strategy.PitstopRule := this.Strategy[true].PitstopRule
 
-			if isDebug() {
+			if (isDebug() && !this.RemoteHandler) {
 				configuration := newConfiguration()
 
 				strategy.saveToConfiguration(configuration)
@@ -2043,13 +2047,34 @@ class RaceStrategist extends RaceAssistant {
 			}
 
 			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, true), 1000)
+
+			if this.RemoteHandler {
+				fileName := temporaryFileName("Race Strategy", "update")
+				configuration := newConfiguration()
+
+				strategy.saveToConfiguration(configuration)
+
+				writeConfiguration(fileName, configuration)
+
+				if isDebug()
+					FileCopy %fileName%, %kTempDirectory%Race Strategist.strategy, 1
+
+				this.RemoteHandler.updateStrategy(fileName)
+			}
 		}
-		else
+		else {
 			Task.startTask(ObjBindMethod(this, "cancelStrategy", false), 1000)
+
+			if isDebug()
+				deleteFile(kTempDirectory . "Race Strategist.strategy")
+
+			if this.RemoteHandler
+				this.RemoteHandler.updateStrategy(false)
+		}
 	}
 
 	recommendPitstop(lap := false) {
-		local knowledgeBase := this.KnowledgeBase
+		local knowledgeBase := this.KnowledgeBases
 		local speaker := this.getSpeaker()
 		local plannedLap
 

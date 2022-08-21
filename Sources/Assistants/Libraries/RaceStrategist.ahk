@@ -1425,7 +1425,8 @@ class RaceStrategist extends RaceAssistant {
 
 		knowledgeBase := this.KnowledgeBase
 
-		if (this.Speaker && (lastLap < (lapNumber - 2)) && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
+		if (this.Speaker && (lastLap < (lapNumber - 2))
+		 && (computeDriverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
 			Process Exist, Race Engineer.exe
 
 			exists := ErrorLevel
@@ -1825,7 +1826,7 @@ class RaceStrategist extends RaceAssistant {
 			telemetryDB := strategyTask.TelemetryDatabase
 
 			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
-				candidate := telemetryDD.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
+				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
 														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets
 																								 , strategyTask.UsedTyreSets)))
 
@@ -1890,17 +1891,17 @@ class RaceStrategist extends RaceAssistant {
 				initialTyreLaps := tyreSets[tyreSets.Length()].Laps
 			}
 
-			initialFuelAmount := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining")
-			initialMap := knowledgeBase.getValue("Lap." . lap . ".Map")
-			initialFuelConsumption := knowledgeBase.getValue("Lap." . lap . ".Fuel.AvgConsumption")
+			initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
+			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
+			initialFuelConsumption := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.AvgConsumption")
 
-			goal := new RuleCompiler().compileGoal("lapAvgTime(" . lap . ", ?lapTime)")
+			goal := new RuleCompiler().compileGoal("lapAvgTime(" . initialLap . ", ?lapTime)")
 			resultSet := knowledgeBase.prove(goal)
 
 			if resultSet
 				initialAvgLapTime := ((resultSet.getValue(goal.Arguments[2]).toString() + 0) / 1000)
 			else
-				initialAvgLapTime := (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)
+				initialAvgLapTime := (knowledgeBase.getValue("Lap." . initialLap . ".Time") / 1000)
 
 			initialSessionTime := (this.OverallTime / 1000)
 

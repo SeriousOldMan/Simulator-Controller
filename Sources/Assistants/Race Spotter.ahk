@@ -102,7 +102,7 @@ startRaceSpotter() {
 	local spotterRecognizer := true
 	local spotterListener := false
 	local debug := false
-	local voiceServer, index, spotter
+	local voiceServer, index, spotter, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
@@ -173,7 +173,7 @@ startRaceSpotter() {
 										  , spotterRecognizer, spotterListener, voiceServer)
 
 	RaceSpotter.Instance := spotter
-	
+
 	Menu SupportMenu, Insert, 1&
 
 	label := translate("Dump Positions")
@@ -191,7 +191,7 @@ startRaceSpotter() {
 
 	if spotter.Debug[kDebugKnowledgebase]
 		Menu SupportMenu, Check, %label%
-		
+
 	registerMessageHandler("Race Spotter", "handleSpotterMessage")
 
 	if (debug && spotterSpeaker) {

@@ -86,7 +86,7 @@ CLR_StartDomain(ByRef AppDomain, BaseDirectory = "") {
 }
 
 CLR_StopDomain(ByRef AppDomain) {
-	local hr
+	local hr, RtHst
 
 	DllCall("SetLastError", "uint", hr := DllCall(NumGet(NumGet(0 + RtHst := CLR_Start()) + 20 * A_PtrSize), "ptr", RtHst, "ptr", ComObjValue(AppDomain)))
 
@@ -96,7 +96,7 @@ CLR_StopDomain(ByRef AppDomain) {
 }
 
 CLR_Start(Version = "") {
-	local SystemRoot
+	local SystemRoot, CLSID_CorRuntimeHost, IID_ICorRuntimeHost
 
 	static RtHst := 0
 
@@ -137,8 +137,7 @@ CLR_GetDefaultDomain() {
 
 CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain = 0, FileName = "", CompilerOptions = "") {
 	local asmProvider, codeProvider, codeCompiler, Refs, Refs0, Refs1, Refs2, Refs3, Refs4, Refs5, Refs6, Refs7, Refs8
-	local prms, aRefs, compilerRes, errors, error_count, error_text, e
-
+	local prms, aRefs, compilerRes, errors, error_count, error_text, e, asmSystem
 
 	if !AppDomain
 		AppDomain := CLR_GetDefaultDomain()

@@ -2382,7 +2382,7 @@ findInstallProperty(name, property) {
 
 initializeSimulatorSetup() {
 	local icon := kIconsDirectory . "Configuration Wand.ico"
-	local definition, wizard, x, y
+	local definition, wizard, x, y, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup

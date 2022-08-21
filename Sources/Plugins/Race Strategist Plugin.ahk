@@ -211,7 +211,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	activeSession(data) {
 		local session := getDataSession(data)
-		local simualator, car, track, weather, sessiom, default
+		local simulator, car, track, weather, sessiom, default
 
 		if (session == kSessionRace)
 			return true

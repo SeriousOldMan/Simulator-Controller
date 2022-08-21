@@ -734,6 +734,7 @@ getControllerActionDefinitions(type) {
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
+	local BCM_SETIMAGELIST
 
 ;   Parameters:
 ;   1) {Handle} 	HWND handle of Gui button

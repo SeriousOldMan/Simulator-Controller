@@ -663,8 +663,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.loadTrack(track, true)
 		this.loadWeather(weather, true)
 
-		; GuiControl Choose, settingsTab, 0
-
 		this.updateState()
 
 		if (this.RequestorPID && this.moduleAvailable("Pressures"))
@@ -1541,7 +1539,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local imgScale := Min(width / imgWidth, height / imgHeight)
 		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
-		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY
+		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY, window
 
 		if actions {
 			token := Gdip_Startup()
@@ -3024,7 +3022,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 WM_MOUSEMOVE() {
 	local editor := SessionDatabaseEditor.Instance
-	local x, y, coordinateX, coordinateY
+	local x, y, coordinateX, coordinateY, window
 
 	static currentAction := false
 	static previousAction := false

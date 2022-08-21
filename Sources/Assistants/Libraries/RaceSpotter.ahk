@@ -1179,13 +1179,14 @@ class RaceSpotter extends RaceAssistant {
 	sessionInformation(lastLap, sector, regular) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker(true)
-		local airTemperature := Round(knowledgbase.getValue("Weather.Temperature.Air"))
-		local trackTemperature := Round(knowledgbase.getValue("Weather.Temperature.Track"))
+		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature.Air"))
+		local trackTemperature := Round(knowledgebase.getValue("Weather.Temperature.Track"))
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := knowledgeBase.getValue("Session.Time.Remaining")
 		local remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
-		local remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel, sessionEnding
+		local situation, remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel
+		local sessionEnding, minute
 
 		if (lastLap == 2) {
 			situation := "StartSummary"
@@ -1227,9 +1228,10 @@ class RaceSpotter extends RaceAssistant {
 				if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLapTime"])) {
 					lapTime := (this.BestLapTime / 1000)
 
+					minute := Floor(lapTime / 60)
+
 					speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
-												  , minute: Floor(lapTime / 60)
-												  , seconds: printNumber((lapTime - (minute * 60)), 1)})
+												  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
 				}
 
 				this.SessionInfos["BestLap"] := this.BestLapTime

@@ -398,7 +398,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	__New(controller, name, configuration := false, register := true) {
 		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
-		local effectFunctions, ignore, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
+		local effectFunctions, ignore, index, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
 
 		base.__New(controller, name, configuration, false)
 

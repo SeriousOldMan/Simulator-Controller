@@ -102,7 +102,7 @@ startRaceEngineer() {
 	local engineerRecognizer := true
 	local engineerListener := false
 	local debug := false
-	local voiceServer, index, engineer
+	local voiceServer, index, engineer, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Engineer
@@ -171,9 +171,9 @@ startRaceEngineer() {
 							   , engineerName, engineerLanguage
 							   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
 							   , engineerRecognizer, engineerListener, voiceServer)
-							   
+
 	RaceEngineer.Instance := engineer
-	
+
 	Menu SupportMenu, Insert, 1&
 
 	label := translate("Dump Knowledgebase")

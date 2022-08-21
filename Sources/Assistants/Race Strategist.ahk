@@ -102,7 +102,7 @@ startRaceStrategist() {
 	local strategistRecognizer := true
 	local strategistListener := false
 	local debug := false
-	local voiceServer, index, spotter
+	local voiceServer, index, strategist, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Strategist
@@ -173,7 +173,7 @@ startRaceStrategist() {
 								   , strategistRecognizer, strategistListener, voiceServer)
 
 	RaceStrategist.Instance := strategist
-	
+
 	Menu SupportMenu, Insert, 1&
 
 	label := translate("Dump Knowledgebase")
@@ -183,7 +183,7 @@ startRaceStrategist() {
 
 	if strategist.Debug[kDebugKnowledgebase]
 		Menu SupportMenu, Check, %label%
-		
+
 	registerMessageHandler("Race Strategist", "handleStrategistMessage")
 
 	if (debug && strategistSpeaker) {

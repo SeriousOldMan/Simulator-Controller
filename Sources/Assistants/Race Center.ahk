@@ -3793,7 +3793,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
 											   , compound(tyreCompound, tyreCompoundColor)) {
-				candidate := telemetryDD.optimalTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
+				candidate := telemetryDB.optimalTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
 														   , this.AirTemperature, this.TrackTemperature
 														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets)))
 
@@ -7429,7 +7429,7 @@ class RaceCenter extends ConfigurationItem {
 	updateSeriesSelector(report, force := false) {
 		local window := this.Window
 		local xChoices, y1Choices, y2Choices, y3Choices, y4Choices, y5Choices, y6Choices
-		local sessionDB, selected, names, ignore, id, found, index
+		local sessionDB, selected, names, ignore, id, found, index, driver
 
 		Gui %window%:Default
 

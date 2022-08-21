@@ -559,12 +559,14 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	__New(configuration := false) {
+		local label, callback
+
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
 
 		base.__New(configuration)
 
 		VoiceServer.Instance := this
-	
+
 		Menu SupportMenu, Insert, 1&
 
 		label := translate("Trace Recognitions")

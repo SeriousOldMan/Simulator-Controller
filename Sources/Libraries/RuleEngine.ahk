@@ -386,6 +386,8 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
+			goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
+
 			resultSet.dispose()
 
 			return true
@@ -472,6 +474,10 @@ class Variable extends Primary {
 			else
 				return default
 		}
+	}
+
+	doVariables(resultSet, function) {
+		%function%(this, this.getValue(resultSet))
 	}
 
 	injectValues(resultSet) {
@@ -794,10 +800,14 @@ class ProveAction extends CallAction {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
+			goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
+
 			if this.iProveAll
 				loop
 					if !resultSet.nextResult()
 						break
+					else
+						goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
 
 			resultSet.dispose()
 		}
@@ -1029,6 +1039,9 @@ class Term {
 		throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 
+	doVariables(resultSet, function) {
+	}
+
 	injectValues(resultSet) {
 		return this
 	}
@@ -1118,6 +1131,13 @@ class Compound extends Term {
 			values.Push(argument.getValue(resultSet, argument))
 
 		return values
+	}
+
+	doVariables(resultSet, function) {
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			argument.doVariables(resultSet, function)
 	}
 
 	injectValues(resultSet) {
@@ -1273,6 +1293,11 @@ class Pair extends Term {
 		}
 
 		return (result . "]")
+	}
+
+	doVariables(resultSet, function) {
+		this.LeftTerm.doVariables(resultSet, function)
+		this.RightTerm.doVariables(resultSet, function)
 	}
 
 	injectValues(resultSet) {

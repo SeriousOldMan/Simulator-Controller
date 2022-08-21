@@ -22,7 +22,7 @@ class AhkUnit {
 	SetDefaultRunner(runnerClass) {
 		AhkUnit.defaultRunner := runnerClass
 	}
-	
+
 	RunTestClass(testClass, runner = false) {
 		if (!runner) {
 			runner := new AhkUnit.defaultRunner()
@@ -31,15 +31,15 @@ class AhkUnit {
 		runner.Run(testClass)
 		return runner
 	}
-	
+
 	AddTest(testInstance) { ; deprecated
 		AhkUnit.AddTestClass(testInstance.base)
 	}
-	
+
 	AddTestClass(testClass) {
 		AhkUnit.testClasses.Insert(testClass)
 	}
-	
+
 	Run(runner = false) {
 		if (AhkUnit.nesting != 0) {
 			return
@@ -52,11 +52,11 @@ class AhkUnit {
 			runner.Run(AhkUnit.testClasses[key])
 		}
 	}
-	
+
 	Begin() {
 		AhkUnit.nesting++
 	}
-	
+
 	End(runner = false) {
 		if (AhkUnit.nesting == 0) {
 			MsgBox,AhkUnit.Begin() not called.
@@ -65,34 +65,34 @@ class AhkUnit {
 		AhkUnit.nesting--
 		return AhkUnit.Run(runner)
 	}
-	
+
 	class FrameworkCore {
 		; method_
 		; result_, message_, assertionCount_
-		
+
 		SetUpBeforeClass() {
 		}
-		
+
 		TearDownAfterClass() {
 		}
-		
+
 		SetUp() {
 		}
-		
+
 		TearDown() {
 		}
-		
+
 		AuInit(method) {
 			this.method_ := method
 			this.result_ := true
 			this.message_ := ""
 			this.assertionCount_ := 0
 		}
-		
+
 		AuSuccess() {
 			this.assertionCount_++
 		}
-		
+
 		AuFailed(message) {
 			this.assertionCount_++
 			this.result_ := false
@@ -101,19 +101,19 @@ class AhkUnit {
 			}
 			this.message_ .= message
 		}
-		
+
 		AuGetMethod() {
 			return this.method_
 		}
-		
+
 		AuGetResult() {
 			return this.result_
 		}
-		
+
 		AuGetMessage() {
 			return this.message_
 		}
-		
+
 		AuGetAssertionCount() {
 			return this.assertionCount_
 		}
@@ -129,7 +129,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 	static nextGuiWindowIndex := 1
 	; guiWindowName
 	; savedDefaultGuiWindow
-	
+
 	__New() {
 		global ahkUnitResultTree
 		base.__New()
@@ -142,24 +142,24 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 		Gui,+LabelAhkUnitGui
 		this.GuiEnd_()
 	}
-	
+
 	Default() {
 		base.Default()
 		this.ShowReport()
 	}
-	
+
 	GuiBegin_() {
 		this.savedDefaultGuiWindow := A_Gui ? A_Gui : 1
 		guiWindowName := this.guiWindowName
 		Gui,%guiWindowName%:Default
 	}
-	
+
 	GuiEnd_() {
 		savedDefaultGuiWindow := this.savedDefaultGuiWindow
 		Gui,%savedDefaultGuiWindow%:Default
 		this.savedDefaultGuiWindow := 0
 	}
-	
+
 	Run(params*) {
 		global ahkUnitResultTree
 		base.Run(params*)
@@ -186,7 +186,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 		GuiControl,+Redraw,ahkUnitResultTree
 		this.GuiEnd_()
 	}
-	
+
 	TV_AddMultiLine(string, parent = 0, options = "Expand") {
 		while (SubStr(string, 0, 1) == "`n") {
 			StringTrimRight,string,string,1
@@ -206,7 +206,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 			}
 	    }
 	}
-	
+
 	ShowReport() {
 		guiWindowName := this.guiWindowName
 		Gui,%guiWindowName%:Show
@@ -237,88 +237,88 @@ class AhkUnit_Assert {
 			}
 		}
 	}
-	
+
 	class Base_ {
 	}
-	
+
 	class Case_ {
 		; noCase
-	
+
 		IgnoreCase() {
 			this.noCase := true
 			return this
 		}
 	}
-	
+
 	class Arg1_ extends AhkUnit_Assert.Base_ {
 		; actual
-		
+
 		__New(actual) {
 			base.__New()
 			this.actual := actual
 		}
 	}
-	
+
 	class Arg2_ extends AhkUnit_Assert.Base_ {
 		; expected, actual
-		
+
 		__New(expected, actual) {
 			base.__New()
 			this.expected := expected
 			this.actual := actual
 		}
 	}
-	
+
 	class Message extends AhkUnit_Assert.Base_ {
 		; message
-		
+
 		__New(message) {
 			base.__New()
 			this.message := message
 		}
-		
+
 		Evaluate() {
 			return false
 		}
-		
+
 		GetMesssage() {
 			return this.message
 		}
 	}
-	
+
 	class Equal extends AhkUnit_Assert.Arg2_ {
 		__New(params*) {
 			base.__New(params*)
 			AhkUnit.Assert.mixin(this, AhkUnit.Assert.Case_)
 		}
-		
+
 		Evaluate() {
 			if (this.noCase) {
 				return this.expected = this.actual
 			}
 			return this.expected == this.actual
 		}
-		
+
 		GetMesssage() {
 			message := "Expected: " this.expected "`n"
 			message .= "Actual  : " this.actual
 			return message
 		}
 	}
-	
+
 	class NotEqual extends AhkUnit_Assert.Equal {
 		Evaluate() {
 			return !base.Evaluate()
 		}
-		
+
 		GetMesssage() {
 			return "Bad value: " . this.actual
 		}
 	}
-	
+
 	class ObjectEqual extends AhkUnit_Assert.Arg2_ {
 		; message
-		
+
 		Evaluate() {
 			if (!IsObject(this.expected) || !IsObject(this.actual)) {
 				this.message := "Not an object"
@@ -353,25 +353,25 @@ class AhkUnit_Assert {
 			}
 			return this.message == ""
 		}
-		
+
 		GetMesssage() {
 			return this.message
 		}
 	}
-	
+
 	class Not extends AhkUnit_Assert.Base_ {
 		; assertion, message
-		
+
 		__New(assertion, message = "") {
 			base.__New()
 			this.assertion := assertion
 			this.message := message
 		}
-		
+
 		Evaluate() {
 			return !this.assertion.Evaluate()
 		}
-		
+
 		GetMesssage() {
 			if (this.message == "") {
 				return "Not: " . this.assertion.GetMessage()
@@ -379,59 +379,59 @@ class AhkUnit_Assert {
 			return this.message
 		}
 	}
-	
+
 	class False extends AhkUnit_Assert.Arg1_ {
 		; isStrict
-		
+
 		Strict() {
 			this.isStrict := true
 			return this
 		}
-		
+
 		Evaluate() {
 			return this.isStrict ? (this.actual == false) : !this.actual
 		}
-		
+
 		GetMesssage() {
 			return "False expected: " . this.actual
 		}
 	}
-	
+
 	class True extends AhkUnit_Assert.False {
 		Evaluate() {
 			return this.isStrict ? (this.actual == true) : !!this.actual
 		}
-		
+
 		GetMesssage() {
 			return "True expected: " . this.actual
 		}
 	}
-	
+
 	class Empty extends AhkUnit_Assert.Arg1_ {
 		Evaluate() {
 			return this.actual == ""
 		}
-		
+
 		GetMesssage() {
 			return "Empty expected: " . this.actual
 		}
 	}
-	
+
 	class NotEmpty extends AhkUnit_Assert.Empty {
 		Evaluate() {
 			return !base.Evaluate()
 		}
-		
+
 		GetMesssage() {
 			return "Non-empty expected"
 		}
 	}
-	
+
 	class Object extends AhkUnit_Assert.Arg1_ {
 		Evaluate() {
 			return IsObject(this.actual)
 		}
-		
+
 		GetMesssage() {
 			return "Object expected: " . this.actual
 		}
@@ -443,10 +443,10 @@ AhkUnit.Assert := AhkUnit_Assert
 class AhkUnit_Runner {
 	; result, message, count
 	; test
-	
+
 	Default() {
 	}
-	
+
 	Run(testClass) {
 		this.result := ""
 		this.message := ""
@@ -487,7 +487,7 @@ class AhkUnit_Runner {
 				testInstance.AuInit(key)
 				testInstance[key]()
 			} catch e {
-				thrownClass := (e.__Class == "") ? "Exception" : e.__Class
+				thrownClass := (!IsObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]
 				if (expectedClass != "") {
 					assertion := new AhkUnit.Assert.Equal("throw " . expectedClass, "throw " . thrownClass)
@@ -524,13 +524,13 @@ class AhkUnit_Runner {
 			this._AddFailure("Exception thrown in TearDownAfterClass")
 		}
 	}
-	
+
 	_AddFailure(message) {
 		this.result .= "F"
 		this.count.failure++
 		this.message .= message . "`n`n"
 	}
-	
+
 	GetCountString() {
 		count := this.GetCount()
 		report := "Tests: " . count.test . ", Assertions: " . count.assertion
@@ -542,7 +542,7 @@ class AhkUnit_Runner {
 		}
 		return report
 	}
-	
+
 	GetReport() {
 		result := this.GetResult()
 		count := this.GetCount()
@@ -554,15 +554,15 @@ class AhkUnit_Runner {
 		report .= this.GetMessage()
 		return report
 	}
-	
+
 	GetResult() {
 		return this.result
 	}
-	
+
 	GetMessage() {
 		return this.message
 	}
-	
+
 	GetCount() {
 		return this.count
 	}
@@ -575,11 +575,11 @@ class Assert extends AhkUnit.FrameworkCore {
 		base.__New()
 		this.callstackDepth := 0
 	}
-	
+
 	; deprecated
 	SetFile(filePath) {
 	}
-	
+
 	ReportParent_(increase) {
 		if (increase) {
 			this.callstackDepth++
@@ -587,7 +587,7 @@ class Assert extends AhkUnit.FrameworkCore {
 			this.callstackDepth--
 		}
 	}
-	
+
 	Assert_(assertion, message, caller) {
 		if (IsObject(assertion)) {
 			if (assertion.Evaluate()) {
@@ -622,47 +622,47 @@ class Assert extends AhkUnit.FrameworkCore {
 		}
 		this.AuFailed(pos . message)
 	}
-	
+
 	Assert(assertion, message = "") {
 		this.Assert_(assertion, message, 2 + this.callstackDepth)
 	}
-	
+
 	AssertEqual(expected, actual, message = "") {
 		this.Assert(new AhkUnit.Assert.Equal(expected, actual), message)
 	}
-	
+
 	AssertNotEqual(expected, actual, message = "") {
 		this.Assert(new AhkUnit.Assert.NotEqual(expected, actual), message)
 	}
-	
+
 	AssertEqualIgnoreCase(expected, actual, message = "") {
 		this.Assert(new AhkUnit.Assert.Equal(expected, actual).IgnoreCase(), message)
 	}
-	
+
 	AssertNotEqualIgnoreCase(expected, actual, message = "") {
 		this.Assert(new AhkUnit.Assert.NotEqual(expected, actual).IgnoreCase(), message)
 	}
-	
+
 	AssertObjectEqual(expected, actual, message = "") {
 		this.Assert(new AhkUnit.Assert.ObjectEqual(expected, actual), message)
 	}
-	
+
 	AssertTrue(actual, message = "") {
 		this.Assert(new AhkUnit.Assert.True(actual), message)
 	}
-	
+
 	AssertFalse(actual, message = "") {
 		this.Assert(new AhkUnit.Assert.False(actual), message)
 	}
-	
+
 	AssertEmpty(actual, message = "") {
 		this.Assert(new AhkUnit.Assert.Empty(actual), message)
 	}
-	
+
 	AssertNotEmpty(actual, message = "") {
 		this.Assert(new AhkUnit.Assert.NotEmpty(actual), message)
 	}
-	
+
 	AssertObject(actual, message = "") {
 		this.Assert(new AhkUnit.Assert.Object(actual), message)
 	}

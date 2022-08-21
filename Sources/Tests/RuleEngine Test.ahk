@@ -95,7 +95,7 @@ kRules =
 				[?Peter = happy] => (Call: celebrate())
 				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 
-				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Call: celebrate())
+				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Prove: father(?father, ?gf), (Call: celebrate())
 )
 
 global kExecutionTestRules := kRules

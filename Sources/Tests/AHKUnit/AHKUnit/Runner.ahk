@@ -4,10 +4,10 @@
 class AhkUnit_Runner {
 	; result, message, count
 	; test
-	
+
 	Default() {
 	}
-	
+
 	Run(testClass) {
 		this.result := ""
 		this.message := ""
@@ -48,7 +48,7 @@ class AhkUnit_Runner {
 				testInstance.AuInit(key)
 				testInstance[key]()
 			} catch e {
-				thrownClass := (e.__Class == "") ? "Exception" : e.__Class
+				thrownClass := (IsObject(e) && (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]
 				if (expectedClass != "") {
 					assertion := new AhkUnit.Assert.Equal("throw " . expectedClass, "throw " . thrownClass)
@@ -85,13 +85,13 @@ class AhkUnit_Runner {
 			this._AddFailure("Exception thrown in TearDownAfterClass")
 		}
 	}
-	
+
 	_AddFailure(message) {
 		this.result .= "F"
 		this.count.failure++
 		this.message .= message . "`n`n"
 	}
-	
+
 	GetCountString() {
 		count := this.GetCount()
 		report := "Tests: " . count.test . ", Assertions: " . count.assertion
@@ -103,7 +103,7 @@ class AhkUnit_Runner {
 		}
 		return report
 	}
-	
+
 	GetReport() {
 		result := this.GetResult()
 		count := this.GetCount()
@@ -115,15 +115,15 @@ class AhkUnit_Runner {
 		report .= this.GetMessage()
 		return report
 	}
-	
+
 	GetResult() {
 		return this.result
 	}
-	
+
 	GetMessage() {
 		return this.message
 	}
-	
+
 	GetCount() {
 		return this.count
 	}

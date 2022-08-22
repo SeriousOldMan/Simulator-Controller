@@ -650,7 +650,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x8 y653 w670 0x10
 
-		choices := ["Local", "Local & Community"]
+		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		Gui %window%:Add, Text, x16 y661 w55 h23 +0x200, % translate("Scope")
@@ -845,7 +845,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				GuiControl Enable, downloadSetupButton
 
-				if (type = translate("Local")) {
+				if (type = translate("User")) {
 					GuiControl Enable, deleteSetupButton
 					GuiControl Enable, renameSetupButton
 				}
@@ -1067,7 +1067,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				Gui ListView, % this.SetupListView
 
 				for ignore, name in userSetups
-					LV_Add("", translate("Local"), name)
+					LV_Add("", translate("User"), name)
 
 				if communitySetups
 					for ignore, name in communitySetups[setupType]
@@ -2415,7 +2415,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
 
 			for type, setups in userSetups
-				LV_Add("", translate("Local"), translate(kSetupNames[type]), setups.Length())
+				LV_Add("", translate("User"), translate(kSetupNames[type]), setups.Length())
 
 			for type, setups in communitySetups
 				LV_Add("", translate("Community"), translate(kSetupNames[type]), setups.Length())
@@ -2453,7 +2453,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
 																			 , this.SelectedTrack, this.SelectedWeather)
-				LV_Add("", translate((info.Source = "User") ? "Local" : "Community"), translate(info.Weather), info.AirTemperature, info.TrackTemperature
+				LV_Add("", translate((info.Source = "User") ? "User" : "Community")
+						 , translate(info.Weather), info.AirTemperature, info.TrackTemperature
 						 , translate(info.Compound), info.Count)
 
 			LV_ModifyCol()

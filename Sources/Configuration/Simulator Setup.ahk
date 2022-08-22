@@ -547,9 +547,9 @@ class SetupWizard extends ConfigurationItem {
 
 		switch option {
 			case kDebugKnowledgeBase:
-				label := translate("Dump Knowledgebase")
+				label := translate("Debug Knowledgebase")
 			case kDebugRules:
-				label := translate("Dump Rules")
+				label := translate("Debug Rule System")
 		}
 
 		if label
@@ -2400,7 +2400,7 @@ initializeSimulatorSetup() {
 
 	Menu SupportMenu, Insert, 1&
 
-	label := translate("Dump Rules")
+	label := translate("Debug Rule System")
 	callback := ObjBindMethod(wizard, "toggleDebug", kDebugRules)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%
@@ -2408,7 +2408,7 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugRules]
 		Menu SupportMenu, Check, %label%
 
-	label := translate("Dump Knowledgebase")
+	label := translate("Debug Knowledgebase")
 	callback := ObjBindMethod(wizard, "toggleDebug", kDebugKnowledgeBase)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%

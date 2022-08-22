@@ -176,7 +176,7 @@ startRaceEngineer() {
 
 	Menu SupportMenu, Insert, 1&
 
-	label := translate("Dump Knowledgebase")
+	label := translate("Debug Knowledgebase")
 	callback := ObjBindMethod(engineer, "toggleDebug", kDebugKnowledgeBase)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%

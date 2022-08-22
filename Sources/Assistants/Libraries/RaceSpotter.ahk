@@ -694,7 +694,7 @@ class RaceSpotter extends RaceAssistant {
 
 		switch option {
 			case kDebugPositions:
-				label := translate("Dump Positions")
+				label := translate("Debug Positions")
 		}
 
 		if label

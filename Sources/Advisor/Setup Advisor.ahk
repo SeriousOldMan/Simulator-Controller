@@ -696,9 +696,9 @@ class SetupAdvisor extends ConfigurationItem {
 
 		switch option {
 			case kDebugKnowledgeBase:
-				label := translate("Dump Knowledgebase")
+				label := translate("Debug Knowledgebase")
 			case kDebugRules:
-				label := translate("Dump Rules")
+				label := translate("Debug Rule System")
 		}
 
 		if label
@@ -3255,7 +3255,7 @@ runSetupAdvisor() {
 
 	Menu SupportMenu, Insert, 1&
 
-	label := translate("Dump Rules")
+	label := translate("Debug Rule System")
 	callback := ObjBindMethod(advisor, "toggleDebug", kDebugRules)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%
@@ -3263,7 +3263,7 @@ runSetupAdvisor() {
 	if advisor.Debug[kDebugRules]
 		Menu SupportMenu, Check, %label%
 
-	label := translate("Dump Knowledgebase")
+	label := translate("Debug Knowledgebase")
 	callback := ObjBindMethod(advisor, "toggleDebug", kDebugKnowledgeBase)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%

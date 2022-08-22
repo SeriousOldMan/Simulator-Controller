@@ -569,7 +569,7 @@ class VoiceServer extends ConfigurationItem {
 
 		Menu SupportMenu, Insert, 1&
 
-		label := translate("Trace Recognitions")
+		label := translate("Debug Recognitions")
 		callback := ObjBindMethod(this, "toggleDebug", kDebugRecognitions)
 
 		Menu SupportMenu, Insert, 1&, %label%, %callback%
@@ -577,7 +577,7 @@ class VoiceServer extends ConfigurationItem {
 		if this.Debug[kDebugRecognitions]
 			Menu SupportMenu, Check, %label%
 
-		label := translate("Trace Grammars")
+		label := translate("Debug Grammars")
 		callback := ObjBindMethod(this, "toggleDebug", kDebugGrammars)
 
 		Menu SupportMenu, Insert, 1&, %label%, %callback%
@@ -667,9 +667,9 @@ class VoiceServer extends ConfigurationItem {
 
 		switch option {
 			case kDebugRecognitions:
-				label := translate("Trace Recognitions")
+				label := translate("Debug Recognitions")
 			case kDebugGrammars:
-				label := translate("Trace Grammars")
+				label := translate("Debug Grammars")
 		}
 
 		if label

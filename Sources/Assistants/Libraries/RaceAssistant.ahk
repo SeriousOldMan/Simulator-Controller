@@ -796,7 +796,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		switch option {
 			case kDebugKnowledgeBase:
-				label := translate("Dump Knowledgebase")
+				label := translate("Debug Knowledgebase")
 		}
 
 		if label

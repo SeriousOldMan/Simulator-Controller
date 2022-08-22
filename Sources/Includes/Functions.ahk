@@ -859,6 +859,18 @@ installTrayMenu(update := false) {
 
 	Menu SupportMenu, Add, %label%, :LogMenu
 
+	Menu SupportMenu, Add
+
+	label := translate("Clear log files")
+	handler := Func("deleteDirectory").Bind(kLogsDirectory, false)
+
+	Menu SupportMenu, Add, %label%, %handler%
+
+	label := translate("Clear temporary files")
+	handler := Func("deleteDirectory").Bind(kTempDirectory, false)
+
+	Menu SupportMenu, Add, %label%, %handler%
+
 	label := translate("Support")
 
 	if (update && vHasSupportMenu) {
@@ -1678,16 +1690,38 @@ deleteFile(fileName) {
 	}
 }
 
-deleteDirectory(directoryName) {
-	try {
-		FileRemoveDir %directoryName%, 1
+deleteDirectory(directoryName, includeDirectory := true) {
+	local files, ignore, fileName, result
 
-		return !ErrorLevel
+	if includeDirectory {
+		try {
+			FileRemoveDir %directoryName%, 1
+
+			return !ErrorLevel
+		}
+		catch exception {
+			logError(exception)
+
+			return false
+		}
 	}
-	catch exception {
-		logError(exception)
+	else {
+		files := []
+		result := true
 
-		return false
+		loop Files, %directoryName%\*.*, DF
+			files.Push(A_LoopFilePath)
+
+		for ignore, fileName in files {
+			if InStr(FileExist(fileName), "D") {
+				if !deleteDirectory(fileName)
+					result := false
+			}
+			else if !deleteFile(fileName)
+				result := false
+		}
+
+		return result
 	}
 }
 

@@ -176,7 +176,7 @@ startRaceSpotter() {
 
 	Menu SupportMenu, Insert, 1&
 
-	label := translate("Dump Positions")
+	label := translate("Debug Positions")
 	callback := ObjBindMethod(spotter, "toggleDebug", kDebugPositions)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%
@@ -184,7 +184,7 @@ startRaceSpotter() {
 	if spotter.Debug[kDebugPositions]
 		Menu SupportMenu, Check, %label%
 
-	label := translate("Dump Knowledgebase")
+	label := translate("Debug Knowledgebase")
 	callback := ObjBindMethod(spotter, "toggleDebug", kDebugKnowledgeBase)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%

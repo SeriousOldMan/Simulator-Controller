@@ -14,7 +14,7 @@
 	 - Detailed information package, when the first half of a race session has been finished.
 	 - Warning a few laps before the current stint is ending.
 	 - Information when temperatures are rising or falling.
-	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](*) for more information.
+	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   5. Delta calculation has been imporved again for the Spotter:
      - The delta history will be reset when a given car is in the pits.
 	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
@@ -30,7 +30,7 @@
 	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
-     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [revised documentation](*) for more information.
+     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer](*) for more information.
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
@@ -39,7 +39,7 @@
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
   9. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
-  10. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](*) for more information.
+  10. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
   11. Big performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
   12. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
   13. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.

@@ -126,7 +126,7 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 1. Keyboard commands
 
-   As you have seen in the chapter about [Installation & Configuration](*), every action or command in Simulator Controller can be activated and controller from hardware controller like Button Boxes or Stream Decks, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
+   As you have seen in the chapter about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), every action or command in Simulator Controller can be activated and controller from hardware controller like Button Boxes or Stream Decks, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
 
 2. Command scripts
 
@@ -137,9 +137,9 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 	Button.2
 	Dial.4 Decrease
 	
-   This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](*) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
+   This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
 
-   A last note for experienced users: Together with the [*execute* controller action function](*), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
+   A last note for experienced users: Together with the [*execute* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
 
 ## And now it's time
 

@@ -47,9 +47,9 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Updates are handled automatically. Beside that:
 
-1. You may want to review the [configuration of the "Race Spotter" plugin](*), since some options have been removed and a new configuration setting has been added.
+1. You may want to review the [configuration of the "Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter), since some options have been removed and a new configuration setting has been added.
 
-2. A new controller action ["StrategyRecommend"](*) for the "Race Strategist" plugin to trigger the recalculation of the current race strategy. If you want to use this new command and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icon for this new action is available.
+2. A new controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin to trigger the recalculation of the current race strategy. If you want to use this new command and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icon for this new action is available.
 
 ***
 

@@ -395,7 +395,7 @@ The following statistical models are currently implemented:
   
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* and *rFactor 2* supply current weather information ranging from "Dry" up to full "Thunderstorm". *Assetto Corsa Competizione* goes even further and can supply a full weather forecast from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona will recommend a tyre change. This recomendation will be incorporated into the plan for an upcoming pitstop depending on the settings you have chosen in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings).
 	 
-	 All applications of Simulator Controller, incl. the Race Engineer, support three different tyre categories (Dry, Intermediate and Wet), as well as a couple of mixtures for each category. The combination of both is a tyre compound, for example "Dry (M)", a dry tyre (aka Slick) with a medium hardness. Please read the chapter [Tyre Compounds](*) carefully for more information and especially for the mapping of simulator specific tyre compounds to the tyre model of Simulator Controller. Jona uses the tyre model to recommend the best possible tyre compound for the given weather conditions.
+	 All applications of Simulator Controller, incl. the Race Engineer, support three different tyre categories (Dry, Intermediate and Wet), as well as a couple of mixtures for each category. The combination of both is a tyre compound, for example "Dry (M)", a dry tyre (aka Slick) with a medium hardness. Please read the chapter [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) carefully for more information and especially for the mapping of simulator specific tyre compounds to the tyre model of Simulator Controller. Jona uses the tyre model to recommend the best possible tyre compound for the given weather conditions.
 	 
 	 | Weather      | Suitable Category | Optimal Category |
      | ------------ | ----------------- | ---------------- |
@@ -409,6 +409,32 @@ The following statistical models are currently implemented:
      (1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
 	 
 	 Looking at the above table, you can understand when and why a tyre change will be recommended by the Jona. As long as the currently mounted tyre has a suitable category, no urgent pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
+	 
+	 Finally some remarks regarding simulator specific restrictions:
+	 
+	 - *Assetto Corsa*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available.
+	 
+	 - *Assetto Corsa Competizione*
+	   
+	   Everything works as designed, but only Dry and Wet tyre categories without different mixtures are available.
+	   
+	 - *Automobilista 2* and *Project CARS 2*
+	 
+	   Both simulator share the same engine, therefore everything applies to both. The API does not provide any information about the currently mounted tyre compound. So make sure, that the initial mounted tyres are specified correctly in the "Race Settings". Additionally, weather information is not available for the future, so weather warnings might come in a *little bit* late.
+	   
+	 - *iRacing*
+	   
+	   *iRacing* neither provides a weather model nor a sophisticated tyre model with different compounds. SO nothing to see her and move on.
+	   
+	 - *RaceRoom Racing Experience*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available.
+	 
+	 - *rFactor 2*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter. Weather information is not available for the future, so weather warnings might come in a *little bit* late. There might be a possibility to parse the weather control history, this will be implemented available in a future release.
 
 	 
 Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always doublecheck under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.

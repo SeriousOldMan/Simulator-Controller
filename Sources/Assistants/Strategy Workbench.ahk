@@ -1531,7 +1531,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	loadTyreCompounds(simulator, car, track) {
 		local window := this.Window
 		local compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
-		local translatedCompounds, choices, index
+		local translatedCompounds, choices, index, ignore, compound
 
 		Gui %window%:Default
 
@@ -1552,6 +1552,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControl Choose, tyreSetDropDown, %index%
 		GuiControl Choose, simCompoundDropDown, %index%
 		GuiControl Choose, strategyCompoundDropDown, %index%
+
+		Gui ListView, % this.TyreSetListView
+
+		LV_Delete()
+
+		for ignore, compound in compounds
+			LV_Add("", translate(compound), 99)
+
+		LV_ModifyCol()
 	}
 
 	loadCompound(compound, force := false) {

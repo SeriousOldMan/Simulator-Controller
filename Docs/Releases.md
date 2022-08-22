@@ -38,22 +38,25 @@
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
-  9. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
-  10. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
-  11. Big performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
-  12. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
-  13. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.
-  14. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
-  15. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
-  16. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
-  17. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context.
-  18. All application windows remember their position after beeing moved with the mouse.
-  19. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
-  20. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
-  21. Temp and Logs folders will be cleaned automatically when an update is installed.
-  22. New options in the Tray menu allow you to dump knowledgebase and rule set of various applications as well as trace grammaes and recognitions in the "Voice Server".
-  23. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
-  24. New car models for "Setup Advisor":
+  9. Improvements for the Strategy Workbench:
+     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned.
+	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
+  10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
+  11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
+  12. Big performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
+  13. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
+  14. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.
+  15. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
+  16. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
+  17. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
+  18. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context.
+  19. All application windows remember their position after beeing moved with the mouse.
+  20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
+  21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
+  22. Temp and Logs folders will be cleaned automatically when an update is installed.
+  23. New options in the Tray menu allow you to dump knowledgebase and rule set of various applications as well as trace grammaes and recognitions in the "Voice Server".
+  24. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
+  25. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

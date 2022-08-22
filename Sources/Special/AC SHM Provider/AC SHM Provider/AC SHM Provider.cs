@@ -403,6 +403,7 @@ namespace ACSHMProvider
             Console.WriteLine("BodyworkDamage=" + damageFront + "," + damageRear + "," + damageLeft + "," + damageRight + ","
                                                 + (damageFront + damageRear + damageLeft + damageRight));
             Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
+            Console.WriteLine("EngineDamage=0");
         }
     }
 }

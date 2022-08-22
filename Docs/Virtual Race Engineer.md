@@ -381,11 +381,51 @@ The following statistical models are currently implemented:
 	 
   3. Damage related lap time degration
   
-     After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap. 
+     After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap.
+	 
+	 The following damage categories are supported for the different simulators:
+	 
+	 | Simulator                  | Bodywork & Aerodynamics | Suspension & Chassis | Engine |
+     | -------------------------- | ----------------------- | -------------------- | ------ |
+     | Assetto Corsa              | Yes (1)                 | No (1)               | No (1) |
+     | Assetto Corsa Competizione | Yes                     | Yes                  | No     |
+     | Automobilista 2            | Yes                     | Yes                  | Yes    |
+     | iRacing                    | No                      | No                   | No     |
+     | Projects CARS 2            | Yes                     | Yes                  | Yes    |
+     | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
+     | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
+	 
+	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as adamage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 
   4. Repair recommendations
   
      Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
+	 
+	 Some remarks regarding simulator specific restrictions for the different damage types:
+	 
+	 - *Assetto Corsa*
+	   
+	   Bodywork repair will be recommended, but you have to select suspension or engine repair on your own as needed.
+	 
+	 - *Assetto Corsa Competizione*
+	   
+	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
+	   
+	 - *Automobilista 2* and *Project CARS 2*
+	   
+	   Repair recommendations will be given for all damage types.
+	   
+	 - *iRacing*
+	   
+	   No automatic support, you must select the "Quick fix" option for the upcoming pitstop manually.
+	   
+	 - *RaceRoom Racing Experience*
+	   
+	   Repair recommendations will be given for all damage types.
+	 
+	 - *rFactor 2*
+	 
+	   Since the damage types are not distinguishable in the API, only bodywork & aerodynamics damage will be recommended. Handle other damage types manually.
 	 
   5. Tyre pressure gambling
   

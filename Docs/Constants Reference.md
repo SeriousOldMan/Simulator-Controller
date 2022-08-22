@@ -47,11 +47,11 @@ All currently defined and supported simulator session types. *kSessionFinished =
 
 ***
 
-## Messsaging Constants ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
+## Messsaging Types ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
 Delivery method types used to supply to [sendMessage](*).
 
 #### *kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage*
-These constans define the various delivery methods for messages send by the function [sendMessage](*).
+These constants define the various delivery methods for messages send by the function [sendMessage](*).
 
 ***
 

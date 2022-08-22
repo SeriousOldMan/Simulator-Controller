@@ -222,6 +222,7 @@ int main(int argc, char* argv[])
 
 		printData("BodyworkDamage", pf->carDamage);
 		printData("SuspensionDamage", pf->suspensionDamage);
+		printData("EngineDamage", 0);
 		printData("FuelRemaining", pf->fuel);
 		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
 		wcout << "TyreCompoundColor=Black" << endl;

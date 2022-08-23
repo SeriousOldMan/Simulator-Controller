@@ -664,7 +664,7 @@ class RaceStrategist extends RaceAssistant {
 					knowledgeBase.produce()
 
 					if this.Debug[kDebugKnowledgeBase]
-						this.dumpKnowledge(this.KnowledgeBase)
+						this.dumpKnowledgeBase(this.KnowledgeBase)
 
 					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 
@@ -1269,7 +1269,7 @@ class RaceStrategist extends RaceAssistant {
 			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	finishSession(shutdown := true, review := true) {
@@ -1745,7 +1745,7 @@ class RaceStrategist extends RaceAssistant {
 				for fact, value in this.loadStrategy({}, strategy, knowledgeBase.getValue("Lap") + 1)
 					knowledgeBase.setFact(fact, value)
 
-				this.dumpKnowledge(knowledgeBase)
+				this.dumpKnowledgeBase(knowledgeBase)
 
 				if original
 					this.updateSessionValues({OriginalStrategy: strategy, Strategy: strategy})
@@ -2094,7 +2094,7 @@ class RaceStrategist extends RaceAssistant {
 		knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
@@ -2160,7 +2160,7 @@ class RaceStrategist extends RaceAssistant {
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		if (nextPitstop && (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false))) {
 			map := knowledgeBase.getValue("Strategy.Pitstop.", nextPitstop, ".Map", "n/a")
@@ -2262,7 +2262,7 @@ class RaceStrategist extends RaceAssistant {
 				knowledgeBase.produce()
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 
 				plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
 

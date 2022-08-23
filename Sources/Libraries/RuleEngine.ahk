@@ -4735,3 +4735,56 @@ get(choicePoint, arguments*) {
 			return (operand1.toString(resultSet) = operand2.toString(resultSet))
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+dumpKnowledgeBase(knowledgeBase, name := false) {
+	local key, value, text, fileName
+
+	if !name
+		name := StrSplit(A_ScriptName, ".")[1]
+
+	fileName := (kTempDirectory . name . ".knowledge")
+
+	deleteFile(fileName)
+
+	for key, value in knowledgeBase.Facts.Facts {
+		text := (key . " = " . value . "`n")
+
+		FileAppend %text%, %fileName%
+	}
+}
+
+dumpRules(knowledgeBase, name := false) {
+	local rules, rule, production, text, ignore, fileName
+
+	if !name
+		name := StrSplit(A_ScriptName, ".")[1]
+
+	fileName := (kTempDirectory . name . ".rules")
+
+	deleteFile(fileName)
+
+	production := knowledgeBase.Rules.Productions[false]
+
+	loop {
+		if !production
+			break
+
+		text := (production.Rule.toString() . "`n")
+
+		FileAppend %text%, %fileName%
+
+		production := production.Next[false]
+	}
+
+	for ignore, rules in knowledgeBase.Rules.Reductions
+		for ignore, rule in rules {
+			text := (rule.toString() . "`n")
+
+			FileAppend %text%, %fileName%
+		}
+}

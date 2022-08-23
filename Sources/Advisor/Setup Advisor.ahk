@@ -699,7 +699,7 @@ class SetupAdvisor extends ConfigurationItem {
 				label := translate("Debug Knowledgebase")
 				
 				if enabled
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
 				
@@ -798,42 +798,12 @@ class SetupAdvisor extends ConfigurationItem {
 			return new SessionDatabase().getTrackName(simulator, track)
 	}
 
-	dumpKnowledge(knowledgeBase) {
-		local key, value, text
-
-		deleteFile(kTempDirectory . "Setup Advisor.knowledge")
-
-		for key, value in knowledgeBase.Facts.Facts {
-			text := (key . " = " . value . "`n")
-
-			FileAppend %text%, %kTempDirectory%Setup Advisor.knowledge
-		}
+	dumpKnowledgeBase(knowledgeBase) {
+		dumpKnowledgeBase(knowledgeBase)
 	}
 
 	dumpRules(knowledgeBase) {
-		local rules, rule, production, text, ignore, rules, rule
-
-		deleteFile(kTempDirectory . "Setup Advisor.rules")
-
-		production := knowledgeBase.Rules.Productions[false]
-
-		loop {
-			if !production
-				break
-
-			text := (production.Rule.toString() . "`n")
-
-			FileAppend %text%, %kTempDirectory%Setup Advisor.rules
-
-			production := production.Next[false]
-		}
-
-		for ignore, rules in knowledgeBase.Rules.Reductions
-			for ignore, rule in rules {
-				text := (rule.toString() . "`n")
-
-				FileAppend %text%, %kTempDirectory%Setup Advisor.rules
-			}
+		dumpRules(knowledgeBase)
 	}
 
 	updateState() {
@@ -1095,7 +1065,7 @@ class SetupAdvisor extends ConfigurationItem {
 		knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		showProgress({progress: this.ProgressCount++, message: translate("Initializing Car Setup...")})
 
@@ -1457,7 +1427,7 @@ class SetupAdvisor extends ConfigurationItem {
 			this.KnowledgeBase.produce()
 
 			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledgeBase(this.KnowledgeBase)
 
 			if draw {
 				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels." . getLanguage(), Object())

@@ -2166,7 +2166,7 @@ class RaceSpotter extends RaceAssistant {
 			this.startupSpotter()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	finishSession(shutdown := true) {
@@ -2345,7 +2345,7 @@ class RaceSpotter extends RaceAssistant {
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		this.finishPitstop(lapNumber)
 

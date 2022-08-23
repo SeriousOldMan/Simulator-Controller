@@ -803,7 +803,7 @@ class RaceAssistant extends ConfigurationItem {
 				label := translate("Debug Knowledgebase")
 
 				if enabled
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
 
@@ -986,7 +986,7 @@ class RaceAssistant extends ConfigurationItem {
 				knowledgeBase.setFact(key, value)
 
 			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(knowledgeBase)
+				this.dumpKnowledgeBase(knowledgeBase)
 		}
 	}
 
@@ -1212,7 +1212,7 @@ class RaceAssistant extends ConfigurationItem {
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		return result
 	}
@@ -1229,7 +1229,7 @@ class RaceAssistant extends ConfigurationItem {
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		return result
 	}
@@ -1304,47 +1304,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	dumpKnowledge(knowledgeBase) {
-		local prefix := this.AssistantType
-		local key, value, text
-
-		deleteFile(kTempDirectory . prefix . ".knowledge")
-
-		if knowledgeBase
-			for key, value in knowledgeBase.Facts.Facts {
-				text := (key . " = " . value . "`n")
-
-				FileAppend %text%, %kTempDirectory%%prefix%.knowledge
-			}
+	dumpKnowledgeBase(knowledgeBase) {
+		dumpKnowledgeBase(knowledgeBase)
 	}
 
 	dumpRules(knowledgeBase) {
-		local prefix := this.AssistantType
-		local rules, reduction, production, text, ignore
-
-		deleteFile(kTempDirectory . prefix . ".rules")
-
-		if knowledgeBase {
-			production := knowledgeBase.Rules.Productions[false]
-
-			loop {
-				if !production
-					break
-
-				text := (production.Rule.toString() . "`n")
-
-				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-
-				production := production.Next[false]
-			}
-
-			for ignore, rules in knowledgeBase.Rules.Reductions
-				for ignore, reduction in rules {
-					text := (reduction.toString() . "`n")
-
-					FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-				}
-		}
+		dumpRules(knowledgeBase)
 	}
 }
 

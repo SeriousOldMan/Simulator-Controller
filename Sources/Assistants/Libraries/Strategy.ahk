@@ -125,44 +125,6 @@ class StrategySimulation {
 		}
 	}
 
-	dumpKnowledge(knowledgeBase) {
-		local key, value, text
-
-		deleteFile(kTempDirectory . "Strategy Validation.knowledge")
-
-		for key, value in knowledgeBase.Facts.Facts {
-			text := (key . " = " . value . "`n")
-
-			FileAppend %text%, %kTempDirectory%Setup Advisor.knowledge
-		}
-	}
-
-	dumpRules(knowledgeBase) {
-		local rules, rule, production, text, ignore
-
-		deleteFile(kTempDirectory . "Strategy Validation.rules")
-
-		production := knowledgeBase.Rules.Productions[false]
-
-		loop {
-			if !production
-				break
-
-			text := (production.Rule.toString() . "`n")
-
-			FileAppend %text%, %kTempDirectory%Strategy Validation.rules
-
-			production := production.Next[false]
-		}
-
-		for ignore, rules in knowledgeBase.Rules.Reductions
-			for ignore, rule in rules {
-				text := (rule.toString() . "`n")
-
-				FileAppend %text%, %kTempDirectory%Strategy Validation.rules
-			}
-	}
-
 	scenarioValid(strategy, validator) {
 		local reqPitstops := strategy.PitstopRule
 		local knowledgeBase, rules, rule, resultSet, refuelRule, valid, ignore, pitstop, tyreChangeRule

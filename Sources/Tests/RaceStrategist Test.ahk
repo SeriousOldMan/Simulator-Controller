@@ -85,7 +85,7 @@ class BasicReporting extends Assert {
 					this.AssertEqual(11, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -105,7 +105,7 @@ class BasicReporting extends Assert {
 			else
 				strategist.addLap(A_Index, data)
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -175,7 +175,7 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 1, -519263), "Unexpected standings gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -208,7 +208,7 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 21, -4103, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -237,7 +237,7 @@ class PositionProjection extends Assert {
 
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 
-				strategist.dumpKnowledge(strategist.KnowledgeBase)
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
@@ -251,7 +251,7 @@ class PositionProjection extends Assert {
 				this.AssertEqual(4, position, "Unexpected future position detected in lap 3...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -281,7 +281,7 @@ class PitstopRecommendation extends Assert {
 				this.AssertFalse(strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break

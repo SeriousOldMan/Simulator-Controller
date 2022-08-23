@@ -750,7 +750,7 @@ class RaceEngineer extends RaceAssistant {
 				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 
 				speaker.speakPhrase("ConfirmPlanUpdate")
 				speaker.speakPhrase("MoreChanges", false, true)
@@ -830,7 +830,7 @@ class RaceEngineer extends RaceAssistant {
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 
 				speaker.speakPhrase("ConfirmPlanUpdate")
 				speaker.speakPhrase("MoreChanges", false, true)
@@ -876,7 +876,7 @@ class RaceEngineer extends RaceAssistant {
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure.RR.Increment", 0)
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(knowledgeBase)
+					this.dumpKnowledgeBase(knowledgeBase)
 
 				speaker.speakPhrase("ConfirmPlanUpdate")
 				speaker.speakPhrase("MoreChanges", false, true)
@@ -907,7 +907,7 @@ class RaceEngineer extends RaceAssistant {
 				knowledgeBase.setValue("Pitstop.Planned.Tyre.Compound.Color", false)
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(knowledgeBase)
+					this.dumpKnowledgeBase(knowledgeBase)
 
 				speaker.speakPhrase("ConfirmPlanUpdate")
 				speaker.speakPhrase("MoreChanges", false, true)
@@ -934,7 +934,7 @@ class RaceEngineer extends RaceAssistant {
 				this.KnowledgeBase.setValue("Pitstop.Planned.Repair." . repairType, repair)
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 
 				speaker.speakPhrase("ConfirmPlanUpdate")
 				speaker.speakPhrase("MoreChanges", false, true)
@@ -1119,7 +1119,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	finishSession(shutdown := true) {
@@ -1407,7 +1407,7 @@ class RaceEngineer extends RaceAssistant {
 				result := true
 
 			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledgeBase(this.KnowledgeBase)
 		}
 
 		return result
@@ -1591,7 +1591,7 @@ class RaceEngineer extends RaceAssistant {
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
 
@@ -1762,7 +1762,7 @@ class RaceEngineer extends RaceAssistant {
 			result := this.KnowledgeBase.produce()
 
 			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledge(this.KnowledgeBase)
+				this.dumpKnowledgeBase(this.KnowledgeBase)
 
 			return result
 		}
@@ -1846,7 +1846,7 @@ class RaceEngineer extends RaceAssistant {
 		result := knowledgeBase.produce()
 
 		if (this.Debug[kDebugKnowledgeBase])
-			this.dumpKnowledge(knowledgeBase)
+			this.dumpKnowledgeBase(knowledgeBase)
 
 		if result {
 			this.finishPitstop(lapNumber)

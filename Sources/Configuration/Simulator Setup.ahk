@@ -399,7 +399,7 @@ class SetupWizard extends ConfigurationItem {
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	registerStepWizard(stepWizard) {
@@ -550,7 +550,7 @@ class SetupWizard extends ConfigurationItem {
 				label := translate("Debug Knowledgebase")
 				
 				if enabled
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
 				
@@ -966,7 +966,7 @@ class SetupWizard extends ConfigurationItem {
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		loop % this.Count
 			if this.Steps.HasKey(A_Index)
@@ -1103,7 +1103,7 @@ class SetupWizard extends ConfigurationItem {
 				this.KnowledgeBase.produce()
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			}
 		}
 	}
@@ -1161,7 +1161,7 @@ class SetupWizard extends ConfigurationItem {
 					this.KnowledgeBase.produce()
 
 					if this.Debug[kDebugKnowledgeBase]
-						this.dumpKnowledge(this.KnowledgeBase)
+						this.dumpKnowledgeBase(this.KnowledgeBase)
 				}
 			}
 		}
@@ -1729,42 +1729,12 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 
-	dumpKnowledge(knowledgeBase) {
-		local key, value, text
-
-		deleteFile(kTempDirectory . "Simulator Setup.knowledge")
-
-		for key, value in knowledgeBase.Facts.Facts {
-			text := (key . " = " . value . "`n")
-
-			FileAppend %text%, %kTempDirectory%Simulator Setup.knowledge
-		}
+	dumpKnowledgeBase(knowledgeBase) {
+		dumpKnowledgeBase(knowledgeBase)
 	}
 
 	dumpRules(knowledgeBase) {
-		local rules, reduction, production, text, ignore
-
-		deleteFile(kTempDirectory . "Simulator Setup.rules")
-
-		production := knowledgeBase.Rules.Productions[false]
-
-		loop {
-			if !production
-				break
-
-			text := (production.Rule.toString() . "`n")
-
-			FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-
-			production := production.Next[false]
-		}
-
-		for ignore, rules in knowledgeBase.Rules.Reductions
-			for ignore, reduction in rules {
-				text := (reduction.toString() . "`n")
-
-				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-			}
+		dumpRules(knowledgeBase)
 	}
 
 	toggleTriggerDetector(callback := false) {

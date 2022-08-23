@@ -204,7 +204,7 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, data)
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(false, vFuelWarnings.HasKey(1), "Unexpected fuel warning in lap 1...")
@@ -229,7 +229,7 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, data)
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
@@ -269,7 +269,7 @@ class DamageReporting extends Assert {
 				this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
@@ -307,7 +307,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -375,7 +375,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 3.1	->	3.2		Report Bodywork
@@ -454,7 +454,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -533,7 +533,7 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -579,7 +579,7 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -628,7 +628,7 @@ class PitstopHandling extends Assert {
 					Break
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -685,7 +685,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
@@ -741,7 +741,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
@@ -790,7 +790,7 @@ class PitstopHandling extends Assert {
 				if (A_Index = 5) {
 					engineer.performPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
 
@@ -823,7 +823,7 @@ class PitstopHandling extends Assert {
 
 					engineer.planPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
@@ -893,7 +893,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
@@ -945,7 +945,7 @@ else {
 					engineer.performPitstop()
 				}
 
-				engineer.dumpKnowledge(engineer.KnowledgeBase)
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
 					MsgBox % "Lap " . A_Index . " loaded - Continue?"
@@ -983,7 +983,7 @@ else {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1017,7 +1017,7 @@ else {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1057,7 +1057,7 @@ else {
 						engineer.preparePitstop()
 					}
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1089,7 +1089,7 @@ else {
 					if (lap = 8)
 						engineer.planPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
 						MsgBox Pitstop
@@ -1124,7 +1124,7 @@ else {
 					if (lap = 17) {
 						engineer.planPitstop()
 
-						engineer.dumpKnowledge(engineer.KnowledgeBase)
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 						MsgBox Pitstop
 					}

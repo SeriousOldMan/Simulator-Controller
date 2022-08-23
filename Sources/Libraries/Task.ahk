@@ -16,10 +16,10 @@
 ;;;                        Public Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLowPriority := 0
-global kNormalPriority := 1
-global kHighPriority := 2
-global kInterruptPriority := 3
+global kLowPriority := 1
+global kNormalPriority := 2
+global kHighPriority := 3
+global kInterruptPriority := 4
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -167,7 +167,7 @@ class Task {
 		}
 	}
 
-	__New(callable := false, sleep := 0, priority := 1) {
+	__New(callable := false, sleep := 0, priority := 2) {
 		this.iSleep := Sleep
 		this.iNextExecution := (A_TickCount + sleep)
 
@@ -300,24 +300,22 @@ class Task {
 		Task.schedule()
 	}
 
-	schedule(priority := 1) {
-		local interrupt := (priority > kLowPriority)
-		local next, worked, interrupt, oldScheduling, visited, schedule
+	schedule(priority := 2) {
+		local next, worked, oldScheduling, visited, schedule
 
 		static scheduling := false
 
 		protectionOn(true)
 
 		try {
-			if (scheduling && !interrupt) {
+			if (scheduling && (priority <= scheduling)) {
 				protectionOff(true)
 
 				return
 			}
 			else {
 				oldScheduling := scheduling
-
-				scheduling := true
+				scheduling := priority
 
 				try {
 					protectionOff(true)
@@ -501,4 +499,4 @@ initializeTasks() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeTasks()
+SetTimer, initializeTasks, -2000

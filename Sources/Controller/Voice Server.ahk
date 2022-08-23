@@ -567,24 +567,6 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		Menu SupportMenu, Insert, 1&
-
-		label := translate("Debug Recognitions")
-		callback := ObjBindMethod(this, "toggleDebug", kDebugRecognitions)
-
-		Menu SupportMenu, Insert, 1&, %label%, %callback%
-
-		if this.Debug[kDebugRecognitions]
-			Menu SupportMenu, Check, %label%
-
-		label := translate("Debug Grammars")
-		callback := ObjBindMethod(this, "toggleDebug", kDebugGrammars)
-
-		Menu SupportMenu, Insert, 1&, %label%, %callback%
-
-		if this.Debug[kDebugGrammars]
-			Menu SupportMenu, Check, %label%
-
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500))
 		Task.startTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
 
@@ -617,8 +599,14 @@ class VoiceServer extends ConfigurationItem {
 		static lastUp := 0
 		static clicks := 0
 		static activation := false
+		static lastPressed := false
 
 		pressed := GetKeyState(this.PushToTalk, "P")
+
+		if (!pressed && !lastPressed)
+			return
+		else
+			lastPressed := pressed
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -1018,9 +1006,9 @@ class VoiceServer extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeVoiceServer() {
+startupVoiceServer() {
 	local icon := kIconsDirectory . "Microphon.ico"
-	local debug, index
+	local debug, index, server
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server
@@ -1042,7 +1030,25 @@ initializeVoiceServer() {
 	if debug
 		setDebug(true)
 
-	new VoiceServer(kSimulatorConfiguration)
+	server := new VoiceServer(kSimulatorConfiguration)
+
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Debug Recognitions")
+	callback := ObjBindMethod(server, "toggleDebug", kDebugRecognitions)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if server.Debug[kDebugRecognitions]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Grammars")
+	callback := ObjBindMethod(server, "toggleDebug", kDebugGrammars)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if server.Debug[kDebugGrammars]
+		Menu SupportMenu, Check, %label%
 
 	registerMessageHandler("Voice", "handleVoiceMessage")
 
@@ -1080,4 +1086,4 @@ handleVoiceMessage(category, data) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeVoiceServer()
+startupVoiceServer()

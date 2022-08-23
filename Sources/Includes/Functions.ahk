@@ -51,12 +51,16 @@ global vProgressMessage
 
 global vTrayMessageDuration := false
 
-global vHasSupportMenu := false
+global vHasTrayMenu := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+exitApplication() {
+	ExitApp 0
+}
 
 moveHTMLViewer() {
 	moveByMouse("HV", "HTML Viewer")
@@ -800,23 +804,25 @@ fixIE(version := 0, exeName := "") {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
 
 	return previousValue
-
-Exit:
-	ExitApp 0
 }
 
 installTrayMenu(update := false) {
+	local icon := kIconsDirectory . "Pause.ico"
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel, label, handler
 
-	if (update && vHasSupportMenu) {
-		oldLabel := translate("Exit", vHasSupportMenu)
+	Menu Tray, Icon, %icon%, , 1
+
+	Sleep 50
+
+	if (update && vHasTrayMenu) {
+		oldLabel := translate("Exit", vHasTrayMenu)
 
 		Menu Tray, Rename, %oldLabel%, %label%
 	}
 	else {
 		Menu Tray, NoStandard
-		Menu Tray, Add, %label%, Exit
+		Menu Tray, Add, %label%, exitApplication
 	}
 
 	try {
@@ -873,8 +879,8 @@ installTrayMenu(update := false) {
 
 	label := translate("Support")
 
-	if (update && vHasSupportMenu) {
-		oldLabel := translate("Support", vHasSupportMenu)
+	if (update && vHasTrayMenu) {
+		oldLabel := translate("Support", vHasTrayMenu)
 
 		Menu Tray, Delete, %oldLabel%
 		Menu Tray, Insert, 1&, %label%, :SupportMenu
@@ -884,7 +890,7 @@ installTrayMenu(update := false) {
 		Menu Tray, Insert, 1&, %label%, :SupportMenu
 	}
 
-	vHasSupportMenu := getLanguage()
+	vHasTrayMenu := getLanguage()
 }
 
 viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400) {
@@ -1532,7 +1538,7 @@ translate(string, targetLanguageCode := false) {
 setLanguage(languageCode) {
 	vTargetLanguageCode := languageCode
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		installTrayMenu(true)
 }
 
@@ -2197,7 +2203,7 @@ setDebug(debug) {
 	local label := translate("Debug")
 	local title, state
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		if debug
 			Menu SupportMenu, Check, %label%
 		else
@@ -2214,7 +2220,7 @@ setDebug(debug) {
 setLogLevel(level) {
 	local ignore, label, title, state
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
 			label := translate(label)
 
@@ -2247,7 +2253,7 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		Menu LogMenu, Check, %state%
 
 	title := translate("Modular Simulator Controller System")

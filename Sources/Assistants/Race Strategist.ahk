@@ -177,11 +177,11 @@ startRaceStrategist() {
 	Menu SupportMenu, Insert, 1&
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(spotter, "toggleDebug", kDebugRules)
+	callback := ObjBindMethod(strategist, "toggleDebug", kDebugRules)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%
 
-	if spotter.Debug[kDebugRules]
+	if strategist.Debug[kDebugRules]
 		Menu SupportMenu, Check, %label%
 
 	label := translate("Debug Knowledgebase")

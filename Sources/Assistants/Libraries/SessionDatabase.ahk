@@ -516,11 +516,19 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSimulators() {
+		local configuredSimulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration"
+																									  , "Simulators", ""))
+		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object()))
 		local simulators := []
 		local simulator, ignore, name, code
 
-		for simulator, ignore in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
-			simulators.Push(simulator)
+		for ignore, simulator in configuredSimulators
+			if inList(controllerSimulators, simulator)
+				simulators.Push(simulator)
+
+		for ignore, simulator in controllerSimulators
+			if !inList(simulators, simulator)
+				simulators.Push(simulator)
 
 		if (simulators.Length() = 0)
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
@@ -842,7 +850,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else
 			fileName = %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
-			
+
 		deleteFile(fileName)
 
 		if (car && (car != true)) {
@@ -941,7 +949,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%
-		
+
 		FileCreateDir %fileName%
 
 		fileName := (fileName . "\" . name)
@@ -975,7 +983,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
-		
+
 		deleteFile(fileName)
 	}
 }

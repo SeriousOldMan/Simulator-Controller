@@ -799,11 +799,11 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	dumpKnowledgeBase(knowledgeBase) {
-		dumpKnowledgeBase(knowledgeBase)
+		knowledgeBase.dumpFacts()
 	}
 
 	dumpRules(knowledgeBase) {
-		dumpRules(knowledgeBase)
+		knowledgeBase.dumpRules()
 	}
 
 	updateState() {

@@ -3370,7 +3370,7 @@ exitFixIE(previous) {
 
 runStrategyWorkbench() {
 	local icon := kIconsDirectory . "Dashboard.ico"
-	local simulator := "Assetto Corsa Competizione"
+	local simulator := false
 	local car := false
 	local track := false
 	local weather := "Dry"

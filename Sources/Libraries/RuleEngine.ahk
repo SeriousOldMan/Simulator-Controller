@@ -2659,6 +2659,14 @@ class KnowledgeBase {
 	disableDeterministicFacts() {
 		this.iDeterministicFacts := false
 	}
+
+	dumpFacts(name := false) {
+		this.Facts.dumpFacts(name)
+	}
+
+	dumpRules(name := false) {
+		this.Rules.dumpRules(name)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2802,6 +2810,23 @@ class Facts {
 		local observers := this.iObservers
 
 		return (observers.HasKey(fact) ? observers[fact] : false)
+	}
+
+	dumpFacts(name := false) {
+		local key, value, text, fileName
+
+		if !name
+			name := StrSplit(A_ScriptName, ".")[1]
+
+		fileName := (kTempDirectory . name . ".knowledge")
+
+		deleteFile(fileName)
+
+		for key, value in this.Facts {
+			text := (key . " = " . value . "`n")
+
+			FileAppend %text%, %fileName%
+		}
 	}
 }
 
@@ -3150,6 +3175,37 @@ class Rules {
 
 	compareProductions(r1, r2) {
 		return (r1.Priority < r2.Priority)
+	}
+
+	dumpRules(name := false) {
+		local rules, rule, production, text, ignore, fileName
+
+		if !name
+			name := StrSplit(A_ScriptName, ".")[1]
+
+		fileName := (kTempDirectory . name . ".rules")
+
+		deleteFile(fileName)
+
+		production := this.Productions[false]
+
+		loop {
+			if !production
+				break
+
+			text := (production.Rule.toString() . "`n")
+
+			FileAppend %text%, %fileName%
+
+			production := production.Next[false]
+		}
+
+		for ignore, rules in this.Reductions
+			for ignore, rule in rules {
+				text := (rule.toString() . "`n")
+
+				FileAppend %text%, %fileName%
+			}
 	}
 }
 
@@ -4734,57 +4790,4 @@ get(choicePoint, arguments*) {
 		else
 			return (operand1.toString(resultSet) = operand2.toString(resultSet))
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-dumpKnowledgeBase(knowledgeBase, name := false) {
-	local key, value, text, fileName
-
-	if !name
-		name := StrSplit(A_ScriptName, ".")[1]
-
-	fileName := (kTempDirectory . name . ".knowledge")
-
-	deleteFile(fileName)
-
-	for key, value in knowledgeBase.Facts.Facts {
-		text := (key . " = " . value . "`n")
-
-		FileAppend %text%, %fileName%
-	}
-}
-
-dumpRules(knowledgeBase, name := false) {
-	local rules, rule, production, text, ignore, fileName
-
-	if !name
-		name := StrSplit(A_ScriptName, ".")[1]
-
-	fileName := (kTempDirectory . name . ".rules")
-
-	deleteFile(fileName)
-
-	production := knowledgeBase.Rules.Productions[false]
-
-	loop {
-		if !production
-			break
-
-		text := (production.Rule.toString() . "`n")
-
-		FileAppend %text%, %fileName%
-
-		production := production.Next[false]
-	}
-
-	for ignore, rules in knowledgeBase.Rules.Reductions
-		for ignore, rule in rules {
-			text := (rule.toString() . "`n")
-
-			FileAppend %text%, %fileName%
-		}
 }

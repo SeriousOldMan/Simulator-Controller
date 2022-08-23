@@ -785,7 +785,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if this.Debug[kDebugRules]
-			this.dumpRules(this.KnowledgeBase)
+			this.dumpRules(knowledgeBase)
 
 		return knowledgeBase
 	}
@@ -801,12 +801,12 @@ class RaceAssistant extends ConfigurationItem {
 		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
-				
+
 				if enabled
 					this.dumpKnowledge(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
-				
+
 				if enabled
 					this.dumpRules(this.KnowledgeBase)
 		}
@@ -1310,11 +1310,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		deleteFile(kTempDirectory . prefix . ".knowledge")
 
-		for key, value in knowledgeBase.Facts.Facts {
-			text := (key . " = " . value . "`n")
+		if knowledgeBase
+			for key, value in knowledgeBase.Facts.Facts {
+				text := (key . " = " . value . "`n")
 
-			FileAppend %text%, %kTempDirectory%%prefix%.knowledge
-		}
+				FileAppend %text%, %kTempDirectory%%prefix%.knowledge
+			}
 	}
 
 	dumpRules(knowledgeBase) {
@@ -1323,25 +1324,27 @@ class RaceAssistant extends ConfigurationItem {
 
 		deleteFile(kTempDirectory . prefix . ".rules")
 
-		production := knowledgeBase.Rules.Productions[false]
+		if knowledgeBase {
+			production := knowledgeBase.Rules.Productions[false]
 
-		loop {
-			if !production
-				break
+			loop {
+				if !production
+					break
 
-			text := (production.Rule.toString() . "`n")
-
-			FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-
-			production := production.Next[false]
-		}
-
-		for ignore, rules in knowledgeBase.Rules.Reductions
-			for ignore, reduction in rules {
-				text := (reduction.toString() . "`n")
+				text := (production.Rule.toString() . "`n")
 
 				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+
+				production := production.Next[false]
 			}
+
+			for ignore, rules in knowledgeBase.Rules.Reductions
+				for ignore, reduction in rules {
+					text := (reduction.toString() . "`n")
+
+					FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+				}
+		}
 	}
 }
 

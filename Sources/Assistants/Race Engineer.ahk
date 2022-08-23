@@ -177,11 +177,11 @@ startRaceEngineer() {
 	Menu SupportMenu, Insert, 1&
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(wizard, "toggleDebug", kDebugRules)
+	callback := ObjBindMethod(engineer, "toggleDebug", kDebugRules)
 
 	Menu SupportMenu, Insert, 1&, %label%, %callback%
 
-	if wizard.Debug[kDebugRules]
+	if engineer.Debug[kDebugRules]
 		Menu SupportMenu, Check, %label%
 
 	label := translate("Debug Knowledgebase")

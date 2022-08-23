@@ -697,8 +697,14 @@ class SetupAdvisor extends ConfigurationItem {
 		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
+				
+				if enabled
+					this.dumpKnowledge(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
+				
+				if enabled
+					this.dumpRules(this.KnowledgeBase)
 		}
 
 		if label

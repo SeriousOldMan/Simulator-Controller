@@ -36,6 +36,7 @@ global kSessionQualification := 3
 global kSessionRace := 4
 
 global kDebugKnowledgeBase := 1
+global kDebugRules := 2
 
 global kAsk := "Ask"
 global kAlways := "Always"
@@ -383,7 +384,7 @@ class RaceAssistant extends ConfigurationItem {
 	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		local options
 
-		this.iDebug := (isDebug() ? kDebugKnowledgeBase : kDebugOff)
+		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 
@@ -783,6 +784,9 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}
 
+		if this.Debug[kDebugRules]
+			this.dumpRules(this.KnowledgeBase)
+
 		return knowledgeBase
 	}
 
@@ -797,6 +801,14 @@ class RaceAssistant extends ConfigurationItem {
 		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
+				
+				if enabled
+					this.dumpKnowledge(this.KnowledgeBase)
+			case kDebugRules:
+				label := translate("Debug Rule System")
+				
+				if enabled
+					this.dumpRules(this.KnowledgeBase)
 		}
 
 		if label
@@ -1303,6 +1315,33 @@ class RaceAssistant extends ConfigurationItem {
 
 			FileAppend %text%, %kTempDirectory%%prefix%.knowledge
 		}
+	}
+
+	dumpRules(knowledgeBase) {
+		local prefix := this.AssistantType
+		local rules, reduction, production, text, ignore
+
+		deleteFile(kTempDirectory . prefix . ".rules")
+
+		production := knowledgeBase.Rules.Productions[false]
+
+		loop {
+			if !production
+				break
+
+			text := (production.Rule.toString() . "`n")
+
+			FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+
+			production := production.Next[false]
+		}
+
+		for ignore, rules in knowledgeBase.Rules.Reductions
+			for ignore, reduction in rules {
+				text := (reduction.toString() . "`n")
+
+				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
+			}
 	}
 }
 

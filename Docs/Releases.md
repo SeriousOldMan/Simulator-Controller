@@ -54,7 +54,7 @@
   20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   22. Temp and Logs folders will be cleaned automatically when an update is installed.
-  23. New options in the Tray menu allow you to dump knowledgebase and rule set of various applications as well as trace grammaes and recognitions in the "Voice Server".
+  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammaes and recognitions in the "Voice Server".
   24. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   25. New car models for "Setup Advisor":
       - Assetto Corsa

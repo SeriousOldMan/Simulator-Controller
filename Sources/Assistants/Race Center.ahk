@@ -85,7 +85,9 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 										  , "Brake.Wear.Average", "Brake.Wear.Front.Average", "Brake.Wear.Rear.Average"
 										  , "Brake.Wear.Front.Left", "Brake.Wear.Front.Right"
 										  , "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right",
-										  , "EngineDamage"]
+										  , "EngineDamage"
+										  , "Brake.Temperature.Average"
+										  , "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -9082,7 +9084,6 @@ class RaceCenter extends ConfigurationItem {
 		local fuelConsumptions := []
 		local accidents := []
 		local currentStint := this.CurrentStint
-		local laps := []
 		local positions := []
 		local remainingFuels := []
 		local tyreLaps := []
@@ -9127,6 +9128,9 @@ class RaceCenter extends ConfigurationItem {
 		html .= "</table>"
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Race Course") . "</i></div>")
+
+		laps := []
+		positions := []
 
 		if lastLap
 			loop % lastLap.Nr

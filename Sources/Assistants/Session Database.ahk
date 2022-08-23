@@ -642,7 +642,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab
 
-		Gui %window%:Add, Text, x16 ys+230 w120 h23 +0x200, % translate("Available Data")
+		Gui %window%:Add, Text, x16 ys+230 w100 h23 +0x200, % translate("Available Data")
+
+		choices := ["User", "User & Community"]
+		chosen := (this.UseCommunity ? 2 : 1)
+
+		Gui %window%:Add, DropDownList, x120 yp w140 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
 
 		Gui %window%:Add, ListView, x16 ys+254 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
 
@@ -650,13 +655,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x8 y653 w670 0x10
 
+		/*
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		Gui %window%:Add, Text, x16 y661 w55 h23 +0x200, % translate("Scope")
 		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
+		*/
 
-		Gui %window%:Add, Button, x304 yp w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
+
+		Gui %window%:Add, Button, x304 y661 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
 
 		this.loadSimulator(simulator, true)
 		this.loadCar(car, true)

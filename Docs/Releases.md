@@ -43,7 +43,7 @@
 	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
   10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
-  12. Big performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
+  12. Significant performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
   13. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
   14. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.
   15. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
@@ -54,7 +54,7 @@
   20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   22. Temp and Logs folders will be cleaned automatically when an update is installed.
-  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammaes and recognitions in the "Voice Server".
+  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammaes and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
   24. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   25. New car models for "Setup Advisor":
       - Assetto Corsa

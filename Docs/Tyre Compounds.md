@@ -46,9 +46,11 @@ Once a set of tyre compound mappings has been defined, these can be used to desc
 
 A word about the tyre compound identifiers used by the different simulators:
 
-Normally, you can use exactly the name, which is visible in the user interface of the given simulator. If a tyre compound is named "Hypercar Road (HR)" in *Assetto Corsa*, for example, you must use this as internal identifier as well. If this doesn't work as expected, you can take a look in the *.data files you find in the *Simulator Controller\Temp\[Simulator]* folder in your user *Documents* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. Search for "TyreCompoundRaw". This field will contain the internal tyre compound identifier used by the given simulator.
+Normally, you can use exactly the name, which is visible in the user interface of the given simulator. If a tyre compound is named "Hypercar Road (HR)" in *Assetto Corsa*, for example, you must use this as internal identifier as well. If this doesn't work as expected, you can take a look in the *.data files you find in the *Simulator Controller\Temp\[Simulator] Data* folder in your user *Documents* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. Search for "TyreCompoundRaw". This field will contain the internal tyre compound identifier used by the given simulator.
 
-A special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
+When creating the tyre compound rule as in the examples above, it is **important** that you use the same order as the *internal* identifiiers appear in the Pitstop dialog. Otherwise you will end up with wrong tyres after a pitstop. A notable exception here is *rFactor 2*, which supports any order, since the API supports tyre compound selection by name. And of course *Assetto Corsa Competizione*, where the two available tyre categories (Dry and Wet) are hardcoded.
+
+A very special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
 
 ### *Tyre Data* files
 

@@ -1620,6 +1620,10 @@ class Strategy extends ConfigurationItem {
 			setConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, this.RemainingTyreLaps)
 			setConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, this.RemainingFuel)
 		}
+
+		dispose() {
+			this.iStrategy := false
+		}
 	}
 
 	StrategyManager[] {
@@ -2609,7 +2613,7 @@ class Strategy extends ConfigurationItem {
 	createStints(currentStint, currentLap, currentStintTime, currentSessionTime
 			   , currentTyreLaps, currentFuel, stintLaps, maxTyreLaps, tyreLapsVariation
 			   , map, fuelConsumption, avgLapTime, adjustments := false) {
-		local rnd, variation, currentPitstops
+		local rnd, variation, currentPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, pitstopNr, remainingFuel, pitstopLap
 		local tyreChange, tyreCompound, tyreCompoundColor, driverID, driverName, pitstop, telemetryDB, candidate
 
@@ -2749,6 +2753,9 @@ class Strategy extends ConfigurationItem {
 			else
 				break
 		}
+
+		for ignore, pitstop in currentPitstops
+			pitstop.dispose()
 	}
 
 	adjustLastPitstop(superfluousLaps, allowDelete) {

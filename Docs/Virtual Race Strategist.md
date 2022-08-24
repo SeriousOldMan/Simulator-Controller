@@ -491,7 +491,7 @@ The weather forecast will be taken into account for the new strategy. If the cur
 
 Please note, that if you are running a race with Team Server support, a new strategy can be also created and activated using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which gives you much more control over various aspects of the new strategy.
 
-Finally a word of a advice: The calculation of a strategy can be a time consuming and CPU intensive process, especially for long endurance races or if the *Optimizer* was used during the creation of the initially strategy. This can result in framerate drops on weaker PC systems. So please check before an important race, whether you can use this functionality safely in your specific environment.
+Finally a word of a advice: The calculation of a strategy can be a time consuming and CPU intensive process, especially for long endurance races or if the *Optimizer* was used during the creation of the initially strategy. This can result in framerate drops on weaker PC systems. So please check before an important race, whether you can use this functionality safely in your specific environment. But, even if your system is capable to handle the load, the recalculation may take some time, especially when high *Optimizer* settings were chosen during the creation of the initially strategy.
 
 ## Technical information
 

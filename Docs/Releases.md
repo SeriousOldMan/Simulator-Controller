@@ -55,8 +55,9 @@
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   22. Temp and Logs folders will be cleaned automatically when an update is installed.
   23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammaes and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
-  24. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
-  25. New car models for "Setup Advisor":
+  24. Significantly reduced CPU consumption of the "Simulator Controller" background process.
+  25. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
+  26. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

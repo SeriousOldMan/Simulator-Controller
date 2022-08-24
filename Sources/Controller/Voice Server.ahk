@@ -567,12 +567,12 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		Task.startTask(new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500))
-		Task.startTask(new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority))
+		new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
+		new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
 
 		deleteFile(kTempDirectory . "Voice.mute")
 
-		Task.startTask(new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority))
+		new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -590,7 +590,7 @@ class VoiceServer extends ConfigurationItem {
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
 		if this.PushToTalk
-			Task.startTask(new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority))
+			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority).start()
 	}
 
 	listen() {

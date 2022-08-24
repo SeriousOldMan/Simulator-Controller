@@ -646,7 +646,7 @@ startupSimulator() {
 
 	OnExit("clearStartupSemaphore")
 
-	Task.startTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
+	new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority).start()
 }
 
 startSimulator() {

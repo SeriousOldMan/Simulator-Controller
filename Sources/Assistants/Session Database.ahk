@@ -4283,7 +4283,7 @@ loadPressures() {
 	local editor := SessionDatabaseEditor.Instance
 
 	if (editor.SelectedModule = "Pressures")
-		Task.startTask(new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100))
+		new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100).start()
 }
 
 noSelect() {

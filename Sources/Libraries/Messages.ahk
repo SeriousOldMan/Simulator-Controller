@@ -293,7 +293,7 @@ class MessageManager extends PeriodicTask {
 			messages := this.receiveMessages()
 
 			if (messages.Length() > 0)
-				Task.startTask(new this.MessagesDispatcher(messages))
+				new this.MessagesDispatcher(messages).start()
 			else
 				this.deliverMessage()
 		}
@@ -499,7 +499,7 @@ startMessageManager() {
 
 	registerMessageHandler("*", "unknownMessageHandler")
 
-	Task.startTask(new MessageManager())
+	new MessageManager().start()
 
 	Process Exist
 

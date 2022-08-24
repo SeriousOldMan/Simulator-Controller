@@ -3659,7 +3659,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	pushTask(theTask) {
-		Task.startTask(new RaceCenterTask(theTask))
+		new RaceCenterTask(theTask).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

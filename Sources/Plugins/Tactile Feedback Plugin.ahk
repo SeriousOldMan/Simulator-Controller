@@ -447,7 +447,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 	deactivate() {
 		if this.iUpdateVibrationStateTask {
-			Task.stopTask(this.iUpdateVibrationStateTask)
+			this.iUpdateVibrationStateTask.stop()
 
 			this.iUpdateVibrationStateTask := false
 		}

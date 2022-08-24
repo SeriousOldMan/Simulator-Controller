@@ -1253,7 +1253,7 @@ restart:
 
 				if (vSimulator && vCar && vTrack) {
 					sessionDB := new SessionDatabase()
-					
+
 					directory := sessionDB.DatabasePath
 					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
 
@@ -1283,7 +1283,7 @@ restart:
 
 				if (vSimulator && vCar && vTrack) {
 					sessionDB := new SessionDatabase()
-					
+
 					directory := sessionDB.DatabasePath
 					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
 

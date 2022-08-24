@@ -56,7 +56,7 @@ Diasables all tray messages from now on. Every following call to *trayMessage* w
 
 ***
 
-## Messages ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
+## Process Communication ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
 Messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
 
 #### *registerMesssageHandler(category :: String, handler :: TypeUnion(String, FuncObj), object :: Object := false)*
@@ -229,7 +229,7 @@ Closes the currently open progress window.
 Miscellaneous helper functions for GUI programming.
 
 #### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
-You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](*).
+You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowpositiondescriptor--string-byref-x--integer-byref-y--integer).
 
 #### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
 Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.

@@ -757,7 +757,7 @@ class SimulatorController extends ConfigurationItem {
 		static lastSimulator := false
 		static lastCheck := 0
 
-		if (A_TickCount + (lastCheck + 10000)) {
+		if (A_TickCount > (lastCheck + 10000)) {
 			lastSimulator := false
 
 			for ignore, thePlugin in this.Plugins

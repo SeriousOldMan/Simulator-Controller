@@ -534,15 +534,16 @@ updateApplicationStates() {
 		mode := plugin.findMode(kLaunchMode)
 	}
 
-	protectionOn()
+	if inList(controller.ActiveModes, mode) {
+		protectionOn()
 
-	try {
-		for ignore, runnable in plugin.RunnableApplications
-			if inList(controller.ActiveModes, mode)
+		try {
+			for ignore, runnable in plugin.RunnableApplications
 				runnable.updateRunningState()
-	}
-	finally {
-		protectionOff()
+		}
+		finally {
+			protectionOff()
+		}
 	}
 }
 

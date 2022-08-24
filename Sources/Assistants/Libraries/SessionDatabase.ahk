@@ -62,7 +62,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	DBID[] {
+	DatabaseID[] {
 		Get {
 			local id
 
@@ -74,6 +74,40 @@ class SessionDatabase extends ConfigurationItem {
 			catch exception {
 				return this.ID
 			}
+		}
+	}
+
+	DatabasePath[] {
+		Get {
+			return kDatabaseDirectory
+		}
+
+		Set {
+			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			setConfigurationValue(configuration, "Database", "Path", value)
+			setConfigurationValue(this.Configuration, "Database", "Path", value)
+
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+			return (kDatabaseDirectory := value)
+		}
+	}
+
+	DatabaseVersion[] {
+		Get {
+			return getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
+									   , "Database", "Version", false)
+		}
+
+		Set {
+			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			setConfigurationValue(configuration, "Database", "Version", value)
+
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+			return value
 		}
 	}
 

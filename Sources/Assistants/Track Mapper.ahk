@@ -250,15 +250,16 @@ recreateTrackMap(simulator, track) {
 
 recreateTrackMaps() {
 	local sessionDB := new SessionDatabase()
+	local directory := sessionDB.DatabasePath
 	local code, simulator, track
 
-	loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
+	loop Files, %directory%User\Tracks\*.*, D		; Simulator
 	{
 		code := A_LoopFileName
 
 		simulator := sessionDB.getSimulatorName(code)
 
-		loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		loop Files, %directory%User\Tracks\%code%\*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 

@@ -40,8 +40,8 @@ class SettingsDatabase extends SessionDatabase {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator
 
-			this.iUserDatabase := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
-			this.iCommunityDatabase := new Database(kDatabaseDirectory . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iUserDatabase := new Database(this.DatabasePath . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iCommunityDatabase := new Database(this.DatabasePath . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
 		}
 
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)

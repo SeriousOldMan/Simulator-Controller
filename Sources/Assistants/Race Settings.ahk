@@ -486,7 +486,7 @@ loadSessions(connector, team) {
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
-	local x, y, e
+	local x, y, e, sessionDB, directory
 
 	static result
 	static newSettings
@@ -1252,9 +1252,12 @@ restart:
 				title := translate("Load Race Settings...")
 
 				if (vSimulator && vCar && vTrack) {
-					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					sessionDB := new SessionDatabase()
+					
+					directory := sessionDB.DatabasePath
+					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
 
-					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
 
 					FileCreateDir %dirName%
 				}
@@ -1279,9 +1282,12 @@ restart:
 				result := false
 
 				if (vSimulator && vCar && vTrack) {
-					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					sessionDB := new SessionDatabase()
+					
+					directory := sessionDB.DatabasePath
+					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
 
-					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
 
 					FileCreateDir %dirName%
 

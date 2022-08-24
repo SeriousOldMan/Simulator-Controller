@@ -3352,6 +3352,7 @@ class RaceCenter extends ConfigurationItem {
 
 	chooseStrategyMenu(line) {
 		local strategy, simulator, car, track, simulatorCode, dirName, fileName, configuration, title, file, name
+		local sessionDB, directory
 
 		if this.Simulator {
 			simulator := this.Simulator
@@ -3359,9 +3360,12 @@ class RaceCenter extends ConfigurationItem {
 			track := this.Track
 
 			if (car && track) {
-				simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+				sessionDB := new SessionDatabase()
+				
+				directory := sessionDB.DatabasePath
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
 
-				dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+				dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Strategies
 
 				FileCreateDir %dirName%
 			}

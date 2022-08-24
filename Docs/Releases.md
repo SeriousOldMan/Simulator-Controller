@@ -9,11 +9,12 @@
      - Initial information at the beginning of a race session (duration, position, weather & temperatures, and so on).
      - Announcement of the Green flag at race start.
 	 - Information when direct opponents or the race leader enter the pit.
-	 - Applause, when a new best lap time has been set.
+	 - Applause, when a new personal best lap time has been set.
 	 - Information when the current session (Practice or Qualification) is ending in 30, 15 or 5 minutes.
 	 - Detailed information package, when the first half of a race session has been finished.
 	 - Warning a few laps before the current stint is ending.
 	 - Information when temperatures are rising or falling.
+	 
 	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   5. Delta calculation has been imporved again for the Spotter:
      - The delta history will be reset when a given car is in the pits.
@@ -34,12 +35,12 @@
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
-	   - Engine repair will be handled automatically during pitstops for ******
+	   - Engine repair will be handled automatically during pitstops for [*to be tested*].
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
   9. Improvements for the Strategy Workbench:
-     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned.
+     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned. A future version might introduce a full weather forecast model here.
 	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
   10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
@@ -54,7 +55,7 @@
   20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
   22. Temp and Logs folders will be cleaned automatically when an update is installed.
-  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammaes and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
+  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammars and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
   24. Significantly reduced CPU consumption of the "Simulator Controller" background process.
   25. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   26. New car models for "Setup Advisor":

@@ -1816,7 +1816,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
 
-		directory := normalizePath(directory)
+		directory := normalizeDirectoryPath(directory)
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -1951,7 +1951,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			setConfigurationValue(info, "General", "Simulator", simulator)
 			setConfigurationValue(info, "General", "Creator", this.SessionDatabase.ID)
-			setConfigurationValue(info, "General", "Origin", this.SessionDatabase.DBID)
+			setConfigurationValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
 
 			for id, name in drivers
 				setConfigurationValue(info, "Driver", id, name)
@@ -1977,7 +1977,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName
 
-		directory := normalizePath(directory)
+		directory := normalizeDirectoryPath(directory)
 
 		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
 			x := Round((A_ScreenWidth - 300) / 2)
@@ -3274,7 +3274,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
-		directory := normalizePath(directory)
+		directory := normalizeDirectoryPath(directory)
 		editor := sessionDatabaseEditorOrCommand
 		owner := editor.Window
 
@@ -3549,10 +3549,6 @@ openSessionDatabaseEditorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
 }
 
-normalizePath(path) {
-	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
-}
-
 copyDirectory(source, destination, progressStep, ByRef count) {
 	local files := []
 	local ignore, fileName, file, subDirectory
@@ -3615,7 +3611,7 @@ chooseDatabasePath() {
 		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
 		OnMessage(0x44, "")
 
-		if ((directory != "") && (normalizePath(directory) != normalizePath(kDatabaseDirectory))) {
+		if ((directory != "") && (normalizeDirectoryPath(directory) != normalizeDirectoryPath(kDatabaseDirectory))) {
 			if !FileExist(directory)
 				try {
 					FileCreateDir %directory%
@@ -3661,7 +3657,7 @@ chooseDatabasePath() {
 					return
 				}
 
-				original := normalizePath(kDatabaseDirectory)
+				original := normalizeDirectoryPath(kDatabaseDirectory)
 
 				x := Round((A_ScreenWidth - 300) / 2)
 				y := A_ScreenHeight - 150
@@ -3677,11 +3673,7 @@ chooseDatabasePath() {
 				hideProgress()
 			}
 
-			configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-
-			setConfigurationValue(configuration, "Database", "Path", directory)
-
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			new SessionDatabase().DatabasePath := normalizeDirectoryPath(directory)
 
 			title := translate("Information")
 

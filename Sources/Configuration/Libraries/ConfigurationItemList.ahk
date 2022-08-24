@@ -166,15 +166,22 @@ class ConfigurationItemList extends ConfigurationItem {
 	listEvent() {
 		local info := ErrorLevel
 
-		if this.processListEvent() {
-			if (A_GuiEvent == "DoubleClick")
-				this.clickEvent(A_EventInfo, 2)
-			else if (A_GuiEvent == "Normal")
-				this.clickEvent(A_EventInfo, 1)
-			else if (A_GuiEvent == "I") {
-				if InStr(info, "S", true)
-					this.selectEvent(A_EventInfo)
+		protectionOn(true, true)
+
+		try {
+			if this.processListEvent() {
+				if (A_GuiEvent == "DoubleClick")
+					this.clickEvent(A_EventInfo, 2)
+				else if (A_GuiEvent == "Normal")
+					this.clickEvent(A_EventInfo, 1)
+				else if (A_GuiEvent == "I") {
+					if InStr(info, "S", true)
+						this.selectEvent(A_EventInfo)
+				}
 			}
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 

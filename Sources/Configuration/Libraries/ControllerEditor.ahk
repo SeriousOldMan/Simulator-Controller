@@ -906,7 +906,7 @@ class LayoutsList extends ConfigurationItemList {
 
 	loadEditor(item) {
 		local size := string2Values("x", item[2]["Grid"])
-		local ignore, widget, margins, choices, rowDefinitions, preview
+		local object, ignore, widget, margins, choices, rows, preview
 
 		layoutNameEdit := item[1]
 		layoutTypeDropDown := item[2]["Type"]
@@ -979,23 +979,30 @@ class LayoutsList extends ConfigurationItemList {
 			GuiControl Disable, layoutVisibleCheck
 		}
 
+		Gui CTRLE:Default
+
 		choices := []
-		rowDefinitions := []
+		rows := []
 
-		loop %layoutRowsEdit% {
-			choices.Push(translate("Row ") . A_Index)
+		loop
+			if item[2].HasKey(A_Index) {
+				choices.Push(translate("Row ") . A_Index)
 
-			rowDefinitions.Push(item[2][A_Index])
-		}
+				definition := item[2]
 
-		this.iRowDefinitions := rowDefinitions
+				rows.Push(definition[A_Index])
+			}
+			else
+				break
+
+		this.iRowDefinitions := rows
 
 		GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
 
 		if (choices.Length() > 0) {
 			GuiControl Choose, layoutRowDropDown, 1
 
-			layoutRowEdit := (rowDefinitions.HasKey(1) ? rowDefinitions[1] : "")
+			layoutRowEdit := ((rows.Length() > 1) ? rows[1] : "")
 
 			this.iSelectedRow := 1
 		}
@@ -1698,7 +1705,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Color, D0D0D0, D8D8D8
 		Gui IRE:Font, Bold, Arial
 
-		Gui IRE:Add, Text, x0 w332 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System")
+		Gui IRE:Add, Text, w316 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System")
 
 		Gui IRE:Font, Norm, Arial
 		Gui IRE:Font, Italic Underline, Arial

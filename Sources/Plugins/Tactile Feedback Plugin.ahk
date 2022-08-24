@@ -441,7 +441,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if !this.iUpdateVibrationStateTask {
 			this.iUpdateVibrationStateTask := new PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
 
-			Task.startTask(this.iUpdateVibrationStateTask)
+			this.iUpdateVibrationStateTask.start()
 		}
 	}
 

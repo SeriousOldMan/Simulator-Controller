@@ -203,15 +203,30 @@ class StrategyViewer {
 			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
 
 			html .= "<table class=""table-std"">"
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th>" . values2String("", drivers*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", map(lapTimes, ObjBindMethod(this, "lapTimeDisplayValue"))*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th>" . values2String("", fuelConsumptions*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop Lap") . "</th>" . values2String("", pitstopLaps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Refuel Amount") . "</th>" . values2String("", refuels*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Change") . "</th>" . values2String("", tyreChanges*) . "</tr>")
+
+			html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
+			       . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			       . "<th class=""th-std"">" . translate("Map") . "</th>"
+			       . "<th class=""th-std"">" . translate("Laps") . "</th>"
+			       . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
+			       . "<th class=""th-std"">" . translate("Consumption") . "</th>"
+			       . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
+			       . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
+			       . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
+			   . "</tr>")
+
+			loop % stints.Length()
+				html .= ("<tr>" . stints[A_Index]
+								. drivers[A_Index]
+								. maps[A_Index]
+								. laps[A_Index]
+								. this.lapTimeDisplayValue(lapTimes[A_Index])
+								. fuelConsumptions[A_Index]
+								. pitstopLaps[A_Index]
+								. refuels[A_Index]
+								. tyreChanges[A_Index]
+					   . "</tr>")
+
 			html .= "</table>"
 		}
 

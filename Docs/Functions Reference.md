@@ -107,7 +107,7 @@ Returns a list of absolute paths for all files in the given directories satisfyi
 Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
 
 #### *normalizeDirectoryPath(directoryPath :: String)*
-Assures that a trailing "\" is present at the end of the director path.
+Assures that a trailing "\" is present at the end of the directory path.
 
 #### *temporaryFileName(name :: String, extension :: String)*
 Creates and returns a unique file name in the temporary folder by adding a random number between 1 and 100000 to the name.

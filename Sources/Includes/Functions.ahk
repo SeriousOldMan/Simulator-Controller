@@ -1894,7 +1894,7 @@ bubbleSort(ByRef array, comparator := "greaterComparator") {
 
 			if %comparator%(lineI := array[i], lineJ := array[j]) {
 				array[i] := lineJ
-				array[J] := lineI
+				array[j] := lineI
 
 				newN := j
 			}

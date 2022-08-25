@@ -105,6 +105,11 @@ global simDriverDropDown
 global addDriverButton
 global deleteDriverButton
 
+global simWeatherTimeEdit
+global simWeatherDropDown
+global addSimWeatherButton
+global deleteSimWeatherButton
+
 global simCompoundDropDown
 global simMaxTyreLapsEdit := 40
 global simInitialFuelAmountEdit := 90
@@ -174,6 +179,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iTrackTemperature := 27
 
 	iDriversListView := false
+	iWeatherListView := false
 	iPitstopListView := false
 
 	iStrategyViewer := false
@@ -213,6 +219,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedWeather[] {
 		Get {
 			return this.iSelectedWeather
+		}
+	}
+
+	AirTemperature[] {
+		Get {
+			return this.iAirTemperature
+		}
+	}
+
+	TrackTemperature[] {
+		Get {
+			return this.iTrackTemperature
 		}
 	}
 
@@ -313,6 +331,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
+	WeatherListView[] {
+		Get {
+			return this.iWeatherListView
+		}
+	}
+
 	PitstopListView[] {
 		Get {
 			return this.iPitstopListView
@@ -322,18 +346,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	StrategyViewer[] {
 		Get {
 			return this.iStrategyViewer
-		}
-	}
-
-	AirTemperature[] {
-		Get {
-			return this.iAirTemperature
-		}
-	}
-
-	TrackTemperature[] {
-		Get {
-			return this.iTrackTemperature
 		}
 	}
 
@@ -529,7 +541,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Drivers", "Simulation", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], "translate")*)
 
 		Gui %window%:Tab, 1
 
@@ -683,6 +695,30 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Tab, 4
 
 		x := 32
+		x2 := x + 220
+		x3 := x2 + 100
+		w3 := 140
+		x4 := x3 + w3 - 50
+		x5 := x4 + 25
+
+		Gui %window%:Add, ListView, x24 ys+34 w216 h171 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDweatherListView gchooseSimWeather, % values2String("|", map(["Time", "Weather"], "translate")*)
+
+		this.iWeatherListView := weatherListView
+
+		Gui %window%:Add, Text, x%x2% ys+34 w90 h23 +0x200, % translate("Time")
+		Gui %window%:Add, DateTime, x%x3% yp w50 h23 vsimWeatherTimeEdit gupdateSimWeather 1, HH:mm
+
+		Gui %window%:Add, Text, x%x2% yp+24 w90 h23 +0x200, % translate("Weather")
+		Gui %window%:Add, DropDownList, x%x3% yp w%w3% AltSubmit vsimWeatherDropDown gupdateSimWeather, % values2String("|", map(kWeatherConditions, "translate")*)
+
+		Gui %window%:Add, Button, x%x4% yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSimWeatherButton gaddSimWeather
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDminusButton vdeleteSimWeatherButton gdeleteSimWeather
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Tab, 5
+
+		x := 32
 		x0 := x - 4
 		x1 := x + 74
 		x2 := x1 + 22
@@ -796,7 +832,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimSessionResultResult, %simSessionResultResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20 VsimSessionResultLabel, % translate("Laps")
 
-		Gui %window%:Tab, 5
+		Gui %window%:Tab, 6
 
 		x := 32
 		x0 := x - 4
@@ -1085,6 +1121,24 @@ class StrategyWorkbench extends ConfigurationItem {
 			GuiControl Disable, simDriverDropDown
 
 			GuiControl Choose, simDriverDropDown, 0
+		}
+
+		Gui ListView, % this.WeatherListView
+
+		GuiControl Enable, addSimWeatherButton
+
+		if LV_GetNext(0) {
+			GuiControl Enable, deleteSimWeatherButton
+			GuiControl Enable, simWeatherTimeEdit
+			GuiControl Enable, simWeatherDropDown
+		}
+		else {
+			GuiControl Disable, deleteSimWeatherButton
+			GuiControl Disable, simWeatherTimeEdit
+			GuiControl Disable, simWeatherDropDown
+
+			GuiControl Choose, simWeatherDropDown, 0
+			GuiControl, , simWeatherTimeEdit, 20200101000000
 		}
 	}
 
@@ -1814,7 +1868,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (simulator && car && track) {
 					if GetKeyState("Ctrl", "P") {
 						sessionDB := new SessionDatabase()
-						
+
 						directory := sessionDB.DatabasePath
 						simulatorCode := sessionDB.getSimulatorCode(simulator)
 
@@ -2120,7 +2174,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		if (simulator && car && track) {
 			sessionDB := new SessionDatabase()
-			
+
 			directory := sessionDB.DatabasePath
 			simulatorCode := sessionDB.getSimulatorCode(simulator)
 
@@ -2547,6 +2601,47 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local window := this.Window
+		local rows, ignore, time, tWeather, candidate, weathers, cHour, cMinute
+
+		weather := this.SelectedWeather
+		airTemperature := this.AirTemperature
+		trackTemperature := this.TrackTemperature
+
+		Gui %window%:Default
+
+		Gui ListView, % this.WeatherListView
+
+		rows := LV_GetCount()
+
+		if (rows > 0) {
+			weathers := []
+
+			loop % rows
+			{
+				LV_GetText(time, A_Index, 1)
+				LV_GetText(tWeather, A_Index, 2)
+
+				weathers.Push(Array(time, tWeather))
+			}
+
+			bubbleSort(weathers, "compareTime")
+
+			hour := Floor(minute / 60)
+			minute := minute - (hour * 60)
+
+			for ignore, candidate in weathers {
+				time := string2Values(":", candidate[1])
+				cHour := (0 + time[1])
+				cMinute := (0 + time[2])
+
+				if ((cHour < hour) || ((cHour = hour) && (cMinute <= minute)))
+					weather := candidate[2]
+			}
+		}
+	}
+
 	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
@@ -2745,6 +2840,10 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+compareTime(w1, w2) {
+	return (w1[1] > w2[1])
+}
 
 readSimulatorData(simulator) {
 	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
@@ -3042,6 +3141,162 @@ deleteSimDriver() {
 
 			loop %numRows%
 				LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
+
+			workbench.updateState()
+		}
+	}
+}
+
+chooseSimWeather() {
+	local workbench, window, sessionDB, time, weather, currentTime
+
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		workbench := StrategyWorkbench.Instance
+		window := workbench.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % workbench.WeatherListView
+
+		LV_GetText(time, A_EventInfo, 1)
+		LV_GetText(weather, A_EventInfo, 2)
+
+		time := string2Values(":", time)
+
+		currentTime := "20200101000000"
+
+		EnvAdd currentTime, time[1], Hours
+		EnvAdd currentTime, time[2], Minutes
+
+		GuiControl, , simWeatherTimeEdit, %currentTime%
+		GuiControl Choose, simWeatherDropDown, % inList(map(kWeatherConditions, "translate"), weather)
+
+		workbench.updateState()
+	}
+}
+
+updateSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, time
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if (row > 0) {
+		GuiControlGet simWeatherTimeEdit
+		GuiControlGet simWeatherDropDown
+
+		FormatTime time, %simWeatherTimeEdit%, HH:mm
+
+		LV_Modify(row, "", time, translate(kWeatherConditions[simWeatherDropDown]))
+	}
+}
+
+addSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local after := false
+	local row, title, lastWeather, lastTime, currentTime
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		LV_GetText(lastTime, row, 1)
+		LV_GetText(lastWeather, row, 2)
+
+		lastWeather := kWeatherConditions[inList(map(kWeatherConditions, "translate"), lastWeather)]
+
+		title := translate("Insert")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
+		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Cancel
+			return
+
+		IfMsgBox No
+		{
+			row += 1
+
+			after := true
+		}
+
+		LV_Insert(row, "Select Vis", "", "")
+	}
+	else {
+		row := LV_GetCount()
+
+		if row {
+			LV_GetText(lastTime, row, 1)
+			LV_GetText(lastWeather, row, 2)
+
+			lastWeather := kWeatherConditions[inList(map(kWeatherConditions, "translate"), lastWeather)]
+		}
+		else {
+			lastWeather := workbench.SelectedWeather
+			lastTime := "00:00"
+		}
+
+		LV_Add("Select Vis", "", "")
+
+		row += 1
+	}
+
+	lastTime := string2Values(":", lastTime)
+
+	currentTime := "20200101000000"
+
+	EnvAdd currentTime, lastTime[1], Hours
+	EnvAdd currentTime, lastTime[2], Minutes
+
+	if after
+		EnvAdd currentTime, 1, Hours
+	else if (LV_GetCount() > 1)
+		EnvAdd currentTime, -30, Minutes
+
+	GuiControl, , simWeatherTimeEdit, %currentTime%
+	GuiControl Choose, simWeatherDropDown, % inList(kWeatherConditions, lastWeather)
+
+	FormatTime currentTime, %currentTime%, HH:mm
+
+	LV_Modify(row, "", currentTime, translate(lastWeather))
+
+	LV_ModifyCol(1, "AutoHdr")
+	LV_ModifyCol(2, "AutoHdr")
+
+	workbench.updateState()
+}
+
+deleteSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, title
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		title := translate("Delete")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the selected change of weather?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+		{
+			LV_Delete(row)
 
 			workbench.updateState()
 		}

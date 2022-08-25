@@ -3839,6 +3839,29 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local strategy
+
+		if this.Weather {
+			weather := this.Weather
+			airTemperature := this.AirTemperature
+			trackTemperature := this.TrackTemperature
+		}
+		else {
+			strategy := := this.Strategy
+
+			if strategy {
+				weather := strategy.Weather
+				airTemperature := strategy.AirTemperature
+				trackTemperature := strategy.TrackTemperature
+
+				return true
+			}
+		}
+
+		return false
+	}
+
 	getTrafficSettings(ByRef randomFactor, ByRef numScenarios, ByRef variationWindow
 					 , ByRef useLapTimeVariation, ByRef useDriverErrors, ByRef usePitstops
 					 , ByRef overTakeDelta, ByRef consideredTraffic) {

@@ -1866,6 +1866,29 @@ class RaceStrategist extends RaceAssistant {
 			return false
 	}
 
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local knowledgeBase := this.KnowledgeBase
+		local strategy := this.Strategy[true]
+
+		if strategy {
+			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
+
+			if weather {
+				airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
+				trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
+			}
+			else {
+				weather := strategy.Weather
+				airTemperature := strategy.AirTemperature
+				trackTemperature := strategy.TrackTemperature
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
 	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {

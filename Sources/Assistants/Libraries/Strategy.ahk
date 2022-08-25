@@ -286,6 +286,10 @@ class StrategySimulation {
 													 , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
 	}
 
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		return this.StrategyManager.getSessionWeather(minute, weather, airTemperature, trackTemperature)
+	}
+
 	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
@@ -1282,6 +1286,10 @@ class Strategy extends ConfigurationItem {
 		iTyreCompound := false
 		iTyreCompoundColor := false
 
+		iWeather := false
+		iAirTemperature := false
+		iTrackTemperature := false
+
 		iStintLaps := 0
 		iFixed := false
 
@@ -1333,6 +1341,24 @@ class Strategy extends ConfigurationItem {
 		Duration[] {
 			Get {
 				return this.iDuration
+			}
+		}
+
+		Weather[] {
+			Get {
+				return this.iWeather
+			}
+		}
+
+		AirTemperature[] {
+			Get {
+				return this.iAirTemperature
+			}
+		}
+
+		TrackTemperature[] {
+			Get {
+				return this.iTrackTemperature
 			}
 		}
 
@@ -1417,7 +1443,7 @@ class Strategy extends ConfigurationItem {
 		__New(strategy, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
 			local pitstopRule, refuelRule, tyreChangeRule, remainingFuel, remainingSessionLaps, fuelConsumption, lastStintLaps
 			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, variation, freshTyreLaps, lastPitstop, delta, rnd
-			local avgLapTime, openingLap, closingLap
+			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature
 
 			this.iStrategy := strategy
 			this.iNr := nr
@@ -1556,6 +1582,16 @@ class Strategy extends ConfigurationItem {
 					this.iTime := (strategy.SessionStartTime + (lastStintLaps * strategy.AvgLapTime))
 					this.iRemainingSessionTime := (strategy.RemainingSessionTime - (lastStintLaps * strategy.AvgLapTime))
 				}
+
+				weather := false
+				airTemperature := false
+				trackTemperature := false
+
+				strategy.StrategyManager.getSessionWeather(Ceil(this.Time / 60), weather, airTemperature, trackTemperature)
+
+				this.iWeather := weather
+				this.iAirTemperature := airTemperature
+				this.iTrackTemperature := trackTemperature
 			}
 		}
 
@@ -1569,6 +1605,11 @@ class Strategy extends ConfigurationItem {
 
 			this.iTime := getConfigurationValue(configuration, "Pitstop", "Time." . lap, 0)
 			this.iDuration := getConfigurationValue(configuration, "Pitstop", "Duration." . lap, 0)
+
+			this.iWeather := getConfigurationValue(configuration, "Pitstop", "Weather." . lap, this.Strategy.Weather)
+			this.iAirTemperature := getConfigurationValue(configuration, "Pitstop", "AirTemperature." . lap, this.Strategy.AirTemperature)
+			this.iTrackTemperature := getConfigurationValue(configuration, "Pitstop", "TrackTemperature." . lap, this.Strategy.TrackTemperature)
+
 			this.iRefuelAmount := getConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, 0)
 			this.iTyreChange := getConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, false)
 
@@ -1601,6 +1642,11 @@ class Strategy extends ConfigurationItem {
 
 			setConfigurationValue(configuration, "Pitstop", "Time." . lap, this.Time)
 			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
+
+			setConfigurationValue(configuration, "Pitstop", "Weather." . lap, this.Weather)
+			setConfigurationValue(configuration, "Pitstop", "AirTemperature." . lap, this.AirTemperature)
+			setConfigurationValue(configuration, "Pitstop", "TrackTemperature." . lap, this.TrackTemperature)
+
 			setConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, Ceil(this.RefuelAmount))
 			setConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, this.TyreChange)
 
@@ -1656,21 +1702,30 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	Weather[] {
+	Weather[lastStint := false] {
 		Get {
-			return this.iWeather
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.Weather
+			else
+				return this.iWeather
 		}
 	}
 
-	AirTemperature[] {
+	AirTemperature[lastStint := false] {
 		Get {
-			return this.iAirTemperature
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.AirTemperature
+			else
+				return this.iAirTemperature
 		}
 	}
 
-	TrackTemperature[] {
+	TrackTemperature[lastStint := false] {
 		Get {
-			return this.iTrackTemperature
+			if (lastStint && this.LastPitstop)
+				return this.LastPitstop.TrackTemperature
+			else
+				return this.iTrackTemperature
 		}
 	}
 
@@ -2388,6 +2443,28 @@ class Strategy extends ConfigurationItem {
 
 	setName(name) {
 		this.iName := name
+	}
+
+	getWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local pitstop := false
+		local ignore, candidate
+
+		for ignore, candidate in this.Pitstops
+			if ((candidate.Time / 60) < minute)
+				pitstop := candidate
+			else
+				break
+
+		if pitstop {
+			weather := pitstop.Weather
+			airTemperature := pitstop.AirTemperature
+			trackTemperature := pitstop.TrackTemperature
+		}
+		else {
+			weather := this.Weather
+			airTemperature := this.AirTemperature
+			trackTemperature := this.TrackTemperature
+		}
 	}
 
 	getLaps(seconds) {

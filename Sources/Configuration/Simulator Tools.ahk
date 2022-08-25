@@ -9,15 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
+
 ;@SC-If %configuration% == Production
 ;@SC #Include ..\Includes\Production.ahk
 ;@SC-EndIf
-
-;@SC-If %configuration% == Development
-;@SC #Include ..\Includes\Development.ahk
-;@SC-EndIf
-
-#Include ..\Includes\Development.ahk
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Simulator Tools.exe
@@ -69,6 +67,9 @@ global kInstallDirectory := (A_ProgramFiles . "\Simulator Controller\")
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+global vTargetConfiguration := "Development"
+global vTargetConfigurationChanged := false
 
 global vUpdateTargets := []
 global vCleanupTargets := []
@@ -987,7 +988,8 @@ deleteUninstallerInfo() {
 	RegDelete HKLM, %kUninstallKey%
 }
 
-readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings, ByRef splashTheme) {
+readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings
+					 , ByRef splashTheme, ByRef targetConfiguration) {
 	local targets := readConfiguration(kToolsTargetsFile)
 	local configuration := readConfiguration(kToolsConfigurationFile)
 	local updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
@@ -1022,12 +1024,13 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySe
 	}
 
 	splashTheme := getConfigurationValue(configuration, "General", "Splash Theme", false)
+	targetConfiguration := getConfigurationValue(configuration, "Compile", "TargetConfiguration", "Development")
 
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme) {
+writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme, targetConfiguration) {
 	local configuration := newConfiguration()
 	local target, setting
 
@@ -1041,6 +1044,7 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 		setConfigurationValue(configuration, "Build", target, setting)
 
 	setConfigurationValue(configuration, "General", "Splash Theme", splashTheme)
+	setConfigurationValue(configuration, "Compile", "TargetConfiguration", targetConfiguration)
 
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
@@ -1204,6 +1208,7 @@ editTargets(command := "") {
 	static buildVariable24
 
 	static splashTheme
+	static targetConfiguration
 
 	if (command == kSave) {
 		Gui TE:Submit
@@ -1234,7 +1239,14 @@ editTargets(command := "") {
 
 		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
 
-		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
+		targetConfiguration := ["Development", "Production"][targetConfiguration]
+
+		if (vTargetConfiguration != targetConfiguration)
+			vTargetConfigurationChanged := true
+
+		vTargetConfiguration := targetConfiguration
+
+		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme, vTargetConfiguration)
 
 		Gui TE:Destroy
 
@@ -1380,13 +1392,18 @@ editTargets(command := "") {
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 
+		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
+
+		chosen := inList(["Development", "Production"], vTargetConfiguration)
+
+		Gui TE:Add, Text, X10 Y%yPos%, % translate("Target")
+		Gui TE:Add, DropDownList, X110 YP-5 w310 AltSubmit Choose%chosen% vtargetConfiguration, % values2String("|", map(["Development", "Production"], "translate")*)
+
 		themes := getAllThemes()
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := (translate("None") . "|" . values2String("|", themes*))
 
-		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
-
-		Gui TE:Add, Text, X10 Y%yPos%, % translate("Theme")
+		Gui TE:Add, Text, X10 YP+30, % translate("Theme")
 		Gui TE:Add, DropDownList, X110 YP-5 w310 Choose%chosen% vsplashTheme, %themes%
 
 		Gui TE:Add, Button, Default X110 y+20 w100 gsaveTargets, % translate("Run")
@@ -2617,7 +2634,7 @@ runCopyTargets(ByRef buildProgress) {
 
 runBuildTargets(ByRef buildProgress) {
 	local title, ignore, target, targetName, build, targetSource, targetBinary, srcLastModified, binLastModified
-	local compiledFile, targetDirectory, sourceDirectory
+	local compiledFile, targetDirectory, sourceDirectory, sourceCode
 
 	if !kSilentMode
 		showProgress({progress: buildProgress, message: ""})
@@ -2635,7 +2652,9 @@ runBuildTargets(ByRef buildProgress) {
 		FileGetTime srcLastModified, %targetSource%, M
 		FileGetTime binLastModified, %targetBinary%, M
 
-		if binLastModified {
+		if vTargetConfigurationChanged
+			build := true
+		else if binLastModified {
 			build := (build || (ErrorLevel || (srcLastModified > binLastModified)))
 			build := (build || checkDependencies(target[4], binLastModified))
 		}
@@ -2653,7 +2672,21 @@ runBuildTargets(ByRef buildProgress) {
 				if !FileExist(targetSource)
 					throw "Source file not found..."
 
-				RunWait % kCompiler . " /in """ . targetSource . """"
+				SplitPath targetSource, , sourceDirectory
+
+				FileRead sourceCode, %targetSource%
+
+				if (vTargetConfiguration = "Production") {
+					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Includes\Development.ahk`r`n;@SC-EndIF", "")
+
+					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Includes\Production.ahk", "#Include ..\Includes\Production.ahk")
+				}
+
+				deleteFile(sourceDirectory . "\compile.ahk")
+
+				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
+
+				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
@@ -2661,6 +2694,8 @@ runBuildTargets(ByRef buildProgress) {
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
+
+			deleteFile(sourceDirectory . "\compile.ahk")
 
 			SplitPath targetBinary, compiledFile, targetDirectory
 			SplitPath targetSource, , sourceDirectory
@@ -2791,7 +2826,7 @@ startSimulatorTools() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
 
-	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
+	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme, vTargetConfiguration)
 
 	if (A_Args.Length() > 0)
 		if (A_Args[1] = "-Update")

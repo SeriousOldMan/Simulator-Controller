@@ -9,15 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
+
 ;@SC-If %configuration% == Production
 ;@SC #Include ..\Includes\Production.ahk
 ;@SC-EndIf
-
-;@SC-If %configuration% == Development
-;@SC #Include ..\Includes\Development.ahk
-;@SC-EndIf
-
-#Include ..\Includes\Development.ahk
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Race Settings.ico
 ;@Ahk2Exe-ExeName Race Settings.exe

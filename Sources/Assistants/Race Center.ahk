@@ -9,17 +9,17 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
+
+;@SC-If %configuration% == Development
+;@SC #Include ..\Includes\Development.ahk
+;@SC-EndIf
+
+#Include ..\Includes\Development.ahk
 
 #MaxMem 128
-
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
 ;@Ahk2Exe-ExeName Race Center.exe

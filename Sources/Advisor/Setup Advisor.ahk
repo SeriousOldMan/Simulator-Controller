@@ -9,15 +9,15 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+;@SC-If %configuration% == Development
+;@SC #Include ..\Includes\Development.ahk
+;@SC-EndIf
 
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+#Include ..\Includes\Development.ahk
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Setup.ico
 ;@Ahk2Exe-ExeName Setup Advisor.exe

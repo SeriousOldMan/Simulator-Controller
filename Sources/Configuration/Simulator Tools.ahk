@@ -478,7 +478,7 @@ checkInstallation() {
 			ExitApp 1
 
 		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
-				  , InstallLocation: normalizePath(installLocation)
+				  , InstallLocation: normalizeDirectoryPath(installLocation)
 				  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
@@ -572,7 +572,7 @@ checkInstallation() {
 			}
 
 			if (!installLocation || (installLocation = ""))
-				installLocation := normalizePath(kInstallDirectory)
+				installLocation := normalizeDirectoryPath(kInstallDirectory)
 
 			isNew := !FileExist(installLocation)
 
@@ -581,14 +581,14 @@ checkInstallation() {
 					ExitApp 1
 
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
-					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
+					  , InstallLocation: normalizeDirectoryPath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
 					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
-			packageLocation := normalizePath(kHomeDirectory)
+			packageLocation := normalizeDirectoryPath(kHomeDirectory)
 
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
@@ -728,10 +728,6 @@ checkInstallation() {
 			ExitApp 0
 		}
 	}
-}
-
-normalizePath(path) {
-	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
 }
 
 copyFiles(source, destination, deleteOrphanes) {
@@ -1670,6 +1666,19 @@ updateConfigurationForV430() {
 
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data")
 		FileAppend `nModule.Team Server.Selected=true, %kUserHomeDirectory%Setup\Setup.data
+
+	if FileExist(kUserConfigDirectory . "Simulator Startup.ini") {
+		userConfigurationFile := getFileName("Application Settings.ini", kUserConfigDirectory)
+		userConfiguration := readConfiguration(userConfigurationFile)
+
+		setConfigurationValue(userConfiguration, "Simulator Startup", "CloseLaunchPad"
+							, getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
+												  , "Startup", "CloseLaunchPad"))
+
+		writeConfiguration(userConfigurationFile, userConfiguration)
+
+		deleteFile(kUserConfigDirectory . "Simulator Startup.ini")
+	}
 }
 
 updateConfigurationForV426() {

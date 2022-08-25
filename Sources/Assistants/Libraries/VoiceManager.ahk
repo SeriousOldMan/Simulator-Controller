@@ -496,7 +496,7 @@ class VoiceManager {
 		registerMessageHandler("Voice", "methodMessageHandler", this)
 
 		if (!this.VoiceServer && this.PushToTalk)
-			Task.startTask(new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority))
+			new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority).start()
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))

@@ -99,7 +99,7 @@ class TriggerDetectorContinuation extends Continuation {
 			found := false
 
 			if GetKeyState("Esc", "P") {
-				Task.stopTask(Task.CurrentTask.Task)
+				this.stop()
 
 				return false
 			}
@@ -190,7 +190,7 @@ class TriggerDetectorContinuation extends Continuation {
 			return new TriggerDetectorContinuation(this.Task, 750)
 		}
 		else {
-			this.Task.stop()
+			this.stop()
 
 			return false
 		}
@@ -433,14 +433,14 @@ triggerDetector(callback := false) {
 			detectorTask := false
 
 		if detectorTask {
-			Task.stopTask(detectorTask)
+			detectorTask.stop()
 
 			detectorTask := false
 		}
 		else {
 			detectorTask := new TriggerDetectorTask(callback, 100)
 
-			Task.startTask(detectorTask)
+			detectorTask.start()
 		}
 	}
 }

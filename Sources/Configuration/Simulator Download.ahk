@@ -127,7 +127,7 @@ downloadSimulatorController() {
 
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
 
-			Task.startTask(updateTask)
+			updateTask.start()
 
 			try {
 				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
@@ -144,11 +144,11 @@ downloadSimulatorController() {
 				ExitApp 0
 			}
 
-			Task.stopTask(updateTask)
+			updateTask.stop()
 
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(90), 1000)
 
-			Task.startTask(updateTask)
+			updateTask.start()
 
 			showProgress({message: translate("Extracting installation files...")})
 
@@ -176,7 +176,7 @@ downloadSimulatorController() {
 				SetWorkingDir %currentDirectory%
 			}
 
-			Task.stopTask(updateTask)
+			updateTask.stop()
 
 			showProgress({progress: 90, message: translate("Preparing installation...")})
 

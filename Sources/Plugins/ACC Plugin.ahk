@@ -1772,7 +1772,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if !async {
 			if updateTask {
-				Task.stopTask(updateTask)
+				updateTask.stop()
 
 				updateTask := false
 			}
@@ -1886,7 +1886,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else {
 				updateTask := new Task(ObjBindMethod(this, "pitstopFinished", pitstopNumber, true), 10000, kLowPriority)
 
-				Task.startTask(updateTask)
+				updateTask.start()
 			}
 		}
 	}

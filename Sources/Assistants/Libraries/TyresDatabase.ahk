@@ -47,7 +47,7 @@ global kMaxTemperatureDelta := 4
 ;;;-------------------------------------------------------------------------;;;
 
 class TyresDatabase extends SessionDatabase {
-	iDatabaseDirectory := kDatabaseDirectory
+	iDatabaseDirectory := this.DatabasePath
 
 	iLastSimulator := false
 	iLastCar := false

@@ -35,6 +35,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\FTP.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,7 +43,9 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups) {
-	local uploadTimeStamp := kDatabaseDirectory . "UPLOAD"
+	local sessionDB := new SessionDatabase()
+	local databaseDirectory := sessionDB.DatabasePath
+	local uploadTimeStamp := databaseDirectory . "UPLOAD"
 	local upload, now, simulator, car, track, distFile, directoryName
 
 	if FileExist(uploadTimeStamp) {
@@ -59,30 +62,30 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	try {
 		deleteDirectory(kTempDirectory . "Shared Database")
 
-		loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+		loop Files, %databaseDirectory%User\*.*, D									; Simulator
 		{
 			simulator := A_LoopFileName
 
 			FileCreateDir %kTempDirectory%Shared Database\%simulator%
 
-			loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			loop Files, %databaseDirectory%User\%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 
 				if (car = "1") {
-					directoryName = %kDatabaseDirectory%User\%simulator%\%car%
+					directoryName = %databaseDirectory%User\%simulator%\%car%
 							
 					deleteDirectory(directoryName)
 				}
 				else {
 					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 
-					loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D			; Track
+					loop Files, %databaseDirectory%User\%simulator%\%car%\*.*, D			; Track
 					{
 						track := A_LoopFileName
 
 						if (track = "1") {
-							directoryName = %kDatabaseDirectory%User\%simulator%\%car%\%track%
+							directoryName = %databaseDirectory%User\%simulator%\%car%\%track%
 							
 							deleteDirectory(directoryName)
 						}
@@ -90,7 +93,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 							FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 
 							if uploadPressures {
-								distFile := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
+								distFile := (databaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
 
 								if FileExist(distFile)
 									FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
@@ -98,7 +101,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 							if uploadSetups {
 								try {
-									FileCopyDir %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
+									FileCopyDir %databaseDirectory%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
 								}
 								catch exception {
 									logError(exception)
@@ -115,9 +118,9 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Shared Database\Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
-		deleteFile(kDatabaseDirectory . "UPLOAD")
+		deleteFile(databaseDirectory . "UPLOAD")
 
-		FileAppend %A_Now%, %kDatabaseDirectory%UPLOAD
+		FileAppend %A_Now%, %databaseDirectory%UPLOAD
 
 		logMessage(kLogInfo, translate("Database successfully uploaded"))
 	}
@@ -130,8 +133,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups) {
-	local downloadTimeStamp := kDatabaseDirectory . "DOWNLOAD"
-	local download, now, ignore, fileName, directory, type, state
+	local sessionDB := new SessionDatabase()
+	local databaseDirectory := sessionDB.DatabasePath
+	local downloadTimeStamp := databaseDirectory . "DOWNLOAD"
+	local download, now, ignore, fileName, databaseDirectory, type, sessionDB
 
 	if FileExist(downloadTimeStamp) {
 		FileReadLine download, %downloadTimeStamp%, 1
@@ -153,37 +158,35 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 		}
 
 		for ignore, fileName in ftpListFiles("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads") {
-			SplitPath fileName, , , , directory
+			SplitPath fileName, , , , databaseDirectory
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if (type = (downloadPressures . downloadSetups)) {
-				state := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				sessionDB := new SessionDatabase()
 
-				if (getConfigurationValue(state, "Database", "Version", false) != directory) {
+				if (sessionDB.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads\" . fileName, kTempDirectory . fileName)
 
 					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 
 					deleteFile(kTempDirectory . fileName)
-					deleteDirectory(kDatabaseDirectory . "Community")
+					deleteDirectory(databaseDirectory . "Community")
 
-					if FileExist(kTempDirectory . "Shared Database\" . directory . "\Community")
-						FileMoveDir %kTempDirectory%Shared Database\%directory%\Community, %kDatabaseDirectory%Community, R
+					if FileExist(kTempDirectory . "Shared Database\" . databaseDirectory . "\Community")
+						FileMoveDir %kTempDirectory%Shared Database\%databaseDirectory%\Community, %databaseDirectory%Community, R
 					else if FileExist(kTempDirectory . "Shared Database\Community")
-						FileMoveDir %kTempDirectory%Shared Database\Community, %kDatabaseDirectory%Community, R
+						FileMoveDir %kTempDirectory%Shared Database\Community, %databaseDirectory%Community, R
 
-					setConfigurationValue(state, "Database", "Version", directory)
-
-					writeConfiguration(kUserConfigDirectory . "Session Database.ini", state)
+					sessionDB.DatabaseVersion := databaseDirectory
 				}
 			}
 		}
 
 		deleteDirectory(kTempDirectory . "Shared Database")
-		deleteFile(kDatabaseDirectory . "DOWNLOAD")
+		deleteFile(databaseDirectory . "DOWNLOAD")
 
-		FileAppend %A_Now%, %kDatabaseDirectory%DOWNLOAD
+		FileAppend %A_Now%, %databaseDirectory%DOWNLOAD
 
 		logMessage(kLogInfo, translate("Database successfully downloaded"))
 	}

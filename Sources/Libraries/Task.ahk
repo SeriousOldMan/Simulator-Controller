@@ -201,6 +201,14 @@ class Task {
 		this.Runnable := false
 	}
 
+	start() {
+		Task.startTask(this)
+	}
+
+	stop() {
+		Task.stopTask(this)
+	}
+
 	getNextTask(priority, remove := true) {
 		local index, candidate
 
@@ -285,8 +293,8 @@ class Task {
 
 		Task.addTask(theTask)
 
+		theTask.Stopped := false
 		theTask.Runnable := true
-
 	}
 
 	stopTask(theTask) {
@@ -318,7 +326,8 @@ class Task {
 				scheduling := priority
 
 				try {
-					protectionOff(true)
+					if (priority < kInterruptPriority)
+						protectionOff(true)
 
 					visited := {}
 
@@ -348,6 +357,9 @@ class Task {
 			schedule := ObjBindMethod(Task, "schedule", priority)
 
 			SetTimer %schedule%, % ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow)))
+
+			if (priority == kInterruptPriority)
+				protectionOff(true)
 		}
 	}
 
@@ -468,6 +480,12 @@ class Continuation extends Task {
 			priority := task.Priority
 
 		base.__New(continuation, sleep, priority)
+	}
+
+	stop() {
+		base.stop()
+
+		this.Task.stop()
 	}
 }
 

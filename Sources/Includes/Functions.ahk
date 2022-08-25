@@ -538,7 +538,7 @@ loadSimulatorConfiguration() {
 
 	path := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
-		kDatabaseDirectory := path . "\"
+		kDatabaseDirectory := normalizeDirectoryPath(path)
 
 		FileCreateDir %kDatabaseDirectory%Community
 		FileCreateDir %kDatabaseDirectory%User
@@ -1673,6 +1673,10 @@ normalizeFilePath(filePath) {
 		else
 			return filePath
 	}
+}
+
+normalizeDirectoryPath(path) {
+	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
 }
 
 temporaryFileName(name, extension) {

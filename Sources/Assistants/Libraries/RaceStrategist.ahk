@@ -1770,7 +1770,7 @@ class RaceStrategist extends RaceAssistant {
 			deleteFile(pitstopHistory)
 		}
 
-		Task.startTask(new this.RaceStrategySimulationTask(this, pitstopHistory))
+		new this.RaceStrategySimulationTask(this, pitstopHistory).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

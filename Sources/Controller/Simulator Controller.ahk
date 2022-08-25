@@ -312,7 +312,7 @@ class GuiFunctionController extends FunctionController {
 				if !hideTask {
 					hideTask := new PeriodicTask("hideFunctionController", duration, kLowPriority)
 
-					Task.startTask(hideTask)
+					hideTask.start()
 				}
 
 				hideTask.Sleep := duration
@@ -1153,8 +1153,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	initializeBackgroundTasks() {
-		Task.startTask(new PeriodicTask("updateSimulatorState", 10000, kLowPriority))
-		Task.startTask(new PeriodicTask("externalCommandManager", 100, kLowPriority))
+		new PeriodicTask("updateSimulatorState", 10000, kLowPriority).start()
+		new PeriodicTask("externalCommandManager", 100, kLowPriority).start()
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}

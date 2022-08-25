@@ -406,8 +406,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	initializeBackgroundTasks() {
-		Task.startTask(new PeriodicTask("updateApplicationStates", 5000, kLowPriority))
-		Task.startTask(new PeriodicTask("updateModeSelector", 500, kLowPriority))
+		new PeriodicTask("updateApplicationStates", 5000, kLowPriority).start()
+		new PeriodicTask("updateModeSelector", 500, kLowPriority).start()
 	}
 }
 

@@ -3352,6 +3352,7 @@ class RaceCenter extends ConfigurationItem {
 
 	chooseStrategyMenu(line) {
 		local strategy, simulator, car, track, simulatorCode, dirName, fileName, configuration, title, file, name
+		local sessionDB, directory
 
 		if this.Simulator {
 			simulator := this.Simulator
@@ -3359,9 +3360,12 @@ class RaceCenter extends ConfigurationItem {
 			track := this.Track
 
 			if (car && track) {
-				simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+				sessionDB := new SessionDatabase()
 
-				dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+				directory := sessionDB.DatabasePath
+				simulatorCode := sessionDB.getSimulatorCode(simulator)
+
+				dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Strategies
 
 				FileCreateDir %dirName%
 			}
@@ -3655,7 +3659,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	pushTask(theTask) {
-		Task.startTask(new RaceCenterTask(theTask))
+		new RaceCenterTask(theTask).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
@@ -9099,7 +9103,7 @@ class RaceCenter extends ConfigurationItem {
 				stint := this.Stints[A_Index]
 
 				stints.Push("<th class=""th-std"">" . stint.Nr . "</th>")
-				drivers.Push("<td class=""td-std"">" . StrReplace(stint.Driver.Nickname, "'", "\'") . "</td>")
+				drivers.Push("<td class=""td-std"">" . StrReplace(stint.Driver.Fullname, "'", "\'") . "</td>")
 				laps.Push("<td class=""td-std"">" . stint.Lap . "</td>")
 
 				duration := 0
@@ -9115,16 +9119,31 @@ class RaceCenter extends ConfigurationItem {
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
 
-		html .= "<br><br><table class=""table-std"">"
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th>" . values2String("", drivers*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Lap") . "</th>" . values2String("", laps*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Duration") . "</th>" . values2String("", durations*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", numLaps*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Position") . "</th>" . values2String("", positions*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Avg. Lap Time") . "</th>" . values2String("", avgLapTimes*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th>" . values2String("", fuelConsumptions*) . "</tr>")
-		html .= ("<tr><th class=""th-std th-left"">" . translate("Accidents") . "</th>" . values2String("", accidents*) . "</tr>")
+		html .= "<br><table class=""table-std"">"
+
+		html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
+			       . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			       . "<th class=""th-std"">" . translate("Lap") . "</th>"
+			       . "<th class=""th-std"">" . translate("Duration") . "</th>"
+			       . "<th class=""th-std"">" . translate("Laps") . "</th>"
+			       . "<th class=""th-std"">" . translate("Position") . "</th>"
+			       . "<th class=""th-std"">" . translate("Avg. Lap Time") . "</th>"
+			       . "<th class=""th-std"">" . translate("Consumption") . "</th>"
+			       . "<th class=""th-std"">" . translate("Accidents") . "</th>"
+			   . "</tr>")
+
+		loop % stints.Length()
+			html .= ("<tr>" . stints[A_Index]
+							. drivers[A_Index]
+							. laps[A_Index]
+							. durations[A_Index]
+							. numLaps[A_Index]
+							. positions[A_Index]
+							. avgLapTimes[A_Index]
+							. fuelConsumptions[A_Index]
+							. accidents[A_Index]
+				   . "</tr>")
+
 		html .= "</table>"
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Race Course") . "</i></div>")

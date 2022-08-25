@@ -380,13 +380,13 @@ launchPad(command := false, arguments*) {
 			return false
 	}
 	else if (command = "CloseOnStartup") {
-		startupConfig := readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
+		startupConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
 		GuiControlGet closeCheckBox
 
-		setConfigurationValue(startupConfig, "Startup", "CloseLaunchPad", closeCheckBox)
+		setConfigurationValue(startupConfig, "Simulator Startup", "CloseLaunchPad", closeCheckBox)
 
-		writeConfiguration(kUserConfigDirectory . "Simulator Startup.ini", startupConfig)
+		writeConfiguration(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 	}
 	else if (command = "Launch") {
 		application := arguments[1]
@@ -494,9 +494,9 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Text, x8 yp+80 w590 0x10
 
-		startupConfig := readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
+		startupConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
-		closeOnStartup := getConfigurationValue(startupConfig, "Startup", "CloseLaunchPad", false)
+		closeOnStartup := getConfigurationValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false)
 
 		Gui LP:Add, CheckBox, x16 yp+10 w250 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
 		Gui LP:Add, Button, x267 yp w80 h23 Default GcloseLaunchPad, % translate("Close")
@@ -646,7 +646,7 @@ startupSimulator() {
 
 	OnExit("clearStartupSemaphore")
 
-	Task.startTask(new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority))
+	new PeriodicTask("watchStartupSemaphore", 2000, kLowPriority).start()
 }
 
 startSimulator() {

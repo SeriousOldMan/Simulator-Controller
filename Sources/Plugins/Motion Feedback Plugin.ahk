@@ -165,7 +165,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if !this.iUpdateLabelsTask {
 				this.iUpdateLabelsTask := new PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
 
-				Task.startTask(this.iUpdateLabelsTask)
+				this.iUpdateLabelsTask.start()
 			}
 		}
 
@@ -173,7 +173,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			base.deactivate()
 
 			if this.iUpdateLabelsTask {
-				Task.stopTask(this.iUpdateLabelsTask)
+				this.iUpdateLabelsTask.stop()
 
 				this.iUpdateLabelsTask := false
 			}
@@ -647,13 +647,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if !this.iUpdateMotionStateTask {
 			this.iUpdateMotionStateTask := new PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
 
-			Task.startTask(this.iUpdateMotionStateTask)
+			this.iUpdateMotionStateTask.start()
 		}
 	}
 
 	deactivate() {
 		if this.iUpdateMotionStateTask {
-			Task.stopTask(this.iUpdateMotionStateTask)
+			this.iUpdateMotionStateTask.stop()
 
 			this.iUpdateMotionStateTask := false
 		}

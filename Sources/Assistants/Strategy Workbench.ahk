@@ -1659,7 +1659,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
 		local compound, strategy, pitstopRule
-		local ignore, descriptor, sessionDB, numPitstops, name, pitstop, compound, compoundColor
+		local ignore, descriptor, sessionDB, directory, numPitstops, name, pitstop, compound, compoundColor
 		local title, simulator, car, track, simulatorCode, dirName, file, settings, settingsDB
 		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index
@@ -1815,9 +1815,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 4: ; "Load from Settings..."
 				if (simulator && car && track) {
 					if GetKeyState("Ctrl", "P") {
-						simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+						sessionDB := new SessionDatabase()
+						
+						directory := sessionDB.DatabasePath
+						simulatorCode := sessionDB.getSimulatorCode(simulator)
 
-						dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Settings
+						dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Settings
 
 						FileCreateDir %dirName%
 
@@ -2115,11 +2118,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
 		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
+		local sessionDB
 
 		if (simulator && car && track) {
-			simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+			sessionDB := new SessionDatabase()
+			
+			directory := sessionDB.DatabasePath
+			simulatorCode := sessionDB.getSimulatorCode(simulator)
 
-			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+			dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Strategies
 
 			FileCreateDir %dirName%
 		}

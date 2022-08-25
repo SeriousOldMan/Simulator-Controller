@@ -580,7 +580,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				RaceAssistantPlugin.sCollectorTask
 					:= new PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 10000, kLowPriority)
 
-				Task.startTask(RaceAssistantPlugin.CollectorTask)
+				RaceAssistantPlugin.CollectorTask.start()
 			}
 		}
 	}

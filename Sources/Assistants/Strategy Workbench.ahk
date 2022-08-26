@@ -2765,8 +2765,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		throw "StrategyWorkbench.setStintDriver should never be called..."
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		local window := this.Window
+		local min := false
+		local max := false
 		local a, b, telemetryDB, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
 		local baseLapTime, count, avgLapTime, lapTime, candidate
 
@@ -2781,16 +2783,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (simInputDropDown > 1) {
 			telemetryDB := this.TelemetryDatabase
 
-			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
+			lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
+			tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
 
 			if (tyreLapTimes.Length() > 1) {
 				xValues := []
 				yValues := []
 
 				for ignore, entry in tyreLapTimes {
+					lapTime := entry["Lap.Time"]
+
 					xValues.Push(entry["Tyre.Laps"])
-					yValues.Push(entry["Lap.Time"])
+					yValues.Push(lapTime)
+
+					min := (min ? Min(min, lapTime) : lapTime)
+					max := (max ? Min(max, lapTime) : lapTime)
 				}
 
 				linRegression(xValues, yValues, a, b)
@@ -2825,6 +2832,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		if (avgLapTime > 0)
 			avgLapTime := (avgLapTime / count)
+
+		if (min && max)
+			avgLapTime := Max(min, Min(max, avgLapTime))
 
 		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}

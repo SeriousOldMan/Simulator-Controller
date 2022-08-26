@@ -1977,9 +1977,8 @@ class RaceStrategist extends RaceAssistant {
 			return false
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local weather := knowledgeBase.getValue("Weather.Weather.10Min")
 		local telemetryDB := Task.CurrentTask.TelemetryDatabase
 		local lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
 		local tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)

@@ -427,7 +427,7 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 ### Drivers
 
-Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not the grand average of all available data is used instead.
+Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not, the grand average of all available data is used instead.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
 
@@ -438,6 +438,8 @@ Note: If you import the strategy into the "Race Center", the driver information 
 Here you can configure a time dependent weather forecast for the strategy simulation. For each weather change specify the time into the race in hours and minutes and supply the expected rain level and temperatures.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%206.JPG)
+
+Depending on the forecast, appropriate pitstops with tyre changes will be planned just before the weather change. If you use this feature, make sure to have enough telemetry data for all applicable tyre compounds available. Otherwise, the simulation will fail or yield false results.
 
 Note: This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Race Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
 

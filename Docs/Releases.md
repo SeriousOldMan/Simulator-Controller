@@ -42,6 +42,7 @@
   9. Improvements for the Strategy Workbench:
      - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned. A future version might introduce a full weather forecast model here.
 	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
+	 - Full support for a weather forecast model. See the [documentation](*) for more details.
   10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
   12. Significant performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.

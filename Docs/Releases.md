@@ -35,14 +35,14 @@
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
-	   - Engine repair will be handled automatically during pitstops for [*to be tested*].
+	   - Engine repair will be handled automatically during pitstops for those simulators, which supports this.
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
   9. Improvements for the Strategy Workbench:
      - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned. A future version might introduce a full weather forecast model here.
 	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
-	 - Full support for a weather forecast model. See the [documentation](*) for more details.
+	 - Full support for a weather forecast model. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#weather) for more details.
   10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
   12. Significant performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.

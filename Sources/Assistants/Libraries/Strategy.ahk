@@ -1204,6 +1204,8 @@ class Strategy extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iWeatherForecast := []
+
 	iSimulator := false
 	iCar := false
 	iTrack := false
@@ -1587,7 +1589,7 @@ class Strategy extends ConfigurationItem {
 				airTemperature := false
 				trackTemperature := false
 
-				strategy.StrategyManager.getSessionWeather(Ceil(this.Time / 60), weather, airTemperature, trackTemperature)
+				strategy.getWeather(Ceil(this.Time / 60), weather, airTemperature, trackTemperature)
 
 				this.iWeather := weather
 				this.iAirTemperature := airTemperature
@@ -1726,6 +1728,12 @@ class Strategy extends ConfigurationItem {
 				return this.LastPitstop.TrackTemperature
 			else
 				return this.iTrackTemperature
+		}
+	}
+
+	WeatherForecast[key := false] {
+		Get {
+			return (key ? this.iWeatherForecast[key] : this.iWeatherForecast)
 		}
 	}
 
@@ -2086,6 +2094,15 @@ class Strategy extends ConfigurationItem {
 	}
 
 	__New(strategyManager, configuration := false, driver := false) {
+		local initialStint := false
+		local initialLap := false
+		local initialStintTime := false
+		local initialSessionTime := false
+		local initialTyreLaps := false
+		local initialFuelAmount := false
+		local map := false
+		local fuelConsumption := false
+		local avgLapTime := false
 		local simulator, car, track, weather, airTemperature, trackTemperature, sessionType, sessionLength
 		local maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures
 		local stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel, pitstopDelta
@@ -2093,6 +2110,7 @@ class Strategy extends ConfigurationItem {
 		local validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets
 		local useInitialConditions, useTelemetryData
 		local consumptionVariation, initialFuelVariation, tyreUsageVariation, tyreCompoundVariation
+		local duration, minute, forecast, lastWeather, lastAirTemperature, lastTrackTemperature
 
 		this.iStrategyManager := strategyManager
 		this.iDriver := driver
@@ -2194,6 +2212,38 @@ class Strategy extends ConfigurationItem {
 			this.iInitialFuelVariation := initialFuelVariation
 			this.iTyreUsageVariation := tyreUsageVariation
 			this.iTyreCompoundVariation := tyreCompoundVariation
+
+			this.StrategyManager.getStartConditions(initialStint, initialLap, initialStintTime, initialSessionTime
+												  , initialTyreLaps, initialFuelAmount, map, fuelConsumption, avgLapTime)
+
+			duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime))
+			forecast := []
+			weather := false
+			airTemperature := false
+			trackTemperature := false
+			lastWeather := this.Weather
+			lastAirTemperature := this.AirTemperature
+			lastTrackTemperature := this.TrackTemperature
+
+			loop {
+				minute := (A_Index * 10)
+
+				if (minute > duration)
+					break
+				else {
+					this.StrategyManager.getSessionWeather(minute, weather, airTemperature, trackTemperature)
+
+					if ((weather != lastWeather) || (airTemperature != lastAirTemperature) || (trackTemperature != lastTrackTemperature)) {
+						lastWeather := weather
+						lastAirTemperature := airTemperature
+						lastTrackTemperature := trackTemperature
+
+						forecast.Push(Array(minute, weather, airTemperature, trackTemperature))
+					}
+				}
+			}
+
+			this.iWeatherForecast := forecast
 		}
 	}
 
@@ -2206,7 +2256,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local tyreSets, defaultPressure, ignore, lap
+		local tyreSets, defaultPressure, ignore, lap, weatherForecast
 
 		base.loadFromConfiguration(configuration)
 
@@ -2219,6 +2269,13 @@ class Strategy extends ConfigurationItem {
 		this.iWeather := getConfigurationValue(configuration, "Weather", "Weather", "Dry")
 		this.iAirTemperature := getConfigurationValue(configuration, "Weather", "AirTemperature", 23)
 		this.iTrackTemperature := getConfigurationValue(configuration, "Weather", "TrackTemperature", 27)
+
+		weatherForecast := []
+
+		loop % getConfigurationValue(configuration, "Weather", "Forecasts", 0)
+			weatherForecast.Push(string2Values(",", getConfigurationValue(configuration, "Weather", "Forecast." . A_Index)))
+
+		this.iWeatherForecast := weatherForecast
 
 		this.iFuelCapacity := getConfigurationValue(configuration, "Settings", "FuelCapacity", 0)
 		this.iSafetyFuel := getConfigurationValue(configuration, "Settings", "SafetyFuel", 0)
@@ -2349,6 +2406,11 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Weather", "AirTemperature", this.AirTemperature)
 		setConfigurationValue(configuration, "Weather", "TrackTemperature", this.TrackTemperature)
 
+		setConfigurationValue(configuration, "Weather", "Forecasts", this.WeatherForecast.Length())
+
+		loop % this.WeatherForecast.Length()
+			setConfigurationValue(configuration, "Weather", "Forecast." . A_Index, values2String(",", this.WeatherForecast[A_Index]*))
+
 		setConfigurationValue(configuration, "Session", "Simulator", this.Simulator)
 		setConfigurationValue(configuration, "Session", "Car", this.Car)
 		setConfigurationValue(configuration, "Session", "Track", this.Track)
@@ -2447,15 +2509,30 @@ class Strategy extends ConfigurationItem {
 
 	getWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
 		local pitstop := false
+		local forecast := false
 		local ignore, candidate
 
-		for ignore, candidate in this.Pitstops
-			if ((candidate.Time / 60) < minute)
-				pitstop := candidate
-			else
-				break
+		if (this.WeatherForecast.Length() > 0) {
+			for ignore, candidate in this.WeatherForecast
+				if candidate[1] < minute
+					forecast := candidate
+				else
+					break
+		}
+		else {
+			for ignore, candidate in this.Pitstops
+				if ((candidate.Time / 60) < minute)
+					pitstop := candidate
+				else
+					break
+		}
 
-		if pitstop {
+		if forecast {
+			weather := forecast[2]
+			airTemperature := forecast[3]
+			trackTemperature := forecast[4]
+		}
+		else if pitstop {
 			weather := pitstop.Weather
 			airTemperature := pitstop.AirTemperature
 			trackTemperature := pitstop.TrackTemperature

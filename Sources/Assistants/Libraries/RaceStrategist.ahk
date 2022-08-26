@@ -1804,8 +1804,8 @@ class RaceStrategist extends RaceAssistant {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
 			if weather {
-				airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
-				trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
+				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
 			}
 			else {
 				weather := strategy.Weather
@@ -1874,8 +1874,8 @@ class RaceStrategist extends RaceAssistant {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
 			if weather {
-				airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
-				trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
+				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
 			}
 			else {
 				weather := strategy.Weather

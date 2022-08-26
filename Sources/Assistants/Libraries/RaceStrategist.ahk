@@ -1804,8 +1804,8 @@ class RaceStrategist extends RaceAssistant {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
 			if weather {
-				airTemperature := knowledgeBase.getValue("Weather.Temperature.Air")
-				trackTemperature := knowledgeBase.getValue("Weather.Temperature.Track")
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
+				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
 			}
 			else {
 				weather := strategy.Weather
@@ -1859,6 +1859,29 @@ class RaceStrategist extends RaceAssistant {
 			pitstopFuelService := strategy.PitstopFuelService
 			pitstopTyreService := strategy.PitstopTyreService
 			pitstopServiceOrder := strategy.PitstopServiceOrder
+
+			return true
+		}
+		else
+			return false
+	}
+
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local knowledgeBase := this.KnowledgeBase
+		local strategy := this.Strategy[true]
+
+		if strategy {
+			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
+
+			if weather {
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
+				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
+			}
+			else {
+				weather := strategy.Weather
+				airTemperature := strategy.AirTemperature
+				trackTemperature := strategy.TrackTemperature
+			}
 
 			return true
 		}
@@ -1954,9 +1977,8 @@ class RaceStrategist extends RaceAssistant {
 			return false
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local weather := knowledgeBase.getValue("Weather.Weather.10Min")
 		local telemetryDB := Task.CurrentTask.TelemetryDatabase
 		local lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
 		local tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)

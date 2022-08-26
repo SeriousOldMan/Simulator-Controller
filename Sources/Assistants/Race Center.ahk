@@ -9,17 +9,15 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
+
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 #MaxMem 128
-
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Console.ico
 ;@Ahk2Exe-ExeName Race Center.exe
@@ -3841,6 +3839,29 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local strategy
+
+		if this.Weather {
+			weather := this.Weather
+			airTemperature := this.AirTemperature
+			trackTemperature := this.TrackTemperature
+		}
+		else {
+			strategy := := this.Strategy
+
+			if strategy {
+				weather := strategy.Weather
+				airTemperature := strategy.AirTemperature
+				trackTemperature := strategy.TrackTemperature
+
+				return true
+			}
+		}
+
+		return false
+	}
+
 	getTrafficSettings(ByRef randomFactor, ByRef numScenarios, ByRef variationWindow
 					 , ByRef useLapTimeVariation, ByRef useDriverErrors, ByRef usePitstops
 					 , ByRef overTakeDelta, ByRef consideredTraffic) {
@@ -3990,10 +4011,10 @@ class RaceCenter extends ConfigurationItem {
 			return false
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		local telemetryDB := this.SimulationTelemetryDatabase
-		local lapTimes := telemetryDB.getMapLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
-		local tyreLapTimes := telemetryDB.getTyreLapTimes(this.Weather, tyreCompound, tyreCompoundColor)
+		local lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
+		local tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
 		local a := false
 		local b := false
 		local xValues, yValues, ignore, entry, baseLapTime, count, avgLapTime, lapTime, candidate

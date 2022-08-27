@@ -345,7 +345,7 @@ class RaceStrategist extends RaceAssistant {
 		run() {
 			new VariationSimulation(this.RaceStrategist
 								  , this.RaceStrategist.KnowledgeBase.getValue("Session.Format")
-								  , this.TelemetryDatabase).runSimulation(true)
+								  , this.TelemetryDatabase).runSimulation(false)
 
 			return false
 		}
@@ -435,7 +435,7 @@ class RaceStrategist extends RaceAssistant {
 
 		FileCreateDir %kTempDirectory%Race Strategist
 
-		this.iSessionDatabaseDirectory := (kTempDirectory . "Race Strategist")
+		this.iSessionDatabaseDirectory := (kTempDirectory . "Race Strategist\")
 	}
 
 	updateConfigurationValues(values) {

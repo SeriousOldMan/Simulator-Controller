@@ -739,11 +739,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sLastLapUpdate := 0
 		RaceAssistantPlugin.sInPit := false
 
+		RaceAssistantPlugin.sWaitForShutdown := (A_TickCount + (90 * 1000))
+
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled
 				assistant.finishSession(shutdownAssistant)
-
-		RaceAssistantPlugin.sWaitForShutdown := (A_TickCount + (90 * 1000))
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
 			RaceAssistantPlugin.TeamServer.leaveSession()

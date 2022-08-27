@@ -588,7 +588,7 @@ class VoiceServer extends ConfigurationItem {
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
 		if this.PushToTalk
-			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority).start()
+			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kInterruptPriority).start()
 	}
 
 	listen() {
@@ -597,14 +597,8 @@ class VoiceServer extends ConfigurationItem {
 		static lastUp := 0
 		static clicks := 0
 		static activation := false
-		static lastPressed := false
 
 		pressed := GetKeyState(this.PushToTalk, "P")
-
-		if (!pressed && !lastPressed)
-			return
-		else
-			lastPressed := pressed
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount

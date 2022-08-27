@@ -342,7 +342,7 @@ class StrategySimulation {
 	}
 
 	acquireTyresData(weather, tyreCompound, tyreCompoundColor) {
-		return this.TelemetryDatabase.getTyresData(weather, tyreCompound, tyreCompoundColor)
+		return this.TelemetryDatabase.getTyreData(weather, tyreCompound, tyreCompoundColor)
 	}
 
 	acquireTelemetryData(ByRef electronicsData, ByRef tyresData, verbose, ByRef progress) {
@@ -359,10 +359,20 @@ class StrategySimulation {
 		local tyreCompound := false
 		local tyreCompoundColor := false
 		local tyrePressures := false
-		local message
+		local message, compound, candidate
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
+
+		compound := compound(tyreCompound, tyreCompoundColor)
+
+		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound) {
+			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+
+			if candidate
+				splitCompound(candidate, tyreCompound, tyreCompoundColor)
+
+		}
 
 		if verbose {
 			message := translate("Reading Electronics Data...")
@@ -658,6 +668,7 @@ class StrategySimulation {
 
 class VariationSimulation extends StrategySimulation {
 	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
+		local telemetryDB := this.TelemetryDatabase
 		local simulator := false
 		local car := false
 		local track := false
@@ -699,6 +710,7 @@ class VariationSimulation extends StrategySimulation {
 		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound, tyreLapsVariation
 		local message, stintLaps, name, driverID, driverName
 		local ignore, mapData, scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
+		local candidate, targetTyreCompound, targetTyreCompoundColor
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
@@ -750,6 +762,17 @@ class VariationSimulation extends StrategySimulation {
 
 		tyreLapsVariation := tyreUsage
 
+		targetTyreCompound := tyreCompound
+		targetTyreCompoundColor := tyreCompoundColor
+
+		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+
+			if candidate
+				splitCompound(candidate, targetTyreCompound, targetTyreCompoundColor)
+
+		}
+
 		loop { ; consumption
 			loop { ; initialFuel
 				loop { ; tyreUsage
@@ -790,7 +813,7 @@ class VariationSimulation extends StrategySimulation {
 
 							this.setStintDriver(initialStint, driverID)
 
-							for ignore, mapData in this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
+							for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
 								scenarioMap := mapData["Map"]
 								scenarioFuelConsumption := mapData["Fuel.Consumption"]
 								scenarioAvgLapTime := mapData["Lap.Time"]
@@ -972,6 +995,7 @@ class TrafficSimulation extends StrategySimulation {
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
+		local telemetryDB := this.TelemetryDatabase
 		local simulator := false
 		local car := false
 		local track := false
@@ -1021,6 +1045,7 @@ class TrafficSimulation extends StrategySimulation {
 		local consumptionRound, initialFuelRound, tyreUsageRound, tyreCompoundVariationRound
 		local message, stintLaps, name, driverID, driverName, strategy, currentConsumption
 		local ignore, mapData, scenarioMap, scenarioFuelConsumption, scenarioAvgLapTime
+		local candidate, targetTyreCompound, targetTyreCompoundColor
 
 		this.getStrategySettings(simulator, car, track, weather, airTemperature, trackTemperature
 							   , sessionType, sessionLength, maxTyreLaps, tyreCompound, tyreCompoundColor, tyrePressures)
@@ -1092,6 +1117,17 @@ class TrafficSimulation extends StrategySimulation {
 			this.TyreCompoundColor := tyreCompoundColor
 			this.TyreCompoundVariation := tyreCompoundVariation
 
+			targetTyreCompound := tyreCompound
+			targetTyreCompoundColor := tyreCompoundColor
+
+			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
+
+				if candidate
+					splitCompound(candidate, targetTyreCompound, targetTyreCompoundColor)
+
+			}
+
 			consumptionRound := 0
 			initialFuelRound := 0
 			tyreUsageRound := 0
@@ -1139,7 +1175,7 @@ class TrafficSimulation extends StrategySimulation {
 
 								this.setStintDriver(initialStint, driverID)
 
-								for ignore, mapData in this.acquireElectronicsData(weather, tyreCompound, tyreCompoundColor) {
+								for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
 									this.getStintDriver(initialStint, driverID, driverName)
 
 									this.setStintDriver(initialStint, driverID)

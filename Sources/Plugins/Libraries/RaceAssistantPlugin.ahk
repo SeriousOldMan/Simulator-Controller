@@ -1375,7 +1375,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (A_TickCount <= RaceAssistantPlugin.WaitForShutdown)
 			return
 		else {
-			RaceAssistantPlugin.WaitForShutdown := false
+			RaceAssistantPlugin.sWaitForShutdown := false
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
 				assistant.RaceAssistant[true]

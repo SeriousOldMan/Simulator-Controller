@@ -270,6 +270,7 @@ int main(int argc, char* argv[])
 			printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 			printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		}
+		printData("InPitLane", gf->isInPit ? "true" : "false");
 		printData("InPit", gf->isInPit ? "true" : "false");
 	}
 

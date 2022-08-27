@@ -128,11 +128,11 @@ class VoiceManager {
 			this.iLanguage := language
 		}
 
-		startTalk() {
+		beginTalk() {
 			this.iIsTalking := true
 		}
 
-		finishTalk() {
+		endTalk() {
 			local text, focus
 
 			if this.Talking {
@@ -234,11 +234,11 @@ class VoiceManager {
 			base.__New(synthesizer, speaker, language)
 		}
 
-		startTalk() {
+		beginTalk() {
 			this.iIsTalking := true
 		}
 
-		finishTalk() {
+		endTalk() {
 			local text, focus
 
 			if this.Talking {

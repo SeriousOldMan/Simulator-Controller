@@ -270,8 +270,8 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
                     Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(car.isCarInPitline);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine(car.isCarInPit);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
+                    Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine((car.isCarInPit == 0) ? "false" : "true");
                 }
 
                 Console.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));

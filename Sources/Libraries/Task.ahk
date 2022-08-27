@@ -36,6 +36,8 @@ class Task {
 	static sNormal := -500
 	static sLow := -2000
 
+	static sBlocked := false
+
 	static sLowTasks := []
 	static sNormalTasks := []
 	static sHighTasks := []
@@ -96,6 +98,12 @@ class Task {
 	CurrentTask[] {
 		Get {
 			return Task.sCurrentTask
+		}
+	}
+
+	Blocked[] {
+		Get {
+			return Task.sBlocked
 		}
 	}
 
@@ -304,6 +312,18 @@ class Task {
 		Task.removeTask(theTask)
 	}
 
+	block(priority) {
+		local oldBlocked := Task.sBlocked
+
+		Task.sBlocked := priority
+
+		return oldBlocked
+	}
+
+	unblock(priority := false) {
+		Task.block(priority)
+	}
+
 	yield() {
 		Task.schedule()
 	}
@@ -316,7 +336,7 @@ class Task {
 		protectionOn(true)
 
 		try {
-			if (scheduling && (priority <= scheduling)) {
+			if ((scheduling >= priority) || (Task.CurrentTask && (Task.CurrentTask.Priority >= priority)) || (Task.Blocked >= priority)) {
 				protectionOff(true)
 
 				return
@@ -337,7 +357,7 @@ class Task {
 						next := Task.getNextTask(priority, true)
 
 						if next
-							if (!visited.HasKey(next) && (!Task.CurrentTask || (Task.CurrentTask.Priority < next.Priority))) {
+							if !visited.HasKey(next) {
 								visited[next] := true
 
 								worked := true

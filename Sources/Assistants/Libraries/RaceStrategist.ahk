@@ -568,7 +568,7 @@ class RaceStrategist extends RaceAssistant {
 		if (remainingFuelLaps == 0)
 			speaker.speakPhrase("Later")
 		else {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("LapsFuel", {laps: remainingFuelLaps})
@@ -582,7 +582,7 @@ class RaceStrategist extends RaceAssistant {
 					speaker.speakPhrase("LapsSession", {laps: remainingSessionLaps})
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -614,7 +614,7 @@ class RaceStrategist extends RaceAssistant {
 		else if inList(words, speaker.Fragments["Laps"])
 			this.futurePositionRecognized(words)
 		else {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("Position", {position: position})
@@ -623,7 +623,7 @@ class RaceStrategist extends RaceAssistant {
 					speaker.speakPhrase("Great")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -700,7 +700,7 @@ class RaceStrategist extends RaceAssistant {
 		local lap, driverLap, otherLap
 
 		if (delta != 0) {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
@@ -713,7 +713,7 @@ class RaceStrategist extends RaceAssistant {
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 		else
@@ -729,7 +729,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
@@ -746,7 +746,7 @@ class RaceStrategist extends RaceAssistant {
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -770,7 +770,7 @@ class RaceStrategist extends RaceAssistant {
 		local lap, driverLap, otherLap
 
 		if (delta != 0) {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
@@ -783,7 +783,7 @@ class RaceStrategist extends RaceAssistant {
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 		else
@@ -799,7 +799,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
@@ -820,7 +820,7 @@ class RaceStrategist extends RaceAssistant {
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -886,7 +886,7 @@ class RaceStrategist extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				minute := Floor(driverLapTime / 60)
@@ -904,7 +904,7 @@ class RaceStrategist extends RaceAssistant {
 					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -978,7 +978,7 @@ class RaceStrategist extends RaceAssistant {
 		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				if (position <= (cars / 5))
@@ -1028,7 +1028,7 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 
@@ -1616,7 +1616,7 @@ class RaceStrategist extends RaceAssistant {
 			speaker := this.getSpeaker()
 
 			if strategyName {
-				speaker.startTalk()
+				speaker.beginTalk()
 
 				try {
 					if ((options == true) || (options.HasKey("Strategy") && options.Strategy))
@@ -1653,7 +1653,7 @@ class RaceStrategist extends RaceAssistant {
 					}
 				}
 				finally {
-					speaker.finishTalk()
+					speaker.endTalk()
 				}
 			}
 			else
@@ -2125,7 +2125,7 @@ class RaceStrategist extends RaceAssistant {
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
@@ -2139,7 +2139,7 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -2242,7 +2242,7 @@ class RaceStrategist extends RaceAssistant {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
-				speaker.startTalk()
+				speaker.beginTalk()
 
 				try {
 					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
@@ -2266,7 +2266,7 @@ class RaceStrategist extends RaceAssistant {
 					}
 				}
 				finally {
-					speaker.finishTalk()
+					speaker.endTalk()
 				}
 			}
 	}
@@ -2294,7 +2294,7 @@ class RaceStrategist extends RaceAssistant {
 
 			laps := (plannedPitstopLap - knowledgeBase.getValue("Lap"))
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("PitstopAhead", {lap: plannedPitstopLap, laps: laps})
@@ -2316,7 +2316,7 @@ class RaceStrategist extends RaceAssistant {
 				}
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}

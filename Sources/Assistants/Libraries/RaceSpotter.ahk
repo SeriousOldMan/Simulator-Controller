@@ -756,7 +756,7 @@ class RaceSpotter extends RaceAssistant {
 		else if inList(words, speaker.Fragments["Laps"])
 			this.futurePositionRecognized(words)
 		else {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("Position", {position: position})
@@ -765,7 +765,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("Great")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -789,7 +789,7 @@ class RaceSpotter extends RaceAssistant {
 		local lap, driverLap, otherLap
 
 		if (delta != 0) {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
@@ -802,7 +802,7 @@ class RaceSpotter extends RaceAssistant {
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 		else
@@ -818,7 +818,7 @@ class RaceSpotter extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
@@ -835,7 +835,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -859,7 +859,7 @@ class RaceSpotter extends RaceAssistant {
 		local lap, driverLap, otherLap
 
 		if (delta != 0) {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
@@ -872,7 +872,7 @@ class RaceSpotter extends RaceAssistant {
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 		else
@@ -888,7 +888,7 @@ class RaceSpotter extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
@@ -909,7 +909,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -971,7 +971,7 @@ class RaceSpotter extends RaceAssistant {
 		if (lap == 0)
 			speaker.speakPhrase("Later")
 		else {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				minute := Floor(driverLapTime / 60)
@@ -989,7 +989,7 @@ class RaceSpotter extends RaceAssistant {
 					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 	}
@@ -1114,7 +1114,7 @@ class RaceSpotter extends RaceAssistant {
 			if (driver && this.GridPosition) {
 				currentPosition := knowledgeBase.getValue("Car." . driver . ".Position")
 
-				speaker.startTalk()
+				speaker.beginTalk()
 
 				try {
 					if (currentPosition = this.GridPosition)
@@ -1136,7 +1136,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 				finally {
-					speaker.finishTalk()
+					speaker.endTalk()
 				}
 
 				return true
@@ -1271,7 +1271,7 @@ class RaceSpotter extends RaceAssistant {
 					if !this.SessionInfos.HasKey(situation) {
 						this.SessionInfos[situation] := true
 
-						speaker.startTalk()
+						speaker.beginTalk()
 
 						try {
 							speaker.speakPhrase("HalfTimeIntro", {minutes: Round(remainingSessionTime / 60000)
@@ -1297,7 +1297,7 @@ class RaceSpotter extends RaceAssistant {
 											  , {laps: remainingFuelLaps})
 						}
 						finally {
-							speaker.finishTalk()
+							speaker.endTalk()
 						}
 					}
 				}
@@ -1420,7 +1420,7 @@ class RaceSpotter extends RaceAssistant {
 			if !this.TacticalAdvices.HasKey(situation) {
 				this.TacticalAdvices[situation] := true
 
-				speaker.startTalk()
+				speaker.beginTalk()
 
 				try {
 					speaker.speakPhrase("LapDownFaster")
@@ -1428,7 +1428,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("Slipstream")
 				}
 				finally {
-					speaker.finishTalk()
+					speaker.endTalk()
 				}
 
 				return true
@@ -1443,7 +1443,7 @@ class RaceSpotter extends RaceAssistant {
 			if !this.TacticalAdvices.HasKey(situation) {
 				this.TacticalAdvices[situation] := true
 
-				speaker.startTalk()
+				speaker.beginTalk()
 
 				try {
 					speaker.speakPhrase("LapUpFaster")
@@ -1451,7 +1451,7 @@ class RaceSpotter extends RaceAssistant {
 					speaker.speakPhrase("Slipstream")
 				}
 				finally {
-					speaker.finishTalk()
+					speaker.endTalk()
 				}
 
 				return true
@@ -1504,7 +1504,7 @@ class RaceSpotter extends RaceAssistant {
 
 		informed := false
 
-		speaker.startTalk()
+		speaker.beginTalk()
 
 		try {
 			if (trackAhead && (trackAhead != standingsAhead)
@@ -1639,7 +1639,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 		finally {
-			speaker.finishTalk()
+			speaker.endTalk()
 		}
 	}
 
@@ -1648,7 +1648,7 @@ class RaceSpotter extends RaceAssistant {
 		local speaker := this.getSpeaker(true)
 		local position := Round(knowledgeBase.getValue("Position", 0))
 
-		speaker.startTalk()
+		speaker.beginTalk()
 
 		try {
 			speaker.speakPhrase("LastLaps")
@@ -1665,7 +1665,7 @@ class RaceSpotter extends RaceAssistant {
 				speaker.speakPhrase("Focus")
 		}
 		finally {
-			speaker.finishTalk()
+			speaker.endTalk()
 		}
 	}
 
@@ -1768,6 +1768,7 @@ class RaceSpotter extends RaceAssistant {
 
 	proximityAlert(alert) {
 		local speaker, type
+		local oldPriority
 
 		static alerting := false
 
@@ -1789,6 +1790,7 @@ class RaceSpotter extends RaceAssistant {
 				return
 			}
 
+			oldPriority := Task.block(kNormalPriority)
 			alerting := true
 
 			try {
@@ -1818,6 +1820,8 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			finally {
+				Task.unblock(oldPriority)
+
 				alerting := false
 			}
 		}
@@ -2050,7 +2054,7 @@ class RaceSpotter extends RaceAssistant {
 		facts := this.createSession(settings, data)
 
 		if this.Speaker {
-			speaker.startTalk()
+			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("GreetingIntro")
@@ -2097,7 +2101,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			finally {
-				speaker.finishTalk()
+				speaker.endTalk()
 			}
 		}
 

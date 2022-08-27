@@ -661,7 +661,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					speaker := this.getSpeaker()
 
-					speaker.startTalk()
+					speaker.beginTalk()
 
 					try {
 						speaker.speakPhrase("Joke")
@@ -669,7 +669,7 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.speak(joke.value)
 					}
 					finally {
-						speaker.finishTalk()
+						speaker.endTalk()
 					}
 				}
 				catch exception {
@@ -696,7 +696,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					speaker := this.getSpeaker()
 
-					speaker.startTalk()
+					speaker.beginTalk()
 
 					try {
 						speaker.speakPhrase("Joke")
@@ -704,7 +704,7 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.speak(joke)
 					}
 					finally {
-						speaker.finishTalk()
+						speaker.endTalk()
 					}
 				}
 				catch exception {

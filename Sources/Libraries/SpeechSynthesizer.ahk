@@ -151,7 +151,17 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
-		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
+
+		dirName := ("PhraseCache_" . StrSplit(A_ScriptName, ".")[1] . "_" . StrReplace(StrSplit(kVersion, "-", , 2), ".", ""))
+
+		FileCreateDir %kTempDirectory%%dirName%
+
+		this.iCacheDirectory := (kTempDirectory . dirName . "\")
+
+		this.clearCache()
+
+		OnExit(ObjBindMethod(this, "clearCache"))
 
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
@@ -240,8 +250,6 @@ class SpeechSynthesizer {
 		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
-
-		OnExit(ObjBindMethod(this, "clearCache"))
 	}
 
 	setPlayerLevel(level) {
@@ -371,28 +379,16 @@ class SpeechSynthesizer {
 		local directory := this.iCacheDirectory
 
 		if directory
-			deleteDirectory(directory)
+			deleteFile(directory . "Unnamed*.*")
 
 		return false
 	}
 
 	cacheFileName(cacheKey, fileName := false) {
-		local postfix, dirName
-
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
-			if !this.iCacheDirectory {
-				Random postfix, 1, 1000000
-
-				dirName := ("PhraseCache" . Round(postfix))
-
-				FileCreateDir %kTempDirectory%%dirName%
-
-				this.iCacheDirectory := (kTempDirectory . dirName)
-			}
-
-			fileName := (this.iCacheDirectory . "\" . (fileName ? fileName : cacheKey) . ".wav")
+			fileName := (this.iCacheDirectory . (fileName ? fileName : cacheKey) . ".wav")
 
 			this.iCache[cacheKey] := fileName
 

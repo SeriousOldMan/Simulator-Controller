@@ -1982,7 +1982,7 @@ class RaceEngineer extends RaceAssistant {
 		setConfigurationValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", knowledgeBase.getValue("Lap") - lastLap)
 
 		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numPitstops)
-		setConfigurationValue(pitstopHistory, "Pitstops", "Count", numTyreSets)
+		setConfigurationValue(pitstopHistory, "Pitstops", "TyreSets", numTyreSets)
 
 		fileName := temporaryFileName("Pitstop", "history")
 

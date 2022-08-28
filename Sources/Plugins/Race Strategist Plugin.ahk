@@ -163,11 +163,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				deleteFile(strategy)
 
 				teamServer.setSessionValue("Race Strategy", text)
-				teamServer.setSessionValue("Race Strategy Version", "Force")
+				teamServer.setSessionValue("Race Strategy Version", A_Now)
 			}
 			else {
 				teamServer.setSessionValue("Race Strategy", "CANCEL")
-				teamServer.setSessionValue("Race Strategy Version", "Force")
+				teamServer.setSessionValue("Race Strategy Version", A_Now)
 			}
 		}
 		else

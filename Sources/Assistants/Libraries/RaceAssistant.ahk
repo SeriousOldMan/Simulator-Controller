@@ -1033,7 +1033,7 @@ class RaceAssistant extends ConfigurationItem {
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1115,8 +1115,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
 
-		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
+		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
@@ -1125,11 +1126,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		values := {OverallTime: overallTime}
 
-		if (lapNumber > 1)
-			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+		if (lapTime > 0) {
+			if ((lapNumber > 1) && lapValid)
+				values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
 
-		if (lapTime > 0)
 			this.updateDynamicValues(values)
+		}
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 

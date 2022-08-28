@@ -410,7 +410,7 @@ class PositionInfo {
 	}
 
 	isValid() {
-		return (this.OpponentType != "Unknown")
+		return (this.LastLap > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1243,7 +1243,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if !this.SessionInfos.HasKey("AirTemperature") {
-				if (lastLap > this.BaseLap + 1) {
+				if (lastLap > (this.BaseLap + 1)) {
 					this.SessionInfos["AirTemperature"] := airTemperature
 
 					if (this.BaseLap > 1) {
@@ -1406,7 +1406,7 @@ class RaceSpotter extends RaceAssistant {
 		if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
 		 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
 		 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapDown")) {
+		 && (trackBehind.OpponentType = "LapDown") && trackBehind.isValid()) {
 			situation := ("ProtectFaster " . trackBehind . A_Space . standingsBehind)
 
 			if !this.TacticalAdvices.HasKey(situation) {
@@ -1419,7 +1419,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapDown")) {
+		 && (trackBehind.OpponentType = "LapDown") && trackBehind.isValid()) {
 			situation := ("LapDownFaster " . trackBehind)
 
 			if !this.TacticalAdvices.HasKey(situation) {
@@ -1441,7 +1441,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapUp")
+		 && (trackBehind.OpponentType = "LapUp") && trackBehind.isValid()
 		 && (Abs(trackBehind.LapTimeDifference[true]) < (this.DriverCar.LapTime[true] * 0.005))) {
 			situation := ("LapUpFaster " . trackBehind)
 

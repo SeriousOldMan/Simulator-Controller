@@ -289,15 +289,15 @@ class RaceStrategist extends RaceAssistant {
 			}
 		}
 
-		Pitstops[] {
+		Pitstops[key := false] {
 			Get {
-				return this.iPitstops
+				return (key ? this.iPitstops[key] : this.iPitstops)
 			}
 		}
 
-		UsedTyreSets[] {
+		UsedTyreSets[key := false] {
 			Get {
-				return this.iUsedTyreSets
+				return (key ? this.iUsedTyreSets[key] : this.iUsedTyreSets)
 			}
 		}
 
@@ -1817,7 +1817,7 @@ class RaceStrategist extends RaceAssistant {
 			}
 
 			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
-			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
+			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color", false)
 
 			if !tyreCompound {
 				tyreCompound := strategy.TyreCompound
@@ -1841,6 +1841,8 @@ class RaceStrategist extends RaceAssistant {
 			sessionLength := strategy.SessionLength
 			maxTyreLaps := strategy.MaxTyreLaps
 			tyrePressures := strategy.TyrePressures
+
+			return true
 		}
 		else
 			return false
@@ -2072,7 +2074,7 @@ class RaceStrategist extends RaceAssistant {
 				writeConfiguration(kTempDirectory . "Race Strategist.strategy", configuration)
 			}
 
-			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, true), 1000)
+			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false), 1000)
 
 			if this.RemoteHandler {
 				fileName := temporaryFileName("Race Strategy", "update")

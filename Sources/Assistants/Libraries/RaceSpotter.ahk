@@ -331,7 +331,7 @@ class PositionInfo {
 			local position := knowledgeBase.getValue("Position")
 			local nearBy := ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true])
 
-			else if ((lastLap > this.Car.LastLap) && !nearBy)
+			if ((lastLap > this.Car.LastLap) && !nearBy)
 				return "LapDown"
 			else if ((lastLap < this.Car.LastLap) && !nearBy)
 				return "LapUp"
@@ -1862,8 +1862,8 @@ class RaceSpotter extends RaceAssistant {
 				sectors := string2Values(",", speaker.Fragments["Sectors"])
 
 				switch alert {
-					case "Full":
-						speaker.speakPhrase("YellowFull", false, false, "YellowFull")
+					case "All":
+						speaker.speakPhrase("YellowAll", false, false, "YellowAll")
 					case "Sector":
 						if (arguments.Length() > 1)
 							speaker.speakPhrase("YellowDistance", {sector: sectors[arguments[1]], distance: arguments[2]})

@@ -1932,7 +1932,7 @@ class Strategy extends ConfigurationItem {
 		}
 
 		Set {
-			return (this.PitstopRule := value)
+			return (this.iPitstopRule := value)
 		}
 	}
 

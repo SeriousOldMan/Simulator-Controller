@@ -615,8 +615,14 @@ int main(int argc, char* argv[]) {
 			else {
 				bool startGo = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
 				
-				if (!running)
-					running = (startGo || (countdown-- <= 0));
+				if (!running) {
+					countdown -= 1;
+
+					if (!greenFlagReported && (countdown <= 0))
+						greenFlagReported = true;
+
+					running = (startGo || (countdown <= 0));
+				}
 
 				if (running)
 					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {

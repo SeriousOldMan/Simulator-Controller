@@ -1441,6 +1441,8 @@ readSimulatorData(simulator) {
 	}
 
 	data := readConfiguration(dataFile)
+	
+	deleteFile(dataFile)
 
 	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)

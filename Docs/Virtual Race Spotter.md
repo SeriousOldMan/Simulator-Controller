@@ -138,7 +138,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
 | Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Full Course Yellow              | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             |
 | Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             |
 | Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |

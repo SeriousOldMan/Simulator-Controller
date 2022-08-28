@@ -153,7 +153,7 @@ class SpeechSynthesizer {
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
 
-		dirName := ("PhraseCache_" . StrSplit(A_ScriptName, ".")[1] . "_" . StrReplace(StrSplit(kVersion, "-", , 2)[1], ".", ""))
+		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
 		FileCreateDir %kTempDirectory%%dirName%
 

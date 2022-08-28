@@ -850,11 +850,16 @@ int main(int argc, char* argv[])
 						checkCoordinates(pHeader, g_data, trackLength);
 					else {
 						if (!running) {
+							countdown -= 1;
+
 							getDataValue(result, pHeader, g_data, "SessionFlags");
 
 							int flags = atoi(result);
 
-							running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown-- <= 0));
+							if (!greenFlagReported && (countdown <= 0))
+								greenFlagReported = true;
+
+							running = (((flags & irsdk_startGo) != 0) || ((flags & irsdk_startSet) != 0) || (countdown <= 0));
 						}
 
 						if (running) {

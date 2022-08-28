@@ -145,7 +145,7 @@ int carBehindCount = 0;
 #define YELLOW_SECTOR_2 2
 #define YELLOW_SECTOR_3 4
 
-#define YELLOW_FULL (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3)
+#define YELLOW_ALL (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3)
 
 #define BLUE 16
 
@@ -481,10 +481,10 @@ BOOL checkFlagState() {
 			map_buffer->flags.sector_yellow[0] == 1 &&
 			map_buffer->flags.sector_yellow[1] == 1 &&
 			map_buffer->flags.sector_yellow[2] == 1) {
-			if ((lastFlagState & YELLOW_FULL) == 0) {
-				sendSpotterMessage("yellowFlag:Full");
+			if ((lastFlagState & YELLOW_ALL) == 0) {
+				sendSpotterMessage("yellowFlag:All");
 
-				lastFlagState |= YELLOW_FULL;
+				lastFlagState |= YELLOW_ALL;
 
 				return TRUE;
 			}
@@ -534,8 +534,8 @@ BOOL checkFlagState() {
 				if (waitYellowFlagState != lastFlagState)
 					sendSpotterMessage("yellowFlag:Clear");
 
-				lastFlagState &= ~YELLOW_FULL;
-				waitYellowFlagState &= ~YELLOW_FULL;
+				lastFlagState &= ~YELLOW_ALL;
+				waitYellowFlagState &= ~YELLOW_ALL;
 				yellowCount = 0;
 
 				return TRUE;
@@ -739,8 +739,14 @@ int main(int argc, char* argv[])
 			else {
 				BOOL startGo = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
 				
-				if (!running)
-					running = (startGo || (countdown-- <= 0));
+				if (!running) {
+					countdown -= 1;
+
+					if (!greenFlagReported && (countdown <= 0))
+						greenFlagReported = TRUE;
+
+					running = (startGo || (countdown <= 0));
+				}
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {

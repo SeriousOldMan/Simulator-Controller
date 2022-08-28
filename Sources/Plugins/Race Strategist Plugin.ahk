@@ -115,8 +115,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceStrategist(this, pid)
 	}
 
-	startSession(settings, data, teamSession) {
-		base.startSession(settings, data, teamSession)
+	startSession(settings, data) {
+		base.startSession(settings, data)
 
 		this.iLapDatabase := false
 	}

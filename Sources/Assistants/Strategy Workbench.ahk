@@ -2926,6 +2926,8 @@ readSimulatorData(simulator) {
 		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 
 		data := readConfiguration(dataFile)
+		
+		deleteFile(dataFile)
 
 		setConfigurationSectionValues(data, "Setup Data", setupData)
 

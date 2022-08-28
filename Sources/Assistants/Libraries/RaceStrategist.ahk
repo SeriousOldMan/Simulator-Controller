@@ -344,8 +344,8 @@ class RaceStrategist extends RaceAssistant {
 
 		run() {
 			new VariationSimulation(this.RaceStrategist
-								  , this.RaceStrategist.KnowledgeBase.getValue("Session.Format")
-								  , this.TelemetryDatabase).runSimulation(false)
+								  , (this.RaceStrategist.KnowledgeBase.getValue("Session.Format") = "Time") ? "Duration" : "Laps"
+								  , this.TelemetryDatabase).runSimulation(isDebug())
 
 			return false
 		}
@@ -1263,7 +1263,7 @@ class RaceStrategist extends RaceAssistant {
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasTelemetryData: false
 							    , BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
-								, EnoughData: false, StrategyReported: (getConfigurationValue(data, "Stint Data", "Laps", 0) < 2)})
+								, EnoughData: false, StrategyReported: (getConfigurationValue(data, "Stint Data", "Laps", 0) > 1)})
 
 		if this.Speaker
 			this.getSpeaker().speakPhrase(raceEngineer ? "" : "Greeting")
@@ -1764,13 +1764,16 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	runSimulation(pitstopHistory) {
-		if !IsObject(pitstopHistory) {
-			pitstopHistory := readConfiguration(pitstopHistory)
+		local data
 
-			deleteFile(pitstopHistory)
+		if !IsObject(pitstopHistory) {
+			data := readConfiguration(pitstopHistory)
+
+			if !isDebug()
+				deleteFile(pitstopHistory)
 		}
 
-		new this.RaceStrategySimulationTask(this, pitstopHistory).start()
+		new this.RaceStrategySimulationTask(this, data).start()
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

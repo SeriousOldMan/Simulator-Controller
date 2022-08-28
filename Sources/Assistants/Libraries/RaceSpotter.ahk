@@ -329,15 +329,16 @@ class PositionInfo {
 			local knowledgeBase := this.Spotter.KnowledgeBase
 			local lastLap := knowledgeBase.getValue("Lap")
 			local position := knowledgeBase.getValue("Position")
+			local nearBy := ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true])
 
-			if ((Abs(position - this.Car.Position) == 1)
-			 || (lastLap == this.LastLap)
-			 || ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true]))
-				return "Position"
-			else if (lastLap > this.Car.LastLap)
+			else if ((lastLap > this.Car.LastLap) && !nearBy)
 				return "LapDown"
-			else
+			else if ((lastLap < this.Car.LastLap) && !nearBy)
 				return "LapUp"
+			else if (Abs(position - this.Car.Position) == 1)
+				return "Position"
+			else
+				return "Unknown"
 		}
 	}
 
@@ -406,6 +407,10 @@ class PositionInfo {
 		; return this.Car.isFaster(sector)
 
 		return (this.LapTimeDifference[true] > 0)
+	}
+
+	isValid() {
+		return (this.OpponentType != "Unknown")
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1507,7 +1512,7 @@ class RaceSpotter extends RaceAssistant {
 		speaker.beginTalk()
 
 		try {
-			if (trackAhead && (trackAhead != standingsAhead)
+			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.isValid()
 			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
 				opponentType := trackAhead.OpponentType
@@ -1525,7 +1530,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 			}
-			else if standingsAhead {
+			else if (standingsAhead  && standingsAhead.isValid()) {
 				delta := Abs(standingsAhead.Delta[false, true, 1])
 				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
@@ -1585,7 +1590,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if standingsBehind {
+			if (standingsBehind  && standingsBehind.isValid()) {
 				delta := Abs(standingsBehind.Delta[false, true, 1])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)

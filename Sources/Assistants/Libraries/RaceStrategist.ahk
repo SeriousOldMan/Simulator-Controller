@@ -2074,6 +2074,8 @@ class RaceStrategist extends RaceAssistant {
 				writeConfiguration(kTempDirectory . "Race Strategist.strategy", configuration)
 			}
 
+			strategy.setVersion(A_Now . "")
+
 			Task.startTask(ObjBindMethod(this, "updateStrategy", strategy, false), 1000)
 
 			if this.RemoteHandler {

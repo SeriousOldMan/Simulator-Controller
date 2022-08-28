@@ -204,6 +204,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.recommendPitstop(lapNumber)
 	}
 
+	recommendStrategy() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendStrategy()
+	}
+
 	cancelStrategy() {
 		if this.RaceStrategist
 			this.RaceStrategist.cancelStrategy()

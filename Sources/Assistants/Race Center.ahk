@@ -609,30 +609,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionStrategy extends Strategy {
-		iVersion := false
-
-		Version[] {
-			Get {
-				return this.iVersion
-			}
-		}
-
-		setVersion(version) {
-			this.iVersion := (version . "")
-		}
-
-		loadFromConfiguration(configuration) {
-			base.loadFromConfiguration(configuration)
-
-			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
-		}
-
-		saveToConfiguration(configuration) {
-			base.saveToConfiguration(configuration)
-
-			setConfigurationValue(configuration, "General", "Version", this.iVersion)
-		}
-
 		initializeAvailableTyreSets() {
 			base.initializeAvailableTyreSets()
 
@@ -641,30 +617,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	class SessionTrafficStrategy extends TrafficStrategy {
-		iVersion := false
-
-		Version[] {
-			Get {
-				return this.iVersion
-			}
-		}
-
-		setVersion(version) {
-			this.iVersion := (version . "")
-		}
-
-		loadFromConfiguration(configuration) {
-			base.loadFromConfiguration(configuration)
-
-			this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
-		}
-
-		saveToConfiguration(configuration) {
-			base.saveToConfiguration(configuration)
-
-			setConfigurationValue(configuration, "General", "Version", this.iVersion)
-		}
-
 		initializeAvailableTyreSets() {
 			base.initializeAvailableTyreSets()
 
@@ -5523,7 +5475,7 @@ class RaceCenter extends ConfigurationItem {
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
-				if (!this.Strategy || (version = "Force") || (this.Strategy.Version && (version > this.Strategy.Version))) {
+				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version) || (version = "Force")) {
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))

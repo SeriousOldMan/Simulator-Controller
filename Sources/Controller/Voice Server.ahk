@@ -282,9 +282,9 @@ class VoiceServer extends ConfigurationItem {
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
 
-			this.iSpeaking := true
-
 			try {
+				this.iSpeaking := true
+
 				try {
 					while (tries-- > 0) {
 						if (tries == 0)
@@ -358,11 +358,8 @@ class VoiceServer extends ConfigurationItem {
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer {
-					if (this.Speaking && synthesizer.Stoppable && this.Interruptable) {
-						this.iInterrupted := true
-
-						synthesizer.stop()
-					}
+					if (this.Speaking && synthesizer.Stoppable && this.Interruptable)
+						this.iInterrupted := synthesizer.stop()
 
 					synthesizer.mute()
 				}

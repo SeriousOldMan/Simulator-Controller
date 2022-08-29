@@ -503,16 +503,20 @@ class PositionInfo {
 	}
 
 	checkpoint(sector) {
+		local fullReset := (this.Spotter.DriverCar.InPit || this.Car.InPit)
 		local position
 		local observed
 
-		if (this.Spotter.DriverCar.InPit || this.Car.InPit)
-			this.reset(sector, true, true)
-		else {
-			position := this.forPosition()
-			observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
-					   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
+		position := this.forPosition()
+		observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
+				   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
 
+		if fullReset {
+			this.reset(sector, true, true)
+
+			this.iObserved := observed
+		}
+		else {
 			if (observed != this.Observed) {
 				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
 					this.reset(sector, true)
@@ -1196,7 +1200,7 @@ class RaceSpotter extends RaceAssistant {
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
 		local situation, remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel
-		local sessionEnding, minute
+		local sessionEnding, minute, lastTemperature
 
 		if (lastLap == 2) {
 			situation := "StartSummary"
@@ -1261,19 +1265,21 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 			else {
-				if (this.SessionInfos["AirTemperature"] < airTemperature) {
+				lastTemperature := this.SessionInfos["AirTemperature"]
+
+				this.SessionInfos["AirTemperature"] := airTemperature
+
+				if (lastTemperature < airTemperature) {
 					speaker.speakPhrase("TemperatureRising", {air: airTemperature, track: trackTemperature})
 
 					return true
 				}
 
-				if (this.SessionInfos["AirTemperature"] > airTemperature) {
+				if (lastTemperature > airTemperature) {
 					speaker.speakPhrase("TemperatureFalling", {air: airTemperature, track: trackTemperature})
 
 					return true
 				}
-
-				this.SessionInfos["AirTemperature"] := airTemperature
 			}
 
 			if (this.Session = kSessionRace) {

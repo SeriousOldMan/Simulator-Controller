@@ -115,8 +115,10 @@ class CarInfo {
 
 	LastLapTime[] {
 		Get {
-			if (this.LastLap > 0)
-				return this.LapTimes[this.LapTimes.Length()]
+			local numLapTimes := this.LapTimes.Length()
+
+			if (numLapTimes > 0)
+				return this.LapTimes[numLapTimes]
 			else
 				return false
 		}
@@ -209,11 +211,6 @@ class CarInfo {
 	}
 
 	reset() {
-		this.iLastLap := false
-		this.iLastSector := false
-		this.iPosition := false
-
-		this.iLapTimes := []
 		this.iDeltas := {}
 		this.iLastDeltas := {}
 	}
@@ -224,7 +221,7 @@ class CarInfo {
 		local deltas
 
 		if (avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) {
-			this.reset()
+			this.reset(true)
 
 			result := false
 		}
@@ -275,6 +272,13 @@ class CarInfo {
 			this.iInPit := false
 
 		return result
+	}
+
+	hasDelta(sector := false) {
+		if sector
+			return (this.Deltas[sector] > 0)
+		else
+			return (this.Deltas.Count() > 0)
 	}
 
 	isFaster(sector) {
@@ -409,8 +413,8 @@ class PositionInfo {
 		return (this.LapTimeDifference[true] > 0)
 	}
 
-	isValid() {
-		return (this.LastLap > 0)
+	hasDelta(sector) {
+		return this.Car.hasDelta(sector)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1349,6 +1353,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
+		local opponentType := this.OpponentType
 		local situation
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
@@ -1391,8 +1396,9 @@ class RaceSpotter extends RaceAssistant {
 
 		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
+		 && trackBehind.hasDelta(sector) && trackAhead.hasDelta(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
-			situation := ("ProtectSlower " . trackAhead . A_Space . trackBehind)
+			situation := ("ProtectSlower " . trackAhead.Car.Nr . A_Space . trackBehind.Car.Nr)
 
 			if !this.TacticalAdvices.HasKey(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1404,10 +1410,11 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
+		 && trackBehind.hasDelta(sector) && standingsBehind.hasDelta(sector)
 		 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
 		 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapDown") && trackBehind.isValid()) {
-			situation := ("ProtectFaster " . trackBehind . A_Space . standingsBehind)
+		 && (opponentType = "LapDown")) {
+			situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
 
 			if !this.TacticalAdvices.HasKey(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1418,9 +1425,9 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 
-		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapDown") && trackBehind.isValid()) {
-			situation := ("LapDownFaster " . trackBehind)
+		if (regular && trackBehind && trackBehind.hasDelta(sector)
+		 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
+			situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
 			if !this.TacticalAdvices.HasKey(situation) {
 				this.TacticalAdvices[situation] := true
@@ -1428,30 +1435,7 @@ class RaceSpotter extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase("LapDownFaster")
-
-					speaker.speakPhrase("Slipstream")
-				}
-				finally {
-					speaker.endTalk()
-				}
-
-				return true
-			}
-		}
-
-		if (regular && trackBehind && trackBehind.isDelta(sector) && trackBehind.isFaster(sector)
-		 && (trackBehind.OpponentType = "LapUp") && trackBehind.isValid()
-		 && (Abs(trackBehind.LapTimeDifference[true]) < (this.DriverCar.LapTime[true] * 0.005))) {
-			situation := ("LapUpFaster " . trackBehind)
-
-			if !this.TacticalAdvices.HasKey(situation) {
-				this.TacticalAdvices[situation] := true
-
-				speaker.beginTalk()
-
-				try {
-					speaker.speakPhrase("LapUpFaster")
+					speaker.speakPhrase(opponentType . "Faster")
 
 					speaker.speakPhrase("Slipstream")
 				}
@@ -1512,7 +1496,7 @@ class RaceSpotter extends RaceAssistant {
 		speaker.beginTalk()
 
 		try {
-			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.isValid()
+			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
 			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
 				opponentType := trackAhead.OpponentType
@@ -1530,7 +1514,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 			}
-			else if (standingsAhead  && standingsAhead.isValid()) {
+			else if (standingsAhead  && standingsAhead.hasDelta(sector)) {
 				delta := Abs(standingsAhead.Delta[false, true, 1])
 				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
@@ -1590,7 +1574,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (standingsBehind  && standingsBehind.isValid()) {
+			if (standingsBehind && standingsBehind.hasDelta(sector)) {
 				delta := Abs(standingsBehind.Delta[false, true, 1])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)

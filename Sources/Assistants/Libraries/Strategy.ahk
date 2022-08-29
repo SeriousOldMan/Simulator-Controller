@@ -1527,7 +1527,7 @@ class Strategy extends ConfigurationItem {
 					openingLap := (pitstopRule[1] * 60 / avgLapTime)
 					closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
-					if ((lap > openingLap) && (lap < closingLap))
+					if ((lap >= openingLap) && (lap <= closingLap))
 						this.iFixed := true
 				}
 
@@ -1549,7 +1549,7 @@ class Strategy extends ConfigurationItem {
 						tyreChange := (adjustments[nr].TyreChange != false)
 				}
 
-				if ((nr == 1) && (refuelRule = "Required") && (refuelAmount <= 0))
+				if ((nr = 1) && (refuelRule = "Required") && (refuelAmount <= 0))
 					refuelAmount := 1
 				else if ((refuelRule = "Always") && (refuelAmount <= 0))
 					refuelAmount := 1
@@ -1587,7 +1587,7 @@ class Strategy extends ConfigurationItem {
 					this.iRemainingTyreLaps := freshTyreLaps
 				}
 				else if ((remainingTyreLaps - stintLaps) >= 0) {
-					if ((nr == 1) && (tyreChangeRule = "Required") && (IsObject(pitstopRule) || (remainingTyreLaps >= this.iRemainingSessionLaps))) {
+					if (this.Fixed && (tyreChangeRule = "Required") && (IsObject(pitstopRule) || (remainingTyreLaps >= this.iRemainingSessionLaps))) {
 						this.iTyreChange := true
 						this.iRemainingTyreLaps := freshTyreLaps
 					}
@@ -2758,7 +2758,7 @@ class Strategy extends ConfigurationItem {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
-			if ((targetLap > openingLap) && (currentLap < closingLap))
+			if ((targetLap >= openingLap) && (currentLap <= closingLap))
 				if ((pitstopNr = 1) || (this.LastPitstop.Lap < openingLap))
 					targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / avgLapTime))
 		}
@@ -2847,8 +2847,10 @@ class Strategy extends ConfigurationItem {
 			   , currentTyreLaps, currentFuel, stintLaps, maxTyreLaps, tyreLapsVariation
 			   , map, fuelConsumption, avgLapTime, adjustments := false) {
 		local valid := true
+		local pitstopLap := 0
+		local pitstopNr := 0
 		local rnd, variation, currentPitstops, ignore
-		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, pitstopNr, remainingFuel, pitstopLap
+		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
 		local tyreChange, tyreCompound, tyreCompoundColor, driverID, driverName, pitstop, telemetryDB, candidate
 		local time, weather, airTemperature, trackTemperature, pitstopRule
 
@@ -2906,7 +2908,19 @@ class Strategy extends ConfigurationItem {
 			if (adjustments && (A_Index > (adjustments.Count())))
 				break
 
+			if !valid
+				if IsObject(pitstopRule)
+					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) && (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
+				else
+					valid := (pitstopNr >= numPitstops)
+
 			pitstopNr := (currentStint + A_Index - 1)
+
+			if !valid
+				if IsObject(pitstopRule)
+					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) && (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
+				else
+					valid := (pitstopNr >= numPitstops)
 
 			if (A_Index > 1)
 				currentStintTime := 0
@@ -2930,12 +2944,6 @@ class Strategy extends ConfigurationItem {
 													, currentStintTime ? (((this.StintLength - currentStintTime) * 60) / avgLapTime)
 																	   : stintLaps
 													, this.RemainingSessionLaps[true], this.RemainingTyreLaps[true], remainingFuel)
-
-			if !valid
-				if IsObject(pitstopRule)
-					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) || (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
-				else
-					valid := (pitstopNr >= numPitstops)
 
 			if adjustments {
 				if (adjustments.HasKey(pitstopNr) && adjustments[pitstopNr].HasKey("TyreChange")) {
@@ -2980,7 +2988,7 @@ class Strategy extends ConfigurationItem {
 
 			pitstop := this.createPitstop(pitstopNr, pitstopLap, driverID, tyreCompound, tyreCompoundColor, false, adjustments)
 
-			if !adjustments
+			if (valid && !adjustments)
 				if (this.SessionType = "Duration") {
 					if (pitStop.RemainingSessionTime <= 0)
 						break
@@ -3182,18 +3190,24 @@ class TrafficStrategy extends Strategy {
 	calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel) {
 		local targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
 												 , remainingTyreLaps, remainingFuel)
-		local variationWindow, moreLaps, rnd
+		local pitstopRule := this.PitstopRule
+		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap
 
-		if ((pitstopNr = 1) && IsObject(this.PitstopRule))
-			return targetLap
-		else {
-			variationWindow := this.StrategyManager.VariationWindow
-			moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
+		if IsObject(pitstopRule) {
+			avgLapTime := this.AvgLapTime[true]
+			openingLap := (pitstopRule[1] * 60 / avgLapTime)
+			closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
-			Random rnd, -1.0, 1.0
-
-			return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
+			if ((targetLap >= openingLap) && (targetLap <= closingLap))
+				return targetLap
 		}
+
+		variationWindow := this.StrategyManager.VariationWindow
+		moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
+
+		Random rnd, -1.0, 1.0
+
+		return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
 	}
 }
 

@@ -35,7 +35,7 @@
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
-	   - Engine repair will be handled automatically during pitstops for those simulators, which supports this.
+	   - Engine repair will be handled automatically during pitstops for those simulators, which support this.
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.

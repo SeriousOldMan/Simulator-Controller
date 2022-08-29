@@ -503,15 +503,11 @@ class PositionInfo {
 	}
 
 	checkpoint(sector) {
-		local fullReset := (this.Spotter.DriverCar.InPit || this.Car.InPit)
-		local position
-		local observed
+		local position := this.forPosition()
+		local observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
+						 . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
 
-		position := this.forPosition()
-		observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
-				   . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
-
-		if fullReset {
+		if (this.Spotter.DriverCar.InPit || this.Car.InPit) {
 			this.reset(sector, true, true)
 
 			this.iObserved := observed
@@ -1367,7 +1363,7 @@ class RaceSpotter extends RaceAssistant {
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
 
-		if (standingsAhead.InPit && (standingsAhead != leader)) {
+		if (standingsAhead.Car.InPit && (standingsAhead != leader)) {
 			situation := ("AheadPitting " . standingsAhead.Car.Nr . A_Space . standingsAhead.Car.LastLap)
 
 			if !this.TacticalAdvices.HasKey(situation) {
@@ -1379,7 +1375,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 
-		if standingsBehind.InPit {
+		if standingsBehind.Car.InPit {
 			situation := ("BehindPitting " . standingsBehind.Car.Nr . A_Space . standingsBehind.Car.LastLap)
 
 			if !this.TacticalAdvices.HasKey(situation) {
@@ -1391,7 +1387,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 
-		if (leader.InPit && (leader.Car.Nr != this.DriverCar.Nr)) {
+		if (leader.Car.InPit && (leader.Car.Nr != this.DriverCar.Nr)) {
 			situation := ("LeaderPitting " . leader.Car.Nr . A_Space . leader.Car.LastLap)
 
 			if !this.TacticalAdvices.HasKey(situation) {
@@ -1530,11 +1526,16 @@ class RaceSpotter extends RaceAssistant {
 
 				if this.Debug[kDebugPositions] {
 					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-											  , standingsAhead.Car.Nr, standingsAhead.Reported, values2String("|", standingsAhead.Car.LapTimes*), standingsAhead.Car.LapTime[true]
-											  , values2String("|", standingsAhead.Car.Deltas[sector]*), standingsAhead.Delta[sector], standingsAhead.Delta[false, true, 1]
-											  , standingsAhead.inFront(), standingsAhead.atBehind(), standingsAhead.inFront(false), standingsAhead.atBehind(false), standingsAhead.forPosition()
+											  , standingsAhead.Car.Nr, standingsAhead.Car.InPit, standingsAhead.Reported
+											  , values2String("|", standingsAhead.Car.LapTimes*), standingsAhead.Car.LapTime[true]
+											  , values2String("|", standingsAhead.Car.Deltas[sector]*)
+											  , standingsAhead.Delta[sector], standingsAhead.Delta[false, true, 1]
+											  , standingsAhead.inFront(), standingsAhead.atBehind()
+											  , standingsAhead.inFront(false), standingsAhead.atBehind(false), standingsAhead.forPosition()
 											  , standingsAhead.DeltaDifference[sector], standingsAhead.LapTimeDifference[true]
-											  , standingsAhead.isFaster(sector), standingsAhead.closingIn(sector, frontGainThreshold), standingsAhead.runningAway(sector, frontLostThreshold))
+											  , standingsAhead.isFaster(sector)
+											  , standingsAhead.closingIn(sector, frontGainThreshold)
+											  , standingsAhead.runningAway(sector, frontLostThreshold))
 
 					info := ("=================================`n" . info . "`n=================================`n`n")
 
@@ -1590,11 +1591,16 @@ class RaceSpotter extends RaceAssistant {
 
 				if this.Debug[kDebugPositions] {
 					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-											  , standingsBehind.Car.Nr, standingsBehind.Reported, values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
-											  , values2String("|", standingsBehind.Car.Deltas[sector]*), standingsBehind.Delta[sector], standingsBehind.Delta[false, true, 1]
-											  , standingsBehind.inFront(), standingsBehind.atBehind(), standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
+											  , standingsBehind.Car.Nr, , standingsBehind.Car.InPit, standingsBehind.Reported
+											  , values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
+											  , values2String("|", standingsBehind.Car.Deltas[sector]*)
+											  , standingsBehind.Delta[sector], standingsBehind.Delta[false, true, 1]
+											  , standingsBehind.inFront(), standingsBehind.atBehind()
+											  , standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
 											  , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
-											  , standingsBehind.isFaster(sector), standingsBehind.closingIn(sector, behindLostThreshold), standingsBehind.runningAway(sector, behindGainThreshold))
+											  , standingsBehind.isFaster(sector)
+											  , standingsBehind.closingIn(sector, behindLostThreshold)
+											  , standingsBehind.runningAway(sector, behindGainThreshold))
 
 					info := ("=================================`n" . info . "`n=================================`n`n")
 

@@ -273,8 +273,14 @@ int main(int argc, char* argv[])
 		}
 		*/
 
-		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? 0 : gf->DriverStintTimeLeft);
-		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? 0 : gf->DriverStintTotalTimeLeft);
+		double timeLeft = gf->sessionTimeLeft;
+
+		if (timeLeft < 0) {
+			timeLeft = 3600.0 * 1000;
+		}
+
+		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
+		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 
 		printData("InPitLane", gf->isInPit ? "true" : "false");
 		printData("InPit", gf->isInPit ? "true" : "false");

@@ -1625,6 +1625,7 @@ class RaceStrategist extends RaceAssistant {
 
 	reportStrategy(options := true) {
 		local knowledgeBase := this.KnowledgeBase
+		local reported := false
 		local strategyName, speaker, nextPitstop, lap, refuel, tyreChange, map
 
 		if this.Speaker {
@@ -1638,8 +1639,11 @@ class RaceStrategist extends RaceAssistant {
 					if ((options == true) || (options.HasKey("Strategy") && options.Strategy))
 						speaker.speakPhrase("Strategy")
 
-					if ((options == true) || (options.HasKey("Pitstops") && options.Pitstops))
+					if ((options == true) || (options.HasKey("Pitstops") && options.Pitstops)) {
 						speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
+
+						reported := true
+					}
 
 					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
@@ -1659,7 +1663,8 @@ class RaceStrategist extends RaceAssistant {
 						}
 					}
 					else if ((options == true) || (options.HasKey("NextPitstop") && options.NextPitstop))
-						speaker.speakPhrase("NoNextPitstop")
+						if !reported
+							speaker.speakPhrase("NoNextPitstop")
 
 					if ((options == true) || (options.HasKey("Map") && options.Map)) {
 						map := knowledgeBase.getValue("Strategy.Map")

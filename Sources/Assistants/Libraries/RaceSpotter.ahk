@@ -26,7 +26,7 @@
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDebugPositions := 2
+global kDebugPositions := 4
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -276,7 +276,7 @@ class CarInfo {
 
 	hasDelta(sector := false) {
 		if sector
-			return (this.Deltas[sector] > 0)
+			return (this.Deltas[sector].Count() > 0)
 		else
 			return (this.Deltas.Count() > 0)
 	}

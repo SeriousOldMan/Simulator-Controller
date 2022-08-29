@@ -183,7 +183,7 @@ class ControllerStepWizard extends StepWizard {
 		functionsInfoText.Navigate("about:blank")
 		functionsInfoText.Document.Write(html)
 
-		this.ifunctionsListView := functionsListViewHandle
+		this.iFunctionsListView := functionsListViewHandle
 
 		this.registerWidgets(1, functionsIconHandle, functionsLabelHandle, functionsListViewHandle, functionsInfoTextHandle)
 	}
@@ -516,7 +516,7 @@ class ControllerStepWizard extends StepWizard {
 		local key1, key2, buttonBoxConfiguration, streamDeckConfiguration
 
 		Gui %window%:Default
-		
+
 		Gui ListView, % this.iFunctionsListView
 
 		LV_GetText(trigger, row, 5)
@@ -1219,6 +1219,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			this.iPendingActionRegistration := false
 			this.iPendingFunctionRegistration := row
 
+			SetTimer showSelectorHint, Off
+
+			ToolTip, , , 1
+
 			this.controlClick(arguments*)
 		}
 		else {
@@ -1450,6 +1454,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			else {
 				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 
+				SetTimer showSelectorHint, Off
+
+				ToolTip, , , 1
+
 				actionRow := this.iPendingFunctionRegistration
 
 				mode := this.getActionMode(actionRow)
@@ -1468,10 +1476,6 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 					LV_Modify(actionRow, "Vis")
 				}
-
-				SetTimer showSelectorHint, Off
-
-				ToolTip, , , 1
 
 				this.iPendingFunctionRegistration := false
 			}

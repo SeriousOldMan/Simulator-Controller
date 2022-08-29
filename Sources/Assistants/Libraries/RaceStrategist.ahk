@@ -143,24 +143,28 @@ class RaceStrategist extends RaceAssistant {
 			local entries := []
 			local newEntries, ignore, entry, ignore, entry, found, candidate
 
-			entries := base.getMapData(weather, compound, compoundColor)
+			for ignore, entry in base.getMapData(weather, compound, compoundColor)
+				if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
+					entries.Push(entry)
 
 			if this.TelemetryDatabase {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapData(weather, compound, compoundColor) {
-					found := false
+					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0)) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
-														&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
+															&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -174,23 +178,27 @@ class RaceStrategist extends RaceAssistant {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			entries := base.getTyreData(weather, compound, compoundColor)
+			for ignore, entry in base.getTyreData(weather, compound, compoundColor)
+				if (entry["Lap.Time"] > 0)
+					entries.Push(entry)
 
 			if this.TelemetryDatabase {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -204,24 +212,28 @@ class RaceStrategist extends RaceAssistant {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			entries := base.getMapLapTimes(weather, compound, compoundColor)
+			for ignore, entry in base.getMapLapTimes(weather, compound, compoundColor)
+				if (entry["Lap.Time"] > 0)
+					entries.Push(entry)
 
 			if this.TelemetryDatabase {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Map"] = entry["Map"]) && (candidate["Fuel.Remaining"] = entry["Fuel.Remaining"])
-															  && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Map"] = entry["Map"]) && (candidate["Fuel.Remaining"] = entry["Fuel.Remaining"])
+																  && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -235,23 +247,27 @@ class RaceStrategist extends RaceAssistant {
 			local entries := []
 			local newEntries, ignore, entry, found, candidate
 
-			entries := base.getTyreLapTimes(weather, compound, compoundColor)
+			for ignore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
+				if (entry["Lap.Time"] > 0)
+					entries.Push(entry)
 
 			if this.TelemetryDatabase {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -1899,7 +1915,7 @@ class RaceStrategist extends RaceAssistant {
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local knowledgeBase := this.KnowledgeBase
 		local strategy := this.Strategy[true]
-		local goal, resultSet, tyreSets, telemetryDB
+		local goal, resultSet, tyreSets, telemetryDB, consumption
 
 		if strategy {
 			initialStint := (Task.CurrentTask.Pitstops.Length() + 1)
@@ -1921,7 +1937,13 @@ class RaceStrategist extends RaceAssistant {
 
 			initialFuelAmount := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.Remaining")
 			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
-			initialFuelConsumption := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.AvgConsumption")
+
+			consumption := knowledgeBase.getValue("Lap." . initialLap . ".Fuel.AvgConsumption")
+
+			if (consumption = 0)
+				consumption := knowledgeBase.getValue("Session.Settings.Fuel.AvgConsumption")
+
+			initialFuelConsumption := consumption
 
 			goal := new RuleCompiler().compileGoal("lapAvgTime(" . initialLap . ", ?lapTime)")
 			resultSet := knowledgeBase.prove(goal)

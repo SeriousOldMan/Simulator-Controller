@@ -1549,7 +1549,7 @@ class Strategy extends ConfigurationItem {
 						tyreChange := (adjustments[nr].TyreChange != false)
 				}
 
-				if ((nr = 1) && (refuelRule = "Required") && (refuelAmount <= 0))
+				if (this.Fixed && (refuelRule = "Required") && (refuelAmount <= 0))
 					refuelAmount := 1
 				else if ((refuelRule = "Always") && (refuelAmount <= 0))
 					refuelAmount := 1
@@ -2915,12 +2915,6 @@ class Strategy extends ConfigurationItem {
 					valid := (pitstopNr >= numPitstops)
 
 			pitstopNr := (currentStint + A_Index - 1)
-
-			if !valid
-				if IsObject(pitstopRule)
-					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) && (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
-				else
-					valid := (pitstopNr >= numPitstops)
 
 			if (A_Index > 1)
 				currentStintTime := 0

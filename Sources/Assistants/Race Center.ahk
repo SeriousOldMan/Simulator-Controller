@@ -395,24 +395,28 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, ignore, entry, found, candidate, lastLap, result
 
 			if this.RaceCenter.UseSessionData
-				entries := base.getMapData(weather, compound, compoundColor)
+				for ignore, entry in base.getMapData(weather, compound, compoundColor)
+					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0))
+						entries.Push(entry)
 
 			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapData(weather, compound, compoundColor) {
-					found := false
+					if ((entry["Fuel.Consumption"] > 0) && (entry["Lap.Time"] > 0)) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
-														&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
+															&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -441,23 +445,27 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, found, candidate
 
 			if this.RaceCenter.UseSessionData
-				entries := base.getTyreData(weather, compound, compoundColor)
+				for ignore, entry in base.getTyreData(weather, compound, compoundColor)
+					if (entry["Lap.Time"] > 0)
+						entries.Push(entry)
 
 			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreData(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -472,24 +480,28 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, found, candidate, lastLap, result
 
 			if this.RaceCenter.UseSessionData
-				entries := base.getMapLapTimes(weather, compound, compoundColor)
+				for ignore, entry in base.getMapLapTimes(weather, compound, compoundColor)
+					if (entry["Lap.Time"] > 0)
+						entries.Push(entry)
 
 			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getMapLapTimes(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Map"] = entry["Map"]) && (candidate["Fuel.Remaining"] = entry["Fuel.Remaining"])
-															  && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Map"] = entry["Map"]) && (candidate["Fuel.Remaining"] = entry["Fuel.Remaining"])
+																  && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -518,23 +530,27 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, found, candidate
 
 			if this.RaceCenter.UseSessionData
-				entries := base.getTyreLapTimes(weather, compound, compoundColor)
+				for ingore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
+					if (entry["Lap.Time"] > 0)
+						entries.Push(entry)
 
 			if (this.RaceCenter.UseTelemetryDatabase && this.TelemetryDatabase) {
 				newEntries := []
 
 				for ignore, entry in this.TelemetryDatabase.getTyreLapTimes(weather, compound, compoundColor) {
-					found := false
+					if (entry["Lap.Time"] > 0) {
+						found := false
 
-					for ignore, candidate in entries
-						if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
-							found := true
+						for ignore, candidate in entries
+							if ((candidate["Tyre.Laps"] = entry["Tyre.Laps"]) && (candidate["Lap.Time"] = entry["Lap.Time"])) {
+								found := true
 
-							break
-						}
+								break
+							}
 
-					if !found
-						newEntries.Push(entry)
+						if !found
+							newEntries.Push(entry)
+					}
 				}
 
 				for ignore, entry in newEntries
@@ -3625,6 +3641,8 @@ class RaceCenter extends ConfigurationItem {
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
 
+		theStrategy.setVersion(A_Now)
+
 		return theStrategy
 	}
 
@@ -5475,7 +5493,7 @@ class RaceCenter extends ConfigurationItem {
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
 
-				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version) || (version = "Force")) {
+				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))

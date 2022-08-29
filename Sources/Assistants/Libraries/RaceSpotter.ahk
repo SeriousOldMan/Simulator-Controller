@@ -85,7 +85,7 @@ class CarInfo {
 		}
 	}
 
-	Pitstops[] {
+	Pitstops[key := false] {
 		Get {
 			return (key ? this.iPitstops[key] : this.iPitstops)
 		}
@@ -1065,8 +1065,8 @@ class RaceSpotter extends RaceAssistant {
 							  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
 							  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 							  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
-							  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1))
-							  , knowledgeBase.getValue("Car." . A_Index . ".InPitlane", false)
+							  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1)
+							  , knowledgeBase.getValue("Car." . A_Index . ".InPitlane", false))
 					if (A_Index != driver)
 						if this.PositionInfos.HasKey(info.Nr)
 							this.PositionInfos.reset(sector, true)
@@ -1192,7 +1192,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackTemperature := Round(knowledgebase.getValue("Weather.Temperature.Track"))
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
-		local remainingSessionTime := knowledgeBase.getValue("Session.Time.Remaining")
+		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local remainingStintTime := knowledgeBase.getValue("Driver.Time.Stint.Remaining")
 		local situation, remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel
 		local sessionEnding, minute
@@ -1209,7 +1209,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if this.hasEnoughData(false) {
-			if (remainingSessionLaps <= 3) {
+			if ((remainingSessionLaps <= 3) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 
 				if !this.SessionInfos.HasKey(situation) {
@@ -1234,7 +1234,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 
-				if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLapTime"])) {
+				if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLap"])) {
 					lapTime := (this.BestLapTime / 1000)
 
 					minute := Floor(lapTime / 60)
@@ -1283,7 +1283,7 @@ class RaceSpotter extends RaceAssistant {
 						speaker.beginTalk()
 
 						try {
-							speaker.speakPhrase("HalfTimeIntro", {minutes: Round(remainingSessionTime / 60000)
+							speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
 																, laps: remainingSessionLaps
 																, position: Round(knowledgeBase.getValue("Position", 0))})
 
@@ -1296,7 +1296,7 @@ class RaceSpotter extends RaceAssistant {
 								enoughFuel := (remainingStintLaps < remainingFuelLaps)
 							}
 							else {
-								speaker.speakPhrase("HalfTimeSession", {minutes: Round(remainingSessionTime / 60000)
+								speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
 																	  , laps: remainingStintLaps})
 
 								enoughFuel := (remainingSessionLaps < remainingFuelLaps)
@@ -1314,7 +1314,7 @@ class RaceSpotter extends RaceAssistant {
 			else {
 				sessionEnding := false
 
-				if ((Round(remainingSessionTime / 60000) < 5) && !this.SessionInfos.HasKey("5MinAlert")) {
+				if ((remainingSessionTime < 5) && !this.SessionInfos.HasKey("5MinAlert")) {
 					this.SessionInfos["5MinAlert"] := true
 					this.SessionInfos["15MinAlert"] := true
 					this.SessionInfos["30MinAlert"] := true
@@ -1322,21 +1322,21 @@ class RaceSpotter extends RaceAssistant {
 					sessionEnding := true
 				}
 
-				if ((Round(remainingSessionTime / 60000) < 15) && !this.SessionInfos.HasKey("15MinAlert")) {
+				if ((remainingSessionTime < 15) && !this.SessionInfos.HasKey("15MinAlert")) {
 					this.SessionInfos["15MinAlert"] := true
 					this.SessionInfos["30MinAlert"] := true
 
 					sessionEnding := true
 				}
 
-				if ((Round(remainingSessionTime / 60000) < 30) && !this.SessionInfos.HasKey("30MinAlert")) {
+				if ((remainingSessionTime < 30) && !this.SessionInfos.HasKey("30MinAlert")) {
 					this.SessionInfos["30MinAlert"] := true
 
 					sessionEnding := true
 				}
 
 				if sessionEnding {
-					speaker.speakPhrase("SessionEnding", {minutes: Round(remainingSessionTime / 60000)})
+					speaker.speakPhrase("SessionEnding", {minutes: remainingSessionTime})
 
 					return true
 				}

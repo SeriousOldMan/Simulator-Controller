@@ -303,6 +303,8 @@ class Task {
 
 		theTask.Stopped := false
 		theTask.Runnable := true
+
+		return theTask
 	}
 
 	stopTask(theTask) {

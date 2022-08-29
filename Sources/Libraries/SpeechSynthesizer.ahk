@@ -283,17 +283,20 @@ class SpeechSynthesizer {
 
 		Process Exist, %pid%
 
-		if ErrorLevel
-			Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kInterruptPriority)
+		if ErrorLevel {
+			Task.CurrentTask.Sleep := 50
+
+			return Task.CurrentTask
+		}
 		else {
 			this.iSoundPlayer := false
 
 			callback := this.SpeechStatusCallback
 
 			%callback%("Stop")
-		}
 
-		return false
+			return false
+		}
 	}
 
 	playSound(soundFile, wait := true) {

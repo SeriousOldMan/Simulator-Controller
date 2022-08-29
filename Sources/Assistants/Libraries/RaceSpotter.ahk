@@ -1075,6 +1075,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updatePositionInfos(lastLap, sector) {
+		local debug := this.Debug[kDebugPositions]
 		local positionInfos, position, info
 		local nr, car
 
@@ -1082,7 +1083,7 @@ class RaceSpotter extends RaceAssistant {
 
 		positionInfos := this.PositionInfos
 
-		if this.Debug[kDebugPositions]
+		if debug
 			FileAppend ---------------------------------`n`n, %kTempDirectory%Race Spotter.positions
 
 		for nr, car in this.OtherCars {
@@ -1094,7 +1095,7 @@ class RaceSpotter extends RaceAssistant {
 				positionInfos[nr] := position
 			}
 
-			if this.Debug[kDebugPositions] {
+			if debug {
 				info := values2String(", ", position.Car.Nr, position.Car.Car, position.Car.Driver, position.Car.Position, position.Observed
 										  , values2String("|", position.Car.LapTimes*), position.Car.LapTime[true]
 										  , values2String("|", position.Car.Deltas[sector]*), position.Delta[sector]
@@ -1108,7 +1109,7 @@ class RaceSpotter extends RaceAssistant {
 			position.checkpoint(sector)
 		}
 
-		if this.Debug[kDebugPositions]
+		if debug
 			FileAppend `n---------------------------------`n`n, %kTempDirectory%Race Spotter.positions
 	}
 
@@ -1266,7 +1267,7 @@ class RaceSpotter extends RaceAssistant {
 					return true
 				}
 
-				if (this.iLastAirTemperature > airTemperature) {
+				if (this.SessionInfos["AirTemperature"] > airTemperature) {
 					speaker.speakPhrase("TemperatureFalling", {air: airTemperature, track: trackTemperature})
 
 					return true

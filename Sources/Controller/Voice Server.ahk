@@ -296,6 +296,9 @@ class VoiceServer extends ConfigurationItem {
 						if this.Interrupted {
 							Sleep 2000
 
+							while this.Muted
+								Sleep 100
+
 							this.iInterrupted := false
 						}
 						else

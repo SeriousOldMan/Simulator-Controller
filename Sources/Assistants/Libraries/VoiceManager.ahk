@@ -339,6 +339,12 @@ class VoiceManager {
 		iAccept := false
 		iReject := false
 
+		Accept[] {
+			Get {
+				return this.iAccept
+			}
+		}
+
 		Reject[] {
 			Get {
 				return this.iReject

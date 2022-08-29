@@ -1234,16 +1234,18 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 
-				if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLap"])) {
-					lapTime := (this.BestLapTime / 1000)
+				if (this.BestLapTime > 0) {
+					if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLap"])) {
+						lapTime := (this.BestLapTime / 1000)
 
-					minute := Floor(lapTime / 60)
+						minute := Floor(lapTime / 60)
 
-					speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
-												  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
+						speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
+													  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
+					}
+
+					this.SessionInfos["BestLap"] := this.BestLapTime
 				}
-
-				this.SessionInfos["BestLap"] := this.BestLapTime
 			}
 
 			if !this.SessionInfos.HasKey("AirTemperature") {

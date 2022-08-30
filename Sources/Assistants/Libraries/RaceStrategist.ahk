@@ -93,7 +93,7 @@ class RaceStrategist extends RaceAssistant {
 			Process Exist, Race Engineer.exe
 
 			if ErrorLevel {
-				speaker.speakPhrase("ConfirmInformEngineerAnyway", false, true)
+				this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
 				this.Manager.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -713,9 +713,10 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
+		local car := knowledgeBase.getValue("Position.Track.Ahead.Car")
 		local lap, driverLap, otherLap
 
-		if (delta != 0) {
+		if ((delta != 0) && !knowledgeBase.getValue("Car." . car . ".InPitLane")) {
 			speaker.beginTalk()
 
 			try {
@@ -783,9 +784,10 @@ class RaceStrategist extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
+		local car := knowledgeBase.getValue("Position.Track.Behind.Car")
 		local lap, driverLap, otherLap
 
-		if (delta != 0) {
+		if ((delta != 0) && !knowledgeBase.getValue("Car." . car . ".InPitLane")) {
 			speaker.beginTalk()
 
 			try {

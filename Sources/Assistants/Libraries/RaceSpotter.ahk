@@ -498,7 +498,7 @@ class PositionInfo {
 	calibrate(sector) {
 		if (this.Car.LastLap >= (this.iBaseLap + 3))
 			this.reset(sector, true)
-		else if !this.iInitialDeltas.HasKey(sector)
+		else
 			this.iInitialDeltas[sector] := this.Delta[sector]
 	}
 

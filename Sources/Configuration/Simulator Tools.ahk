@@ -106,6 +106,8 @@ installOptions(options) {
 
 	static result := false
 
+	static update := false
+
 	if (options == kOk) {
 		GuiControlGet installLocationPathEdit
 
@@ -114,26 +116,27 @@ installOptions(options) {
 		valid := true
 		empty := true
 
-		if !FileExist(directory)
-			try {
-				FileCreateDir %directory%
-			}
-			catch exception {
-				title := translate("Error")
+		if !update
+			if !FileExist(directory)
+				try {
+					FileCreateDir %directory%
+				}
+				catch exception {
+					title := translate("Error")
 
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-				OnMessage(0x44, "")
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+					OnMessage(0x44, "")
 
-				valid := false
-			}
-		else if (InStr(kHomeDirectory, directory) != 1)
-			loop Files, %directory%\*.*, FD
-			{
-				empty := false
+					valid := false
+				}
+			else if (InStr(kHomeDirectory, directory) != 1)
+				loop Files, %directory%\*.*, FD
+				{
+					empty := false
 
-				break
-			}
+					break
+				}
 
 		if (empty && valid)
 			result := kOk
@@ -149,6 +152,7 @@ installOptions(options) {
 		result := kCancel
 	else {
 		result := false
+		update := options["Update"]
 
 		Gui Install:Default
 

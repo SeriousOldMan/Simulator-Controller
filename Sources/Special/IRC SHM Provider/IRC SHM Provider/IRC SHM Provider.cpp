@@ -558,7 +558,7 @@ bool getCarCoordinates(const irsdk_header* header, const char* data, const char*
 	return false;
 }
 
-void writeStandings(const irsdk_header *header, const char* data)
+void writePositions(const irsdk_header *header, const char* data)
 {
 	if (header && data)
 	{
@@ -1063,11 +1063,20 @@ int main(int argc, char* argv[])
 					else if (strcmp(argv[2], "Change") == 0)
 						pitstopChangeValues(pHeader, g_data, argv[3]);
 				}
-				else if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
-					writeStandings(pHeader, g_data);
+				else {
+					bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+					bool writeTelemetry = !writeStandings;
+					bool writeSetup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
+
+					writeTelemetry = true;
+					writeStandings = !writeSetup;
+
+					if (writeStandings)
+						writePositions(pHeader, g_data);
+
+					if (writeTelemetry)
+						writeData(pHeader, g_data, writeSetup);
 				}
-				else
-					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
 
 				break;
 			}

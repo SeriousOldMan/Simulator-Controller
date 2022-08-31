@@ -16,12 +16,14 @@ using static RF2SHMProvider.rFactor2Constants;
 namespace RF2SHMProvider {
     static class Program {
         [STAThread]
-        static void Main(string[] args) {
+        static void Main(string[] args)
+        {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
             SHMProvider provider = new SHMProvider();
 
-            if (args.Length > 0 && args[0] == "-Pitstop") {
+            if (args.Length > 0 && args[0] == "-Pitstop")
+            {
                 string[] arguments = args[1].Split(':');
 
                 if (arguments[0] == "Set")
@@ -34,7 +36,10 @@ namespace RF2SHMProvider {
             else if (args.Length > 0 && args[0] == "-Standings")
                 provider.ReadStandings();
             else
+            {
                 provider.ReadData();
+                provider.ReadStandings();
+            }
         }
     }
 }

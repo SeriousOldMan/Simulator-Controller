@@ -125,7 +125,13 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
+	bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	bool writeTelemetry = !writeStandings;
+
+	writeTelemetry = true;
+	writeStandings = true;
+
+	if (writeStandings) {
 		printf("[Position Data]\n");
 
 		if (fileHandle == NULL) {
@@ -185,7 +191,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	else {
+
+	if (writeTelemetry) {
 		printf("[Session Data]\n");
 
 		if (fileHandle == NULL) {

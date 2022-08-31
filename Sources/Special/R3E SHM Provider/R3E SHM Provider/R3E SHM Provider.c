@@ -139,9 +139,15 @@ int main(int argc, char* argv[])
             return err_code;
 
         mapped_r3e = TRUE;
-    }
+	}
+
+	BOOL writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	BOOL writeTelemetry = !writeStandings;
+
+	writeStandings = TRUE;
+	writeTelemetry = TRUE;
 	
-	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
+	if (writeStandings) {
 		wprintf_s(L"[Position Data]\n");
 		
 		if (!mapped_r3e) {
@@ -204,7 +210,8 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
-	else {
+	
+	if (writeTelemetry) {
 		BOOL practice = FALSE;
 
 		wprintf_s(L"[Session Data]\n");

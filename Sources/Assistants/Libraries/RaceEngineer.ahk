@@ -1220,7 +1220,7 @@ class RaceEngineer extends RaceAssistant {
 			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Suspension.RR", Round(suspensionDamage[4], 2))
 
 			knowledgeBase.setFact("Lap." . lapNumber . ".Damage.Engine"
-								, getConfigurationValue(data, "Car Data", "EngineDamage", 0))
+								, Round(getConfigurationValue(data, "Car Data", "EngineDamage", 0), 1))
 		}
 
 		return data
@@ -1325,7 +1325,7 @@ class RaceEngineer extends RaceAssistant {
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
 		local fact, index, tyreType, oldValue, newValue, tyreTemperatures
-		local bodyworkDamage, suspensionDamage, engineDamage, position
+		local bodyworkDamage, suspensionDamage, position
 
 		for index, tyreType in ["FL", "FR", "RL", "RR"] {
 			newValue := Round(tyrePressures[index], 2)
@@ -1389,9 +1389,7 @@ class RaceEngineer extends RaceAssistant {
 			needProduce := true
 		}
 
-		engineDamage := getConfigurationValue(data, "Car Data", "EngineDamage", 0)
-
-		newValue := Round(engineDamage, 2)
+		newValue := Round(getConfigurationValue(data, "Car Data", "EngineDamage", 0), 1)
 		fact := ("Lap." . lapNumber . ".Damage.Engine")
 
 		if (knowledgeBase.getValue(fact, 0) < newValue) {

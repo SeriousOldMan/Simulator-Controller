@@ -1428,41 +1428,43 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 
-		if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
-		 && trackBehind.hasDelta(sector) && standingsBehind.hasDelta(sector)
-		 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
-		 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-		 && (opponentType = "LapDown")) {
-			situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
+		if (sector > 1) {
+			if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
+			 && trackBehind.hasDelta(sector) && standingsBehind.hasDelta(sector)
+			 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
+			 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
+			 && (opponentType = "LapDown")) {
+				situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
 
-			if !this.TacticalAdvices.HasKey(situation) {
-				this.TacticalAdvices[situation] := true
+				if !this.TacticalAdvices.HasKey(situation) {
+					this.TacticalAdvices[situation] := true
 
-				speaker.speakPhrase("ProtectFaster")
+					speaker.speakPhrase("ProtectFaster")
 
-				return true
+					return true
+				}
 			}
-		}
 
-		if (regular && trackBehind && trackBehind.hasDelta(sector)
-		 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
-			situation := (opponentType . "Faster " . trackBehind.Car.Nr)
+			if (regular && trackBehind && trackBehind.hasDelta(sector)
+			 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
+				situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
-			if !this.TacticalAdvices.HasKey(situation) {
-				this.TacticalAdvices[situation] := true
+				if !this.TacticalAdvices.HasKey(situation) {
+					this.TacticalAdvices[situation] := true
 
-				speaker.beginTalk()
+					speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase(opponentType . "Faster")
+					try {
+						speaker.speakPhrase(opponentType . "Faster")
 
-					speaker.speakPhrase("Slipstream")
+						speaker.speakPhrase("Slipstream")
+					}
+					finally {
+						speaker.endTalk()
+					}
+
+					return true
 				}
-				finally {
-					speaker.endTalk()
-				}
-
-				return true
 			}
 		}
 
@@ -1515,7 +1517,7 @@ class RaceSpotter extends RaceAssistant {
 		speaker.beginTalk()
 
 		try {
-			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
+			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
 			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
 				opponentType := trackAhead.OpponentType

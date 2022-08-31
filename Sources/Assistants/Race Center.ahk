@@ -3349,7 +3349,7 @@ class RaceCenter extends ConfigurationItem {
 					configuration := readConfiguration(fileName)
 
 					if (configuration.Count() > 0)
-						this.selectStrategy(this.createStrategy(configuration), true)
+						this.selectStrategy(this.createStrategy(configuration, false, false), true)
 				}
 				else {
 					title := translate("Information")
@@ -3371,7 +3371,7 @@ class RaceCenter extends ConfigurationItem {
 					configuration := readConfiguration(file)
 
 					if (configuration.Count() > 0)
-						this.selectStrategy(this.createStrategy(configuration), true)
+						this.selectStrategy(this.createStrategy(configuration, false, false), true)
 				}
 			case 5: ; "Save Strategy..."
 				if this.Strategy {
@@ -3628,15 +3628,15 @@ class RaceCenter extends ConfigurationItem {
 		new RaceCenterTask(theTask).start()
 	}
 
-	createStrategy(nameOrConfiguration, driver := false) {
+	createStrategy(nameOrConfiguration, driver := false, simulation := true) {
 		local name := nameOrConfiguration
 		local theStrategy
 
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
-		theStrategy := (this.UseTraffic ? new this.SessionTrafficStrategy(this, nameOrConfiguration, driver)
-										: new this.SessionStrategy(this, nameOrConfiguration, driver))
+		theStrategy := ((simulation && this.UseTraffic) ? new this.SessionTrafficStrategy(this, nameOrConfiguration, driver)
+														: new this.SessionStrategy(this, nameOrConfiguration, driver))
 
 		if (name && !IsObject(name))
 			theStrategy.setName(name)
@@ -3765,10 +3765,8 @@ class RaceCenter extends ConfigurationItem {
 
 			telemetryDB := this.SimulationTelemetryDatabase
 
-			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
-											   , compound(tyreCompound, tyreCompoundColor)) {
-				candidate := telemetryDB.optimalTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
-														   , this.AirTemperature, this.TrackTemperature
+			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
+				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature
 														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets)))
 
 				if candidate
@@ -3827,6 +3825,11 @@ class RaceCenter extends ConfigurationItem {
 
 				return true
 			}
+			else {
+				weather := "Dry"
+				airTemperature := 23
+				trackTemperature := 27
+			}
 		}
 
 		return false
@@ -3864,6 +3867,7 @@ class RaceCenter extends ConfigurationItem {
 					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
+		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
 
 		this.syncSessionStore()
 
@@ -3895,8 +3899,34 @@ class RaceCenter extends ConfigurationItem {
 				if this.Stints.HasKey(A_Index)
 					initialSessionTime += this.computeDuration(this.Stints[A_Index])
 
-			if !telemetryDB.suitableTyreCompound(this.Simulator, this.Car, this.Track, this.Weather
-											   , this.TyreCompound, this.TyreCompoundColor)
+			strategy := this.Strategy
+
+			if this.Simulator {
+				simulator := new SessionDatabase().getSimulatorName(this.Simulator)
+				car := this.Car
+				track := this.Track
+			}
+			else {
+				simulator := strategy.Simulator
+				car := strategy.Car
+				track := strategy.Track
+			}
+
+			if this.Weather
+				weather := this.Weather
+			else
+				weather := strategy.Weather
+
+			if this.TyreCompound {
+				tyreCompound := this.TyreCompound
+				tyreCompoundColor := this.TyreCompoundColor
+			}
+			else {
+				tyreCompound := strategy.TyreCompound
+				tyreCompoundColor := strategy.TyreCompoundColor
+			}
+
+			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, tyreCompound, tyreCompoundColor)
 				initialTyreLaps := 999
 			else {
 				tyresTable := telemetryDB.Database.Tables["Tyres"]
@@ -5501,7 +5531,7 @@ class RaceCenter extends ConfigurationItem {
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, translate("Updating session strategy, Strategy: `n`n") . strategy . "`n")
 
-					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy)))
+					this.selectStrategy((strategy = "CANCEL") ? false : this.createStrategy(parseConfiguration(strategy), false, false))
 				}
 			}
 			else if (!this.Strategy && !this.LastLap) {
@@ -5511,7 +5541,7 @@ class RaceCenter extends ConfigurationItem {
 					configuration := readConfiguration(fileName)
 
 					if (configuration.Count() > 0)
-						this.selectStrategy(this.createStrategy(configuration), true)
+						this.selectStrategy(this.createStrategy(configuration, false, false), true)
 				}
 			}
 		}
@@ -5864,14 +5894,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeDuration(stint) {
-		local duration, lastStint, duration, ignore, lap
+		local duration, duration, ignore, lap
 
 		if stint.Duration
 			return stint.Duration
 		else {
 			duration := 0
 
-			for ignore, lap in lastStint.Laps
+			for ignore, lap in stint.Laps
 				duration += lap.LapTime
 
 			if (stint != this.CurrentStint)

@@ -1489,10 +1489,6 @@ class Strategy extends ConfigurationItem {
 		}
 
 		__New(strategy, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-			local pitstopRule, refuelRule, tyreChangeRule, remainingFuel, remainingSessionLaps, fuelConsumption, lastStintLaps
-			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, variation, freshTyreLaps, lastPitstop, delta, rnd
-			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature
-
 			this.iStrategy := strategy
 			this.iNr := nr
 			this.iLap := lap
@@ -1503,144 +1499,155 @@ class Strategy extends ConfigurationItem {
 
 			base.__New(configuration)
 
-			if !configuration {
-				pitstopRule := strategy.PitstopRule
-				refuelRule := strategy.RefuelRule
-				tyreChangeRule := strategy.TyreChangeRule
+			if !configuration
+				this.initialize(tyreCompound, tyreCompoundColor, adjustments)
+		}
 
-				remainingFuel := strategy.RemainingFuel[true]
-				remainingSessionLaps := strategy.RemainingSessionLaps[true]
-				fuelConsumption := strategy.FuelConsumption[true]
-				lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap)) ; strategy.StintLaps[true],
+		dispose() {
+			this.iStrategy := false
+		}
 
-				if (adjustments && adjustments.HasKey(nr) && adjustments[nr].HasKey("RemainingSessionLaps"))
-					remainingSessionLaps := (adjustments[nr].RemainingSessionLaps + lastStintLaps)
+		initialize(tyreCompound, tyreCompoundColor, adjustments := false) {
+			local strategy := this.Strategy
+			local nr := this.Nr
+			local lap := this.Lap
+			local pitstopRule := strategy.PitstopRule
+			local refuelRule := strategy.RefuelRule
+			local tyreChangeRule := strategy.TyreChangeRule
+			local remainingFuel := strategy.RemainingFuel[true]
+			local remainingSessionLaps := strategy.RemainingSessionLaps[true]
+			local fuelConsumption := strategy.FuelConsumption[true]
+			local lastStintLaps := Floor(Min(remainingFuel / fuelConsumption, strategy.LastPitstop ? (lap - strategy.LastPitstop.Lap) : lap))
+			local stintLaps, refuelAmount, tyreChange, remainingTyreLaps, variation, freshTyreLaps, lastPitstop, delta, rnd
+			local avgLapTime, openingLap, closingLap, weather, airTemperature, trackTemperature
 
-				if (adjustments && adjustments.HasKey(nr) && adjustments[nr].HasKey("StintLaps"))
-					stintLaps := adjustments[nr].StintLaps
-				else
-					stintLaps := Floor(Min(remainingSessionLaps - lastStintLaps, strategy.StintLaps
-										 , strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
+			if (adjustments && adjustments.HasKey(nr) && adjustments[nr].HasKey("RemainingSessionLaps"))
+				remainingSessionLaps := (adjustments[nr].RemainingSessionLaps + lastStintLaps)
 
-				if IsObject(pitstopRule) {
-					avgLapTime := strategy.AvgLapTime[true]
-					openingLap := (pitstopRule[1] * 60 / avgLapTime)
-					closingLap := (pitstopRule[2] * 60 / avgLapTime)
+			if (adjustments && adjustments.HasKey(nr) && adjustments[nr].HasKey("StintLaps"))
+				stintLaps := adjustments[nr].StintLaps
+			else
+				stintLaps := Floor(Min(remainingSessionLaps - lastStintLaps, strategy.StintLaps
+									 , strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
 
-					if ((lap >= openingLap) && (lap <= closingLap))
-						this.iFixed := true
-				}
+			if IsObject(pitstopRule) {
+				avgLapTime := strategy.AvgLapTime[true]
+				openingLap := (pitstopRule[1] * 60 / avgLapTime)
+				closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
-				this.iMap := strategy.Map[true]
-				this.iFuelConsumption := fuelConsumption
-
-				if (refuelRule = "Disallowed")
-					refuelAmount := 0
-				else
-					refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
-
-				tyreChange := kUndefined
-
-				if (adjustments && adjustments.HasKey(nr)) {
-					if adjustments[nr].HasKey("RefuelAmount")
-						refuelAmount := adjustments[nr].RefuelAmount
-
-					if adjustments[nr].HasKey("TyreChange")
-						tyreChange := (adjustments[nr].TyreChange != false)
-				}
-
-				if (this.Fixed && (refuelRule = "Required") && (refuelAmount <= 0))
-					refuelAmount := 1
-				else if ((refuelRule = "Always") && (refuelAmount <= 0))
-					refuelAmount := 1
-				else if (refuelAmount <= 0)
-					refuelAmount := 0
-
-				this.iRemainingSessionLaps := (remainingSessionLaps - lastStintLaps)
-				this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
-
-				remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
-
-				Random rnd, -10, 100
-
-				variation := (strategy.TyreLapsVariation / 100 * rnd)
-
-				freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
-
-				if (tyreChangeRule = "Always") {
-					this.iTyreChange := true
-					this.iRemainingTyreLaps := freshTyreLaps
-				}
-				else if (tyreChangeRule = "Disallowed") {
-					this.iTyreChange := false
-					this.iRemainingTyreLaps := remainingTyreLaps
-				}
-				else if (tyreChange != kUndefined) {
-					this.iTyreChange := tyreChange
-					this.iRemainingTyreLaps := (tyreChange ? freshTyreLaps : remainingTyreLaps)
-				}
-				else if (!tyreCompound && !tyreCompoundColor)
-					this.iRemainingTyreLaps := remainingTyreLaps
-				else if (tyreCompound && tyreCompoundColor
-					  && ((strategy.TyreCompound[true] != tyreCompound) || (strategy.TyreCompoundColor[true] != tyreCompoundColor))) {
-					this.iTyreChange := true
-					this.iRemainingTyreLaps := freshTyreLaps
-				}
-				else if ((remainingTyreLaps - stintLaps) >= 0) {
-					if (this.Fixed && (tyreChangeRule = "Required") && (IsObject(pitstopRule) || (remainingTyreLaps >= this.iRemainingSessionLaps))) {
-						this.iTyreChange := true
-						this.iRemainingTyreLaps := freshTyreLaps
-					}
-					else
-						this.iRemainingTyreLaps := remainingTyreLaps
-				}
-				else {
-					this.iTyreChange := true
-					this.iRemainingTyreLaps := freshTyreLaps
-				}
-
-				if !this.iTyreChange {
-					tyreCompound := strategy.TyreCompound[true]
-					tyreCompoundColor := strategy.TyreCompoundColor[true]
-
-					this.iStintLaps := Round(stintLaps)
-				}
-				else
-					this.iStintLaps := Round(Min(stintLaps, this.iRemainingTyreLaps))
-
-				this.iTyreCompound := tyreCompound
-				this.iTyreCompoundColor := tyreCompoundColor
-
-				lastPitstop := strategy.LastPitstop
-
-				if lastPitstop {
-					delta := (lastPitstop.Duration + (lastPitstop.StintLaps * lastPitstop.AvgLapTime))
-
-					this.iTime := (lastPitstop.Time + delta)
-					this.iRemainingSessionTime := (lastPitstop.RemainingSessionTime - delta)
-				}
-				else {
-					this.iTime := (strategy.SessionStartTime + (lastStintLaps * strategy.AvgLapTime))
-					this.iRemainingSessionTime := (strategy.RemainingSessionTime - (lastStintLaps * strategy.AvgLapTime))
-				}
-
-				weather := false
-				airTemperature := false
-				trackTemperature := false
-
-				strategy.getWeather(this.Time / 60, weather, airTemperature, trackTemperature)
-
-				this.iWeather := weather
-				this.iAirTemperature := airTemperature
-				this.iTrackTemperature := trackTemperature
-
-				this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel, fuelConsumption
-														 , weather, tyreCompound, tyreCompoundColor
-														 , Max(strategy.MaxTyreLaps - this.RemainingTyreLaps, 0))
-
-				this.iRefuelAmount := refuelAmount
-				this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
+				if ((lap >= openingLap) && (lap <= closingLap))
+					this.iFixed := true
 			}
+
+			this.iMap := strategy.Map[true]
+			this.iFuelConsumption := fuelConsumption
+
+			if (refuelRule = "Disallowed")
+				refuelAmount := 0
+			else
+				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
+
+			tyreChange := kUndefined
+
+			if (adjustments && adjustments.HasKey(nr)) {
+				if adjustments[nr].HasKey("RefuelAmount")
+					refuelAmount := adjustments[nr].RefuelAmount
+
+				if adjustments[nr].HasKey("TyreChange")
+					tyreChange := (adjustments[nr].TyreChange != false)
+			}
+
+			if (this.Fixed && (refuelRule = "Required") && (refuelAmount <= 0))
+				refuelAmount := 1
+			else if ((refuelRule = "Always") && (refuelAmount <= 0))
+				refuelAmount := 1
+			else if (refuelAmount <= 0)
+				refuelAmount := 0
+
+			this.iRemainingSessionLaps := (remainingSessionLaps - lastStintLaps)
+			this.iRemainingFuel := (remainingFuel - (lastStintLaps * fuelConsumption) + refuelAmount)
+
+			remainingTyreLaps := (strategy.RemainingTyreLaps[true] - lastStintLaps)
+
+			Random rnd, -10, 100
+
+			variation := (strategy.TyreLapsVariation / 100 * rnd)
+
+			freshTyreLaps := (strategy.MaxTyreLaps + (strategy.MaxTyreLaps / 100 * variation))
+
+			if (tyreChangeRule = "Always") {
+				this.iTyreChange := true
+				this.iRemainingTyreLaps := freshTyreLaps
+			}
+			else if (tyreChangeRule = "Disallowed") {
+				this.iTyreChange := false
+				this.iRemainingTyreLaps := remainingTyreLaps
+			}
+			else if (tyreChange != kUndefined) {
+				this.iTyreChange := tyreChange
+				this.iRemainingTyreLaps := (tyreChange ? freshTyreLaps : remainingTyreLaps)
+			}
+			else if (!tyreCompound && !tyreCompoundColor)
+				this.iRemainingTyreLaps := remainingTyreLaps
+			else if (tyreCompound && tyreCompoundColor
+				  && ((strategy.TyreCompound[true] != tyreCompound) || (strategy.TyreCompoundColor[true] != tyreCompoundColor))) {
+				this.iTyreChange := true
+				this.iRemainingTyreLaps := freshTyreLaps
+			}
+			else if ((remainingTyreLaps - stintLaps) >= 0) {
+				if (this.Fixed && (tyreChangeRule = "Required") && (IsObject(pitstopRule) || (remainingTyreLaps >= this.iRemainingSessionLaps))) {
+					this.iTyreChange := true
+					this.iRemainingTyreLaps := freshTyreLaps
+				}
+				else
+					this.iRemainingTyreLaps := remainingTyreLaps
+			}
+			else {
+				this.iTyreChange := true
+				this.iRemainingTyreLaps := freshTyreLaps
+			}
+
+			if !this.iTyreChange {
+				tyreCompound := strategy.TyreCompound[true]
+				tyreCompoundColor := strategy.TyreCompoundColor[true]
+
+				this.iStintLaps := Round(stintLaps)
+			}
+			else
+				this.iStintLaps := Round(Min(stintLaps, this.iRemainingTyreLaps))
+
+			this.iTyreCompound := tyreCompound
+			this.iTyreCompoundColor := tyreCompoundColor
+
+			lastPitstop := strategy.LastPitstop
+
+			if lastPitstop {
+				delta := (lastPitstop.Duration + (lastPitstop.StintLaps * lastPitstop.AvgLapTime))
+
+				this.iTime := (lastPitstop.Time + delta)
+				this.iRemainingSessionTime := (lastPitstop.RemainingSessionTime - delta)
+			}
+			else {
+				this.iTime := (strategy.SessionStartTime + (lastStintLaps * strategy.AvgLapTime))
+				this.iRemainingSessionTime := (strategy.RemainingSessionTime - (lastStintLaps * strategy.AvgLapTime))
+			}
+
+			weather := false
+			airTemperature := false
+			trackTemperature := false
+
+			strategy.getWeather(this.Time / 60, weather, airTemperature, trackTemperature)
+
+			this.iWeather := weather
+			this.iAirTemperature := airTemperature
+			this.iTrackTemperature := trackTemperature
+
+			this.iAvgLapTime := strategy.getAvgLapTime(this.StintLaps, this.Map, this.RemainingFuel, fuelConsumption
+													 , weather, tyreCompound, tyreCompoundColor
+													 , Max(strategy.MaxTyreLaps - this.RemainingTyreLaps, 0))
+
+			this.iRefuelAmount := refuelAmount
+			this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
 		}
 
 		loadFromConfiguration(configuration) {
@@ -1713,10 +1720,6 @@ class Strategy extends ConfigurationItem {
 			setConfigurationValue(configuration, "Pitstop", "RemainingSessionTime." . lap, this.RemainingSessionTime)
 			setConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, this.RemainingTyreLaps)
 			setConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, this.RemainingFuel)
-		}
-
-		dispose() {
-			this.iStrategy := false
 		}
 	}
 
@@ -2713,7 +2716,9 @@ class Strategy extends ConfigurationItem {
 		return (this.PitstopDelta + ((this.PitstopServiceOrder = "Simultaneous") ? Max(tyreService, refuelService) : (tyreService + refuelService)))
 	}
 
-	calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel) {
+	calcNextPitstopLap(pitstopNr, currentLap
+					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
+					 , ByRef adjusted) {
 		local telemetryDB := this.StrategyManager.TelemetryDatabase
 		local simulator := this.Simulator
 		local car := this.Car
@@ -2725,6 +2730,8 @@ class Strategy extends ConfigurationItem {
 		local airTemperature := false
 		local trackTemperature := false
 		local targetLap, pitstopRule, avgLapTime, openingLap, closingLap, time
+
+		adjusted := false
 
 		if (this.LastPitstop && !this.LastPitstop.TyreChange)
 			remainingTyreLaps := this.MaxTyreLaps
@@ -2745,6 +2752,7 @@ class Strategy extends ConfigurationItem {
 												  , weather, airTemperature, trackTemperature
 												  , getKeys(this.AvailableTyreSets))) {
 					targetLap := (currentLap + A_Index - 1)
+					adjusted := true
 
 					break
 				}
@@ -2759,8 +2767,11 @@ class Strategy extends ConfigurationItem {
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
 			if ((targetLap >= openingLap) && (currentLap <= closingLap))
-				if ((pitstopNr = 1) || (this.LastPitstop.Lap < openingLap))
+				if ((pitstopNr = 1) || (this.LastPitstop.Lap < openingLap)) {
 					targetLap := Min(targetLap, Floor((pitstopRule[1] + ((pitstopRule[2] - pitstopRule[1]) / 2)) * 60 / avgLapTime))
+
+					adjusted := true
+				}
 		}
 
 		return targetLap
@@ -2849,10 +2860,10 @@ class Strategy extends ConfigurationItem {
 		local valid := true
 		local pitstopLap := 0
 		local pitstopNr := 0
-		local rnd, variation, currentPitstops, ignore
+		local rnd, variation, pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
 		local tyreChange, tyreCompound, tyreCompoundColor, driverID, driverName, pitstop, telemetryDB, candidate
-		local time, weather, airTemperature, trackTemperature, pitstopRule
+		local time, weather, airTemperature, trackTemperature, pitstopRule, adjusted, lastPitstop
 
 		this.iStartStint := currentStint
 		this.iStartLap := currentLap
@@ -2875,9 +2886,10 @@ class Strategy extends ConfigurationItem {
 		this.iFuelConsumption := fuelConsumption
 		this.iAvgLapTime := avgLapTime
 
-		currentPitstops := this.Pitstops
+		lastPitstops := this.Pitstops
 
-		this.iPitstops := []
+		pitstops := []
+		this.iPitstops := pitstops
 
 		sessionLaps := this.RemainingSessionLaps
 
@@ -2933,11 +2945,27 @@ class Strategy extends ConfigurationItem {
 
 			if (adjustments && adjustments.HasKey(pitstopNr) && adjustments[pitstopNr].HasKey("Lap"))
 				pitstopLap := adjustments[pitstopNr]["Lap"]
-			else
+			else {
 				pitstopLap := this.calcNextPitstopLap(pitstopNr, currentLap
 													, currentStintTime ? (((this.StintLength - currentStintTime) * 60) / avgLapTime)
 																	   : stintLaps
-													, this.RemainingSessionLaps[true], this.RemainingTyreLaps[true], remainingFuel)
+													, this.RemainingSessionLaps[true], this.RemainingTyreLaps[true], remainingFuel
+													, adjusted)
+
+				if adjusted
+					if (this.LastPitstop) {
+						lastPitstop := pitstops.Pop()
+
+						lastPitstop.initialize(lastPitstop.TyreCompound, lastPitstop.TyreCompoundColor
+											 , {lastPitstop.Nr: {StintLaps: (pitstopLap - lastPitstop.Lap)}})
+
+						pitstops.Push(lastPitstop)
+					}
+					/*
+					else
+						this.iStintLaps := (pitstopLap - currentLap)
+					*/
+			}
 
 			if adjustments {
 				if (adjustments.HasKey(pitstopNr) && adjustments[pitstopNr].HasKey("TyreChange")) {
@@ -2967,7 +2995,7 @@ class Strategy extends ConfigurationItem {
 					tyreCompoundColor := this.TyreCompoundColor[true]
 				}
 
-				tyreCompoundColor := this.chooseTyreCompoundColor(currentPitstops, pitstopNr, tyreCompound, tyreCompoundColor)
+				tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor)
 
 				if !tyreCompoundColor
 					tyreCompound := false
@@ -2992,20 +3020,16 @@ class Strategy extends ConfigurationItem {
 						break
 				}
 
-			avgLapTime := pitstop.AvgLapTime
-			currentLap := pitstopLap
-
-			if ((numPitstops && (pitstopNr <= numPitstops)) || ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || (pitstop.TyreChange)))) {
-				if (pitstopNr > 1)
-					this.LastPitstop.iStintLaps := (pitstop.Lap - this.LastPitstop.Lap)
-
-				this.Pitstops.Push(pitstop)
-			}
+			if ((numPitstops && (pitstopNr <= numPitstops)) || ((pitstop.StintLaps > 0) && ((pitstop.RefuelAmount > 0) || (pitstop.TyreChange))))
+				pitstops.Push(pitstop)
 			else if valid
 				break
+
+			avgLapTime := pitstop.AvgLapTime
+			currentLap := pitstopLap
 		}
 
-		for ignore, pitstop in currentPitstops
+		for ignore, pitstop in lastPitstops
 			pitstop.dispose()
 	}
 
@@ -3037,7 +3061,7 @@ class Strategy extends ConfigurationItem {
 					pitstop.iRefuelAmount -= delta
 					pitstop.iRemainingFuel -= delta
 
-					this.iDuration := pitstop.Strategy.calcPitstopDuration(this.RefuelAmount, this.TyreChange)
+					pitstop.iDuration := pitstop.Strategy.calcPitstopDuration(this.RefuelAmount, this.TyreChange)
 				}
 			}
 
@@ -3048,7 +3072,7 @@ class Strategy extends ConfigurationItem {
 	adjustLastPitstopRefuelAmount() {
 		local pitstops := this.Pitstops
 		local numPitstops := pitstops.Length()
-		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, ignore, pitstop, key, value
+		local remainingSessionLaps, refuelAmount, stintLaps, adjustments, ignore, pitstop, key, value, pitstopNr
 
 		if ((numPitstops > 1) && !pitstops[numPitstops].Fixed) {
 			remainingSessionLaps := Ceil(pitstops[numPitstops - 1].StintLaps + pitstops[numPitstops].StintLaps)
@@ -3065,10 +3089,14 @@ class Strategy extends ConfigurationItem {
 			adjustments := {}
 
 			for ignore, pitstop in pitstops {
-				adjustments[pitstop.Nr] := ((pitstop.Nr = pitstops[numPitstops].Nr) ? {} : {Lap: pitstop.Lap})
+				pitstopNr := pitstop.Nr
+
+				adjustments[pitstopNr] := ((pitstopNr = pitstops[numPitstops].Nr) ? {StintLaps: pitstop.StintLaps}
+																				  : {StintLaps: pitstop.StintLaps
+																				   , Lap: pitstop.Lap})
 
 				if pitstop.TyreChange
-					adjustments[pitstop.Nr]["TyreChange"] := Array(pitstop.TyreCompound, pitstop.TyreCompoundColor)
+					adjustments[pitstopNr]["TyreChange"] := Array(pitstop.TyreCompound, pitstop.TyreCompoundColor)
 			}
 
 			for key, value in {RefuelAmount: refuelAmount, RemainingSessionLaps: remainingSessionLaps, StintLaps: stintLaps}
@@ -3181,27 +3209,24 @@ class TrafficStrategy extends Strategy {
 		return pitstop
 	}
 
-	calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel) {
+	calcNextPitstopLap(pitstopNr, currentLap
+					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
+					 , ByRef adjusted) {
 		local targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
-												 , remainingTyreLaps, remainingFuel)
+												 , remainingTyreLaps, remainingFuel, adjusted)
 		local pitstopRule := this.PitstopRule
 		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap
 
-		if IsObject(pitstopRule) {
-			avgLapTime := this.AvgLapTime[true]
-			openingLap := (pitstopRule[1] * 60 / avgLapTime)
-			closingLap := (pitstopRule[2] * 60 / avgLapTime)
+		if !adjusted {
+			variationWindow := this.StrategyManager.VariationWindow
+			moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
 
-			if ((targetLap >= openingLap) && (targetLap <= closingLap))
-				return targetLap
+			adjusted := true
+
+			Random rnd, -1.0, 1.0
+
+			return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
 		}
-
-		variationWindow := this.StrategyManager.VariationWindow
-		moreLaps := Min(variationWindow, (remainingFuel / this.FuelConsumption[true]))
-
-		Random rnd, -1.0, 1.0
-
-		return Round(Max(currentLap, targetLap + ((rnd > 0) ? Floor(rnd * moreLaps) : (rnd * variationWindow))))
 	}
 }
 

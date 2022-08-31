@@ -1035,7 +1035,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquirePositionsData(telemetryData) {
-		return readSimulatorData(this.Code, "-Standings")
+		if telemetryData.HasKey("Position Data")
+			return telemetryData["Position Data"]
+		else
+			return readSimulatorData(this.Code, "-Standings")
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {

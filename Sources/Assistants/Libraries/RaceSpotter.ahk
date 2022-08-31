@@ -1208,7 +1208,7 @@ class RaceSpotter extends RaceAssistant {
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
-		local situation, remainingFuelLaps, sessionDuration, sessionLaps, lapTime, enoughFuel
+		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
 		local sessionEnding, minute, lastTemperature
 
 		if (lastLap == 2) {

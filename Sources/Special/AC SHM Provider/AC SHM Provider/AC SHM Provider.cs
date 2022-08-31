@@ -60,7 +60,14 @@ namespace ACSHMProvider
         private long GetRemainingTime(long timeLeft)
         {
             if (staticInfo.IsTimedRace != 0)
-                return (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
+            {
+                long time = (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
+
+                if (time > 0)
+                    return time;
+                else
+                    return 0;
+            }
             else
                 return (GetRemainingLaps(timeLeft) * graphics.iLastTime);
         }

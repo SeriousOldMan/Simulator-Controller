@@ -372,7 +372,14 @@ namespace RF2SHMProvider {
 				return 0;
 
 			if (scoring.mScoringInfo.mEndET > 0.0)
-				return (long)((scoring.mScoringInfo.mEndET - (Normalize(playerScoring.mLastLapTime) * playerScoring.mTotalLaps)) * 1000);
+			{
+				long time = (long)((scoring.mScoringInfo.mEndET - (Normalize(playerScoring.mLastLapTime) * playerScoring.mTotalLaps)) * 1000);
+
+				if (time > 0)
+					return time;
+				else
+					return 0;
+			}
 			else
 				return (long)(GetRemainingLaps(ref playerScoring) * Normalize(playerScoring.mLastLapTime) * 1000);
 		}

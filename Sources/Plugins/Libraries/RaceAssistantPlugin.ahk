@@ -580,7 +580,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if first {
 				RaceAssistantPlugin.sCollectorTask
-					:= new PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kLowPriority)
+					:= new PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
 				RaceAssistantPlugin.CollectorTask.start()
 			}
@@ -697,6 +697,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if activeAssistant
 			Sleep 1500
 
+		RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
 		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 
 		return activeAssistant
@@ -755,6 +756,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
+		RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
 		RaceAssistantPlugin.CollectorTask.Sleep := 1000
 	}
 

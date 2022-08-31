@@ -46,7 +46,12 @@ long getRemainingLaps(SharedMemory* shm) {
 
 long getRemainingTime(SharedMemory* shm) {
 	if (shm->mLapsInEvent > 0) {
-		return getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
+		long time = getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
 	}
 	else
 		return normalize(shm->mEventTimeRemaining) * 1000;
@@ -239,7 +244,10 @@ int main(int argc, char* argv[]) {
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
-		printf("EngineDamage=%f\n", normalizeDamage(localCopy->mEngineDamage));
+
+		double engineDamage = normalizeDamage(localCopy->mEngineDamage);
+
+		printf("EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10: 0);
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],

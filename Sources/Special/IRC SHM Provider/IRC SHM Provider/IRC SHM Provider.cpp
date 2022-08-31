@@ -161,8 +161,14 @@ long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime
 	if (lap < 1)
 		return max(0, sessionTime);
 
-	if (sessionLaps == -1)
-		return (sessionTime - (lastTime * lap));
+	if (sessionLaps == -1) {
+		long time = (sessionTime - (lastTime * lap));
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
+	}
 	else
 		return (getRemainingLaps(sessionInfo, sessionLaps, sessionTime, lap, lastTime) * lastTime);
 }

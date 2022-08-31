@@ -100,8 +100,13 @@ long getRemainingTime() {
         return 0;
 
     if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        return (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-                      (normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
+        long time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+						   (normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
     }
     else {
         return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
@@ -263,7 +268,10 @@ int main(int argc, char* argv[])
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
-			wprintf_s(L"EngineDamage=%f\n", normalizeDamage(map_buffer->car_damage.engine));
+
+			double engineDamage = normalizeDamage(map_buffer->car_damage.engine);
+
+			wprintf_s(L"EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0);
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
 			char tyreCompoundRaw[11] = "Unknown";

@@ -742,7 +742,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sLastLapUpdate := 0
 		RaceAssistantPlugin.sInPit := false
 
-		RaceAssistantPlugin.sWaitForShutdown := (A_TickCount + (90 * 1000))
+		if shutdownAssistant
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant) {
+					RaceAssistantPlugin.sWaitForShutdown := (A_TickCount + (90 * 1000))
+
+					break
+				}
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled

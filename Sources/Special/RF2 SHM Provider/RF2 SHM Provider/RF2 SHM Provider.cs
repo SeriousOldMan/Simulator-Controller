@@ -221,6 +221,7 @@ namespace RF2SHMProvider {
 				Console.Write("SessionFormat="); Console.WriteLine((scoring.mScoringInfo.mEndET < 0.0) ? "Lap" : "Time");
 				Console.Write("FuelAmount="); Console.WriteLine(Math.Round(playerTelemetry.mFuelCapacity));
 
+				/*
 				if (session == "Practice")
 				{
 					Console.WriteLine("SessionTimeRemaining=3600000");
@@ -229,12 +230,15 @@ namespace RF2SHMProvider {
 				}
 				else
 				{
+				*/
 					long time = GetRemainingTime(ref playerScoring);
 
 					Console.Write("SessionTimeRemaining="); Console.WriteLine(time);
 
 					Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(ref playerScoring));
+				/*
 				}
+				*/
 			}
 
 			Console.WriteLine("[Stint Data]");
@@ -251,6 +255,7 @@ namespace RF2SHMProvider {
 				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
+				/*
 				if (session == "Practice")
 				{
 					Console.WriteLine("StintTimeRemaining=3600000");
@@ -258,11 +263,14 @@ namespace RF2SHMProvider {
 				}
 				else
 				{
+				*/
 					long time = GetRemainingTime(ref playerScoring);
 
 					Console.Write("StintTimeRemaining="); Console.WriteLine(time);
 					Console.Write("DriverTimeRemaining="); Console.WriteLine(time);
+				/*
 				}
+				*/
 				Console.Write("InPit="); Console.WriteLine(playerScoring.mPitState == (byte)Stopped ? "true" : "false");
 			}
 

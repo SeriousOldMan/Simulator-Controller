@@ -47,7 +47,7 @@ namespace ACSHMProvider
 
         private long GetRemainingLaps(long timeLeft)
         {
-            if (staticInfo.IsTimedRace == 0)
+            if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0)
                 return (graphics.NumberOfLaps - graphics.CompletedLaps);
             else {
                 if (graphics.iLastTime > 0)
@@ -59,7 +59,7 @@ namespace ACSHMProvider
 
         private long GetRemainingTime(long timeLeft)
         {
-            if (staticInfo.IsTimedRace != 0)
+            if (GetSession(graphics.Session) == "Practice" || staticInfo.IsTimedRace != 0)
             {
                 long time = (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
 
@@ -316,9 +316,10 @@ namespace ACSHMProvider
 
                 Console.Write("Car="); Console.WriteLine(staticInfo.CarModel);
                 Console.Write("Track="); Console.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
-                Console.Write("SessionFormat="); Console.WriteLine(staticInfo.IsTimedRace != 0 ? "Time" : "Lap");
+                Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Lap");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 
+                /*
                 if (session == "Practice")
                 {
                     Console.WriteLine("SessionTimeRemaining=3600000");
@@ -326,6 +327,7 @@ namespace ACSHMProvider
                 }
                 else
                 {
+                */
                     timeLeft = (long)graphics.SessionTimeLeft;
 
                     if (timeLeft < 0)
@@ -335,7 +337,9 @@ namespace ACSHMProvider
 
                     Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
                     Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
+                /*
                 }
+                */
             }
             else
                 return;
@@ -353,6 +357,7 @@ namespace ACSHMProvider
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);
             Console.WriteLine("LapBestTime=" + graphics.iBestTime);
 
+            /*
             if (session == "Practice")
             {
                 Console.WriteLine("StintTimeRemaining=3600000");
@@ -360,11 +365,14 @@ namespace ACSHMProvider
             }
             else
             {
+            */
                 long time = GetRemainingTime(timeLeft);
 
                 Console.WriteLine("StintTimeRemaining=" + time);
                 Console.WriteLine("DriverTimeRemaining=" + time);
+            /*
             }
+            */
             Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
 
             Console.WriteLine("[Track Data]");

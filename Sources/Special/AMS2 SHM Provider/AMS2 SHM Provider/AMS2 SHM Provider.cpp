@@ -31,7 +31,10 @@ inline double normalizeKelvin(double value) {
 long getRemainingTime(SharedMemory* shm);
 
 long getRemainingLaps(SharedMemory* shm) {
-	if (shm->mLapsInEvent > 0) {
+	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
+		return 30;
+
+	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
 		return (long)shm->mLapsInEvent - shm->mParticipantInfo[shm->mViewedParticipantIndex].mLapsCompleted;
 	}
 	else {
@@ -45,7 +48,10 @@ long getRemainingLaps(SharedMemory* shm) {
 }
 
 long getRemainingTime(SharedMemory* shm) {
-	if (shm->mLapsInEvent > 0) {
+	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
+		return 3600000;
+
+	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
 		long time = getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
 
 		if (time > 0)
@@ -224,14 +230,18 @@ int main(int argc, char* argv[]) {
 
 		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
 
+		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {
 			printf("SessionTimeRemaining=3600000\n");
 			printf("SessionLapsRemaining=30\n");
 		}
 		else {
+		*/
 			printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
 			printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+		/*
 		}
+		*/
 
 		printf("[Car Data]\n");
 
@@ -316,14 +326,18 @@ int main(int argc, char* argv[]) {
 
 		long timeRemaining = getRemainingTime(localCopy);
 
+		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {
 			printf("StintTimeRemaining=3600000\n");
 			printf("DriverTimeRemaining=3600000\n");
 		}
 		else {
+		*/
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		/*
 		}
+		*/
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");

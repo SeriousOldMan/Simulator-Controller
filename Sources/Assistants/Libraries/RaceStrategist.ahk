@@ -21,6 +21,7 @@
 #Include ..\Libraries\Database.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
 #Include ..\Assistants\Libraries\Strategy.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 
 
@@ -43,7 +44,7 @@ class RaceStrategist extends RaceAssistant {
 
 	iFirstStandingsLap := true
 
-	iSessionDatabaseDirectory := false
+	iTelemetryDatabaseDirectory := false
 
 	iTelemetryDatabase := false
 
@@ -126,7 +127,7 @@ class RaceStrategist extends RaceAssistant {
 
 			base.__New()
 
-			this.setDatabase(new Database(strategist.SessionDatabaseDirectory, kTelemetrySchemas))
+			this.setDatabase(new Database(strategist.TelemetryDatabaseDirectory, kTelemetrySchemas))
 
 			if simulator
 				this.iTelemetryDatabase := new TelemetryDatabase(simulator, car, track)
@@ -423,9 +424,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	SessionDatabaseDirectory[] {
+	TelemetryDatabaseDirectory[] {
 		Get {
-			return this.iSessionDatabaseDirectory
+			return this.iTelemetryDatabaseDirectory
 		}
 	}
 
@@ -451,7 +452,7 @@ class RaceStrategist extends RaceAssistant {
 
 		FileCreateDir %kTempDirectory%Race Strategist
 
-		this.iSessionDatabaseDirectory := (kTempDirectory . "Race Strategist\")
+		this.iTelemetryDatabaseDirectory := (kTempDirectory . "Race Strategist\")
 	}
 
 	updateConfigurationValues(values) {
@@ -1812,6 +1813,39 @@ class RaceStrategist extends RaceAssistant {
 			theStrategy.setName(name)
 
 		return theStrategy
+	}
+
+	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {
+		local strategy := this.Strategy[true]
+		local sessionDB, numPitstops, index
+
+		if strategy {
+			if (stintNumber == 1) {
+				driverID := strategy.Driver
+				driverName := strategy.DriverName
+
+				return true
+			}
+			else {
+				numPitstops := strategy.Pitstops.Length()
+				index := (stintNumber - 1)
+
+				if (index <= numPitstops) {
+					driverID := strategy.Pitstops[index].Driver
+					driverName := strategy.Pitstops[index].DriverName
+
+					return true
+				}
+			}
+		}
+
+		sessionDB := new SessionDatabase()
+
+		driverID := sessionDB.ID
+
+		sessionDB.getDriverName(this.Simulator, driverID)
+
+		return true
 	}
 
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature

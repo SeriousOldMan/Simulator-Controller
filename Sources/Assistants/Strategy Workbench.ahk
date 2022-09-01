@@ -2761,10 +2761,6 @@ class StrategyWorkbench extends ConfigurationItem {
 		return true
 	}
 
-	setStintDriver(stintNumber, driverID) {
-		throw "StrategyWorkbench.setStintDriver should never be called..."
-	}
-
 	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
 		local window := this.Window
 		local min := false

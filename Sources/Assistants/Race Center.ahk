@@ -3683,10 +3683,6 @@ class RaceCenter extends ConfigurationItem {
 		return true
 	}
 
-	setStintDriver(stintNumber, driverID) {
-		throw "RaceCenter.setStintDriver should never be called..."
-	}
-
 	runSimulation(sessionType) {
 		this.pushTask(ObjBindMethod(this, "runSimulationAsync", sessionType))
 	}

@@ -1512,6 +1512,7 @@ class Strategy extends ConfigurationItem {
 			local nr := this.Nr
 			local lap := this.Lap
 			local pitstopRule := strategy.PitstopRule
+			local numPitstops := (IsObject(pitstopRule) ? 1 : pitstopRule)
 			local refuelRule := strategy.RefuelRule
 			local tyreChangeRule := strategy.TyreChangeRule
 			local remainingFuel := strategy.RemainingFuel[true]
@@ -1557,7 +1558,7 @@ class Strategy extends ConfigurationItem {
 					tyreChange := (adjustments[nr].TyreChange != false)
 			}
 
-			if (this.Fixed && (refuelRule = "Required") && (refuelAmount <= 0))
+			if ((this.Fixed || (nr <= numPitstops)) && (refuelRule = "Required") && (refuelAmount <= 0))
 				refuelAmount := 1
 			else if ((refuelRule = "Always") && (refuelAmount <= 0))
 				refuelAmount := 1
@@ -1595,7 +1596,7 @@ class Strategy extends ConfigurationItem {
 				this.iRemainingTyreLaps := freshTyreLaps
 			}
 			else if ((remainingTyreLaps - stintLaps) >= 0) {
-				if (this.Fixed && (tyreChangeRule = "Required") && (IsObject(pitstopRule) || (remainingTyreLaps >= this.iRemainingSessionLaps))) {
+				if ((this.Fixed || (nr <= numPitstops)) && (tyreChangeRule = "Required")) {
 					this.iTyreChange := true
 					this.iRemainingTyreLaps := freshTyreLaps
 				}

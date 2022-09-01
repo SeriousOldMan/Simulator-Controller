@@ -62,9 +62,9 @@
   26. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   27. New car models for "Setup Advisor":
       - Assetto Corsa
-	    - ...
+	    - Lamborghini Huracan GT3
 	  - Assetto Corsa Competizione
-	    - ...
+	    - McLaren 650s GT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-430), especially, if you want to use the "StrategyRecommend" controller action.
 

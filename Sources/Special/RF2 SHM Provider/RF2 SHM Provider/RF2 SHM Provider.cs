@@ -200,9 +200,11 @@ namespace RF2SHMProvider {
 					Console.WriteLine(scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat ? "true" : "false");
 				}
 
-				if (scoring.mScoringInfo.mGamePhase == (byte)SessionOver)
+				if (scoring.mScoringInfo.mEndET <= 0.0 && (scoring.mScoringInfo.mMaxLaps - playerScoring.mTotalLaps) <= 0)
 					session = "Finished";
-				if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
+				else if (scoring.mScoringInfo.mGamePhase == (byte)SessionOver)
+					session = "Finished";
+				else if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
 				else if (scoring.mScoringInfo.mSession >= 0 && scoring.mScoringInfo.mSession <= 4)
 					session = "Practice";

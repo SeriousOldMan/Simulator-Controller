@@ -751,9 +751,17 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Active=true\n");
 			printf("Paused=%s\n", paused);
 
+			char buffer[64];
+
+			getDataValue(buffer, header, data, "SessionFlags");
+
+			int flags = atoi(buffer);
+
 			bool practice = false;
 
-			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
+			if (flags & irsdk_checkered)
+				printf("Session=Finished\n");
+			else if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
 				if (strstr(result, "Practice")) {
 					printf("Session=Practice\n");
 

@@ -322,9 +322,11 @@ int main(int argc, char* argv[])
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+		string session = (gf->flag == AC_CHECKERED_FLAG) ? "Finished" : getSession(gf->session);
+
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Session", getSession(gf->session));
+		printData("Session", session);
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;
 		wcout << "SessionFormat=Time" << endl;

@@ -215,6 +215,8 @@ int main(int argc, char* argv[]) {
 		printf("Active=true\n");
 		printf("Paused=%s\n", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
 
+		if (localCopy->mHighestFlagColour == FLAG_COLOUR_CHEQUERED)
+			printf("Session=Finished\n");
 		if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
 			printf("Session=Race\n");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)

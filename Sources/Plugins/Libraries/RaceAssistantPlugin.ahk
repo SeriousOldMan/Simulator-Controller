@@ -1610,6 +1610,8 @@ getDataSession(data) {
 					return kSessionPractice
 				case "Qualification":
 					return kSessionQualification
+				case "Finished":
+					return kSessionFinished
 				default:
 					return kSessionOther
 			}

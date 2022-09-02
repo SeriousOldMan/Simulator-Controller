@@ -223,7 +223,9 @@ int main(int argc, char* argv[])
 		wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
 		if (mapped_r3e) {
 			wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
-			if (map_buffer->session_type == R3E_SESSION_QUALIFY)
+			if (map_buffer->flags.checkered)
+				wprintf_s(L"Session=Finished\n");
+			else if (map_buffer->session_type == R3E_SESSION_QUALIFY)
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				wprintf_s(L"Session=Race\n");

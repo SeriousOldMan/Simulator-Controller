@@ -1209,7 +1209,7 @@ class RaceSpotter extends RaceAssistant {
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
-		local sessionEnding, minute, lastTemperature
+		local sessionEnding, minute, lastTemperature, stintLaps
 
 		if (lastLap == 2) {
 			situation := "StartSummary"
@@ -1236,15 +1236,19 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if (sector = 1) {
-				if ((this.Session = kSessionRace) && (remainingStintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
-					situation := ("StintEnding " . Ceil(lastLap + remainingStintLaps))
+				stintLaps := Floor(remainingStintLaps)
 
-					if !this.SessionInfos.HasKey(situation) {
-						this.SessionInfos[situation] := true
+				if ((this.Session = kSessionRace) && (stintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
+					if (stintLaps > 0) {
+						situation := ("StintEnding " . Ceil(lastLap + stintLaps))
 
-						speaker.speakPhrase("StintEnding", {laps: Floor(remainingStintLaps)})
+						if !this.SessionInfos.HasKey(situation) {
+							this.SessionInfos[situation] := true
 
-						return true
+							speaker.speakPhrase("StintEnding", {laps: stintLaps})
+
+							return true
+						}
 					}
 				}
 

@@ -342,7 +342,7 @@ class PositionInfo {
 			else if (Abs(position - this.Car.Position) == 1)
 				return "Position"
 			else
-				return "Unknown"
+				return "Position"
 		}
 	}
 
@@ -1521,11 +1521,12 @@ class RaceSpotter extends RaceAssistant {
 		speaker.beginTalk()
 
 		try {
-			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
-			 && trackAhead.inDelta((trackAhead.OpponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
-			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
-				opponentType := trackAhead.OpponentType
+			opponentType := (trackAhead ? trackAhead.OpponentType : false)
 
+			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
+			 && (opponentType != "Position")
+			 && trackAhead.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
 				if (!trackAhead.Reported && (sector > 1)) {
 					if (opponentType = "LapDown") {
 						speaker.speakPhrase("LapDownDriver")
@@ -2118,8 +2119,8 @@ class RaceSpotter extends RaceAssistant {
 						speaker.speakPhrase("GreetingPosition"
 										  , {position: getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")})
 
-					if (facts["Session.Type"] = "Duration")
-						speaker.speakPhrase("GreetingDuration", {minutes: Round(this.SessionDuration / 60000)})
+					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time")
+						speaker.speakPhrase("GreetingDuration", {minutes: Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining") / 60000)})
 					else
 						speaker.speakPhrase("GreetingLaps", {laps: this.SessionLaps})
 				}

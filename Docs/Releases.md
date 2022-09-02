@@ -1,4 +1,4 @@
-## 4.3.0.0-release 09/02/22 (planned)
+## 4.3.0.0-release 09/02/22
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always

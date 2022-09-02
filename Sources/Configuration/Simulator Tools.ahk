@@ -871,7 +871,11 @@ cleanupDirectory(source, destination, maxStep, ByRef count) {
 		if InStr(FileExist(A_LoopFilePath), "D") {
 			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
 
-			deleteDirectory(A_LoopFilePath)
+			try {
+				FileRemoveDir %A_LoopFilePath%
+			}
+			catch exception {
+			}
 		}
 		else if !FileExist(source . "\" . fileName) {
 			count := Min(count + 1, maxStep)

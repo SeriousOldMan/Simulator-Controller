@@ -193,7 +193,7 @@ namespace RF2SHMSpotter {
 		const int YELLOW_SECTOR_2 = 2;
 		const int YELLOW_SECTOR_3 = 4;
 
-		const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
+		const int YELLOW_ALL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 
 		const int BLUE = 16;
 
@@ -566,6 +566,7 @@ namespace RF2SHMSpotter {
 				blueCount = 0;
 			}
 
+			/*
 			if (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.FullCourseYellow)
 			{
 				if ((lastFlagState & YELLOW_FULL) == 0)
@@ -573,6 +574,18 @@ namespace RF2SHMSpotter {
 					SendSpotterMessage("yellowFlag:Full");
 
 					lastFlagState |= YELLOW_FULL;
+
+					return true;
+				}
+			}
+			*/
+			if ((scoring.mScoringInfo.mSectorFlag[0] == 1) && (scoring.mScoringInfo.mSectorFlag[1] == 1) && (scoring.mScoringInfo.mSectorFlag[2] == 1))
+			{
+				if ((lastFlagState & YELLOW_ALL) == 0)
+				{
+					SendSpotterMessage("yellowFlag:All");
+
+					lastFlagState |= YELLOW_ALL;
 
 					return true;
 				}
@@ -636,8 +649,8 @@ namespace RF2SHMSpotter {
 					if (waitYellowFlagState != lastFlagState)
 						SendSpotterMessage("yellowFlag:Clear");
 
-					lastFlagState &= ~YELLOW_FULL;
-					waitYellowFlagState &= ~YELLOW_FULL;
+					lastFlagState &= ~YELLOW_ALL;
+					waitYellowFlagState &= ~YELLOW_ALL;
 					yellowCount = 0;
 
 					return true;
@@ -812,10 +825,17 @@ namespace RF2SHMSpotter {
 						else
 						{
 							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
-							
+
 							if (!running)
-								if (startGo || (countdown-- <= 0))
+							{
+								countdown -= 1;
+
+								if (!greenFlagReported && (countdown <= 0))
+									greenFlagReported = true;
+
+								if (startGo || (countdown <= 0))
 									running = true;
+							}
 
 							if (running)
 							{

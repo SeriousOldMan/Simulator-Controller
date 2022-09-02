@@ -515,7 +515,7 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community").
+With the dropdown menu above the list of available data you can choose whether only your own setups (=> "User") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "User & Community").
 
 Important:
 

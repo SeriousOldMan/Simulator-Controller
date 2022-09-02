@@ -1034,8 +1034,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
 	}
 
-	acquirePositionsData() {
-		return readSimulatorData(this.Code, "-Standings")
+	acquirePositionsData(telemetryData) {
+		if telemetryData.HasKey("Position Data")
+			return telemetryData["Position Data"]
+		else
+			return readSimulatorData(this.Code, "-Standings")
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
@@ -1043,7 +1046,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local section, values
 
 		telemetryData := this.acquireTelemetryData()
-		positionsData := this.acquirePositionsData()
+		positionsData := this.acquirePositionsData(telemetryData)
 
 		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)

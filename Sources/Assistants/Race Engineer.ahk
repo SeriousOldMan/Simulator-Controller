@@ -202,7 +202,7 @@ startRaceEngineer() {
 		showLogo(engineerName)
 
 	if remotePID
-		Task.startTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority)
+		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
 }

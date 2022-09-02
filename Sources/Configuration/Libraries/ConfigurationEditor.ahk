@@ -182,6 +182,10 @@ class TriggerDetectorContinuation extends Continuation {
 					callback := this.Task.Callback
 
 					%callback%(joystickNumber . "Joy" . found)
+
+					this.stop()
+
+					return false
 				}
 				else
 					return new TriggerDetectorContinuation(this.Task, 2000)

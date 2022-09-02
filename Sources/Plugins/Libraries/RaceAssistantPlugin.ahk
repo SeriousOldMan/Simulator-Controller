@@ -305,9 +305,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	Assistants[] {
+	Assistants[key := false] {
 		Get {
-			return RaceAssistantPlugin.sAssistants
+			return (key ? RaceAssistantPlugin.sAssistants[key] : RaceAssistantPlugin.sAssistants)
 		}
 	}
 
@@ -473,6 +473,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				else
 					teamServer := false
 			}
+			else
+				teamServer := RaceAssistantPlugin.TeamServer
 
 			this.iRaceAssistantName := this.getArgumentValue("raceAssistantName", false)
 			this.iRaceAssistantLogo := this.getArgumentValue("raceAssistantLogo", false)
@@ -578,7 +580,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			if first {
 				RaceAssistantPlugin.sCollectorTask
-					:= new PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 10000, kLowPriority)
+					:= new PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
 				RaceAssistantPlugin.CollectorTask.start()
 			}
@@ -684,16 +686,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 
-	startupAssistants() {
+	requireAssistants() {
 		local activeAssistant := false
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled {
-				assistant.startupRaceAssistant()
-
+			if assistant.requireRaceAssistant()
 				activeAssistant := true
-			}
+
+		if activeAssistant
+			Sleep 1500
+
+		RaceAssistantPlugin.CollectorTask.Priority := kLowPriority
+		RaceAssistantPlugin.CollectorTask.Sleep := 10000
 
 		return activeAssistant
 	}
@@ -702,7 +707,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.requireRaceAssistant()
 				assistant.prepareSession(assistant.prepareSettings(data), data)
 	}
 
@@ -715,7 +720,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.sFinished := false
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if assistant.RaceAssistantEnabled {
+				if assistant.requireRaceAssistant() {
 					settings := assistant.prepareSettings(data)
 
 					if first {
@@ -737,6 +742,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sLastLapUpdate := 0
 		RaceAssistantPlugin.sInPit := false
 
+		if shutdownAssistant
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if (assistant.RaceAssistantEnabled && assistant.RaceAssistant) {
+					RaceAssistantPlugin.sWaitForShutdown := (A_TickCount + (90 * 1000))
+
+					break
+				}
+
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.RaceAssistantEnabled
 				assistant.finishSession(shutdownAssistant)
@@ -748,13 +761,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
+
+		RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
+		RaceAssistantPlugin.CollectorTask.Sleep := 1000
 	}
 
 	addAssistantsLap(data, telemetryData, positionsData) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.requireRaceAssistant()
 				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LastLapUpdate, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
@@ -765,7 +781,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.requireRaceAssistant()
 				assistant.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LastLapUpdate, data)
 	}
 
@@ -773,7 +789,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.requireRaceAssistant()
 				assistant.performPitstop(lapNumber)
 	}
 
@@ -781,7 +797,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if assistant.requireRaceAssistant()
 				assistant.restoreSessionState()
 	}
 
@@ -999,62 +1015,62 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return new this.RemoteRaceAssistant(pid)
 	}
 
-	startupRaceAssistant() {
+	requireRaceAssistant() {
 		local pid, options, exePath
 
-		if (!this.RaceAssistant && this.RaceAssistantEnabled) {
-			Process Exist
+		if this.RaceAssistantEnabled {
+			if !this.RaceAssistant {
+				Process Exist
 
-			pid := ErrorLevel
+				pid := ErrorLevel
 
-			try {
-				logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
+				try {
+					logMessage(kLogInfo, translate("Starting ") . translate(this.Plugin))
 
-				options := " -Remote " . pid
+					options := " -Remote " . pid
 
-				if this.RaceAssistantName
-					options .= " -Name """ . this.RaceAssistantName . """"
+					if this.RaceAssistantName
+						options .= " -Name """ . this.RaceAssistantName . """"
 
-				if this.RaceAssistantLogo
-					options .= " -Logo """ . this.RaceAssistantLogo . """"
+					if this.RaceAssistantLogo
+						options .= " -Logo """ . this.RaceAssistantLogo . """"
 
-				if this.RaceAssistantLanguage
-					options .= " -Language """ . this.RaceAssistantLanguage . """"
+					if this.RaceAssistantLanguage
+						options .= " -Language """ . this.RaceAssistantLanguage . """"
 
-				if this.RaceAssistantSynthesizer
-					options .= " -Synthesizer """ . this.RaceAssistantSynthesizer . """"
+					if this.RaceAssistantSynthesizer
+						options .= " -Synthesizer """ . this.RaceAssistantSynthesizer . """"
 
-				if this.RaceAssistantSpeaker
-					options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
+					if this.RaceAssistantSpeaker
+						options .= " -Speaker """ . this.RaceAssistantSpeaker . """"
 
-				if this.RaceAssistantSpeakerVocalics
-					options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
+					if this.RaceAssistantSpeakerVocalics
+						options .= " -SpeakerVocalics """ . this.RaceAssistantSpeakerVocalics . """"
 
-				if this.RaceAssistantRecognizer
-					options .= " -Recognizer """ . this.RaceAssistantRecognizer . """"
+					if this.RaceAssistantRecognizer
+						options .= " -Recognizer """ . this.RaceAssistantRecognizer . """"
 
-				if this.RaceAssistantListener
-					options .= " -Listener """ . this.RaceAssistantListener . """"
+					if this.RaceAssistantListener
+						options .= " -Listener """ . this.RaceAssistantListener . """"
 
-				if this.Controller.VoiceServer
-					options .= " -Voice """ . this.Controller.VoiceServer . """"
+					if this.Controller.VoiceServer
+						options .= " -Voice """ . this.Controller.VoiceServer . """"
 
-				exePath := """" . kBinariesDirectory . this.Plugin . ".exe""" . options
+					exePath := """" . kBinariesDirectory . this.Plugin . ".exe""" . options
 
-				Run %exePath%, %kBinariesDirectory%, , pid
+					Run %exePath%, %kBinariesDirectory%, , pid
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-				Sleep 1500
+					showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%Race Assistant.exe) - please rebuild the applications..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+					return false
+				}
+
+				this.RaceAssistant := this.createRaceAssistant(pid)
 			}
-			catch exception {
-				logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-				showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%Race Assistant.exe) - please rebuild the applications..."))
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-				return false
-			}
-
-			this.RaceAssistant := this.createRaceAssistant(pid)
 
 			return true
 		}
@@ -1067,8 +1083,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if raceAssistant {
 			this.RaceAssistant := false
-
-			this.WaitForShutdown := (A_TickCount + (90 * 1000))
 
 			raceAssistant.shutdown()
 		}
@@ -1140,7 +1154,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if this.RaceAssistant
 				this.finishSession(false)
 			else
-				this.startupRaceAssistant()
+				this.requireRaceAssistant()
 
 			if this.RaceAssistant {
 				settingsFile := (kTempDirectory . this.Plugin . ".settings")
@@ -1443,7 +1457,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					}
 				}
 
-				if RaceAssistantPlugin.startupAssistants() {
+				if RaceAssistantPlugin.requireAssistants() {
 					; Car is on the track
 
 					if getConfigurationValue(data, "Stint Data", "InPit", false) {
@@ -1528,7 +1542,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLastLapUpdate := 0
 
 							if !firstLap
-								RaceAssistantPlugin.sFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) == 0)
+								RaceAssistantPlugin.sFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) <= 0)
 						}
 
 						if firstLap {
@@ -1582,10 +1596,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				protectionOff()
 			}
 		}
-		else {
-			if (RaceAssistantPlugin.Session != kSessionFinished)
-				RaceAssistantPlugin.finishAssistantsSession()
-		}
+		else if (RaceAssistantPlugin.Session != kSessionFinished)
+			RaceAssistantPlugin.finishAssistantsSession()
 	}
 }
 
@@ -1606,6 +1618,8 @@ getDataSession(data) {
 					return kSessionPractice
 				case "Qualification":
 					return kSessionQualification
+				case "Finished":
+					return kSessionFinished
 				default:
 					return kSessionOther
 			}
@@ -1705,10 +1719,8 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 
 			if pid
-				for ignore, plugin in [kRaceEngineerPlugin, kRaceStrategistPlugin, kRaceSpotterPlugin] {
-					plugin := controller.findPlugin(plugin)
-
-					if (plugin && controller.isActive(plugin))
+				for ignore, plugin in RaceAssistantPlugin.Assistants {
+					if (plugin && controller.isActive(plugin) && plugin.RaceAssistantEnabled)
 						Task.startTask(ObjBindMethod(plugin, "reloadSettings", pid, fileName), 1000, kLowPriority)
 				}
 		}

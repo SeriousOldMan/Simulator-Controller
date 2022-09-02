@@ -340,7 +340,7 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 	  {All: [?Session.Settings.Damage.Engine.Repair = Impact],
 			[?Damage.Engine.Lap.Delta < ?Session.Settings.Damage.Engine.Repair.Threshold]}} => (Clear: Damage.Repair.Engine.Target)
 
-{All: [?Lap], [?Damage.Engine]} => (Set: Lap, ?Lap, Damage.Engine, ?Damage.Engine)
+{All: [?Lap], [?Damage.Suspension]} => (Set: Lap, ?Lap, Damage.Suspension, ?Damage.Suspension)
 {All: [?Lap], [?Damage.Bodywork]} => (Set: Lap, ?Lap, Damage.Bodywork, ?Damage.Bodywork)
 {All: [?Lap], [?Damage.Engine]} => (Set: Lap, ?Lap, Damage.Engine, ?Damage.Engine)
 

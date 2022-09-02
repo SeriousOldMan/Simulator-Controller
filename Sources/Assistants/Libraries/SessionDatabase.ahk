@@ -794,16 +794,22 @@ class SessionDatabase extends ConfigurationItem {
 
 		compound := compound(compound)
 
-		if ((weather = "Dry") && (compound = "Dry"))
-			return true
-		else if ((weather = "Drizzle") && inList(["Dry", "Intermediate"], compound))
-			return true
-		else if ((weather = "LightRain") && inList(["Intermediate", "Wet"], compound))
-			return true
+		if (weather = "Dry") {
+			if (compound = "Dry")
+				return true
+		}
+		else if (weather = "Drizzle") {
+			if inList(["Dry", "Intermediate"], compound)
+				return true
+		}
+		else if (weather = "LightRain") {
+			if inList(["Intermediate", "Wet"], compound)
+				return true
+		}
 		else if (compound = "Wet")
 			return true
-		else
-			return false
+
+		return false
 	}
 
 	optimalTyreCompound(simulator, car, track, weather, airTemeperature, trackTemperature, availableTyreCompounds := false) {

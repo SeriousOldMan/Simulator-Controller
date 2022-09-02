@@ -115,8 +115,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceStrategist(this, pid)
 	}
 
-	startSession(settings, data, teamSession) {
-		base.startSession(settings, data, teamSession)
+	startSession(settings, data) {
+		base.startSession(settings, data)
 
 		this.iLapDatabase := false
 	}
@@ -163,11 +163,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				deleteFile(strategy)
 
 				teamServer.setSessionValue("Race Strategy", text)
-				teamServer.setSessionValue("Race Strategy Version", "Force")
+				teamServer.setSessionValue("Race Strategy Version", A_Now)
 			}
 			else {
 				teamServer.setSessionValue("Race Strategy", "CANCEL")
-				teamServer.setSessionValue("Race Strategy Version", "Force")
+				teamServer.setSessionValue("Race Strategy Version", A_Now)
 			}
 		}
 		else
@@ -202,6 +202,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	recommendPitstop(lapNumber := false) {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop(lapNumber)
+	}
+
+	recommendStrategy() {
+		if this.RaceStrategist
+			this.RaceStrategist.recommendStrategy()
 	}
 
 	cancelStrategy() {

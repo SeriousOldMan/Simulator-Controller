@@ -16,7 +16,7 @@
 	 - Information when temperatures are rising or falling.
 	 
 	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
-  5. Delta calculation has been imporved again for the Spotter:
+  5. Delta calculation has been improved again for the Spotter:
      - The delta history will be reset when a given car is in the pits.
 	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
 	 - Cars that are currently in the pits, will be ignored completely, thereby eliminating disturbing and unnecessary gap updates when you have the last valid position on the track.
@@ -25,23 +25,24 @@
      - When you ask for the gap to the car ahead or behind, it will be mentioned whether this car is at least one lap up or one lap down.
   7. A couple of improvements for the automated strategy handling (Race Strategist, Race Engineer and Race Center):
      - When a strategy is recalculated / adjusted in "Race Center", an urgent pitstop is created when the currently mounted tyres are not suitable for the current weather conditions.
-     - The Race Strategist can now [recalculate / adjust the currently active strategy](*) anytime during a race.
+     - The Race Strategist can now [recalculate / adjust the currently active strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) anytime during a race.
 	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
 	   - New controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
 	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
 	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
   8. Improvements for the Race Engineer:
-     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
+     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
 	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
 	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
 	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
-	   - Engine repair will be handled automatically during pitstops for [*to be tested*].
+	   - Engine repair will be handled automatically during pitstops for those simulators, which support this.
 	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
 	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
 	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
   9. Improvements for the Strategy Workbench:
-     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned. A future version might introduce a full weather forecast model here.
+     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned.
 	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
+	 - Full support for a weather forecast model. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#weather) for more details.
   10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
   11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
   12. Significant performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
@@ -50,7 +51,7 @@
   15. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
   16. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
   17. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
-  18. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context.
+  18. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context. This creates the default for the "Mode Automation" configuration available in the "Simulator Settings" tool.
   19. All application windows remember their position after beeing moved with the mouse.
   20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
   21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
@@ -61,9 +62,9 @@
   26. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
   27. New car models for "Setup Advisor":
       - Assetto Corsa
-	    - ...
+	    - Lamborghini Huracan GT3
 	  - Assetto Corsa Competizione
-	    - ...
+	    - McLaren 650s GT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-430), especially, if you want to use the "StrategyRecommend" controller action.
 

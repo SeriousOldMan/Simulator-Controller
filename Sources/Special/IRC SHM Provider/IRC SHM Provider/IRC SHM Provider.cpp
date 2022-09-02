@@ -141,30 +141,36 @@ int getCurrentSessionID(const char* sessionInfo) {
 	return -1;
 }
 
-long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime);
+long getRemainingTime(const char* sessionInfo, bool practice, int sessionLaps, long sessionTime, int lap, long lastTime);
 
-long getRemainingLaps(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
+long getRemainingLaps(const char* sessionInfo, bool practice, int sessionLaps, long sessionTime, int lap, long lastTime) {
 	char result[100];
 
 	if (lap < 1)
 		return 0;
 
-	if (sessionLaps > 0)
+	if (!practice && sessionLaps > 0)
 		return (long)(sessionLaps - lap);
 	else if (lastTime > 0)
-		return (long)(getRemainingTime(sessionInfo, sessionLaps, sessionTime, lap, lastTime) / lastTime);
+		return (long)(getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, lap, lastTime) / lastTime);
 	else
 		return 0;
 }
 
-long getRemainingTime(const char* sessionInfo, int sessionLaps, long sessionTime, int lap, long lastTime) {
+long getRemainingTime(const char* sessionInfo, bool practice, int sessionLaps, long sessionTime, int lap, long lastTime) {
 	if (lap < 1)
 		return max(0, sessionTime);
 
-	if (sessionLaps == -1)
-		return (sessionTime - (lastTime * lap));
+	if (practice || sessionLaps == -1) {
+		long time = (sessionTime - (lastTime * lap));
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
+	}
 	else
-		return (getRemainingLaps(sessionInfo, sessionLaps, sessionTime, lap, lastTime) * lastTime);
+		return (getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, lap, lastTime) * lastTime);
 }
 
 void printDataValue(const irsdk_header* header, const char* data, const irsdk_varHeader* rec) {
@@ -558,7 +564,7 @@ bool getCarCoordinates(const irsdk_header* header, const char* data, const char*
 	return false;
 }
 
-void writeStandings(const irsdk_header *header, const char* data)
+void writePositions(const irsdk_header *header, const char* data)
 {
 	if (header && data)
 	{
@@ -745,9 +751,17 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("Active=true\n");
 			printf("Paused=%s\n", paused);
 
+			char buffer[64];
+
+			getDataValue(buffer, header, data, "SessionFlags");
+
+			int flags = atoi(buffer);
+
 			bool practice = false;
 
-			if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
+			if (flags & irsdk_checkered)
+				printf("Session=Finished\n");
+			else if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
 				if (strstr(result, "Practice")) {
 					printf("Session=Practice\n");
 
@@ -789,9 +803,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			long timeRemaining = -1;
 			
+			/*
 			if (practice)
 				timeRemaining = 3600000;
 			else {
+			*/
 				if (getDataValue(result, header, data, "SessionTimeRemain")) {
 					float time = atof(result);
 
@@ -800,16 +816,20 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				}
 
 				if (timeRemaining == -1)
-					timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+					timeRemaining = getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, laps, lastTime);
+			/*
 			}
+			*/
 
 			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 
 			long lapsRemaining = -1;
 			
+			/*
 			if (practice)
 				lapsRemaining = 30;
 			else {
+			*/
 				timeRemaining = -1;
 
 				if (getDataValue(result, header, data, "SessionLapsRemain"))
@@ -821,9 +841,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 					if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
 						estTime = (long)(atof(result) * 1000);
 
-					lapsRemaining = getRemainingLaps(sessionInfo, sessionLaps, sessionTime, laps, estTime);
+					lapsRemaining = getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, laps, estTime);
 				}
+			/*
 			}
+			*/
 
 			printf("SessionLapsRemaining=%ld\n", lapsRemaining);
 
@@ -892,8 +914,8 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 					timeRemaining = ((long)time * 1000);
 			}
 
-			if (!practice && (timeRemaining == -1))
-				timeRemaining = getRemainingTime(sessionInfo, sessionLaps, sessionTime, laps, lastTime);
+			if (timeRemaining == -1)
+				timeRemaining = getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, laps, lastTime);
 
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
@@ -1063,11 +1085,20 @@ int main(int argc, char* argv[])
 					else if (strcmp(argv[2], "Change") == 0)
 						pitstopChangeValues(pHeader, g_data, argv[3]);
 				}
-				else if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
-					writeStandings(pHeader, g_data);
+				else {
+					bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+					bool writeTelemetry = !writeStandings;
+					bool writeSetup = ((argc == 2) && (strcmp(argv[1], "-Setup") == 0));
+
+					writeTelemetry = true;
+					writeStandings = !writeSetup;
+
+					if (writeStandings)
+						writePositions(pHeader, g_data);
+
+					if (writeTelemetry)
+						writeData(pHeader, g_data, writeSetup);
 				}
-				else
-					writeData(pHeader, g_data, ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)));
 
 				break;
 			}

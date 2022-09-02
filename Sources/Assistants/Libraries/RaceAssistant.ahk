@@ -661,7 +661,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					speaker := this.getSpeaker()
 
-					speaker.startTalk()
+					speaker.beginTalk()
 
 					try {
 						speaker.speakPhrase("Joke")
@@ -669,7 +669,7 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.speak(joke.value)
 					}
 					finally {
-						speaker.finishTalk()
+						speaker.endTalk()
 					}
 				}
 				catch exception {
@@ -696,7 +696,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					speaker := this.getSpeaker()
 
-					speaker.startTalk()
+					speaker.beginTalk()
 
 					try {
 						speaker.speakPhrase("Joke")
@@ -704,7 +704,7 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.speak(joke)
 					}
 					finally {
-						speaker.finishTalk()
+						speaker.endTalk()
 					}
 				}
 				catch exception {
@@ -875,10 +875,47 @@ class RaceAssistant extends ConfigurationItem {
 								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 	}
 
+	initializeSessionFormat(facts, settings, data, lapTime) {
+		local sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
+		local sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		local sessionLapsRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+		local dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
+		local laps := sessionLapsRemaining
+		local duration := dataDuration
+		local settingsDuration
+
+		if (sessionFormat = "Time") {
+			if (lapTime > 0)
+				laps := Round((dataDuration * 1000) / lapTime)
+			else
+				laps := 0
+		}
+		else if (dataDuration > 0) {
+			settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
+
+			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
+				duration := dataDuration
+			else
+				duration := settingsDuration
+		}
+
+		if isInstance(facts, KnowledgeBase) {
+			facts.setValue("Session.Duration", duration)
+			facts.setValue("Session.Laps", laps)
+			facts.setValue("Session.Format", sessionFormat)
+		}
+		else {
+			facts["Session.Duration"] := duration
+			facts["Session.Laps"] := laps
+			facts["Session.Format"] := sessionFormat
+		}
+
+		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps})
+	}
+
 	createSession(ByRef settings, ByRef data) {
 		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
-		local lapTime, settingsLapTime, sessionForma, sessionTimeRemaining, sessionLapsRemaining
-		local dataDuration, duration, laps, settingsDuration, sessionFormat
+		local lapTime, settingsLapTime, facts
 
 		if (settings && !IsObject(settings))
 			settings := readConfiguration(settings)
@@ -922,47 +959,24 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
-		sessionFormat := getConfigurationValue(data, "Session Data", "SessionFormat", "Time")
-		sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-		sessionLapsRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+		facts := {"Session.Simulator": simulator
+				, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
+				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
+				, "Session.Type": this.Session
+				, "Session.Time.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+				, "Session.Lap.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+				, "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
+				, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
+				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
+				, "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
+				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
+				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
+				, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
+				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
 
-		dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
+		this.initializeSessionFormat(facts, settings, data, lapTime)
 
-		if (sessionFormat = "Time") {
-			duration := dataDuration
-
-			laps := Round((dataDuration * 1000) / lapTime)
-		}
-		else {
-			laps := (sessionLapsRemaining + 1)
-
-			settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
-
-			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
-				duration := dataDuration
-			else
-				duration := settingsDuration
-		}
-
-		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps})
-
-		return {"Session.Simulator": simulator
-			  , "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
-			  , "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
-			  , "Session.Duration": duration
-			  , "Session.Laps": laps
-			  , "Session.Type": this.Session
-			  , "Session.Format": sessionFormat
-			  , "Session.Time.Remaining": sessionTimeRemaining
-			  , "Session.Lap.Remaining": sessionLapsRemaining
-			  , "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
-			  , "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
-			  , "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-			  , "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
-			  , "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
-			  , "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
-			  , "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
-			  , "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
+		return facts
 	}
 
 	updateSession(settings) {
@@ -1033,7 +1047,7 @@ class RaceAssistant extends ConfigurationItem {
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1107,16 +1121,20 @@ class RaceAssistant extends ConfigurationItem {
 
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 
-		if ((lapNumber <= 2) && knowledgeBase.getValue("Session.Settings.Lap.Time.Adjust", false)) {
+		if ((lapNumber <= 2) && this.AdjustLapTime) {
 			settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
 			if ((lapTime / settingsLapTime) > 1.2)
 				lapTime := settingsLapTime
 		}
 
-		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+		if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
+			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
-		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
+		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
@@ -1125,11 +1143,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		values := {OverallTime: overallTime}
 
-		if (lapNumber > 1)
-			values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+		if (lapTime > 0) {
+			if ((lapNumber > 1) && lapValid)
+				values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
 
-		if (lapTime > 0)
 			this.updateDynamicValues(values)
+		}
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 

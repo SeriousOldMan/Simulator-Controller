@@ -147,7 +147,7 @@ const int YELLOW_SECTOR_1 = 1;
 const int YELLOW_SECTOR_2 = 2;
 const int YELLOW_SECTOR_3 = 4;
 
-const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
+const int YELLOW_ALL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 
 const int BLUE = 16;
 
@@ -476,10 +476,10 @@ bool checkFlagState() {
 	}
 
 	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
-		if ((lastFlagState & YELLOW_FULL) == 0) {
-			sendSpotterMessage("yellowFlag:Full");
+		if ((lastFlagState & YELLOW_ALL) == 0) {
+			sendSpotterMessage("yellowFlag:All");
 
-			lastFlagState |= YELLOW_FULL;
+			lastFlagState |= YELLOW_ALL;
 
 			return true;
 		}
@@ -535,8 +535,8 @@ bool checkFlagState() {
 			if (waitYellowFlagState != lastFlagState)
 				sendSpotterMessage("yellowFlag:Clear");
 
-			lastFlagState &= ~YELLOW_FULL;
-			waitYellowFlagState &= ~YELLOW_FULL;
+			lastFlagState &= ~YELLOW_ALL;
+			waitYellowFlagState &= ~YELLOW_ALL;
 			yellowCount = 0;
 
 			return true;
@@ -732,8 +732,14 @@ int main(int argc, char* argv[])
 		else {
 			bool startGo = (gf->flag == AC_GREEN_FLAG);
 			
-			if (!running)
-				running = (startGo || (countdown-- <= 0) || (pf->speedKmh >= 200));
+			if (!running) {
+				countdown -= 1;
+
+				if (!greenFlagReported && ((countdown <= 0) || (pf->speedKmh >= 200)))
+					greenFlagReported = true;
+
+				running = (startGo || (countdown <= 0) || (pf->speedKmh >= 200));
+			}
 
 			if (running) {
 				if (pf->speedKmh > 120)

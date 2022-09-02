@@ -151,8 +151,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		return settings
 	}
 
-	startSession(settings, data, teamSession) {
-		base.startSession(settings, data, teamSession)
+	startSession(settings, data) {
+		base.startSession(settings, data)
 
 		this.iLapDatabase := false
 	}

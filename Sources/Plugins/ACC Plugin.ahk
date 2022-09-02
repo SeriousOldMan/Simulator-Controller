@@ -270,8 +270,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !ErrorLevel
 			this.iUDPClient := false
 
-		if (this.Session == kSessionRace)
-			this.startupUDPClient(restart)
+		this.startupUDPClient(restart)
 	}
 
 	updateSession(session) {
@@ -289,7 +288,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPitstopMode.updateActions(session)
 
 		if (session == kSessionRace)
-			this.startupUDPClient((lastSession != kSessionRace) && (lastSession != kSessionPaused))
+			this.requireUDPClient((lastSession != kSessionRace) && (lastSession != kSessionPaused))
 		else {
 			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
@@ -301,8 +300,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	acquirePositionsData() {
-		local data
+	acquirePositionsData(telemetryData) {
+		local positionsData
 		local lap, restart, fileName, tries
 		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
@@ -312,7 +311,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		static sessionID := 0
 		static lastLap := 0
 
-		lap := getConfigurationValue(data, "Stint Data", "Laps", 0)
+		lap := getConfigurationValue(telemetryData, "Stint Data", "Laps", 0)
 		restart := false
 
 		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
@@ -325,10 +324,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		lastLap := lap
 
-		if (this.Session == kSessionRace)
-			this.requireUDPClient(restart)
-		else if !this.UDPClient
-			return
+		this.requireUDPClient(restart)
 
 		if !carIDs
 			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
@@ -352,12 +348,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (tries > 0) {
 				fileName := kTempDirectory . "ACCUDP.out"
 
-				data := readConfiguration(fileName)
+				positionsData := readConfiguration(fileName)
 
 				deleteFile(fileName)
 			}
 			else {
-				data := false
+				positionsData := false
 
 				deleteFile(fileName)
 
@@ -365,21 +361,21 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		if data {
+		if positionsData {
 			if (lap <= 1)
 				lastDriverCar := false
 
-			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+			driverForname := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
+			driverSurname := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+			driverNickname := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 
-			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+			lapTime := getConfigurationValue(telemetryData, "Stint Data", "LapLastTime", 0)
 
 			driverCar := false
 			driverCarCandidate := false
 
 			loop {
-				carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+				carID := getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID == kUndefined)
 					break
@@ -389,16 +385,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if ((car = "Unknown") && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
-					setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", car)
+					setConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
 					if !driverCar
-						if ((getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+						if ((getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
 						}
-						else if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						else if (getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
 							driverCarCandidate := A_Index
 				}
 			}
@@ -406,9 +402,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if !driverCar
 				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
 
-			setConfigurationValue(data, "Position Data", "Driver.Car", driverCar)
+			setConfigurationValue(positionsData, "Position Data", "Driver.Car", driverCar)
 
-			return data
+			return positionsData
 		}
 		else
 			return newConfiguration()

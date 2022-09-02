@@ -256,6 +256,7 @@ int main(int argc, char* argv[])
 		printData("GapAhead", gf->gapAhead);
 		printData("GapBehind", gf->gapBehind);
 
+		/*
 		if (gf->session == AC_PRACTICE) {
 			printData("StintTimeRemaining", 3600000);
 			printData("DriverTimeRemaining", 3600000);
@@ -270,6 +271,18 @@ int main(int argc, char* argv[])
 			printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 			printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
 		}
+		*/
+
+		double timeLeft = gf->sessionTimeLeft;
+
+		if (timeLeft < 0) {
+			timeLeft = 3600.0 * 1000;
+		}
+
+		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
+		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
+
+		printData("InPitLane", gf->isInPit ? "true" : "false");
 		printData("InPit", gf->isInPit ? "true" : "false");
 	}
 
@@ -309,28 +322,23 @@ int main(int argc, char* argv[])
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+		string session = (gf->flag == AC_CHECKERED_FLAG) ? "Finished" : getSession(gf->session);
+
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData("Session", getSession(gf->session));
+		printData("Session", session);
 		wcout << "Car=" << sf->carModel << endl;
 		wcout << "Track=" << sf->track << endl;
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
-		if (gf->session == AC_PRACTICE) {
-			printData("SessionTimeRemaining", 3600000);
-			printData("SessionLapsRemaining", 30);
-		}
-		else {
-			double timeLeft = gf->sessionTimeLeft;
+		double timeLeft = gf->sessionTimeLeft;
 
-			if (timeLeft < 0) {
-				timeLeft = 3600.0 * 1000;
-			}
+		if (timeLeft < 0)
+			timeLeft = 0;
 
-			printData("SessionTimeRemaining", timeLeft);
-			printData("SessionLapsRemaining", timeLeft / gf->iLastTime);
-		}
+		printData("SessionTimeRemaining", timeLeft);
+		printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
 	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))

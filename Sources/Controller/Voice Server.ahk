@@ -282,9 +282,9 @@ class VoiceServer extends ConfigurationItem {
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
 
-			this.iSpeaking := true
-
 			try {
+				this.iSpeaking := true
+
 				try {
 					while (tries-- > 0) {
 						if (tries == 0)
@@ -295,6 +295,9 @@ class VoiceServer extends ConfigurationItem {
 
 						if this.Interrupted {
 							Sleep 2000
+
+							while this.Muted
+								Sleep 100
 
 							this.iInterrupted := false
 						}
@@ -355,11 +358,8 @@ class VoiceServer extends ConfigurationItem {
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer {
-					if (this.Speaking && synthesizer.Stoppable && this.Interruptable) {
-						this.iInterrupted := true
-
-						synthesizer.stop()
-					}
+					if (this.Speaking && synthesizer.Stoppable && this.Interruptable)
+						this.iInterrupted := synthesizer.stop()
 
 					synthesizer.mute()
 				}
@@ -588,7 +588,7 @@ class VoiceServer extends ConfigurationItem {
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
 		if this.PushToTalk
-			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kHighPriority).start()
+			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kInterruptPriority).start()
 	}
 
 	listen() {
@@ -597,14 +597,8 @@ class VoiceServer extends ConfigurationItem {
 		static lastUp := 0
 		static clicks := 0
 		static activation := false
-		static lastPressed := false
 
 		pressed := GetKeyState(this.PushToTalk, "P")
-
-		if (!pressed && !lastPressed)
-			return
-		else
-			lastPressed := pressed
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount

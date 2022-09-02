@@ -151,7 +151,17 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
-		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
+
+		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
+
+		FileCreateDir %kTempDirectory%%dirName%
+
+		this.iCacheDirectory := (kTempDirectory . dirName . "\")
+
+		this.clearCache()
+
+		OnExit(ObjBindMethod(this, "clearCache"))
 
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
@@ -240,8 +250,6 @@ class SpeechSynthesizer {
 		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
-
-		OnExit(ObjBindMethod(this, "clearCache"))
 	}
 
 	setPlayerLevel(level) {
@@ -275,17 +283,20 @@ class SpeechSynthesizer {
 
 		Process Exist, %pid%
 
-		if ErrorLevel
-			Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 50, kInterruptPriority)
+		if ErrorLevel {
+			Task.CurrentTask.Sleep := 50
+
+			return Task.CurrentTask
+		}
 		else {
 			this.iSoundPlayer := false
 
 			callback := this.SpeechStatusCallback
 
 			%callback%("Stop")
-		}
 
-		return false
+			return false
+		}
 	}
 
 	playSound(soundFile, wait := true) {
@@ -371,28 +382,16 @@ class SpeechSynthesizer {
 		local directory := this.iCacheDirectory
 
 		if directory
-			deleteDirectory(directory)
+			deleteFile(directory . "Unnamed*.*")
 
 		return false
 	}
 
 	cacheFileName(cacheKey, fileName := false) {
-		local postfix, dirName
-
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
-			if !this.iCacheDirectory {
-				Random postfix, 1, 1000000
-
-				dirName := ("PhraseCache" . Round(postfix))
-
-				FileCreateDir %kTempDirectory%%dirName%
-
-				this.iCacheDirectory := (kTempDirectory . dirName)
-			}
-
-			fileName := (this.iCacheDirectory . "\" . (fileName ? fileName : cacheKey) . ".wav")
+			fileName := (this.iCacheDirectory . (fileName ? fileName : cacheKey) . ".wav")
 
 			this.iCache[cacheKey] := fileName
 
@@ -604,10 +603,18 @@ class SpeechSynthesizer {
 		local status
 
 		if pid {
-			Process Close, %pid%
+			Process Exist, %pid%
 
-			this.iSoundPlayer := false
-			this.iPlaysCacheFile := false
+			if ErrorLevel {
+				Process Close, %pid%
+
+				this.iSoundPlayer := false
+				this.iPlaysCacheFile := false
+
+				return true
+			}
+			else
+				return false
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
@@ -618,6 +625,8 @@ class SpeechSynthesizer {
 			}
 
 			this.iPlaysCacheFile := false
+
+			return true
 		}
 		else if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
@@ -626,6 +635,8 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.Resume
 
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
+
+			return true
 		}
 	}
 

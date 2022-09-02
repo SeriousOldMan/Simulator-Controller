@@ -959,6 +959,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	disableRaceAssistant(label := false, force := false) {
+		local ignore, assistant
+
 		if (this.RaceAssistantEnabled || force) {
 			label := translate(this.Plugin)
 
@@ -970,6 +972,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.finishSession()
 
 			this.updateTrayLabel(label, false)
+
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if assistant.RaceAssistantEnabled
+					return
+
+			RaceAssistantPlugin.finishAssistantsSession()
 		}
 	}
 

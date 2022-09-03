@@ -802,7 +802,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			else
 				printf("Car=Unknown\n");
 
-			printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Lap");
+			printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Laps");
 
 			long timeRemaining = -1;
 			

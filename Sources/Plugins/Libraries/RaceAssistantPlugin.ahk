@@ -686,6 +686,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 
+	initializeAssistantsState() {
+		RaceAssistantPlugin.sSession := kSessionFinished
+		RaceAssistantPlugin.sLastLap := 0
+		RaceAssistantPlugin.sLastLapUpdate := 0
+		RaceAssistantPlugin.sInPit := false
+		RaceAssistantPlugin.sFinished := false
+	}
+
 	requireAssistants() {
 		local activeAssistant := false
 		local ignore, assistant
@@ -737,10 +745,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		local ignore, assistant
 
-		RaceAssistantPlugin.sSession := kSessionFinished
-		RaceAssistantPlugin.sLastLap := 0
-		RaceAssistantPlugin.sLastLapUpdate := 0
-		RaceAssistantPlugin.sInPit := false
+		RaceAssistantPlugin.initializeAssistantsState()
 
 		if shutdownAssistant
 			for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1390,15 +1395,24 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	collectSessionData() {
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
-		local newLap, firstLap, ignore, assistant
+		local newLap, firstLap, ignore, assistant, hasAssistant
+		local finished, sessionTimeRemaining, sessionLapsRemaining
 
 		if (A_TickCount <= RaceAssistantPlugin.WaitForShutdown)
 			return
 		else {
 			RaceAssistantPlugin.sWaitForShutdown := false
 
-			for ignore, assistant in RaceAssistantPlugin.Assistants
+			hasAssistant := false
+
+			for ignore, assistant in RaceAssistantPlugin.Assistants {
 				assistant.RaceAssistant[true]
+
+				hasAssistant := (hasAssistant || (assistant.RaceAssistant != false))
+			}
+
+			if (!hasAssistant && (this.Session == kSessionFinished))
+				RaceAssistantPlugin.initializeAssistantsState()
 		}
 
 		if RaceAssistantPlugin.Simulator {
@@ -1480,6 +1494,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 
+						if (RaceAssistantPlugin.Finished && (dataLastLap >= RaceAssistantPlugin.Finished)) {
+							; Session has endedd
+
+							RaceAssistantPlugin.finishAssistantsSession()
+
+							return
+						}
+
 						if (dataLastLap > 1) {
 							if (RaceAssistantPlugin.LastLap == 0) {
 								; Missed the start of the session, might be a team session
@@ -1532,12 +1554,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						}
 
 						if newLap {
-							if RaceAssistantPlugin.Finished {
-								RaceAssistantPlugin.finishAssistantsSession()
-
-								return
-							}
-
 							RaceAssistantPlugin.sLastLap := dataLastLap
 							RaceAssistantPlugin.sLastLapUpdate := 0
 

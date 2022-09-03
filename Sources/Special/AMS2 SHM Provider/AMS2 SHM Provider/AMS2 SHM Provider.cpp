@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
 		printf("Track=%s-%s\n", localCopy->mTrackLocation, localCopy->mTrackVariation);
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
-		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
+		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
 
 		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {

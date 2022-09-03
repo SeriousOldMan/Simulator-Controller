@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
 			wprintf_s(L"Car=%S\n", buffer);
 			wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
 			wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
-			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
+			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Laps" : "Time");
 
 			/*
 			if (practice) {

@@ -520,8 +520,10 @@ class PositionInfo {
 		}
 		else {
 			if (observed != this.Observed) {
-				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) ; (this.Observed != "")
+				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B")))
 					this.reset(sector, true)
+				else if ((InStr(observed, "B") || InStr(observed, "F")) && (!InStr(this.Observed, "B") && !InStr(this.Observed, "F")))
+					this.reset(sector, true, true)
 				else
 					this.Reported := false
 
@@ -1311,7 +1313,7 @@ class RaceSpotter extends RaceAssistant {
 
 							remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-							if (remainingStintLaps < remainingSessionLaps) {
+							if (remainingStintTime < remainingSessionTime) {
 								speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
 
 								enoughFuel := (remainingStintLaps < remainingFuelLaps)

@@ -1541,8 +1541,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLastLap := dataLastLap
 							RaceAssistantPlugin.sLastLapUpdate := 0
 
-							if !firstLap
-								RaceAssistantPlugin.sFinished := (getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) <= 0)
+							if (!firstLap && !RaceAssistantPlugin.Finished) {
+								sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
+								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
+
+								if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
+									if (sessionTimeRemaining <= 0)
+										RaceAssistantPlugin.sFinished := (dataLastLap + 1)
+									else if (sessionLapsRemaining <= 0.5)
+										RaceAssistantPlugin.sFinished := (dataLastLap + 2)
+								}
+								else if (sessionLapsRemaining == 0)
+									RaceAssistantPlugin.sFinished := dataLastLap
+							}
 						}
 
 						if firstLap {

@@ -699,8 +699,6 @@ class VoiceManager {
 
 		if voiceServer
 			try {
-				; sendMessage(kWindowMessage, "Voice", "mute", "ahk_pid " . voiceServer, "INTR")
-
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
 			catch exception {
@@ -713,8 +711,6 @@ class VoiceManager {
 
 		if voiceServer
 			deleteFile(kTempDirectory . "Voice.mute")
-
-			; sendMessage(kWindowMessage, "Voice", "unmute", "ahk_pid " . voiceServer, "INTR")
 	}
 
 	getGrammars(language) {

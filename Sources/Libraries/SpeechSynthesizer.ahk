@@ -331,9 +331,9 @@ class SpeechSynthesizer {
 
 			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
 
-			this.iSoundPlayer := pid
-
 			Sleep 500
+
+			this.iSoundPlayer := pid
 
 			if kNirCmd
 				try {
@@ -615,11 +615,7 @@ class SpeechSynthesizer {
 
 				this.iSoundPlayer := false
 				this.iPlaysCacheFile := false
-
-				return true
 			}
-			else
-				return false
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
@@ -630,8 +626,6 @@ class SpeechSynthesizer {
 			}
 
 			this.iPlaysCacheFile := false
-
-			return true
 		}
 		else if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
@@ -640,9 +634,9 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer.Resume
 
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
-
-			return true
 		}
+
+		return true
 	}
 
 	setRate(rate) {

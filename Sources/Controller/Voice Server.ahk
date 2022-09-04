@@ -97,7 +97,7 @@ class VoiceServer extends ConfigurationItem {
 
 		iMuted := false
 		iInterrupted := false
-		iInterruptable := false
+		iInterruptable := true
 
 		iSpeechRecognizer := false
 		iSpeaking := false
@@ -290,21 +290,22 @@ class VoiceServer extends ConfigurationItem {
 				try {
 					while (tries-- > 0) {
 						if (tries == 0)
-							this.iInterruptable := false
-
-						if !this.Interrupted
 							this.SpeechSynthesizer[true].speak(text, true)
+						else {
+							if !this.Interrupted
+								this.SpeechSynthesizer[true].speak(text, true)
 
-						if this.Interrupted {
-							Sleep 2000
+							if this.Interrupted {
+								Sleep 2000
 
-							while this.Muted
-								Sleep 100
+								while this.Muted
+									Sleep 100
 
-							this.iInterrupted := false
+								this.iInterrupted := false
+							}
+							else
+								break
 						}
-						else
-							break
 					}
 				}
 				finally {
@@ -354,31 +355,31 @@ class VoiceServer extends ConfigurationItem {
 		mute() {
 			local synthesizer
 
-			if !this.Muted {
+			; if !this.Muted {
 				this.iMuted := true
 
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer {
-					if (this.Speaking && synthesizer.Stoppable && this.Interruptable)
+					if (this.Speaking && this.Interruptable && synthesizer.Stoppable)
 						this.iInterrupted := synthesizer.stop()
 
 					synthesizer.mute()
 				}
-			}
+			; }
 		}
 
 		unmute() {
 			local synthesizer
 
-			if this.Muted {
+			; if this.Muted {
 				this.iMuted := false
 
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer
 					synthesizer.unmute()
-			}
+			; }
 		}
 
 		registerChoices(name, choices*) {
@@ -763,7 +764,7 @@ class VoiceServer extends ConfigurationItem {
 
 	muteVoiceClients() {
 		if FileExist(kTempDirectory . "Voice.mute")
-			this.mute
+			this.mute()
 		else
 			this.unmute()
 	}

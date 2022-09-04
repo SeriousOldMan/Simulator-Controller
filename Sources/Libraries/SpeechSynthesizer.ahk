@@ -331,6 +331,8 @@ class SpeechSynthesizer {
 
 			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
 
+			this.iSoundPlayer := pid
+
 			Sleep 500
 
 			if kNirCmd
@@ -343,8 +345,6 @@ class SpeechSynthesizer {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-
-			this.iSoundPlayer := pid
 
 			if wait {
 				loop {

@@ -559,8 +559,6 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	__New(configuration := false) {
-		local label, callback
-
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
 
 		base.__New(configuration)
@@ -572,11 +570,7 @@ class VoiceServer extends ConfigurationItem {
 
 		deleteFile(kTempDirectory . "Voice.mute")
 
-		callback := ObjBindMethod(this, "muteVoiceClients")
-
-		SetTimer %callback%, 10
-
-		; new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
+		new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {

@@ -304,7 +304,7 @@ class MessageManager extends PeriodicTask {
 		this.Sleep := 200
 	}
 
-	sendMessage(messageType, category, data, target := false) {
+	sendMessage(messageType, category, data, target := false, request := "NORM") {
 		local messageHandlers, messageHandler
 
 		switch messageType {
@@ -324,7 +324,10 @@ class MessageManager extends PeriodicTask {
 			case kWindowMessage:
 				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")) . translate(" to target ") . target)
 
-				this.OutgoingMessages.Push(ObjBindMethod(this, "sendWindowMessage", target, category, data))
+				if (request = "INTR")
+					sendWindowMessage(target, category, data, request)
+				else
+					this.OutgoingMessages.Push(Func("sendWindowMessage").Bind(target, category, data, request))
 			case kPipeMessage:
 				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")))
 
@@ -351,6 +354,7 @@ createMessageReceiver() {
 	Gui MR:Add, Text, , % A_ScriptName
 
 	Gui MR:Margin, 10, 10
+
 	Gui MR:Show, X0 Y0 Hide AutoSize
 }
 
@@ -382,7 +386,7 @@ decodeDWORD(data) {
     return result
 }
 
-sendWindowMessage(target, category, data) {
+sendWindowMessage(target, category, data, request) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local curTitleMatchMode := A_TitleMatchMode
 	local dwData, cbData, lpData, struct, message, wParam, lParam, control
@@ -392,7 +396,7 @@ sendWindowMessage(target, category, data) {
 	;---------------------------------------------------------------------------
 	; construct the message to send
 	;---------------------------------------------------------------------------
-	dwData := encodeDWORD("EVNT")
+	dwData := encodeDWORD(request)
 	cbData := StrLen(category) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
 	lpData := &category                                ; pointer to DATA string
 
@@ -405,7 +409,7 @@ sendWindowMessage(target, category, data) {
 	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
 
 	;---------------------------------------------------------------------------
-	; parameters for SendMessage command
+	; parameters for PostMessage command
 	;---------------------------------------------------------------------------
 	message := 0x4a     ; WM_COPYDATA
 	wParam  := ""       ; not used
@@ -416,11 +420,13 @@ sendWindowMessage(target, category, data) {
 	DetectHiddenWindows On ; needed for sending messages
 
 	try {
-		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
+		PostMessage %message%, %wParam%, %lParam%, %control%, %target%
 
 		return (ErrorLevel != "FAIL")
 	}
 	catch exception {
+		logError(exception)
+
 		return false
 	}
 	finally {
@@ -444,13 +450,13 @@ receiveWindowMessage(wParam, lParam) {
     ;---------------------------------------------------------------------------
     request := decodeDWORD(dwData)              ; 4-char decoded request
 
-	if (request = "EVNT") {
-		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length)           ; DATA string from pointer
-	}
-	else if ((request = "RS") || (request = "SD")) {
+	if ((request = "RS") || (request = "SD")) {
 		length  := (cbData - 1)						; length of DATA string (excl ZERO)
 		data    := StrGet(lpData, length, "")       ; DATA string from pointer
+	}
+	else if ((request = "NORM") || (request = "INTR")) {
+		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
+		data    := StrGet(lpData, length)           ; DATA string from pointer
 	}
 	else
 		throw % "Unhandled message received: " . request . " in receiveWindowMessage..."
@@ -469,7 +475,7 @@ receiveWindowMessage(wParam, lParam) {
 
 	callable := ObjBindMethod(messageHandler, "call", category, data[2])
 
-	if (request = "RS")
+	if ((request = "RS") || (request = "INTR"))
 		withProtection(callable)
 	else
 		Task.startTask(callable)
@@ -547,8 +553,8 @@ registerMessageHandler(category, handler, object := false) {
 	}
 }
 
-sendMessage(messageType, category, data, target := false) {
-	MessageManager.Instance.sendMessage(messageType, category, data, target)
+sendMessage(messageType, category, data, target := false, request := "NORM") {
+	MessageManager.Instance.sendMessage(messageType, category, data, target, request)
 }
 
 

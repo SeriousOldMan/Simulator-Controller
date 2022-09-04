@@ -698,25 +698,23 @@ class VoiceManager {
 		local voiceServer := this.VoiceServer
 
 		if voiceServer
-			sendMessage(kWindowMessage, "Voice", "mute", "ahk_pid " . voiceServer)
-
-			/*
 			try {
+				; sendMessage(kWindowMessage, "Voice", "mute", "ahk_pid " . voiceServer, "INTR")
+
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
 			catch exception {
 				logError(exception)
 			}
-			*/
 	}
 
 	unmute() {
 		local voiceServer := this.VoiceServer
 
 		if voiceServer
-			sendMessage(kWindowMessage, "Voice", "unmute", "ahk_pid " . voiceServer)
+			deleteFile(kTempDirectory . "Voice.mute")
 
-			; deleteFile(kTempDirectory . "Voice.mute")
+			; sendMessage(kWindowMessage, "Voice", "unmute", "ahk_pid " . voiceServer, "INTR")
 	}
 
 	getGrammars(language) {

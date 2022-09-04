@@ -570,6 +570,10 @@ class VoiceServer extends ConfigurationItem {
 
 		deleteFile(kTempDirectory . "Voice.mute")
 
+		callback := ObjBindMethod(this, "muteVoiceClients")
+
+		SetTimer %callback%, 10
+
 		; new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
@@ -763,7 +767,7 @@ class VoiceServer extends ConfigurationItem {
 
 	muteVoiceClients() {
 		if FileExist(kTempDirectory . "Voice.mute")
-			this.mute()
+			this.mute
 		else
 			this.unmute()
 	}

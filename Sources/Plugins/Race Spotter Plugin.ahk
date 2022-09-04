@@ -337,7 +337,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		base.finishSession(arguments*)
 	}
 
-	addLap(lap, update, data) {
+	addLap(lap, running, data) {
 		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile
 
 		static sessionDB := false
@@ -345,7 +345,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if !sessionDB
 			sessionDB := new SessionDatabase()
 
-		base.addLap(lap, update, data)
+		base.addLap(lap, running, data)
 
 		if (this.RaceAssistant && this.Simulator) {
 			simulator := this.Simulator.Simulator[true]
@@ -406,8 +406,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	updateLap(lap, update, data) {
-		base.updateLap(lap, update, data)
+	updateLap(lap, running, data) {
+		base.updateLap(lap, running, data)
 
 		if this.TeamSessionActive
 			this.TeamServer.setLapValue(lap, "Track Data", data)

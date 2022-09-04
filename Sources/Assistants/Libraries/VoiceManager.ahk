@@ -695,18 +695,28 @@ class VoiceManager {
 	}
 
 	mute() {
-		if this.VoiceServer
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
+			sendMessage(kWindowMessage, "Voice", "mute", "ahk_pid " . voiceServer)
+
+			/*
 			try {
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
 			catch exception {
 				logError(exception)
 			}
+			*/
 	}
 
 	unmute() {
-		if this.VoiceServer
-			deleteFile(kTempDirectory . "Voice.mute")
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
+			sendMessage(kWindowMessage, "Voice", "unmute", "ahk_pid " . voiceServer)
+
+			; deleteFile(kTempDirectory . "Voice.mute")
 	}
 
 	getGrammars(language) {

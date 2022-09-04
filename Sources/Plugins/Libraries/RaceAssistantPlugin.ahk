@@ -27,7 +27,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	static sSession := 0 ; kSessionFinished
 	static sLastLap := 0
-	static sLastLapUpdate := 0
+	static sLapRunning := 0
 	static sWaitForShutdown := 0
 	static sInPit := false
 	static sFinished := false
@@ -335,9 +335,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	LastLapUpdate[] {
+	LapRunning[] {
 		Get {
-			return RaceAssistantPlugin.sLastLapUpdate
+			return RaceAssistantPlugin.sLapRunning
 		}
 	}
 
@@ -689,7 +689,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	initializeAssistantsState() {
 		RaceAssistantPlugin.sSession := kSessionFinished
 		RaceAssistantPlugin.sLastLap := 0
-		RaceAssistantPlugin.sLastLapUpdate := 0
+		RaceAssistantPlugin.sLapRunning := 0
 		RaceAssistantPlugin.sInPit := false
 		RaceAssistantPlugin.sFinished := false
 	}
@@ -776,7 +776,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant()
-				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LastLapUpdate, data)
+				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
 			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
@@ -787,7 +787,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant()
-				assistant.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LastLapUpdate, data)
+				assistant.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 	}
 
 	performAssistantsPitstop(lapNumber) {
@@ -1486,10 +1486,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
 
-						if (RaceAssistantPlugin.sLastLapUpdate = 0)
+						if (RaceAssistantPlugin.sLapRunning = 0)
 							RaceAssistantPlugin.prepareAssistantsSession(data)
 
-						RaceAssistantPlugin.sLastLapUpdate := RaceAssistantPlugin.sLastLapUpdate + 1
+						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.sLapRunning + 1
 					}
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
@@ -1555,7 +1555,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 						if newLap {
 							RaceAssistantPlugin.sLastLap := dataLastLap
-							RaceAssistantPlugin.sLastLapUpdate := 0
+							RaceAssistantPlugin.sLapRunning := 0
 
 							if (!firstLap && !RaceAssistantPlugin.Finished) {
 								sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
@@ -1610,7 +1610,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.restoreAssistantsSessionState()
 						}
 
-						RaceAssistantPlugin.sLastLapUpdate := RaceAssistantPlugin.sLastLapUpdate + 1
+						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.sLapRunning + 1
 
 						if newLap
 							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, positionsData)

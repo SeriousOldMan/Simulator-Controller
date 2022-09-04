@@ -61,6 +61,7 @@ class SpeechSynthesizer {
 	iCacheDirectory := false
 
 	iSoundPlayer := false
+	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
 
 	iSpeechStatusCallback := false
@@ -255,6 +256,8 @@ class SpeechSynthesizer {
 	setPlayerLevel(level) {
 		local pid := this.iSoundPlayer
 
+		this.iSoundPlayerLevel := level
+
 		if (kNirCmd && pid) {
 			Process Exist, %pid%
 
@@ -300,7 +303,7 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, copied, workingDirectory
+		local callback, player, pid, copied, workingDirectory, level
 
 		callback := this.SpeechStatusCallback
 
@@ -332,7 +335,9 @@ class SpeechSynthesizer {
 
 			if kNirCmd
 				try {
-					Run "%kNirCmd%" setappvolume /%pid% 1.0
+					level := this.iSoundPlayerLevel
+
+					Run "%kNirCmd%" setappvolume /%pid% %level%
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))

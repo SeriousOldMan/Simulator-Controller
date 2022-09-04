@@ -570,7 +570,7 @@ class VoiceServer extends ConfigurationItem {
 
 		deleteFile(kTempDirectory . "Voice.mute")
 
-		new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
+		; new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -747,15 +747,25 @@ class VoiceServer extends ConfigurationItem {
 		return (activeClient ? activeClient.stopListening(retry) : false)
 	}
 
-	muteVoiceClients() {
+	mute() {
 		local ignore, client
 
+		for ignore, client in this.VoiceClients
+			client.mute()
+	}
+
+	unmute() {
+		local ignore, client
+
+		for ignore, client in this.VoiceClients
+			client.unmute()
+	}
+
+	muteVoiceClients() {
 		if FileExist(kTempDirectory . "Voice.mute")
-			for ignore, client in this.VoiceClients
-				client.mute()
+			this.mute()
 		else
-			for ignore, client in this.VoiceClients
-				client.unmute()
+			this.unmute()
 	}
 
 	speak(descriptor, text, activate := false) {

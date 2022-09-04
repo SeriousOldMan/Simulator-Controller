@@ -190,14 +190,14 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	addLap(lap, update, data) {
-		base.addLap(lap, update, data)
+	addLap(lap, running, data) {
+		base.addLap(lap, running, data)
 
 		this.checkPitstopPlan()
 	}
 
-	updateLap(lap, update, data) {
-		base.updateLap(lap, update, data)
+	updateLap(lap, running, data) {
+		base.updateLap(lap, running, data)
 
 		this.checkPitstopPlan()
 	}

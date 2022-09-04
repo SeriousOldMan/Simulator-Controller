@@ -258,7 +258,7 @@ class SpeechSynthesizer {
 
 		this.iSoundPlayerLevel := level
 
-		if (kNirCmd && pid) {
+		if (pid && kNirCmd) {
 			Process Exist, %pid%
 
 			if ErrorLevel {

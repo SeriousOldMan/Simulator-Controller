@@ -272,7 +272,7 @@ class VoiceServer extends ConfigurationItem {
 
 		speak(text) {
 			local tries := 3
-			local stopped, oldSpeaking
+			local stopped, oldSpeaking, oldInterruptable
 
 			while this.Muted
 				Sleep 100
@@ -281,9 +281,11 @@ class VoiceServer extends ConfigurationItem {
 
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
+			oldInterruptable := this.iInterruptable
 
 			try {
 				this.iSpeaking := true
+				this.iInterruptable := true
 
 				try {
 					while (tries-- > 0) {
@@ -306,7 +308,7 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 				finally {
-					this.iInterruptable := true
+					this.iInterruptable := oldInterruptable
 					this.iSpeaking := oldSpeaking
 				}
 			}

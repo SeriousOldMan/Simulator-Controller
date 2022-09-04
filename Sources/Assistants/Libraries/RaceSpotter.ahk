@@ -213,6 +213,7 @@ class CarInfo {
 	reset() {
 		this.iDeltas := {}
 		this.iLastDeltas := {}
+		this.iLapTimes := []
 	}
 
 	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
@@ -221,7 +222,7 @@ class CarInfo {
 		local deltas
 
 		if (avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) {
-			this.reset(true)
+			this.reset()
 
 			result := false
 		}

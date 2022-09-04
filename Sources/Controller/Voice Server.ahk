@@ -271,7 +271,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text) {
-			local tries := 3
+			local tries := 5
 			local stopped, oldSpeaking, oldInterruptable
 
 			while this.Muted
@@ -353,33 +353,30 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		mute() {
-			local synthesizer
+			local synthesizer := this.SpeechSynthesizer
 
-			; if !this.Muted {
+			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
+					this.iInterrupted := synthesizer.stop()
+
+			if !this.Muted {
 				this.iMuted := true
 
-				synthesizer := this.SpeechSynthesizer
-
-				if synthesizer {
-					if (this.Speaking && this.Interruptable && synthesizer.Stoppable)
-						this.iInterrupted := synthesizer.stop()
-
+				if synthesizer
 					synthesizer.mute()
-				}
-			; }
+			}
 		}
 
 		unmute() {
 			local synthesizer
 
-			; if this.Muted {
+			if this.Muted {
 				this.iMuted := false
 
 				synthesizer := this.SpeechSynthesizer
 
 				if synthesizer
 					synthesizer.unmute()
-			; }
+			}
 		}
 
 		registerChoices(name, choices*) {

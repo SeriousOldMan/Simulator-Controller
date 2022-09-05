@@ -48,12 +48,15 @@ class CarInfo {
 	iInPit := false
 
 	iLapTimes := []
+	iBestLapTime := false
 
 	iDeltas := {}
 	iLastDeltas := {}
 
-	iInvalidLaps := false
-	iIncidents := false
+	iInvalidLaps := 0
+	iIncidents := 0
+
+	iProblem := true
 
 	Nr[] {
 		Get {
@@ -70,6 +73,12 @@ class CarInfo {
 	Driver[] {
 		Get {
 			return this.iDriver
+		}
+	}
+
+	BestLapTime[] {
+		Get {
+			return this.iBestLapTime
 		}
 	}
 
@@ -205,6 +214,12 @@ class CarInfo {
 		}
 	}
 
+	Problem[] {
+		Get {
+			return this.iProblem
+		}
+	}
+
 	__New(nr, car) {
 		this.iNr := nr
 		this.iCar := car
@@ -215,13 +230,19 @@ class CarInfo {
 		this.iLastDeltas := {}
 	}
 
-	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
+	update(driver, position, lastLap, sector, lapTime, validLap, invalidLaps, incidents, delta, inPit) {
 		local avgLapTime := this.AverageLapTime
 		local valid := true
+		local pited := (inPit || inList(this.Pitstops, lastLap - 1))
 		local deltas
 
-		if ((avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) || inPit) {
+		this.iProblem := true
+
+		if ((avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) || pitted) {
 			this.reset()
+
+			if !pitted
+				this.iProblem := false
 
 			valid := false
 		}
@@ -229,13 +250,16 @@ class CarInfo {
 		this.iDriver := driver
 		this.iPosition := position
 
-		if ((lastLap > this.LastLap) && (lapTime > 0) && valid && !inPit && !inList(this.Pitstops, (lastLap - 1))) {
+		if ((lastLap > this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
 			this.iLastLap := lastLap
+
+			if (lapTime < this.BestLapTime)
+				this.iBestLapTime := lapTime
 		}
 
 		this.iInvalidLaps := invalidLaps
@@ -285,6 +309,10 @@ class CarInfo {
 			return (this.Deltas.Count() > 0)
 	}
 
+	hasProblem() {
+		return this.Problem
+	}
+
 	isFaster(sector) {
 		local xValues := []
 		local yValues := []
@@ -313,6 +341,8 @@ class PositionInfo {
 	iInitialDeltas := {}
 
 	iReported := false
+
+	iBestLapTime := false
 
 	Type[] {
 		Get {
@@ -400,6 +430,12 @@ class PositionInfo {
 		}
 	}
 
+	BestLapTime[] {
+		Get {
+			return (this.iBestLapTime := this.Car.BestLapTime)
+		}
+	}
+
 	__New(spotter, car) {
 		this.iSpotter := spotter
 		this.iCar := car
@@ -417,8 +453,18 @@ class PositionInfo {
 		return (this.LapTimeDifference[true] > 0)
 	}
 
+	hasBestLapTime() {
+		local bestLapTime := this.Car.BestLapTime
+
+		return (bestLapTime && (!this.iBestLapTime || (bestLapTime < this.iBestLapTime)))
+	}
+
 	hasGap(sector) {
 		return (this.Car.hasDelta(sector) && this.Car.hasLapTime())
+	}
+
+	hasProblem() {
+		return this.Car.Problem
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1077,6 +1123,7 @@ class RaceSpotter extends RaceAssistant {
 							  , knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Laps")
 							  , sector
 							  , Round(knowledgeBase.getValue("Car." . A_Index . ".Time", false) / 1000, 1)
+							  , knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
 							  , (lap - knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", lap))
 							  , knowledgeBase.getValue("Car." . A_Index . ".Incidents", 0)
 							  , Round(knowledgeBase.getValue("Standings.Lap." . lastLap . ".Car." . A_Index . ".Delta") / 1000, 1)
@@ -1381,7 +1428,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local opponentType := this.OpponentType
-		local situation
+		local situation, lapTime, minute, seconds, rnd, phrase
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader, true)
 
@@ -1422,6 +1469,18 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
+
+		if (standingsAhead && standingsAhead.hasProblem()) {
+			situation := ("AheadProblem " . lastLap)
+
+			if !this.TacticalAdvices.HasKey(situation) {
+				this.TacticalAdvices[situation] := true
+
+				speaker.speakPhrase("AheadProblem")
+
+				return true
+			}
+		}
 
 		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
@@ -1476,6 +1535,63 @@ class RaceSpotter extends RaceAssistant {
 					return true
 				}
 			}
+		}
+
+		if (standingsBehind && standingsBehind.hasProblem()) {
+			situation := ("BehindProblem " . lastLap)
+
+			if !this.TacticalAdvices.HasKey(situation) {
+				this.TacticalAdvices[situation] := true
+
+				speaker.speakPhrase("BehindProblem")
+
+				return true
+			}
+		}
+
+		lapTime := false
+
+		if (trackAhead && trackAhead.hasBestLapTime()) {
+			lapTime := trackAhead.BestLapTime
+			phrase := "AheadBestLap"
+		}
+		else if (trackBehind && trackBehind.hasBestLapTime()) {
+			lapTime := trackBehind.BestLapTime
+			phrase := "BehindBestLap"
+		}
+		else if (leader && leader.hasBestLapTime()) {
+			lapTime := leader.BestLapTime
+			phrase := "LeaderBestLap"
+		}
+
+		if !lapTime {
+			Random rnd, 0.0, 1.0
+
+			if (rnd > 0.8) {
+				Random rnd, 1, 100
+
+				if ((rnd <= 33) && trackAhead) {
+					lapTime := trackAhead.LastLapTime
+					phrase := "AheadLapTime"
+				}
+				else if ((rnd > 33) && (rnd <= 66) && trackBehind) {
+					lapTime := trackBehind.LastLapTime
+					phrase := "BehindLapTime"
+				}
+				else if ((rnd > 66) && leader) {
+					lapTime := leader.LastLapTime
+					phrase := "LeaderLapTime"
+				}
+			}
+		}
+
+		if lapTime {
+			minute := Floor(lapTime / 60)
+			seconds := (lapTime - (minute * 60))
+
+			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
+
+			return true
 		}
 
 		return false
@@ -2134,6 +2250,8 @@ class RaceSpotter extends RaceAssistant {
 			finally {
 				speaker.endTalk()
 			}
+
+			this.getSpeaker(true)
 		}
 
 		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 20000)

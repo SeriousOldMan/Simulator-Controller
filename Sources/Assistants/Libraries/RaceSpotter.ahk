@@ -1263,8 +1263,9 @@ class RaceSpotter extends RaceAssistant {
 		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
 		local sessionEnding, minute, lastTemperature, stintLaps
+		local minute, rnd, phrase
 
-		if (lastLap == 2) {
+		if ((lastLap == 2) && (this.Session == kSessionRace)) {
 			situation := "StartSummary"
 
 			if !this.SessionInfos.HasKey(situation) {
@@ -1415,6 +1416,51 @@ class RaceSpotter extends RaceAssistant {
 					return true
 				}
 			}
+
+			lapTime := false
+
+			if (trackAhead && standingsAhead.hasBestLapTime()) {
+				lapTime := standingsAhead.BestLapTime
+				phrase := "AheadBestLap"
+			}
+			else if (standingsBehind && standingsBehind.hasBestLapTime()) {
+				lapTime := standingsBehind.BestLapTime
+				phrase := "BehindBestLap"
+			}
+			else if (leader && leader.hasBestLapTime()) {
+				lapTime := leader.BestLapTime
+				phrase := "LeaderBestLap"
+			}
+
+			if (!lapTime && (this.Session == kSessionRace)) {
+				Random rnd, 0.0, 1.0
+
+				if (rnd > 0.8) {
+					Random rnd, 1, 100
+
+					if ((rnd <= 33) && standingsAhead) {
+						lapTime := standingsAhead.LastLapTime
+						phrase := "AheadLapTime"
+					}
+					else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
+						lapTime := standingsBehind.LastLapTime
+						phrase := "BehindLapTime"
+					}
+					else if ((rnd > 66) && leader) {
+						lapTime := leader.LastLapTime
+						phrase := "LeaderLapTime"
+					}
+				}
+			}
+
+			if lapTime {
+				minute := Floor(lapTime / 60)
+
+				speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute
+																		  , seconds: printNumber(lapTime - (minute * 60), 1)})
+
+				return true
+			}
 		}
 
 		return false
@@ -1428,7 +1474,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local opponentType := this.OpponentType
-		local situation, lapTime, minute, seconds, rnd, phrase
+		local situation
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader, true)
 
@@ -1547,51 +1593,6 @@ class RaceSpotter extends RaceAssistant {
 
 				return true
 			}
-		}
-
-		lapTime := false
-
-		if (trackAhead && trackAhead.hasBestLapTime()) {
-			lapTime := trackAhead.BestLapTime
-			phrase := "AheadBestLap"
-		}
-		else if (trackBehind && trackBehind.hasBestLapTime()) {
-			lapTime := trackBehind.BestLapTime
-			phrase := "BehindBestLap"
-		}
-		else if (leader && leader.hasBestLapTime()) {
-			lapTime := leader.BestLapTime
-			phrase := "LeaderBestLap"
-		}
-
-		if !lapTime {
-			Random rnd, 0.0, 1.0
-
-			if (rnd > 0.8) {
-				Random rnd, 1, 100
-
-				if ((rnd <= 33) && trackAhead) {
-					lapTime := trackAhead.LastLapTime
-					phrase := "AheadLapTime"
-				}
-				else if ((rnd > 33) && (rnd <= 66) && trackBehind) {
-					lapTime := trackBehind.LastLapTime
-					phrase := "BehindLapTime"
-				}
-				else if ((rnd > 66) && leader) {
-					lapTime := leader.LastLapTime
-					phrase := "LeaderLapTime"
-				}
-			}
-		}
-
-		if lapTime {
-			minute := Floor(lapTime / 60)
-			seconds := (lapTime - (minute * 60))
-
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
-
-			return true
 		}
 
 		return false

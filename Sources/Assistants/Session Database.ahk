@@ -4655,6 +4655,15 @@ testSettings() {
 
 		options := "-NoTeam -Test -File """ . fileName . """"
 
+		if (editor.SelectedSimulator)
+			options .= (" -Simulator """ . editor.SelectedSimulator . """")
+
+		if (editor.SelectedCar)
+			options .= (" -Car """ . editor.SelectedCar . """")
+
+		if (editor.SelectedTrack)
+			options .= (" -Track """ . editor.SelectedTrack . """")
+
 		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
 	catch exception {

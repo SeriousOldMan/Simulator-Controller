@@ -213,24 +213,23 @@ class CarInfo {
 	reset() {
 		this.iDeltas := {}
 		this.iLastDeltas := {}
-		this.iLapTimes := []
 	}
 
 	update(driver, position, lastLap, sector, lapTime, invalidLaps, incidents, delta, inPit) {
 		local avgLapTime := this.AverageLapTime
-		local result := true
+		local valid := true
 		local deltas
 
-		if (avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) {
+		if ((avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) || inPit) {
 			this.reset()
 
-			result := false
+			valid := false
 		}
 
 		this.iDriver := driver
 		this.iPosition := position
 
-		if ((lastLap > this.LastLap) && (lapTime > 0)) {
+		if ((lastLap > this.LastLap) && (lapTime > 0) && valid && !inPit && !inList(this.Pitstops, (lastLap - 1))) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)
@@ -272,7 +271,11 @@ class CarInfo {
 		else
 			this.iInPit := false
 
-		return result
+		return valid
+	}
+
+	hasLapTime() {
+		return (this.LapTimes.Length() > 0)
 	}
 
 	hasDelta(sector := false) {
@@ -414,8 +417,8 @@ class PositionInfo {
 		return (this.LapTimeDifference[true] > 0)
 	}
 
-	hasDelta(sector) {
-		return this.Car.hasDelta(sector)
+	hasGap(sector) {
+		return (this.Car.hasDelta(sector) && this.Car.hasLapTime())
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1422,7 +1425,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
-		 && trackBehind.hasDelta(sector) && trackAhead.hasDelta(sector)
+		 && trackBehind.hasGap(sector) && trackAhead.hasGap(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
 			situation := ("ProtectSlower " . trackAhead.Car.Nr . A_Space . trackBehind.Car.Nr)
 
@@ -1437,7 +1440,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (sector > 1) {
 			if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
-			 && trackBehind.hasDelta(sector) && standingsBehind.hasDelta(sector)
+			 && trackBehind.hasGap(sector) && standingsBehind.hasGap(sector)
 			 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
 			 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
 			 && (opponentType = "LapDown")) {
@@ -1452,7 +1455,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (regular && trackBehind && trackBehind.hasDelta(sector)
+			if (regular && trackBehind && trackBehind.hasGap(sector)
 			 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
 				situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
@@ -1526,7 +1529,7 @@ class RaceSpotter extends RaceAssistant {
 		try {
 			opponentType := (trackAhead ? trackAhead.OpponentType : false)
 
-			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasDelta(sector)
+			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
 			 && (opponentType != "Position")
 			 && trackAhead.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
@@ -1543,7 +1546,7 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 			}
-			else if (standingsAhead  && standingsAhead.hasDelta(sector)) {
+			else if (standingsAhead  && standingsAhead.hasGap(sector)) {
 				delta := Abs(standingsAhead.Delta[false, true, 1])
 				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
@@ -1608,7 +1611,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (standingsBehind && standingsBehind.hasDelta(sector)) {
+			if (standingsBehind && standingsBehind.hasGap(sector)) {
 				delta := Abs(standingsBehind.Delta[false, true, 1])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)

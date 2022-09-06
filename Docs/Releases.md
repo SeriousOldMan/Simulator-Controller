@@ -1,3 +1,14 @@
+## 4.3.1.0-release 09/09/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Mutually interruption of voice outputs of the Assistants works much more sensitive now.
+  4. Better detection for end of race at sessions with fixed laps.
+  5. Spotter informs about new best laps of direct opponents and the leader.
+  6. Spotter periodically announces lap times of direct oppenents.
+  7. Spotter informs about potential problems and much slower lap times of direct opponents.
+  8. Better handling of a couple of edge cases in the new weather model for strategy simulations.
+
 ## 4.3.0.0-release 09/02/22
 
   1. Minor bugfixes, as always

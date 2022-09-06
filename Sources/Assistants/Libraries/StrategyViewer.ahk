@@ -167,7 +167,7 @@ class StrategyViewer {
 				fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
 				weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
-				refuels.Push("<td class=""td-std"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
+				refuels.Push("<td class=""td-std"">" . ((pitstop.Nr > 1) ? Ceil(lastRefuel) : "") . "</td>")
 				tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)

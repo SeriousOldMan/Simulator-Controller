@@ -79,6 +79,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 11. [Track Mapping and Track Automation](https://youtu.be/QWJyUYdjlFg) - This video shows you how to create a track map for any track in any simulator and where you can use these track maps. A special usage is the automation of in-car settings like traction control or ABS depending on your location on the track, which will be demonstrated on-track at the end of the video.
 
+12. [Tyre Compounds and Weather Model](https://youtu.be/KFyhVuqojVk) - This session covers the handling of simulator specific tyre compounds. You will learn how to configure the available compounds for your car of choice and we will take a look at the weather model of Simulator Controller and learn how this is used together with the tyre compounds in strategy simulations.
+
 This list will be extended with one new video per week.
 
 ### Discord Community

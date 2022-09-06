@@ -233,16 +233,16 @@ class CarInfo {
 	update(driver, position, lastLap, sector, lapTime, validLap, invalidLaps, incidents, delta, inPit) {
 		local avgLapTime := this.AverageLapTime
 		local valid := true
-		local pited := (inPit || inList(this.Pitstops, lastLap - 1))
+		local pitted := (inPit || inList(this.Pitstops, lastLap - 1))
 		local deltas
 
-		this.iProblem := true
+		this.iProblem := false
 
 		if ((avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) || pitted) {
 			this.reset()
 
 			if !pitted
-				this.iProblem := false
+				this.iProblem := true
 
 			valid := false
 		}
@@ -258,7 +258,7 @@ class CarInfo {
 
 			this.iLastLap := lastLap
 
-			if (lapTime < this.BestLapTime)
+			if (!this.BestLapTime || (lapTime < this.BestLapTime))
 				this.iBestLapTime := lapTime
 		}
 
@@ -1268,6 +1268,11 @@ class RaceSpotter extends RaceAssistant {
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
+		local standingsAhead := false
+		local standingsBehind := false
+		local trackAhead := false
+		local trackBehind := false
+		local leader := false
 		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
 		local sessionEnding, minute, lastTemperature, stintLaps
 		local minute, rnd, phrase
@@ -1424,49 +1429,53 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			lapTime := false
+			if ((sector = 1) && (lastLap > 2)) {
+				this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader)
 
-			if (trackAhead && standingsAhead.hasBestLapTime()) {
-				lapTime := standingsAhead.BestLapTime[true]
-				phrase := "AheadBestLap"
-			}
-			else if (standingsBehind && standingsBehind.hasBestLapTime()) {
-				lapTime := standingsBehind.BestLapTime[true]
-				phrase := "BehindBestLap"
-			}
-			else if (leader && leader.hasBestLapTime()) {
-				lapTime := leader.BestLapTime[true]
-				phrase := "LeaderBestLap"
-			}
+				lapTime := false
 
-			if (!lapTime && (this.Session == kSessionRace)) {
-				Random rnd, 0.0, 1.0
+				if (standingsAhead && standingsAhead.hasBestLapTime()) {
+					lapTime := standingsAhead.BestLapTime[true]
+					phrase := "AheadBestLap"
+				}
+				else if (standingsBehind && standingsBehind.hasBestLapTime()) {
+					lapTime := standingsBehind.BestLapTime[true]
+					phrase := "BehindBestLap"
+				}
+				else if (leader && leader.hasBestLapTime()) {
+					lapTime := leader.BestLapTime[true]
+					phrase := "LeaderBestLap"
+				}
 
-				if (rnd > 0.8) {
-					Random rnd, 1, 100
+				if (!lapTime && (this.Session == kSessionRace)) {
+					Random rnd, 0.0, 1.0
 
-					if ((rnd <= 33) && standingsAhead) {
-						lapTime := standingsAhead.LastLapTime
-						phrase := "AheadLapTime"
-					}
-					else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
-						lapTime := standingsBehind.LastLapTime
-						phrase := "BehindLapTime"
-					}
-					else if ((rnd > 66) && leader) {
-						lapTime := leader.LastLapTime
-						phrase := "LeaderLapTime"
+					if (rnd > 0.8) {
+						Random rnd, 1, 100
+
+						if ((rnd <= 33) && standingsAhead) {
+							lapTime := standingsAhead.LastLapTime
+							phrase := "AheadLapTime"
+						}
+						else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
+							lapTime := standingsBehind.LastLapTime
+							phrase := "BehindLapTime"
+						}
+						else if ((rnd > 66) && leader) {
+							lapTime := leader.LastLapTime
+							phrase := "LeaderLapTime"
+						}
 					}
 				}
-			}
 
-			if lapTime {
-				minute := Floor(lapTime / 60)
+				if lapTime {
+					minute := Floor(lapTime / 60)
 
-				speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute
-																		  , seconds: printNumber(lapTime - (minute * 60), 1)})
+					speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute
+																			  , seconds: printNumber(lapTime - (minute * 60), 1)})
 
-				return true
+					return true
+				}
 			}
 		}
 

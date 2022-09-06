@@ -1326,6 +1326,10 @@ class RaceSpotter extends RaceAssistant {
 
 						speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
 													  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
+
+						this.SessionInfos["BestLap"] := this.BestLapTime
+
+						return true
 					}
 
 					this.SessionInfos["BestLap"] := this.BestLapTime

@@ -420,6 +420,21 @@ class PositionInfo {
 		}
 	}
 
+	LastLapTime[] {
+		Get {
+			return this.Car.LastLapTime
+		}
+	}
+
+	BestLapTime[update := false] {
+		Get {
+			if update
+				this.iBestLapTime := this.Car.BestLapTime
+
+			return this.iBestLapTime
+		}
+	}
+
 	Reported[] {
 		Get {
 			return this.iReported
@@ -427,12 +442,6 @@ class PositionInfo {
 
 		Set {
 			return (this.iReported := value)
-		}
-	}
-
-	BestLapTime[] {
-		Get {
-			return (this.iBestLapTime := this.Car.BestLapTime)
 		}
 	}
 
@@ -454,9 +463,7 @@ class PositionInfo {
 	}
 
 	hasBestLapTime() {
-		local bestLapTime := this.Car.BestLapTime
-
-		return (bestLapTime && (!this.iBestLapTime || (bestLapTime < this.iBestLapTime)))
+		return (this.BestLapTime != this.Car.BestLapTime)
 	}
 
 	hasGap(sector) {
@@ -1420,15 +1427,15 @@ class RaceSpotter extends RaceAssistant {
 			lapTime := false
 
 			if (trackAhead && standingsAhead.hasBestLapTime()) {
-				lapTime := standingsAhead.BestLapTime
+				lapTime := standingsAhead.BestLapTime[true]
 				phrase := "AheadBestLap"
 			}
 			else if (standingsBehind && standingsBehind.hasBestLapTime()) {
-				lapTime := standingsBehind.BestLapTime
+				lapTime := standingsBehind.BestLapTime[true]
 				phrase := "BehindBestLap"
 			}
 			else if (leader && leader.hasBestLapTime()) {
-				lapTime := leader.BestLapTime
+				lapTime := leader.BestLapTime[true]
 				phrase := "LeaderBestLap"
 			}
 
@@ -2255,7 +2262,7 @@ class RaceSpotter extends RaceAssistant {
 			this.getSpeaker(true)
 		}
 
-		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 20000)
+		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 25000)
 	}
 
 	startSession(settings, data) {

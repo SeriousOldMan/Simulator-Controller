@@ -1935,46 +1935,31 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	proximityAlert(alert) {
-		local speaker := false
-		local type, oldPriority, oldAlerting
+		local speaker, type, oldPriority, oldAlerting
 
 		static alerting := false
 
 		if this.Speaker[false] {
-			if alert {
-				if alerting {
-					this.iPendingAlerts.Push(alert)
+			speaker := this.getSpeaker(true)
 
+			if alert {
+				this.iPendingAlerts.Push(alert)
+
+				if (alerting || speaker.isSpeaking()) {
 					if (this.iPendingAlerts.Length() == 1)
 						Task.startTask(ObjBindMethod(this, "proximityAlert", false), 500, kHighPriority)
 
 					return
 				}
-				else {
-					speaker := this.getSpeaker(true)
-
-					if speaker.isSpeaking()
-						return
-					else
-						this.iPendingAlerts.Push(alert)
-				}
 			}
-			else {
-				speaker := this.getSpeaker(true)
+			else if (alerting || speaker.isSpeaking())
+				if (this.iPendingAlerts.Length() > 0) {
+					Task.CurrentTask.Sleep := 200
 
-				if (alerting || speaker.isSpeaking()) {
-					if (this.iPendingAlerts.Length() > 0) {
-						Task.CurrentTask.Sleep := 200
-
-						return Task.CurrentTask
-					}
-					else
-						return false
+					return Task.CurrentTask
 				}
-			}
-
-			if !speaker
-				speaker := this.getSpeaker(true)
+				else
+					return false
 
 			oldPriority := Task.block(kHighPriority)
 			oldAlerting := alerting

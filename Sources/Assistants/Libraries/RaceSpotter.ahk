@@ -1318,7 +1318,10 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if (this.BestLapTime > 0) {
-					if (this.SessionInfos.HasKey("BestLap") && (this.BestLapTime < this.SessionInfos["BestLap"])) {
+					if !this.SessionInfos.HasKey("BestLap")
+						this.SessionInfos["BestLap"] := this.BestLapTime
+
+					if (this.BestLapTime < this.SessionInfos["BestLap"]) {
 						lapTime := (this.BestLapTime / 1000)
 
 						minute := Floor(lapTime / 60)
@@ -1330,8 +1333,6 @@ class RaceSpotter extends RaceAssistant {
 
 						return true
 					}
-
-					this.SessionInfos["BestLap"] := this.BestLapTime
 				}
 			}
 

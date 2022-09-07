@@ -234,14 +234,15 @@ class CarInfo {
 		local avgLapTime := this.AverageLapTime
 		local valid := true
 		local pitted := (inPit || inList(this.Pitstops, lastLap - 1))
+		local difference := Abs((lapTime - avgLapTime) / avgLapTime)
 		local deltas
 
 		this.iProblem := false
 
-		if ((avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.02)) || pitted) {
+		if ((avgLapTime && (difference > 0.03)) || pitted) {
 			this.reset()
 
-			if !pitted
+			if (!pitted && (difference > 0.04))
 				this.iProblem := true
 
 			valid := false

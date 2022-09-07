@@ -153,6 +153,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
+		local player, copied
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -251,6 +252,22 @@ class SpeechSynthesizer {
 		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
+
+		if kSox
+			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
+				if !FileExist(kTempDirectory . player) {
+					copied := false
+
+					while (!copied)
+						try {
+							FileCopy %kSox%, %kTempDirectory%%player%, 1
+
+							copied := true
+						}
+						catch exception {
+							logError(exception)
+						}
+				}
 	}
 
 	setPlayerLevel(level) {
@@ -303,33 +320,19 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, copied, workingDirectory, level
+		local callback, player, pid, workingDirectory, level
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
 			player := (wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe")
 
-			if !FileExist(kTempDirectory . player) {
-				copied := false
-
-				while (!copied)
-					try {
-						FileCopy %kSox%, %kTempDirectory%%player%, 1
-
-						copied := true
-					}
-					catch exception {
-						logError(exception)
-					}
-			}
-
-			if callback
-				%callback%("Start")
-
 			SplitPath kSox, , workingDirectory
 
 			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
+
+			if callback
+				%callback%("Start")
 
 			Sleep 500
 
@@ -598,7 +601,7 @@ class SpeechSynthesizer {
 	wait() {
 		if this.iSoundPlayer
 			while this.isSpeaking()
-				Sleep 50
+				Sleep 1
 		else
 			this.stop()
 	}

@@ -2071,28 +2071,15 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 				case 7: ; "Import from Simulation..."
 					if simulator {
-						switch simulator {
-							case "Assetto Corsa":
-								prefix := "AC"
-							case "Assetto Corsa Competizione":
-								prefix := "ACC"
-							case "Automobilista 2":
-								prefix := "AMS2"
-							case "RaceRoom Racing Experience":
-								prefix := "R3E"
-							case "rFactor 2":
-								prefix := "RF2"
-							case "iRacing":
-								prefix := "IRC"
-							case "Project CARS 2":
-								prefix := "PCARS2"
-							default:
-								OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-								title := translate("Warning")
-								MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
-								OnMessage(0x44, "")
+						prefix := new SessionDatabase().getSimulatorCode(simulator)
 
-								return
+						if !prefix {
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							title := translate("Warning")
+							MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
+							OnMessage(0x44, "")
+
+							return
 						}
 
 						data := readSimulatorData(prefix)
@@ -2922,7 +2909,7 @@ readSimulatorData(simulator) {
 		RunWait %ComSpec% /c ""%exePath%" > "%dataFile%"", , Hide
 
 		data := readConfiguration(dataFile)
-		
+
 		deleteFile(dataFile)
 
 		setConfigurationSectionValues(data, "Setup Data", setupData)

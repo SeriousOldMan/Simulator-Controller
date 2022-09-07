@@ -621,12 +621,11 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			speakPhrase(phrase, arguments*) {
-				if this.Awaitable {
-					this.wait()
+				if this.VoiceManager.RaceAssistant.skipAlert(phrase)
+					return
 
-					if this.VoiceManager.RaceAssistant.skipAlert(phrase)
-						return
-				}
+				if this.Awaitable
+					this.wait()
 
 				base.speakPhrase(phrase, arguments*)
 			}
@@ -1943,18 +1942,18 @@ class RaceSpotter extends RaceAssistant {
 				this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
-					Task.startTask(ObjBindMethod(this, "proximityAlert", false), 1000, kHighPriority)
+					Task.startTask(ObjBindMethod(this, "proximityAlert", false), 200, kHighPriority)
 
 					return
 				}
 			}
 			else if (alerting || speaker.isSpeaking()) {
-				Task.startTask(ObjBindMethod(this, "proximityAlert", false), 100, kHighPriority)
+				Task.startTask(ObjBindMethod(this, "proximityAlert", false), 200, kHighPriority)
 
 				return
 			}
 
-			oldPriority := Task.block(kNormalPriority)
+			oldPriority := Task.block(kHighPriority)
 			alerting := true
 
 			try {
@@ -1969,7 +1968,8 @@ class RaceSpotter extends RaceAssistant {
 					else
 						type := alert
 
-					if (((type != "Behind") && this.Announcements["SideProximity"]) || ((type = "Behind") && this.Announcements["RearProximity"])) {
+					if (((type != "Behind") && this.Announcements["SideProximity"])
+					 || ((type = "Behind") && this.Announcements["RearProximity"])) {
 						if (!this.SpotterSpeaking || (type != "Hold")) {
 							this.SpotterSpeaking := true
 

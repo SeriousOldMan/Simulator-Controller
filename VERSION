@@ -1,9 +1,9 @@
 [Development]
 Version=4.3.1.0-dev
 Target=4.3.1.0-release
-Date=09/05/2022
+Date=09/07/2022
 Download=
-Changes=Faster muting for voice output interruption, Better detection for session end at races with fixed laps, Spotter can inform about new best laps of opponents, Spotter periodically announces lap times of oppenents, Spotter informs about problems and slower laps of opponents
+Changes=Faster muting for voice output interruption, Better detection for session end at races with fixed laps, Spotter can inform about new best laps of opponents, Spotter periodically announces lap times of oppenents, Spotter informs about problems and slower laps of opponents, Small improvement in Spotter responsiveness, Better handling of voice input when no P2T is used
 [Release]
 Version=4.3.0.0-release
 Date=09/02/2022

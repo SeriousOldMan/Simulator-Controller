@@ -785,6 +785,7 @@ class VoiceManager {
 				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
+		/*
 		if speechRecognizer
 			try {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
@@ -794,6 +795,11 @@ class VoiceManager {
 			}
 		else
 			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		*/
+		
+		if !speechRecognizer
+			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		
 	}
 
 	raisePhraseRecognized(grammar, words) {

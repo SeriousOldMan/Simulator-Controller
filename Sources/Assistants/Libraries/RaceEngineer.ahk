@@ -2170,7 +2170,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
-		if this.RemoteHandler
+		if (this.RemoteHandler && driver)
 			this.RemoteHandler.requestPitstopDriver(pitstopNumber, driver)
 	}
 

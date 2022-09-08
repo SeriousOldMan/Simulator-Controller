@@ -232,14 +232,13 @@ class CarInfo {
 
 	update(driver, position, lastLap, sector, lapTime, validLap, invalidLaps, incidents, delta, inPit) {
 		local avgLapTime := this.AverageLapTime
-		local valid := true
 		local pitted := (inPit || inList(this.Pitstops, lastLap - 1))
-		local difference := Abs((lapTime - avgLapTime) / avgLapTime)
+		local valid := true
 		local deltas
 
 		this.iProblem := false
 
-		if ((avgLapTime && (difference > 0.03)) || pitted) {
+		if ((lapTime && avgLapTime && (Abs((lapTime - avgLapTime) / avgLapTime) > 0.03)) || pitted) {
 			this.reset()
 
 			if (!pitted && (lapTime > avgLapTime))
@@ -248,7 +247,7 @@ class CarInfo {
 			valid := false
 		}
 
-		if ((lastLap != this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
+		if ((lastLap != this.LastLap) && (lapTime > 0) && validLap && !pitted) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)

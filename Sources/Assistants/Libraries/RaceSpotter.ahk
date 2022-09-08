@@ -242,7 +242,7 @@ class CarInfo {
 		if ((avgLapTime && (difference > 0.03)) || pitted) {
 			this.reset()
 
-			if (!pitted && (difference > 0.04))
+			if (!pitted && (lapTime > avgLapTime))
 				this.iProblem := true
 
 			valid := false

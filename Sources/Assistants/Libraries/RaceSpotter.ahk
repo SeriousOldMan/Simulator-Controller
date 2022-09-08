@@ -173,7 +173,7 @@ class CarInfo {
 	AverageDelta[sector, count := 3] {
 		Get {
 			local deltas := []
-			local numDeltas, sDeltas
+			local numDeltas, ignore, sDeltas
 
 			if sector {
 				numDeltas := this.Deltas[sector].Length()
@@ -182,7 +182,7 @@ class CarInfo {
 					deltas.Push(this.Deltas[sector][numDeltas - A_Index + 1])
 			}
 			else
-				for sector, sDeltas in this.Deltas {
+				for ignore, sDeltas in this.Deltas {
 					numDeltas := sDeltas.Length()
 
 					loop % Min(count, numDeltas)
@@ -248,21 +248,19 @@ class CarInfo {
 			valid := false
 		}
 
-		this.iDriver := driver
-		this.iPosition := position
-
-		if ((lastLap > this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
+		if ((lastLap != this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
-			this.iLastLap := lastLap
-
 			if (!this.BestLapTime || (lapTime < this.BestLapTime))
 				this.iBestLapTime := lapTime
 		}
 
+		this.iDriver := driver
+		this.iPosition := position
+		this.iLastLap := lastLap
 		this.iInvalidLaps := invalidLaps
 		this.iIncidents := incidents
 
@@ -363,19 +361,18 @@ class PositionInfo {
 		}
 	}
 
-	OpponentType[] {
+	OpponentType[sector := false] {
 		Get {
 			local knowledgeBase := this.Spotter.KnowledgeBase
 			local lastLap := knowledgeBase.getValue("Lap")
 			local position := knowledgeBase.getValue("Position")
-			local nearBy := ((Abs(this.Delta[false, true, 1]) * 2) < this.DriverCar.LapTime[true])
 
-			if ((lastLap > this.Car.LastLap) && !nearBy)
-				return "LapDown"
-			else if ((lastLap < this.Car.LastLap) && !nearBy)
-				return "LapUp"
-			else if (Abs(position - this.Car.Position) == 1)
+			if (((Abs(this.Delta[sector, true, 1]) * 2) < this.DriverCar.LapTime[true]) || (Abs(position - this.Car.Position) == 1))
 				return "Position"
+			else if (lastLap > this.Car.LastLap)
+				return "LapDown"
+			else if (lastLap < this.Car.LastLap)
+				return "LapUp"
 			else
 				return "Position"
 		}
@@ -602,7 +599,7 @@ class RaceSpotter extends RaceAssistant {
 
 	iWasStartDriver := false
 
-	iLastDeltaInformationLap := false
+	iLastDeltaInformationLap := 0
 	iPositionInfos := {}
 	iTacticalAdvices := {}
 	iSessionInfos := {}
@@ -786,7 +783,7 @@ class RaceSpotter extends RaceAssistant {
 		base.updateSessionValues(values)
 
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
-			this.iLastDeltaInformationLap := false
+			this.iLastDeltaInformationLap := 0
 
 			this.iDriverCar := false
 			this.OtherCars := {}
@@ -1494,7 +1491,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
-		local opponentType := this.OpponentType
+		local opponentType := this.OpponentType[sector]
 		local situation
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader, true)
@@ -1665,23 +1662,22 @@ class RaceSpotter extends RaceAssistant {
 		speaker.beginTalk()
 
 		try {
-			opponentType := (trackAhead ? trackAhead.OpponentType : false)
+			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
 			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
 			 && (opponentType != "Position")
 			 && trackAhead.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
-			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)) {
-				if (!trackAhead.Reported && (sector > 1)) {
-					if (opponentType = "LapDown") {
-						speaker.speakPhrase("LapDownDriver")
+			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
+			 && !trackAhead.Reported) {
+				if (opponentType = "LapDown") {
+					speaker.speakPhrase("LapDownDriver")
 
-						trackAhead.Reported := true
-					}
-					else if (opponentType = "LapUp") {
-						speaker.speakPhrase("LapUpDriver")
+					trackAhead.Reported := true
+				}
+				else if (opponentType = "LapUp") {
+					speaker.speakPhrase("LapUpDriver")
 
-						trackAhead.Reported := true
-					}
+					trackAhead.Reported := true
 				}
 			}
 			else if (standingsAhead  && standingsAhead.hasGap(sector)) {
@@ -1840,7 +1836,7 @@ class RaceSpotter extends RaceAssistant {
 
 	updateDriver(lastLap, sector) {
 		local knowledgeBase = this.KnowledgeBase
-		local tacticalAdvices, deltaInformation, regular, sessionInformation
+		local tacticalAdvices, deltaInformation, sessionInformation
 
 		if this.Speaker[false] {
 			if (lastLap > 1)
@@ -1861,15 +1857,12 @@ class RaceSpotter extends RaceAssistant {
 
 								if deltaInformation {
 									if (deltaInformation = "S")
-										regular := "S"
-									else {
-										regular := (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
+										informationLap := "S"
+									else if (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
+										this.iLastDeltaInformationLap := lastLap
 
-										if regular
-											this.iLastDeltaInformationLap := lastLap
-									}
-
-									this.deltaInformation(lastLap, sector, regular)
+									this.deltaInformation(lastLap, sector
+														, (informationLap = "S") || (lastLap = this.iLastDeltaInformationLap))
 								}
 							}
 						}
@@ -2336,7 +2329,7 @@ class RaceSpotter extends RaceAssistant {
 		this.PositionInfos := {}
 		this.TacticalAdvices := {}
 		this.SessionInfos := {}
-		this.iLastDeltaInformationLap := false
+		this.iLastDeltaInformationLap := 0
 
 		if !this.GridPosition
 			this.initializeGridPosition(data)
@@ -2452,7 +2445,7 @@ class RaceSpotter extends RaceAssistant {
 			this.PositionInfos := {}
 			this.TacticalAdvices := {}
 			this.SessionInfos := {}
-			this.iLastDeltaInformationLap := false
+			this.iLastDeltaInformationLap := 0
 		}
 
 		if !this.GridPosition
@@ -2515,7 +2508,7 @@ class RaceSpotter extends RaceAssistant {
 		this.PositionInfos := {}
 		this.TacticalAdvices := {}
 		this.SessionInfos := {}
-		this.iLastDeltaInformationLap := false
+		this.iLastDeltaInformationLap := 0
 
 		this.startPitstop(lapNumber)
 

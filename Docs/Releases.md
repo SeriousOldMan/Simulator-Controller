@@ -8,8 +8,9 @@
   6. Spotter periodically announces lap times of direct oppenents.
   7. Spotter informs about potential problems and much slower lap times of direct opponents.
   8. Better handling of a couple of edge cases in the new weather model for strategy simulations.
-  9. Small improvements in Spotter responsiveness for side and behind alerts.
-  10. Better handling of voice input when Push-2-Talk is not used.
+  9. Fixed a bug, where the Spotter incorrectly reported a car as one lap up or one lap down.
+  10. Small improvements in Spotter responsiveness for side and behind alerts.
+  11. Better handling of voice input when Push-2-Talk is not used.
 
 ## 4.3.0.1-release 09/03/22
 

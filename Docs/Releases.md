@@ -11,6 +11,11 @@
   9. Small improvements in Spotter responsiveness for side and behind alerts.
   10. Better handling of voice input when Push-2-Talk is not used.
 
+## 4.3.0.1-release 09/03/22
+
+  1. Fixed a bug in session restart handling
+  2. Better detection of session end in races with fixed number of laps
+
 ## 4.3.0.0-release 09/02/22
 
   1. Minor bugfixes, as always

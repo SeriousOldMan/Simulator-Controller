@@ -804,18 +804,11 @@ deleteRaceReport() {
 	RaceReports.Instance.deleteRace()
 }
 
-exitFixIE(previous) {
-	fixIE(previous)
-
-	return false
-}
-
-
 runRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
 	local reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 	local title := translate("Configuration")
-	local reports, simulators, current
+	local reports, simulators
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Reports
@@ -831,9 +824,7 @@ runRaceReports() {
 		ExitApp 0
 	}
 
-	current := fixIE(11)
-
-	OnExit(Func("exitFixIE").Bind(current))
+	fixIE(11)
 
 	reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)
 

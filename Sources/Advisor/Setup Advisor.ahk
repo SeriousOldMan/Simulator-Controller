@@ -2939,12 +2939,6 @@ class FileSetupComparator extends SetupComparator {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitFixIE(previous) {
-	fixIE(previous)
-
-	return false
-}
-
 initializeSlider(slider1, value1, slider2, value2) {
 	local window := SetupAdvisor.Instance.Window
 	local y, pos, posX, posY
@@ -3194,7 +3188,7 @@ runSetupAdvisor() {
 	local track := false
 	local weather := false
 	local index := 1
-	local advisor, current, label, callback
+	local advisor, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Setup Advisor
@@ -3218,9 +3212,7 @@ runSetupAdvisor() {
 		}
 	}
 
-	current := fixIE(11)
-
-	OnExit(Func("exitFixIE").Bind(current))
+	fixIE(11)
 
 	if car
 		car := new SessionDatabase().getCarName(simulator, car)

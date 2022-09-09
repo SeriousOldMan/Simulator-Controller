@@ -9518,12 +9518,6 @@ class RaceCenter extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitFixIE(previous) {
-	fixIE(previous)
-
-	return false
-}
-
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	local x, y, row, driver, owner, ignore, name
 
@@ -10647,14 +10641,12 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 
 startupRaceCenter() {
 	local icon := kIconsDirectory . "Console.ico"
-	local current, rCenter
+	local rCenter
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Center
 
-	current := fixIE(11)
-
-	OnExit(Func("exitFixIE").Bind(current))
+	fixIE(11)
 
 	rCenter := new RaceCenter(kSimulatorConfiguration, readConfiguration(kUserConfigDirectory . "Race.settings"))
 

@@ -1861,6 +1861,13 @@ removeDuplicates(list) {
 	return result
 }
 
+do(list, function) {
+	local ignore, value
+
+	for ignore, value in list
+		%function%(value)
+}
+
 getKeys(map) {
 	local result := []
 	local ignore, key

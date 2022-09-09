@@ -625,6 +625,8 @@ checkInstallation() {
 						SetWorkingDir %directory%
 
 						RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+
+						do(kForegroundApps, Func("fixIE").Bind(11))
 					}
 					finally {
 						SetWorkingDir %currentDirectory%

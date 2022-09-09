@@ -67,14 +67,19 @@ class ACSetup extends FileSetup {
 
 		setConfigurationValue(data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
 
-		this.Setup := this.printSetup()
+		if !display
+			this.Setup := this.printSetup(data)
 
 		return value
 	}
 
-	printSetup() {
+	printSetup(setup) {
 		local display := newConfiguration()
-		local ignore, setting
+		local ignore, setting, section, values, key, value
+
+		for section, values in setup
+			for key, value in values
+				setConfigurationValue(display, section, key, value)
 
 		for ignore, setting in this.Editor.Advisor.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
@@ -85,13 +90,15 @@ class ACSetup extends FileSetup {
 	enable(setting) {
 		base.enable(setting)
 
-		this.setValue(setting, this.getValue(setting))
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	disable(setting) {
 		base.disable(setting)
 
-		this.setValue(setting, this.getValue(setting))
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {

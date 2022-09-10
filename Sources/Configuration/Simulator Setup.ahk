@@ -2004,8 +2004,6 @@ class StartStepWizard extends StepWizard {
 					SetWorkingDir %directory%
 
 					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
-
-					do(kForegroundApps, Func("fixIE").Bind(11))
 				}
 				finally {
 					SetWorkingDir %currentDirectory%
@@ -2420,7 +2418,7 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 restartSetup:
-	fixIE(11)
+	fixIE(10)
 
 	wizard.createGui(wizard.Configuration)
 

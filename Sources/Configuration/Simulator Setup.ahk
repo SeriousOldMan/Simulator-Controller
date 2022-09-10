@@ -447,13 +447,13 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Font, s8 Norm, Arial
 
 		Gui %window%:Add, Button, x16 y540 w30 h30 HwndfirstButtonHandle Disabled VfirstPageButton GfirstPage
-		setButtonIcon(firstButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
+		setButtonIcon(firstButtonHandle, kIconsDirectory . "First.ico", 1, "L2 T2 R2 B2 H24 W24")
 		Gui %window%:Add, Button, x48 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
 		setButtonIcon(previousButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
 		Gui %window%:Add, Button, x638 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
 		setButtonIcon(nextButtonHandle, kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
 		Gui %window%:Add, Button, x670 y540 w30 h30 HwndlastButtonHandle Disabled VlastPageButton GlastPage
-		setButtonIcon(lastButtonHandle, kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
+		setButtonIcon(lastButtonHandle, kIconsDirectory . "Last.ico", 1, "L2 T2 R2 B2 H24 W24")
 
 		languages := string2Values("|", getConfigurationValue(this.Definition, "Setup", "Languages"))
 

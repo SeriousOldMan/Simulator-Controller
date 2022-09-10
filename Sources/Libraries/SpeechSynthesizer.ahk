@@ -310,6 +310,7 @@ class SpeechSynthesizer {
 		}
 		else {
 			this.iSoundPlayer := false
+			this.iPlaysCacheFile := false
 
 			callback := this.SpeechStatusCallback
 
@@ -577,6 +578,7 @@ class SpeechSynthesizer {
 				return true
 			else {
 				this.iSoundPlayer := false
+				this.iPlaysCacheFile := false
 
 				return false
 			}
@@ -619,6 +621,8 @@ class SpeechSynthesizer {
 				this.iSoundPlayer := false
 				this.iPlaysCacheFile := false
 			}
+
+			return true
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
 			try {
@@ -628,7 +632,11 @@ class SpeechSynthesizer {
 				logError(exception)
 			}
 
-			this.iPlaysCacheFile := false
+			if this.iPlaysCacheFile {
+				this.iPlaysCacheFile := false
+
+				return true
+			}
 		}
 		else if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
@@ -639,7 +647,7 @@ class SpeechSynthesizer {
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
 
-		return true
+		return false
 	}
 
 	setRate(rate) {

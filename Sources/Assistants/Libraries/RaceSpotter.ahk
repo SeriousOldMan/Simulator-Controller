@@ -2211,6 +2211,7 @@ class RaceSpotter extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
+		local position, length
 
 		base.prepareSession(settings, data)
 
@@ -2257,15 +2258,23 @@ class RaceSpotter extends RaceAssistant {
 
 				if (this.Session = kSessionRace) {
 					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+					position := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 
-					if driver
-						speaker.speakPhrase("GreetingPosition"
-										  , {position: getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")})
+					if (driver && position)
+						speaker.speakPhrase("GreetingPosition", {position: position})
 
-					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time")
-						speaker.speakPhrase("GreetingDuration", {minutes: Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining") / 60000)})
-					else
-						speaker.speakPhrase("GreetingLaps", {laps: this.SessionLaps})
+					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
+
+						if (length > 0)
+							speaker.speakPhrase("GreetingDuration", {minutes: length})
+					}
+					else {
+						length := this.SessionLaps
+
+						if (length > 0)
+							speaker.speakPhrase("GreetingLaps", {laps: length})
+					}
 				}
 			}
 			finally {

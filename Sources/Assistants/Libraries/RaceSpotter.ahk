@@ -248,13 +248,13 @@ class CarInfo {
 			valid := false
 		}
 
-		if ((lastLap != this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
+		if ((lastLap != this.LastLap) && (lapTime > 0) && !pitted) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
-			if (!this.BestLapTime || (lapTime < this.BestLapTime))
+			if (validLap && (!this.BestLapTime || (lapTime < this.BestLapTime)))
 				this.iBestLapTime := lapTime
 		}
 
@@ -1370,32 +1370,34 @@ class RaceSpotter extends RaceAssistant {
 					if !this.SessionInfos.HasKey(situation) {
 						this.SessionInfos[situation] := true
 
-						speaker.beginTalk()
+						if (remainingSessionLaps > 5) {
+							speaker.beginTalk()
 
-						try {
-							speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-																, laps: remainingSessionLaps
-																, position: Round(knowledgeBase.getValue("Position", 0))})
+							try {
+								speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+																	, laps: remainingSessionLaps
+																	, position: Round(knowledgeBase.getValue("Position", 0))})
 
-							remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+								remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-							if (remainingStintTime < remainingSessionTime) {
-								speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+								if (remainingStintTime < remainingSessionTime) {
+									speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
 
-								enoughFuel := (remainingStintLaps < remainingFuelLaps)
+									enoughFuel := (remainingStintLaps < remainingFuelLaps)
+								}
+								else {
+									speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+																		  , laps: Ceil(remainingSessionLaps)})
+
+									enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+								}
+
+								speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+												  , {laps: Floor(remainingFuelLaps)})
 							}
-							else {
-								speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-																	  , laps: Ceil(remainingSessionLaps)})
-
-								enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+							finally {
+								speaker.endTalk()
 							}
-
-							speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-											  , {laps: Floor(remainingFuelLaps)})
-						}
-						finally {
-							speaker.endTalk()
 						}
 					}
 				}

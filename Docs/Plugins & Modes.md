@@ -1108,4 +1108,4 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.

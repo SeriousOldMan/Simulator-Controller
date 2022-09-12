@@ -214,34 +214,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			this.RaceStrategist.cancelStrategy()
 	}
 
-	activeSession(data) {
-		local session := getDataSession(data)
-		local simulator, car, track, weather, sessiom, default
-
-		if (session == kSessionRace)
-			return true
-		else {
-			simulator := getConfigurationValue(data, "Session Data", "Simulator")
-			car := getConfigurationValue(data, "Session Data", "Car")
-			track := getConfigurationValue(data, "Session Data", "Track")
-			weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-
-			session := "Other"
-			default := false
-
-			switch session {
-				case kSessionPractice:
-					session := "Practice"
-					default := true
-				case kSessionQualification:
-					session := "Qualification"
-			}
-
-			return getConfigurationValue(new SettingsDatabase().loadSettings(simulator, car, track, weather)
-									   , "Session Settings", "Telemetry." . session, default)
-		}
-	}
-
 	saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 					, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 					, compound, compoundColor, pressures, temperatures, wear) {

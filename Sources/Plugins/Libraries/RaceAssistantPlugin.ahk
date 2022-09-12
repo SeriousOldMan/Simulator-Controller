@@ -1235,11 +1235,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	getSession(data := false) {
+		local ignore
+
 		if RaceAssistantPlugin.Simulator {
 			if !data
 				data := readSimulatorData(RaceAssistantPlugin.Simulator.Code)
 
-			return getDataSession(data)
+			return getDataSession(data, ignore)
 		}
 		else
 			return kSessionFinished
@@ -1256,7 +1258,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	activeSession(data) {
-		return (getDataSession(data) >= kSessionPractice)
+		local ignore
+
+		return (getDataSession(data, ignore) >= kSessionPractice)
 	}
 
 	updateSession(session) {
@@ -1393,6 +1397,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	collectSessionData() {
+		local finished := false
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
 		local newLap, firstLap, ignore, assistant, hasAssistant
@@ -1442,7 +1447,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			protectionOn()
 
 			try {
-				session := RaceAssistantPlugin.getSession(data)
+				session := getDataSession(data, finished)
+
+				if (finished && (this.Session = kSessionRace)) {
+					session := kSessionRace
+
+					setConfigurationValue(data, "Session Data", "Session", "Race")
+				}
+
 				joinedSession := false
 
 				RaceAssistantPlugin.updateAssistantsSession(session)
@@ -1618,6 +1630,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.updateAssistantsLap(data)
 					}
 				}
+
+				if finished
+					RaceAssistantPlugin.finishAssistantsSession()
 			}
 			finally {
 				protectionOff()
@@ -1633,8 +1648,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getDataSession(data) {
+getDataSession(data, ByRef finished) {
 	if getConfigurationValue(data, "Session Data", "Active", false) {
+		finished := false
+
 		if getConfigurationValue(data, "Session Data", "Paused", false)
 			return kSessionPaused
 		else
@@ -1646,13 +1663,18 @@ getDataSession(data) {
 				case "Qualification":
 					return kSessionQualification
 				case "Finished":
+					finished := true
+
 					return kSessionFinished
 				default:
 					return kSessionOther
 			}
 	}
-	else
+	else {
+		finished := true
+
 		return kSessionFinished
+	}
 }
 
 findActivePlugin(plugin := false) {

@@ -248,13 +248,13 @@ class CarInfo {
 			valid := false
 		}
 
-		if ((lastLap != this.LastLap) && (lapTime > 0) && valid && validLap && !pitted) {
+		if ((lastLap != this.LastLap) && (lapTime > 0) && !pitted) {
 			this.LapTimes.Push(lapTime)
 
 			if (this.LapTimes.Length() > 5)
 				this.LapTimes.RemoveAt(1)
 
-			if (!this.BestLapTime || (lapTime < this.BestLapTime))
+			if (validLap && (!this.BestLapTime || (lapTime < this.BestLapTime)))
 				this.iBestLapTime := lapTime
 		}
 
@@ -1370,32 +1370,34 @@ class RaceSpotter extends RaceAssistant {
 					if !this.SessionInfos.HasKey(situation) {
 						this.SessionInfos[situation] := true
 
-						speaker.beginTalk()
+						if (remainingSessionLaps > 5) {
+							speaker.beginTalk()
 
-						try {
-							speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-																, laps: remainingSessionLaps
-																, position: Round(knowledgeBase.getValue("Position", 0))})
+							try {
+								speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+																	, laps: remainingSessionLaps
+																	, position: Round(knowledgeBase.getValue("Position", 0))})
 
-							remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+								remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-							if (remainingStintTime < remainingSessionTime) {
-								speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+								if (remainingStintTime < remainingSessionTime) {
+									speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
 
-								enoughFuel := (remainingStintLaps < remainingFuelLaps)
+									enoughFuel := (remainingStintLaps < remainingFuelLaps)
+								}
+								else {
+									speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+																		  , laps: Ceil(remainingSessionLaps)})
+
+									enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+								}
+
+								speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+												  , {laps: Floor(remainingFuelLaps)})
 							}
-							else {
-								speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-																	  , laps: Ceil(remainingSessionLaps)})
-
-								enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+							finally {
+								speaker.endTalk()
 							}
-
-							speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-											  , {laps: Floor(remainingFuelLaps)})
-						}
-						finally {
-							speaker.endTalk()
 						}
 					}
 				}
@@ -2211,6 +2213,7 @@ class RaceSpotter extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
+		local position, length
 
 		base.prepareSession(settings, data)
 
@@ -2257,15 +2260,23 @@ class RaceSpotter extends RaceAssistant {
 
 				if (this.Session = kSessionRace) {
 					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+					position := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 
-					if driver
-						speaker.speakPhrase("GreetingPosition"
-										  , {position: getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")})
+					if (driver && position)
+						speaker.speakPhrase("GreetingPosition", {position: position})
 
-					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time")
-						speaker.speakPhrase("GreetingDuration", {minutes: Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining") / 60000)})
-					else
-						speaker.speakPhrase("GreetingLaps", {laps: this.SessionLaps})
+					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
+
+						if (length > 0)
+							speaker.speakPhrase("GreetingDuration", {minutes: length})
+					}
+					else {
+						length := this.SessionLaps
+
+						if (length > 0)
+							speaker.speakPhrase("GreetingLaps", {laps: length})
+					}
 				}
 			}
 			finally {

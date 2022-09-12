@@ -316,7 +316,7 @@ class StreamDeckPreview extends ControllerPreview {
 		local count, menuItem, window, label, handler, count
 		local button, labelMode, iconMode, mode, menu
 
-		if (GetKeyState("Ctrl", "P") && !isEmpty)
+		if GetKeyState("Ctrl", "P")
 			LayoutsList.Instance.changeControl(row, column, "__Number__", false)
 		else {
 			menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")

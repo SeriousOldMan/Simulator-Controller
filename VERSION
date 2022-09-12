@@ -3,7 +3,7 @@ Version=4.3.2.0-dev
 Target=4.3.2.0-release
 Date=09/10/2022
 Download=
-Changes=Integrated support in "Setup Advisor" for modded AC setups, Support admin mode for apps with Google chart library, Jump directly to the last page of "Simulator Setup", Better last lap detection in races with fixed nr of laps
+Changes=Integrated support in "Setup Advisor" for modded AC setups, Support admin mode for apps with Google chart library, Jump directly to the last page of "Simulator Setup", Better last lap detection in races with fixed nr of laps, Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents
 [Release]
 Version=4.3.1.0-release
 Date=09/09/2022

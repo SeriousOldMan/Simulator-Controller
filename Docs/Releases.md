@@ -12,7 +12,8 @@
   10. The gap and position calculations of the Spotter has been completely rewritten. Time between data acquisition and the information reported by the Spotter is now less than 3 seconds.
   11. Added more regular Spotter delta and lap time information for the cars around you.
   12. Fixed a regression where in many lists and reports the last name of the drivers where missing.
-  13. New car models for "Setup Advisor":
+  13. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
+  14. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

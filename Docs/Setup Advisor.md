@@ -4,7 +4,7 @@ When it comes to race cars, the vast amount of available options when developing
 
 Welcome to "Setup Advisor", a new member in the growing collection of tools of the Simulator Controller suite.
 
-Important: "Setup Advisor" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the required key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Advisor" once using administrator privileges.
+Important: "Setup Advisor" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Advisor" once using administrator privileges.
 
 ## Describing Setup Issues
 

@@ -88,7 +88,7 @@ Note: Choosing media files depending on the currently selected simulation game i
 
 ## Additional requirements for the embedded HTML browser
 
-A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the required key in the registry. If you encounter an error, that the Google library can not be loaded, you must run this application once using administrator privileges. This applies to "Race Reports", "Strategy Workbench", "Race Center" and "Setup Advisor".
+A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error that the Google library can not be loaded, you must run the application in question once using administrator privileges. This currently applies to "Race Reports", "Strategy Workbench", "Race Center" and "Setup Advisor".
 
 ## Special steps for *Assetto Corsa Compeitizione* and *RaceRoom Racinng Experience*
 

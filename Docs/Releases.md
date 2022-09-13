@@ -1,3 +1,23 @@
+## 4.3.2.0-release 09/16/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. "Setup Advisor" now supports setup files for modded cars.
+  4. All applications which use the Google chart library can now be run as administrator, so that the browser settings can be added to the registry. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#additional-requirements-for-the-embedded-html-browser) for more details.
+  5. "Simulator Setup" now has navigation buttons to jump to the last page and to the first page in one step.
+  6. Better last lap detection in races with fixed number of laps.
+  7. Race reports will now be created including the last lap for races with fixed number of laps.
+  8. Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents.
+  9. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
+  10. The gap and position calculations of the Spotter has been completely rewritten. Time between data acquisition and the information reported by the Spotter is now less than 3 seconds.
+  11. Added more regular Spotter delta and lap time information for the cars around you.
+  12. Fixed a regression where in many lists and reports the last name of the drivers where missing.
+  13. New car models for "Setup Advisor":
+      - Assetto Corsa
+	    - ...
+	  - Assetto Corsa Competizione
+	    - ...
+
 ## 4.3.1.0-release 09/09/22
 
   1. Minor bugfixes, as always

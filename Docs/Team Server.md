@@ -106,7 +106,7 @@ During a team session, all team members can use the "Race Center" application, e
 
 Please note, that all the data and graphs shown in the window will be updated dynamically as the race progresses. Most updates will be done each lap, but some minor details will be updated more frequently.
 
-Important: "Race Center" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the required key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Race Center" once using administrator privileges.
+Important: "Race Center" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Race Center" once using administrator privileges.
 
 ### Connecting to a Session
 

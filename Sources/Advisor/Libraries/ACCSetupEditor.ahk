@@ -125,13 +125,15 @@ class ACCSetup extends FileSetup {
 	enable(setting) {
 		base.enable(setting)
 
-		this.setValue(setting, this.getValue(setting))
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	disable(setting) {
 		base.disable(setting)
 
-		this.setValue(setting, this.getValue(setting))
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {

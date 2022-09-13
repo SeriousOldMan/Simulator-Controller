@@ -153,6 +153,9 @@ Returns a new list with all occurencies of *object* removed from the original li
 #### *removeDuplicates(list :: Array)*
 Returns a new list with all duplicate values removed.
 
+#### *do(list :: Array, function :: TypeUnion(String, FuncObj))*
+Applies the given function to each element in *list* in the order of elements without collecting the results.
+
 #### *getKeys(map :: Map)*
 Returns a list of all keys in the given map.
 

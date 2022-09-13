@@ -4,6 +4,8 @@ When it comes to race cars, the vast amount of available options when developing
 
 Welcome to "Setup Advisor", a new member in the growing collection of tools of the Simulator Controller suite.
 
+Important: "Setup Advisor" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the required key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Advisor" once using administrator privileges.
+
 ## Describing Setup Issues
 
 The real world approach, when developing a setup for a race car, is to drive a few laps and make mental notes of all the flaws and drawbacks of the current car handling. You then describe all these issues to your suspension engineer, who then adjusts the settings on the car accordingly. Another test on the track will hopefully confirm the improvements that have been made, but usually also reveal new issues that arise as a result of the changes. After you have gone through this cycle a few times, you usually have found the best possible compromise for the current track.

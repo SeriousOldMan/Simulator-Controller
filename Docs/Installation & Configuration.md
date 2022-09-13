@@ -86,6 +86,10 @@ The startup process of Simulator Controller can entertain you with splash images
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
+## Additional requirements for the embedded HTML browser
+
+A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the required key in the registry. If you encounter an error, that the Google library can not be loaded, you must run this application once using administrator privileges. This applies to "Race Reports", "Strategy Workbench", "Race Center" and "Setup Advisor".
+
 ## Special steps for *Assetto Corsa Compeitizione* and *RaceRoom Racinng Experience*
 
 If you want to use the automated handling of the pitstop settings for the *Assetto Corsa Competizione* or *RaceRoom Racinng Experience* simulations, either manually by using your connected controller or controlled by one of the Race Assistants, you need to create small graphical elements, which Simulator Controller uses to detect and *understand* the currently chossen pitstop settings. You will find detailed instructions for this task in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).

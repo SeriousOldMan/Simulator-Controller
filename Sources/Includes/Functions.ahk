@@ -798,10 +798,14 @@ fixIE(version := 0, exeName := "") {
 
 	RegRead previousValue, HKCU, %key%, %exeName%
 
-	if (version = "")
+	if (version = "") {
 		RegDelete, HKCU, %key%, %exeName%
-	else
+		RegDelete, HKLM, %key%, %exeName%
+	}
+	else {
 		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
+		RegWrite, REG_DWORD, HKLM, %key%, %exeName%, %version%
+	}
 
 	return previousValue
 }
@@ -1855,6 +1859,13 @@ removeDuplicates(list) {
 			result.Push(value)
 
 	return result
+}
+
+do(list, function) {
+	local ignore, value
+
+	for ignore, value in list
+		%function%(value)
 }
 
 getKeys(map) {

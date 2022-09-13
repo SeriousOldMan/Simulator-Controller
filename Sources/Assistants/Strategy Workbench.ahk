@@ -3691,12 +3691,6 @@ runSimulation() {
 		workbench.chooseSimulationMenu(5)
 }
 
-exitFixIE(previous) {
-	fixIE(previous)
-
-	return false
-}
-
 runStrategyWorkbench() {
 	local icon := kIconsDirectory . "Dashboard.ico"
 	local simulator := false
@@ -3708,7 +3702,7 @@ runStrategyWorkbench() {
 	local compound := "Dry"
 	local compoundColor := "Black"
 	local index := 1
-	local current, workbench
+	local workbench
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Strategy Workbench
@@ -3750,9 +3744,7 @@ runStrategyWorkbench() {
 	if (trackTemperature <= 0)
 		trackTemperature := 27
 
-	current := fixIE(11)
-
-	OnExit(Func("exitFixIE").Bind(current))
+	fixIE(11)
 
 	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 

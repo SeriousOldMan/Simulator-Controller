@@ -113,8 +113,10 @@ global stepSubtitle
 
 global languageDropDown
 
+global firstPageButton
 global previousPageButton
 global nextPageButton
+global lastPageButton
 global finishButton
 
 class SetupWizard extends ConfigurationItem {
@@ -444,10 +446,14 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, Button, x16 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
+		Gui %window%:Add, Button, x16 y540 w30 h30 HwndfirstButtonHandle Disabled VfirstPageButton GfirstPage
+		setButtonIcon(firstButtonHandle, kIconsDirectory . "First.ico", 1, "L2 T2 R2 B2 H24 W24")
+		Gui %window%:Add, Button, x48 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
 		setButtonIcon(previousButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
-		Gui %window%:Add, Button, x670 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
+		Gui %window%:Add, Button, x638 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
 		setButtonIcon(nextButtonHandle, kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
+		Gui %window%:Add, Button, x670 y540 w30 h30 HwndlastButtonHandle Disabled VlastPageButton GlastPage
+		setButtonIcon(lastButtonHandle, kIconsDirectory . "Last.ico", 1, "L2 T2 R2 B2 H24 W24")
 
 		languages := string2Values("|", getConfigurationValue(this.Definition, "Setup", "Languages"))
 
@@ -546,12 +552,12 @@ class SetupWizard extends ConfigurationItem {
 		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
-				
+
 				if enabled
 					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
-				
+
 				if enabled
 					this.dumpRules(this.KnowledgeBase)
 		}
@@ -673,8 +679,10 @@ class SetupWizard extends ConfigurationItem {
 
 			Gui %window%:+Disabled
 
+			GuiControl Disable, firstPageButton
 			GuiControl Disable, previousPageButton
 			GuiControl Disable, nextPageButton
+			GuiControl Disable, lastPageButton
 			GuiControl Disable, finishButton
 
 			this.Working := true
@@ -778,6 +786,13 @@ class SetupWizard extends ConfigurationItem {
 		return configuration
 	}
 
+	getFirstPage(ByRef step, ByRef page) {
+		step := this.Steps[1]
+		page := 1
+
+		return true
+	}
+
 	getPreviousPage(ByRef step, ByRef page) {
 		local index, candidate
 
@@ -846,6 +861,13 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 
+	getLastPage(ByRef step, ByRef page) {
+		step := this.Steps[this.Count]
+		page := step.Pages
+
+		return true
+	}
+
 	isFirstPage() {
 		local step := false
 		local page := false
@@ -869,8 +891,10 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:+Disabled
 
+		GuiControl Disable, firstPageButton
 		GuiControl Disable, previousPageButton
 		GuiControl Disable, nextPageButton
+		GuiControl Disable, lastPageButton
 		GuiControl Disable, finishButton
 
 		oldPageSwitch := this.PageSwitch
@@ -912,6 +936,28 @@ class SetupWizard extends ConfigurationItem {
 		}
 		else
 			return false
+	}
+
+	firstPage() {
+		local step, page
+
+		try {
+			this.Working := true
+
+			try {
+				step := false
+				page := false
+
+				if this.getFirstPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				this.Working := false
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	previousPage() {
@@ -958,6 +1004,28 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 
+	lastPage() {
+		local step, page
+
+		try {
+			this.Working := true
+
+			try {
+				step := false
+				page := false
+
+				if this.getLastPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				this.Working := false
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
+	}
+
 	updateState() {
 		local window := this.WizardWindow
 
@@ -973,17 +1041,23 @@ class SetupWizard extends ConfigurationItem {
 		Gui %window%:Default
 
 		if !this.PageSwitch {
-			if this.isFirstPage()
+			if this.isFirstPage() {
+				GuiControl Disable, firstPageButton
 				GuiControl Disable, previousPageButton
-			else
+			}
+			else {
+				GuiControl Enable, firstPageButton
 				GuiControl Enable, previousPageButton
+			}
 
 			if this.isLastPage() {
 				GuiControl Disable, nextPageButton
+				GuiControl Disable, lastPageButton
 				GuiControl Enable, finishButton
 			}
 			else {
 				GuiControl Enable, nextPageButton
+				GuiControl Enable, lastPageButton
 				GuiControl Disable, finishButton
 			}
 
@@ -2206,12 +2280,20 @@ cancelSetup() {
 		ExitApp 0
 }
 
+firstPage() {
+	SetupWizard.Instance.firstPage()
+}
+
 previousPage() {
 	SetupWizard.Instance.previousPage()
 }
 
 nextPage() {
 	SetupWizard.Instance.nextPage()
+}
+
+lastPage() {
+	SetupWizard.Instance.lastPage()
 }
 
 chooseLanguage() {
@@ -2418,17 +2500,9 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 restartSetup:
-	previous := fixIE(9)
+	fixIE(10)
 
-	if (previous = "")
-		previous := "9"
-
-	try {
-		wizard.createGui(wizard.Configuration)
-	}
-	finally {
-		fixIE(previous)
-	}
+	wizard.createGui(wizard.Configuration)
 
 	wizard.startSetup()
 

@@ -1044,6 +1044,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
 		local data := newConfiguration()
 		local section, values
+		
+		setConfigurationValue(data, "System", "Time", A_TickCount)
 
 		telemetryData := this.acquireTelemetryData()
 		positionsData := this.acquirePositionsData(telemetryData)

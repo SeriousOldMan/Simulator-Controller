@@ -882,8 +882,9 @@ class RaceSpotter extends RaceAssistant {
 			speaker.speakPhrase("NoTrackGap")
 	}
 
-	standingsGapToAheadRecognized(words) {
+	standingsGapToAheadRecognized(words, noLapped := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local talking := false
 		local delta, lap, car, speaker
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
@@ -891,24 +892,35 @@ class RaceSpotter extends RaceAssistant {
 		else {
 			speaker := this.getSpeaker()
 
-			speaker.beginTalk()
-
 			try {
 				lap := knowledgeBase.getValue("Lap")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 				car := knowledgeBase.getValue("Position.Standings.Ahead.Car")
 
 				if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
-					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
-					speaker.speakPhrase("StandingsAheadLapped")
-				else
+					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
+					if !noLapped {
+						speaker.beginTalk()
+
+						speaker.speakPhrase("StandingsAheadLapped")
+					}
+					else
+						return
+				}
+				else {
+					speaker.beginTalk()
+
 					speaker.speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
+				}
+
+				talking := true
 
 				if knowledgeBase.getValue("Car." . car . ".InPitLane")
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.endTalk()
+				if talking
+					speaker.endTalk()
 			}
 		}
 	}
@@ -953,16 +965,15 @@ class RaceSpotter extends RaceAssistant {
 			speaker.speakPhrase("NoTrackGap")
 	}
 
-	standingsGapToBehindRecognized(words) {
+	standingsGapToBehindRecognized(words, noLapped := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local talking := false
 		local delta, car, speaker, driver, lap, lapped
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
 			this.getSpeaker().speakPhrase("NoGapToBehind")
 		else {
 			speaker := this.getSpeaker()
-
-			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
@@ -972,18 +983,30 @@ class RaceSpotter extends RaceAssistant {
 
 				if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
-					speaker.speakPhrase("StandingsBehindLapped")
+					if !noLapped {
+						speaker.beginTalk()
 
-					lapped := true
+						speaker.speakPhrase("StandingsBehindLapped")
+
+						lapped := true
+					}
+					else
+						return
 				}
-				else
+				else {
+					speaker.beginTalk()
+
 					speaker.speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
+				}
+
+				talking := true
 
 				if (!lapped && knowledgeBase.getValue("Car." . car . ".InPitLane"))
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
-				speaker.endTalk()
+				if talking
+					speaker.endTalk()
 			}
 		}
 	}
@@ -1331,10 +1354,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if (this.BestLapTime > 0) {
-					if !this.SessionInfos.HasKey("BestLap")
-						this.SessionInfos["BestLap"] := this.BestLapTime
-
-					if (this.BestLapTime < this.SessionInfos["BestLap"]) {
+					if (!this.SessionInfos.HasKey("BestLap") || (this.BestLapTime < this.SessionInfos["BestLap"])) {
 						lapTime := (this.BestLapTime / 1000)
 
 						minute := Floor(lapTime / 60)
@@ -1346,6 +1366,8 @@ class RaceSpotter extends RaceAssistant {
 
 						return true
 					}
+					else
+						this.SessionInfos["BestLap"] := this.BestLapTime
 				}
 			}
 
@@ -1851,9 +1873,9 @@ class RaceSpotter extends RaceAssistant {
 				Random rnd, 1, 10
 
 				if (standingsAhead && (rnd > 3))
-					this.standingsGapToAheadRecognized([])
+					this.standingsGapToAheadRecognized([], true)
 				else if (standingsBehind && (rnd <= 3))
-					this.standingsGapToBehindRecognized([])
+					this.standingsGapToBehindRecognized([], true)
 			}
 		}
 	}

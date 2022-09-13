@@ -1467,9 +1467,9 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if (!lapTime && (this.Session == kSessionRace)) {
-					Random rnd, 0.0, 1.0
+					Random rnd, 1, 10
 
-					if (rnd > 0.8) {
+					if (rnd > 8) {
 						Random rnd, 1, 100
 
 						if ((rnd <= 33) && standingsAhead) {
@@ -1841,8 +1841,11 @@ class RaceSpotter extends RaceAssistant {
 			speaker.endTalk()
 		}
 
-		if !spoken {
-			Random rnd, 1, 10
+		if (!spoken && regular) {
+			if (regular = "S")
+				Random rnd, 1, 7
+			else
+				Random rnd, 1, 9
 
 			if (rnd > 6) {
 				Random rnd, 1, 10

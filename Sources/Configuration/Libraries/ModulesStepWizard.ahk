@@ -233,8 +233,14 @@ class DefaultStreamDeck extends NamedPreset {
 	}
 }
 
-class StreamDeckIcons extends NamedPreset {
+class FilesPreset extends NamedPreset {
 	iFiles := []
+
+	Directory[] {
+		Get {
+			throw "Virtual property FilesPreset.Directory must be implemented in a subclass..."
+		}
+	}
 
 	Files[] {
 		Get {
@@ -258,11 +264,12 @@ class StreamDeckIcons extends NamedPreset {
 	}
 
 	install(wizard) {
+		local directory := this.Directory
 		local ignore, file
 
 		for ignore, file in this.Files
 			try {
-				FileCopy %file%, %kUserTranslationsDirectory%, 1
+				FileCopy %file%, %directory%, 1
 			}
 			catch exception {
 				logError(exception)
@@ -270,12 +277,29 @@ class StreamDeckIcons extends NamedPreset {
 	}
 
 	uninstall(wizard) {
+		local directory := this.Directory
 		local ignore, file, name
 
 		for ignore, file in this.Files {
 			SplitPath file, name
 
-			deleteFile(kUserTranslationsDirectory . name)
+			deleteFile(directory . name)
+		}
+	}
+}
+
+class StreamDeckIcons extends FilesPreset {
+	Directory[] {
+		Get {
+			return kUserTranslationsDirectory
+		}
+	}
+}
+
+class P2TConfiguration extends FilesPreset {
+	Directory[] {
+		Get {
+			return kUserConfigDirectory
 		}
 	}
 }
@@ -320,7 +344,7 @@ class PitstopImages extends NamedPreset {
 		local name
 
 		SplitPath directory, , , , name
-		
+
 		deleteDirectory(kUserHomeDirectory . "Screen Images\" . name)
 	}
 }

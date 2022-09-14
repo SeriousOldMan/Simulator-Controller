@@ -585,18 +585,44 @@ class VoiceServer extends ConfigurationItem {
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
-		if this.PushToTalk
-			new PeriodicTask(ObjBindMethod(this, "listen"), 50, kInterruptPriority).start()
+		this.initializePushToTalk()
 	}
 
-	listen() {
+	initializePushToTalk() {
+		local p2tHotkey := this.PushToTalk
+		local toggle, handler
+
+		if p2tHotkey {
+			toggle := false
+
+			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
+				toggle := (getConfigurationValue(readConfiguration(kUserConfigDirectory . "P2T Configuration.ini")
+											   , "PushToTalk", "Mode", "Press") = "Toggle")
+
+			if toggle {
+				handler := ObjBindMethod(this, "listen", true)
+
+				Hotkey %p2tHotkey%, %handler%
+				Hotkey %p2tHotkey%, On
+			}
+			else
+				new PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+		}
+	}
+
+	listen(toggle, down := true) {
+		local listen := false
+
 		static isPressed := false
 		static lastDown := 0
 		static lastUp := 0
 		static clicks := 0
 		static activation := false
+		static listening := false
 
-		pressed := GetKeyState(this.PushToTalk, "P")
+		static listenTask := false
+
+		pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -620,19 +646,69 @@ class VoiceServer extends ConfigurationItem {
 				clicks := 0
 		}
 
-		if (((A_TickCount - lastDown) < 200) && !activation)
-			pressed := false
+		if toggle {
+			if pressed {
+				if listenTask {
+					listen := true
 
-		if !this.Speaking && pressed {
-			if activation
-				this.startActivationListener()
-			else
-				this.startListening(false)
+					listenTask.stop()
+
+					listenTask := false
+				}
+
+				if (activation && listening) {
+					this.stopActivationListener()
+					this.stopListening()
+
+					this.startActivationListener()
+				}
+				else if listening {
+					this.stopActivationListener()
+					this.stopListening()
+
+					listening := false
+				}
+				else {
+					if activation {
+						this.startActivationListener()
+
+						listening := true
+					}
+					else if listen {
+						this.startListening(false)
+
+						listening := true
+					}
+					else {
+						listenTask := new Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
+
+						Task.startTask(listenTask)
+					}
+				}
+			}
 		}
-		else if !pressed {
-			this.stopActivationListener()
-			this.stopListening()
+		else {
+			if (((A_TickCount - lastDown) < 200) && !activation)
+				pressed := false
+
+			if !this.Speaking && pressed {
+				if activation
+					this.startActivationListener()
+				else
+					this.startListening(false)
+
+				listening := true
+			}
+			else if !pressed {
+				this.stopActivationListener()
+				this.stopListening()
+
+				listening := false
+			}
 		}
+
+		if (toggle && down)
+			this.listen(toggle, false)
 	}
 
 	setDebug(option, enabled) {

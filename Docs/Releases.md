@@ -13,7 +13,8 @@
   11. Added more regular Spotter delta and lap time information for the cars around you.
   12. Fixed a regression where in many lists and reports the last name of the drivers where missing.
   13. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
-  14. New car models for "Setup Advisor":
+  14. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  15. New car models for "Setup Advisor":
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione

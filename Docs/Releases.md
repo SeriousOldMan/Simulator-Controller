@@ -16,7 +16,8 @@
   14. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
   15. New car models for "Setup Advisor":
       - Assetto Corsa
-	    - ...
+        - Pagani Zonda R
+	    - Mercedes-Benz AMG GT3
 	  - Assetto Corsa Competizione
 	    - Bentley Continental GT3 (2015)
 		- Lamborghini Huracan GT3

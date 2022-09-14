@@ -813,6 +813,18 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	Weather10Min[] {
+		Get {
+			return this.iWeather10Min
+		}
+	}
+
+	Weather30Min[] {
+		Get {
+			return this.iWeather30Min
+		}
+	}
+
 	AirTemperature[] {
 		Get {
 			return this.iAirTemperature
@@ -3807,20 +3819,21 @@ class RaceCenter extends ConfigurationItem {
 		local strategy
 
 		if this.Weather {
-			weather := this.Weather
+			if (minute >= 30)
+				weather := this.Weather30Min
+			else if (minute >= 10)
+				weather := this.Weather10Min
+			else
+				weather := this.Weather
+
 			airTemperature := this.AirTemperature
 			trackTemperature := this.TrackTemperature
 		}
 		else {
 			strategy := := this.Strategy
 
-			if strategy {
-				weather := strategy.Weather
-				airTemperature := strategy.AirTemperature
-				trackTemperature := strategy.TrackTemperature
-
-				return true
-			}
+			if strategy
+				return strategy.getWeather(minute, weather, airTemperature, trackTemperature)
 			else {
 				weather := "Dry"
 				airTemperature := 23
@@ -4258,6 +4271,8 @@ class RaceCenter extends ConfigurationItem {
 			this.iTrack := false
 
 			this.iWeather := false
+			this.iWeather10Min := false
+			this.iWeather30Min := false
 			this.iAirTemperature := false
 			this.iTrackTemperature := false
 
@@ -4545,13 +4560,14 @@ class RaceCenter extends ConfigurationItem {
 			lap.ABS := getConfigurationValue(data, "Car Data", "ABS")
 
 			lap.Weather := getConfigurationValue(data, "Weather Data", "Weather")
+			lap.Weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min")
+			lap.Weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min")
 			lap.AirTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature"), 1)
 			lap.TrackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature"), 1)
 			lap.Grip := getConfigurationValue(data, "Track Data", "Grip")
 
 			compound := getConfigurationValue(data, "Car Data", "TyreCompound")
 			compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor")
-
 
 			lap.Compound := compound(compound, compoundColor)
 
@@ -4787,6 +4803,15 @@ class RaceCenter extends ConfigurationItem {
 						this.iWeather := lastLap.Weather
 						this.iAirTemperature := lastLap.AirTemperature
 						this.iTrackTemperature := lastLap.TrackTemperature
+
+						if lastLap.HasKey("Weather10Min") {
+							this.iWeather10Min := lastLap.Weather10Min
+							this.iWeather30Min := lastLap.Weather30Min
+						}
+						else {
+							this.iWeather10Min := lastLap.Weather
+							this.iWeather30Min := lastLap.Weather
+						}
 					}
 
 					currentStint := this.CurrentStint
@@ -6715,13 +6740,20 @@ class RaceCenter extends ConfigurationItem {
 
 				this.initializeReports()
 
-				if !this.Weather {
-					lastLap := this.LastLap
+				lastLap := this.LastLap
 
-					if lastLap {
-						this.iWeather := lastLap.Weather
-						this.iAirTemperature := lastLap.AirTemperature
-						this.iTrackTemperature := lastLap.TrackTemperature
+				if lastLap {
+					this.iWeather := lastLap.Weather
+					this.iAirTemperature := lastLap.AirTemperature
+					this.iTrackTemperature := lastLap.TrackTemperature
+
+					if lastLap.HasKey("Weather10Min") {
+						this.iWeather10Min := lastLap.Weather10Min
+						this.iWeather30Min := lastLap.Weather30Min
+					}
+					else {
+						this.iWeather10Min := lastLap.Weather
+						this.iWeather30Min := lastLap.Weather
 					}
 				}
 

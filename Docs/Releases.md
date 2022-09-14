@@ -17,7 +17,8 @@
       - Assetto Corsa
 	    - ...
 	  - Assetto Corsa Competizione
-	    - ...
+	    - Bentley Continental GT3 (2015)
+		- Lamborghini Huracan GT3
 
 ## 4.3.1.0-release 09/09/22
 

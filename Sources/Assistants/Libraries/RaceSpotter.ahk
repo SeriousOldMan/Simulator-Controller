@@ -448,18 +448,6 @@ class PositionInfo {
 		this.iCar := car
 	}
 
-	inDelta(sector, threshold := 2.0) {
-		return (Abs(this.Delta[false, true, 1]) <= threshold)
-	}
-
-	isFaster(sector) {
-		; return ((this.InitialDelta[sector] - this.Delta[Sector]) > 0)
-
-		; return this.Car.isFaster(sector)
-
-		return (this.LapTimeDifference[true] > 0)
-	}
-
 	hasBestLapTime() {
 		return (this.BestLapTime != this.Car.BestLapTime)
 	}
@@ -469,7 +457,15 @@ class PositionInfo {
 	}
 
 	hasProblem() {
-		return this.Car.Problem
+		return this.Car.hasProblem()
+	}
+
+	inDelta(sector, threshold := 2.0) {
+		return (Abs(this.Delta[false, true, 1]) <= threshold)
+	}
+
+	isFaster(sector) {
+		return (this.LapTimeDifference[true] > 0)
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -532,19 +528,19 @@ class PositionInfo {
 			return false
 	}
 
-	reset(sector, full := false, inPit := false) {
-		if full {
+	reset(sector, reset := false, full := false) {
+		if reset {
 			this.Reported := false
 			this.iBaseLap := this.Car.LastLap
 		}
 
 		this.iInitialDeltas := {}
 
-		if !inPit
+		if !full
 			this.iInitialDeltas[sector] := this.Delta[sector]
 	}
 
-	calibrate(sector) {
+	rebase(sector) {
 		if (this.Car.LastLap >= (this.iBaseLap + 3))
 			this.reset(sector, true)
 		else
@@ -557,8 +553,9 @@ class PositionInfo {
 		local standingsBehind := (position = "Behind")
 		local trackAhead := this.inFront(false)
 		local trackBehind := this.atBehind(false)
-		local observed := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
-						 . (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : ""))
+		local oldObserved := this.Observed
+		local newObserved := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
+							. (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : ""))
 
 		if this.Car.InPit {
 			if !InStr(this.iObserved, "P")
@@ -569,36 +566,39 @@ class PositionInfo {
 		else if this.Spotter.DriverCar.InPit {
 			this.reset(sector, true, true)
 
-			this.iObserved := observed
+			this.iObserved := newObserved
 		}
-		else {
-			if (observed != this.Observed) {
-				if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
-				 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
-					; Can happen in ACC due to asynchronous position updating
+		else if (newObserved != oldObserved) {
+			if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
+			 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
+				; Can happen in ACC due to asynchronous position updating
+
+				this.reset(sector, true, true)
+
+				this.iObserved := ""
+			}
+			else if ((standingsBehind && InStr(oldObserved, "SF")) || (standingsAhead && InStr(oldObserved, "SB"))
+				  || (trackBehind && InStr(oldObserved, "TF")) || (trackAhead && InStr(oldObserved, "TB"))) {
+				; Drivers car has been overtaken
+
+				this.reset(sector, true, true)
+
+				this.iObserved := ""
+			}
+			else {
+				if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TF"))) {
+					; Change in car ahead or behind due to an overtake
 
 					this.reset(sector, true, true)
-
-					this.iObserved := ""
 				}
-				else {
-					this.iObserved := observed
+				else
+					this.Reported := false
 
-					if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) {
-						this.reset(sector, true, true)
-
-						this.iObserved := ""
-					}
-					else if ((InStr(observed, "TB") || InStr(observed, "TF"))
-						  && (!InStr(this.Observed, "TB") && !InStr(this.Observed, "TF")))
-						this.reset(sector, true, true)
-					else
-						this.Reported := false
-				}
+				this.iObserved := newObserved
 			}
-			else if ((observed = "") || (observed = "L"))
-				this.calibrate(sector)
 		}
+		else if ((newObserved = "") || (newObserved = "L"))
+			this.rebase(sector)
 	}
 }
 

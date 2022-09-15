@@ -1703,7 +1703,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
+						this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
 					}
 			}
 			finally {
@@ -2011,7 +2011,7 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(new VoiceManager.VoiceContinuation(this, ObjBindMethod(this, "preparePitstop")))
+						this.setContinuation(new VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
 					}
 				}
 			}

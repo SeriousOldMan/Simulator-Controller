@@ -2666,31 +2666,31 @@ class RaceSpotter extends RaceAssistant {
 					}
 				}
 			}
+
+			trackAhead := carPositions[trackAhead][1]
+			trackBehind := carPositions[trackBehind][1]
+
+			if (gapAhead && trackAhead) {
+				positions[trackAhead][8] := gapAhead
+
+				if (standingsAhead = trackAhead)
+					positions[standingsAhead][8] := gapAhead
+			}
+
+			if (gapBehind && trackBehind) {
+				positions[trackBehind][8] := gapBehind
+
+				if (standingsBehind = trackBehind)
+					positions[standingsBehind][8] := gapBehind
+			}
+
+			positions["Position"] := position
+			positions["Leader"] := leader
+			positions["StandingsAhead"] := standingsAhead
+			positions["StandingsBehind"] := standingsBehind
+			positions["TrackAhead"] := trackAhead
+			positions["TrackBehind"] := trackBehind
 		}
-
-		trackAhead := carPositions[trackAhead][1]
-		trackBehind := carPositions[trackBehind][1]
-
-		if (gapAhead && trackAhead) {
-			positions[trackAhead][8] := gapAhead
-
-			if (standingsAhead = trackAhead)
-				positions[standingsAhead][8] := gapAhead
-		}
-
-		if (gapBehind && trackBehind) {
-			positions[trackBehind][8] := gapBehind
-
-			if (standingsBehind = trackBehind)
-				positions[standingsBehind][8] := gapBehind
-		}
-
-		positions["Position"] := position
-		positions["Leader"] := leader
-		positions["StandingsAhead"] := standingsAhead
-		positions["StandingsBehind"] := standingsBehind
-		positions["TrackAhead"] := trackAhead
-		positions["TrackBehind"] := trackBehind
 
 		return positions
 	}

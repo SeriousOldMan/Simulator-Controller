@@ -232,7 +232,8 @@ class CarInfo {
 
 	update(driver, position, lastLap, sector, lapTime, delta, validLap, invalidLaps, incidents, inPit) {
 		local avgLapTime := this.AverageLapTime
-		local pitted := (inPit || inList(this.Pitstops, lastLap - 1))
+		local pitstops := this.Pitstops
+		local pitted := (inPit || inList(pitstops, lastLap) || inList(pitstops, lastLap - 1) || inList(pitstops, lastLap - 2))
 		local valid := true
 		local deltas
 

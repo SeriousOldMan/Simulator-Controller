@@ -6754,20 +6754,22 @@ class RaceCenter extends ConfigurationItem {
 
 				this.initializeReports()
 
-				lastLap := this.LastLap
+				if !this.Weather {
+					lastLap := this.LastLap
 
-				if lastLap {
-					this.iWeather := lastLap.Weather
-					this.iAirTemperature := lastLap.AirTemperature
-					this.iTrackTemperature := lastLap.TrackTemperature
+					if lastLap {
+						this.iWeather := lastLap.Weather
+						this.iAirTemperature := lastLap.AirTemperature
+						this.iTrackTemperature := lastLap.TrackTemperature
 
-					if lastLap.HasKey("Weather10Min") {
-						this.iWeather10Min := lastLap.Weather10Min
-						this.iWeather30Min := lastLap.Weather30Min
-					}
-					else {
-						this.iWeather10Min := lastLap.Weather
-						this.iWeather30Min := lastLap.Weather
+						if lastLap.HasKey("Weather10Min") {
+							this.iWeather10Min := lastLap.Weather10Min
+							this.iWeather30Min := lastLap.Weather30Min
+						}
+						else {
+							this.iWeather10Min := lastLap.Weather
+							this.iWeather30Min := lastLap.Weather
+						}
 					}
 				}
 

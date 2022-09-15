@@ -553,8 +553,12 @@ class PositionInfo {
 
 	checkpoint(sector) {
 		local position := this.forPosition()
-		local observed := ((this.isLeader() ? "L" : "") . (this.inFront(false) ? "TA" : "") . (this.atBehind(false) ? "TB" : "")
-						 . ((position = "Ahead") ? "SA" : "") . ((position = "Behind") ? "SB" : ""))
+		local standingsAhead := (position = "Ahead")
+		local standingsBehind := (position = "Behind")
+		local trackAhead := this.inFront(false)
+		local trackBehind := this.atBehind(false)
+		local observed := ((this.isLeader() ? "L" : "") . (trackAhead ? "TA" : "") . (trackBehind ? "TB" : "")
+						 . (standingsAhead ? "SA" : "") . (standingsBehind ? "SB" : ""))
 
 		if this.Car.InPit {
 			if !InStr(this.iObserved, "P")
@@ -569,18 +573,28 @@ class PositionInfo {
 		}
 		else {
 			if (observed != this.Observed) {
-				this.iObserved := observed
+				if (((trackAhead && standingsBehind) || (trackBehind && standingsAhead))
+				 && (this.Car.LastLap = this.Spotter.DriverCar.LastLap)) {
+					; Can happen in ACC due to asynchronous position updating
 
-				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) {
-					this.reset(sector, true)
+					this.reset(sector, true, true)
 
 					this.iObserved := ""
 				}
-				else if ((InStr(observed, "TB") || InStr(observed, "TF"))
-					  && (!InStr(this.Observed, "TB") && !InStr(this.Observed, "TF")))
-					this.reset(sector, true, true)
-				else
-					this.Reported := false
+				else {
+					this.iObserved := observed
+
+					if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) {
+						this.reset(sector, true, true)
+
+						this.iObserved := ""
+					}
+					else if ((InStr(observed, "TB") || InStr(observed, "TF"))
+						  && (!InStr(this.Observed, "TB") && !InStr(this.Observed, "TF")))
+						this.reset(sector, true, true)
+					else
+						this.Reported := false
+				}
 			}
 			else if ((observed = "") || (observed = "L"))
 				this.calibrate(sector)
@@ -1913,13 +1927,11 @@ class RaceSpotter extends RaceAssistant {
 						}
 
 						if (!hadInfo && deltaInformation) {
-							if (deltaInformation = "S")
-								informationLap := "S"
-							else if (lastLap >= (this.iLastDeltaInformationLap + deltaInformation))
+							if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
 								this.iLastDeltaInformationLap := lastLap
 
 							this.deltaInformation(lastLap, sector, positions
-												, (informationLap = "S") || (lastLap = this.iLastDeltaInformationLap))
+												, (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
 						}
 					}
 				}

@@ -307,9 +307,9 @@ Below you will find a brief and incomplete overview over the possible hotkeys, t
 
 | Symbol | Description |
 | ------ | ------ |
-| ^ | Represents the CTRL key. |
-| ! | Represents the ALT key. |
-| + | Represents the SHIFT key. |
+| ^ | A modifier that represents the CTRL key. |
+| ! | A modifier that represents the ALT key. |
+| + | A modifier that represents the SHIFT key. |
 | < | A modifier for all keys that restrict it to be on the left side of the keyboard. |
 | > | A modifier for all keys that restrict it to be on the right side of the keyboard. |
 | A - Z | A normal alphabetical key on the keyboard. |
@@ -322,8 +322,8 @@ Beside using the standard Hotkey syntax of AutoHotkey, you can use a special *Ho
 
 | Example | Description |
 | ------ | ------ |
-| ?Next mode | This voice hotkey will most likely used to switch the mode on the controller. You simply have to say: "Next Mode". |
-| ?{Please} activate motion | This voice hotkey can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
+| ?Next mode | This voice *hotkey* will most likely be used to switch the mode on the controller. You simply have to say: "Next Mode". |
+| ?{Please} activate motion | This voice *hotkey* can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
 
 Note: The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to user Push-To-Talk and also activation commands, if you have more than one voice dialog partner configured, for example the Virtual Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 

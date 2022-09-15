@@ -532,7 +532,7 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, found, candidate
 
 			if this.RaceCenter.UseSessionData
-				for ingore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
+				for ignore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 

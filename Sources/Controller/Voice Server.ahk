@@ -612,6 +612,7 @@ class VoiceServer extends ConfigurationItem {
 
 	listen(toggle, down := true) {
 		local listen := false
+		local pressed
 
 		static isPressed := false
 		static lastDown := 0
@@ -1084,7 +1085,7 @@ class VoiceServer extends ConfigurationItem {
 
 startupVoiceServer() {
 	local icon := kIconsDirectory . "Microphon.ico"
-	local debug, index, server
+	local debug, index, server, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server

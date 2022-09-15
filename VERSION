@@ -1,8 +1,8 @@
 [Development]
-Version=4.3.2.0-beta
+Version=4.3.2.0-rc1
 Target=4.3.2.0-release
 Date=09/15/2022
-Download=https://www.dropbox.com/s/8uobokdts6yl3tk/Simulator%20Controller%204.3.2.0-beta.zip?dl=1
+Download=https://www.dropbox.com/s/v4qhbevebmauctn/Simulator%20Controller%204.3.2.0-rc1.zip?dl=1
 Changes=Integrated support in "Setup Advisor" for modded AC setups, Support admin mode for apps with Google chart library, Jump directly to the last page of "Simulator Setup", Better last lap detection in races with fixed nr of laps, Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents, A lot of new tyre compound data for Automobilista 2 (Chris Matthews), All new Spotter gap and position calculation, Fixed missing driver last name in many apps, Added more regular Spotter delta information, New car models for "Setup Advisor", Performance improvement in "Simulator Setup", New preset to activate a toggle beahviour for the P2T trigger, "Race Center" incorporates real race weather when creating a new strategy
 [Release]
 Version=4.3.1.0-release
@@ -13,4 +13,4 @@ Changes=Faster muting for voice output interruption, Better detection for sessio
 Type=Development
 [Version]
 Release=4.3.1.0-release
-Development=4.3.2.0-beta
+Development=4.3.2.0-rc1

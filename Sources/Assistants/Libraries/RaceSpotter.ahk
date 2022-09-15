@@ -569,14 +569,18 @@ class PositionInfo {
 		}
 		else {
 			if (observed != this.Observed) {
-				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B")))
+				this.iObserved := observed
+
+				if ((InStr(observed, "B") && InStr(this.Observed, "F")) || (InStr(observed, "F") && InStr(this.Observed, "B"))) {
 					this.reset(sector, true)
-				else if ((InStr(observed, "B") || InStr(observed, "F")) && (!InStr(this.Observed, "B") && !InStr(this.Observed, "F")))
+
+					this.iObserved := ""
+				}
+				else if ((InStr(observed, "TB") || InStr(observed, "TF"))
+					  && (!InStr(this.Observed, "TB") && !InStr(this.Observed, "TF")))
 					this.reset(sector, true, true)
 				else
 					this.Reported := false
-
-				this.iObserved := observed
 			}
 			else if ((observed = "") || (observed = "L"))
 				this.calibrate(sector)

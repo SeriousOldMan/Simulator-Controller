@@ -1967,6 +1967,10 @@ class RaceSpotter extends RaceAssistant {
 			return true
 		else if ((alert = "Side") && this.pendingAlert("Clear", true))
 			return true
+		else if ((alert = "ClearLeft") && this.pendingAlert("ClearLeft"))
+			return true
+		else if ((alert = "ClearRight") && this.pendingAlert("ClearRight"))
+			return true
 		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 			return true
 		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"]) || this.pendingAlert("Clear", true)))

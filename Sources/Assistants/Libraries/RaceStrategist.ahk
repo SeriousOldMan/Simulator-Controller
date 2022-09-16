@@ -713,21 +713,23 @@ class RaceStrategist extends RaceAssistant {
 	trackGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 		local car := knowledgeBase.getValue("Position.Track.Ahead.Car")
+		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if ((delta != 0) && !knowledgeBase.getValue("Car." . car . ".InPitLane")) {
+		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+			speaker.speakPhrase("AheadCarInPit")
+		else if (delta != 0) {
 			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
-				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Ahead.Car") . ".Laps"))
+				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+				otherLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Ahead.Car") . ".Laps"))
 
-				if (driverLap < otherLap)
+				if (driverLap != otherLap)
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
@@ -740,27 +742,29 @@ class RaceStrategist extends RaceAssistant {
 
 	standingsGapToAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local delta, lap, car, speaker
+		local speaker := this.getSpeaker()
+		local delta, lap, car, inPit, speaker
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
-			this.getSpeaker().speakPhrase("NoGapToAhead")
+			speaker.speakPhrase("NoGapToAhead")
 		else {
-			speaker := this.getSpeaker()
-
 			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 				car := knowledgeBase.getValue("Position.Standings.Ahead.Car")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
+				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 
-				if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
+				if (delta = 0)
+					speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
+				else if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
 					speaker.speakPhrase("StandingsAheadLapped")
 				else
 					speaker.speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
 
-				if knowledgeBase.getValue("Car." . car . ".InPitLane")
+				if inPit
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {
@@ -784,21 +788,23 @@ class RaceStrategist extends RaceAssistant {
 	trackGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 		local car := knowledgeBase.getValue("Position.Track.Behind.Car")
+		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if ((delta != 0) && !knowledgeBase.getValue("Car." . car . ".InPitLane")) {
+		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+			speaker.speakPhrase("BehindCarInPit")
+		else if (delta != 0) {
 			speaker.beginTalk()
 
 			try {
 				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
-				driverLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
-				otherLap := floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
+				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
+				otherLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Position.Track.Behind.Car") . ".Laps"))
 
-				if (driverLap > (otherLap + 1))
+				if (driverLap != otherLap)
 				  speaker.speakPhrase("NotTheSameLap")
 			}
 			finally {
@@ -811,22 +817,24 @@ class RaceStrategist extends RaceAssistant {
 
 	standingsGapToBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local delta, car, speaker, driver, lap, lapped
+		local speaker := this.getSpeaker()
+		local delta, car, speaker, driver, inPit, lap, lapped
 
 		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
-			this.getSpeaker().speakPhrase("NoGapToBehind")
+			speaker.speakPhrase("NoGapToBehind")
 		else {
-			speaker := this.getSpeaker()
-
 			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
 				car := knowledgeBase.getValue("Position.Standings.Behind.Car")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
+				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 				lapped := false
 
-				if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
+				if (delta = 0)
+					speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
+				else if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
 					speaker.speakPhrase("StandingsBehindLapped")
 
@@ -835,7 +843,7 @@ class RaceStrategist extends RaceAssistant {
 				else
 					speaker.speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
 
-				if (!lapped && knowledgeBase.getValue("Car." . car . ".InPitLane"))
+				if (!lapped && inPit)
 					speaker.speakPhrase("GapCarInPit")
 			}
 			finally {

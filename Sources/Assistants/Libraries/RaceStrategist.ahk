@@ -756,8 +756,11 @@ class RaceStrategist extends RaceAssistant {
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
 				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 
-				if (delta = 0)
+				if (delta = 0) {
 					speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
+
+					return
+				}
 				else if ((knowledgeBase.getValue("Car." . car . ".Lap") > lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
 					speaker.speakPhrase("StandingsAheadLapped")
@@ -832,8 +835,11 @@ class RaceStrategist extends RaceAssistant {
 				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 				lapped := false
 
-				if (delta = 0)
+				if (delta = 0) {
 					speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
+
+					return
+				}
 				else if ((knowledgeBase.getValue("Car." . car . ".Lap") < lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
 					speaker.speakPhrase("StandingsBehindLapped")
@@ -1475,20 +1481,20 @@ class RaceStrategist extends RaceAssistant {
 
 		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
-		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+		if ((gapAhead != kUndefined) && (gapAhead != 0)) {
+			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
 		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
-		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+		if ((gapBehind != kUndefined) && (gapBehind != 0)) {
+			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 		}
 
 		loop % knowledgeBase.getValue("Car.Count")
@@ -1583,19 +1589,19 @@ class RaceStrategist extends RaceAssistant {
 		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
 		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
 		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
 		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 		}
 
 		return result

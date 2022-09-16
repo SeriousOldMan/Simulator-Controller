@@ -464,6 +464,18 @@ class PositionInfo {
 		return (Abs(this.Delta[false, true, 1]) <= threshold)
 	}
 
+	inRange(sector, track := false, threshold := 2.0) {
+		local delta := Abs(this.Delta[false, true, 1])
+
+		if track
+			if InStr(this.Observed, "TA")
+				delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
+			else if InStr(this.Observed, "TB")
+				delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
+
+		return (delta <= threshold)
+	}
+
 	isFaster(sector) {
 		return (this.LapTimeDifference[true] > 0)
 	}
@@ -918,8 +930,11 @@ class RaceSpotter extends RaceAssistant {
 				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 
 				if (delta = 0) {
-					if standard
+					if standard {
 						speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
+
+						return true
+					}
 					else
 						return false
 				}
@@ -1013,8 +1028,11 @@ class RaceSpotter extends RaceAssistant {
 				lapped := false
 
 				if (delta = 0) {
-					if standard
+					if standard {
 						speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
+
+						return true
+					}
 					else
 						return false
 				}
@@ -1624,7 +1642,7 @@ class RaceSpotter extends RaceAssistant {
 			}
 		}
 
-		if (regular && trackAhead && trackAhead.inDelta(sector) && !trackAhead.isFaster(sector)
+		if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
 		 && trackBehind.hasGap(sector) && trackAhead.hasGap(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
@@ -1642,7 +1660,7 @@ class RaceSpotter extends RaceAssistant {
 		if (sector > 1) {
 			if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
 			 && trackBehind.hasGap(sector) && standingsBehind.hasGap(sector)
-			 && trackBehind.inDelta(sector) && trackBehind.isFaster(sector)
+			 && trackBehind.inRange(sector, true) && trackBehind.isFaster(sector)
 			 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
 			 && (opponentType = "LapDown")) {
 				situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
@@ -1745,7 +1763,7 @@ class RaceSpotter extends RaceAssistant {
 
 			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
 			 && (opponentType != "Position")
-			 && trackAhead.inDelta((opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
 			 && !trackAhead.Reported) {
 				if (opponentType = "LapDown") {
@@ -2520,18 +2538,18 @@ class RaceSpotter extends RaceAssistant {
 		local gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 		local validLaps, lap, lastPitstop
 
-		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+		if ((gapAhead != kUndefined) && (gapAhead != 0)) {
+			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
-		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+		if ((gapBehind != kUndefined) && (gapBehind != 0)) {
+			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 		}
 
 		loop % knowledgeBase.getValue("Car.Count")
@@ -2596,17 +2614,17 @@ class RaceSpotter extends RaceAssistant {
 		result := base.updateLap(lapNumber, data)
 
 		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
 
 			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
 		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
 
 			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 		}
 
 		return result
@@ -2697,18 +2715,18 @@ class RaceSpotter extends RaceAssistant {
 			trackAhead := carPositions[trackAhead][1]
 			trackBehind := carPositions[trackBehind][1]
 
-			if (gapAhead && trackAhead) {
-				positions[trackAhead][8] := gapAhead
+			if (gapAhead && standingsAhead) {
+				positions[standingsAhead][8] := gapAhead
 
 				if (standingsAhead = trackAhead)
-					positions[standingsAhead][8] := gapAhead
+					positions[trackAhead][8] := gapAhead
 			}
 
-			if (gapBehind && trackBehind) {
-				positions[trackBehind][8] := gapBehind
+			if (gapBehind && standingsBehind) {
+				positions[standingsBehind][8] := gapBehind
 
 				if (standingsBehind = trackBehind)
-					positions[standingsBehind][8] := gapBehind
+					positions[trackBehind][8] := gapBehind
 			}
 
 			positions["Position"] := position

@@ -2625,18 +2625,18 @@ class RaceSpotter extends RaceAssistant {
 		local standingsAhead := false
 		local standingsBehind := false
 		local leader := false
-		local index, car, prefix, position, lapTime, running, carRunning, carIndex, carLaps, carPosition, carDelta
+		local index, car, prefix, position, lapTime, running, carIndex, carLaps, carRunning, carPosition, carDelta
 
 		if (driver && count) {
 			loop %count%
 			{
-				carRunning := (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
-							 + getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running"))
+				carLaps := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
+				carRunning := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver)
-					running := carRunning
+					running := (carLaps + carRunning)
 
-				carPositions.Push(Array(A_Index, carRunning))
+				carPositions.Push(Array(A_Index, carLaps, carRunning))
 			}
 
 			bubbleSort(carPositions, "trackOrder")
@@ -2649,20 +2649,20 @@ class RaceSpotter extends RaceAssistant {
 
 			for index, car in carPositions {
 				carIndex := car[1]
-				carLaps := Floor(car[2])
+				carLaps := car[2]
+				carRunning := car[3]
 
 				prefix := ("Car." . carIndex)
 
 				carPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
-				carDelta := ((car[2] - running) * lapTime)
+				carDelta := (((carLaps + carRunning) - running) * lapTime)
 
 				positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
 										   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
 										   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
 															 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
 															 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
-										   , carPosition
-										   , carLaps, car[2] - carLaps
+										   , carPosition, carLaps, carRunning
 										   , getConfigurationValue(data, "Position Data", prefix . ".Time")
 										   , carDelta
 										   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid", true)
@@ -2801,5 +2801,5 @@ getTime() {
 }
 
 trackOrder(a, b) {
-	return (a[2] < b[2])
+	return (a[3] < b[3])
 }

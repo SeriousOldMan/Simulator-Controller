@@ -145,6 +145,8 @@ class SetupWizard extends ConfigurationItem {
 	iPresets := false
 	iInitialize := false
 
+	iCachedActions := {}
+
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
@@ -1167,6 +1169,8 @@ class SetupWizard extends ConfigurationItem {
 
 	selectModule(module, selected, update := true) {
 		if (this.isModuleSelected(module) != (selected != false)) {
+			this.iCachedActions := {}
+
 			this.KnowledgeBase.setFact("Module." . module . ".Selected", selected != false)
 
 			if update
@@ -1499,10 +1503,19 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	simulatorActionAvailable(simulator, mode, action) {
-		local knowledgeBase := this.KnowledgeBase
-		local goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+		local goal, result
 
-		return (knowledgeBase.prove(goal) != false)
+		if this.iCachedActions.HasKey(simulator . mode . action)
+			return this.iCachedActions[simulator . mode . action]
+		else {
+			goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[simulator . mode . action] := result
+
+			return result
+		}
 	}
 
 	setSimulatorValue(simulator, key, value, update := true) {
@@ -1577,10 +1590,19 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	assistantActionAvailable(assistant, action) {
-		local knowledgeBase := this.KnowledgeBase
-		local goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+		local goal, result
 
-		return (knowledgeBase.prove(goal) != false)
+		if this.iCachedActions.HasKey(assistant . action)
+			return this.iCachedActions[assistant . action]
+		else {
+			goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[assistant . action] := result
+
+			return result
+		}
 	}
 
 	assistantSimulators(assistant) {
@@ -1713,42 +1735,54 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	moduleActionAvailable(module, mode, action) {
-		local knowledgeBase := this.KnowledgeBase
-		local goal
+		local goal, result
 
-		if mode
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
-		else
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+		if this.iCachedActions.HasKey(module . mode . action)
+			return this.iCachedActions[module . mode . action]
+		else {
+			if mode
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+			else
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
 
-		goal := new RuleCompiler().compileGoal(goal)
+			goal := new RuleCompiler().compileGoal(goal)
 
-		return knowledgeBase.prove(goal)
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[module . mode . action] := result
+
+			return result
+		}
 	}
 
 	moduleAvailableActions(module, mode) {
-		local knowledgeBase := this.KnowledgeBase
 		local resultSet, variable, goal, actions
 
-		if mode
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"
-		else
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", ?action)"
+		if this.iCachedActions.HasKey(module . mode)
+			return this.iCachedActions[module . mode]
+		else {
+			if mode
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"
+			else
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", ?action)"
 
-		goal := new RuleCompiler().compileGoal(goal)
-		variable := goal.Arguments[mode ? 3 : 2]
+			goal := new RuleCompiler().compileGoal(goal)
+			variable := goal.Arguments[mode ? 3 : 2]
 
-		resultSet := knowledgeBase.prove(goal)
-		actions := []
+			resultSet := this.KnowledgeBase.prove(goal)
+			actions := []
 
-		while resultSet {
-			actions.Push(resultSet.getValue(variable).toString())
+			while resultSet {
+				actions.Push(resultSet.getValue(variable).toString())
 
-			if !resultSet.nextResult()
-				resultSet := false
+				if !resultSet.nextResult()
+					resultSet := false
+			}
+
+			this.iCachedActions[module . mode] := actions
+
+			return actions
 		}
-
-		return actions
 	}
 
 	setTitle(title) {

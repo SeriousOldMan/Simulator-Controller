@@ -1,0 +1,19 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Pagani Zonda R                  ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Pagani Zonda R",
+										[Aero.Height.Front, Aero.Height.Rear,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right]))

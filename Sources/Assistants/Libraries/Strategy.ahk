@@ -776,7 +776,7 @@ class VariationSimulation extends StrategySimulation {
 					loop { ; tyreCompoundVariation
 						if useInitialConditions {
 							if verbose {
-								message := (translate("Creating Initial Scenario with Map ") . simMapEdit . translate(":") . variation++ . translate("..."))
+								message := (translate("Creating Initial Scenario with Map ") . map . translate(":") . variation++ . translate("..."))
 
 								showProgress({progress: progress, message: message})
 							}
@@ -1144,7 +1144,7 @@ class TrafficSimulation extends StrategySimulation {
 						loop { ; tyreCompoundVariation
 							if useInitialConditions {
 								if verbose {
-									message := (translate("Creating Initial Scenario with Map ") . simMapEdit  . translate(":") . variation++ . translate("..."))
+									message := (translate("Creating Initial Scenario with Map ") . map  . translate(":") . variation++ . translate("..."))
 
 									showProgress({progress: progress, message: message})
 								}

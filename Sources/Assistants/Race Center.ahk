@@ -293,6 +293,8 @@ class RaceCenter extends ConfigurationItem {
 	iCar := false
 	iTrack := false
 	iWeather := false
+	iWeather10Min := false
+	iWeather30Min := false
 	iAirTemperature := false
 	iTrackTemperature := false
 
@@ -530,7 +532,7 @@ class RaceCenter extends ConfigurationItem {
 			local newEntries, ignore, entry, found, candidate
 
 			if this.RaceCenter.UseSessionData
-				for ingore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
+				for ignore, entry in base.getTyreLapTimes(weather, compound, compoundColor)
 					if (entry["Lap.Time"] > 0)
 						entries.Push(entry)
 
@@ -6273,6 +6275,12 @@ class RaceCenter extends ConfigurationItem {
 			setConfigurationValue(info, "Session", "Car", this.Car)
 			setConfigurationValue(info, "Session", "Track", this.Track)
 
+			setConfigurationValue(info, "Weather", "Weather", this.Weather)
+			setConfigurationValue(info, "Weather", "Weather10Min", this.Weather10Min)
+			setConfigurationValue(info, "Weather", "Weather30Min", this.Weather30Min)
+			setConfigurationValue(info, "Weather", "AirTemperature", this.AirTemperature)
+			setConfigurationValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
+
 			writeConfiguration(this.SessionDirectory . "Session.info", info)
 		}
 		else {
@@ -6712,6 +6720,12 @@ class RaceCenter extends ConfigurationItem {
 				this.iDate := getConfigurationValue(info, "Session", "Date", A_Now)
 				this.iTime := getConfigurationValue(info, "Session", "Time", A_Now)
 
+				this.iWeather := getConfigurationValue(info, "Weather", "Weather", false)
+				this.iWeather10Min := getConfigurationValue(info, "Weather", "Weather10Min", false)
+				this.iWeather30Min := getConfigurationValue(info, "Weather", "Weather30Min", false)
+				this.iAirTemperature := getConfigurationValue(info, "Weather", "AirTemperature", false)
+				this.iTrackTemperature := getConfigurationValue(info, "Weather", "TrackTemperature", false)
+
 				window := this.Window
 
 				Gui %window%:Default
@@ -6740,20 +6754,22 @@ class RaceCenter extends ConfigurationItem {
 
 				this.initializeReports()
 
-				lastLap := this.LastLap
+				if !this.Weather {
+					lastLap := this.LastLap
 
-				if lastLap {
-					this.iWeather := lastLap.Weather
-					this.iAirTemperature := lastLap.AirTemperature
-					this.iTrackTemperature := lastLap.TrackTemperature
+					if lastLap {
+						this.iWeather := lastLap.Weather
+						this.iAirTemperature := lastLap.AirTemperature
+						this.iTrackTemperature := lastLap.TrackTemperature
 
-					if lastLap.HasKey("Weather10Min") {
-						this.iWeather10Min := lastLap.Weather10Min
-						this.iWeather30Min := lastLap.Weather30Min
-					}
-					else {
-						this.iWeather10Min := lastLap.Weather
-						this.iWeather30Min := lastLap.Weather
+						if lastLap.HasKey("Weather10Min") {
+							this.iWeather10Min := lastLap.Weather10Min
+							this.iWeather30Min := lastLap.Weather30Min
+						}
+						else {
+							this.iWeather10Min := lastLap.Weather
+							this.iWeather30Min := lastLap.Weather
+						}
 					}
 				}
 

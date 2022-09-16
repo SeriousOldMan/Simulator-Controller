@@ -88,6 +88,14 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 Important: In order to reduce confusion of an activation command with a normal command given to the currently active *dialog partner*, the [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control has two different behaviours. If you simply press the configured control, for example a button on your steering wheel, you will talk to the currently active *dialog partner*. Whenever you press the control twice like double clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the *double press* must be held down as long as you speak.
 
+#### Push-To-Talk behaviour
+
+Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be activated either by chossing the corresponding preset in "Simulator Setup" or by copying the file "P2T Configuration.ini" from the *Resources\Templates* directory from the program folder to the *Simulator Controller\Config* directory which resides in your user *Documents* folder.
+
+Please don't forget to press the Push-To-Talk button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up beeing very confused.
+
+#### Testing voice configuration and voice commands
+
 *After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the Assistants), you can test the dialog with two different Assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
 
 	D:\Controller\Binaries>"Voice Server.exe" -Debug true
@@ -116,7 +124,7 @@ The third Assistant, Elisa, is not so much of a dialog partner, but gives you cr
 
 ### Controller Commands
 
-If you have configured one or more hardware controllers (Button Boxes and/or Stream Decks), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
+If you have configured one or more hardware controllers (Button Boxes, Stream Decks or even your steering wheel), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
 
 Please note, that you can mix voice commands and commands triggered by the controller hardware freely, so choose your weapon depending on the current situation on the track.
 
@@ -126,7 +134,7 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 1. Keyboard commands
 
-   As you have seen in the chapter about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), every action or command in Simulator Controller can be activated and controller from hardware controller like Button Boxes or Stream Decks, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
+   As you have seen in the chapter about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), every action or command in Simulator Controller can be activated from any hardware controller like Button Boxes, Stream Decks or your steering wheel, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
 
 2. Command scripts
 

@@ -670,6 +670,12 @@ checkInstallation() {
 					writeUninstallerInfo(installLocation)
 				}
 
+				fixIE(11, "Setup Advisor.exe")
+				fixIE(11, "Race Reports.exe")
+				fixIE(11, "Strategy Workbench.exe")
+				fixIE(11, "Race Center.exe")
+				fixIE(10, "Simulator Setup.exe")
+
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 
 				hideSplashTheme()

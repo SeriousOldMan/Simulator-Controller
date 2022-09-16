@@ -483,14 +483,16 @@ class StreamDeck extends FunctionController {
 
 						function := controller.findFunction(theFunction)
 
-						for ignore, theAction in this.Actions[function]
-							if function.Enabled[theAction] {
-								enabled := true
+						if function {
+							for ignore, theAction in this.Actions[function]
+								if function.Enabled[theAction] {
+									enabled := true
 
-								break
+									break
+							}
+
+							this.setFunctionImage(theFunction, image, enabled, true)
 						}
-
-						this.setFunctionImage(theFunction, image, enabled, true)
 					}
 
 				this.iChangedFunctionTitles := {}

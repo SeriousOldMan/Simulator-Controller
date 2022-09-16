@@ -263,7 +263,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
 			setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"
-								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
+								, StrReplace(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
 	}
 }
 

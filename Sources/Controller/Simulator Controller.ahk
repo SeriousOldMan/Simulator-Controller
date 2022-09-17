@@ -2011,7 +2011,7 @@ initializeSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Controller
 
-	SetKeyDelay 5, 25
+	SetKeyDelay 10, 30
 
 	settings := readConfiguration(kSimulatorSettingsFile)
 

@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
 		printNAData("ABS", gf->ABS);
 
 		printData("Ignition", pf->ignitionOn ? "true" : "false");
-		printData("HeadLights", (gf->lightsStage = 0) ? "Off" : (gf->lightsStage = 1) ? "Low" : "High");
+		printData("HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");
 		printData("RainLights", gf->rainLights ? "true" : "false");
 
 		printData("BodyworkDamage", pf->carDamage);

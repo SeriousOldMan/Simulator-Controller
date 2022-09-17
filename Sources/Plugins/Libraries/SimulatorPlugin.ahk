@@ -250,7 +250,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 				settings := new SettingsDatabase().loadSettings(simulator, car, track, "*")
 
-				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 20)
+				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 30)
 
 				this.iCommandDelay := getConfigurationValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
 			}

@@ -1304,11 +1304,11 @@ class RaceSpotter extends RaceAssistant {
 	reviewRaceStart(lastLap, sector, positions) {
 		local speaker, driver, currentPosition
 
-		if (this.Session == kSessionRace) {
+		if ((this.Session == kSessionRace) && this.GridPosition) {
 			speaker := this.getSpeaker(true)
 			driver := positions["Driver"]
 
-			if (driver && this.GridPosition) {
+			if driver {
 				currentPosition := positions["Position"]
 
 				speaker.beginTalk()
@@ -2340,7 +2340,7 @@ class RaceSpotter extends RaceAssistant {
 	initializeGridPosition(data) {
 		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if driver
+		if (driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) = 1))
 			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 	}
 

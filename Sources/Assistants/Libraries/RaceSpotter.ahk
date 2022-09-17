@@ -589,8 +589,8 @@ class PositionInfo {
 
 				this.iObserved := ""
 			}
-			else if ((standingsBehind && InStr(oldObserved, "SF")) || (standingsAhead && InStr(oldObserved, "SB"))
-				  || (trackBehind && InStr(oldObserved, "TF")) || (trackAhead && InStr(oldObserved, "TB"))) {
+			else if ((standingsBehind && InStr(oldObserved, "SA")) || (standingsAhead && InStr(oldObserved, "SB"))
+				  || (trackBehind && InStr(oldObserved, "TA")) || (trackAhead && InStr(oldObserved, "TB"))) {
 				; Drivers car has been overtaken
 
 				this.reset(sector, true, true)
@@ -598,7 +598,7 @@ class PositionInfo {
 				this.iObserved := ""
 			}
 			else {
-				if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TF"))) {
+				if ((trackBehind || trackAhead) && (!InStr(oldObserved, "TB") && !InStr(oldObserved, "TA"))) {
 					; Change in car ahead or behind due to an overtake
 
 					this.reset(sector, true, true)

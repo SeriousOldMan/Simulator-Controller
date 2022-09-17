@@ -2699,11 +2699,11 @@ class RaceSpotter extends RaceAssistant {
 
 				if (driverRunning < carRunning) {
 					carAheadDelta := ((carRunning - driverRunning) * lapTime)
-					carBehindDelta := ((1 - carRunning + driverRunning) * lapTime)
+					carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
 				}
 				else {
 					carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
-					carBehindDelta := ((driverRunning - carRunning) * lapTime)
+					carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
 				}
 
 				positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")

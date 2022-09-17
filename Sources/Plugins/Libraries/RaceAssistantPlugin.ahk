@@ -51,6 +51,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistant := false
 	iRaceAssistantZombie := false
 
+	iRaceAssistantActive := false
+
 	class RemoteRaceAssistant {
 		iPlugin := false
 		iRemoteEvent := false
@@ -378,6 +380,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.iRaceAssistantZombie := value
 
 			return (this.iRaceAssistant := value)
+		}
+	}
+
+	RaceAssistantActive[] {
+		Get {
+			return this.iRaceAssistantActive
+		}
+
+		Set {
+			return (this.iRaceAssistantActive := value)
 		}
 	}
 
@@ -720,6 +732,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	startAssistantsSession(data) {
+		local lap := getConfigurationValue(data, "Stint Data", "Laps", false)
+		local start := ((lap = 1) || RaceAssistantPlugin.TeamSessionActive)
 		local first := true
 		local ignore, assistant, settings
 
@@ -737,7 +751,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						RaceAssistantPlugin.Simulator.startSession(settings, data)
 					}
 
-					assistant.startSession(settings, data)
+
+					if start
+						assistant.startSession(settings, data)
+					else
+						assistant.joinSession(settings, data)
 				}
 		}
 	}
@@ -775,7 +793,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
+			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
@@ -786,7 +804,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
+			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 	}
 
@@ -794,7 +812,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
+			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.performPitstop(lapNumber)
 	}
 
@@ -802,7 +820,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.requireRaceAssistant()
+			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.restoreSessionState()
 	}
 
@@ -1169,13 +1187,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				writeConfiguration(dataFile, data)
 
 				this.RaceAssistant.startSession(settingsFile, dataFile)
+
+				this.RaceAssistantActive := true
 			}
 		}
+	}
+
+	joinSession(settings, data) {
 	}
 
 	finishSession(shutdownAssistant := true) {
 		if this.RaceAssistant {
 			this.RaceAssistant.finishSession(shutdownAssistant)
+
+			 this.RaceAssistantActive := false
 
 			if shutdownAssistant
 				this.shutdownRaceAssistant()
@@ -1398,6 +1423,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	collectSessionData() {
 		local finished := false
+		local lateJoin := false
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
 		local newLap, firstLap, ignore, assistant, hasAssistant
@@ -1520,13 +1546,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								teamSessionActive := RaceAssistantPlugin.connectTeamSession()
 
-								if (!teamSessionActive || !RaceAssistantPlugin.TeamServer.Connected)
-									return ; No Team Server, no late join
+								if (teamSessionActive && RaceAssistantPlugin.TeamServer.Connected) {
+									if !RaceAssistantPlugin.driverActive(data) {
+										logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
 
-								if !RaceAssistantPlugin.driverActive(data) {
-									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
-
-									return ; Still a different driver, might happen in some simulations
+										return ; Still a different driver, might happen in some simulations
+									}
 								}
 
 								RaceAssistantPlugin.sInPit := false
@@ -1612,14 +1637,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.startAssistantsSession(data)
 						}
 						else if joinedSession {
-							RaceAssistantPlugin.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
-																     , getConfigurationValue(data, "Session Data", "Car")
-																     , getConfigurationValue(data, "Session Data", "Track")
-																     , dataLastLap)
+							if RaceAssistantPlugin.TeamSessionActive {
+								RaceAssistantPlugin.TeamServer.joinSession(getConfigurationValue(data, "Session Data", "Simulator")
+																		 , getConfigurationValue(data, "Session Data", "Car")
+																		 , getConfigurationValue(data, "Session Data", "Track")
+																		 , dataLastLap)
 
-							RaceAssistantPlugin.startAssistantsSession(data)
+								RaceAssistantPlugin.startAssistantsSession(data)
 
-							RaceAssistantPlugin.restoreAssistantsSessionState()
+								RaceAssistantPlugin.restoreAssistantsSessionState()
+							}
+							else
+								RaceAssistantPlugin.startAssistantsSession(data)
 						}
 
 						RaceAssistantPlugin.sLapRunning := RaceAssistantPlugin.sLapRunning + 1

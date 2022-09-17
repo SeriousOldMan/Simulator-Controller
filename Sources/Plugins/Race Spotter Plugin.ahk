@@ -328,6 +328,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return false
 	}
 
+	joinSession(settings, data) {
+		this.startSession(settings, data)
+	}
+
 	finishSession(arguments*) {
 		this.iHasTrackMap := false
 

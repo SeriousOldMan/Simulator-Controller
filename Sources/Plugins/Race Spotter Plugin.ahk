@@ -410,7 +410,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		base.updateLap(lap, running, data)
 
 		if this.TeamSessionActive
-			this.TeamServer.setLapValue(lap, "Track Data", printConfiguration(data))
+			this.TeamServer.setLapValue(lap, "Telemetry Update", printConfiguration(data))
 	}
 
 	createTrackMap(simulator, track, dataFile) {

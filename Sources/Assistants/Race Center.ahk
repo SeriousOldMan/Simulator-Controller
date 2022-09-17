@@ -4524,7 +4524,6 @@ class RaceCenter extends ConfigurationItem {
 			data := parseConfiguration(rawData)
 
 			lap.Telemetry := rawData
-			lap.Track := false
 
 			damage := 0
 
@@ -4999,10 +4998,10 @@ class RaceCenter extends ConfigurationItem {
 		local rawData
 
 		if this.LastLap {
-			rawData := this.Connector.GetLapValue(this.LastLap.Identifier, "Track Data")
+			rawData := this.Connector.GetLapValue(this.LastLap.Identifier, "Telemetry Update")
 
 			if (rawData && (rawData != "")) {
-				this.LastLap.Track := rawData
+				this.LastLap.Telemetry := rawData
 
 				return true
 			}
@@ -7168,7 +7167,7 @@ class RaceCenter extends ConfigurationItem {
 				imgScale := Min(width / imgWidth, height / imgHeight)
 
 				if (this.SessionActive && lastLap) {
-					telemetry := (lastLap.Track ? lastLap.Track : lastLap.Telemetry)
+					telemetry := lastLap.Telemetry
 					positions := lastLap.Positions
 
 					if telemetry {

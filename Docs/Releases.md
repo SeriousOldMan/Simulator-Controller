@@ -1,3 +1,9 @@
+## 4.3.3.0-release 09/23/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Fixed a regression in "Race Center", where the track map update creates an infinite loop.
+
 ## 4.3.2.0-release 09/16/22
 
   1. Minor bugfixes, as always

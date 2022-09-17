@@ -4,6 +4,7 @@
   2. Documentation updates, as always
   3. Fixed a regression in "Race Center", where the track map update creates an infinite loop.
   4. The Spotter no longer warns for cars attacking you when they are just beeing passed by you.
+  5. Fixed a lapped car being reported for overtaking far too early.
 
 ## 4.3.2.0-release 09/16/22
 

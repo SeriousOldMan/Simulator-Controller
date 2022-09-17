@@ -53,6 +53,9 @@ class CarInfo {
 	iDeltas := {}
 	iLastDeltas := {}
 
+	iTrackAheadDelta := false
+	iTrackBehindDelta := false
+
 	iInvalidLaps := 0
 	iIncidents := 0
 
@@ -170,6 +173,18 @@ class CarInfo {
 		}
 	}
 
+	TrackAheadDelta[] {
+		Get {
+			return this.iTrackAheadDelta
+		}
+	}
+
+	TrackBehindDelta[] {
+		Get {
+			return this.iTrackBehindDelta
+		}
+	}
+
 	AverageDelta[sector, count := 3] {
 		Get {
 			local deltas := []
@@ -230,7 +245,8 @@ class CarInfo {
 		this.iLastDeltas := {}
 	}
 
-	update(driver, position, lastLap, sector, lapTime, delta, validLap, invalidLaps, incidents, inPit) {
+	update(driver, position, lastLap, sector, lapTime, delta, trackAheadDelta, trackBehindDelta
+		 , validLap, invalidLaps, incidents, inPit) {
 		local avgLapTime := this.AverageLapTime
 		local pitstops := this.Pitstops
 		local pitted := (inPit || inList(pitstops, lastLap) || inList(pitstops, lastLap - 1) || inList(pitstops, lastLap - 2))
@@ -281,6 +297,9 @@ class CarInfo {
 				deltas.RemoveAt(1)
 
 			this.iLastDeltas[sector] := delta
+
+			this.iTrackAheadDelta := trackAheadDelta
+			this.iTrackBehindDelta := trackBehindDelta
 		}
 
 		if inPit {
@@ -465,15 +484,15 @@ class PositionInfo {
 	}
 
 	inRange(sector, track := false, threshold := 2.0) {
-		local delta := Abs(this.Delta[false, true, 1])
+		local delta := this.Delta[false, true, 1]
 
 		if track
 			if InStr(this.Observed, "TA")
-				delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
+				delta := this.Car.TrackAheadDelta
 			else if InStr(this.Observed, "TB")
-				delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
+				delta := this.Car.TrackBehindDelta
 
-		return (delta <= threshold)
+		return (Abs(delta) <= threshold)
 	}
 
 	isFaster(sector) {
@@ -1201,8 +1220,8 @@ class RaceSpotter extends RaceAssistant {
 				carLaps := car[5]
 
 				if !cInfo.update(car[3], car[4], carLaps, sector
-							   , Round(car[7] / 1000, 1), Round(car[8] / 1000, 1)
-							   , car[9], (carLaps - car[10]), car[11], car[12])
+							   , Round(car[7] / 1000, 1), Round(car[8] / 1000, 1), Round(car[9] / 1000, 1), Round(car[10] / 1000, 1)
+							   , car[11], (carLaps - car[12]), car[13], car[14])
 					if (A_Index != driver)
 						if this.PositionInfos.HasKey(cInfo.Nr)
 							this.PositionInfos[cInfo.Nr].reset(sector, true)
@@ -1587,8 +1606,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
-		local opponentType := this.OpponentType[sector]
-		local situation
+		local situation, opponentType
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader, true)
 
@@ -1662,7 +1680,7 @@ class RaceSpotter extends RaceAssistant {
 			 && trackBehind.hasGap(sector) && standingsBehind.hasGap(sector)
 			 && trackBehind.inRange(sector, true) && trackBehind.isFaster(sector)
 			 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-			 && (opponentType = "LapDown")) {
+			 && (trackAhead.OpponentType[sector] = "LapDown")) {
 				situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
 
 				if !this.TacticalAdvices.HasKey(situation) {
@@ -1675,7 +1693,8 @@ class RaceSpotter extends RaceAssistant {
 			}
 
 			if (regular && trackBehind && trackBehind.hasGap(sector)
-			 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
+			 && trackBehind.isFaster(sector)
+			 && (((opponentType := trackBehind.OpponentType[sector]) = "LapDown") || (opponentType = "LapUp"))) {
 				situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
 				if !this.TacticalAdvices.HasKey(situation) {
@@ -2643,7 +2662,8 @@ class RaceSpotter extends RaceAssistant {
 		local standingsAhead := false
 		local standingsBehind := false
 		local leader := false
-		local index, car, prefix, position, lapTime, running, carIndex, carLaps, carRunning, carPosition, carDelta
+		local index, car, prefix, position, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
+		local carPosition, carDelta, carAheadDelta, carBehindDelta
 
 		if (driver && count) {
 			loop %count%
@@ -2651,8 +2671,10 @@ class RaceSpotter extends RaceAssistant {
 				carLaps := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
 				carRunning := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
-				if (A_Index = driver)
-					running := (carLaps + carRunning)
+				if (A_Index = driver) {
+					driverLaps := carLaps
+					driverRunning := carRunning
+				}
 
 				carPositions.Push(Array(A_Index, carLaps, carRunning))
 			}
@@ -2673,7 +2695,16 @@ class RaceSpotter extends RaceAssistant {
 				prefix := ("Car." . carIndex)
 
 				carPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
-				carDelta := (((carLaps + carRunning) - running) * lapTime)
+				carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
+
+				if (driverRunning < carRunning) {
+					carAheadDelta := ((carRunning - driverRunning) * lapTime)
+					carBehindDelta := ((1 - carRunning + driverRunning) * lapTime)
+				}
+				else {
+					carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
+					carBehindDelta := ((driverRunning - carRunning) * lapTime)
+				}
 
 				positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
 										   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
@@ -2682,7 +2713,7 @@ class RaceSpotter extends RaceAssistant {
 															 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
 										   , carPosition, carLaps, carRunning
 										   , getConfigurationValue(data, "Position Data", prefix . ".Time")
-										   , carDelta
+										   , carDelta, carAheadDelta, carBehindDelta
 										   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid", true)
 										   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 										   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)

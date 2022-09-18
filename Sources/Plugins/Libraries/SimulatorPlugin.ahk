@@ -835,6 +835,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.updateTyreCompound(data)
 	}
 
+	finishSession() {
+		this.updateSession(kSessionFinished)
+	}
+
 	recommendPitstop() {
 		if this.RaceStrategist
 			this.RaceStrategist.recommendPitstop()

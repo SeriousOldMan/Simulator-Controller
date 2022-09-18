@@ -757,6 +757,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else
 						assistant.joinSession(settings, data)
 				}
+
+			if first
+				RaceAssistantPlugin.Simulator.startSession(settings, data)
 		}
 	}
 

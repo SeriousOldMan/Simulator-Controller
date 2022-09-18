@@ -88,7 +88,7 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 Important: In order to reduce confusion of an activation command with a normal command given to the currently active *dialog partner*, the [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control has two different behaviours. If you simply press the configured control, for example a button on your steering wheel, you will talk to the currently active *dialog partner*. Whenever you press the control twice like double clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the *double press* must be held down as long as you speak.
 
-#### Push-To-Talk behaviour
+#### Push-To-Talk Behaviour
 
 Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be activated either by choosing the corresponding preset in "Simulator Setup" or by copying the file "P2T Configuration.ini" from the *Resources\Templates* directory from the program folder to the *Simulator Controller\Config* directory which resides in your user *Documents* folder.
 

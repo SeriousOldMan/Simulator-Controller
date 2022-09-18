@@ -174,6 +174,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(strategy)
 	}
 
+	joinSession(settings, data) {
+		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", true)
+			this.startSession(settings, data)
+	}
+
 	addLap(lap, running, data) {
 		base.addLap(lap, running, data)
 

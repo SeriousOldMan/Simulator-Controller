@@ -157,6 +157,11 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.iLapDatabase := false
 	}
 
+	joinSession(settings, data) {
+		if getConfigurationValue(settings, "Assistant.Engineer", "Join.Late", true)
+			this.startSession(settings, data)
+	}
+
 	checkPitstopPlan() {
 		local pitstopSettings, requestDriver
 

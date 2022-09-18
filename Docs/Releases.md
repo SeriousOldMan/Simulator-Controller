@@ -5,6 +5,7 @@
   3. Fixed a regression in "Race Center", where the track map update creates an infinite loop.
   4. The Spotter no longer warns for cars attacking you when they are just beeing passed by you.
   5. Fixed a lapped car being reported for overtaking far too early.
+  6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
 
 ## 4.3.2.0-release 09/16/22
 

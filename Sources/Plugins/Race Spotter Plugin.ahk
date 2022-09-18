@@ -329,7 +329,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	joinSession(settings, data) {
-		this.startSession(settings, data)
+		if getConfigurationValue(settings, "Assistant.Spotter", "Join.Late", true)
+			this.startSession(settings, data)
 	}
 
 	finishSession(arguments*) {

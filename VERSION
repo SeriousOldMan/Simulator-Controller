@@ -3,7 +3,7 @@ Version=4.3.3.0-dev
 Target=4.3.2.1-release
 Date=09/17/2022
 Download=
-Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta
+Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining
 [Release]
 Version=4.3.2.1-release
 Date=09/16/2022

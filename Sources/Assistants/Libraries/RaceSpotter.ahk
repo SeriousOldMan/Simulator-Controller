@@ -1270,7 +1270,7 @@ class RaceSpotter extends RaceAssistant {
 
 	getPositionInfos(ByRef standingsAhead, ByRef standingsBehind
 				   , ByRef trackAhead, ByRef trackBehind, ByRef leader, inpit := false) {
-		local nr, observed, candidate, cInpit
+		local ignore, observed, candidate, cInpit
 
 		standingsAhead := false
 		standingsBehind := false
@@ -1278,7 +1278,7 @@ class RaceSpotter extends RaceAssistant {
 		trackBehind := false
 		leader := false
 
-		for nr, candidate in this.PositionInfos {
+		for ignore, candidate in this.PositionInfos {
 			observed := candidate.Observed
 			cInPit := InStr(observed, "P")
 
@@ -1662,7 +1662,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
 		 && standingsBehind && (standingsBehind == trackBehind)
-		 && trackBehind.hasGap(sector) && trackAhead.hasGap(sector)
+		 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
 		 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
 			situation := ("ProtectSlower " . trackAhead.Car.Nr . A_Space . trackBehind.Car.Nr)
 
@@ -1676,44 +1676,42 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if (sector > 1) {
-			if (regular && trackBehind && standingsBehind && (trackBehind != standingsBehind)
-			 && trackBehind.hasGap(sector) && standingsBehind.hasGap(sector)
-			 && trackBehind.inRange(sector, true) && trackBehind.isFaster(sector)
-			 && standingsBehind.inDelta(sector, 4.0) && standingsBehind.isFaster(sector)
-			 && (trackAhead.OpponentType[sector] = "LapDown")) {
-				situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
-
-				if !this.TacticalAdvices.HasKey(situation) {
-					this.TacticalAdvices[situation] := true
-
-					speaker.speakPhrase("ProtectFaster")
-
-					return true
-				}
-			}
-
 			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
 			if (regular && trackBehind && trackBehind.hasGap(sector)
-			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)
-			 && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
-				situation := (opponentType . "Faster " . trackBehind.Car.Nr)
+			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
+				if (standingsBehind && (trackBehind != standingsBehind)
+				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
+				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
+					situation := ("ProtectFaster " . trackBehind.Car.Nr . A_Space . standingsBehind.Car.Nr)
 
-				if !this.TacticalAdvices.HasKey(situation) {
-					this.TacticalAdvices[situation] := true
+					if !this.TacticalAdvices.HasKey(situation) {
+						this.TacticalAdvices[situation] := true
 
-					speaker.beginTalk()
+						speaker.speakPhrase("ProtectFaster")
 
-					try {
-						speaker.speakPhrase(opponentType . "Faster")
-
-						speaker.speakPhrase("Slipstream")
+						return true
 					}
-					finally {
-						speaker.endTalk()
-					}
+				}
+				else if ((opponentType = "LapDown") || (opponentType = "LapUp")) {
+					situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
-					return true
+					if !this.TacticalAdvices.HasKey(situation) {
+						this.TacticalAdvices[situation] := true
+
+						speaker.beginTalk()
+
+						try {
+							speaker.speakPhrase(opponentType . "Faster")
+
+							speaker.speakPhrase("Slipstream")
+						}
+						finally {
+							speaker.endTalk()
+						}
+
+						return true
+					}
 				}
 			}
 		}

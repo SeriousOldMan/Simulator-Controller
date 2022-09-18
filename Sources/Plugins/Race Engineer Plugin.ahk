@@ -158,7 +158,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	joinSession(settings, data) {
-		if getConfigurationValue(settings, "Assistant.Engineer", "Join.Late", true)
+		if getConfigurationValue(settings, "Assistant.Engineer", "Join.Late", false)
 			this.startSession(settings, data)
 	}
 

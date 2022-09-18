@@ -175,7 +175,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	joinSession(settings, data) {
-		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", true)
+		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", false)
 			this.startSession(settings, data)
 	}
 

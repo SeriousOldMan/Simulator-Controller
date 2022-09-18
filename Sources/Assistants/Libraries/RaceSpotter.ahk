@@ -1695,7 +1695,8 @@ class RaceSpotter extends RaceAssistant {
 			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
 			if (regular && trackBehind && trackBehind.hasGap(sector)
-			 && trackBehind.isFaster(sector) && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
+			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)
+			 && ((opponentType = "LapDown") || (opponentType = "LapUp"))) {
 				situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
 				if !this.TacticalAdvices.HasKey(situation) {

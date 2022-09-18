@@ -3208,7 +3208,7 @@ class RaceCenter extends ConfigurationItem {
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
 
-				splitCompound(kQualifiedTyreCompoundColors[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
+				splitCompound(this.TyreCompounds[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", compound)
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
@@ -4291,10 +4291,10 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	initializeSimulator(simulator, car, track, force := true) {
+	initializeSimulator(simulator, car, track, force := false) {
 		local window, compounds, currentListView, row, compound
 
-		if (force || !this.Simulator) {
+		if (force || !this.Simulator || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
 			this.iSimulator := simulator
 			this.iCar := car
 			this.iTrack := track
@@ -5776,7 +5776,7 @@ class RaceCenter extends ConfigurationItem {
 
 				if (simulator && (simulator != ""))
 					try {
-						this.initializeSimulator(simulator, car, track, true)
+						this.initializeSimulator(simulator, car, track)
 					}
 					catch exception {
 						logError(exception)

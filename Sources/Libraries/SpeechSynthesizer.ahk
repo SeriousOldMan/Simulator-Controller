@@ -469,7 +469,11 @@ class SpeechSynthesizer {
 				try {
 					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
 					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
-					RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+
+					if (this.iVolume = 100)
+						RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+					else
+						RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%", , Hide
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))

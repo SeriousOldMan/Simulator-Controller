@@ -1553,18 +1553,30 @@ class RaceSpotter extends RaceAssistant {
 
 				if (standingsAhead && standingsAhead.hasBestLapTime()) {
 					lapTime := standingsAhead.BestLapTime[true]
-					phrase := "AheadBestLap"
+
+					if (lapTime = standingsAhead.LastLapTime)
+						phrase := "AheadBestLap"
+					else
+						lapTime := false
 				}
 				else if (standingsBehind && standingsBehind.hasBestLapTime()) {
 					lapTime := standingsBehind.BestLapTime[true]
-					phrase := "BehindBestLap"
+
+					if (lapTime = standingsBehind.LastLapTime)
+						phrase := "BehindBestLap"
+					else
+						lapTime := false
 				}
 				else if (leader && leader.hasBestLapTime()) {
 					lapTime := leader.BestLapTime[true]
-					phrase := "LeaderBestLap"
+
+					if (lapTime = leader.LastLapTime)
+						phrase := "LeaderBestLap"
+					else
+						lapTime := false
 				}
 
-				if (!lapTime && (this.Session == kSessionRace)) {
+				if (!lapTime && regular && (this.Session == kSessionRace)) {
 					Random rnd, 1, 10
 
 					if (rnd > 8) {

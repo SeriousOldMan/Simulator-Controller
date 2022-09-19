@@ -2348,10 +2348,10 @@ class RaceSpotter extends RaceAssistant {
 		this.updateConfigurationValues({Announcements: announcements})
 	}
 
-	initializeGridPosition(data) {
+	initializeGridPosition(data, force := false) {
 		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if (driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) = 1))
+		if ((force || !this.GridPosition) && (driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)))
 			this.iGridPosition := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 	}
 
@@ -2366,7 +2366,7 @@ class RaceSpotter extends RaceAssistant {
 		this.iWasStartDriver := true
 
 		this.initializeAnnouncements(data)
-		this.initializeGridPosition(data)
+		this.initializeGridPosition(data, true)
 
 		facts := this.createSession(settings, data)
 
@@ -2488,8 +2488,7 @@ class RaceSpotter extends RaceAssistant {
 		this.SessionInfos := {}
 		this.iLastDeltaInformationLap := 0
 
-		if !this.GridPosition
-			this.initializeGridPosition(data)
+		this.initializeGridPosition(data)
 
 		if joined
 			Task.startTask(ObjBindMethod(this, "startupSpotter"), 10000)
@@ -2605,8 +2604,7 @@ class RaceSpotter extends RaceAssistant {
 			this.iLastDeltaInformationLap := 0
 		}
 
-		if !this.GridPosition
-			this.initializeGridPosition(data)
+		this.initializeGridPosition(data)
 
 		return result
 	}

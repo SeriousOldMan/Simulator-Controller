@@ -16,15 +16,27 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet]
-        public string Login([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
+        public string Login([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password,
+                            [FromQuery(Name = "type")] string type) {
             if (name == null)
                 name = "";
 
             if (password == null)
                 password = "";
 
+            if (type == null)
+                type = "";
+
+            if (type == "")
+                type = "Session";
+
             try {
-                return Server.TeamServer.TokenIssuer.CreateToken(name, password).Identifier.ToString();
+                if (type == "Session")
+                    return Server.TeamServer.TokenIssuer.CreateSessionToken(name, password).Identifier.ToString();
+                else if (type == "Store")
+                    return Server.TeamServer.TokenIssuer.CreateStoreToken(name, password).Identifier.ToString();
+                else
+                    throw new Exception("Unknown login type...");
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;

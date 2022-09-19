@@ -26,9 +26,18 @@ namespace TeamServer.Model.Access {
         public int ContractMinutes { get; set; } = 0;
 
         [Ignore]
-        public List<Token> Tokens {
+        public List<SessionToken> SessionTokens
+        {
             get {
-                return ObjectManager.GetAccountTokensAsync(this).Result;
+                return ObjectManager.GetAccountSessionTokensAsync(this).Result;
+            }
+        }
+
+        [Ignore]
+        public StoreToken StoreToken
+        {
+            get {
+                return ObjectManager.GetAccountStoreTokenAsync(this).Result;
             }
         }
 
@@ -40,9 +49,18 @@ namespace TeamServer.Model.Access {
         }
 
         [Ignore]
-        public List<Session> Sessions {
+        public List<Session> Sessions
+        {
             get {
                 return ObjectManager.GetAccountSessionsAsync(this).Result;
+            }
+        }
+
+        [Ignore]
+        public List<Store.StoreData> Data
+        {
+            get {
+                return ObjectManager.GetAccountStoreDataAsync(this).Result;
             }
         }
 
@@ -53,20 +71,22 @@ namespace TeamServer.Model.Access {
             foreach (Session session in Sessions)
                 session.Delete();
 
-            foreach (Token token in Tokens)
-                token.Delete();
+            ObjectManager.DoAccountTokensAsync(this, (Token token) => token.Delete());
+
+            ObjectManager.DoAccountStoreDataAsync(this, (Store.StoreData data) => data.Delete());
 
             return base.Delete();
         }
     }
 
-    [Table("Access_Tokens")]
-    public class Token : ModelObject {
+    public abstract class Token : ModelObject
+    {
         [Indexed]
         public int AccountID { get; set; }
 
         [Ignore]
-        public Account Account {
+        public Account Account
+        {
             get {
                 return ObjectManager.GetTokenAccountAsync(this).Result;
             }
@@ -78,17 +98,42 @@ namespace TeamServer.Model.Access {
 
         public DateTime Used { get; set; } = DateTime.MinValue;
 
-        public bool IsValid() {
-            if ((Used != null) && (DateTime.Now < Used + new TimeSpan(0, 5, 0)))
-                return true;
-            else
-                return DateTime.Now < Until;
+        public virtual bool IsValid()
+        {
+            return (Until == null) || (DateTime.Now < Until);
         }
 
-        public int GetRemainingMinutes() {
+        public virtual int GetRemainingMinutes()
+        {
+            return 0;
+        }
+    }
+
+    [Table("Session_Tokens")]
+    public class SessionToken : Token
+    {
+        public virtual bool IsValid() {
+            if (base.IsValid())
+                return true;
+            else {
+                if (Used != null)
+                    return (DateTime.Now < Used + new TimeSpan(0, 5, 0));
+                else
+                    return false;
+            }
+        }
+
+        public virtual int GetRemainingMinutes() {
             int usedMinutes = (int)(DateTime.Now - Created).TotalMinutes;
 
             return (7 * 24 * 60) - usedMinutes;
         }
     }
+
+    [Table("Store_Tokens")]
+    public class StoreToken : Token
+    {
+    }
+
+    public class AdminToken : Token { }
 }

@@ -8,52 +8,56 @@ namespace TeamServer.Model {
             Connection = connection;
         }
 
-        public void CreateTables() {
-            CreateAccountTable();
-            CreateTokenTable();
-            CreateTeamTable();
-            CreateDriverTable();
-            CreateSessionTable();
-            CreateStintTable();
-            CreateLapTable();
+        public void CreateTables()
+        {
             CreateAttributeTable();
             CreateTaskTable();
+
+            CreateAccountTable();
+            CreateTokenTables();
+            CreateTeamTables();
+            CreateSessionTables();
+
+            CreateStoreTables();
+        }
+
+        protected void CreateAttributeTable()
+        {
+            Connection.CreateTableAsync<Attribute>().Wait();
+        }
+
+        protected void CreateTaskTable()
+        {
+            Connection.CreateTableAsync<Model.Task.Task>().Wait();
         }
 
         protected void CreateAccountTable() {
             Connection.CreateTableAsync<Access.Account>().Wait();
         }
 
-        protected void CreateTokenTable() {
-            Connection.CreateTableAsync<Access.Token>().Wait();
+        protected void CreateTokenTables()
+        {
+            Connection.CreateTableAsync<Access.SessionToken>().Wait();
+            Connection.CreateTableAsync<Access.StoreToken>().Wait();
         }
 
-        protected void CreateTeamTable() {
+        protected void CreateTeamTables() {
             Connection.CreateTableAsync<Team>().Wait();
-        }
-
-        protected void CreateDriverTable() {
             Connection.CreateTableAsync<Driver>().Wait();
         }
 
-        protected void CreateSessionTable() {
+        protected void CreateSessionTables() {
             Connection.CreateTableAsync<Session>().Wait();
-        }
-
-        protected void CreateStintTable() {
             Connection.CreateTableAsync<Stint>().Wait();
-        }
-
-        protected void CreateLapTable() {
             Connection.CreateTableAsync<Lap>().Wait();
         }
 
-        protected void CreateAttributeTable() {
-            Connection.CreateTableAsync<Attribute>().Wait();
-        }
-
-        protected void CreateTaskTable() {
-            Connection.CreateTableAsync<Model.Task.Task>().Wait();
+        protected void CreateStoreTables()
+        {
+            Connection.CreateTableAsync<Model.Store.ElectronicsData>().Wait();
+            Connection.CreateTableAsync<Model.Store.TyresData>().Wait();
+            Connection.CreateTableAsync<Model.Store.TyresPressuresData>().Wait();
+            Connection.CreateTableAsync<Model.Store.TyresPressuresDistributionData>().Wait();
         }
     }
 }

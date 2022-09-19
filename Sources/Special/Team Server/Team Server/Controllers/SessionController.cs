@@ -20,7 +20,8 @@ namespace TeamServer.Controllers {
         [HttpGet("allsessions")]
         public string GetSessions([FromQuery(Name = "token")] string token) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.GetAllSessions().Select(a => a.Identifier));
             }
@@ -35,7 +36,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
 
                 return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Name", "Duration", "Started", "Finished", "Car", "Track" }));
@@ -49,7 +51,8 @@ namespace TeamServer.Controllers {
         public string GetSessionValue([FromQuery(Name = "token")] string token, string identifier,
                                       [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetSessionValue(sessionManager.LookupSession(identifier), name);
             }
@@ -62,7 +65,8 @@ namespace TeamServer.Controllers {
         public string GetSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
                                            [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
                     @"
@@ -81,7 +85,8 @@ namespace TeamServer.Controllers {
         public string GetSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
                                          [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
@@ -100,7 +105,8 @@ namespace TeamServer.Controllers {
         public string SetSessionValue([FromQuery(Name = "token")] string token, string identifier,
                                       [FromQuery(Name = "name")] string name, [FromBody] string value) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.SetSessionValue(identifier, name, value);
 
@@ -116,7 +122,8 @@ namespace TeamServer.Controllers {
         public string SetSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
                                            [FromQuery(Name = "name")] string name, [FromBody] string value) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
                     @"
@@ -136,7 +143,8 @@ namespace TeamServer.Controllers {
         public string SetSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
                                          [FromQuery(Name = "name")] string name, [FromBody] string value) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
@@ -156,7 +164,8 @@ namespace TeamServer.Controllers {
         public string DeleteSessionValue([FromQuery(Name = "token")] string token, string identifier,
                                          [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteSessionValue(identifier, name);
 
@@ -171,7 +180,8 @@ namespace TeamServer.Controllers {
         public string DeleteSessionStintValue([FromQuery(Name = "token")] string token, string identifier, int stint,
                                             [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Stint theStint = Server.TeamServer.ObjectManager.Connection.QueryAsync<Stint>(
                     @"
@@ -191,7 +201,8 @@ namespace TeamServer.Controllers {
         public string DeleteSessionLapValue([FromQuery(Name = "token")] string token, string identifier, int lap,
                                             [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Lap theLap = Server.TeamServer.ObjectManager.Connection.QueryAsync<Lap>(
                     @"
@@ -210,7 +221,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/team")]
         public string GetTeam([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 
                 return sessionManager.LookupSession(identifier).Team.Identifier.ToString();
             }
@@ -222,7 +234,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/driver")]
         public string GetDriver([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
                 Stint stint = session.GetCurrentStint();
 
@@ -276,7 +289,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/lap/last")]
         public string GetLastLap([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
                 Stint stint = session.GetCurrentStint();
 
@@ -303,7 +317,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/currentstint")]
         public string GetCurrentStint([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
                 Stint stint = session.GetCurrentStint();
 
@@ -317,7 +332,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/stints")]
         public string GetStints([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupSession(identifier).Stints.OrderBy(s => s.Nr).Select(s => s.Identifier));
             }
@@ -329,7 +345,8 @@ namespace TeamServer.Controllers {
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Session session = sessionManager.LookupSession(identifier);
 
                 ControllerUtils.DeserializeObject(session, keyValues);
@@ -347,7 +364,8 @@ namespace TeamServer.Controllers {
         public string StartSession([FromQuery(Name = "token")] string token, string identifier,
                                    [FromBody] string keyValues) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
@@ -368,7 +386,8 @@ namespace TeamServer.Controllers {
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.FinishSession(identifier);
 
@@ -385,7 +404,8 @@ namespace TeamServer.Controllers {
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.ClearSession(identifier);
 
@@ -400,7 +420,7 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromQuery(Name = "team")] string team, [FromBody] string keyValues) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
                 Team theTeam = new TeamManager(Server.TeamServer.ObjectManager, theToken).LookupTeam(team);
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);
 
@@ -416,7 +436,8 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteSession(identifier);
 
@@ -440,7 +461,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Stint stint = sessionManager.LookupStint(identifier);
 
                 return ControllerUtils.SerializeObject(stint, new List<string>(new string[] { "Identifier", "Nr", "Lap" }));
@@ -453,7 +475,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/session")]
         public string GetSession([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 				
                 return sessionManager.LookupStint(identifier).Session.Identifier.ToString();
             }
@@ -465,7 +488,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/driver")]
         public string GetDriver([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.LookupStint(identifier).Driver.Identifier.ToString();
             }
@@ -477,7 +501,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/lap")]
         public string GetLap([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Stint stint = sessionManager.LookupStint(identifier);
                 Lap lap = stint.GetCurrentLap();
 
@@ -491,7 +516,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/laps")]
         public string GetLaps([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupStint(identifier).Laps.OrderBy(l => l.Nr).Select(l => l.Identifier));
             }
@@ -506,7 +532,8 @@ namespace TeamServer.Controllers {
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetStintValue(identifier, name);
             }
@@ -520,7 +547,8 @@ namespace TeamServer.Controllers {
         public string SetStintValue([FromQuery(Name = "token")] string token, string identifier,
 									[FromQuery(Name = "name")] string name, [FromBody] string value) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.SetStintValue(identifier, name, value);
 
@@ -535,7 +563,8 @@ namespace TeamServer.Controllers {
         public string DeleteStintValue([FromQuery(Name = "token")] string token, string identifier,
 									   [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteStintValue(identifier, name);
 
@@ -551,7 +580,7 @@ namespace TeamServer.Controllers {
                            [FromQuery(Name = "session")] string session, [FromQuery(Name = "driver")] string driver,
                            [FromBody] string keyValues) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);
                 Session theSession = sessionManager.LookupSession(session);
                 Driver theDriver = new TeamManager(Server.TeamServer.ObjectManager, theToken).LookupDriver(driver);
@@ -568,7 +597,8 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteStint(identifier);
 
@@ -593,7 +623,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Lap lap = sessionManager.LookupLap(identifier);
 
                 return ControllerUtils.SerializeObject(lap, new List<string>(new string[] { "Identifier", "Nr" }));
@@ -606,7 +637,8 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/stint")]
         public string GetStint([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 				
                 return sessionManager.LookupLap(identifier).Stint.Identifier.ToString();
             }
@@ -621,7 +653,8 @@ namespace TeamServer.Controllers {
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetLapValue(identifier, name);
             }
@@ -635,7 +668,8 @@ namespace TeamServer.Controllers {
         public string SetLapValue([FromQuery(Name = "token")] string token, string identifier,
                                   [FromQuery(Name = "name")] string name, [FromBody] string value) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.SetLapValue(identifier, name, value);
 
@@ -650,7 +684,8 @@ namespace TeamServer.Controllers {
         public string DeleteLapValue([FromQuery(Name = "token")] string token, string identifier,
                                      [FromQuery(Name = "name")] string name) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteLapValue(identifier, name);
 
@@ -664,7 +699,7 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromQuery(Name = "stint")] string stint, [FromBody] string keyValues) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);
                 Stint theStint = sessionManager.LookupStint(stint);
                 
@@ -680,7 +715,8 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 sessionManager.DeleteLap(identifier);
 

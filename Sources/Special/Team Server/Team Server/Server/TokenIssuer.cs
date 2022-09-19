@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 
@@ -13,11 +14,11 @@ namespace TeamServer.Server {
             ObjectManager = objectManager;
             TokenLifeTime = tokenLifeTime;
 
-            AdminToken = new Token { ID = -1, Identifier = Guid.NewGuid(), AccountID = 0, Until = DateTime.MaxValue };
+            AdminToken = new AdminToken { ID = -1, Identifier = Guid.NewGuid(), AccountID = 0, Until = DateTime.MaxValue };
         }
 
         #region CRUD
-        public Token CreateToken(string name, string password) {
+        public SessionToken CreateSessionToken(string name, string password) {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
             if (account == null)
@@ -25,10 +26,37 @@ namespace TeamServer.Server {
             else if (!account.Administrator && (account.AvailableMinutes <= 0))
                 throw new Exception("Not enough time available on account...");
             else {
-                Token token = new Token { Identifier = Guid.NewGuid(), AccountID = account.ID,
-                                          Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };
+                SessionToken token = new SessionToken { Identifier = Guid.NewGuid(), AccountID = account.ID,
+                                                        Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };
 
                 token.Save();
+
+                return token;
+            }
+        }
+
+        public StoreToken CreateStoreToken(string name, string password)
+        {
+            Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
+
+            if (account == null)
+                throw new Exception("Unknown account or password...");
+            else
+            {
+                StoreToken token = ObjectManager.GetAccountStoreTokenAsync(account).Result;
+
+                if (token == null)
+                {
+                    token = new StoreToken
+                    {
+                        Identifier = Guid.NewGuid(),
+                        AccountID = account.ID,
+                        Created = DateTime.Now,
+                        Until = DateTime.MaxValue
+                    };
+
+                    token.Save();
+                }
 
                 return token;
             }
@@ -94,14 +122,23 @@ namespace TeamServer.Server {
         #endregion
 
         #region Operations
-        public async void CleanupTokensAsync() {
-            await ObjectManager.Connection.QueryAsync<Token>(
+        public async void CleanupTokensAsync()
+        {
+            await ObjectManager.Connection.QueryAsync<SessionToken>(
                 @"
-                    Select * From Access_Tokens Where Until < ?
+                    Select * From Session_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
                         DeleteToken(t);
-                    }));
+                }));
+
+            await ObjectManager.Connection.QueryAsync<SessionToken>(
+                @"
+                    Select * From Store_Tokens Where Until < ?
+                ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
+                    if (!t.IsValid())
+                        DeleteToken(t);
+                }));
         }
         #endregion
     }

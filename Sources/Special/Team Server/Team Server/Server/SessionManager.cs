@@ -4,8 +4,15 @@ using System.Threading.Tasks;
 using TeamServer.Model;
 
 namespace TeamServer.Server {
-	public class SessionManager : ManagerBase {
-		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+	public class SessionManager : ManagerBase
+	{
+		public SessionManager(ObjectManager objectManager, Model.Access.SessionToken token) : base(objectManager, token)
+		{
+		}
+
+		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
+		{
+			TeamServer.TokenIssuer.ElevateToken(token);
 		}
 
 		#region Validation

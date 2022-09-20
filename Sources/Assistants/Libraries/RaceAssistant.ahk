@@ -1046,7 +1046,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
-		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
+		local driver, driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
@@ -1132,7 +1132,13 @@ class RaceAssistant extends ConfigurationItem {
 			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
-		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid")
+		else
+			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
@@ -1241,9 +1247,6 @@ class RaceAssistant extends ConfigurationItem {
 		local result
 
 		data := this.prepareData(lapNumber, data)
-
-		if knowledgeBase.getFact("Lap." . lapNumber . ".Valid")
-			knowledgeBase.setFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
 
 		result := knowledgeBase.produce()
 

@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.3.3.0-dev]() (New features: Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used. Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-432) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

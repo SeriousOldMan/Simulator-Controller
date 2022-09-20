@@ -9,7 +9,8 @@
      - No more warnings for cars attacking you when they are just beeing passed by you.
 	 - No more reports for lapped cars for overtaking far too early.
 	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
-  5. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  5. Fixed volume control for voice output, when SoX is used.
+  6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
 
 ## 4.3.2.0-release 09/16/22
 

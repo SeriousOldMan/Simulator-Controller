@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -8,7 +9,21 @@ namespace TeamServer {
     public class TeamServerConnector {
 		static readonly HttpClient httpClient = new HttpClient();
 
-		public class Parameters : Dictionary<string, string> { }
+		public class Parameters : Dictionary<string, string> {
+			public Parameters() { }
+
+			public Parameters(string keyValues) {
+				foreach (var kv in ParseKeyValues(keyValues))
+					this[kv.Key] = kv.Value;
+            }
+
+			public static Dictionary<string, string> ParseKeyValues(string text)
+			{
+				var keyValues = text.Replace("\r", "").Split('\n');
+
+				return keyValues.Select(value => value.Split('=')).ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
+			}
+		}
 
 		string Server = "";
 
@@ -205,20 +220,25 @@ namespace TeamServer {
 		#endregion
 
 		#region Data
-		public string Query(string table, string projection, string where)
+		public string Query(string table, string where)
         {
-
+			return Get("store/" + table, arguments: new Parameters(where));
         }
+
+		public string Load(string table, string identifier)
+		{
+			return Get("store/" + table + "/" + identifier);
+		}
 
 		public void Delete(string table, string identifier)
         {
+			Delete("store/" + table + "/" + identifier);
+		}
 
-        }
-
-		public void Insert(string table, string data)
+		public string Insert(string table, string data)
         {
-
-        }
+			return Post("store/" + table, body: data);
+		}
 		#endregion
 	}
 }

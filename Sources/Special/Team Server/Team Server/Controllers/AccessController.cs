@@ -56,6 +56,21 @@ namespace TeamServer.Controllers {
             return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
 
+        [HttpGet("validatestoretoken")]
+        public string ValidateStoreToken([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                StoreToken theToken = (StoreToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
+
+                return "Ok";
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpPut("password")]
         public string ChangePassword([FromQuery(Name = "token")] string token, [FromBody] string password) {
             try {

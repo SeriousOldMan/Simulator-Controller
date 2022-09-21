@@ -2143,7 +2143,7 @@ class RaceSpotter extends RaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if this.Speaker[false] { ; && !this.SpotterSpeaking) {
+		if (this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {

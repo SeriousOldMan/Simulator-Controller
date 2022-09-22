@@ -1,8 +1,8 @@
 [Development]
-Version=4.3.3.0-dev
+Version=4.3.3.0-alpha
 Target=4.3.2.1-release
 Date=09/22/2022
-Download=https://www.dropbox.com/s/pk6bul0v7pn2934/Simulator%20Controller%204.3.3.0-dev.zip?dl=1
+Download=https://www.dropbox.com/s/ek6oq8ri2d06zfx/Simulator%20Controller%204.3.3.0-alpha.zip?dl=1
 Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews)
 [Release]
 Version=4.3.2.1-release
@@ -13,4 +13,4 @@ Changes=Integrated support in "Setup Advisor" for modded AC setups, Support admi
 Type=Development
 [Version]
 Release=4.3.2.1-release
-Development=4.3.3.0-dev
+Development=4.3.3.0-alpha

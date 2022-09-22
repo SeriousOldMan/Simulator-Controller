@@ -1538,9 +1538,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						if (RaceAssistantPlugin.Finished && (dataLastLap >= RaceAssistantPlugin.Finished)) {
 							; Session has endedd
 
-							RaceAssistantPlugin.finishAssistantsSession()
-
-							return
+							finished := true
 						}
 
 						if (dataLastLap > 1) {

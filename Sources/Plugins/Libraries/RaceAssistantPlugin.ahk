@@ -1430,7 +1430,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
 		local newLap, firstLap, ignore, assistant, hasAssistant
-		local finished, sessionTimeRemaining, sessionLapsRemaining
+		local sessionTimeRemaining, sessionLapsRemaining
 
 		if (A_TickCount <= RaceAssistantPlugin.WaitForShutdown)
 			return

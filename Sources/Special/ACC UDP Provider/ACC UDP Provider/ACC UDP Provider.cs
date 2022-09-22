@@ -313,7 +313,7 @@ namespace ACCUDPProvider {
 
                                         if (lastLap.LapHint == "OUT")
                                             outStream.WriteLine("Out");
-                                        else if (lastLap.LapHint == "In")
+                                        else if (lastLap.LapHint == "IN")
                                             outStream.WriteLine("In");
                                         else
                                             outStream.WriteLine("Regular");

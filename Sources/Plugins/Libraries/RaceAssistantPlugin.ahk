@@ -1424,6 +1424,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			return true
 	}
 
+	currentLap(data) {
+		loop % getConfigurationValue(data, "Position Data", "Car.Count")
+			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
+				return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
+
+		return getConfigurationValue(data, "Stint Data", "Laps", 0)
+	}
+
 	collectSessionData() {
 		local finished := false
 		local lateJoin := false
@@ -1535,7 +1543,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 
-						if (RaceAssistantPlugin.Finished && (dataLastLap >= RaceAssistantPlugin.Finished)) {
+						if (RaceAssistantPlugin.Finished && (this.currentLap(data) >= RaceAssistantPlugin.Finished)) {
 							; Session has endedd
 
 							finished := true
@@ -1600,10 +1608,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
 
 								if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-									if (sessionTimeRemaining <= 0)
-										RaceAssistantPlugin.sFinished := (dataLastLap + 1)
-									else if (sessionLapsRemaining <= 0.5)
-										RaceAssistantPlugin.sFinished := (dataLastLap + 2)
+									if ((sessionTimeRemaining <= 0) || (sessionLapsRemaining < 1))
+										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
 								}
 								else if (sessionLapsRemaining == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap
@@ -1689,12 +1695,6 @@ getDataSession(data, ByRef finished) {
 		else
 			switch getConfigurationValue(data, "Session Data", "Session", "Other") {
 				case "Race":
-					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
-
-					if (driver
-					 && getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Type", "Regular") = "In")
-						finished := true
-
 					return kSessionRace
 				case "Practice":
 					return kSessionPractice

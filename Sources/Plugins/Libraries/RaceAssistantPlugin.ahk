@@ -1440,6 +1440,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local newLap, firstLap, ignore, assistant, hasAssistant
 		local sessionTimeRemaining, sessionLapsRemaining
 
+		if (RaceAssistantPlugin.Finished = "Finished")
+			RaceAssistantPlugin.finishAssistantsSession()
+
 		if (A_TickCount <= RaceAssistantPlugin.WaitForShutdown)
 			return
 		else {
@@ -1543,12 +1546,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 
-						if (RaceAssistantPlugin.Finished && (this.currentLap(data) >= RaceAssistantPlugin.Finished)) {
-							; Session has endedd
-
-							finished := true
-						}
-
 						if (dataLastLap > 1) {
 							if (RaceAssistantPlugin.LastLap == 0) {
 								; Missed the start of the session, might be a team session
@@ -1603,7 +1600,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLastLap := dataLastLap
 							RaceAssistantPlugin.sLapRunning := 0
 
-							if (!firstLap && !RaceAssistantPlugin.Finished) {
+							if RaceAssistantPlugin.Finished {
+								if (this.currentLap(data) >= RaceAssistantPlugin.Finished) {
+									; Session has endedd
+
+									finished := true
+								}
+							}
+							else {
 								sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
 								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
 
@@ -1668,7 +1672,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 				if finished
-					RaceAssistantPlugin.finishAssistantsSession()
+					RaceAssistantPlugin.sFinished := "Finished"
 			}
 			finally {
 				protectionOff()

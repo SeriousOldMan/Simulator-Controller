@@ -1971,6 +1971,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateDriver(lastLap, sector, positions) {
+		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
 		local deltaInformation, rnd
 
@@ -1982,14 +1983,14 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 
 				try {
-					if this.Announcements["SessionInformation"]
-						hadInfo := this.sessionInformation(lastLap, sector, positions, true)
-
-					if (this.hasEnoughData(false) && (this.Session = kSessionRace)) {
-						if (!hadInfo && this.Announcements["TacticalAdvices"])
-							hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
-
+					if raceInfo {
 						deltaInformation := this.Announcements["DeltaInformation"]
+
+						if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+							this.iLastDeltaInformationLap := lastLap
+
+						hadInfo := this.deltaInformation(lastLap, sector, positions
+													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
 
 						if hadInfo {
 							Random rnd, 1, 10
@@ -1997,15 +1998,13 @@ class RaceSpotter extends RaceAssistant {
 							if (rnd < 5)
 								hadInfo := false
 						}
-
-						if (!hadInfo && deltaInformation) {
-							if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-								this.iLastDeltaInformationLap := lastLap
-
-							this.deltaInformation(lastLap, sector, positions
-												, (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
-						}
 					}
+
+					if (!hadInfo && this.Announcements["SessionInformation"])
+						hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+
+					if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
+						hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
 				}
 				finally {
 					this.SpotterSpeaking := false

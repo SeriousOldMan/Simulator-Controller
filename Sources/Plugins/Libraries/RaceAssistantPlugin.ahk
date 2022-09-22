@@ -1602,10 +1602,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
 
 								if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-									if (sessionTimeRemaining <= 0)
+									if (sessionTimeRemaining <= 0.5)
 										RaceAssistantPlugin.sFinished := (dataLastLap + 1)
-									else if (sessionLapsRemaining <= 0.5)
-										RaceAssistantPlugin.sFinished := (dataLastLap + 2)
 								}
 								else if (sessionLapsRemaining == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap
@@ -1681,6 +1679,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 getDataSession(data, ByRef finished) {
+	local driver
+
 	if getConfigurationValue(data, "Session Data", "Active", false) {
 		finished := false
 
@@ -1689,6 +1689,12 @@ getDataSession(data, ByRef finished) {
 		else
 			switch getConfigurationValue(data, "Session Data", "Session", "Other") {
 				case "Race":
+					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+
+					if (driver
+					 && getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Type", "Regular") = "In")
+						finished := true
+
 					return kSessionRace
 				case "Practice":
 					return kSessionPractice

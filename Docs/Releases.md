@@ -11,7 +11,8 @@
 	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
   5. Fixed volume control for voice output, when SoX is used.
   6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
-  7. New car models for "Setup Advisor":
+  7. Increased precision in session end detection in ACC races
+  8. New car models for "Setup Advisor":
       - Assetto Corsa Competizione
 	    - Nissan GT-R Nismo GT3 (2015)
 

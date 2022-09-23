@@ -1,4 +1,4 @@
-## 4.3.3.0-release 09/23/22 (planned)
+## 4.3.3.0-release 09/23/22
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
@@ -12,7 +12,7 @@
   5. Fixed volume control for voice output, when SoX is used.
   6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
   7. Increased precision in session end detection in ACC races
-  8. Even more new tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, the list of cars should be complete now. 
+  8. New tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, all current cars of *Automobilista 2* should be covered now. 
   9. New car models for "Setup Advisor":
       - Assetto Corsa Competizione
 	    - Nissan GT-R Nismo GT3 (2015)

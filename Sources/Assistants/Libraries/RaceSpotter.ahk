@@ -2046,9 +2046,9 @@ class RaceSpotter extends RaceAssistant {
 	skipAlert(alert) {
 		if ((alert = "Hold") && this.pendingAlert("Clear", true))
 			return true
-		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlerts(["Left", "Three"])))
+		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])))
 			return true
-		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight"]) || this.pendingAlerts(["Right", "Three"])))
+		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])))
 			return true
 		else if ((alert = "Three") && this.pendingAlert("Clear", true))
 			return true
@@ -2060,11 +2060,18 @@ class RaceSpotter extends RaceAssistant {
 			return true
 		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 			return true
-		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"]) || this.pendingAlert("Clear", true)))
+		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
 			return true
 		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
+			return true
+
+		return false
+	}
+
+	superfluousAlert(alert) {
+		if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 
 		return false
@@ -2079,7 +2086,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			if alert {
-				this.iPendingAlerts.Push(alert)
+				if this.superfluousAlert(alert)
+					return
+				else
+					this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
 					if (this.iPendingAlerts.Length() == 1)

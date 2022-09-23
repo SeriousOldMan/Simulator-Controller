@@ -16,6 +16,8 @@
   9. New car models for "Setup Advisor":
       - Assetto Corsa Competizione
 	    - Nissan GT-R Nismo GT3 (2015)
+      - Assetto Corsa
+	    - Maserati MC12 GT1
 
 ## 4.3.2.0-release 09/16/22
 

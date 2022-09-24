@@ -97,9 +97,11 @@ downloadSimulatorController() {
 		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 
 		if ErrorLevel
-			throw "No valid installation file..."
+			throw "No valid installation file (Error: " . ErrorLevel . ")..."
 	}
 	catch exception {
+		logError(exception, true)
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		title := translate("Error")
 		MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")
@@ -131,9 +133,11 @@ downloadSimulatorController() {
 				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
 
 				if ErrorLevel
-					throw "No valid installation file..."
+					throw "No valid installation file (Error: " . ErrorLevel . ")..."
 			}
 			catch exception {
+				logError(exception, true)
+
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")

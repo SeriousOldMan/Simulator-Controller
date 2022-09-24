@@ -2071,7 +2071,9 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	superfluousAlert(alert) {
-		if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		if this.pendingAlert(alert)
+			return true
+		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 
 		return false

@@ -1,16 +1,16 @@
 [Development]
-Version=4.3.3.0-release
-Target=4.3.3.0-release
-Date=09/23/2022
-Download=https://cntr.click/dRZ4zXd
-Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews)
+Version=4.3.4.0-dev
+Target=4.3.4.0-release
+Date=09/25/2022
+Download=
+Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments
 [Release]
 Version=4.3.3.0-release
 Date=09/23/2022
 Download=https://cntr.click/dRZ4zXd
 Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews)
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.3.3.0-release
-Development=4.3.3.0-release
+Development=4.3.4.0-dev

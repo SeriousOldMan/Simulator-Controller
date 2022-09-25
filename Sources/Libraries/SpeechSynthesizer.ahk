@@ -410,6 +410,7 @@ class SpeechSynthesizer {
 
 	speak(text, wait := true, cache := false) {
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
+		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static counter := 1
 
@@ -465,14 +466,28 @@ class SpeechSynthesizer {
 				return
 			}
 
+			overdriveGain := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
+			overdriveColor := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
+			filterHighpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
+			filterLowpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+			noiseVolume := Round(0.2 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 100) / 100, 2)
+			clickVolume := Round(0.5 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 100) / 100, 2)
+
 			try {
 				try {
-					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
-					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive %overdriveGain% %overdriveColor% highpass %filterHighpass% lowpass %filterLowpass% Norm, , Hide
+
+					if (noiseVolume > 0)
+						RunWait "%kSoX%" -m -v %noiseVolume% "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					else
+						RunWait "%kSoX%" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
 
 					volume := Round(this.iVolume / 100, 2)
 
-					RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
+					if (clickVolume > 0)
+						RunWait "%kSoX%" -v %clickVolume% "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
+					else
+						RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))

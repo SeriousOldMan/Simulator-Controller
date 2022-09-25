@@ -732,12 +732,9 @@ class SetupWizard extends ConfigurationItem {
 						FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 					}
 					else
-						try {
-							FileDelete %startupLink%
-						}
-						catch exception {
-							logError(exception)
-						}
+						deleteFile(startupLink)
+
+					deleteDirectory(kTempDirectory, false)
 
 					if this.isModuleSelected("Controller") {
 						if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")

@@ -470,8 +470,8 @@ class SpeechSynthesizer {
 			overdriveColor := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
 			filterHighpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
 			filterLowpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
-			noiseVolume := Round(0.2 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 100) / 100, 2)
-			clickVolume := Round(0.5 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 100) / 100, 2)
+			noiseVolume := Round(0.3 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+			clickVolume := Round(0.6 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
 
 			try {
 				try {

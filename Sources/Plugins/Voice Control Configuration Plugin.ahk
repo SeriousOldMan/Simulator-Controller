@@ -45,6 +45,7 @@ global soXPathLabel1
 global soXPathLabel2
 global soXPathEdit := ""
 global soXPathButton
+global soXConfigurationButton
 global voiceRecognizerLabel
 global voiceRecognizerDropDown := 1
 global listenerLabel
@@ -74,6 +75,8 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	iTopAzureCredentialsVisible := false
 	iBottomAzureCredentialsVisible := false
 
+	iSoundProcessingSettings := false
+
 	iCorrection := 0
 
 	Editor[] {
@@ -97,7 +100,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		local enIndex := 0
 		local languageCode := "en"
 		local languages := availableLanguages()
-		local code, language, ignore, grammarFile, x0, x1, x2, w1, w2, x3, x4, w4, voices, recognizers
+		local code, language, ignore, grammarFile, x0, x1, x2, w1, w2, x3, w3, x4, w4, voices, recognizers
 
 		this.iCorrection := correction
 
@@ -143,11 +146,12 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		x2 := x + 230
 
 		w1 := width - (x1 - x)
-		w2 := w1 - 26
+		w2 := w1 - 26 - 26
 
 		x3 := x1 + w2 + 2
 		x4 := x2 + 24 + 8
 		w4 := width - (x4 - x)
+		x5 := x3 + 24
 
 		Gui %window%:Add, Text, x%x% y%y% w110 h23 +0x200 HWNDwidget1 Hidden, % translate("Language")
 		Gui %window%:Add, DropDownList, x%x1% yp w160 Choose%chosen% HWNDwidget2 VvoiceLanguageDropDown GupdateLanguage Hidden, % values2String("|", choices*)
@@ -166,13 +170,13 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% HWNDwidget6 VwindowsSpeakerDropDown Hidden, % values2String("|", voices*)
 
 		Gui %window%:Add, Text, x%x% ys+24 w110 h23 +0x200 HWNDwidget6 VwindowsSpeakerVolumeLabel Hidden, % translate("Volume")
-		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range0-100 ToolTip HWNDwidget7 VspeakerVolumeSlider Hidden, % speakerVolumeSlider
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w160 0x10 Range0-100 ToolTip HWNDwidget7 VspeakerVolumeSlider Hidden, % speakerVolumeSlider
 
 		Gui %window%:Add, Text, x%x% yp+22 w110 h23 +0x200 HWNDwidget8 VwindowsSpeakerPitchLabel Hidden, % translate("Pitch")
-		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range-10-10 ToolTip HWNDwidget9 VspeakerPitchSlider Hidden, % speakerPitchSlider
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w160 0x10 Range-10-10 ToolTip HWNDwidget9 VspeakerPitchSlider Hidden, % speakerPitchSlider
 
 		Gui %window%:Add, Text, x%x% yp+22 w110 h23 +0x200 HWNDwidget10 VwindowsSpeakerSpeedLabel Hidden, % translate("Speed")
-		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w135 0x10 Range-10-10 ToolTip HWNDwidget11 VspeakerSpeedSlider Hidden, % speakerSpeedSlider
+		Gui %window%:Add, Slider, Center Thick15 x%x1% yp+2 w160 0x10 Range-10-10 ToolTip HWNDwidget11 VspeakerSpeedSlider Hidden, % speakerSpeedSlider
 
 		this.iWindowsSynthesizerWidgets := [["windowsSpeakerLabel", "windowsSpeakerDropDown"]]
 
@@ -180,8 +184,15 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Font, c505050 s8
 		Gui %window%:Add, Text, x%x0% yp+18 w133 h23 HWNDwidget13 VsoXPathLabel2 Hidden, % translate("(Post Processing)")
 		Gui %window%:Font
-		Gui %window%:Add, Edit, x%x1% yp-19 w%w2% h21 HWNDwidget14 VsoXPathEdit Hidden, %soXPathEdit%
+		Gui %window%:Add, Edit, x%x1% yp-19 w%w2% h21 HWNDwidget14 gupdateConfigurationButton VsoXPathEdit Hidden, %soXPathEdit%
 		Gui %window%:Add, Button, x%x3% yp w23 h23 gchooseSoXPath HWNDwidget15 VsoXPathButton Hidden, % translate("...")
+
+		if (soXPathEdit != "")
+			Gui %window%:Add, Button, x%x5% yp w23 h23 geditSoXConfiguration HWNDwidget29 VsoXConfigurationButton Hidden
+		else
+			Gui %window%:Add, Button, x%x5% yp w23 h23 Disabled geditSoXConfiguration HWNDwidget29 VsoXConfigurationButton Hidden
+
+		setButtonIcon(widget29, kIconsDirectory . "General Settings.ico", 1)
 
 		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services"]
 		chosen := voiceRecognizerDropDown
@@ -218,7 +229,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		this.iOtherWidgets := [["windowsSpeakerVolumeLabel", "speakerVolumeSlider"]
 							 , ["windowsSpeakerPitchLabel", "speakerPitchSlider"]
 							 , ["windowsSpeakerSpeedLabel", "speakerSpeedSlider"]
-							 , ["soXPathLabel1", "soXPathLabel2", "soXPathEdit", "soXPathButton"]
+							 , ["soXPathLabel1", "soXPathLabel2", "soXPathEdit", "soXPathButton", "soXConfigurationButton"]
 							 , ["voiceRecognizerLabel", "voiceRecognizerDropDown"], ["listenerLabel", "listenerDropDown"]
 							 , ["pushToTalkLabel", "pushToTalkEdit", "pushToTalkButton", "activationCommandEdit"]]
 
@@ -323,6 +334,13 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			else if (listenerDropDown == false)
 				listenerDropDown := translate("Deactivated")
 		}
+
+		this.iSoundProcessingSettings := [getConfigurationValue(configuration, "Voice Control", "Speaker.ClickVolume", 80)
+										, getConfigurationValue(configuration, "Voice Control", "Speaker.NoiseVolume", 66)
+										, getConfigurationValue(configuration, "Voice Control", "Speaker.Overdrive", 20)
+										, getConfigurationValue(configuration, "Voice Control", "Speaker.Color", 20)
+										, getConfigurationValue(configuration, "Voice Control", "Speaker.HighPass", 800)
+										, getConfigurationValue(configuration, "Voice Control", "Speaker.LowPass", 1800)]
 	}
 
 	saveToConfiguration(configuration) {
@@ -400,6 +418,13 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
 		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
 		setConfigurationValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
+
+		setConfigurationValue(configuration, "Voice Control", "Speaker.ClickVolume", this.iSoundProcessingSettings[1])
+		setConfigurationValue(configuration, "Voice Control", "Speaker.NoiseVolume", this.iSoundProcessingSettings[2])
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Overdrive", this.iSoundProcessingSettings[3])
+		setConfigurationValue(configuration, "Voice Control", "Speaker.Color", this.iSoundProcessingSettings[4])
+		setConfigurationValue(configuration, "Voice Control", "Speaker.HighPass", this.iSoundProcessingSettings[5])
+		setConfigurationValue(configuration, "Voice Control", "Speaker.LowPass", this.iSoundProcessingSettings[6])
 	}
 
 	loadConfigurator(configuration) {
@@ -463,6 +488,11 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControl, , speakerSpeedSlider, %speakerSpeedSlider%
 
 		GuiControl, , soXPathEdit, %soXPathEdit%
+
+		if (soXPathEdit != "")
+			GuiControl Enable, soXConfigurationButton
+		else
+			GuiControl Disable, soXConfigurationButton
 
 		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", true)
 
@@ -870,12 +900,90 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControl, , azureSpeakerDropDown, % "|" . values2String("|", voices*)
 		GuiControl Choose, azureSpeakerDropDown, % chosen
 	}
+
+	editSoundProcessing() {
+		local newSettings := editSoundProcessing(this, this.iSoundProcessingSettings)
+
+		if newSettings
+			this.iSoundProcessingSettings := newSettings
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+editSoundProcessing(editorOrCommand := false, settings := false) {
+	local title, window, eWindow
+
+	static result := false
+
+	static clickVolume, noiseVolume, distortionGain, distortionHarmonics, highpassFrequency, lowpassFrequency
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+		window := "SCE"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x16 y16 w100 h23 +0x200, % translate("Click")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range0-100 ToolTip vclickVolume, % settings[1]
+
+		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Noise && Crackle")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range0-100 ToolTip vnoiseVolume, % settings[2]
+
+		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Gain")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range0-30 ToolTip vdistortionGain, % settings[3]
+
+		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Harmonics")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range0-30 ToolTip vdistortionHarmonics, % settings[4]
+
+		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Highpass")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range20-4000 ToolTip vhighpassFrequency, % settings[5]
+
+		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Lowpass")
+		Gui %window%:Add, Slider, Center Thick15 x120 yp+2 w150 0x10 Range20-4000 ToolTip vlowpassFrequency, % settings[6]
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptSoundProcessing, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelSoundProcessing, % translate("&Cancel")
+
+		eWindow := editorOrCommand.Editor.Window
+
+		Gui %window%:+Owner%eWindow%
+		Gui %window%:Show, AutoSize Center
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk)
+			return [clickVolume, noiseVolume, distortionGain, distortionHarmonics, highpassFrequency, lowpassFrequency]
+	}
+}
+
+acceptSoundProcessing() {
+	editSoundProcessing(kOk)
+}
+
+cancelSoundProcessing() {
+	editSoundProcessing(kCancel)
+}
 
 updateLanguage() {
 	VoiceControlConfigurator.Instance.updateLanguage()
@@ -893,6 +1001,11 @@ showWidgets(widgets) {
 			GuiControl Enable, %widgetPart%
 			GuiControl Show, %widgetPart%
 		}
+
+	GuiControlGet soXPathEdit
+
+	if (soXPathEdit = "")
+		GuiControl Disable, soXConfigurationButton
 }
 
 hideWidgets(widgets) {
@@ -1024,8 +1137,31 @@ chooseSoXPath() {
 	FileSelectFolder directory, *%soXPathEdit%, 0, % translate("Select SoX folder...")
 	OnMessage(0x44, "")
 
-	if (directory != "")
+	if (directory != "") {
 		GuiControl Text, soXPathEdit, %directory%
+
+		GuiControl Enable, soXConfigurationButton
+	}
+}
+
+updateConfigurationButton() {
+	GuiControlGet soXPathEdit
+
+	if (soXPathEdit != "")
+		GuiControl Enable, soXConfigurationButton
+	else
+		GuiControl Disable, soXConfigurationButton
+}
+
+editSoXConfiguration() {
+	protectionOn()
+
+	try {
+		VoiceControlConfigurator.Instance.editSoundProcessing()
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 initializeVoiceControlConfigurator() {

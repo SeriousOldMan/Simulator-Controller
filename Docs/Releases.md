@@ -1,3 +1,10 @@
+## 4.3.4.0-release 09/30/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. The strength of the individual effects applied by the sound post processing using *SoX* can now be dialed in the configuration. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information.
+  4. It is now possible to wildcard inidividual arguments in the ["raceAssistantVocalics" parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the different Race Assistant plugins, so that the values chosen in the voice control configuration will be used. 
+
 ## 4.3.3.0-release 09/23/22
 
   1. Minor bugfixes, as always

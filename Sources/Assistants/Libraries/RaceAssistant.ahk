@@ -398,10 +398,19 @@ class RaceAssistant extends ConfigurationItem {
 			options["Language"] := ((language != false) ? language : options["Language"])
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
-			options["Vocalics"] := (vocalics ? string2Values(",", vocalics) : options["Vocalics"])
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
+
+			if vocalics {
+				vocalics := string2Values(",", vocalics)
+
+				loop 3
+					if (vocalics[A_Index] = "*")
+						vocalics[A_Index] := options["Vocalics"][A_Index]
+
+				options["Vocalics"] := vocalics
+			}
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)

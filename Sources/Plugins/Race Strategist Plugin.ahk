@@ -35,7 +35,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
 										 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"]}
 
-	iLastTeamSession := false
+	iRaceStrategist := false
 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -77,6 +77,22 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.Plugin.recommendStrategy()
 			else
 				base.fireAction(function, trigger)
+		}
+	}
+
+	RaceAssistant[zombie := false] {
+		Get {
+			if (zombie = "Ghost")
+				return this.iRaceStrategist
+			else
+				return base.RaceAssistant[zombie]
+		}
+
+		Set {
+			if value
+				this.iRaceStrategist := value
+
+			return (base.RaceAssistant := value)
 		}
 	}
 
@@ -179,14 +195,6 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	joinSession(settings, data) {
 		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", false)
 			this.startSession(settings, data)
-	}
-
-	finishSession(arguments*) {
-		local teamServer := this.TeamServer
-
-		this.iLastTeamSession := ((teamServer && teamServer.Active) ? this.TeamSession : false)
-
-		base.finishSession(arguments*)
 	}
 
 	addLap(lap, running, data) {
@@ -451,7 +459,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
-			session := this.iLastTeamSession
+			session := this.TeamSession
 
 			runningLap := 0
 
@@ -662,11 +670,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-				this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
-												  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				this.RaceAssistant["Ghost"].reviewRace(cars, laps, position, leaderAvgLapTime
+													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 			}
 			catch exception {
-				this.RaceAssistant[true].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
+				this.RaceAssistant["Ghost"].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
 			}
 		}
 		finally {

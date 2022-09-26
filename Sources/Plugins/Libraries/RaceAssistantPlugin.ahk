@@ -777,7 +777,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && assistant.RaceAssistantActive)
 				assistant.finishSession(shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {

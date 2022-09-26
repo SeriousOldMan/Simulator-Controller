@@ -6,6 +6,8 @@
   4. It is now possible to wildcard inidividual arguments in the ["raceAssistantVocalics" parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the different Race Assistant plugins, so that the values chosen in the voice control configuration will be used.
   5. The name of the team will be shown in the tool tip for the *Simulator Controller* tray icon, when you are connected to a team session.
   6. More superfluous Spotter alerts ("Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
+  7. Increased reliability for pitstop handover in "Race Center".
+  8. Increased reliability of race report creation in team races.
 
 ## 4.3.3.0-release 09/23/22
 

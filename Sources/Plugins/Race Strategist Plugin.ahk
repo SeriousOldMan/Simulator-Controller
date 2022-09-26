@@ -35,6 +35,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
 										 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"]}
 
+	iLastTeamSession := false
+
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			base.__New(plugin, "Race Strategist", remotePID)
@@ -177,6 +179,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	joinSession(settings, data) {
 		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", false)
 			this.startSession(settings, data)
+	}
+
+	finishSession(arguments*) {
+		local teamServer := this.TeamServer
+
+		this.iLastTeamSession := ((teamServer && teamServer.Active) ? this.TeamSession : false)
+
+		base.finishSession(arguments*)
 	}
 
 	addLap(lap, running, data) {
@@ -441,11 +451,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
-			session := this.TeamSession
+			session := this.iLastTeamSession
 
 			runningLap := 0
 
-			if (teamServer && teamServer.Active && session) {
+			if (teamServer && session) {
 				deleteDirectory(kTempDirectory . "Race Report")
 
 				FileCreateDir %kTempDirectory%Race Report

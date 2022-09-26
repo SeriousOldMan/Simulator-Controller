@@ -1405,10 +1405,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.Simulator.restoreSessionState(sessionSettings, sessionState)
 
 			if sessionSettings
-				sessionSettings := this.createSettingsFile(sessionSettings)
+				sessionSettings := this.createSessionSettingsFile(sessionSettings)
 
 			if sessionState
-				sessionState := this.createStateFile(sessionState)
+				sessionState := this.createSessionStateFile(sessionState)
 
 			this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
 		}

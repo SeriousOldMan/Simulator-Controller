@@ -8,7 +8,8 @@
   6. More superfluous Spotter alerts ("Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
   7. Increased reliability of pitstop handover in team races.
   8. Increased reliability of race report creation in team races.
-  9. New car models for "Setup Advisor":
+  9. New tyre compound data for *RaceRoom Racing Experience*, thanks to Chris Matthews. With this, allmost all current cars of *RaceRoom Racing Experience* should be covered now.
+  10. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Chevrolet Corvette C7R
       - Assetto Corsa Competizione

@@ -777,7 +777,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && assistant.RaceAssistantActive)
 				assistant.finishSession(shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
@@ -1405,10 +1405,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.Simulator.restoreSessionState(sessionSettings, sessionState)
 
 			if sessionSettings
-				sessionSettings := this.createSettingsFile(sessionSettings)
+				sessionSettings := this.createSessionSettingsFile(sessionSettings)
 
 			if sessionState
-				sessionState := this.createStateFile(sessionState)
+				sessionState := this.createSessionStateFile(sessionState)
 
 			this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
 		}

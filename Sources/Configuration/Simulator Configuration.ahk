@@ -512,6 +512,8 @@ saveConfiguration(configurationFile, editor) {
 	}
 	else
 		deleteFile(startupLink)
+
+	deleteDirectory(kTempDirectory, false)
 }
 
 initializeSimulatorConfiguration() {

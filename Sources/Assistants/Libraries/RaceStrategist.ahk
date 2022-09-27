@@ -1378,9 +1378,9 @@ class RaceStrategist extends RaceAssistant {
 
 	finishSessionWithReview(shutdown) {
 		if this.RemoteHandler {
-			this.RemoteHandler.reviewRace()
-
 			this.setContinuation(new this.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
+
+			this.RemoteHandler.reviewRace()
 		}
 		else
 			this.finishSession(shutdown, false)

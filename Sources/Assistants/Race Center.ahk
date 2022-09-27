@@ -3208,7 +3208,7 @@ class RaceCenter extends ConfigurationItem {
 					nextNr := inList(this.TeamDrivers, nextDriver)
 
 					if (currentNr && nextNr)
-						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNR . "|" . nextDriver . ":" . nextNr)
+						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . nextDriver . ":" . nextNr)
 				}
 			}
 

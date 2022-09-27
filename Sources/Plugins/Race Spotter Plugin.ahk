@@ -323,6 +323,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						break
 				}
 			}
+
+			this.iAutomationPID := false
 		}
 
 		return false

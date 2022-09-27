@@ -830,6 +830,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
+		this.Car := getConfigurationValue(data, "Session Data", "Car")
+		this.Track := getConfigurationValue(data, "Session Data", "Track")
+
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
 		this.updateTyreCompound(data)
@@ -837,6 +840,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	finishSession() {
 		this.updateSession(kSessionFinished)
+
+		this.Car := false
+		this.Track := false
 	}
 
 	recommendPitstop() {

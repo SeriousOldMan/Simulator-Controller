@@ -9,6 +9,8 @@
   7. Increased reliability of pitstop handover in team races.
   8. Increased reliability of race report creation in team races.
   9. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Chevrolet Corvette C7R
       - Assetto Corsa Competizione
 	    - BMW M4 GT4
 		- Lamborghini Huracan ST

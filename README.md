@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.3.4.0-release](https://www.dropbox.com/s/1haxhvqo5hb28ph/Simulator%20Controller%204.3.4.0-dev.zip?dl=1) (Early build for 4.3.4. New features: Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews). Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-434) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

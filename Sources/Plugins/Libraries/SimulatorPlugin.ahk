@@ -795,8 +795,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updateSession(session) {
 		base.updateSession(session)
 
-		if (session = kSessionFinished)
-			this.iTyreCompound := false
+		if (session = kSessionFinished) {
+			this.CurrentTyreCompound := false
+			this.RequestedTyreCompound := false
+		}
 	}
 
 	requestInformation(arguments*) {

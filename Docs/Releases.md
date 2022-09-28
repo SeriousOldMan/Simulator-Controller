@@ -5,18 +5,17 @@
   3. The strength of the individual effects applied by the sound post processing using *SoX* can now be dialed in the configuration. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information.
   4. It is now possible to wildcard inidividual arguments in the ["raceAssistantVocalics" parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the different Race Assistant plugins, so that the values chosen in the voice control configuration will be used.
   5. The name of the team will be shown in the tool tip for the *Simulator Controller* tray icon, when you are connected to a team session.
-  6. More superfluous Spotter alerts ("Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
+  6. More superfluous Spotter alerts (for example "Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
   7. Increased reliability of pitstop handover in team races.
   8. Increased reliability of race report creation in team races.
   9. New tyre compound data for *RaceRoom Racing Experience*, thanks to Chris Matthews. With this, allmost all current cars of *RaceRoom Racing Experience* should be covered now.
-  10. New car models for "Setup Advisor":
+  10. New car models for "Setup Advisor" (*Assetto Corsa Competizione* has been completed with this):
       - Assetto Corsa:
 	    - Chevrolet Corvette C7R
       - Assetto Corsa Competizione
 	    - BMW M4 GT4
 		- Lamborghini Huracan ST
 		- Lamborghini Huracan ST Evo2
-     The car models for *Assetto Corsa Competizione* are now complete.
 
 ## 4.3.3.0-release 09/23/22
 

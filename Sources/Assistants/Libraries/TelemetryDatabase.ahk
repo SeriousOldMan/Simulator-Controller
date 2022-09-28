@@ -150,7 +150,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getTyreEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
+		return this.combineResults("Tyres", {Transform: compose("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
 										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}}
 										  , drivers)
 	}
@@ -206,7 +206,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getPressuresCount(weather, drivers := "__Undefined__") {
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
-										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Transform: compose("removeInvalidLaps", "computePressures")
 										   , Where: {Weather: weather}},
 										  , drivers)
 	}
@@ -216,7 +216,7 @@ class TelemetryDatabase extends SessionDatabase {
 												   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
 												   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 												   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
-										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Transform: compose("removeInvalidLaps", "computePressures")
 										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
 										  , drivers)
 	}
@@ -318,7 +318,7 @@ countValues(groupedColumn, countColumn, rows) {
 	return result
 }
 
-combine(functions*) {
+compose(functions*) {
 	return Func("callFunctions").Bind(functions)
 }
 

@@ -93,16 +93,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("shutdown", arguments*)
 		}
 
+		updateSettings(arguments*) {
+			this.callRemote("updateSettings", arguments*)
+		}
+
 		prepareSession(arguments*) {
 			this.callRemote("prepareSession", arguments*)
 		}
 
 		startSession(arguments*) {
 			this.callRemote("startSession", arguments*)
-		}
-
-		updateSession(arguments*) {
-			this.callRemote("updateSession", arguments*)
 		}
 
 		finishSession(arguments*) {
@@ -786,6 +786,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.disconnectTeamSession()
 		}
 
+		RaceAssistantPlugin.Simulator.finishSession()
+
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
 		RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
@@ -839,7 +841,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			session := kSessionFinished
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			assistant.updateSession(session)
+			if assistant.Active
+				assistant.updateSession(session)
 	}
 
 	updateAssistantsTelemetryData(data) {
@@ -1144,7 +1147,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if ErrorLevel
 			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
 		else if this.RaceAssistant
-			this.RaceAssistant.updateSession(settingsFileName)
+			this.RaceAssistant.updateSettings(settingsFileName)
 
 		return false
 	}

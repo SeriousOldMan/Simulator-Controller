@@ -1868,6 +1868,17 @@ do(list, function) {
 		%function%(value)
 }
 
+combine(maps*) {
+	local result := {}
+	local ignore, map, key, value
+
+	for ignore, map in maps
+		for key, value in map
+			result[key] := value
+
+	return result
+}
+
 getKeys(map) {
 	local result := []
 	local ignore, key

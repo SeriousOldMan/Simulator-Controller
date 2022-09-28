@@ -1,9 +1,9 @@
 [Development]
-Version=4.3.4.0-dev
+Version=4.3.4.0-alpha
 Target=4.3.4.0-release
-Date=09/27/2022
+Date=09/28/2022
 Download=
-Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor"
+Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews)
 [Release]
 Version=4.3.3.0-release
 Date=09/23/2022
@@ -13,4 +13,4 @@ Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some fal
 Type=Development
 [Version]
 Release=4.3.3.0-release
-Development=4.3.4.0-dev
+Development=4.3.4.0-alpha

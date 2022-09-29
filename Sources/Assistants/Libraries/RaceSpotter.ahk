@@ -1345,6 +1345,53 @@ class RaceSpotter extends RaceAssistant {
 			return false
 	}
 
+	reviewHalfTime(lastLap, sector, positions) {
+		local knowledgeBase, remainingSessionLaps, remainingStintLaps, remainingSessionTime
+		local remainingStintTime, remainingFuelLaps, enoughFuel, speaker
+
+		if (this.Session == kSessionRace) {
+			speaker := this.getSpeaker(true)
+
+			knowledgeBase := this.KnowledgeBase
+			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
+			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
+			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
+			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+													, laps: remainingSessionLaps
+													, position: Round(positions["Position"])})
+
+				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+
+				if (remainingStintTime < remainingSessionTime) {
+					speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+
+					enoughFuel := (remainingStintLaps < remainingFuelLaps)
+				}
+				else {
+					speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+														  , laps: Ceil(remainingSessionLaps)})
+
+					enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+				}
+
+				speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+								  , {laps: Floor(remainingFuelLaps)})
+			}
+			finally {
+				speaker.endTalk()
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
 	announceFinalLaps(lastLap, sector, positions) {
 		local speaker := this.getSpeaker(true)
 		local position := positions["Position"]
@@ -1378,26 +1425,34 @@ class RaceSpotter extends RaceAssistant {
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
-		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 		local standingsAhead := false
 		local standingsBehind := false
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
-		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
-		local sessionEnding, minute, lastTemperature, stintLaps
+		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
 		local minute, rnd, phrase
 
-		if ((lastLap == 2) && (this.Session == kSessionRace)) {
-			situation := "StartSummary"
+		if (this.Session == kSessionRace)
+			if (lastLap == 2) {
+				situation := "StartSummary"
 
-			if !this.SessionInfos.HasKey(situation) {
-				this.SessionInfos[situation] := true
+				if !this.SessionInfos.HasKey(situation) {
+					this.SessionInfos[situation] := true
 
-				if this.reviewRaceStart(lastLap, sector, positions)
-					return true
+					if this.reviewRaceStart(lastLap, sector, positions)
+						return true
+				}
 			}
-		}
+			else if (remainingSessionLaps > 5)
+				situation := "HalfTime"
+
+				if (!this.SessionInfos.HasKey(situation) && (Abs((this.SessionDuration / 2) - this.OverallTime) < 120000)) {
+					this.SessionInfos[situation] := true
+
+					if this.reviewHalfTime(lastLap, sector, positions)
+						return true
+				}
 
 		if this.hasEnoughData(false) {
 			if ((remainingSessionLaps <= 3) && (this.Session = kSessionRace)) {
@@ -1476,46 +1531,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (this.Session = kSessionRace) {
-				if (this.OverAllTime > (this.SessionDuration / 2)) {
-					situation := "HalfTime"
-
-					if !this.SessionInfos.HasKey(situation) {
-						this.SessionInfos[situation] := true
-
-						if (remainingSessionLaps > 5) {
-							speaker.beginTalk()
-
-							try {
-								speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-																	, laps: remainingSessionLaps
-																	, position: Round(positions["Position"])})
-
-								remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
-
-								if (remainingStintTime < remainingSessionTime) {
-									speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
-
-									enoughFuel := (remainingStintLaps < remainingFuelLaps)
-								}
-								else {
-									speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-																		  , laps: Ceil(remainingSessionLaps)})
-
-									enoughFuel := (remainingSessionLaps < remainingFuelLaps)
-								}
-
-								speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-												  , {laps: Floor(remainingFuelLaps)})
-							}
-							finally {
-								speaker.endTalk()
-							}
-						}
-					}
-				}
-			}
-			else {
+			if (this.Session != kSessionRace) {
 				sessionEnding := false
 
 				if ((remainingSessionTime < 5) && !this.SessionInfos.HasKey("5MinAlert")) {

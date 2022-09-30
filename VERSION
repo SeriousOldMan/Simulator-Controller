@@ -1,16 +1,16 @@
 [Development]
-Version=4.3.4.0-alpha
+Version=4.3.4.0-release
 Target=4.3.4.0-release
-Date=09/28/2022
-Download=https://www.dropbox.com/s/squdiynuh5k95f6/Simulator%20Controller%204.3.4.0-alpha.zip?dl=1
+Date=09/30/2022
+Download=https://cutt.ly/CVZSEMz
 Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews)
 [Release]
-Version=4.3.3.0-release
-Date=09/23/2022
-Download=https://cutt.ly/EVn9i5Q
-Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews)
+Version=4.3.4.0-release
+Date=09/30/2022
+Download=https://cutt.ly/CVZSEMz
+Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews)
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.3.3.0-release
-Development=4.3.4.0-alpha
+Release=4.3.4.0-release
+Development=4.3.4.0-release

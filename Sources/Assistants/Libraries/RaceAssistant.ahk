@@ -1140,7 +1140,7 @@ class RaceAssistant extends ConfigurationItem {
 		if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
 			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
-		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
 
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 

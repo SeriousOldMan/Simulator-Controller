@@ -72,7 +72,7 @@ namespace TeamServer.Server {
 			return ObjectManager.GetAllSessionsAsync().Result;
 		}
 
-		public List<Session> GetAllSessions(Model.Access.SessionToken token)
+		public List<Session> GetSessions(Model.Access.SessionToken token)
 		{
 			return token.Account.Sessions;
 		}

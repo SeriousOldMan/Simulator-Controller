@@ -17,13 +17,13 @@ namespace TeamServer.Controllers {
             _logger = logger;
         }
 
-        [HttpGet("allsessions")]
+        [HttpGet("sessions")]
         public string GetSessions([FromQuery(Name = "token")] string token) {
             try {
                 SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);
 
-                return String.Join(";", sessionManager.GetAllSessions(theToken).Select(a => a.Identifier));
+                return String.Join(";", sessionManager.GetSessions(theToken).Select(a => a.Identifier));
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;

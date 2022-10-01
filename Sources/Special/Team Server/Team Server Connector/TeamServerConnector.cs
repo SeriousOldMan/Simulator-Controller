@@ -173,6 +173,11 @@ namespace TeamServer {
 			return Get("login/allconnections");
 		}
 
+		public string GetAllSessions()
+		{
+			return Get("login/allsessions");
+		}
+
 		public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);
@@ -310,8 +315,8 @@ namespace TeamServer {
 		#endregion
 
 		#region Session
-		public string GetAllSessions() {
-			return Get("session/allsessions");
+		public string GetSessions() {
+			return Get("session/sessions");
 		}
 
 		public string CreateSession(string team, string name) {

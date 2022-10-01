@@ -207,6 +207,24 @@ namespace TeamServer.Server {
             return FindConnection(new Guid(identifier));
         }
         #endregion
+
+        #region CRUD
+        public void DeleteConnection(Connection connection)
+        {
+            if (connection != null)
+                connection.Delete();
+        }
+
+        public void DeleteConnection(Guid identifier)
+        {
+            DeleteConnection(ObjectManager.GetConnectionAsync(identifier).Result);
+        }
+
+        public void DeleteConnection(string identifier)
+        {
+            DeleteConnection(new Guid(identifier));
+        }
+        #endregion
         #endregion
 
         #region Operations
@@ -217,7 +235,7 @@ namespace TeamServer.Server {
                     Select * From Access_Connections
                 ").ContinueWith(t => t.Result.ForEach(c => {
                     if (!c.IsConnected())
-                        c.Delete();
+                        DeleteConnection(c);
                 }));
         }
 
@@ -225,7 +243,7 @@ namespace TeamServer.Server {
         {
             await ObjectManager.Connection.QueryAsync<SessionToken>(
                 @"
-                    Select * From Session_Tokens Where Until < ?
+                    Select * From Access_Session_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
                         DeleteToken(t);
@@ -233,7 +251,7 @@ namespace TeamServer.Server {
 
             await ObjectManager.Connection.QueryAsync<StoreToken>(
                 @"
-                    Select * From Store_Tokens Where Until < ?
+                    Select * From Access_Store_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
                         DeleteToken(t);

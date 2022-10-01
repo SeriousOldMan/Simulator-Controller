@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 using TeamServer.Server;
@@ -152,7 +153,7 @@ namespace TeamServer.Controllers {
             {
                 Server.TeamServer.TokenIssuer.ElevateToken(token);
 
-                return String.Join(";", Server.TeamServer.TokenIssuer.GetAllConnections());
+                return String.Join(";", Server.TeamServer.TokenIssuer.GetAllConnections().Select(c => c.Identifier));
             }
             catch (AggregateException exception)
             {
@@ -172,7 +173,7 @@ namespace TeamServer.Controllers {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ElevateToken(token));
 
-                return String.Join(";", sessionManager.GetAllSessions());
+                return String.Join(";", sessionManager.GetAllSessions().Select(c => c.Identifier));
             }
             catch (AggregateException exception)
             {

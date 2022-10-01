@@ -125,7 +125,7 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    [Table("Session_Tokens")]
+    [Table("Access_Session_Tokens")]
     public class SessionToken : Token
     {
         public override bool IsValid() {
@@ -146,7 +146,7 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    [Table("Store_Tokens")]
+    [Table("Access_Store_Tokens")]
     public class StoreToken : Token
     {
     }

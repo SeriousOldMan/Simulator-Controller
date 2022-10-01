@@ -178,13 +178,14 @@ namespace TeamServer {
 			GetConnection(identifier);
 		}
 
+		public string ValidateToken()
+		{
+			return Get("login/validateStoreToken");
+		}
+
 		public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);
-		}
-
-		public string ValidateToken() {
-			return Get("login/validateStoreToken");
 		}
 
 		public void Logout() {

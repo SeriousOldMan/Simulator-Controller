@@ -163,6 +163,16 @@ namespace TeamServer {
 			GetConnection(identifier);
 		}
 
+		public string ValidateToken()
+		{
+			return Get("login/validateSessionToken");
+		}
+
+		public string GetAllConnections()
+		{
+			return Get("login/allconnections");
+		}
+
 		public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);

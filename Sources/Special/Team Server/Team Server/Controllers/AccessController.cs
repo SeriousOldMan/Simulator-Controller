@@ -84,14 +84,19 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("accountavailableminutes")]
-        public string GetAccountMinutes([FromQuery(Name = "token")] string token) {
-            return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.AvailableMinutes.ToString();
-        }
+        [HttpGet("validatesessiontoken")]
+        public string ValidateSessionToken([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
 
-        [HttpGet("tokenavailableminutes")]
-        public string GetTokenMinutes([FromQuery(Name = "token")] string token) {
-            return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
+                return "Ok";
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
         }
 
         [HttpGet("validatestoretoken")]
@@ -107,6 +112,18 @@ namespace TeamServer.Controllers {
             {
                 return "Error: " + exception.Message;
             }
+        }
+
+        [HttpGet("accountavailableminutes")]
+        public string GetAccountMinutes([FromQuery(Name = "token")] string token)
+        {
+            return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.AvailableMinutes.ToString();
+        }
+
+        [HttpGet("tokenavailableminutes")]
+        public string GetTokenMinutes([FromQuery(Name = "token")] string token)
+        {
+            return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
 
         [HttpPut("password")]
@@ -128,10 +145,50 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("allconnections")]
+        public string GetConnections([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                Server.TeamServer.TokenIssuer.ElevateToken(token);
+
+                return String.Join(";", Server.TeamServer.TokenIssuer.GetAllConnections());
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("allsessions")]
+        public string GetSessions([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ElevateToken(token));
+
+                return String.Join(";", sessionManager.GetAllSessions());
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                Server.TeamServer.TokenIssuer.ValidateToken(token);
+                
                 Connection connection = Server.TeamServer.TokenIssuer.LookupConnection(identifier);
 
                 connection.Renew();

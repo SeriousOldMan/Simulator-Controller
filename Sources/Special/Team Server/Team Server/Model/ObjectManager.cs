@@ -234,6 +234,22 @@ namespace TeamServer.Model {
                 });
         }
 
+        public Task<List<Access.Connection>> GetAllConnectionsAsync()
+        {
+            return Connection.Table<Access.Connection>().ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
+        }
+
         public Task<List<Access.Connection>> GetTokenConnectionsAsync(Access.Token token)
         {
             return Connection.Table<Access.Connection>().Where(t => t.TokenID == token.ID).ToListAsync().
@@ -323,6 +339,11 @@ namespace TeamServer.Model {
         #endregion
 
         #region Session
+        public Task<List<Session>> GetAllSessionsAsync()
+        {
+            return Connection.Table<Session>().ToListAsync();
+        }
+
         public Task<Session> GetSessionAsync(int id) {
             return Connection.Table<Session>().Where(s => s.ID == id).FirstOrDefaultAsync();
         }

@@ -20,10 +20,10 @@ namespace TeamServer.Controllers {
         [HttpGet("allsessions")]
         public string GetSessions([FromQuery(Name = "token")] string token) {
             try {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
-                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, theToken);
 
-                return String.Join(";", sessionManager.GetAllSessions().Select(a => a.Identifier));
+                return String.Join(";", sessionManager.GetAllSessions(theToken).Select(a => a.Identifier));
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;

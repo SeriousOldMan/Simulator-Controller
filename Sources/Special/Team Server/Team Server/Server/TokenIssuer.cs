@@ -178,6 +178,11 @@ namespace TeamServer.Server {
         #endregion
 
         #region Query
+        public List<Connection> GetAllConnections()
+        {
+            return ObjectManager.GetAllConnectionsAsync().Result;
+        }
+
         public Connection LookupConnection(Guid identifier)
         {
             Connection connection = FindConnection(identifier);

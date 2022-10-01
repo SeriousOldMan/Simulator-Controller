@@ -67,8 +67,14 @@ namespace TeamServer.Server {
 
 		#region Session
 		#region Query
-		public List<Session> GetAllSessions() {
-			return Token.Account.Sessions;
+		public List<Session> GetAllSessions()
+		{
+			return ObjectManager.GetAllSessionsAsync().Result;
+		}
+
+		public List<Session> GetAllSessions(Model.Access.SessionToken token)
+		{
+			return token.Account.Sessions;
 		}
 
 		public Session LookupSession(Guid identifier) {

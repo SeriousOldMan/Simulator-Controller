@@ -23,6 +23,8 @@ namespace TeamServer {
 
         public int TokenLifeTime { get; set; }
 
+        public int ConnectionLifeTime { get; set; }
+
         public IList<Account> Accounts { get; set; } = null;
     }
 
@@ -46,7 +48,7 @@ namespace TeamServer {
 
             CreateAccounts(objectManager, settings.Accounts);
 
-            new Server.TeamServer(objectManager, settings.TokenLifeTime);
+            new Server.TeamServer(objectManager, settings.TokenLifeTime, settings.ConnectionLifeTime);
 
             CreateHostBuilder(args).Build().Run();
         }

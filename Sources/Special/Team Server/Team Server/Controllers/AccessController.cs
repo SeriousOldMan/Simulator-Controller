@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 using TeamServer.Server;
@@ -46,6 +47,43 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("connect")]
+        public string Connect([FromQuery(Name = "token")] string token,
+                              [FromQuery(Name = "client")] string client, [FromQuery(Name = "name")] string name,
+                              [FromQuery(Name = "type")] string type, [FromQuery(Name = "session")] string session)
+        {
+            if (client == null)
+                client = "";
+
+            if (name == null)
+                name = "";
+
+            if (session == null)
+                session = "";
+
+            if (type == null)
+                type = "";
+
+            ConnectionType theType = ConnectionType.Unknown;
+
+            try {
+                if (!Enum.TryParse(type, out theType))
+                    throw new Exception("Unknown connection type...");
+
+                Server.TeamServer.TokenIssuer.Connect(token, client, name, theType, session);
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("accountavailableminutes")]
         public string GetAccountMinutes([FromQuery(Name = "token")] string token) {
             return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.AvailableMinutes.ToString();
@@ -84,6 +122,22 @@ namespace TeamServer.Controllers {
                 account.Save();
 
                 return "Ok";
+            }
+            catch (Exception exception) {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("{identifier}")]
+        public string Get([FromQuery(Name = "token")] string token, string identifier) {
+            try {
+                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+                Connection connection = Server.TeamServer.TokenIssuer.LookupConnection(identifier);
+
+                connection.Renew();
+
+                return ControllerUtils.SerializeObject(connection,
+                                                       new List<string>(new string[] { "Identifier", "Client", "Name", "Type", "Session" }));
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

@@ -3,11 +3,13 @@
 
   "TokenLifeTime": 10080,
 
+  "ConnectionLifeTime": 300,
+
   "Accounts": [
     {
       "Name": "admin",
       "Password": "admin",
-      "Administrator":  true
+      "Administrator": true
     },
     {
       "Name": "test1",

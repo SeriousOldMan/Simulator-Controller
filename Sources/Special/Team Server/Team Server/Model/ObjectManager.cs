@@ -158,7 +158,7 @@ namespace TeamServer.Model {
             foreach (Store.StoreData data in await GetAccountTyresPressuresDistributionDataAsync(account))
                 action(data);
         }
-
+        
         public Task<List<Store.StoreData>> GetAccountStoreDataAsync(Access.Account account)
         {
             return new Task<List<Store.StoreData>>(() =>
@@ -201,6 +201,70 @@ namespace TeamServer.Model {
 
         public Task<Access.Account> GetTokenAccountAsync(Access.Token token) {
             return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
+        }
+
+        public Task<Access.Connection> GetTokenConnectionAsync(Access.Token token, string client, string name,
+                                                               Access.ConnectionType type, Session session = null)
+        {
+            Task<Access.Connection> task =
+                (session != null) ?
+                    Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
+                                                                     c.Client == client && c.Name == name &&
+                                                                     c.SessionID == session.ID).FirstAsync()
+                :
+                    Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
+                                                                     c.Client == client && c.Name == name).FirstAsync();
+
+
+            return task.ContinueWith(t =>
+                {
+                    if (t.Result != null)
+                    {
+                        if (t.Result.IsConnected())
+                            return t.Result;
+                        else
+                        {
+                            t.Result.Delete();
+
+                            return null;
+                        }
+                    }
+                    else
+                        return null;
+                });
+        }
+
+        public Task<List<Access.Connection>> GetTokenConnectionsAsync(Access.Token token)
+        {
+            return Connection.Table<Access.Connection>().Where(t => t.TokenID == token.ID).ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
+        }
+        #endregion
+
+        #region Access.Connection
+        public Task<Access.Connection> GetConnectionAsync(int id)
+        {
+            return Connection.Table<Access.Connection>().Where(c => c.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Connection> GetConnectionAsync(Guid identifier)
+        {
+            return Connection.Table<Access.Connection>().Where(c => c.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Connection> GetConnectionAsync(string identifier)
+        {
+            return GetConnectionAsync(new Guid(identifier));
         }
         #endregion
 
@@ -273,6 +337,21 @@ namespace TeamServer.Model {
 
         public Task<Team> GetSessionTeamAsync(Session session) {
             return Connection.Table<Team>().Where(t => t.ID == session.TeamID).FirstAsync();
+        }
+
+        public Task<List<Access.Connection>> GetSessionConnectionsAsync(Session session) {
+            return Connection.Table<Access.Connection>().Where(c => c.SessionID == session.ID).ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
         }
 
         public Task<List<Stint>> GetSessionStintsAsync(Session session) {

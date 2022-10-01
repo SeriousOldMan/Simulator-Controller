@@ -342,6 +342,22 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpGet("{identifier}/connections")]
+        public string GetConnections([FromQuery(Name = "token")] string token, string identifier)
+        {
+            try
+            {
+                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
+                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+
+                return String.Join(";", sessionManager.LookupSession(identifier).Connections.Select(s => s.Identifier));
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {

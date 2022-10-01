@@ -163,6 +163,8 @@ namespace TeamServer.Server {
                         ScheduleTask(task);
                     }
 
+                TeamServer.TokenIssuer.CleanupConnectionsAsync();
+
                 await Task.Delay(60 * 60 * 1000);
             }
         }

@@ -17,6 +17,7 @@ namespace TeamServer.Server {
             AdminToken = new AdminToken { ID = -1, Identifier = Guid.NewGuid(), AccountID = 0, Until = DateTime.MaxValue };
         }
 
+        #region Tokens
         #region CRUD
         public SessionToken CreateSessionToken(string name, string password) {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
@@ -120,8 +121,101 @@ namespace TeamServer.Server {
             return ElevateToken(new Guid(identifier));
         }
         #endregion
+        #endregion
+
+        #region Connections
+        #region Connect
+        public Connection Connect(Token token, string client, string name, ConnectionType type, Session session = null)
+        {
+            ValidateToken(token);
+
+            Connection connection = ObjectManager.GetTokenConnectionAsync(token, client, name, type, session).Result;
+
+            if (connection == null)
+            {
+                connection = new Connection
+                {
+                    Identifier = Guid.NewGuid(),
+                    TokenID = token.ID,
+                    Created = DateTime.Now,
+                    Type = type,
+                    Client = client,
+                    Name = name
+                };
+
+                connection.Save();
+            }
+            
+            connection.Renew();
+            
+            return connection;
+        }
+
+        public Connection Connect(Token token, string client, string name, ConnectionType type, string session = "")
+        {
+            ValidateToken(token);
+
+            return Connect(token, client, name, type, ObjectManager.GetSessionAsync(session).Result);
+        }
+
+        public Connection Connect(Guid identifier, string client, string name, ConnectionType type, string session = "")
+        {
+            return Connect(ObjectManager.GetTokenAsync(identifier).Result, client, name, type, session);
+        }
+
+        public Connection Connect(string identifier, string client, string name, ConnectionType type, string session = "")
+        {
+            return Connect(new Guid(identifier), client, name, type, session);
+        }
+        #endregion
+
+        #region Validation
+        public void ValidateConnection(Connection connection)
+        {
+            if ((connection == null) || (!connection.IsConnected()))
+                throw new Exception("Not a valid or active connection...");
+        }
+        #endregion
+
+        #region Query
+        public Connection LookupConnection(Guid identifier)
+        {
+            Connection connection = FindConnection(identifier);
+
+            ValidateConnection(connection);
+
+            return connection;
+        }
+
+        internal Connection LookupConnection(string identifier)
+        {
+            return LookupConnection(new Guid(identifier));
+        }
+
+        public Connection FindConnection(Guid identifier)
+        {
+            return ObjectManager.GetConnectionAsync(identifier).Result;
+        }
+
+        public Connection FindConnection(string identifier)
+        {
+            return FindConnection(new Guid(identifier));
+        }
+        #endregion
+        #endregion
 
         #region Operations
+        public async void CleanupConnectionsAsync()
+        {
+            await ObjectManager.Connection.QueryAsync<Connection>(
+                @"
+                    Select * From Access_Connections
+                ").ContinueWith(t => t.Result.ForEach(c => {
+                    if (!c.IsConnected())
+                        c.Delete();
+                }));
+        }
+
         public async void CleanupTokensAsync()
         {
             await ObjectManager.Connection.QueryAsync<SessionToken>(
@@ -132,7 +226,7 @@ namespace TeamServer.Server {
                         DeleteToken(t);
                 }));
 
-            await ObjectManager.Connection.QueryAsync<SessionToken>(
+            await ObjectManager.Connection.QueryAsync<StoreToken>(
                 @"
                     Select * From Store_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {

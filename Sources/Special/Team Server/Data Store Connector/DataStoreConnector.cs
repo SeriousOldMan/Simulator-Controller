@@ -33,14 +33,10 @@ namespace TeamServer {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
-		public void Connect(string url, string token = null) {
+		public void Initialize(string url, string token = null) {
 			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
 
-			if ((token != null) && (token != "")) {
-				Token = token;
-
-				ValidateToken();
-			}
+			Token = "";
 		}
 
 		#region Requests
@@ -167,13 +163,29 @@ namespace TeamServer {
 			return token;
 		}
 
+		public string Connect(string token, string client, string name, string type, string session = "")
+		{
+			string connection = Get("login/connect", new Parameters() { { "token", token }, { "client", client }, { "name", name },
+																		{ "type", type }, { "session", session } });
+
+			Token = token;
+
+			return connection;
+		}
+
+		public void KeekAlive(string identifier)
+		{
+			GetConnection(identifier);
+		}
+
+		public string GetConnection(string identifier)
+		{
+			return Get("login/" + identifier);
+		}
+
 		public string ValidateToken() {
 			return Get("login/validateStoreToken");
 		}
-
-		public void ChangePassword(string newPassword) {
-			Put("login/password", body: newPassword);
-        }
 
 		public void Logout() {
 			Token = "";
@@ -182,60 +194,33 @@ namespace TeamServer {
 		}
 		#endregion
 
-		#region Administration
-		public string GetAllAccounts() {
-			return Get("account/allaccounts");
-        }
-
-		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
-			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
-																	  { "EMail", eMail },
-																	  { "Contract", contract }, { "ContractMinutes", renewal },
-																	  { "AvailableMinutes", minutes } }));
-		}
-
-		public string GetAccount(string identifier) {
-			return Get("account/" + identifier);
-		}
-
-		public void ChangeAccountEMail(string identifier, string eMail) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
-		}
-
-		public void ChangeAccountContract(string identifier, string contract, string renewal) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
-		}
-
-		public void ChangeAccountPassword(string identifier, string newPassword) {
-			Put("account/" + identifier + "/password", body: newPassword);
-		}
-
-		public void SetAccountMinutes(string identifier, int minutes) {
-			Put("account/" + identifier + "/minutes", body: minutes.ToString());
-		}
-
-		public void DeleteAccount(string identifier) {
-			Delete("account/" + identifier);
-		}
-		#endregion
-
 		#region Data
-		public string Query(string table, string where)
-        {
-			return Get("store/" + table, arguments: new Parameters(where));
-        }
+		public string GetIDs(string table, string where)
+		{
+			return Get("store/" + table + "/query", arguments: new Parameters(where));
+		}
 
-		public string Load(string table, string identifier)
+		public string GetData(string table, string where)
+		{
+			return Get("store/" + table + "/query", arguments: new Parameters(where));
+		}
+
+		public string CountData(string table, string where)
+		{
+			return Get("store/" + table + "/count", arguments: new Parameters(where));
+		}
+
+		public string LoadData(string table, string identifier)
 		{
 			return Get("store/" + table + "/" + identifier);
 		}
 
-		public void Delete(string table, string identifier)
+		public void DeleteData(string table, string identifier)
         {
 			Delete("store/" + table + "/" + identifier);
 		}
 
-		public string Insert(string table, string data)
+		public string InsertData(string table, string data)
         {
 			return Post("store/" + table, body: data);
 		}

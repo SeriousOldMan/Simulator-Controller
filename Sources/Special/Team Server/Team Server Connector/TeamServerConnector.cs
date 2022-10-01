@@ -18,18 +18,10 @@ namespace TeamServer {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
-		public string Connect(string url, string token = null) {
+		public void Initialize(string url) {
 			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
 
-			if ((token != null) && (token != "")) {
-				Token = token;
-
-				string remainingMinutes = GetTokenLifeTime();
-
-				return remainingMinutes;
-			}
-			else
-				return "Ok";
+			Token = "";
 		}
 
 		#region Requests
@@ -154,6 +146,26 @@ namespace TeamServer {
 			Token = token;
 
 			return token;
+		}
+
+		public string Connect(string token, string client, string name, string type, string session = "")
+		{
+			string connection = Get("login/connect", new Parameters() { { "token", token }, { "client", client }, { "name", name },
+																		{ "type", type }, { "session", session } });
+
+			Token = token;
+
+			return connection;
+		}
+
+		public void KeekAlive(string identifier)
+		{
+			GetConnection(identifier);
+		}
+
+		public string GetConnection(string identifier)
+		{
+			return Get("login/" + identifier);
 		}
 
 		public string GetAvailableMinutes() {
@@ -352,6 +364,11 @@ namespace TeamServer {
 
 		public string GetSessionTeam(string identifier) {
 			return Get("session/" + identifier + "/team");
+		}
+
+		public string GetSessionConnections(string identifier)
+		{
+			return Get("session/" + identifier + "/connections");
 		}
 
 		public string GetSessionStint(string identifier, string stint) {

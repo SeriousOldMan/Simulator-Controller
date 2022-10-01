@@ -14,7 +14,7 @@ namespace TeamServer.Model {
             CreateTaskTable();
 
             CreateAccountTable();
-            CreateTokenTables();
+            CreateAccessTables();
             CreateTeamTables();
             CreateSessionTables();
 
@@ -35,10 +35,11 @@ namespace TeamServer.Model {
             Connection.CreateTableAsync<Access.Account>().Wait();
         }
 
-        protected void CreateTokenTables()
+        protected void CreateAccessTables()
         {
             Connection.CreateTableAsync<Access.SessionToken>().Wait();
             Connection.CreateTableAsync<Access.StoreToken>().Wait();
+            Connection.CreateTableAsync<Access.Connection>().Wait();
         }
 
         protected void CreateTeamTables() {

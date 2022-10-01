@@ -92,6 +92,14 @@ namespace TeamServer.Model.Access {
             }
         }
 
+        [Ignore]
+        public List<Connection> Connections
+        {
+            get {
+                return ObjectManager.GetTokenConnectionsAsync(this).Result;
+            }
+        }
+
         public DateTime Created { get; set; }
 
         public DateTime Until { get; set; }
@@ -107,12 +115,20 @@ namespace TeamServer.Model.Access {
         {
             return 0;
         }
+
+        public override System.Threading.Tasks.Task Delete()
+        {
+            foreach (Connection connection in Connections)
+                connection.Delete();
+
+            return base.Delete();
+        }
     }
 
     [Table("Session_Tokens")]
     public class SessionToken : Token
     {
-        public virtual bool IsValid() {
+        public override bool IsValid() {
             if (base.IsValid())
                 return true;
             else {
@@ -123,7 +139,7 @@ namespace TeamServer.Model.Access {
             }
         }
 
-        public virtual int GetRemainingMinutes() {
+        public override int GetRemainingMinutes() {
             int usedMinutes = (int)(DateTime.Now - Created).TotalMinutes;
 
             return (7 * 24 * 60) - usedMinutes;
@@ -136,4 +152,61 @@ namespace TeamServer.Model.Access {
     }
 
     public class AdminToken : Token { }
+
+    public enum ConnectionType
+    {
+        Unknown = 0,
+        Internal = 1,
+        Admin = 2,
+        Driver = 3
+    }
+
+    [Table("Access_Connections")]
+    public class Connection : ModelObject
+    {
+        [Indexed]
+        public int TokenID { get; set; }
+
+
+        [Indexed]
+        public int SessionID { get; set; }
+
+        [Ignore]
+        public Token Token
+        {
+            get {
+                return ObjectManager.GetTokenAsync(this.TokenID).Result;
+            }
+        }
+
+        [Ignore]
+        public Session Session
+        {
+            get {
+                return ObjectManager.GetSessionAsync(this.SessionID).Result;
+            }
+        }
+
+        public ConnectionType Type { get; set; }
+
+        public string Client { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime Until { get; set; } = DateTime.MinValue;
+
+        public void Renew()
+        {
+            Until = DateTime.Now + TimeSpan.FromSeconds(Server.TeamServer.Instance.ConnectionLifeTime);
+
+            Save();
+        }
+
+        public bool IsConnected()
+        {
+            return (DateTime.Now <= Until);
+        }
+    }
 }

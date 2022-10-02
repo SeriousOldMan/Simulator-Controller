@@ -178,11 +178,6 @@ namespace TeamServer {
 			GetConnection(identifier);
 		}
 
-		public string ValidateToken()
-		{
-			return Get("login/validateStoreToken");
-		}
-
 		public string GetConnection(string identifier)
 		{
 			return Get("login/" + identifier);
@@ -196,22 +191,17 @@ namespace TeamServer {
 		#endregion
 
 		#region Data
-		public string GetIDs(string table, string where)
+		public string QueryData(string table, string where)
 		{
-			return Get("store/" + table + "/query", arguments: new Parameters(where));
-		}
-
-		public string GetData(string table, string where)
-		{
-			return Get("store/" + table + "/query", arguments: new Parameters(where));
+			return Get("store/query/" + table, arguments: new Parameters(where));
 		}
 
 		public string CountData(string table, string where)
 		{
-			return Get("store/" + table + "/count", arguments: new Parameters(where));
+			return Get("store/count/" + table, arguments: new Parameters(where));
 		}
 
-		public string LoadData(string table, string identifier)
+		public string GetData(string table, string identifier)
 		{
 			return Get("store/" + table + "/" + identifier);
 		}

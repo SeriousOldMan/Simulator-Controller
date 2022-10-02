@@ -91,7 +91,7 @@ namespace TeamServer.Server {
             return ObjectManager.GetDriverAsync(identifier).Result;
         }
 
-        internal Driver FindDriver(string identifier) {
+        public Driver FindDriver(string identifier) {
             return FindDriver(new Guid(identifier));
         }
 
@@ -103,7 +103,7 @@ namespace TeamServer.Server {
             return driver;
         }
 
-        internal Driver LookupDriver(string identifier) {
+        public Driver LookupDriver(string identifier) {
             return LookupDriver(new Guid(identifier));
         }
         #endregion

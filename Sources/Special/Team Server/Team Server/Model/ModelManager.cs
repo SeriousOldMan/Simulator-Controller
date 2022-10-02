@@ -55,10 +55,10 @@ namespace TeamServer.Model {
 
         protected void CreateStoreTables()
         {
-            Connection.CreateTableAsync<Model.Store.ElectronicsData>().Wait();
-            Connection.CreateTableAsync<Model.Store.TyresData>().Wait();
-            Connection.CreateTableAsync<Model.Store.TyresPressuresData>().Wait();
-            Connection.CreateTableAsync<Model.Store.TyresPressuresDistributionData>().Wait();
+            Connection.CreateTableAsync<Model.Store.Electronics>().Wait();
+            Connection.CreateTableAsync<Model.Store.Tyres>().Wait();
+            Connection.CreateTableAsync<Model.Store.TyresPressures>().Wait();
+            Connection.CreateTableAsync<Model.Store.TyresPressuresDistribution>().Wait();
         }
     }
 }

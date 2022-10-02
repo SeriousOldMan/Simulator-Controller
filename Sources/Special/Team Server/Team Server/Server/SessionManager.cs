@@ -85,7 +85,7 @@ namespace TeamServer.Server {
 			return session;
 		}
 
-		internal Session LookupSession(string identifier) {
+		public Session LookupSession(string identifier) {
 			return LookupSession(new Guid(identifier));
 		}
 
@@ -420,7 +420,7 @@ namespace TeamServer.Server {
 			return lap;
 		}
 
-		internal Lap LookupLap(string identifier) {
+		public Lap LookupLap(string identifier) {
 			return LookupLap(new Guid(identifier));
 		}
 

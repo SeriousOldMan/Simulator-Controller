@@ -57,7 +57,7 @@ namespace TeamServer.Model.Access {
         }
 
         [Ignore]
-        public List<Store.StoreData> Data
+        public List<Store.StoreObject> Data
         {
             get {
                 return ObjectManager.GetAccountStoreDataAsync(this).Result;
@@ -73,7 +73,7 @@ namespace TeamServer.Model.Access {
 
             ObjectManager.DoAccountTokensAsync(this, (Token token) => token.Delete());
 
-            ObjectManager.DoAccountStoreDataAsync(this, (Store.StoreData data) => data.Delete());
+            ObjectManager.DoAccountStoreDataAsync(this, (Store.StoreObject data) => data.Delete());
 
             return base.Delete();
         }

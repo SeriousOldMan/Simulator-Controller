@@ -100,21 +100,6 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("validatestoretoken")]
-        public string ValidateStoreToken([FromQuery(Name = "token")] string token)
-        {
-            try
-            {
-                StoreToken theToken = (StoreToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
-
-                return "Ok";
-            }
-            catch (Exception exception)
-            {
-                return "Error: " + exception.Message;
-            }
-        }
-
         [HttpGet("accountavailableminutes")]
         public string GetAccountMinutes([FromQuery(Name = "token")] string token)
         {

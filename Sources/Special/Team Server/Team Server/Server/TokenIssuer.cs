@@ -192,7 +192,7 @@ namespace TeamServer.Server {
             return connection;
         }
 
-        internal Connection LookupConnection(string identifier)
+        public Connection LookupConnection(string identifier)
         {
             return LookupConnection(new Guid(identifier));
         }

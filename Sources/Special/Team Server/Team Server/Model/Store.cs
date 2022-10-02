@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TeamServer.Model.Store
 {
-    public abstract class StoreData : ModelObject
+    public abstract class StoreObject : ModelObject
     {
         [Indexed]
         public int AccountID { get; set; }
@@ -19,11 +19,11 @@ namespace TeamServer.Model.Store
         }
     }
 
-    [Table("Store_Drivers")]
-    public class DriverData : StoreData
+    [Table("Store_Licenses")]
+    public class License : StoreObject
     {
         [Indexed]
-        public string ID { get; set; }
+        public string LID { get; set; }
 
         public string Forname { get; set; }
 
@@ -32,7 +32,7 @@ namespace TeamServer.Model.Store
         public string Nickname { get; set; }
     }
 
-    public abstract class SimulatorData : StoreData
+    public abstract class SimulatorObject : StoreObject
     {
         public string Simulator { get; set; }
 
@@ -46,7 +46,7 @@ namespace TeamServer.Model.Store
         public string Driver { get; set; }
     }
 
-    public abstract class TelemetryData : SimulatorData
+    public abstract class TelemetryObject : SimulatorObject
     {
         public string Weather { get; set; }
 
@@ -66,7 +66,7 @@ namespace TeamServer.Model.Store
     }
 
     [Table("Store_Electronics")]
-    public class ElectronicsData : TelemetryData
+    public class Electronics : TelemetryObject
     {
         public string Map { get; set; }
 
@@ -76,7 +76,7 @@ namespace TeamServer.Model.Store
     }
 
     [Table("Store_Tyres")]
-    public class TyresData : TelemetryData
+    public class Tyres : TelemetryObject
     {
         public int Laps { get; set; }
 
@@ -106,7 +106,7 @@ namespace TeamServer.Model.Store
     }
 
     [Table("Store_Brakes")]
-    public class BrakesData : TelemetryData
+    public class Brakes : TelemetryObject
     {
         public int Laps { get; set; }
 
@@ -127,7 +127,7 @@ namespace TeamServer.Model.Store
         public float PadWearRearRight { get; set; }
     }
 
-    public abstract class PressuresData : SimulatorData
+    public abstract class PressuresObject : SimulatorObject
     {
         [Indexed]
         public string Weather { get; set; }
@@ -144,7 +144,7 @@ namespace TeamServer.Model.Store
     }
 
     [Table("Store_Tyres_Pressures")]
-    public class TyresPressuresData : PressuresData
+    public class TyresPressures : PressuresObject
     {
         public float HotPressureFrontLeft { get; set; }
 
@@ -164,7 +164,7 @@ namespace TeamServer.Model.Store
     }
 
     [Table("Store_Tyres_Pressures_Distribution")]
-    public class TyresPressuresDistributionData : PressuresData
+    public class TyresPressuresDistribution : PressuresObject
     {
         public string Type { get; set; }
 

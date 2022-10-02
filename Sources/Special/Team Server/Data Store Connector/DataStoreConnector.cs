@@ -156,7 +156,7 @@ namespace TeamServer {
 
 		#region Access
 		public string Login(string name, string password) {
-			string token = Get("login", new Parameters() { { "Name", name }, { "Password", password }, { "Type", "Store" } });
+			string token = Get("login", new Parameters() { { "Name", name }, { "Password", password }, { "Type", "Data" } });
 
 			Token = token;
 
@@ -193,27 +193,27 @@ namespace TeamServer {
 		#region Data
 		public string QueryData(string table, string where)
 		{
-			return Get("store/query/" + table, arguments: new Parameters(where));
+			return Get("data/query/" + table, arguments: new Parameters(where));
 		}
 
 		public string CountData(string table, string where)
 		{
-			return Get("store/count/" + table, arguments: new Parameters(where));
+			return Get("data/count/" + table, arguments: new Parameters(where));
 		}
 
 		public string GetData(string table, string identifier)
 		{
-			return Get("store/" + table + "/" + identifier);
+			return Get("data/" + table + "/" + identifier);
 		}
 
 		public void DeleteData(string table, string identifier)
         {
-			Delete("store/" + table + "/" + identifier);
+			Delete("data/" + table + "/" + identifier);
 		}
 
 		public string InsertData(string table, string data)
         {
-			return Post("store/" + table, body: data);
+			return Post("data/" + table, body: data);
 		}
 		#endregion
 	}

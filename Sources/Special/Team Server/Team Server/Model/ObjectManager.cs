@@ -89,9 +89,9 @@ namespace TeamServer.Model {
             return Connection.Table<Access.SessionToken>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<Access.StoreToken> GetAccountStoreTokenAsync(Access.Account account)
+        public Task<Access.DataToken> GetAccountDataTokenAsync(Access.Account account)
         {
-            return Connection.Table<Access.StoreToken>().Where(t => t.AccountID == account.ID).FirstOrDefaultAsync();
+            return Connection.Table<Access.DataToken>().Where(t => t.AccountID == account.ID).FirstOrDefaultAsync();
         }
 
         public async void DoAccountTokensAsync(Access.Account account, Action<Access.Token> action)
@@ -99,7 +99,7 @@ namespace TeamServer.Model {
             foreach (Access.Token t in await GetAccountSessionTokensAsync(account))
                 action(t);
 
-            Access.Token token = await GetAccountStoreTokenAsync(account);
+            Access.Token token = await GetAccountDataTokenAsync(account);
                 
             if (token != null)
                 action(token);
@@ -116,56 +116,64 @@ namespace TeamServer.Model {
                 ", account.ID);
         }
 
-        public Task<List<Store.Electronics>> GetAccountElectronicsAsync(Access.Account account)
+        public Task<List<Data.License>> GetAccountLicensesAsync(Access.Account account)
         {
-            return Connection.Table<Store.Electronics>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Data.License>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<List<Store.Tyres>> GetAccountTyresAsync(Access.Account account)
+        public Task<List<Data.Electronics>> GetAccountElectronicsAsync(Access.Account account)
         {
-            return Connection.Table<Store.Tyres>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Data.Electronics>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<List<Store.Brakes>> GetAccountBrakesAsync(Access.Account account)
+        public Task<List<Data.Tyres>> GetAccountTyresAsync(Access.Account account)
         {
-            return Connection.Table<Store.Brakes>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Data.Tyres>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<List<Store.TyresPressures>> GetAccountTyresPressuresAsync(Access.Account account)
+        public Task<List<Data.Brakes>> GetAccountBrakesAsync(Access.Account account)
         {
-            return Connection.Table<Store.TyresPressures>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Data.Brakes>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<List<Store.TyresPressuresDistribution>> GetAccountTyresPressuresDistributionDataAsync(Access.Account account)
+        public Task<List<Data.TyresPressures>> GetAccountTyresPressuresAsync(Access.Account account)
         {
-            return Connection.Table<Store.TyresPressuresDistribution>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Data.TyresPressures>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public async void DoAccountStoreDataAsync(Access.Account account, Action<Store.StoreObject> action)
+        public Task<List<Data.TyresPressuresDistribution>> GetAccountTyresPressuresDistributionDataAsync(Access.Account account)
         {
-            foreach (Store.StoreObject data in await GetAccountElectronicsAsync(account))
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public async void DoAccountDataAsync(Access.Account account, Action<Data.DataObject> action)
+        {
+            foreach (Data.DataObject data in await GetAccountLicensesAsync(account))
                 action(data);
 
-            foreach (Store.StoreObject data in await GetAccountTyresAsync(account))
+            foreach (Data.DataObject data in await GetAccountElectronicsAsync(account))
                 action(data);
 
-            foreach (Store.StoreObject data in await GetAccountBrakesAsync(account))
+            foreach (Data.DataObject data in await GetAccountTyresAsync(account))
                 action(data);
 
-            foreach (Store.StoreObject data in await GetAccountTyresPressuresAsync(account))
+            foreach (Data.DataObject data in await GetAccountBrakesAsync(account))
                 action(data);
 
-            foreach (Store.StoreObject data in await GetAccountTyresPressuresDistributionDataAsync(account))
+            foreach (Data.DataObject data in await GetAccountTyresPressuresAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountTyresPressuresDistributionDataAsync(account))
                 action(data);
         }
         
-        public Task<List<Store.StoreObject>> GetAccountStoreDataAsync(Access.Account account)
+        public Task<List<Data.DataObject>> GetAccountDataAsync(Access.Account account)
         {
-            return new Task<List<Store.StoreObject>>(() =>
+            return new Task<List<Data.DataObject>>(() =>
             {
-                List<Store.StoreObject> list = new List<Store.StoreObject>();
+                List<Data.DataObject> list = new List<Data.DataObject>();
 
-                DoAccountStoreDataAsync(account, (Store.StoreObject data) => { list.Add(data); });
+                DoAccountDataAsync(account, (Data.DataObject data) => { list.Add(data); });
 
                 return list;
             });
@@ -178,7 +186,7 @@ namespace TeamServer.Model {
                 Access.Token token = Connection.Table<Access.SessionToken>().Where(t => t.ID == id).FirstOrDefaultAsync().Result;
 
                 if (token == null)
-                    return Connection.Table<Access.StoreToken>().Where(t => t.ID == id).FirstOrDefaultAsync().Result;
+                    return Connection.Table<Access.DataToken>().Where(t => t.ID == id).FirstOrDefaultAsync().Result;
                 else
                     return token;
             });
@@ -189,7 +197,7 @@ namespace TeamServer.Model {
                 Access.Token token = Connection.Table<Access.SessionToken>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync().Result;
 
                 if (token == null)
-                    return Connection.Table<Access.StoreToken>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync().Result;
+                    return Connection.Table<Access.DataToken>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync().Result;
                 else
                     return token;
             });
@@ -424,38 +432,88 @@ namespace TeamServer.Model {
         }
         #endregion
 
-        #region Store.License
-        public Task<Store.License> GetLicenseAsync(Guid identifier)
+        #region Data.License
+        public Task<Data.License> GetLicenseAsync(int id)
         {
-            return Connection.Table<Store.License>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+            return Connection.Table<Data.License>().Where(l => l.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.License> GetLicenseAsync(Guid identifier)
+        {
+            return Connection.Table<Data.License>().Where(l => l.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.License> GetLicenseAsync(string identifier)
+        {
+            return GetLicenseAsync(new Guid(identifier));
         }
         #endregion
 
-        #region Store.Electronics
-        public Task<Store.Electronics> GetElectronicsAsync(Guid identifier)
+        #region Data.Electronics
+        public Task<Data.Electronics> GetElectronicsAsync(int id)
         {
-            return Connection.Table<Store.Electronics>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+            return Connection.Table<Data.Electronics>().Where(e => e.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Electronics> GetElectronicsAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Electronics>().Where(e => e.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Electronics> GetElectronicsAsync(string identifier)
+        {
+            return GetElectronicsAsync(new Guid(identifier));
         }
         #endregion
 
-        #region Store.Tyres
-        public Task<Store.Tyres> GetTyresAsync(Guid identifier)
+        #region Data.Tyres
+        public Task<Data.Tyres> GetTyresAsync(int id)
         {
-            return Connection.Table<Store.Tyres>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+            return Connection.Table<Data.Tyres>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Tyres> GetTyresAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Tyres>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Tyres> GetTyresAsync(string identifier)
+        {
+            return GetTyresAsync(new Guid(identifier));
         }
         #endregion
 
-        #region Store.TyresPressures
-        public Task<Store.TyresPressures> GetTyresPressuresAsync(Guid identifier)
+        #region Data.TyresPressures
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(int id)
         {
-            return Connection.Table<Store.TyresPressures>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+            return Connection.Table<Data.TyresPressures>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(Guid identifier)
+        {
+            return Connection.Table<Data.TyresPressures>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(string identifier)
+        {
+            return GetTyresPressuresAsync(new Guid(identifier));
         }
         #endregion
 
-        #region Store.TyresPressuresDistribution
-        public Task<Store.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(Guid identifier)
+        #region Data.TyresPressuresDistribution
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(int id)
         {
-            return Connection.Table<Store.TyresPressuresDistribution>().Where(s => s.Identifier == identifier).FirstOrDefaultAsync();
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(Guid identifier)
+        {
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(string identifier)
+        {
+            return GetTyresPressuresDistributionAsync(new Guid(identifier));
         }
         #endregion
 

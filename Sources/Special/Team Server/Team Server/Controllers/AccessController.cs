@@ -35,8 +35,8 @@ namespace TeamServer.Controllers {
             try {
                 if (type == "Session")
                     return Server.TeamServer.TokenIssuer.CreateSessionToken(name, password).Identifier.ToString();
-                else if (type == "Store")
-                    return Server.TeamServer.TokenIssuer.CreateStoreToken(name, password).Identifier.ToString();
+                else if (type == "Data")
+                    return Server.TeamServer.TokenIssuer.CreateDataToken(name, password).Identifier.ToString();
                 else
                     throw new Exception("Unknown login type...");
             }

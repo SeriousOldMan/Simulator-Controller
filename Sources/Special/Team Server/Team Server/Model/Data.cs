@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TeamServer.Model.Store
+namespace TeamServer.Model.Data
 {
-    public abstract class StoreObject : ModelObject
+    public abstract class DataObject : ModelObject
     {
         [Indexed]
         public int AccountID { get; set; }
@@ -19,11 +19,11 @@ namespace TeamServer.Model.Store
         }
     }
 
-    [Table("Store_Licenses")]
-    public class License : StoreObject
+    [Table("Data_Licenses")]
+    public class License : DataObject
     {
         [Indexed]
-        public string LID { get; set; }
+        public string Driver { get; set; }
 
         public string Forname { get; set; }
 
@@ -32,7 +32,7 @@ namespace TeamServer.Model.Store
         public string Nickname { get; set; }
     }
 
-    public abstract class SimulatorObject : StoreObject
+    public abstract class SimulatorObject : DataObject
     {
         public string Simulator { get; set; }
 
@@ -65,7 +65,7 @@ namespace TeamServer.Model.Store
         public float LapTime { get; set; }
     }
 
-    [Table("Store_Electronics")]
+    [Table("Data_Electronics")]
     public class Electronics : TelemetryObject
     {
         public string Map { get; set; }
@@ -75,7 +75,7 @@ namespace TeamServer.Model.Store
         public string ABS { get; set; }
     }
 
-    [Table("Store_Tyres")]
+    [Table("Data_Tyres")]
     public class Tyres : TelemetryObject
     {
         public int Laps { get; set; }
@@ -105,7 +105,7 @@ namespace TeamServer.Model.Store
         public float WearRearRight { get; set; }
     }
 
-    [Table("Store_Brakes")]
+    [Table("Data_Brakes")]
     public class Brakes : TelemetryObject
     {
         public int Laps { get; set; }
@@ -143,7 +143,7 @@ namespace TeamServer.Model.Store
         public string TyreCompoundColor { get; set; }
     }
 
-    [Table("Store_Tyres_Pressures")]
+    [Table("Data_Tyres_Pressures")]
     public class TyresPressures : PressuresObject
     {
         public float HotPressureFrontLeft { get; set; }
@@ -163,7 +163,7 @@ namespace TeamServer.Model.Store
         public float ColdPressureRearRight { get; set; }
     }
 
-    [Table("Store_Tyres_Pressures_Distribution")]
+    [Table("Data_Tyres_Pressures_Distribution")]
     public class TyresPressuresDistribution : PressuresObject
     {
         public string Type { get; set; }

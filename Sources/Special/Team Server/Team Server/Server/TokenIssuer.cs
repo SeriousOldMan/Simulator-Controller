@@ -36,7 +36,7 @@ namespace TeamServer.Server {
             }
         }
 
-        public StoreToken CreateStoreToken(string name, string password)
+        public DataToken CreateDataToken(string name, string password)
         {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
@@ -44,11 +44,11 @@ namespace TeamServer.Server {
                 throw new Exception("Unknown account or password...");
             else
             {
-                StoreToken token = ObjectManager.GetAccountStoreTokenAsync(account).Result;
+                DataToken token = ObjectManager.GetAccountDataTokenAsync(account).Result;
 
                 if (token == null)
                 {
-                    token = new StoreToken
+                    token = new DataToken
                     {
                         Identifier = Guid.NewGuid(),
                         AccountID = account.ID,
@@ -249,9 +249,9 @@ namespace TeamServer.Server {
                         DeleteToken(t);
                 }));
 
-            await ObjectManager.Connection.QueryAsync<StoreToken>(
+            await ObjectManager.Connection.QueryAsync<DataToken>(
                 @"
-                    Select * From Access_Store_Tokens Where Until < ?
+                    Select * From Access_Data_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
                         DeleteToken(t);

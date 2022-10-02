@@ -34,10 +34,10 @@ namespace TeamServer.Model.Access {
         }
 
         [Ignore]
-        public StoreToken StoreToken
+        public DataToken DataToken
         {
             get {
-                return ObjectManager.GetAccountStoreTokenAsync(this).Result;
+                return ObjectManager.GetAccountDataTokenAsync(this).Result;
             }
         }
 
@@ -57,10 +57,10 @@ namespace TeamServer.Model.Access {
         }
 
         [Ignore]
-        public List<Store.StoreObject> Data
+        public List<Data.DataObject> Data
         {
             get {
-                return ObjectManager.GetAccountStoreDataAsync(this).Result;
+                return ObjectManager.GetAccountDataAsync(this).Result;
             }
         }
 
@@ -73,7 +73,7 @@ namespace TeamServer.Model.Access {
 
             ObjectManager.DoAccountTokensAsync(this, (Token token) => token.Delete());
 
-            ObjectManager.DoAccountStoreDataAsync(this, (Store.StoreObject data) => data.Delete());
+            ObjectManager.DoAccountDataAsync(this, (Data.DataObject data) => data.Delete());
 
             return base.Delete();
         }
@@ -146,8 +146,8 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    [Table("Access_Store_Tokens")]
-    public class StoreToken : Token
+    [Table("Access_Data_Tokens")]
+    public class DataToken : Token
     {
     }
 

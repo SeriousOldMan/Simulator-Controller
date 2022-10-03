@@ -94,6 +94,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception)
             {
                 return "Error: " + exception.Message;
@@ -125,6 +129,10 @@ namespace TeamServer.Controllers {
                 account.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -181,6 +189,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(connection,
                                                        new List<string>(new string[] { "Identifier", "Client", "Name", "Type", "Session" }));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

@@ -62,15 +62,34 @@ namespace TeamServer {
 			return Server + request + arguments;
 		}
 
-		public string Get(string request, Parameters arguments = null) {
+		public string Get(string request, Parameters arguments = null, string body = null)
+		{
 			string result;
 
-			try {
-                string uri = BuildRequest(request, arguments);
+			try
+			{
+				string uri = BuildRequest(request, arguments);
 
-                result = httpClient.GetStringAsync(uri).Result;
+				if (body == null)
+					result = httpClient.GetStringAsync(uri).Result;
+				else
+				{
+					var httpRequest = new HttpRequestMessage
+					{
+						Method = HttpMethod.Get,
+						RequestUri = new Uri(uri),
+						Content = new StringContent(body, Encoding.Unicode)
+					};
+
+					var response = httpClient.SendAsync(httpRequest).Result;
+
+					response.EnsureSuccessStatusCode();
+
+					result = response.Content.ReadAsStringAsync().Result;
+				}
 			}
-			catch (Exception e) {
+			catch (Exception e)
+			{
 				result = "Error: " + e.Message;
 			}
 

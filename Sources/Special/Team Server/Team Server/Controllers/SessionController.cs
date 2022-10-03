@@ -42,6 +42,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(session, new List<string>(new string[] { "Identifier", "Name", "Duration", "Started", "Finished", "Car", "Track" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -55,6 +59,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetSessionValue(sessionManager.LookupSession(identifier), name);
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -74,6 +82,10 @@ namespace TeamServer.Controllers {
                     ", identifier, stint).Result.FirstOrDefault<Stint>();
 
                 return sessionManager.GetStintValue(theStint, name);
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -95,6 +107,10 @@ namespace TeamServer.Controllers {
 
                 return sessionManager.GetLapValue(theLap, name);
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception)
             {
                 return "Error: " + exception.Message;
@@ -111,6 +127,10 @@ namespace TeamServer.Controllers {
                 sessionManager.SetSessionValue(identifier, name, value);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -134,6 +154,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -155,6 +179,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -170,6 +198,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteSessionValue(identifier, name);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -192,6 +224,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -213,6 +249,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -225,6 +265,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
                 
                 return sessionManager.LookupSession(identifier).Team.Identifier.ToString();
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -240,6 +284,10 @@ namespace TeamServer.Controllers {
                 Stint stint = session.GetCurrentStint();
 
                 return (stint != null) ? stint.Driver.Identifier.ToString() : "Null";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -261,6 +309,10 @@ namespace TeamServer.Controllers {
 
                 return (theStint != null) ? theStint.Identifier.ToString() : "Null";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -280,6 +332,10 @@ namespace TeamServer.Controllers {
                     ", identifier, lap).Result.FirstOrDefault<Lap>();
 
                 return (theLap != null) ? theLap.Identifier.ToString() : "Null";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -309,6 +365,10 @@ namespace TeamServer.Controllers {
 
                 return "";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -324,6 +384,10 @@ namespace TeamServer.Controllers {
 
                 return (stint != null) ? stint.Identifier.ToString() : "Null";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -336,6 +400,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupSession(identifier).Stints.OrderBy(s => s.Nr).Select(s => s.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -351,6 +419,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupSession(identifier).Connections.Select(s => s.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -370,6 +442,10 @@ namespace TeamServer.Controllers {
                 session.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -392,6 +468,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -408,6 +488,10 @@ namespace TeamServer.Controllers {
                 sessionManager.FinishSession(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -427,6 +511,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception)
             {
                 return "Error: " + exception.Message;
@@ -444,6 +532,10 @@ namespace TeamServer.Controllers {
 
                 return sessionManager.CreateSession(theTeam, properties.GetValueOrDefault<string, string>("Name", "Unknown")).Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -458,6 +550,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteSession(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -483,6 +579,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(stint, new List<string>(new string[] { "Identifier", "Nr", "Lap" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -496,6 +596,10 @@ namespace TeamServer.Controllers {
 				
                 return sessionManager.LookupStint(identifier).Session.Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -508,6 +612,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.LookupStint(identifier).Driver.Identifier.ToString();
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -524,6 +632,10 @@ namespace TeamServer.Controllers {
 
                 return (lap != null) ? lap.Identifier.ToString() : "Null";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -536,6 +648,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", sessionManager.LookupStint(identifier).Laps.OrderBy(l => l.Nr).Select(l => l.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -552,6 +668,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetStintValue(identifier, name);
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -570,6 +690,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -585,6 +709,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteStintValue(identifier, name);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -605,6 +733,10 @@ namespace TeamServer.Controllers {
 
                 return sessionManager.CreateStint(theSession, theDriver, lap: Int32.Parse(properties["Lap"])).Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -619,6 +751,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteStint(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -645,6 +781,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(lap, new List<string>(new string[] { "Identifier", "Nr" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -657,6 +797,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 				
                 return sessionManager.LookupLap(identifier).Stint.Identifier.ToString();
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -673,6 +817,10 @@ namespace TeamServer.Controllers {
                                                                    (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return sessionManager.GetLapValue(identifier, name);
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception)
             {
@@ -691,6 +839,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -706,6 +858,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteLapValue(identifier, name);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -723,6 +879,10 @@ namespace TeamServer.Controllers {
 
                 return sessionManager.CreateLap(theStint, lap: Int32.Parse(properties["Nr"])).Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -737,6 +897,10 @@ namespace TeamServer.Controllers {
                 sessionManager.DeleteLap(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

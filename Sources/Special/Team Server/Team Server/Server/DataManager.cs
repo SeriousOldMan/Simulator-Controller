@@ -16,7 +16,8 @@ namespace TeamServer.Server
 
 		public DataManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			TeamServer.TokenIssuer.ElevateToken(token);
+			if (!typeof(Model.Access.DataToken).IsInstanceOfType(token))
+				throw new Exception("Invalid token...");
 		}
 
 		#region Generic
@@ -37,40 +38,46 @@ namespace TeamServer.Server
 		public void ValidateLicense(License license)
 		{
 			if (license == null)
-				throw new Exception("Not valid license data...");
+				throw new Exception("No valid license data...");
 		}
 
 		public void ValidateElectronics(Electronics electronics)
 		{
 			if (electronics == null)
-				throw new Exception("Not valid electronics data...");
+				throw new Exception("No valid electronics data...");
 		}
 
 		public void ValidateTyres(Tyres tyres)
 		{
 			if (tyres == null)
-				throw new Exception("Not valid tyres data...");
+				throw new Exception("No valid tyres data...");
+		}
+
+		public void ValidateBrakes(Brakes brakes)
+		{
+			if (brakes == null)
+				throw new Exception("No valid brakes data...");
 		}
 
 		public void ValidateTyresPressures(TyresPressures tyresPressures)
 		{
 			if (tyresPressures == null)
-				throw new Exception("Not valid tyres pressures data...");
+				throw new Exception("No valid tyres pressures data...");
 		}
 
 		public void ValidateTyresPressuresDistribution(TyresPressuresDistribution tyresPressuresDistribution)
 		{
 			if (tyresPressuresDistribution == null)
-				throw new Exception("Not valid tyres pressures distribution data...");
+				throw new Exception("No valid tyres pressures distribution data...");
 		}
 		#endregion
 
 		#region License
 		#region Query
-		public string QueryLicenses(string where)
+		public IEnumerable<Guid> QueryLicenses(string where)
 		{
-			return String.Join(";", ObjectManager.Connection.QueryAsync<License>(
-				@"Select Identifier From Data_Licenses Where " + where).Result.Select(d => d.Identifier));
+			return ObjectManager.Connection.QueryAsync<License>(
+				@"Select Identifier From Data_Licenses Where " + where).Result.Select(d => d.Identifier);
 		}
 
 		public int CountLicenses(string where)
@@ -146,10 +153,10 @@ namespace TeamServer.Server
 
 		#region Electronics
 		#region Query
-		public string QueryElectronics(string where)
+		public IEnumerable<Guid> QueryElectronics(string where)
 		{
-			return String.Join(";", ObjectManager.Connection.QueryAsync<Electronics>(
-				@"Select Identifier From Data_Electronics Where " + where).Result.Select(d => d.Identifier));
+			return ObjectManager.Connection.QueryAsync<Electronics>(
+				@"Select Identifier From Data_Electronics Where " + where).Result.Select(d => d.Identifier);
 		}
 
 		public int CountElectronics(string where)
@@ -226,10 +233,10 @@ namespace TeamServer.Server
 
 		#region Tyres
 		#region Query
-		public string QueryTyres(string where)
+		public IEnumerable<Guid> QueryTyres(string where)
 		{
-			return String.Join(";", ObjectManager.Connection.QueryAsync<Tyres>(
-				@"Select Identifier From Data_Tyres Where " + where).Result.Select(d => d.Identifier));
+			return ObjectManager.Connection.QueryAsync<Tyres>(
+				@"Select Identifier From Data_Tyres Where " + where).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyres(string where)
@@ -304,12 +311,97 @@ namespace TeamServer.Server
 		#endregion
 		#endregion
 
+
+
+
+
+
+		#region Brakes
+		#region Query
+		public IEnumerable<Guid> QueryBrakes(string where)
+		{
+			return ObjectManager.Connection.QueryAsync<Brakes>(
+				@"Select Identifier From Data_Brakes Where " + where).Result.Select(d => d.Identifier);
+		}
+
+		public int CountBrakes(string where)
+		{
+			return ObjectManager.Connection.ExecuteScalarAsync<int>(
+				@"Select Count(ID) From Data_Brakes Where " + where).Result;
+		}
+
+		public Brakes LookupBrakes(Guid identifier)
+		{
+			Brakes brakes = FindBrakes(identifier);
+
+			ValidateBrakes(brakes);
+
+			return brakes;
+		}
+
+		public Brakes LookupBrakes(string identifier)
+		{
+			return LookupBrakes(new Guid(identifier));
+		}
+
+		public Brakes FindBrakes(Guid identifier)
+		{
+			return ObjectManager.GetBrakesAsync(identifier).Result;
+		}
+
+		public Brakes FindBrakes(string identifier)
+		{
+			return FindBrakes(new Guid(identifier));
+		}
+		#endregion
+
+		#region CRUD
+		public Brakes CreateBrakes(Dictionary<string, string> values)
+		{
+			Brakes brakes = new Brakes() { AccountID = Token.AccountID };
+
+			SetProperties(brakes, values);
+
+			ValidateBrakes(brakes);
+
+			brakes.Save();
+
+			return brakes;
+		}
+
+		public void UpdateBrakes(Brakes brakes, Dictionary<string, string> values)
+		{
+			ValidateBrakes(brakes);
+
+			SetProperties(brakes, values);
+
+			brakes.Save();
+		}
+
+		public void DeleteBrakes(Brakes brakes)
+		{
+			if (brakes != null)
+				brakes.Delete();
+		}
+
+		public void DeleteBrakes(Guid identifier)
+		{
+			DeleteBrakes(ObjectManager.GetBrakesAsync(identifier).Result);
+		}
+
+		public void DeleteBrakes(string identifier)
+		{
+			DeleteBrakes(new Guid(identifier));
+		}
+		#endregion
+		#endregion
+
 		#region TyresPressures
 		#region Query
-		public string QueryTyresPressures(string where)
+		public IEnumerable<Guid>  QueryTyresPressures(string where)
 		{
-			return String.Join(";", ObjectManager.Connection.QueryAsync<TyresPressures>(
-				@"Select Identifier From Data_TyresPressures Where " + where).Result.Select(d => d.Identifier));
+			return ObjectManager.Connection.QueryAsync<TyresPressures>(
+				@"Select Identifier From Data_TyresPressures Where " + where).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyresPressures(string where)
@@ -386,10 +478,10 @@ namespace TeamServer.Server
 
 		#region TyresPressuresDistribution
 		#region Query
-		public string QueryTyresPressuresDistribution(string where)
+		public IEnumerable<Guid> QueryTyresPressuresDistribution(string where)
 		{
-			return String.Join(";", ObjectManager.Connection.QueryAsync<TyresPressuresDistribution>(
-				@"Select Identifier From Data_TyresPressuresDistribution Where " + where).Result.Select(d => d.Identifier));
+			return ObjectManager.Connection.QueryAsync<TyresPressuresDistribution>(
+				@"Select Identifier From Data_TyresPressuresDistribution Where " + where).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyresPressuresDistribution(string where)

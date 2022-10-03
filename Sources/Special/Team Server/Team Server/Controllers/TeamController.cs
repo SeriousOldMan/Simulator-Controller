@@ -42,6 +42,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(team, new List<string>(new string[] { "Identifier", "Name" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -54,6 +58,10 @@ namespace TeamServer.Controllers {
                                                           (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 return String.Join(";", teamManager.LookupTeam(identifier).Drivers.Select(d => d.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -89,6 +97,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -104,6 +116,10 @@ namespace TeamServer.Controllers {
                 
                 return teamManager.CreateTeam(theToken.Account, properties["Name"]).Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -118,6 +134,10 @@ namespace TeamServer.Controllers {
                 teamManager.DeleteTeam(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -144,6 +164,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(driver, new List<string>(new string[] { "Identifier", "ForName", "SurName", "NickName" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -162,6 +186,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -178,6 +206,10 @@ namespace TeamServer.Controllers {
 
                 return teamManager.CreateDriver(theTeam, properties["ForName"], properties["SurName"], properties["NickName"]).Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -192,6 +224,10 @@ namespace TeamServer.Controllers {
                 teamManager.DeleteDriver(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

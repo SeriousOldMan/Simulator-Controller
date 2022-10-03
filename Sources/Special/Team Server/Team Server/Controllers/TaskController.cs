@@ -39,6 +39,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(task, new List<string>(new string[] { "Identifier", "Which", "What", "When", "Active" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -68,6 +72,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -86,6 +94,10 @@ namespace TeamServer.Controllers {
 
                 return task.Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -99,6 +111,10 @@ namespace TeamServer.Controllers {
                 taskManager.DeleteTask(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

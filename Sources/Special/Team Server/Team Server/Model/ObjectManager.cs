@@ -483,6 +483,23 @@ namespace TeamServer.Model {
         }
         #endregion
 
+        #region Data.Brakes
+        public Task<Data.Brakes> GetBrakesAsync(int id)
+        {
+            return Connection.Table<Data.Brakes>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Brakes> GetBrakesAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Brakes>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Brakes> GetBrakesAsync(string identifier)
+        {
+            return GetBrakesAsync(new Guid(identifier));
+        }
+        #endregion
+
         #region Data.TyresPressures
         public Task<Data.TyresPressures> GetTyresPressuresAsync(int id)
         {

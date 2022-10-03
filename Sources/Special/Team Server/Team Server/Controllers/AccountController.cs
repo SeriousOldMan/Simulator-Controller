@@ -39,6 +39,10 @@ namespace TeamServer.Controllers {
 
                 return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "EMail", "Virgin", "Contract", "ContractMinutes", "AvailableMinutes" }));
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -70,6 +74,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -87,6 +95,10 @@ namespace TeamServer.Controllers {
                 account.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -108,6 +120,10 @@ namespace TeamServer.Controllers {
 
                 return "Ok";
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -124,6 +140,10 @@ namespace TeamServer.Controllers {
                 account.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -158,6 +178,10 @@ namespace TeamServer.Controllers {
                 
                 return account.Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -171,6 +195,10 @@ namespace TeamServer.Controllers {
                 accountManager.DeleteAccount(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

@@ -12,7 +12,8 @@ namespace TeamServer.Server {
 
 		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			TeamServer.TokenIssuer.ElevateToken(token);
+			if (!typeof(Model.Access.SessionToken).IsInstanceOfType(token))
+				TeamServer.TokenIssuer.ElevateToken(token);
 		}
 
 		#region Validation

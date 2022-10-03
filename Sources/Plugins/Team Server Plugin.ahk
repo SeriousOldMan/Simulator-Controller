@@ -296,6 +296,8 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.disableTeamServer(false, true)
 
 			this.keepAlive()
+
+			OnExit(ObjBindMethod(this, "finishSession"))
 		}
 	}
 
@@ -629,6 +631,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.iLapData := {Telemetry: {}, Positions: {}}
 		this.iSessionActive := false
+
+		return false
 	}
 
 	joinSession(simulator, car, track, lapNumber, duration := 0) {

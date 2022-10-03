@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 
 namespace TeamServer {
-    public class TeamServerConnector {
+    public class DataConnector {
 		static readonly HttpClient httpClient = new HttpClient();
 
 		public class Parameters : Dictionary<string, string> {
@@ -29,7 +29,7 @@ namespace TeamServer {
 
 		public string Token { get; set; } = "";
 		
-		public TeamServerConnector() {
+		public DataConnector() {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
@@ -77,13 +77,29 @@ namespace TeamServer {
 			return Server + request + arguments;
 		}
 
-		public string Get(string request, Parameters arguments = null) {
+		public string Get(string request, Parameters arguments = null, string body = null) {
 			string result;
 
 			try {
                 string uri = BuildRequest(request, arguments);
 
-                result = httpClient.GetStringAsync(uri).Result;
+				if (body == null)
+					result = httpClient.GetStringAsync(uri).Result;
+				else
+                {
+					var httpRequest = new HttpRequestMessage
+					{
+						Method = HttpMethod.Get,
+						RequestUri = new Uri(uri),
+						Content = new StringContent(body, Encoding.Unicode)
+					};
+
+					var response = httpClient.SendAsync(httpRequest).Result;
+
+					response.EnsureSuccessStatusCode();
+
+					result = response.Content.ReadAsStringAsync().Result;
+				}
 			}
 			catch (Exception e) {
 				result = "Error: " + e.Message;
@@ -178,27 +194,27 @@ namespace TeamServer {
 			GetConnection(identifier);
 		}
 
-		public string GetConnection(string identifier)
-		{
-			return Get("login/" + identifier);
-		}
-
 		public void Logout() {
 			Token = "";
 
 			Delete("logout");
+		}
+
+		public string GetConnection(string identifier)
+		{
+			return Get("login/" + identifier);
 		}
 		#endregion
 
 		#region Data
 		public string QueryData(string table, string where)
 		{
-			return Get("data/query/" + table, arguments: new Parameters(where));
+			return Get("data/query/" + table, body: where);
 		}
 
 		public string CountData(string table, string where)
 		{
-			return Get("data/count/" + table, arguments: new Parameters(where));
+			return Get("data/count/" + table, body: where);
 		}
 
 		public string GetData(string table, string identifier)
@@ -206,14 +222,19 @@ namespace TeamServer {
 			return Get("data/" + table + "/" + identifier);
 		}
 
+		public void UpdateData(string table, string identifier, string properties)
+		{
+			Put("data/" + table + "/" + identifier, body: properties);
+		}
+
 		public void DeleteData(string table, string identifier)
         {
 			Delete("data/" + table + "/" + identifier);
 		}
 
-		public string InsertData(string table, string data)
+		public string InsertData(string table, string properties)
         {
-			return Post("data/" + table, body: data);
+			return Post("data/" + table, body: properties);
 		}
 		#endregion
 	}

@@ -20,7 +20,7 @@ namespace TeamServer.Controllers
             _logger = logger;
         }
 
-        [HttpGet("query/{table:string}")]
+        [HttpGet("query/{table}")]
         public string QueryData([FromQuery(Name = "token")] string token, [FromBody] string where, string table)
         {
             try
@@ -56,7 +56,7 @@ namespace TeamServer.Controllers
             }
         }
 
-        [HttpGet("count/{table:string}")]
+        [HttpGet("count/{table}")]
         public string CountData([FromQuery(Name = "token")] string token, [FromBody] string where, string table)
         {
             try
@@ -92,7 +92,7 @@ namespace TeamServer.Controllers
             }
         }
 
-        [HttpGet("{table:string}/{identifier:string}")]
+        [HttpGet("{table}/{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string table, string identifier)
         {
             try
@@ -178,7 +178,7 @@ namespace TeamServer.Controllers
             }
         }
 
-        [HttpPut("{table:string}/{identifier:string}")]
+        [HttpPut("{table}/{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string table, string identifier,
                           [FromBody] string keyValues)
         {
@@ -223,7 +223,7 @@ namespace TeamServer.Controllers
             }
         }
 
-        [HttpPost("{table:string}")]
+        [HttpPost("{table}")]
         public string Post([FromQuery(Name = "token")] string token, string table, [FromBody] string keyValues)
         {
             DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
@@ -260,7 +260,7 @@ namespace TeamServer.Controllers
             }
         }
 
-        [HttpDelete("{table:string}/{identifier:string}")]
+        [HttpDelete("{table}/{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string table, string identifier)
         {
             DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,

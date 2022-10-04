@@ -172,17 +172,27 @@ namespace TeamServer {
 
 		#region Access
 		public string Login(string name, string password) {
-			string token = Get("login", new Parameters() { { "Name", name }, { "Password", password }, { "Type", "Data" } });
+			string token = Get("login", new Parameters() { { "Name", name }, { "Password", password } });
 
 			Token = token;
 
 			return token;
 		}
 
-		public string Connect(string token, string client, string name, string type, string session = "")
+		public string GetSessionToken()
 		{
-			string connection = Get("login/connect", new Parameters() { { "token", token }, { "client", client }, { "name", name },
-																		{ "type", type }, { "session", session } });
+			return Get("login/token/session", new Parameters() { { "token", Token } });
+		}
+
+		public string GetDataToken()
+		{
+			return Get("login/token/data", new Parameters() { { "token", Token } });
+		}
+
+		public string Connect(string token, string client, string name)
+		{
+			string connection = Get("login/connect/data", new Parameters() { { "token", token },
+																			 { "client", client }, { "name", name } });
 
 			Token = token;
 

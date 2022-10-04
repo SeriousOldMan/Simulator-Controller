@@ -263,7 +263,7 @@ class RaceCenter extends ConfigurationItem {
 	iRaceSettings := false
 
 	iConnector := false
-	iConnected := false
+	iConnection := false
 
 	iServerURL := ""
 	iServerToken := "__INVALID__"
@@ -673,7 +673,13 @@ class RaceCenter extends ConfigurationItem {
 
 	Connected[] {
 		Get {
-			return this.iConnected
+			return (this.iConnection != false)
+		}
+	}
+
+	Connection[] {
+		Get {
+			return this.iConnection
 		}
 	}
 
@@ -1094,7 +1100,9 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSyncTask := new SyncSessionTask()
 
-		Task.addTask(this.iSyncTask)
+		this.iSyncTask.start()
+
+		new PeriodicTask(ObjBindMethod(this, "keepAlive"), 120000, kLowPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1505,7 +1513,7 @@ class RaceCenter extends ConfigurationItem {
 
 	connectAsync(silent) {
 		local window := this.Window
-		local token, title
+		local token, title, connection
 
 		if (!silent && GetKeyState("Ctrl", "P")) {
 			Gui TSL:+Owner%window%
@@ -1541,18 +1549,25 @@ class RaceCenter extends ConfigurationItem {
 			if (!this.ServerToken || (this.ServerToken = ""))
 				throw "Invalid token detected..."
 
-			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
+			this.Connector.Initialize(this.ServerURL)
 
-			this.iConnected := true
+			connection := this.Connector.Connect(this.ServerToken, new SessionDatabase().ID, "Race Center", "Internal", this.SelectedSession)
 
-			showMessage(translate("Successfully connected to the Team Server."))
+			if connection {
+				this.iConnection := connection
 
-			this.loadTeams()
+				showMessage(translate("Successfully connected to the Team Server."))
 
-			this.iSyncTask.resume()
+				this.loadTeams()
+
+				this.iSyncTask.resume()
+			}
+			else
+				throw "Cannot connect to Team Server..."
 		}
 		catch exception {
 			this.iServerToken := "__INVALID__"
+			this.iConnection := false
 
 			GuiControl, , serverTokenEdit, % ""
 
@@ -1566,6 +1581,13 @@ class RaceCenter extends ConfigurationItem {
 
 			this.loadTeams()
 		}
+	}
+
+	keepAlive() {
+		local connection := this.Connection
+
+		if connection
+			this.Connector.KeepAlive(connection)
 	}
 
 	loadTeams() {
@@ -1686,10 +1708,14 @@ class RaceCenter extends ConfigurationItem {
 		if (chosen > 0) {
 			this.iSessionName := names[chosen]
 			this.iSessionIdentifier := identifier
+
+			this.iConnection := this.Connector.Connect(this.ServerToken, new SessionDatabase().ID, "Race Center", "Internal", identifier)
 		}
 		else {
 			this.iSessionName := ""
 			this.iSessionIdentifier := false
+
+			this.iConnection := false
 		}
 
 		this.initializeSession()
@@ -6704,7 +6730,7 @@ class RaceCenter extends ConfigurationItem {
 			else {
 				this.iSyncTask.pause()
 
-				this.iConnected := false
+				this.iConnection := false
 
 				this.initializeSession()
 
@@ -9845,9 +9871,11 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 			return false
 		else if (result == kOk) {
 			try {
-				connectorOrCommand.Connect(teamServerURL)
+				connectorOrCommand.Initialize(teamServerURL)
 
-				return connectorOrCommand.Login(nameEdit, passwordEdit)
+				connectorOrCommand.Login(nameEdit, passwordEdit)
+
+				return connectorOrCommand.GetSessionToken()
 			}
 			catch exception {
 				title := translate("Error")

@@ -33,6 +33,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include ..\Libraries\Task.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -137,7 +139,7 @@ global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
-	local dllName, dllFile
+	local dllName, dllFile, connection
 	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 
 	static connector := false
@@ -176,6 +178,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static deleteAccountButton
 	static saveAccountButton
 
+	static keepAliveTask := false
+
 	if (configurationOrCommand == kClose)
 		done := true
 	else if (configurationOrCommand == kConnect) {
@@ -184,13 +188,23 @@ administrationEditor(configurationOrCommand, arguments*) {
 		GuiControlGet teamServerPasswordEdit
 
 		try {
-			connector.Connect(teamServerURLEdit)
+			connector.Initialize(teamServerURLEdit)
+
 			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 
 			if (token = "")
 				token := false
 
 			if token {
+				connection := connector.Connect(token, new SessionDatabase().ID, "Server Administration", "Internal")
+
+				if keepAliveTask
+					keepAliveTask.stop()
+
+				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+
+				keepAliveTask.start()
+
 				accounts := loadAccounts(connector, accountsListView)
 
 				administrationEditor(kEvent, "TasksLoad")

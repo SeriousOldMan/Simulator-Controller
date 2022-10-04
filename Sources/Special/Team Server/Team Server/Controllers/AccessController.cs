@@ -17,28 +17,26 @@ namespace TeamServer.Controllers {
             _logger = logger;
         }
 
+        public Token ValidateToken(Token token)
+        {
+            Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
+
+            if (!theToken.IsAllowed(Token.TokenType.Account))
+                throw new Exception("Invalid token type...");
+            else
+                return theToken;
+        }
+
         [HttpGet]
-        public string Login([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password,
-                            [FromQuery(Name = "type")] string type) {
+        public string Login([FromQuery(Name = "name")] string name, [FromQuery(Name = "password")] string password) {
             if (name == null)
                 name = "";
 
             if (password == null)
                 password = "";
 
-            if (type == null)
-                type = "";
-
-            if (type == "")
-                type = "Session";
-
             try {
-                if (type == "Session")
-                    return Server.TeamServer.TokenIssuer.CreateSessionToken(name, password).Identifier.ToString();
-                else if (type == "Data")
-                    return Server.TeamServer.TokenIssuer.CreateDataToken(name, password).Identifier.ToString();
-                else
-                    throw new Exception("Unknown login type...");
+                return Server.TeamServer.TokenIssuer.CreateAccountToken(name, password).Identifier.ToString();
             }
             catch (AggregateException exception) {
                 return "Error: " + exception.InnerException.Message;
@@ -48,10 +46,41 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("connect")]
+        [HttpGet("token/{type}")]
+        public string IssueToken([FromQuery(Name = "token")] string token, string type)
+        {
+            if ((type == null) || (type == ""))
+                return "Error: Invalid token request...";
+
+            TokenIssuer tokenIssuer = Server.TeamServer.TokenIssuer;
+
+            try {
+                Token theToken = tokenIssuer.ValidateToken(token);
+
+                ValidateToken(theToken);
+
+                if (type == "Session")
+                    return tokenIssuer.IssueSessionToken(theToken).Identifier.ToString();
+                else if (type == "Data")
+                    return tokenIssuer.IssueDataToken(theToken).Identifier.ToString();
+                else
+                    return "Error: Invalid token type...";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("connect/{category}")]
         public string Connect([FromQuery(Name = "token")] string token,
                               [FromQuery(Name = "client")] string client, [FromQuery(Name = "name")] string name,
-                              [FromQuery(Name = "type")] string type, [FromQuery(Name = "session")] string session)
+                              [FromQuery(Name = "type")] string type, [FromQuery(Name = "session")] string session,
+                              string category)
         {
             if (client == null)
                 client = "";
@@ -65,15 +94,28 @@ namespace TeamServer.Controllers {
             if (type == null)
                 type = "";
 
+            if (category == "session")
+            {
+                if (session == "")
+                    throw new Exception("Not a valid or active session...");
+
+            }
+            else if (category == "data")
+            {
+                if (type != "Internal")
+                    throw new Exception("Not a valid connection type...");
+
+            }
+            else if (category != "admin")
+                throw new Exception("Unknown access type...");
+
             Connection.ConnectionType theType = Connection.ConnectionType.Unknown;
 
             try {
                 if (!Enum.TryParse(type, out theType))
                     throw new Exception("Unknown connection type...");
 
-                Server.TeamServer.TokenIssuer.Connect(token, client, name, theType, session);
-
-                return "Ok";
+                return Server.TeamServer.TokenIssuer.Connect(token, client, name, theType, session).Identifier.ToString();
             }
             catch (AggregateException exception)
             {
@@ -84,6 +126,7 @@ namespace TeamServer.Controllers {
                 return "Error: " + exception.Message;
             }
         }
+
 
         [HttpGet("validatetoken")]
         public string ValidateToken([FromQuery(Name = "token")] string token)

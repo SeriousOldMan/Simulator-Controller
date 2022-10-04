@@ -44,9 +44,9 @@ namespace TeamServer.Server {
             }
         }
 
-        public Token CreateSessionToken(string name, string password)
+        public Token IssueSessionToken(Token token)
         {
-            Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
+            Account account = token.Account;
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
@@ -58,7 +58,7 @@ namespace TeamServer.Server {
                 throw new Exception("Not enough time available on account...");
             else
             {
-                Token token = new Token
+                token = new Token
                 {
                     AccountID = account.ID,
                     Type = Token.TokenType.Session,
@@ -72,9 +72,9 @@ namespace TeamServer.Server {
             }
         }
 
-        public Token CreateDataToken(string name, string password)
+        public Token IssueDataToken(Token token)
         {
-            Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
+            Account account = token.Account;
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
@@ -82,7 +82,7 @@ namespace TeamServer.Server {
                 throw new Exception("Account does not support data access...");
             else
             {
-                Token token = ObjectManager.GetAccountDataTokenAsync(account).Result;
+                token = ObjectManager.GetAccountDataTokenAsync(account).Result;
 
                 if (token == null)
                 {

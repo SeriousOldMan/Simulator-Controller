@@ -167,10 +167,22 @@ namespace TeamServer {
 			return token;
 		}
 
+		public string GetSessionToken()
+		{
+			return Get("login/token/session", new Parameters() { { "token", Token } });
+		}
+
+		public string GetDataToken()
+		{
+			return Get("login/token/data", new Parameters() { { "token", Token } });
+		}
+
 		public string Connect(string token, string client, string name, string type, string session = "")
 		{
-			string connection = Get("login/connect", new Parameters() { { "token", token }, { "client", client }, { "name", name },
-																		{ "type", type }, { "session", session } });
+			string connection = Get((session != "") ? "login/connect/session" : "login/connect/admin",
+									new Parameters() { { "token", token },
+													   { "client", client }, { "name", name },
+													   { "type", type } });
 
 			Token = token;
 

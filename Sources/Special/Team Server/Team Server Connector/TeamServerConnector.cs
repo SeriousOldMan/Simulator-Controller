@@ -184,7 +184,7 @@ namespace TeamServer {
 
 		public string ValidateToken()
 		{
-			return Get("login/validateSessionToken");
+			return Get("login/validatetoken");
 		}
 
 		public string GetAllConnections()
@@ -206,10 +206,6 @@ namespace TeamServer {
 			return Get("login/accountavailableminutes");
 		}
 
-		public string GetTokenLifeTime() {
-			return Get("login/tokenavailableminutes");
-		}
-
 		public void ChangePassword(string newPassword) {
 			Put("login/password", body: newPassword);
         }
@@ -229,7 +225,7 @@ namespace TeamServer {
 		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
 																	  { "EMail", eMail },
-																	  { "Contract", contract }, { "ContractMinutes", renewal },
+																	  { "Contract", contract }, { "SessionMinutes", renewal },
 																	  { "AvailableMinutes", minutes } }));
 		}
 
@@ -242,7 +238,7 @@ namespace TeamServer {
 		}
 
 		public void ChangeAccountContract(string identifier, string contract, string renewal) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
+			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "SessionMinutes", renewal } }));
 		}
 
 		public void ChangeAccountPassword(string identifier, string newPassword) {

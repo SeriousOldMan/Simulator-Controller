@@ -65,7 +65,7 @@ namespace TeamServer.Controllers {
             if (type == null)
                 type = "";
 
-            ConnectionType theType = ConnectionType.Unknown;
+            Connection.ConnectionType theType = Connection.ConnectionType.Unknown;
 
             try {
                 if (!Enum.TryParse(type, out theType))
@@ -85,12 +85,12 @@ namespace TeamServer.Controllers {
             }
         }
 
-        [HttpGet("validatesessiontoken")]
-        public string ValidateSessionToken([FromQuery(Name = "token")] string token)
+        [HttpGet("validatetoken")]
+        public string ValidateToken([FromQuery(Name = "token")] string token)
         {
             try
             {
-                SessionToken theToken = (SessionToken)Server.TeamServer.TokenIssuer.ValidateToken(token);
+                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
 
                 return "Ok";
             }
@@ -108,12 +108,6 @@ namespace TeamServer.Controllers {
         public string GetAccountMinutes([FromQuery(Name = "token")] string token)
         {
             return Server.TeamServer.TokenIssuer.ValidateToken(token).Account.AvailableMinutes.ToString();
-        }
-
-        [HttpGet("tokenavailableminutes")]
-        public string GetTokenMinutes([FromQuery(Name = "token")] string token)
-        {
-            return Math.Max(0, Server.TeamServer.TokenIssuer.ValidateToken(token).GetRemainingMinutes()).ToString();
         }
 
         [HttpPut("password")]
@@ -164,7 +158,7 @@ namespace TeamServer.Controllers {
             try
             {
                 SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager,
-                                                                   (SessionToken)Server.TeamServer.TokenIssuer.ElevateToken(token));
+                                                                   Server.TeamServer.TokenIssuer.ElevateToken(token));
 
                 return String.Join(";", sessionManager.GetAllSessions().Select(c => c.Identifier));
             }

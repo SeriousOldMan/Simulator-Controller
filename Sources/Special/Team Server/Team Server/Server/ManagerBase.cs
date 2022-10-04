@@ -15,7 +15,7 @@ namespace TeamServer.Server {
         }
 
         #region Validation
-        public void ValidateToken(Token token) {
+        public virtual void ValidateToken(Token token) {
             TeamServer.TokenIssuer.ValidateToken(token);
         }
 

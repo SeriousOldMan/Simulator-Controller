@@ -6,7 +6,7 @@ using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
     public class TeamManager : ManagerBase {
-        public TeamManager(ObjectManager objectManager, Model.Access.SessionToken token) : base(objectManager, token) {
+        public TeamManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
         }
 
         #region Validation

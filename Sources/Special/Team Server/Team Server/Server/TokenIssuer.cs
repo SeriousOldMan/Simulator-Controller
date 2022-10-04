@@ -8,27 +8,35 @@ namespace TeamServer.Server {
         protected readonly ObjectManager ObjectManager = null;
         protected readonly int TokenLifeTime;
 
-        public Token AdminToken = null;
+        public Token InternalToken = null;
 
         public TokenIssuer(ObjectManager objectManager, int tokenLifeTime) {
             ObjectManager = objectManager;
             TokenLifeTime = tokenLifeTime;
 
-            AdminToken = new AdminToken { ID = -1, Identifier = Guid.NewGuid(), AccountID = 0, Until = DateTime.MaxValue };
+            InternalToken = new InternalToken { ID = -1, Identifier = Guid.NewGuid(), Type = Token.TokenType.Internal,
+                                                AccountID = 0, Until = DateTime.MaxValue };
         }
 
         #region Tokens
         #region CRUD
-        public SessionToken CreateSessionToken(string name, string password) {
+        public Token CreateAccountToken(string name, string password)
+        {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (!account.Administrator && (account.AvailableMinutes <= 0))
-                throw new Exception("Not enough time available on account...");
-            else {
-                SessionToken token = new SessionToken { Identifier = Guid.NewGuid(), AccountID = account.ID,
-                                                        Created = DateTime.Now, Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0) };
+            else if (account.Contract == Account.ContractType.Expired)
+                throw new Exception("Account is no longer valid...");
+            else
+            {
+                Token token = new Token
+                {
+                    AccountID = account.ID,
+                    Type = Token.TokenType.Account,
+                    Created = DateTime.Now,
+                    Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0)
+                };
 
                 token.Save();
 
@@ -36,22 +44,52 @@ namespace TeamServer.Server {
             }
         }
 
-        public DataToken CreateDataToken(string name, string password)
+        public Token CreateSessionToken(string name, string password)
         {
             Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
+            else if (!account.UseSessions)
+                throw new Exception("Account does not support session access...");
+            else if (account.Contract == Account.ContractType.Expired)
+                throw new Exception("Account is no longer valid...");
+            else if (account.Contract != Account.ContractType.Unlimited && (account.AvailableMinutes <= 0))
+                throw new Exception("Not enough time available on account...");
             else
             {
-                DataToken token = ObjectManager.GetAccountDataTokenAsync(account).Result;
+                Token token = new Token
+                {
+                    AccountID = account.ID,
+                    Type = Token.TokenType.Session,
+                    Created = DateTime.Now,
+                    Until = DateTime.Now + new TimeSpan(0, 0, TokenLifeTime, 0)
+                };
+
+                token.Save();
+
+                return token;
+            }
+        }
+
+        public Token CreateDataToken(string name, string password)
+        {
+            Account account = ObjectManager.Instance.GetAccountAsync(name, password).Result;
+
+            if (account == null)
+                throw new Exception("Unknown account or password...");
+            else if (!account.UseData)
+                throw new Exception("Account does not support data access...");
+            else
+            {
+                Token token = ObjectManager.GetAccountDataTokenAsync(account).Result;
 
                 if (token == null)
                 {
-                    token = new DataToken
+                    token = new Token
                     {
-                        Identifier = Guid.NewGuid(),
                         AccountID = account.ID,
+                        Type = Token.TokenType.Data,
                         Created = DateTime.Now,
                         Until = DateTime.MaxValue
                     };
@@ -105,7 +143,7 @@ namespace TeamServer.Server {
         public Token ElevateToken(Token token) {
             ValidateToken(token);
 
-            if (token == AdminToken)
+            if (token == InternalToken)
                 return token;
             else if (!token.Account.Administrator)
                 throw new Exception("Higher privileges required...");
@@ -125,7 +163,8 @@ namespace TeamServer.Server {
 
         #region Connections
         #region Connect
-        public Connection Connect(Token token, string client, string name, ConnectionType type, Session session = null)
+        public Connection Connect(Token token, string client, string name,
+                                  Connection.ConnectionType type, Session session = null)
         {
             ValidateToken(token);
 
@@ -151,19 +190,22 @@ namespace TeamServer.Server {
             return connection;
         }
 
-        public Connection Connect(Token token, string client, string name, ConnectionType type, string session = "")
+        public Connection Connect(Token token, string client, string name,
+                                  Connection.ConnectionType type, string session = "")
         {
             ValidateToken(token);
 
             return Connect(token, client, name, type, ObjectManager.GetSessionAsync(session).Result);
         }
 
-        public Connection Connect(Guid identifier, string client, string name, ConnectionType type, string session = "")
+        public Connection Connect(Guid identifier, string client, string name,
+                                  Connection.ConnectionType type, string session = "")
         {
             return Connect(ObjectManager.GetTokenAsync(identifier).Result, client, name, type, session);
         }
 
-        public Connection Connect(string identifier, string client, string name, ConnectionType type, string session = "")
+        public Connection Connect(string identifier, string client, string name,
+                                  Connection.ConnectionType type, string session = "")
         {
             return Connect(new Guid(identifier), client, name, type, session);
         }
@@ -241,17 +283,9 @@ namespace TeamServer.Server {
 
         public async void CleanupTokensAsync()
         {
-            await ObjectManager.Connection.QueryAsync<SessionToken>(
+            await ObjectManager.Connection.QueryAsync<Token>(
                 @"
-                    Select * From Access_Session_Tokens Where Until < ?
-                ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
-                    if (!t.IsValid())
-                        DeleteToken(t);
-                }));
-
-            await ObjectManager.Connection.QueryAsync<DataToken>(
-                @"
-                    Select * From Access_Data_Tokens Where Until < ?
+                    Select * From Access_Tokens Where Until < ?
                 ", DateTime.Now).ContinueWith(t => t.Result.ForEach(t => {
                     if (!t.IsValid())
                         DeleteToken(t);

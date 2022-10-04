@@ -84,25 +84,21 @@ namespace TeamServer.Model {
             return Connection.Table<Access.Account>().Where(c => c.Name == account && c.Password == password).FirstOrDefaultAsync();
         }
 
-        public Task<List<Access.SessionToken>> GetAccountSessionTokensAsync(Access.Account account)
+        public Task<List<Access.Token>> GetAccountTokensAsync(Access.Account account)
         {
-            return Connection.Table<Access.SessionToken>().Where(t => t.AccountID == account.ID).ToListAsync();
+            return Connection.Table<Access.Token>().Where(t => t.AccountID == account.ID).ToListAsync();
         }
 
-        public Task<Access.DataToken> GetAccountDataTokenAsync(Access.Account account)
+        public Task<Access.Token> GetAccountDataTokenAsync(Access.Account account)
         {
-            return Connection.Table<Access.DataToken>().Where(t => t.AccountID == account.ID).FirstOrDefaultAsync();
+            return Connection.Table<Access.Token>().Where(t => t.AccountID == account.ID &&
+                                                               t.Type == Access.Token.TokenType.Data).FirstOrDefaultAsync();
         }
 
         public async void DoAccountTokensAsync(Access.Account account, Action<Access.Token> action)
         {
-            foreach (Access.Token t in await GetAccountSessionTokensAsync(account))
+            foreach (Access.Token t in await GetAccountTokensAsync(account))
                 action(t);
-
-            Access.Token token = await GetAccountDataTokenAsync(account);
-                
-            if (token != null)
-                action(token);
         }
 
         public Task<List<Team>> GetAccountTeamsAsync(Access.Account account) {
@@ -182,25 +178,11 @@ namespace TeamServer.Model {
 
         #region Access.Token
         public Task<Access.Token> GetTokenAsync(int id) {
-            return new Task<Access.Token>(() => {
-                Access.Token token = Connection.Table<Access.SessionToken>().Where(t => t.ID == id).FirstOrDefaultAsync().Result;
-
-                if (token == null)
-                    return Connection.Table<Access.DataToken>().Where(t => t.ID == id).FirstOrDefaultAsync().Result;
-                else
-                    return token;
-            });
+            return Connection.Table<Access.Token>().Where(t => t.ID == id).FirstOrDefaultAsync();
         }
 
         public Task<Access.Token> GetTokenAsync(Guid identifier) {
-            return new Task<Access.Token>(() => {
-                Access.Token token = Connection.Table<Access.SessionToken>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync().Result;
-
-                if (token == null)
-                    return Connection.Table<Access.DataToken>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync().Result;
-                else
-                    return token;
-            });
+            return Connection.Table<Access.Token>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
         }
 
         public Task<Access.Token> GetTokenAsync(string identifier) {
@@ -212,7 +194,8 @@ namespace TeamServer.Model {
         }
 
         public Task<Access.Connection> GetTokenConnectionAsync(Access.Token token, string client, string name,
-                                                               Access.ConnectionType type, Session session = null)
+                                                               Access.Connection.ConnectionType type,
+                                                               Session session = null)
         {
             Task<Access.Connection> task =
                 (session != null) ?

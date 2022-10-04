@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TeamServer.Model.Access {
     [Table("Access_Accounts")]
     public class Account : ModelObject {
-        public enum ContractType : int { Expired = 0, OneTime = 1, FixedMinutes = 2, AdditionalMinutes = 3 };
+        public enum ContractType : int { Expired = 0, OneTime = 1, FixedMinutes = 2, AdditionalMinutes = 3, Unlimited = 4 };
 
         [Unique]
         public string Name { get; set; }
@@ -21,28 +21,24 @@ namespace TeamServer.Model.Access {
 
         public int AvailableMinutes { get; set; }
 
+        public bool UseData { get; set; } = false;
+
+        public bool UseSessions { get; set; } = false;
+
         public ContractType Contract { get; set; } = ContractType.OneTime;
 
-        public int ContractMinutes { get; set; } = 0;
+        public int SessionMinutes { get; set; } = 0;
 
         [Ignore]
-        public List<SessionToken> SessionTokens
+        public List<Token> Tokens
         {
             get {
-                return ObjectManager.GetAccountSessionTokensAsync(this).Result;
+                return ObjectManager.GetAccountTokensAsync(this).Result;
             }
         }
 
         [Ignore]
-        public DataToken DataToken
-        {
-            get {
-                return ObjectManager.GetAccountDataTokenAsync(this).Result;
-            }
-        }
-
-        [Ignore]
-        public List<Team> Teams {
+        public List<Team> Teams {  
             get {
                 return ObjectManager.GetAccountTeamsAsync(this).Result;
             }
@@ -79,8 +75,18 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    public abstract class Token : ModelObject
+    [Table("Token")]
+    public class Token : ModelObject
     {
+        public enum TokenType
+        {
+            Invalid = 0,
+            Internal = 1,
+            Account = 2,
+            Session = 3,
+            Data = 4
+        }
+
         [Indexed]
         public int AccountID { get; set; }
 
@@ -100,20 +106,34 @@ namespace TeamServer.Model.Access {
             }
         }
 
+        public TokenType Type { get; set; } = TokenType.Invalid;
+
         public DateTime Created { get; set; }
 
         public DateTime Until { get; set; }
 
         public DateTime Used { get; set; } = DateTime.MinValue;
 
-        public virtual bool IsValid()
+        public bool IsValid()
         {
-            return (Until == null) || (DateTime.Now < Until);
+            return Type != TokenType.Invalid || Until == null || DateTime.Now < Until || DateTime.Now < Used + new TimeSpan(0, 5, 0);
         }
 
-        public virtual int GetRemainingMinutes()
+        public bool IsAllowed(TokenType type)
         {
-            return 0;
+            switch (type)
+            {
+                case TokenType.Session:
+                    return Type == TokenType.Session || Type == TokenType.Account || Type == TokenType.Internal;
+                case TokenType.Data:
+                    return Type == TokenType.Data || Type == TokenType.Account || Type == TokenType.Internal;
+                case TokenType.Account:
+                    return Type == TokenType.Account;
+                case TokenType.Internal:
+                    return Type == TokenType.Internal;
+                default:
+                    return false;
+            }
         }
 
         public override System.Threading.Tasks.Task Delete()
@@ -125,45 +145,20 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    [Table("Access_Session_Tokens")]
-    public class SessionToken : Token
-    {
-        public override bool IsValid() {
-            if (base.IsValid())
-                return true;
-            else {
-                if (Used != null)
-                    return (DateTime.Now < Used + new TimeSpan(0, 5, 0));
-                else
-                    return false;
-            }
-        }
-
-        public override int GetRemainingMinutes() {
-            int usedMinutes = (int)(DateTime.Now - Created).TotalMinutes;
-
-            return (7 * 24 * 60) - usedMinutes;
-        }
-    }
-
-    [Table("Access_Data_Tokens")]
-    public class DataToken : Token
-    {
-    }
-
-    public class AdminToken : Token { }
-
-    public enum ConnectionType
-    {
-        Unknown = 0,
-        Internal = 1,
-        Admin = 2,
-        Driver = 3
-    }
+    public class InternalToken : Token { }
 
     [Table("Access_Connections")]
     public class Connection : ModelObject
     {
+        public enum ConnectionType
+        {
+            Unknown = 0,
+            Internal = 1,
+            Admin = 2,
+            Manager = 3,
+            Driver = 4
+        }
+
         [Indexed]
         public int TokenID { get; set; }
 
@@ -195,18 +190,18 @@ namespace TeamServer.Model.Access {
 
         public DateTime Created { get; set; }
 
-        public DateTime Until { get; set; } = DateTime.MinValue;
+        public DateTime Valid { get; set; } = DateTime.MinValue;
 
         public void Renew()
         {
-            Until = DateTime.Now + TimeSpan.FromSeconds(Server.TeamServer.Instance.ConnectionLifeTime);
+            Valid = DateTime.Now + TimeSpan.FromSeconds(Server.TeamServer.Instance.ConnectionLifeTime);
 
             Save();
         }
 
         public bool IsConnected()
         {
-            return (DateTime.Now <= Until);
+            return (DateTime.Now <= Valid);
         }
     }
 }

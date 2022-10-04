@@ -10,14 +10,10 @@ namespace TeamServer.Server
 {
 	public class DataManager : ManagerBase
 	{
-		public DataManager(ObjectManager objectManager, Model.Access.DataToken token) : base(objectManager, token)
-		{
-		}
-
 		public DataManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			if (!typeof(Model.Access.DataToken).IsInstanceOfType(token))
-				throw new Exception("Invalid token...");
+			if (!token.IsAllowed(Model.Access.Token.TokenType.Data))
+				throw new Exception("Token does not support data access...");
 		}
 
 		#region Generic
@@ -35,6 +31,15 @@ namespace TeamServer.Server
 		#endregion
 
 		#region Validation
+		public void ValidateAccount()
+		{
+			if (!Token.Account.Administrator)
+				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
+					throw new Exception("Account is no longer valid...");
+				else if (!Token.Account.UseData)
+					throw new Exception("Account does not support data storage...");
+		}
+
 		public void ValidateLicense(License license)
 		{
 			if (license == null)
@@ -310,11 +315,6 @@ namespace TeamServer.Server
 		}
 		#endregion
 		#endregion
-
-
-
-
-
 
 		#region Brakes
 		#region Query

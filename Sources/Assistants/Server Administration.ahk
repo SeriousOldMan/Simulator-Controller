@@ -306,7 +306,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountEMailEdit, % account.EMail
 				GuiControl, , accountPasswordEdit, % ""
 				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
-				GuiControl, , accountMinutesEdit, % account.ContractMinutes
+				GuiControl, , accountMinutesEdit, % account.SessionMinutes
 
 				administrationEditor(kEvent, "UpdateState")
 			}
@@ -337,7 +337,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 					if (accountPasswordEdit != "")
 						connector.ChangeAccountPassword(account.Identifier, accountPasswordEdit)
 
-					if ((account.Contract != contract) || (account.ContractMinutes != accountMinutesEdit))
+					if ((account.Contract != contract) || (account.SessionMinutes != accountMinutesEdit))
 						connector.ChangeAccountContract(account.Identifier, contract, accountMinutesEdit)
 
 					if (accountEMailEdit != account.EMail)

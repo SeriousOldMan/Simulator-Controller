@@ -19,7 +19,7 @@ namespace TeamServer.Server {
 
             ConnectionLifeTime = connectionLifeTime;
 
-            new TaskManager(objectManager, TokenIssuer.AdminToken).RunBackgroundTasksAsync();
+            new TaskManager(objectManager, TokenIssuer.InternalToken).RunBackgroundTasksAsync();
         }
     }
 }

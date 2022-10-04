@@ -6,20 +6,30 @@ using TeamServer.Model;
 namespace TeamServer.Server {
 	public class SessionManager : ManagerBase
 	{
-		public SessionManager(ObjectManager objectManager, Model.Access.SessionToken token) : base(objectManager, token)
-		{
-		}
-
 		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			if (!typeof(Model.Access.SessionToken).IsInstanceOfType(token))
+			if (!token.IsAllowed(Model.Access.Token.TokenType.Session))
 				TeamServer.TokenIssuer.ElevateToken(token);
 		}
 
 		#region Validation
+		public override void ValidateToken(Model.Access.Token token)
+		{
+			base.ValidateToken(token);
+
+			if (!token.IsAllowed(Model.Access.Token.TokenType.Session))
+				throw new Exception("Token does not support session access...");
+		}
+
 		public void ValidateAccount(int duration) {
-			if (!Token.Account.Administrator && (Token.Account.AvailableMinutes < duration))
-				throw new Exception("Not enough time available on account...");
+			if (!Token.Account.Administrator)
+				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
+					throw new Exception("Account is no longer valid...");
+				else if (!Token.Account.UseSessions)
+					throw new Exception("Account does not support team sessions...");
+				else if (Token.Account.Contract != Model.Access.Account.ContractType.Unlimited &&
+						 (Token.Account.AvailableMinutes < duration))
+					throw new Exception("Not enough time available on account...");
 		}
 
 		public void ValidateSession(Session session) {
@@ -73,8 +83,10 @@ namespace TeamServer.Server {
 			return ObjectManager.GetAllSessionsAsync().Result;
 		}
 
-		public List<Session> GetSessions(Model.Access.SessionToken token)
+		public List<Session> GetSessions(Model.Access.Token token)
 		{
+			ValidateToken(token);
+
 			return token.Account.Sessions;
 		}
 

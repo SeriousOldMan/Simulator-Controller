@@ -95,7 +95,7 @@ namespace TeamServer.Server {
 
                 Account account = new Account {
                     Name = name, EMail = eMail, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
-                    Contract = contract, ContractMinutes = renewalMinutes
+                    Contract = contract, SessionMinutes = renewalMinutes
                 };
 
                 account.Save();
@@ -119,7 +119,7 @@ namespace TeamServer.Server {
             ValidateAccount(account);
 
             account.Contract = contract;
-            account.ContractMinutes = renewalMinutes;
+            account.SessionMinutes = renewalMinutes;
 
             account.Save().Wait();
         }
@@ -176,9 +176,9 @@ namespace TeamServer.Server {
                     Select * From Access_Accounts
                 ").ContinueWith(t => t.Result.ForEach(a => {
                     if (a.Contract == Account.ContractType.FixedMinutes)
-                        SetMinutes(a, a.ContractMinutes);
+                        SetMinutes(a, a.SessionMinutes);
                     else if (a.Contract == Account.ContractType.AdditionalMinutes)
-                        AddMinutes(a, a.ContractMinutes);
+                        AddMinutes(a, a.SessionMinutes);
                 }));
         }
 
@@ -187,8 +187,8 @@ namespace TeamServer.Server {
 
             await ObjectManager.Connection.QueryAsync<Account>(
                 @"
-                    Select * From Access_Accounts
-                ").ContinueWith(t => t.Result.ForEach(a => {
+                    Select * From Access_Accounts Where UseData = ?
+                ", false).ContinueWith(t => t.Result.ForEach(a => {
                     if (!a.Administrator)
                         if (a.Contract == Account.ContractType.Expired)
                             a.Delete();

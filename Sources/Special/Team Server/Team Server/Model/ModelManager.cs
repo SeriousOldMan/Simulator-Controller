@@ -37,8 +37,7 @@ namespace TeamServer.Model {
 
         protected void CreateAccessTables()
         {
-            Connection.CreateTableAsync<Access.SessionToken>().Wait();
-            Connection.CreateTableAsync<Access.DataToken>().Wait();
+            Connection.CreateTableAsync<Access.Token>().Wait();
             Connection.CreateTableAsync<Access.Connection>().Wait();
         }
 
@@ -55,10 +54,11 @@ namespace TeamServer.Model {
 
         protected void CreateDataTables()
         {
-            Connection.CreateTableAsync<Model.Data.Electronics>().Wait();
-            Connection.CreateTableAsync<Model.Data.Tyres>().Wait();
-            Connection.CreateTableAsync<Model.Data.TyresPressures>().Wait();
-            Connection.CreateTableAsync<Model.Data.TyresPressuresDistribution>().Wait();
+            Connection.CreateTableAsync<Data.Electronics>().Wait();
+            Connection.CreateTableAsync<Data.Tyres>().Wait();
+            Connection.CreateTableAsync<Data.Brakes>().Wait();
+            Connection.CreateTableAsync<Data.TyresPressures>().Wait();
+            Connection.CreateTableAsync<Data.TyresPressuresDistribution>().Wait();
         }
     }
 }

@@ -37,7 +37,7 @@ namespace TeamServer.Controllers {
                 AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
-                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "EMail", "Virgin", "Contract", "ContractMinutes", "AvailableMinutes" }));
+                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "EMail", "Virgin", "Contract", "SessionMinutes", "AvailableMinutes" }));
             }
             catch (AggregateException exception)
             {
@@ -67,7 +67,7 @@ namespace TeamServer.Controllers {
 
                 if (properties.ContainsKey("Contract"))
                     accountManager.ChangeContract(account, (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]),
-                                                           Int32.Parse(properties["ContractMinutes"]));
+                                                           Int32.Parse(properties["SessionMinutes"]));
 
                 if (properties.ContainsKey("AvailableMinutes"))
                     accountManager.SetMinutes(account, Int32.Parse(properties["AvailableMinutes"]));
@@ -114,7 +114,7 @@ namespace TeamServer.Controllers {
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
                 accountManager.ChangeContract(account, (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]),
-                                                       Int32.Parse(properties["ContractMinutes"]));
+                                                       Int32.Parse(properties["SessionMinutes"]));
 
                 account.Save();
 
@@ -168,8 +168,8 @@ namespace TeamServer.Controllers {
                 if (properties.ContainsKey("Contract"))
                     account.Contract = (Account.ContractType)Enum.Parse(typeof(Account.ContractType), properties["Contract"]);
 
-                if (properties.ContainsKey("ContractMinutes"))
-                    account.ContractMinutes = Int32.Parse(properties["ContractMinutes"]);
+                if (properties.ContainsKey("SessionMinutes"))
+                    account.SessionMinutes = Int32.Parse(properties["SessionMinutes"]);
 
                 if (properties.ContainsKey("AvailableMinutes"))
                     account.AvailableMinutes = Int32.Parse(properties["AvailableMinutes"]);

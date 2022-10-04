@@ -26,7 +26,7 @@ namespace TeamServer.Controllers
             try
             {
                 DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 switch (table)
                 {
@@ -62,7 +62,7 @@ namespace TeamServer.Controllers
             try
             {
                 DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 switch (table)
                 {
@@ -98,7 +98,7 @@ namespace TeamServer.Controllers
             try
             {
                 DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
 
                 switch (table)
                 {
@@ -185,7 +185,7 @@ namespace TeamServer.Controllers
             try
             {
                 DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
                 switch (table)
@@ -227,7 +227,7 @@ namespace TeamServer.Controllers
         public string Post([FromQuery(Name = "token")] string token, string table, [FromBody] string keyValues)
         {
             DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                      (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                      Server.TeamServer.TokenIssuer.ValidateToken(token));
             Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
             try
@@ -264,7 +264,7 @@ namespace TeamServer.Controllers
         public string Delete([FromQuery(Name = "token")] string token, string table, string identifier)
         {
             DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                      (DataToken)Server.TeamServer.TokenIssuer.ValidateToken(token));
+                                                      Server.TeamServer.TokenIssuer.ValidateToken(token));
 
             try
             {

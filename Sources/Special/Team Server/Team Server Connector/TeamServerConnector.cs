@@ -237,7 +237,7 @@ namespace TeamServer {
 		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
 																	  { "EMail", eMail },
-																	  { "Contract", contract }, { "SessionMinutes", renewal },
+																	  { "Contract", contract }, { "ContractMinutes", renewal },
 																	  { "AvailableMinutes", minutes } }));
 		}
 
@@ -250,7 +250,7 @@ namespace TeamServer {
 		}
 
 		public void ChangeAccountContract(string identifier, string contract, string renewal) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "SessionMinutes", renewal } }));
+			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
 		}
 
 		public void ChangeAccountPassword(string identifier, string newPassword) {

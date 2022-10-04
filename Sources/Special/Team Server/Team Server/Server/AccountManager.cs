@@ -95,7 +95,7 @@ namespace TeamServer.Server {
 
                 Account account = new Account {
                     Name = name, EMail = eMail, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
-                    Contract = contract, SessionMinutes = renewalMinutes
+                    Contract = contract, ContractMinutes = renewalMinutes
                 };
 
                 account.Save();
@@ -119,7 +119,7 @@ namespace TeamServer.Server {
             ValidateAccount(account);
 
             account.Contract = contract;
-            account.SessionMinutes = renewalMinutes;
+            account.ContractMinutes = renewalMinutes;
 
             account.Save().Wait();
         }
@@ -176,9 +176,9 @@ namespace TeamServer.Server {
                     Select * From Access_Accounts
                 ").ContinueWith(t => t.Result.ForEach(a => {
                     if (a.Contract == Account.ContractType.FixedMinutes)
-                        SetMinutes(a, a.SessionMinutes);
+                        SetMinutes(a, a.ContractMinutes);
                     else if (a.Contract == Account.ContractType.AdditionalMinutes)
-                        AddMinutes(a, a.SessionMinutes);
+                        AddMinutes(a, a.ContractMinutes);
                 }));
         }
 

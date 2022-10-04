@@ -197,14 +197,16 @@ namespace TeamServer.Model {
                                                                Access.Connection.ConnectionType type,
                                                                Session session = null)
         {
+            int theType = (int)type;
+
             Task<Access.Connection> task =
                 (session != null) ?
                     Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
                                                                      c.Client == client && c.Name == name &&
-                                                                     c.SessionID == session.ID).FirstAsync()
+                                                                     c.SessionID == session.ID).FirstOrDefaultAsync()
                 :
                     Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
-                                                                     c.Client == client && c.Name == name).FirstAsync();
+                                                                     c.Client == client && c.Name == name).FirstOrDefaultAsync();
 
 
             return task.ContinueWith(t =>

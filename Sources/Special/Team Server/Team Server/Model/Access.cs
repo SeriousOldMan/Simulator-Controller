@@ -27,7 +27,7 @@ namespace TeamServer.Model.Access {
 
         public ContractType Contract { get; set; } = ContractType.OneTime;
 
-        public int SessionMinutes { get; set; } = 0;
+        public int ContractMinutes { get; set; } = 0;
 
         [Ignore]
         public List<Token> Tokens
@@ -161,7 +161,6 @@ namespace TeamServer.Model.Access {
 
         [Indexed]
         public int TokenID { get; set; }
-
 
         [Indexed]
         public int SessionID { get; set; }

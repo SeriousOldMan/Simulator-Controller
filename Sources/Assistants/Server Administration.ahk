@@ -96,9 +96,9 @@ loadAccounts(connector, listView) {
 			accounts[A_Index] := account
 			accounts[account.Name] := account
 
-			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
+			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
 
-			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Fixed", "Additional"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
+			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
 		}
 	}
 
@@ -319,8 +319,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountNameEdit, % account.Name
 				GuiControl, , accountEMailEdit, % account.EMail
 				GuiControl, , accountPasswordEdit, % ""
-				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
-				GuiControl, , accountMinutesEdit, % account.SessionMinutes
+				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
+				GuiControl, , accountMinutesEdit, % account.ContractMinutes
 
 				administrationEditor(kEvent, "UpdateState")
 			}
@@ -341,7 +341,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControlGet accountContractDropDown
 				GuiControlGet accountMinutesEdit
 
-				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"][accountContractDropDown]
+				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"][accountContractDropDown]
 
 				if (account == true) {
 					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
@@ -351,7 +351,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 					if (accountPasswordEdit != "")
 						connector.ChangeAccountPassword(account.Identifier, accountPasswordEdit)
 
-					if ((account.Contract != contract) || (account.SessionMinutes != accountMinutesEdit))
+					if ((account.Contract != contract) || (account.ContractMinutes != accountMinutesEdit))
 						connector.ChangeAccountContract(account.Identifier, contract, accountMinutesEdit)
 
 					if (accountEMailEdit != account.EMail)
@@ -601,7 +601,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes

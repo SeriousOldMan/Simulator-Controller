@@ -195,7 +195,8 @@ namespace TeamServer.Server {
         {
             ValidateToken(token);
 
-            return Connect(token, client, name, type, ObjectManager.GetSessionAsync(session).Result);
+            return Connect(token, client, name, type,
+                           (session == "") ? null : ObjectManager.GetSessionAsync(session).Result);
         }
 
         public Connection Connect(Guid identifier, string client, string name,

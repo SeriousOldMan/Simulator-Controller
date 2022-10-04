@@ -126,7 +126,8 @@ Race Spotter Configuration.4=%kResourcesDirectory%Templates\Race Spotter.grammar
 Race Spotter Configuration.5=%kGrammarsDirectory%Race Spotter.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.de
 Race Spotter Configuration.6=%kResourcesDirectory%Templates\Race Spotter.grammars.de <- %kSourcesDirectory%Assistants\Grammars\Race Spotter.grammars.de
 Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Team Server Connector.dll
-Team Server.2=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
+Team Server.2=%kBinariesDirectory%Data Store Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Data Store Connector.dll
+Team Server.3=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
 AC Plugin.1=%kHomeDirectory%Utilities\Plugins\SimulatorController <- %kSourcesDirectory%Special\AC Plugin
 [Build]
 Special Applications && DLLs=Special

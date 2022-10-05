@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
@@ -34,10 +35,11 @@ class TeamServerPlugin extends ControllerPlugin {
 	iConnector := false
 
 	iServerURL := false
-	iAccessToken := false
+	iServerToken := false
 
-	iConnected := false
+	iConnection := false
 
+	iSimulator := false
 	iTeam := false
 	iDriver := false
 	iSession := false
@@ -160,15 +162,27 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	AccessToken[] {
+	ServerToken[] {
 		Get {
-			return ((this.iAccessToken && (this.iAccessToken != "")) ? this.iAccessToken : false)
+			return ((this.iServerToken && (this.iServerToken != "")) ? this.iServerToken : false)
+		}
+	}
+
+	Connection[] {
+		Get {
+			return this.iConnection
 		}
 	}
 
 	Connected[] {
 		Get {
-			return this.iConnected
+			return (this.Connection != false)
+		}
+	}
+
+	Simulator[] {
+		Get {
+			return this.iSimulator
 		}
 	}
 
@@ -295,7 +309,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			else
 				this.disableTeamServer(false, true)
 
-			this.keepAlive()
+			this.keepAlive(true)
 
 			OnExit(ObjBindMethod(this, "finishSession"))
 		}
@@ -411,7 +425,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			trayMessage(label, translate("State: Off"))
 
-			this.disconnect()
+			this.disconnect(true, true)
 
 			this.iTeamServerEnabled := false
 
@@ -450,23 +464,23 @@ class TeamServerPlugin extends ControllerPlugin {
 	tryConnect() {
 		local settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
 		local serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		local accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+		local serverToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
 		local teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		local driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
 		local sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 
-		this.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+		this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
 
 		this.disconnect()
 	}
 
-	connect(serverURL, accessToken, team, driver, session, verbose := false) {
+	connect(serverURL, serverToken, team, driver, session, verbose := false) {
 		local driverObject, teamName, driverName, sessionName
 
 		this.disconnect()
 
 		this.iServerURL := ((serverURL && (serverURL != "")) ? serverURL : false)
-		this.iAccessToken := ((accessToken && (accessToken != "")) ? accessToken : false)
+		this.iServerToken := ((serverToken && (serverToken != "")) ? serverToken : false)
 
 		this.setSession(team, driver, session)
 
@@ -481,7 +495,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				sessionName := this.parseObject(this.Connector.GetSession(session)).Name
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
+					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
 
 				if verbose
 					showMessage(translate("Successfully connected to the Team Server.") . "`n`n"
@@ -491,12 +505,12 @@ class TeamServerPlugin extends ControllerPlugin {
 							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 			}
 			catch exception {
-				this.iConnected := false
+				this.iConnection := false
 
 				if !InStr(A_IconTip, translate(" - Invalid"))
 					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
 
-				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
 				this.disconnect(false)
 			}
@@ -505,16 +519,18 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.Connected && this.Team && this.Driver && this.Session)
 	}
 
-	disconnect(leave := true) {
+	disconnect(leave := true, disconnect := false) {
 		if (leave && this.SessionActive)
 			this.leaveSession()
 
-		this.iServerURL := false
-		this.iAccessToken := false
+		if disconnect {
+			this.iServerURL := false
+			this.iServerToken := false
 
-		this.setSession(false, false, false)
+			this.iConnection := false
 
-		this.keepAlive()
+			this.keepAlive()
+		}
 	}
 
 	getStintDriverName(stint, session := false) {
@@ -586,6 +602,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			try {
 				this.iLapData := {Telemetry: {}, Positions: {}}
+				this.iSimulator := simulator
 
 				this.Connector.StartSession(this.Session, duration, car, track)
 
@@ -631,6 +648,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.iLapData := {Telemetry: {}, Positions: {}}
 		this.iSessionActive := false
+		this.iSimulator := false
 
 		return false
 	}
@@ -650,6 +668,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					this.iLapData := {Telemetry: {}, Positions: {}}
 					this.iSessionActive := true
+					this.iSimulator := simulator
 				}
 
 				if (getLogLevel() <= kLogInfo)
@@ -673,6 +692,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		else {
 			this.iLapData := {Telemetry: {}, Positions: {}}
 			this.iSessionActive := false
+			this.iSimulator := false
 		}
 	}
 
@@ -1024,14 +1044,26 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	keepAlive() {
+	keepAlive(start := false) {
 		local nextPing := 10000
 
-		if (this.Connector && this.ServerURL && this.AccessToken)
-			try {
-				this.Connector.Connect(this.ServerURL, this.AccessToken)
+		static keepAliveTask := false
 
-				this.iConnected := true
+		if (this.Connector && this.ServerURL && this.ServerToken)
+			try {
+				if this.Connection
+					this.Connector.KeepAlive(this.Connection)
+				else {
+					this.Connector.Initialize(this.ServerURL)
+
+					this.Connector.Token := this.ServerToken
+
+					if (this.Driver && this.Session)
+						this.iConnection := this.Connector.Connect(this.ServerToken
+																 , new SessionDatabase().ID
+																 , computeDriverName(this.DriverForName, this.DriverSurName, this.DriverNickName)
+																 , "Driver", this.Session)
+				}
 
 				nextPing := 60000
 			}
@@ -1039,14 +1071,20 @@ class TeamServerPlugin extends ControllerPlugin {
 				if !InStr(A_IconTip, translate(" - Invalid"))
 					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
 
-				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.ServerToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
-				this.iConnected := false
+				this.iConnection := false
 			}
 		else
-			this.iConnected := false
+			this.iConnection := false
 
-		Task.startTask(ObjBindMethod(this, "keepAlive"), nextPing, kLowPriority)
+		if start {
+			keepAliveTask := new PeriodicTask(ObjBindMethod(this, "keepAlive"), nextPing, kLowPriority)
+
+			keepAliveTask.start()
+		}
+		else if keepAliveTask
+			keepAliveTask.Sleep := nextPing
 
 		return false
 	}

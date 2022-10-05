@@ -199,7 +199,7 @@ namespace TeamServer {
 			return connection;
 		}
 
-		public void KeekAlive(string identifier)
+		public void KeepAlive(string identifier)
 		{
 			GetConnection(identifier);
 		}

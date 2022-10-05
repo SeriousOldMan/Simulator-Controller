@@ -37,7 +37,9 @@ namespace TeamServer.Controllers {
                 AccountManager accountManager = new AccountManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
                 Account account = accountManager.LookupAccount(identifier);
 
-                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "EMail", "Virgin", "Contract", "ContractMinutes", "AvailableMinutes" }));
+                return ControllerUtils.SerializeObject(account, new List<string>(new string[] { "Identifier", "Name", "EMail", "Virgin",
+                                                                                                "SessionAccess", "DataAccess",
+                                                                                                "Contract", "ContractMinutes", "AvailableMinutes" }));
             }
             catch (AggregateException exception)
             {
@@ -71,6 +73,17 @@ namespace TeamServer.Controllers {
 
                 if (properties.ContainsKey("AvailableMinutes"))
                     accountManager.SetMinutes(account, Int32.Parse(properties["AvailableMinutes"]));
+
+                if (properties.ContainsKey("SessionAccess") || properties.ContainsKey("DataAccess"))
+                {
+                    if (properties.ContainsKey("SessionAccess"))
+                        account.SessionAccess = (properties["SessionAccess"].ToLower() == "true");
+
+                    if (properties.ContainsKey("DataAccess"))
+                        account.DataAccess = (properties["DataAccess"].ToLower() == "true");
+
+                    account.Save().Wait();
+                }
 
                 return "Ok";
             }
@@ -173,6 +186,12 @@ namespace TeamServer.Controllers {
 
                 if (properties.ContainsKey("AvailableMinutes"))
                     account.AvailableMinutes = Int32.Parse(properties["AvailableMinutes"]);
+
+                if (properties.ContainsKey("SessionAccess"))
+                    account.SessionAccess = properties["SessionAccess"].ToLower() == "true";
+
+                if (properties.ContainsKey("DataAccess"))
+                    account.SessionAccess = properties["DataAccess"].ToLower() == "true";
 
                 account.Save();
                 

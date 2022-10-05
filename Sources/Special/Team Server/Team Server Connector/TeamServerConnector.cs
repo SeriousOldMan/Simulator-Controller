@@ -179,17 +179,23 @@ namespace TeamServer {
 
 		public string Connect(string token, string client, string name, string type, string session = "")
 		{
-			string connection = Get((session != "") ? "login/connect/session" : "login/connect/admin",
-									new Parameters() { { "token", token },
-													   { "client", client }, { "name", name },
-													   { "type", type } });
+			string connection;
+				
+			if (session != "")
+                connection = Get("login/connect/session", new Parameters() { { "token", token },
+																			 { "client", client }, { "name", name },
+																			 { "type", type }, { "session", session } });
+			else
+				connection = Get("login/connect/admin", new Parameters() { { "token", token },
+																		   { "client", client }, { "name", name },
+																		   { "type", type } });
 
-			Token = token;
+            Token = token;
 
 			return connection;
 		}
 
-		public void KeekAlive(string identifier)
+		public void KeepAlive(string identifier)
 		{
 			GetConnection(identifier);
 		}
@@ -234,22 +240,30 @@ namespace TeamServer {
 			return Get("account/allaccounts");
         }
 
-		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
+		public string CreateAccount(string name, string eMail, string password, string sessionAccess, string dataAccess,
+                                    string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
 																	  { "EMail", eMail },
-																	  { "Contract", contract }, { "ContractMinutes", renewal },
+                                                                      { "SessionAccess", sessionAccess }, { "DataAccess", dataAccess },
+                                                                      { "Contract", contract }, { "ContractMinutes", renewal },
 																	  { "AvailableMinutes", minutes } }));
 		}
 
 		public string GetAccount(string identifier) {
 			return Get("account/" + identifier);
-		}
+        }
 
-		public void ChangeAccountEMail(string identifier, string eMail) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
-		}
+        public void ChangeAccountEMail(string identifier, string eMail)
+        {
+            Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
+        }
 
-		public void ChangeAccountContract(string identifier, string contract, string renewal) {
+        public void ChangeAccountAccess(string identifier, string sessionAccess, string dataAccess)
+        {
+            Put("account/" + identifier, body: BuildBody(new Parameters() { { "SessionAccess", sessionAccess }, { "DataAccess", dataAccess } }));
+        }
+
+        public void ChangeAccountContract(string identifier, string contract, string renewal) {
 			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
 		}
 

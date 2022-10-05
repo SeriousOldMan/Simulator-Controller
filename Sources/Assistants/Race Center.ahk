@@ -1124,8 +1124,8 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL"
 														 , getConfigurationValue(configuration, "Team Server", "Server.URL", ""))
-		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Session.Token"
-														   , getConfigurationValue(setting, "Team Server", "Server.Token", "__INVALID__"))
+		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token"
+														   , getConfigurationValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
 		this.iTeamName := getConfigurationValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getConfigurationValue(settings, "Team Settings", "Session.Name", "")
@@ -1550,17 +1550,21 @@ class RaceCenter extends ConfigurationItem {
 				throw "Invalid token detected..."
 
 			this.Connector.Initialize(this.ServerURL)
-	
+
+			this.Connector.Token := this.ServerToken
+
+			this.iConnection := true
+
+			this.loadTeams()
+
 			sessionDB := new SessionDatabase()
-			
-			connection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", this.SelectedSession)
+
+			connection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", this.SelectedSession[true])
 
 			if connection {
 				this.iConnection := connection
 
 				showMessage(translate("Successfully connected to the Team Server."))
-
-				this.loadTeams()
 
 				this.iSyncTask.resume()
 			}
@@ -1712,7 +1716,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iSessionIdentifier := identifier
 
 			sessionDB := new SessionDatabase()
-			
+
 			this.iConnection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", identifier)
 		}
 		else {

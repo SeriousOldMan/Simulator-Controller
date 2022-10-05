@@ -788,8 +788,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
-		RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
-		RaceAssistantPlugin.CollectorTask.Sleep := 1000
+		if RaceAssistantPlugin.CollectorTask {
+			RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
+			RaceAssistantPlugin.CollectorTask.Sleep := 1000
+		}
 	}
 
 	addAssistantsLap(data, telemetryData, positionsData) {

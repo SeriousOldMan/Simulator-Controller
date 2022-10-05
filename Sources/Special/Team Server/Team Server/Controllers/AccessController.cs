@@ -102,7 +102,6 @@ namespace TeamServer.Controllers {
             {
                 if (session == "")
                     throw new Exception("Not a valid or active session...");
-
             }
             else if (category == "data")
             {

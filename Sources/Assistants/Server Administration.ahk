@@ -98,16 +98,18 @@ loadAccounts(connector, listView) {
 
 			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
 
-			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
+			LV_Add("", account.Name, account.EMail
+					 , (account.SessionAccess = "true") ? translate("Yes") : translate("No")
+					 , (account.DataAccess = "true") ? translate("Yes") : translate("No")
+					 , translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account.ContractMinutes . translate(")")
+					 , account.AvailableMinutes)
 		}
 	}
 
 	LV_ModifyCol()
-	LV_ModifyCol(1, "AutoHdr")
-	LV_ModifyCol(2, "AutoHdr")
-	LV_ModifyCol(3, "AutoHdr")
-	LV_ModifyCol(4, "AutoHdr")
-	LV_ModifyCol(5, "AutoHdr")
+
+	loop 6
+		LV_ModifyCol(A_Index, "AutoHdr")
 
 	return accounts
 }
@@ -159,6 +161,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static accountPasswordEdit
 	static accountContractDropDown
 	static accountMinutesEdit := 120
+	static accountSessionAccessCheck
+	static accountDataAccessCheck
 
 	static createPasswordButton
 	static copyPasswordButton
@@ -196,7 +200,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 			if token {
 				sessionDB := new SessionDatabase()
-				
+
 				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
 
 				if keepAliveTask
@@ -318,6 +322,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountPasswordEdit, % ""
 				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
 				GuiControl, , accountMinutesEdit, % account.ContractMinutes
+				GuiControl, , accountSessionAccessCheck, % (account.SessionAccess = kTrue)
+				GuiControl, , accountDataAccessCheck, % (account.DataAccess = kTrue)
 
 				administrationEditor(kEvent, "UpdateState")
 			}
@@ -337,11 +343,15 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControlGet accountPasswordEdit
 				GuiControlGet accountContractDropDown
 				GuiControlGet accountMinutesEdit
+				GuiControlGet accountSessionAccessCheck
+				GuiControlGet accountDataAccessCheck
 
 				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"][accountContractDropDown]
 
 				if (account == true) {
 					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
+										  , accountSessionAccessCheck ? "true" : "false"
+										  , accountDataAccessCheck ? "true" : "false"
 										  , accountMinutesEdit, contract, accountMinutesEdit)
 				}
 				else {
@@ -353,6 +363,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					if (accountEMailEdit != account.EMail)
 						connector.ChangeAccountEMail(account.Identifier, accountEMailEdit)
+
+					connector.ChangeAccountAccess(account.Identifier, accountSessionAccessCheck ? "true" : "false"
+																	, accountDataAccessCheck ? "true" : "false")
 				}
 
 				accounts := loadAccounts(connector, accountsListView)
@@ -372,6 +385,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountNameEdit, % ""
 				GuiControl, , accountEMailEdit, % ""
 				GuiControl, , accountPasswordEdit, % ""
+				GuiControl, , accountSessionAccessCheck, 0
+				GuiControl, , accountDataAccessCheck, 0
 				GuiControl Choose, accountContractDropDown, 0
 				GuiControl, , accountMinutesEdit, % ""
 
@@ -444,6 +459,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					GuiControl Enable, accountEMailEdit
 					GuiControl Enable, accountPasswordEdit
+					GuiControl Enable, accountSessionAccessCheck
+					GuiControl Enable, accountDataAccessCheck
 					GuiControl Enable, accountContractDropDown
 
 					if (accountContractDropDown > 1) {
@@ -464,6 +481,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, accountNameEdit
 					GuiControl Disable, accountEMailEdit
 					GuiControl Disable, accountPasswordEdit
+					GuiControl Disable, accountSessionAccessCheck
+					GuiControl Disable, accountDataAccessCheck
 					GuiControl Disable, accountContractDropDown
 					GuiControl Disable, accountMinutesEdit
 
@@ -535,7 +554,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		Gui ADM:Font, Norm, Arial
 
-		Gui ADM:Add, Button, x164 y450 w80 h23 gcloseAdministrationEditor, % translate("Close")
+		Gui ADM:Add, Button, x164 y474 w80 h23 gcloseAdministrationEditor, % translate("Close")
 
 		x := 8
 		y := 68
@@ -572,14 +591,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
 		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Tab3, x8 y122 w388 h319 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
+		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
 
 		x0 := 16
 		y := 152
 
 		Gui Tab, 1
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Quota", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], "translate")*)
 
 		Gui ADM:Add, Text, x%x0% yp+150 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
@@ -594,7 +613,11 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
+		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Session / Data")
+		Gui ADM:Add, CheckBox, x%x1% yp+3 w23 vaccountSessionAccessCheck
+		Gui ADM:Add, CheckBox, xp+24 yp w23 vaccountDataAccessCheck
+
+		Gui ADM:Add, Text, x%x0% yp+22 w90 h23 +0x200, % translate("Contingent")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")

@@ -9,18 +9,22 @@ namespace TeamServer.Server {
 
         public ManagerBase(ObjectManager objectManager, Model.Access.Token token) {
             ObjectManager = objectManager;
-            Token = token;
-
-            ValidateToken(token);
+            Token = ValidateToken(token);
         }
 
         #region Validation
-        public virtual void ValidateToken(Token token) {
-            TeamServer.TokenIssuer.ValidateToken(token);
+        public virtual Token ValidateToken(Token token) {
+            return TeamServer.TokenIssuer.ValidateToken(token);
         }
 
-        public void ValidateToken(Guid token) {
-            TeamServer.TokenIssuer.ValidateToken(token);
+        public Token ValidateToken(Guid token)
+        {
+            return ValidateToken(token);
+        }
+
+        public Token ValidateToken(string token)
+        {
+            return ValidateToken(new Guid(token));
         }
         #endregion
     }

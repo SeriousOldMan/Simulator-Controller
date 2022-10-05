@@ -50,7 +50,7 @@ namespace TeamServer.Server {
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (!account.UseSessions)
+            else if (!account.SessionAccess)
                 throw new Exception("Account does not support session access...");
             else if (account.Contract == Account.ContractType.Expired)
                 throw new Exception("Account is no longer valid...");
@@ -78,7 +78,7 @@ namespace TeamServer.Server {
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
-            else if (!account.UseData)
+            else if (!account.DataAccess)
                 throw new Exception("Account does not support data access...");
             else
             {

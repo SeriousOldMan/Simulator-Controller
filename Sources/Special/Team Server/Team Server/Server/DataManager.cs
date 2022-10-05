@@ -12,7 +12,7 @@ namespace TeamServer.Server
 	{
 		public DataManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			if (!token.IsAllowed(Model.Access.Token.TokenType.Data))
+			if (!token.HasAccess(Model.Access.Token.TokenType.Data))
 				throw new Exception("Token does not support data access...");
 		}
 
@@ -36,7 +36,7 @@ namespace TeamServer.Server
 			if (!Token.Account.Administrator)
 				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
 					throw new Exception("Account is no longer valid...");
-				else if (!Token.Account.UseData)
+				else if (!Token.Account.DataAccess)
 					throw new Exception("Account does not support data storage...");
 		}
 

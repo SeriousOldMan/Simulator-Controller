@@ -66,7 +66,7 @@ namespace TeamServer.Controllers {
                     task.When = (Model.Task.Task.Frequency)Enum.Parse(typeof(Model.Task.Task.Frequency), properties["When"]);
 
                 if (properties.ContainsKey("Active"))
-                    task.Active = (properties["Active"] == "true");
+                    task.Active = (properties["Active"].ToLower() == "true");
 
                 task.Save();
 

@@ -21,7 +21,7 @@ namespace TeamServer.Controllers {
         {
             Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
 
-            if (!theToken.IsAllowed(Token.TokenType.Account))
+            if (!theToken.HasAccess(Token.TokenType.Account))
                 throw new Exception("Invalid token type...");
             else
                 return theToken;
@@ -51,6 +51,8 @@ namespace TeamServer.Controllers {
         {
             if ((type == null) || (type == ""))
                 return "Error: Invalid token request...";
+            else
+                type = type.ToLower();
 
             TokenIssuer tokenIssuer = Server.TeamServer.TokenIssuer;
 
@@ -59,9 +61,9 @@ namespace TeamServer.Controllers {
 
                 ValidateToken(theToken);
 
-                if (type == "Session")
+                if (type == "session")
                     return tokenIssuer.IssueSessionToken(theToken).Identifier.ToString();
-                else if (type == "Data")
+                else if (type == "data")
                     return tokenIssuer.IssueDataToken(theToken).Identifier.ToString();
                 else
                     return "Error: Invalid token type...";
@@ -93,6 +95,8 @@ namespace TeamServer.Controllers {
 
             if (type == null)
                 type = "";
+
+            category = category.ToLower();
 
             if (category == "session")
             {

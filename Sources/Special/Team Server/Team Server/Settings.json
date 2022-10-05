@@ -14,7 +14,9 @@
     {
       "Name": "test1",
       "Password": "",
-      "Minutes": 120
+      "Minutes": 120,
+      "Session": true,
+      "Reset": true
     },
     {
       "Name": "test2",

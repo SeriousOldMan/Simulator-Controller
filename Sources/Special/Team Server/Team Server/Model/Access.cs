@@ -21,9 +21,9 @@ namespace TeamServer.Model.Access {
 
         public int AvailableMinutes { get; set; }
 
-        public bool UseData { get; set; } = false;
+        public bool DataAccess { get; set; } = false;
 
-        public bool UseSessions { get; set; } = false;
+        public bool SessionAccess { get; set; } = false;
 
         public ContractType Contract { get; set; } = ContractType.OneTime;
 
@@ -119,7 +119,7 @@ namespace TeamServer.Model.Access {
             return Type != TokenType.Invalid || Until == null || DateTime.Now < Until || DateTime.Now < Used + new TimeSpan(0, 5, 0);
         }
 
-        public bool IsAllowed(TokenType type)
+        public bool HasAccess(TokenType type)
         {
             switch (type)
             {

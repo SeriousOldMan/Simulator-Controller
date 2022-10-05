@@ -8,24 +8,29 @@ namespace TeamServer.Server {
 	{
 		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
 		{
-			if (!token.IsAllowed(Model.Access.Token.TokenType.Session))
+			if (!token.HasAccess(Model.Access.Token.TokenType.Session))
 				TeamServer.TokenIssuer.ElevateToken(token);
 		}
 
 		#region Validation
-		public override void ValidateToken(Model.Access.Token token)
+		public override Model.Access.Token ValidateToken(Model.Access.Token token)
 		{
-			base.ValidateToken(token);
+			token = base.ValidateToken(token);
 
-			if (!token.IsAllowed(Model.Access.Token.TokenType.Session))
-				throw new Exception("Token does not support session access...");
+			if (!Token.Account.Administrator)
+				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
+					throw new Exception("Account is no longer valid...");
+				else if (!token.HasAccess(Model.Access.Token.TokenType.Session))
+					throw new Exception("Account does not support team sessions...");
+			
+			return token;
 		}
 
 		public void ValidateAccount(int duration) {
 			if (!Token.Account.Administrator)
 				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
 					throw new Exception("Account is no longer valid...");
-				else if (!Token.Account.UseSessions)
+				else if (!Token.Account.SessionAccess)
 					throw new Exception("Account does not support team sessions...");
 				else if (Token.Account.Contract != Model.Access.Account.ContractType.Unlimited &&
 						 (Token.Account.AvailableMinutes < duration))
@@ -85,7 +90,7 @@ namespace TeamServer.Server {
 
 		public List<Session> GetSessions(Model.Access.Token token)
 		{
-			ValidateToken(token);
+			token = ValidateToken(token);
 
 			return token.Account.Sessions;
 		}

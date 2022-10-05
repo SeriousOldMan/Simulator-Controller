@@ -6,8 +6,18 @@ using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
-    public class AccountManager : ManagerBase {
-        public AccountManager(ObjectManager objectManager, Token token) : base(objectManager, token) {
+    public class AccountManager : ManagerBase
+    {
+        public AccountManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
+
+        public AccountManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public AccountManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
         }
 
         public string CreatePassword(int length) {
@@ -23,6 +33,16 @@ namespace TeamServer.Server {
         }
 
         #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            token = base.ValidateToken(token);
+
+            if (!token.HasAccess(Token.TokenType.Account))
+                throw new Exception("Account does not support account access...");
+
+            return token;
+        }
+
         public void ValidateAccount(Account account) {
             if (account == null)
                 throw new Exception("Not a valid account...");

@@ -50,7 +50,7 @@ namespace TeamServer {
 
             CreateAccounts(objectManager, settings.Accounts);
 
-            new Server.TeamServer(objectManager, settings.TokenLifeTime, settings.ConnectionLifeTime);
+            new Server.TeamServer(objectManager, settings.TokenLifeTime, Math.Max(settings.ConnectionLifeTime, 300));
 
             CreateHostBuilder(args).Build().Run();
         }

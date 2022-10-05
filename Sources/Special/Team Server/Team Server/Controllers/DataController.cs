@@ -25,8 +25,7 @@ namespace TeamServer.Controllers
         {
             try
             {
-                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
+                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
 
                 switch (table)
                 {
@@ -61,8 +60,7 @@ namespace TeamServer.Controllers
         {
             try
             {
-                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
+                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
 
                 switch (table)
                 {
@@ -97,8 +95,7 @@ namespace TeamServer.Controllers
         {
             try
             {
-                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
+                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
 
                 switch (table)
                 {
@@ -184,8 +181,7 @@ namespace TeamServer.Controllers
         {
             try
             {
-                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                          Server.TeamServer.TokenIssuer.ValidateToken(token));
+                DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
                 switch (table)
@@ -226,8 +222,7 @@ namespace TeamServer.Controllers
         [HttpPost("{table}")]
         public string Post([FromQuery(Name = "token")] string token, string table, [FromBody] string keyValues)
         {
-            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                      Server.TeamServer.TokenIssuer.ValidateToken(token));
+            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
             Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
             try
@@ -263,8 +258,7 @@ namespace TeamServer.Controllers
         [HttpDelete("{table}/{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string table, string identifier)
         {
-            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager,
-                                                      Server.TeamServer.TokenIssuer.ValidateToken(token));
+            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
 
             try
             {

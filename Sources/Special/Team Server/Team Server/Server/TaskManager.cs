@@ -6,12 +6,26 @@ using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
-    public class TaskManager : ManagerBase {
-        public TaskManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+    public class TaskManager : ManagerBase
+    {
+        public TaskManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
+
+        public TaskManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public TaskManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
         }
 
         #region Task
         #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            return TeamServer.TokenIssuer.ElevateToken(base.ValidateToken(token));
+        }
 
         public void ValidateTask(Model.Task.Task task) {
             if (task == null)

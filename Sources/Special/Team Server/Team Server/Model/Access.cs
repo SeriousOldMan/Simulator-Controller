@@ -128,7 +128,7 @@ namespace TeamServer.Model.Access {
                 case TokenType.Data:
                     return Type == TokenType.Data || Type == TokenType.Account || Type == TokenType.Internal;
                 case TokenType.Account:
-                    return Type == TokenType.Account;
+                    return Type == TokenType.Account || Type == TokenType.Internal;
                 case TokenType.Internal:
                     return Type == TokenType.Internal;
                 default:

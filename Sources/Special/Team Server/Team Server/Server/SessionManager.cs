@@ -5,23 +5,24 @@ using TeamServer.Model;
 
 namespace TeamServer.Server {
 	public class SessionManager : ManagerBase
-	{
-		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
-		{
-			if (!token.HasAccess(Model.Access.Token.TokenType.Session))
-				TeamServer.TokenIssuer.ElevateToken(token);
-		}
+    {
+        public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
+        {
+        }
+        public SessionManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+        public SessionManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
+        }
 
-		#region Validation
-		public override Model.Access.Token ValidateToken(Model.Access.Token token)
+        #region Validation
+        public override Model.Access.Token ValidateToken(Model.Access.Token token)
 		{
 			token = base.ValidateToken(token);
 
-			if (!Token.Account.Administrator)
-				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
-					throw new Exception("Account is no longer valid...");
-				else if (!token.HasAccess(Model.Access.Token.TokenType.Session))
-					throw new Exception("Account does not support team sessions...");
+			if (!token.HasAccess(Model.Access.Token.TokenType.Session))
+				throw new Exception("Token does not support session access...");
 			
 			return token;
 		}
@@ -88,11 +89,9 @@ namespace TeamServer.Server {
 			return ObjectManager.GetAllSessionsAsync().Result;
 		}
 
-		public List<Session> GetSessions(Model.Access.Token token)
+		public List<Session> GetSessions()
 		{
-			token = ValidateToken(token);
-
-			return token.Account.Sessions;
+			return Token.Account.Sessions;
 		}
 
 		public Session LookupSession(Guid identifier) {

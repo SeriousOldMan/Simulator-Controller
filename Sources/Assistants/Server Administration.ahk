@@ -139,7 +139,7 @@ global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
-	local dllName, dllFile, connection
+	local dllName, dllFile, sessionDB, connection
 	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 
 	static connector := false
@@ -152,7 +152,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 	static teamServerURLEdit = "https://localhost:5001"
 	static changePasswordButton
-	static teamServerTokenEdit = ""
 	static accountsListView
 
 	static accountNameEdit
@@ -196,7 +195,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 				token := false
 
 			if token {
-				connection := connector.Connect(token, new SessionDatabase().ID, "Server Administration", "Internal")
+				sessionDB := new SessionDatabase()
+				
+				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
 
 				if keepAliveTask
 					keepAliveTask.stop()
@@ -210,15 +211,11 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "TasksLoad")
 				administrationEditor(kEvent, "AccountClear")
 
-				GuiControl, , teamServerTokenEdit, % token
-
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
 		catch exception {
 			token := false
-
-			GuiControl, , teamServerTokenEdit, % ""
 
 			accounts := loadAccounts(connector, accountsListView)
 			account := false
@@ -570,24 +567,21 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Login Credentials")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% h21 HWNDloginHandle VteamServerNameEdit, %teamServerNameEdit%
 		Gui ADM:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit, %teamServerPasswordEdit%
+		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton grenewToken
+		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
 		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Text, x%x0% yp+26 w90 h23 +0x200, % translate("Access Token")
-		Gui ADM:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit, %teamServerTokenEdit%
-		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton grenewToken
-		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-
-		Gui ADM:Add, Tab3, x8 y148 w388 h293 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
+		Gui ADM:Add, Tab3, x8 y122 w388 h319 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
 
 		x0 := 16
-		y := 178
+		y := 152
 
 		Gui Tab, 1
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Quota", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Quota", "Available"], "translate")*)
 
-		Gui ADM:Add, Text, x%x0% yp+124 w90 h23 +0x200, % translate("Name")
+		Gui ADM:Add, Text, x%x0% yp+150 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
 
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Password")

@@ -646,7 +646,9 @@ restart:
 
 				sessionDB := new SessionDatabase()
 
-				connection := connector.Connect(serverTokenEdit, sessionDB.ID, vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : "Unknown", "Driver")
+				connection := connector.Connect(serverTokenEdit, sessionDB.ID
+											  , vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : sessionDB.getUserName()
+											  , "Driver")
 
 				if connection {
 					if keepAliveTask
@@ -1223,7 +1225,7 @@ restart:
 			Gui RES:Add, Text, x16 y82 w90 h23 +0x200, % translate("Server URL")
 			Gui RES:Add, Edit, x126 yp+1 w256 vserverURLEdit, %serverURLEdit%
 
-			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Access Token")
+			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Session Token")
 			Gui RES:Add, Edit, x126 yp w256 h21 vserverTokenEdit, %serverTokenEdit%
 			Gui RES:Add, Button, x102 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gconnectServer
 			setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")

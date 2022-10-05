@@ -5,11 +5,31 @@ using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
-    public class TeamManager : ManagerBase {
-        public TeamManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+    public class TeamManager : ManagerBase
+    {
+        public TeamManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
+
+        public TeamManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public TeamManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
         }
 
         #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            token = base.ValidateToken(token);
+
+            if (!token.HasAccess(Token.TokenType.Session))
+                throw new Exception("Token does not support session access...");
+
+            return token;
+        }
+
         public void ValidateTeam(Team team) {
             if (team == null)
                 throw new Exception("Not a known team...");

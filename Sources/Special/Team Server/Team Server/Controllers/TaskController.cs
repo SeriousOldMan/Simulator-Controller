@@ -19,7 +19,7 @@ namespace TeamServer.Controllers {
         [HttpGet("alltasks")]
         public string GetTasks([FromQuery(Name = "token")] string token) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 return String.Join(";", taskManager.GetAllTasks().Select(a => a.Identifier));
             }
@@ -34,7 +34,7 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 Model.Task.Task task = taskManager.LookupTask(identifier);
 
                 return ControllerUtils.SerializeObject(task, new List<string>(new string[] { "Identifier", "Which", "What", "When", "Active" }));
@@ -51,7 +51,7 @@ namespace TeamServer.Controllers {
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 Model.Task.Task task = taskManager.LookupTask(identifier);
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
@@ -84,7 +84,7 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromBody] string keyValues) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
@@ -106,7 +106,7 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 taskManager.DeleteTask(identifier);
 

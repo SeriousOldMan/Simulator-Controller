@@ -241,6 +241,10 @@ class SessionDatabase extends ConfigurationItem {
 			return []
 	}
 
+	getUserName(id) {
+		return this.getDriverNames(false, id)[1]
+	}
+
 	registerDriver(simulator, id, name) {
 		local sessionDB, forName, surName, nickName
 
@@ -303,6 +307,16 @@ class SessionDatabase extends ConfigurationItem {
 				drivers.Push(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
 
 			return ((drivers.Length() = 0) ? ["John Doe (JD)"] : drivers)
+		}
+		else if id {
+			for ignore, simulator in this.getSimulators() {
+				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
+					return computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+			}
+
+			return ["John Doe (JD)"]
 		}
 		else
 			return ["John Doe (JD)"]

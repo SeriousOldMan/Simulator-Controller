@@ -190,7 +190,15 @@ namespace TeamServer.Model {
         }
 
         public Task<Access.Account> GetTokenAccountAsync(Access.Token token) {
-            return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
+            if (token.AccountID == 0)
+            {
+                if (token != Server.TeamServer.TokenIssuer.InternalToken)
+                    throw new Exception("Corrupt token detected...");
+
+                return null;
+            }
+            else
+                return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
         }
 
         public Task<Access.Connection> GetTokenConnectionAsync(Access.Token token, string client, string name,

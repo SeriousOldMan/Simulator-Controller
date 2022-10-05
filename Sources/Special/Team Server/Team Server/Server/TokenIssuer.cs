@@ -117,7 +117,13 @@ namespace TeamServer.Server {
 
         #region Validation
         public Token ValidateToken(Token token) {
-            if ((token == null) || !token.IsValid())
+            if (token == null)
+                throw new Exception("Token expired...");
+            else if (token == InternalToken)
+                return token;
+            else if (token.Account.Contract == Model.Access.Account.ContractType.Expired)
+                throw new Exception("Account is no longer valid...");
+            else if (!token.IsValid())
                 throw new Exception("Token expired...");
             else {
                 if ((token.Used == null) || (DateTime.Now > token.Used + new TimeSpan(0, 1, 0))) {

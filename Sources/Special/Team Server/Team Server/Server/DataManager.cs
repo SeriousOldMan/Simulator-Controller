@@ -4,20 +4,27 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TeamServer.Model;
+using TeamServer.Model.Access;
 using TeamServer.Model.Data;
 
 namespace TeamServer.Server
 {
 	public class DataManager : ManagerBase
-	{
-		public DataManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
-		{
-			if (!token.HasAccess(Model.Access.Token.TokenType.Data))
-				throw new Exception("Token does not support data access...");
-		}
+    {
+        public DataManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
 
-		#region Generic
-		protected void SetProperties(object obj, Dictionary<string, string> values)
+        public DataManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public DataManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
+        }
+
+        #region Generic
+        protected void SetProperties(object obj, Dictionary<string, string> values)
 		{
 			foreach (KeyValuePair<string, string> kvp in values)
 			{
@@ -28,10 +35,20 @@ namespace TeamServer.Server
 					propInfo.SetValue(obj, kvp.Value, null);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Validation
-		public void ValidateAccount()
+        #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            token = base.ValidateToken(token);
+
+            if (!token.HasAccess(Token.TokenType.Data))
+                throw new Exception("Token does not support data access...");
+
+            return token;
+        }
+
+        public void ValidateAccount()
 		{
 			if (!Token.Account.Administrator)
 				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)

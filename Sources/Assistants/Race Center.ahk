@@ -1124,8 +1124,8 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iServerURL := getConfigurationValue(settings, "Team Settings", "Server.URL"
 														 , getConfigurationValue(configuration, "Team Server", "Server.URL", ""))
-		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Server.Token"
-														   , getConfigurationValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
+		this.iServerToken := getConfigurationValue(settings, "Team Settings", "Session.Token"
+														   , getConfigurationValue(setting, "Team Server", "Server.Token", "__INVALID__"))
 		this.iTeamName := getConfigurationValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getConfigurationValue(settings, "Team Settings", "Session.Name", "")
@@ -1167,7 +1167,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Server URL")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverURLEdit, % this.ServerURL
 
-		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Access Token")
+		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session Token")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverTokenEdit, % this.ServerToken
 		Gui %window%:Add, Button, x116 yp-1 w23 h23 Center +0x200 HWNDconnectButton gconnectServer
 		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
@@ -1513,7 +1513,7 @@ class RaceCenter extends ConfigurationItem {
 
 	connectAsync(silent) {
 		local window := this.Window
-		local token, title, connection
+		local token, title, sessionDB, connection
 
 		if (!silent && GetKeyState("Ctrl", "P")) {
 			Gui TSL:+Owner%window%
@@ -1550,8 +1550,10 @@ class RaceCenter extends ConfigurationItem {
 				throw "Invalid token detected..."
 
 			this.Connector.Initialize(this.ServerURL)
-
-			connection := this.Connector.Connect(this.ServerToken, new SessionDatabase().ID, "Race Center", "Internal", this.SelectedSession)
+	
+			sessionDB := new SessionDatabase()
+			
+			connection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", this.SelectedSession)
 
 			if connection {
 				this.iConnection := connection
@@ -1693,7 +1695,7 @@ class RaceCenter extends ConfigurationItem {
 
 	selectSession(identifier) {
 		local window := this.Window
-		local chosen, names
+		local chosen, names, sessionDB
 
 		this.iSyncTask.pause()
 
@@ -1709,7 +1711,9 @@ class RaceCenter extends ConfigurationItem {
 			this.iSessionName := names[chosen]
 			this.iSessionIdentifier := identifier
 
-			this.iConnection := this.Connector.Connect(this.ServerToken, new SessionDatabase().ID, "Race Center", "Internal", identifier)
+			sessionDB := new SessionDatabase()
+			
+			this.iConnection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", identifier)
 		}
 		else {
 			this.iSessionName := ""

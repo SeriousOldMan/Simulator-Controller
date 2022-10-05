@@ -197,14 +197,14 @@ namespace TeamServer {
 			Token = token;
 
 			return connection;
-		}
+        }
 
-		public void KeepAlive(string identifier)
-		{
-			GetConnection(identifier);
-		}
+        public void KeepAlive(string identifier)
+        {
+            Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+        }
 
-		public void Logout() {
+        public void Logout() {
 			Token = "";
 
 			Delete("logout");

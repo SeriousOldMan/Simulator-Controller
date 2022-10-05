@@ -1237,7 +1237,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -3324,9 +3324,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You are not connected to an active session.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; Load Session...
+			case 6:
+				this.manageTeam()
+			case 8: ; Load Session...
 				this.loadSession()
-			case 7: ; Save Session
+			case 9: ; Save Session
 				if this.HasData {
 					if this.SessionActive
 						this.saveSession()
@@ -3345,7 +3347,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 8: ; Save Session Copy...
+			case 10: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -3355,11 +3357,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 10: ; Update Statistics
+			case 12: ; Update Statistics
 				this.updateStatistics()
-			case 12: ; Race Summary
+			case 14: ; Race Summary
 				this.showRaceSummary()
-			case 13: ; Driver Statistics
+			case 15: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -9600,7 +9602,7 @@ class RaceCenter extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
-	local x, y, row, driver, owner, ignore, name
+	local x, y, row, driver, owner, ignore, name, connection
 
 	static result := false
 
@@ -9611,6 +9613,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	static deselectDriverButton
 	static upDriverButton
 	static downDriverButton
+
+	static connectedDrivers := []
 
 	if (raceCenterOrCommand = kCancel)
 		result := kCancel
@@ -9626,7 +9630,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %selectedDriversListView%
 
-		LV_Add("Select Vis", driver)
+		LV_Add("Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9640,7 +9644,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %availableDriversListView%
 
-		LV_Add("Vis", driver)
+		LV_Add("Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9652,7 +9656,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row - 1, "Select Vis", driver)
+		LV_Insert(row - 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9664,7 +9668,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row + 1, "Select Vis", driver)
+		LV_Insert(row + 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9725,19 +9729,37 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s8 Norm, Arial
 
-		Gui TE:Add, ListView, x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gupdateTeamManager Section, % values2String("|", map(["Available Driver"], "translate")*)
+		connectedDrivers := []
+
+		if raceCenterOrCommand.SessionActive
+			for ignore, connection in string2Values(";", raceCenterOrCommand.Connector.GetSessionConnections(raceCenterOrCommand.SelectedSession[true])) {
+				connection := parseObject(raceCenterOrCommand.Connector.GetConnection(connection))
+
+				if (connection.Name && (connection.Name != ""))
+					connectedDrivers.Push(connection.Name)
+			}
+
+		Gui TE:Add, ListView, x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gupdateTeamManager Section, % values2String("|", map(["Available Driver", "Online"], "translate")*)
 
 		if !teamDrivers
 			teamDrivers := raceCenterOrCommand.TeamDrivers
 
 		for name, ignore in raceCenterOrCommand.SessionDrivers
 			if !inList(teamDrivers, name)
-				LV_Add("", name)
+				LV_Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
 
-		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver"], "translate")*)
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
+
+		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver", "Online"], "translate")*)
 
 		for ignore, name in teamDrivers
-			LV_Add("", name)
+			LV_Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
+
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr")
 
 		Gui TE:Font, s10 Bold, Arial
 

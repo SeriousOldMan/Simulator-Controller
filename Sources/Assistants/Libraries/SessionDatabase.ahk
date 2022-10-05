@@ -241,8 +241,8 @@ class SessionDatabase extends ConfigurationItem {
 			return []
 	}
 
-	getUserName(id) {
-		return this.getDriverNames(false, id)[1]
+	getUserName() {
+		return this.getDriverNames(false, this.ID)[1]
 	}
 
 	registerDriver(simulator, id, name) {
@@ -313,7 +313,7 @@ class SessionDatabase extends ConfigurationItem {
 				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-					return computeDriverName(driver.Forname, driver.Surname, driver.Nickname)
+					return Array(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
 			}
 
 			return ["John Doe (JD)"]

@@ -188,6 +188,9 @@ namespace TeamServer.Server {
                     Name = name
                 };
 
+                if (session != null)
+                    connection.SessionID = session.ID;
+
                 connection.Save();
             }
             

@@ -197,8 +197,8 @@ namespace TeamServer {
 
 		public void KeepAlive(string identifier)
 		{
-			GetConnection(identifier);
-		}
+			Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+        }
 
 		public string ValidateToken()
 		{

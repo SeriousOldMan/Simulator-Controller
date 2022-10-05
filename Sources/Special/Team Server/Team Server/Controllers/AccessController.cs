@@ -219,13 +219,14 @@ namespace TeamServer.Controllers {
         }
 
         [HttpGet("{identifier}")]
-        public string Get([FromQuery(Name = "token")] string token, string identifier) {
+        public string Get([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "keepalive")] string keepAlive) {
             try {
                 Server.TeamServer.TokenIssuer.ValidateToken(token);
                 
                 Connection connection = Server.TeamServer.TokenIssuer.LookupConnection(identifier);
 
-                connection.Renew();
+                if ((keepAlive != null) && (keepAlive.ToLower() == "true"))    
+                    connection.Renew();
 
                 return ControllerUtils.SerializeObject(connection,
                                                        new List<string>(new string[] { "Identifier", "Client", "Name", "Type", "Session" }));

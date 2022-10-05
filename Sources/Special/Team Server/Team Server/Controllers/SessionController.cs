@@ -395,9 +395,7 @@ namespace TeamServer.Controllers {
         {
             try
             {
-                SessionManager sessionManager = new SessionManager(Server.TeamServer.ObjectManager, token);
-
-                return String.Join(";", sessionManager.LookupSession(identifier).Connections.Select(s => s.Identifier));
+                return String.Join(";", new SessionManager(Server.TeamServer.ObjectManager, token).LookupSession(identifier).Connections.Select(s => s.Identifier));
             }
             catch (AggregateException exception)
             {

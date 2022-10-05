@@ -204,21 +204,21 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	DriverForName[] {
+	DriverForName[force := false] {
 		Get {
-			return this.getDriverForName()
+			return this.getDriverForName(force)
 		}
 	}
 
-	DriverSurName[] {
+	DriverSurName[force := false] {
 		Get {
-			return this.getDriverSurName()
+			return this.getDriverSurName(force)
 		}
 	}
 
-	DriverNickName[] {
+	DriverNickName[force := false] {
 		Get {
-			return this.getDriverNickName()
+			return this.getDriverNickName(force)
 		}
 	}
 
@@ -556,10 +556,10 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getDriverForName() {
+	getDriverForName(force := false) {
 		local driver
 
-		if (!this.iDriverForName && this.TeamServerActive) {
+		if (force || (!this.iDriverForName && this.TeamServerActive)) {
 			try {
 				driver := this.parseObject(this.Connector.GetDriver(this.Driver))
 
@@ -580,14 +580,14 @@ class TeamServerPlugin extends ControllerPlugin {
 		return (this.iDriverForName ? this.iDriverForName : "")
 	}
 
-	getDriverSurName() {
-		this.getDriverForName()
+	getDriverSurName(force := false) {
+		this.getDriverForName(force)
 
 		return (this.iDriverSurName ? this.iDriverSurName : "")
 	}
 
-	getDriverNickName() {
-		this.getDriverForName()
+	getDriverNickName(force := false) {
+		this.getDriverForName(force)
 
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
@@ -1061,7 +1061,9 @@ class TeamServerPlugin extends ControllerPlugin {
 					if (this.Driver && this.Session)
 						this.iConnection := this.Connector.Connect(this.ServerToken
 																 , new SessionDatabase().ID
-																 , computeDriverName(this.DriverForName, this.DriverSurName, this.DriverNickName)
+																 , computeDriverName(this.DriverForName[true]
+																				   , this.DriverSurName[true]
+																				   , this.DriverNickName[true])
 																 , "Driver", this.Session)
 				}
 

@@ -644,13 +644,17 @@ restart:
 			try {
 				connector.Initialize(serverURLEdit)
 
+				connector.Token := serverTokenEdit
+
 				sessionDB := new SessionDatabase()
 
 				connection := connector.Connect(serverTokenEdit, sessionDB.ID
 											  , vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : sessionDB.getUserName()
 											  , "Driver")
 
-				if connection {
+				if (connection && (connection != "")) {
+					connector.ValidateSessionToken()
+
 					if keepAliveTask
 						keepAliveTask.stop()
 

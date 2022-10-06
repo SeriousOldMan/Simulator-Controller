@@ -203,9 +203,14 @@ namespace TeamServer {
 		public string ValidateToken()
 		{
 			return Get("login/validatetoken");
-		}
+        }
 
-		public string GetAllConnections()
+        public string ValidateSessionToken()
+        {
+            return Get("session/validatetoken");
+        }
+
+        public string GetAllConnections()
 		{
 			return Get("login/allconnections");
 		}

@@ -3637,8 +3637,11 @@ editSettings(editorOrCommand) {
 
 			connection := connector.Connect(serverTokenEdit, sessionDB.ID, sessionDB.getUserName())
 
-			if (connection && (connection != ""))
+			if (connection && (connection != "")) {
+				connector.ValidateDataToken()
+
 				showMessage(translate("Successfully connected to the Team Server."))
+			}
 		}
 		catch exception {
 			title := translate("Error")

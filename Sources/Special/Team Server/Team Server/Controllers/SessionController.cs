@@ -17,6 +17,26 @@ namespace TeamServer.Controllers {
             _logger = logger;
         }
 
+
+        [HttpGet("validatetoken")]
+        public string ValidateToken([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                new SessionManager(Server.TeamServer.ObjectManager, token);
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("sessions")]
         public string GetSessions([FromQuery(Name = "token")] string token) {
             try {

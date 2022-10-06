@@ -20,6 +20,26 @@ namespace TeamServer.Controllers
             _logger = logger;
         }
 
+
+        [HttpGet("validatetoken")]
+        public string ValidateToken([FromQuery(Name = "token")] string token)
+        {
+            try
+            {
+                new DataManager(Server.TeamServer.ObjectManager, token);
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("query/{table}")]
         public string QueryData([FromQuery(Name = "token")] string token, [FromBody] string where, string table)
         {

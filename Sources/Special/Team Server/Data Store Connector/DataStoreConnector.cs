@@ -205,6 +205,16 @@ namespace TeamServer {
             Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
         }
 
+        public string ValidateToken()
+        {
+            return Get("login/validatetoken");
+        }
+
+        public string ValidateDataToken()
+        {
+            return Get("data/validatetoken");
+        }
+
         public void Logout() {
 			Token = "";
 

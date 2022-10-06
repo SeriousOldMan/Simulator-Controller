@@ -50,7 +50,7 @@ updateProgress(max) {
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
 	local options, index, title, cState, sState, devVersion, release, version, download, x, y, updateTask
-	local directory, currentDirectory, start
+	local directory, currentDirectory, start, ignore, url, error
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
@@ -129,15 +129,28 @@ downloadSimulatorController() {
 
 			updateTask.start()
 
-			try {
-				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+			error := false
 
-				if ErrorLevel
-					throw "No valid installation file (Error: " . ErrorLevel . ")..."
-			}
-			catch exception {
-				logError(exception, true)
+			for ignore, url in string2Values(";", download)
+				try {
+					URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
 
+					if ErrorLevel {
+						error := true
+
+						throw "No valid installation file (Error: " . ErrorLevel . ")..."
+					}
+					else {
+						error := false
+
+						break
+					}
+				}
+				catch exception {
+					logError(exception, true)
+				}
+
+			if error {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")

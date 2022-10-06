@@ -192,7 +192,8 @@ namespace TeamServer {
 		public string Connect(string token, string client, string name)
 		{
 			string connection = Get("login/connect/data", new Parameters() { { "token", token },
-																			 { "client", client }, { "name", name } });
+																			 { "client", client }, { "name", name },
+																			 { "type", "Internal" } });
 
 			Token = token;
 

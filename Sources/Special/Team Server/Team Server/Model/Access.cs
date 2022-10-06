@@ -75,7 +75,7 @@ namespace TeamServer.Model.Access {
         }
     }
 
-    [Table("Token")]
+    [Table("Access_Tokens")]
     public class Token : ModelObject
     {
         public enum TokenType

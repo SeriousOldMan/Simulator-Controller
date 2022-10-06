@@ -34,6 +34,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\GDIP.ahk
+#Include ..\Libraries\CLR.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
@@ -449,7 +450,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Picture, x280 ys w30 h30 Section, %kIconsDirectory%Report.ico
 		Gui %window%:Add, Text, xp+34 yp+5 w120 h26, % translate("Notes")
 
-		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gchooseDatabasePath
+		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gshowSettings
 		setButtonIcon(generalSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
 
 		Gui %window%:Font, s8 Norm, Arial
@@ -751,8 +752,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
 		}
-		else
-			GuiControl Choose, settingsTab, 0
 
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
@@ -3262,7 +3261,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		Gui IDS:Font, s9 Norm, Arial
 		Gui IDS:Font, Italic Underline, Arial
 
-		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenImportDocumentation, % translate("Import Data")
+		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenSettingsDocumentation, % translate("Database Location")
 
 		Gui IDS:Font, s8 Norm, Arial
 
@@ -3535,6 +3534,330 @@ openImportDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
 }
 
+showSettings() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+
+	protectionOn()
+
+	Gui SE:+Owner%window%
+	Gui %window%:+Disabled
+
+	try {
+		editSettings(editor)
+	}
+	finally {
+		Gui %window%:-Disabled
+
+		protectionOff()
+	}
+}
+
+editSettings(editorOrCommand) {
+	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
+	local directory, empty, original
+
+	static result := false
+	static sessionDB := false
+
+	static databaseLocationEdit := ""
+	static useTeamServerCheck
+	static serverURLEdit := ""
+	static serverTokenEdit := ""
+	static tokenButtonHandle
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else if (editorOrCommand = "DatabaseLocation") {
+		Gui +OwnDialogs
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
+		OnMessage(0x44, "")
+
+		if (directory != "") {
+			databaseLocationEdit := directory
+
+			GuiControl, , databaseLocationEdit, %databaseLocationEdit%
+		}
+	}
+	else if (editorOrCommand = "ValidateToken") {
+		GuiControlGet serverURLEdit
+		GuiControlGet serverTokenEdit
+
+		dllName := "Data Store Connector.dll"
+		dllFile := kBinariesDirectory . dllName
+
+		try {
+			if (!FileExist(dllFile)) {
+				logMessage(kLogCritical, translate("Data Store Connector.dll not found in ") . kBinariesDirectory)
+
+				throw "Unable to find Data Store Connector.dll in " . kBinariesDirectory . "..."
+			}
+
+			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
+
+			showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+
+		try {
+			connector.Initialize(serverURLEdit)
+
+			connector.Token := serverTokenEdit
+
+			connection := connector.Connect(serverTokenEdit, sessionDB.ID, sessionDB.getUserName())
+
+			if (connection && (connection != ""))
+				showMessage(translate("Successfully connected to the Team Server."))
+		}
+		catch exception {
+			title := translate("Error")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
+
+			return false
+		}
+	}
+	else if (editorOrCommand = "UpdateState") {
+		GuiControlGet useTeamServerCheck
+
+		if useTeamServerCheck {
+			GuiControl Enable, serverURLEdit
+			GuiControl Enable, serverTokenEdit
+			GuiControl Enable, %tokenButtonHandle%
+		}
+		else {
+			GuiControl Disable, serverURLEdit
+			GuiControl Disable, serverTokenEdit
+			GuiControl Disable, %tokenButtonHandle%
+		}
+	}
+	else {
+		result := false
+		sessionDB := editorOrCommand.SessionDatabase
+
+		window := "SE"
+
+		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		databaseLocationEdit := normalizeDirectoryPath(getConfigurationValue(configuration, "Database", "Path", kDatabaseDirectory))
+
+		useTeamServerCheck := getConfigurationValue(configuration, "Team Server", "Replication", false)
+
+		if useTeamServerCheck {
+			serverURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "")
+			serverTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+		}
+		else {
+			serverURLEdit := ""
+			serverTokenEdit := ""
+		}
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w394 Center gmoveSettings, % translate("Modular Simulator Controller System")
+
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, x153 YP+20 w104 cBlue Center gopenSettingsDocumentation, % translate("Database Settings")
+
+		Gui %window%:Font, s8 Norm, Arial
+
+		Gui %window%:Add, Text, x16 y60 w90 h23 +0x200, % translate("Database Folder")
+		Gui %window%:Add, Edit, x146 yp w234 h21 VdatabaseLocationEdit, %databaseLocationEdit%
+		Gui %window%:Add, Button, x382 yp-1 w23 h23 gchooseDatabaseLocation, % translate("...")
+
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h108 Section, % translate("Team Server")
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Activate")
+		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Replicate Telemetry Data")
+
+		GuiControl, , useTeamServerCheck, %useTeamServerCheck%
+
+		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Edit, x146 yp+1 w246 vserverURLEdit, %serverURLEdit%
+
+		Gui %window%:Add, Text, x24 yp+23 w90 h23 +0x200, % translate("Data Token")
+		Gui %window%:Add, Edit, x146 yp w246 h21 vserverTokenEdit, %serverTokenEdit%
+		Gui %window%:Add, Button, x122 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gvalidateServerToken
+		setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Button, x122 ys+126 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
+
+		updateSettingsState()
+
+		if getWindowPosition("Session Database.Settings", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show, AutoSize Center
+
+		done := false
+
+		while !done {
+			result := false
+
+			while !result
+				Sleep 100
+
+			if (result == kCancel)
+				done := true
+			else if (result == kOk) {
+				GuiControlGet databaseLocationEdit
+				GuiControlGet useTeamServerCheck
+				GuiControlGet serverURLEdit
+				GuiControlGet serverTokenEdit
+
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
+				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+
+				databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+
+				setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+				if ((databaseLocationEdit != "")
+				 && (normalizeDirectoryPath(databaseLocationEdit) != normalizeDirectoryPath(kDatabaseDirectory))) {
+					if !FileExist(databaseLocationEdit)
+						try {
+							FileCreateDir %databaseLocationEdit%
+						}
+						catch exception {
+							title := translate("Error")
+
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+							OnMessage(0x44, "")
+
+							continue
+						}
+
+					SoundPlay *32
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
+					title := translate("Session Database")
+					MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+					OnMessage(0x44, "")
+
+					IfMsgBox Cancel
+						continue
+
+					IfMsgBox Yes
+					{
+						empty := true
+
+						loop Files, %directory%\*.*, FD
+						{
+							empty := false
+
+							break
+						}
+
+						if !empty {
+							title := translate("Error")
+
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							MsgBox 262160, %title%, % translate("The new database folder must be empty.")
+							OnMessage(0x44, "")
+
+							continue
+						}
+
+						original := normalizeDirectoryPath(kDatabaseDirectory)
+
+						x := Round((A_ScreenWidth - 300) / 2)
+						y := A_ScreenHeight - 150
+
+						showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
+
+						copyFiles(original, directory)
+
+						showProgress({progress: 100, message: translate("Finished...")})
+
+						Sleep 200
+
+						hideProgress()
+					}
+
+					sessionDB.DatabasePath := normalizeDirectoryPath(directory)
+
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("The session database location has been updated and the application will exit now. Make sure to restart all other applications as well.")
+					OnMessage(0x44, "")
+
+					ExitApp 0
+				}
+
+				done := true
+			}
+		}
+
+		Gui %window%:Destroy
+	}
+}
+
+acceptSettings() {
+	editSettings(kOk)
+}
+
+cancelSettings() {
+	editSettings(kCancel)
+}
+
+chooseDatabaseLocation() {
+	editSettings("DatabaseLocation")
+}
+
+validateServerToken() {
+	editSettings("ValidateToken")
+}
+
+updateSettingsState() {
+	editSettings("UpdateState")
+}
+
+moveSettings() {
+	moveByMouse("SE", "Session Database.Settings")
+}
+
+openSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location
+}
+
+
+
+
+
+
+
+
+
 moveSessionDatabaseEditor() {
 	moveByMouse(SessionDatabaseEditor.Instance.Window, "Session Database")
 }
@@ -3595,96 +3918,6 @@ copyFiles(source, destination) {
 	showProgress({progress: 50, color: "Green"})
 
 	copyDirectory(source, destination, 50 / count, step)
-}
-
-chooseDatabasePath() {
-	local directory, title, empty, original, x, y, configuration
-
-	protectionOn()
-
-	try {
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
-		OnMessage(0x44, "")
-
-		if ((directory != "") && (normalizeDirectoryPath(directory) != normalizeDirectoryPath(kDatabaseDirectory))) {
-			if !FileExist(directory)
-				try {
-					FileCreateDir %directory%
-				}
-				catch exception {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-					OnMessage(0x44, "")
-
-					return
-				}
-
-			SoundPlay *32
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
-			title := translate("Session Database")
-			MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
-			OnMessage(0x44, "")
-
-			IfMsgBox Cancel
-				return
-
-			IfMsgBox Yes
-			{
-				empty := true
-
-				loop Files, %directory%\*.*, FD
-				{
-					empty := false
-
-					break
-				}
-
-				if !empty {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("The new database folder must be empty.")
-					OnMessage(0x44, "")
-
-					return
-				}
-
-				original := normalizeDirectoryPath(kDatabaseDirectory)
-
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
-
-				showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
-
-				copyFiles(original, directory)
-
-				showProgress({progress: 100, message: translate("Finished...")})
-
-				Sleep 200
-
-				hideProgress()
-			}
-
-			new SessionDatabase().DatabasePath := normalizeDirectoryPath(directory)
-
-			title := translate("Information")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262192, %title%, % translate("The session database location has been updated and the application will exit now. Make sure to restart all other applications as well.")
-			OnMessage(0x44, "")
-
-			ExitApp 0
-		}
-	}
-	finally {
-		protectionOff()
-	}
 }
 
 chooseSimulator() {

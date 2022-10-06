@@ -538,7 +538,7 @@ loadSimulatorConfiguration() {
 
 	path := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
-		kDatabaseDirectory := normalizeDirectoryPath(path)
+		kDatabaseDirectory := (normalizeDirectoryPath(path) . "\")
 
 		FileCreateDir %kDatabaseDirectory%Community
 		FileCreateDir %kDatabaseDirectory%User

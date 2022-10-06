@@ -105,7 +105,7 @@ namespace TeamServer.Controllers {
             }
             else if (category == "data")
             {
-                if (type != "Internal")
+                if (type.ToLower() != "internal")
                     throw new Exception("Not a valid connection type...");
 
             }

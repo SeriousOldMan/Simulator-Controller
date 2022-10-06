@@ -9759,7 +9759,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr Center")
 
 		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver", "Online"], "translate")*)
 
@@ -9768,7 +9768,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr Center")
 
 		Gui TE:Font, s10 Bold, Arial
 

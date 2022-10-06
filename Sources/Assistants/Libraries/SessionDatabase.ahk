@@ -85,6 +85,8 @@ class SessionDatabase extends ConfigurationItem {
 		Set {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
+			value := (normalizeDirectoryPath(value) . "\")
+
 			setConfigurationValue(configuration, "Database", "Path", value)
 			setConfigurationValue(this.Configuration, "Database", "Path", value)
 

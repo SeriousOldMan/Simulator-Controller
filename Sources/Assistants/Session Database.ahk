@@ -3604,6 +3604,30 @@ editSettings(editorOrCommand) {
 
 			showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return
+		}
+
+		if GetKeyState("Ctrl", "P") {
+			Gui TSL:+OwnerSE
+			Gui SE:+Disabled
+
+			try {
+				token := loginDialog(connector, serverURLEdit)
+
+				if token {
+					serverTokenEdit := token
+
+					Gui SE:Default
+
+					GuiControl Text, serverTokenEdit, %serverTokenEdit%
+				}
+				else
+					return
+			}
+			finally {
+				Gui SE:-Disabled
+			}
 		}
 
 		try {
@@ -3675,7 +3699,7 @@ editSettings(editorOrCommand) {
 		Gui %window%:Font, s9 Norm, Arial
 		Gui %window%:Font, Italic Underline, Arial
 
-		Gui %window%:Add, Text, x153 YP+20 w104 cBlue Center gopenSettingsDocumentation, % translate("Database Settings")
+		Gui %window%:Add, Text, x133 YP+20 w144 cBlue Center gopenSettingsDocumentation, % translate("Database Settings")
 
 		Gui %window%:Font, s8 Norm, Arial
 
@@ -3728,20 +3752,16 @@ editSettings(editorOrCommand) {
 				GuiControlGet serverURLEdit
 				GuiControlGet serverTokenEdit
 
-				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				if (databaseLocationEdit = "") {
+					title := translate("Error")
 
-				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
-				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
-				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+					OnMessage(0x44, "")
 
-				databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
-
-				setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
-
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-
-				if ((databaseLocationEdit != "")
-				 && (normalizeDirectoryPath(databaseLocationEdit) != normalizeDirectoryPath(kDatabaseDirectory))) {
+					continue
+				}
+				else if (normalizeDirectoryPath(databaseLocationEdit) != normalizeDirectoryPath(kDatabaseDirectory)) {
 					if !FileExist(databaseLocationEdit)
 						try {
 							FileCreateDir %databaseLocationEdit%
@@ -3770,7 +3790,7 @@ editSettings(editorOrCommand) {
 					{
 						empty := true
 
-						loop Files, %directory%\*.*, FD
+						loop Files, %databaseLocationEdit%\*.*, FD
 						{
 							empty := false
 
@@ -3794,7 +3814,7 @@ editSettings(editorOrCommand) {
 
 						showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
 
-						copyFiles(original, directory)
+						copyFiles(original, databaseLocationEdit)
 
 						showProgress({progress: 100, message: translate("Finished...")})
 
@@ -3803,7 +3823,7 @@ editSettings(editorOrCommand) {
 						hideProgress()
 					}
 
-					sessionDB.DatabasePath := normalizeDirectoryPath(directory)
+					sessionDB.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
 					title := translate("Information")
 
@@ -3813,6 +3833,18 @@ editSettings(editorOrCommand) {
 
 					ExitApp 0
 				}
+
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
+				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+
+				databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+
+				setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
 				done := true
 			}
@@ -3850,13 +3882,79 @@ openSettingsDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location
 }
 
+loginDialog(connectorOrCommand := false, teamServerURL := false) {
+	local window := "TSL"
+	local title
 
+	static result := false
+	static nameEdit := ""
+	static passwordEdit := ""
 
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
 
+		Gui %window%:New
 
+		Gui %window%:Default
 
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
 
+		Gui %window%:Font, Norm, Arial
 
+		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
+
+		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
+		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
+
+		Gui %window%:Show, AutoSize Center
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk) {
+			try {
+				connectorOrCommand.Initialize(teamServerURL)
+
+				connectorOrCommand.Login(nameEdit, passwordEdit)
+
+				return connectorOrCommand.GetDataToken()
+			}
+			catch exception {
+				title := translate("Error")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+				OnMessage(0x44, "")
+
+				return false
+			}
+		}
+	}
+}
+
+acceptLogin() {
+	loginDialog(kOk)
+}
+
+cancelLogin() {
+	loginDialog(kCancel)
+}
 
 moveSessionDatabaseEditor() {
 	moveByMouse(SessionDatabaseEditor.Instance.Window, "Session Database")
@@ -3900,6 +3998,9 @@ copyFiles(source, destination) {
 	local count := 0
 	local progress := 0
 	local step := 0
+
+	source := normalizeDirectoryPath(source)
+	destination := normalizeDirectoryPath(destination)
 
 	showProgress({color: "Blue"})
 

@@ -118,6 +118,11 @@ namespace TeamServer.Controllers {
                 if (!Enum.TryParse(type, out theType))
                     throw new Exception("Unknown connection type...");
 
+                if (category == "data")
+                    new DataManager(Server.TeamServer.ObjectManager, token);
+                else if (category == "session")
+                    new SessionManager(Server.TeamServer.ObjectManager, token);
+
                 return Server.TeamServer.TokenIssuer.Connect(token, client, name, theType, session).Identifier.ToString();
             }
             catch (AggregateException exception)

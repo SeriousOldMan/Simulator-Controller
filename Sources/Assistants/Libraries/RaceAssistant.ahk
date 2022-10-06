@@ -398,10 +398,19 @@ class RaceAssistant extends ConfigurationItem {
 			options["Language"] := ((language != false) ? language : options["Language"])
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := ((speaker == true) ? options["Speaker"] : speaker)
-			options["Vocalics"] := (vocalics ? string2Values(",", vocalics) : options["Vocalics"])
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
 			options["Listener"] := ((listener == true) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
+
+			if vocalics {
+				vocalics := string2Values(",", vocalics)
+
+				loop 3
+					if (vocalics[A_Index] = "*")
+						vocalics[A_Index] := options["Vocalics"][A_Index]
+
+				options["Vocalics"] := vocalics
+			}
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
@@ -913,6 +922,33 @@ class RaceAssistant extends ConfigurationItem {
 		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps})
 	}
 
+	readSettings(ByRef settings) {
+		if !IsObject(settings)
+			settings := readConfiguration(settings)
+
+		return {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																				, "Lap.Formation", true)
+			  , "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																			   , "Lap.PostRace", true)
+			  , "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																			  , "Lap.AvgTime", 0)
+			  , "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings"
+																				     , "Race Settings", "Lap.PitstopWarning", 5)
+			  , "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings"
+			 																		  , "Race Settings", "Fuel.AvgConsumption", 0)
+			  , "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings"
+																					, "Race Settings", "Fuel.SafetyMargin", 5)}
+	}
+
+	updateSettings(settings) {
+		local knowledgeBase := this.KnowledgeBase
+		local facts, key, value
+
+		if knowledgeBase
+			for key, value in this.readSettings(settings)
+				knowledgeBase.setFact(key, value)
+	}
+
 	createSession(ByRef settings, ByRef data) {
 		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 		local lapTime, settingsLapTime, facts
@@ -959,49 +995,19 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
-		facts := {"Session.Simulator": simulator
-				, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
-				, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
-				, "Session.Type": this.Session
-				, "Session.Time.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-				, "Session.Lap.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
-				, "Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
-				, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
-				, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-				, "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
-				, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
-				, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)
-				, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
-				, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
+		facts := combine(this.readSettings(settings)
+					   , {"Session.Simulator": simulator
+						, "Session.Car": getConfigurationValue(data, "Session Data", "Car", "")
+						, "Session.Track": getConfigurationValue(data, "Session Data", "Track", "")
+						, "Session.Type": this.Session
+						, "Session.Time.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+						, "Session.Lap.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+						, "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
+						, "Session.Settings.Fuel.Max": getConfigurationValue(data, "Session Data", "FuelAmount", 0)})
 
 		this.initializeSessionFormat(facts, settings, data, lapTime)
 
 		return facts
-	}
-
-	updateSession(settings) {
-		local knowledgeBase := this.KnowledgeBase
-		local facts, key, value
-
-		if knowledgeBase {
-			if !IsObject(settings)
-				settings := readConfiguration(settings)
-
-			this.updateConfigurationValues({Settings: settings})
-
-			facts := {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
-					, "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
-					, "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
-					, "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
-					, "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
-					, "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5)}
-
-			for key, value in facts
-				knowledgeBase.setFact(key, value)
-
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledgeBase(knowledgeBase)
-		}
 	}
 
 	startSession(settings, data) {
@@ -1030,7 +1036,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			deleteFile(settingsFile)
 
-			this.updateSession(sessionSettings)
+			this.updateSettings(sessionSettings)
 		}
 	}
 
@@ -1046,7 +1052,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
-		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
+		local driver, driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
@@ -1132,7 +1138,13 @@ class RaceAssistant extends ConfigurationItem {
 			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
-		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid")
+		else
+			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
@@ -1241,9 +1253,6 @@ class RaceAssistant extends ConfigurationItem {
 		local result
 
 		data := this.prepareData(lapNumber, data)
-
-		if knowledgeBase.getFact("Lap." . lapNumber . ".Valid")
-			knowledgeBase.setFact("Lap." . lapNumber . ".Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
 
 		result := knowledgeBase.produce()
 

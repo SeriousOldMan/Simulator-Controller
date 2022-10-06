@@ -695,12 +695,12 @@ class SetupAdvisor extends ConfigurationItem {
 		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
-				
+
 				if enabled
 					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
-				
+
 				if enabled
 					this.dumpRules(this.KnowledgeBase)
 		}
@@ -2984,13 +2984,13 @@ factPath(path*) {
 }
 
 loadSetup() {
-	local title := translate("Load Setup...")
+	local title := translate("Load Problems...")
 	local fileName
 
 	Gui +OwnDialogs
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-	FileSelectFile fileName, 1, , %title%, Setup (*.setup)
+	FileSelectFile fileName, 1, , %title%, Problems (*.setup)
 	OnMessage(0x44, "")
 
 	if (fileName != "")
@@ -2998,13 +2998,13 @@ loadSetup() {
 }
 
 saveSetup() {
-	local title := translate("Save Setup...")
+	local title := translate("Save Problems...")
 	local fileName
 
 	Gui +OwnDialogs
 
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-	FileSelectFile fileName, S17, , %title%, Setup (*.setup)
+	FileSelectFile fileName, S17, , %title%, Problems (*.setup)
 	OnMessage(0x44, "")
 
 	if (fileName != "") {

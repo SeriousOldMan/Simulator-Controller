@@ -409,7 +409,8 @@ class SpeechSynthesizer {
 	}
 
 	speak(text, wait := true, cache := false) {
-		local cacheFileName, tempName, temp1Name, temp2Name, callback
+		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
+		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static counter := 1
 
@@ -465,15 +466,28 @@ class SpeechSynthesizer {
 				return
 			}
 
+			overdriveGain := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
+			overdriveColor := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
+			filterHighpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
+			filterLowpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+			noiseVolume := Round(0.3 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+			clickVolume := Round(0.6 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+
 			try {
 				try {
-					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
-					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive %overdriveGain% %overdriveColor% highpass %filterHighpass% lowpass %filterLowpass% Norm, , Hide
 
-					if (this.iVolume = 100)
-						RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+					if (noiseVolume > 0)
+						RunWait "%kSoX%" -m -v %noiseVolume% "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
 					else
-						RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%", , Hide
+						RunWait "%kSoX%" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+
+					volume := Round(this.iVolume / 100, 2)
+
+					if (clickVolume > 0)
+						RunWait "%kSoX%" -v %clickVolume% "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
+					else
+						RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
@@ -550,8 +564,14 @@ class SpeechSynthesizer {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
 		    ssml .= " <voice name=""%voice%"">"
 
-			if (this.Synthesizer = "Azure")
-				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
+			if (this.Synthesizer = "Azure") {
+				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"""
+
+				if !kSoX
+					ssml .= " volume=""%volume%"""
+
+				ssml .= ">"
+			}
 			else
 				ssml .= "  <prosody pitch=""%pitch%"">"
 
@@ -660,16 +680,16 @@ class SpeechSynthesizer {
 		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Rate := rate
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(rate, this.iVolume)
+			this.iSpeechSynthesizer.SetProsody(rate, kSoX ? 100 : this.iVolume)
 	}
 
 	setVolume(volume) {
 		this.iVolume := volume
 
 		if (this.Synthesizer = "Windows")
-			this.iSpeechSynthesizer.Volume := volume
+			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : this.iVolume)
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(this.iRate, volume)
+			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : this.iVolume)
 	}
 
 	setPitch(pitch) {

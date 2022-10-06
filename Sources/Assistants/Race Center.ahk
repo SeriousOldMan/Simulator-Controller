@@ -3217,6 +3217,15 @@ class RaceCenter extends ConfigurationItem {
 
 			pitstopPlan := newConfiguration()
 
+			if ((pitstopPlanEdit = "") || (pitstopPlanEdit = 0))
+				pitstopPlanEdit := (this.LastLap ? this.LastLap.Nr : 1)
+
+			if (pitstopRefuelEdit = "")
+				pitstopRefuelEdit := 0
+
+			if (pitstopTyreSetEdit = "")
+				pitstopTyreSetEdit := 0
+
 			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
 			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
 
@@ -3233,7 +3242,7 @@ class RaceCenter extends ConfigurationItem {
 					nextNr := inList(this.TeamDrivers, nextDriver)
 
 					if (currentNr && nextNr)
-						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNR . "|" . nextDriver . ":" . nextNr)
+						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . nextDriver . ":" . nextNr)
 				}
 			}
 

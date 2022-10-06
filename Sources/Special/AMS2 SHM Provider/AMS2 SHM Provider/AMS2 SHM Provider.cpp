@@ -32,7 +32,7 @@ long getRemainingTime(SharedMemory* shm);
 
 long getRemainingLaps(SharedMemory* shm) {
 	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
-		return 30;
+		return 360;
 
 	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
 		return (long)shm->mLapsInEvent - shm->mParticipantInfo[shm->mViewedParticipantIndex].mLapsCompleted;
@@ -49,7 +49,7 @@ long getRemainingLaps(SharedMemory* shm) {
 
 long getRemainingTime(SharedMemory* shm) {
 	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
-		return 3600000;
+		return 3600000 * 12;
 
 	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
 		long time = getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);

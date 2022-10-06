@@ -35,6 +35,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
 										 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"]}
 
+	iRaceStrategist := false
+
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			base.__New(plugin, "Race Strategist", remotePID)
@@ -75,6 +77,22 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.Plugin.recommendStrategy()
 			else
 				base.fireAction(function, trigger)
+		}
+	}
+
+	RaceAssistant[zombie := false] {
+		Get {
+			if (zombie = "Ghost")
+				return this.iRaceStrategist
+			else
+				return base.RaceAssistant[zombie]
+		}
+
+		Set {
+			if value
+				this.iRaceStrategist := value
+
+			return (base.RaceAssistant := value)
 		}
 	}
 
@@ -445,7 +463,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 			runningLap := 0
 
-			if (teamServer && teamServer.Active && session) {
+			if (teamServer && session) {
 				deleteDirectory(kTempDirectory . "Race Report")
 
 				FileCreateDir %kTempDirectory%Race Report
@@ -652,11 +670,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-				this.RaceAssistant[true].reviewRace(cars, laps, position, leaderAvgLapTime
-												  , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+				this.RaceAssistant["Ghost"].reviewRace(cars, laps, position, leaderAvgLapTime
+													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 			}
 			catch exception {
-				this.RaceAssistant[true].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
+				this.RaceAssistant["Ghost"].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
 			}
 		}
 		finally {

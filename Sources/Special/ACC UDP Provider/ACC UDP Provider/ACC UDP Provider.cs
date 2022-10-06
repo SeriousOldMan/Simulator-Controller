@@ -305,9 +305,21 @@ namespace ACCUDPProvider {
 
 									LapData lastLap = car.LastLap;
 
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
 
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
+                                    if (lastLap != null)
+                                    {
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Type=");
+
+                                        if (lastLap.LapHint == "OUT")
+                                            outStream.WriteLine("Out");
+                                        else if (lastLap.LapHint == "IN")
+                                            outStream.WriteLine("In");
+                                        else
+                                            outStream.WriteLine("Regular");
+                                    }
+
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
 									outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
 
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Delta="); outStream.WriteLine(car.Delta);

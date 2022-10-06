@@ -535,8 +535,9 @@ class SetupWizard extends ConfigurationItem {
 			stepWizard.saveToConfiguration(configuration)
 	}
 
-	reset() {
-		this.show(true)
+	reset(show := true) {
+		if show
+			this.show(true)
 
 		loop % this.Count
 			if this.Steps.HasKey(A_Index)
@@ -732,12 +733,9 @@ class SetupWizard extends ConfigurationItem {
 						FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 					}
 					else
-						try {
-							FileDelete %startupLink%
-						}
-						catch exception {
-							logError(exception)
-						}
+						deleteFile(startupLink)
+
+					deleteDirectory(kTempDirectory, false)
 
 					if this.isModuleSelected("Controller") {
 						if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
@@ -2570,7 +2568,7 @@ restartSetup:
 		wizard.Result := false
 
 		wizard.close()
-		wizard.reset()
+		wizard.reset(false)
 
 		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 

@@ -1971,6 +1971,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	updateDriver(lastLap, sector, positions) {
+		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
 		local deltaInformation, rnd
 
@@ -1982,14 +1983,14 @@ class RaceSpotter extends RaceAssistant {
 				this.SpotterSpeaking := true
 
 				try {
-					if this.Announcements["SessionInformation"]
-						hadInfo := this.sessionInformation(lastLap, sector, positions, true)
-
-					if (this.hasEnoughData(false) && (this.Session = kSessionRace)) {
-						if (!hadInfo && this.Announcements["TacticalAdvices"])
-							hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
-
+					if raceInfo {
 						deltaInformation := this.Announcements["DeltaInformation"]
+
+						if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+							this.iLastDeltaInformationLap := lastLap
+
+						hadInfo := this.deltaInformation(lastLap, sector, positions
+													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
 
 						if hadInfo {
 							Random rnd, 1, 10
@@ -1997,15 +1998,13 @@ class RaceSpotter extends RaceAssistant {
 							if (rnd < 5)
 								hadInfo := false
 						}
-
-						if (!hadInfo && deltaInformation) {
-							if ((deltaInformation != "S") && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-								this.iLastDeltaInformationLap := lastLap
-
-							this.deltaInformation(lastLap, sector, positions
-												, (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
-						}
 					}
+
+					if (!hadInfo && this.Announcements["SessionInformation"])
+						hadInfo := this.sessionInformation(lastLap, sector, positions, true)
+
+					if (!hadInfo && raceInfo && this.Announcements["TacticalAdvices"])
+						hadInfo := this.tacticalAdvice(lastLap, sector, positions, true)
 				}
 				finally {
 					this.SpotterSpeaking := false
@@ -2047,9 +2046,9 @@ class RaceSpotter extends RaceAssistant {
 	skipAlert(alert) {
 		if ((alert = "Hold") && this.pendingAlert("Clear", true))
 			return true
-		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft"]) || this.pendingAlerts(["Left", "Three"])))
+		else if ((alert = "Left") && (this.pendingAlerts(["ClearAll", "ClearLeft", "Left", "Three"])))
 			return true
-		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight"]) || this.pendingAlerts(["Right", "Three"])))
+		else if ((alert = "Right") && (this.pendingAlerts(["ClearAll", "ClearRight", "Right", "Three"])))
 			return true
 		else if ((alert = "Three") && this.pendingAlert("Clear", true))
 			return true
@@ -2061,11 +2060,20 @@ class RaceSpotter extends RaceAssistant {
 			return true
 		else if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 			return true
-		else if (InStr(alert, "Behind") && (this.pendingAlert("Behind", true) || this.pendingAlerts(["Left", "Right", "Three"]) || this.pendingAlert("Clear", true)))
+		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 		else if (InStr(alert, "Yellow") && this.pendingAlert("YellowClear"))
 			return true
 		else if ((alert = "YellowClear") && this.pendingAlert("Yellow", true))
+			return true
+
+		return false
+	}
+
+	superfluousAlert(alert) {
+		if this.pendingAlert(alert)
+			return true
+		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 
 		return false
@@ -2080,7 +2088,10 @@ class RaceSpotter extends RaceAssistant {
 			speaker := this.getSpeaker(true)
 
 			if alert {
-				this.iPendingAlerts.Push(alert)
+				if this.superfluousAlert(alert)
+					return
+				else
+					this.iPendingAlerts.Push(alert)
 
 				if (alerting || speaker.isSpeaking()) {
 					if (this.iPendingAlerts.Length() == 1)
@@ -2143,7 +2154,7 @@ class RaceSpotter extends RaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if this.Speaker[false] { ; && !this.SpotterSpeaking) {
+		if (this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -2303,30 +2314,14 @@ class RaceSpotter extends RaceAssistant {
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local configuration := this.Configuration
 
-		settings := this.Settings
-
-		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.History.Considered"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-		facts["Session.Settings.Lap.History.Damping"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+		facts["Session.Settings.Lap.Learning.Laps"]
+			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Lap.History.Considered"]
+			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+		facts["Session.Settings.Lap.History.Damping"]
+			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 
 		return facts
-	}
-
-	updateSession(settings) {
-		local knowledgeBase := this.KnowledgeBase
-		local facts, key, value
-
-		if knowledgeBase {
-			if !IsObject(settings)
-				settings := readConfiguration(settings)
-
-			facts := {}
-
-			for key, value in facts
-				knowledgeBase.setFact(key, value)
-
-			base.updateSession(settings)
-		}
 	}
 
 	initializeAnnouncements(data) {

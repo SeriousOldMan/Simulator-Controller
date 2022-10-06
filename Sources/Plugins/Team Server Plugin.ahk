@@ -385,20 +385,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			hasTrayMenu := true
 		}
 
-		if enabled {
+		if enabled
 			Menu Tray, Check, %label%
-
-			if !InStr(A_IconTip, translate(" (Team)"))
-				Menu Tray, Tip, % A_IconTip . translate(" (Team)")
-		}
-		else {
+		else
 			Menu Tray, Uncheck, %label%
-
-			index := InStr(A_IconTip, translate(" (Team)"))
-
-			if index
-				Menu Tray, Tip, % SubStr(A_IconTip, 1, index - 1)
-		}
 	}
 
 	enableTeamServer(label := false, force := false) {
@@ -426,6 +416,8 @@ class TeamServerPlugin extends ControllerPlugin {
 			trayMessage(label, translate("State: Off"))
 
 			this.disconnect(true, true)
+
+			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1]
 
 			this.iTeamServerEnabled := false
 
@@ -503,12 +495,13 @@ class TeamServerPlugin extends ControllerPlugin {
 										. translate("Driver: ") . driverName . "`n"
 										. translate("Session: ") . sessionName
 							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
+
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . teamName . translate(")")
 			}
 			catch exception {
 				this.iConnection := false
 
-				if !InStr(A_IconTip, translate(" - Invalid"))
-					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
@@ -1070,8 +1063,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				nextPing := 60000
 			}
 			catch exception {
-				if !InStr(A_IconTip, translate(" - Invalid"))
-					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.ServerToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 

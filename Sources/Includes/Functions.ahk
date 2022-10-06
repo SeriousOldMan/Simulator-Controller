@@ -193,7 +193,10 @@ readLanguage(targetLanguageCode) {
 			return translation[2]
 	}
 
-	throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
+	if isDebug()
+		throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
+	else
+		logError("Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage...")
 }
 
 initializeLoggingSystem() {
@@ -1445,9 +1448,12 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 
 			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
 				if ((A_Index == 1) && (translations.HasKey(enString) && (translations[enString] != translation[2])))
-					throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
-				else
-					translations[enString] := translation[2]
+					if isDebug()
+						throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
+					else
+						logError("Inconsistent translation encountered for """ . enString . """ in readTranslations...")
+
+				translations[enString] := translation[2]
 		}
 
 	return translations
@@ -1866,6 +1872,17 @@ do(list, function) {
 
 	for ignore, value in list
 		%function%(value)
+}
+
+combine(maps*) {
+	local result := {}
+	local ignore, map, key, value
+
+	for ignore, map in maps
+		for key, value in map
+			result[key] := value
+
+	return result
 }
 
 getKeys(map) {

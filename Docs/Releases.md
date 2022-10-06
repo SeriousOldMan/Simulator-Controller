@@ -1,4 +1,23 @@
-## 4.3.3.0-release 09/23/22 (planned)
+## 4.3.4.0-release 09/30/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. The strength of the individual effects applied by the sound post processing using *SoX* can now be dialed in the configuration. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information.
+  4. It is now possible to wildcard inidividual arguments in the ["raceAssistantVocalics" parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the different Race Assistant plugins, so that the values chosen in the voice control configuration will be used.
+  5. The name of the team will be shown in the tool tip for the *Simulator Controller* tray icon, when you are connected to a team session.
+  6. More superfluous Spotter alerts (for example "Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
+  7. Increased reliability of pitstop handover in team races.
+  8. Increased reliability of race report creation in team races.
+  9. New tyre compound data for *RaceRoom Racing Experience*, thanks to Chris Matthews. With this, allmost all current cars of *RaceRoom Racing Experience* should be covered now.
+  10. New car models for "Setup Advisor" (*Assetto Corsa Competizione* has been completed with this):
+      - Assetto Corsa:
+	    - Chevrolet Corvette C7R
+      - Assetto Corsa Competizione
+	    - BMW M4 GT4
+		- Lamborghini Huracan ST
+		- Lamborghini Huracan ST Evo2
+
+## 4.3.3.0-release 09/23/22
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
@@ -9,7 +28,15 @@
      - No more warnings for cars attacking you when they are just beeing passed by you.
 	 - No more reports for lapped cars for overtaking far too early.
 	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
-  5. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  5. Fixed volume control for voice output, when SoX is used.
+  6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  7. Increased precision in session end detection in ACC races
+  8. New tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, all current cars of *Automobilista 2* should be covered now.
+  9. New car models for "Setup Advisor":
+      - Assetto Corsa Competizione
+	    - Nissan GT-R Nismo GT3 (2015)
+      - Assetto Corsa
+	    - Maserati MC12 GT1
 
 ## 4.3.2.0-release 09/16/22
 

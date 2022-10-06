@@ -93,16 +93,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("shutdown", arguments*)
 		}
 
+		updateSettings(arguments*) {
+			this.callRemote("updateSettings", arguments*)
+		}
+
 		prepareSession(arguments*) {
 			this.callRemote("prepareSession", arguments*)
 		}
 
 		startSession(arguments*) {
 			this.callRemote("startSession", arguments*)
-		}
-
-		updateSession(arguments*) {
-			this.callRemote("updateSession", arguments*)
 		}
 
 		finishSession(arguments*) {
@@ -777,7 +777,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if assistant.RaceAssistantEnabled
+			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && assistant.RaceAssistantActive)
 				assistant.finishSession(shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
@@ -785,6 +785,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			RaceAssistantPlugin.disconnectTeamSession()
 		}
+
+		RaceAssistantPlugin.Simulator.finishSession()
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
@@ -841,7 +843,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			session := kSessionFinished
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			assistant.updateSession(session)
+			if assistant.Active
+				assistant.updateSession(session)
 	}
 
 	updateAssistantsTelemetryData(data) {
@@ -1146,7 +1149,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if ErrorLevel
 			Task.startTask(ObjBindMethod(this, "reloadSettings", pid, settingsFileName), 1000, kLowPriority)
 		else if this.RaceAssistant
-			this.RaceAssistant.updateSession(settingsFileName)
+			this.RaceAssistant.updateSettings(settingsFileName)
 
 		return false
 	}
@@ -1407,10 +1410,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.Simulator.restoreSessionState(sessionSettings, sessionState)
 
 			if sessionSettings
-				sessionSettings := this.createSettingsFile(sessionSettings)
+				sessionSettings := this.createSessionSettingsFile(sessionSettings)
 
 			if sessionState
-				sessionState := this.createStateFile(sessionState)
+				sessionState := this.createSessionStateFile(sessionState)
 
 			this.RaceAssistant.restoreSessionState(sessionSettings, sessionState)
 		}
@@ -1426,13 +1429,24 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			return true
 	}
 
+	currentLap(data) {
+		loop % getConfigurationValue(data, "Position Data", "Car.Count")
+			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
+				return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
+
+		return getConfigurationValue(data, "Stint Data", "Laps", 0)
+	}
+
 	collectSessionData() {
 		local finished := false
 		local lateJoin := false
 		local telemetryData, positionsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer, teamSessionActive, joinedSession
 		local newLap, firstLap, ignore, assistant, hasAssistant
-		local finished, sessionTimeRemaining, sessionLapsRemaining
+		local sessionTimeRemaining, sessionLapsRemaining
+
+		if (RaceAssistantPlugin.Finished = "Finished")
+			RaceAssistantPlugin.finishAssistantsSession()
 
 		if (A_TickCount <= RaceAssistantPlugin.WaitForShutdown)
 			return
@@ -1537,14 +1551,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					else if (dataLastLap > 0) {
 						; Car has finished the first lap
 
-						if (RaceAssistantPlugin.Finished && (dataLastLap >= RaceAssistantPlugin.Finished)) {
-							; Session has endedd
-
-							RaceAssistantPlugin.finishAssistantsSession()
-
-							return
-						}
-
 						if (dataLastLap > 1) {
 							if (RaceAssistantPlugin.LastLap == 0) {
 								; Missed the start of the session, might be a team session
@@ -1599,15 +1605,20 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLastLap := dataLastLap
 							RaceAssistantPlugin.sLapRunning := 0
 
-							if (!firstLap && !RaceAssistantPlugin.Finished) {
+							if RaceAssistantPlugin.Finished {
+								if (this.currentLap(data) >= RaceAssistantPlugin.Finished) {
+									; Session has endedd
+
+									finished := true
+								}
+							}
+							else {
 								sessionTimeRemaining := getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0)
 								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
 
 								if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-									if (sessionTimeRemaining <= 0)
-										RaceAssistantPlugin.sFinished := (dataLastLap + 1)
-									else if (sessionLapsRemaining <= 0.5)
-										RaceAssistantPlugin.sFinished := (dataLastLap + 2)
+									if ((sessionTimeRemaining <= 0) || (sessionLapsRemaining < 1))
+										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
 								}
 								else if (sessionLapsRemaining == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap
@@ -1666,7 +1677,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 				if finished
-					RaceAssistantPlugin.finishAssistantsSession()
+					RaceAssistantPlugin.sFinished := "Finished"
 			}
 			finally {
 				protectionOff()
@@ -1683,6 +1694,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 ;;;-------------------------------------------------------------------------;;;
 
 getDataSession(data, ByRef finished) {
+	local driver
+
 	if getConfigurationValue(data, "Session Data", "Active", false) {
 		finished := false
 

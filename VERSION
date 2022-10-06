@@ -1,16 +1,16 @@
 [Development]
-Version=4.3.3.0-dev
-Target=4.3.2.1-release
-Date=09/19/2022
+Version=4.3.4.1-dev
+Target=4.3.4.1-release
+Date=10/04/2022
 Download=
-Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center"
+Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews)
 [Release]
-Version=4.3.2.1-release
-Date=09/16/2022
-Download=https://cntr.click/Nr536zT
-Changes=Integrated support in "Setup Advisor" for modded AC setups, Support admin mode for apps with Google chart library, Jump directly to the last page of "Simulator Setup", Better last lap detection in races with fixed nr of laps, Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents, A lot of new tyre compound data for Automobilista 2 (Chris Matthews), All new Spotter gap and position calculation, Fixed missing driver last name in many apps, Added more regular Spotter delta information, New car models for "Setup Advisor", Performance improvement in "Simulator Setup", New preset to activate a toggle beahviour for the P2T trigger, "Race Center" incorporates real race weather when creating a new strategy
+Version=4.3.3.0-release
+Date=09/23/2022
+Download=https://cutt.ly/EVn9i5Q
+Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews)
 [Current]
 Type=Development
 [Version]
-Release=4.3.2.1-release
-Development=4.3.3.0-dev
+Release=4.3.4.0-release
+Development=4.3.4.1-dev

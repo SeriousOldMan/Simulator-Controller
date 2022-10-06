@@ -1138,6 +1138,28 @@ class RaceStrategist extends RaceAssistant {
 		return facts
 	}
 
+	readSettings(ByRef settings) {
+		return combine(base.readSettings(settings)
+					 , {"Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta"
+																			  , getConfigurationValue(settings, "Session Settings"
+																									, "Pitstop.Delta", 30))
+					  , "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings"
+																							 , "Extrapolation.Laps", 2)
+					  , "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings
+																											 , "Strategy Settings"
+																											 , "Overtake.Delta", 1) * 1000)
+					  , "Session.Settings.Strategy.Traffic.Considered": (getConfigurationValue(settings, "Strategy Settings"
+																							 , "Traffic.Considered", 5) / 100)
+					  , "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings"
+																					   , "Service.Refuel", 1.5)
+					  , "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings"
+																					  , "Service.Tyres", 30)
+					  , "Session.Settings.Pitstop.Service.Order": getConfigurationValue(settings, "Strategy Settings"
+																					  , "Service.Order", "Simultaneous")
+					  , "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings"
+																								   , "Strategy.Window.Considered", 2)})
+	}
+
 	prepareSession(settings, data) {
 		local raceData, carCount,  carNr, carID
 
@@ -1211,45 +1233,15 @@ class RaceStrategist extends RaceAssistant {
 		}
 
 		configuration := this.Configuration
-		settings := this.Settings
 
-		facts["Session.Settings.Pitstop.Delta"] := getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
-		facts["Session.Settings.Lap.Learning.Laps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
-		facts["Session.Settings.Lap.History.Considered"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
-		facts["Session.Settings.Lap.History.Damping"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
-		facts["Session.Settings.Standings.Extrapolation.Laps"] := getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
-		facts["Session.Settings.Standings.Extrapolation.Overtake.Delta"] := Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
-		facts["Session.Settings.Strategy.Traffic.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
-		facts["Session.Settings.Pitstop.Service.Refuel"] := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-		facts["Session.Settings.Pitstop.Service.Order"] := getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous")
-		facts["Session.Settings.Pitstop.Service.Tyres"] := getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-		facts["Session.Settings.Pitstop.Strategy.Window.Considered"] := getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)
+		facts["Session.Settings.Lap.Learning.Laps"]
+			:= getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
+		facts["Session.Settings.Lap.History.Considered"]
+			:= getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+		facts["Session.Settings.Lap.History.Damping"]
+			:= getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 
 		return facts
-	}
-
-	updateSession(settings) {
-		local knowledgeBase := this.KnowledgeBase
-		local facts, key, value
-
-		if knowledgeBase {
-			if !IsObject(settings)
-				settings := readConfiguration(settings)
-
-			facts := {"Session.Settings.Pitstop.Delta": getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", getConfigurationValue(settings, "Session Settings", "Pitstop.Delta", 30))
-					, "Session.Settings.Standings.Extrapolation.Laps": getConfigurationValue(settings, "Strategy Settings", "Extrapolation.Laps", 2)
-					, "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getConfigurationValue(settings, "Strategy Settings", "Overtake.Delta", 1) * 1000)
-					, "Session.Settings.Strategy.Traffic.Considered": getConfigurationValue(settings, "Strategy Settings", "Traffic.Considered", 5) / 100
-					, "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-					, "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
-					, "Session.Settings.Pitstop.Service.Order": getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous")
-					, "Session.Settings.Pitstop.Strategy.Window.Considered": getConfigurationValue(settings, "Strategy Settings", "Strategy.Window.Considered", 2)}
-
-			for key, value in facts
-				knowledgeBase.setFact(key, value)
-
-			base.updateSession(settings)
-		}
 	}
 
 	startSession(settings, data) {
@@ -1378,9 +1370,9 @@ class RaceStrategist extends RaceAssistant {
 
 	finishSessionWithReview(shutdown) {
 		if this.RemoteHandler {
-			this.RemoteHandler.reviewRace()
-
 			this.setContinuation(new this.RaceReviewContinuation(this, ObjBindMethod(this, "finishSession", shutdown, false)))
+
+			this.RemoteHandler.reviewRace()
 		}
 		else
 			this.finishSession(shutdown, false)

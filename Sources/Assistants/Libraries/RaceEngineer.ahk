@@ -2097,7 +2097,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 				else if (repair == false)
-					speaker.speakPhrase((delta == 0) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
+					speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 			}
 	}
 

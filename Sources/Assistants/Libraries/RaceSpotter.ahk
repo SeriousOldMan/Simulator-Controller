@@ -1444,7 +1444,7 @@ class RaceSpotter extends RaceAssistant {
 						return true
 				}
 			}
-			else if (remainingSessionLaps > 5)
+			else if (remainingSessionLaps > 5) {
 				situation := "HalfTime"
 
 				if (!this.SessionInfos.HasKey(situation) && (Abs((this.SessionDuration / 2) - this.OverallTime) < 120000)) {
@@ -1453,6 +1453,7 @@ class RaceSpotter extends RaceAssistant {
 					if this.reviewHalfTime(lastLap, sector, positions)
 						return true
 				}
+			}
 
 		if this.hasEnoughData(false) {
 			if ((remainingSessionLaps <= 3) && (this.Session = kSessionRace)) {

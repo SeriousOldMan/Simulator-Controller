@@ -26,7 +26,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kTelemetrySchemas := {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"]
+										 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver", "Synchronized"]
 						   , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 								   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
 								   , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
@@ -34,7 +34,7 @@ global kTelemetrySchemas := {Electronics: ["Weather", "Temperature.Air", "Temper
 								   , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
 								   , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 								   , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-								   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"]}
+								   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver", "Synchronized"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -410,7 +410,7 @@ validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
 invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
 	if ((drivers = kUndefined)
 	 || (IsObject(drivers) && inList(drivers, row.Driver))
-	 || ((drivers == true) && (row.Driver = this.ID))
+	 || ((drivers == true) && (row.Driver = SessionDatabase.ID))
 	 || (drivers = row.Driver))
 		return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
 	else

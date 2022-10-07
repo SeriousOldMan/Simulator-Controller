@@ -202,7 +202,13 @@ namespace TeamServer {
 
         public void KeepAlive(string identifier)
         {
-            Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+			try
+			{
+				Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+			}
+			catch (Exception)
+			{
+			}
         }
 
         public string ValidateToken()
@@ -228,6 +234,11 @@ namespace TeamServer {
 		#endregion
 
 		#region Data
+		public string GetServerTimestamp()
+		{
+            return Get("data/timestamp");
+        }
+
 		public string QueryData(string table, string where)
 		{
 			return Get("data/query/" + table, body: where);
@@ -253,7 +264,7 @@ namespace TeamServer {
 			Delete("data/" + table + "/" + identifier);
 		}
 
-		public string InsertData(string table, string properties)
+		public string CreateData(string table, string properties)
         {
 			return Post("data/" + table, body: properties);
 		}

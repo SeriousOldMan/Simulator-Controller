@@ -29,9 +29,9 @@ global kTyresSchemas := {"Tyres.Pressures": ["Weather", "Temperature.Air", "Temp
 										   , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 										   , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 										   , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
-										   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"]
+										   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver", "Synchronized"]
 					   , "Tyres.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-														, "Type", "Tyre", "Pressure", "Count", "Driver"]}
+														, "Type", "Tyre", "Pressure", "Count", "Driver", "Synchronized"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -406,6 +406,7 @@ class TyresDatabase extends SessionDatabase {
 
 		if (rows.Length() > 0) {
 			rows[1].Count := rows[1].Count + count
+			rows.Synchronized := kNull
 
 			if flush
 				this.flush()

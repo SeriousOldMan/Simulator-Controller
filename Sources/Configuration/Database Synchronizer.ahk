@@ -33,6 +33,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\FTP.ahk
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
@@ -196,6 +197,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 	}
 }
 
+synchronizeSessionDatabase() {
+	if synchronizeDatabase() {
+		Task.CurrentTask.Sleep := 120000
+
+		return Task.CurrentTask
+	}
+	else
+		return false
+}
+
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
 	local usePressures, useSetups, id
@@ -211,11 +222,11 @@ updateSessionDatabase() {
 	if id {
 		id := A_Args[id + 1]
 
-		; uploadSessionDatabase(id, usePressures, useSetups)
+		uploadSessionDatabase(id, usePressures, useSetups)
 		downloadSessionDatabase(id, usePressures, useSetups)
 	}
 
-	ExitApp 0
+	Task.startTask("synchronizeSessionDatabase", 1000, kLowPriority)
 }
 
 ;;;-------------------------------------------------------------------------;;;

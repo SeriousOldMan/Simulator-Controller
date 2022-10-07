@@ -9,6 +9,9 @@ namespace TeamServer.Model.Data
     {
         [Indexed]
         public int AccountID { get; set; }
+    
+        [Indexed]
+        public long Modified { get; set; } = DateTime.Now.ToFileTimeUtc();
 
         [Ignore]
         public TeamServer.Model.Access.Account Account
@@ -16,6 +19,13 @@ namespace TeamServer.Model.Data
             get {
                 return ObjectManager.GetAccountAsync(this.AccountID).Result;
             }
+        }
+
+        public override System.Threading.Tasks.Task Save()
+        {
+            Modified = DateTime.Now.ToFileTimeUtc();
+
+            return base.Save();
         }
     }
 

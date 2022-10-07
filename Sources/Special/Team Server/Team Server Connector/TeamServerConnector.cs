@@ -197,7 +197,13 @@ namespace TeamServer {
 
 		public void KeepAlive(string identifier)
 		{
-			Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+            try
+            {
+                Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+            }
+            catch (Exception)
+            {
+            }
         }
 
 		public string ValidateToken()

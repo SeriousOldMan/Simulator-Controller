@@ -417,8 +417,11 @@ class Task {
 			Task.sCurrentTask := oldCurrentTask
 		}
 
-		if (next && !next.Stopped)
+		if (next && !next.Stopped) {
+			next.NextExecution := (A_TickCount + next.Sleep)
+
 			Task.addTask(next)
+		}
 	}
 }
 

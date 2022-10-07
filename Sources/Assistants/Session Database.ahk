@@ -3555,7 +3555,7 @@ showSettings() {
 
 editSettings(editorOrCommand) {
 	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
-	local directory, empty, original
+	local directory, empty, original, changed
 
 	static result := false
 	static sessionDB := false
@@ -3755,6 +3755,8 @@ editSettings(editorOrCommand) {
 				GuiControlGet serverURLEdit
 				GuiControlGet serverTokenEdit
 
+				changed := false
+
 				if (databaseLocationEdit = "") {
 					title := translate("Error")
 
@@ -3830,24 +3832,35 @@ editSettings(editorOrCommand) {
 
 					title := translate("Information")
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("The session database location has been updated and the application will exit now. Make sure to restart all other applications as well.")
-					OnMessage(0x44, "")
-
-					ExitApp 0
+					changed := true
 				}
 
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
-				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
-				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+				if (changed
+				 || (getConfigurationValue(configuration, "Team Server", "Replication", false) != useTeamServerCheck)
+				 || (setConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
+				 || (setConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
+					changed := true
 
-				databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+					setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
+					setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : false)
+					setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : false)
 
-				setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+
+					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+				}
+
+				if changed {
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+					OnMessage(0x44, "")
+
+					ExitApp 0
+				}
 
 				done := true
 			}

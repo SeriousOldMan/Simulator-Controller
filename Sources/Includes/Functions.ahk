@@ -289,24 +289,25 @@ shareSessionDatabase() {
 			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 
-			if (shareTyrePressures || shareCarSetups) {
-				options := ("-ID " . ID)
+			options := ("-ID " . ID)
 
-				if shareTyrePressures
-					options .= " -Pressures"
+			if shareTyrePressures
+				options .= " -Pressures"
 
-				if shareCarSetups
-					options .= " -Setups"
+			if shareCarSetups
+				options .= " -Setups"
 
-				try {
+			try {
+				Process Exist, Database Synchronizer.exe
+
+				if !ErrorLevel
 					Run %kBinariesDirectory%Database Synchronizer.exe %options%
-				}
-				catch exception {
-					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
+				showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 	}

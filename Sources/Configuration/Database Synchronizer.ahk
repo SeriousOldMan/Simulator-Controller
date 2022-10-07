@@ -197,19 +197,17 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 	}
 }
 
-synchronizeSessionDatabase() {
-	if synchronizeDatabase() {
-		Task.CurrentTask.Sleep := 120000
+synchronizeSessionDatabase(minutes) {
+	synchronizeDatabase()
 
-		return Task.CurrentTask
-	}
-	else
-		return false
+	Task.CurrentTask.Sleep := (minutes * 60000)
+
+	return Task.CurrentTask
 }
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, id
+	local usePressures, useSetups, id, minutes, configuration
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Database Synchronizer
@@ -226,7 +224,21 @@ updateSessionDatabase() {
 		downloadSessionDatabase(id, usePressures, useSetups)
 	}
 
-	Task.startTask("synchronizeSessionDatabase", 1000, kLowPriority)
+	minutes := inList(A_Args, "-Synchronize")
+
+	if minutes {
+		minutes := A_Args[id + 1]
+
+		if (minutes && (minutes != kFalse)) {
+			if ((minutes == true) || (minutes = kTrue)) {
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+				minutes := getConfigurationValue(configuration, "Team Server", "Replication", value)
+			}
+
+			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000, kLowPriority)
+		}
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

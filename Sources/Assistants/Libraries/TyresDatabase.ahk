@@ -430,3 +430,13 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 }
+
+synchronizeTyresPressures(connector, simulators, timestamp, lastSynchronization) {
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                           Initialization Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+SessionDatabase.registerSynchronizer("synchronizeTyresPressures")

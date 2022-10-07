@@ -447,3 +447,13 @@ removeInvalidLaps(rows) {
 
 	return result
 }
+
+synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                           Initialization Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+SessionDatabase.registerSynchronizer("synchronizeTelemetry")

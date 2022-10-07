@@ -3564,6 +3564,7 @@ editSettings(editorOrCommand) {
 	static useTeamServerCheck
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
+	static serverUpdateEdit := 0
 	static tokenButtonHandle
 
 	if (editorOrCommand == kOk)
@@ -3659,12 +3660,22 @@ editSettings(editorOrCommand) {
 		if useTeamServerCheck {
 			GuiControl Enable, serverURLEdit
 			GuiControl Enable, serverTokenEdit
+			GuiControl Enable, serverUpdateEdit
 			GuiControl Enable, %tokenButtonHandle%
 		}
 		else {
 			GuiControl Disable, serverURLEdit
 			GuiControl Disable, serverTokenEdit
+			GuiControl Disable, serverUpdateEdit
 			GuiControl Disable, %tokenButtonHandle%
+
+			serverURLEdit := ""
+			serverTokenEdit := ""
+			serverUpdateEdit := 0
+
+			GuiControl, , serverURLEdit, %serverURLEdit%
+			GuiControl, , serverTokenEdit, %serverTokenEdit%
+			GuiControl, , serverUpdateEdit, %serverUpdateEdit%
 		}
 	}
 	else {
@@ -3682,10 +3693,14 @@ editSettings(editorOrCommand) {
 		if useTeamServerCheck {
 			serverURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "")
 			serverTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+			serverUpdateEdit := useTeamServerCheck
+
+			useTeamServerCheck := true
 		}
 		else {
 			serverURLEdit := ""
 			serverTokenEdit := ""
+			serverUpdateEdit := ""
 		}
 
 		Gui %window%:New
@@ -3712,12 +3727,12 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h108 Section, % translate("Team Server")
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h132 Section, % translate("Team Server")
 
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Activate")
-		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Replicate Telemetry Data")
+		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Synchronize Telemetry Data")
 
 		GuiControl, , useTeamServerCheck, %useTeamServerCheck%
 
@@ -3729,7 +3744,13 @@ editSettings(editorOrCommand) {
 		Gui %window%:Add, Button, x122 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gvalidateServerToken
 		setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Button, x122 ys+126 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Text, x24 yp+25 w110 h23 +0x200, % translate("Synchronize each")
+		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range2-60, %serverUpdateEdit%
+		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
+
+
+		Gui %window%:Add, Button, x122 ys+150 w80 h23 gacceptSettings, % translate("Ok")
 		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
 
 		updateSettingsState()
@@ -3754,6 +3775,7 @@ editSettings(editorOrCommand) {
 				GuiControlGet useTeamServerCheck
 				GuiControlGet serverURLEdit
 				GuiControlGet serverTokenEdit
+				GuiControlGet serverUpdateEdit
 
 				changed := false
 
@@ -3838,12 +3860,12 @@ editSettings(editorOrCommand) {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 				if (changed
-				 || (getConfigurationValue(configuration, "Team Server", "Replication", false) != useTeamServerCheck)
+				 || (getConfigurationValue(configuration, "Team Server", "Replication", false) != (useTeamServerCheck != false))
 				 || (setConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
 				 || (setConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
 					changed := true
 
-					setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck)
+					setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
 					setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : false)
 					setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : false)
 

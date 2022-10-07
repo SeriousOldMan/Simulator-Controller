@@ -289,7 +289,7 @@ shareSessionDatabase() {
 			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 
-			options := ("-ID " . ID)
+			options := ("-ID " . ID . " -Synchronize " . true)
 
 			if shareTyrePressures
 				options .= " -Pressures"

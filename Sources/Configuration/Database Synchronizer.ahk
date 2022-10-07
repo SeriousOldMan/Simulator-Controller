@@ -129,6 +129,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		showMessage(translate("Error while uploading database - please check your internet connection...")
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
+
+	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
+
+	return Task.CurrentTask
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups) {
@@ -195,6 +199,10 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 		showMessage(translate("Error while downloading database - please check your internet connection...")
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
+
+	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
+
+	return Task.CurrentTask
 }
 
 synchronizeSessionDatabase(minutes) {
@@ -220,8 +228,8 @@ updateSessionDatabase() {
 	if id {
 		id := A_Args[id + 1]
 
-		uploadSessionDatabase(id, usePressures, useSetups)
-		downloadSessionDatabase(id, usePressures, useSetups)
+		new PeriodicTask(Func("uploadSessionDatabase").Bind(id, usePressures, useSetups)).start()
+		new PeriodicTask(Func("downloadSessionDatabase").Bind(id, usePressures, useSetups)).start()
 	}
 
 	minutes := inList(A_Args, "-Synchronize")
@@ -236,7 +244,7 @@ updateSessionDatabase() {
 				minutes := getConfigurationValue(configuration, "Team Server", "Replication", value)
 			}
 
-			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000, kLowPriority)
+			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)
 		}
 	}
 }

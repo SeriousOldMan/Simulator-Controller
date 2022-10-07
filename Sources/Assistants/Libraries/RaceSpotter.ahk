@@ -1400,7 +1400,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if this.hasEnoughData(false) {
-			if ((remainingSessionLaps <= 3) && (this.Session = kSessionRace)) {
+			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 
 				if !this.SessionInfos.HasKey(situation) {
@@ -1415,7 +1415,7 @@ class RaceSpotter extends RaceAssistant {
 			if (sector = 1) {
 				stintLaps := Floor(remainingStintLaps)
 
-				if ((this.Session = kSessionRace) && (stintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
+				if ((this.Session = kSessionRace) && (stintLaps < 4) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
 					if (stintLaps > 0) {
 						situation := ("StintEnding " . Ceil(lastLap + stintLaps))
 

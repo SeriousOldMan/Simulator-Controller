@@ -129,7 +129,7 @@ Three files will be created by the *Simulator Setup* tool at the end of the inst
   - *Stream Deck Configuration.ini*
     This special configuration file describes the [layout and profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) of your connected Stream Decks, if there are any.
   - *Simulator Settings.ini*
-    This file is also created in the last step of "Simulator Setup" and is maintained in the future by the "Simulator Settings" application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
+    This file is also created in the last step of "Simulator Setup" and is maintained in the future by the "Simulator Startup" application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by "Simulator Setup". Please note, that each configuration change that you make with the "Simulator Configuration" tool, which is described in the following sections, will be overwritten, if you ever use "Simulator Setup" afterwards.
 

@@ -1313,7 +1313,8 @@ synchronizeDrivers(connector, simulators, timestamp, lastSynchronization) {
 
 			modified := false
 
-			for ignore, identifier in connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization) {
+			for ignore, identifier in string2Values(";", connector.QueryData("License"
+																		   , "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)) {
 				modified := true
 
 				driver := parseData(connector.GetData("License", identifier))

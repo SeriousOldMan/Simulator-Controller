@@ -28,11 +28,15 @@ namespace TeamServer.Server
 		{
 			foreach (KeyValuePair<string, string> kvp in values)
 			{
+				string property = kvp.Key;
 				PropertyInfo propInfo =
-					obj.GetType().GetProperty(kvp.Key, BindingFlags.Public | BindingFlags.Instance);
+					obj.GetType().GetProperty(property, BindingFlags.Public | BindingFlags.Instance);
 
 				if (propInfo != null && propInfo.CanWrite)
-					propInfo.SetValue(obj, kvp.Value, null);
+					if (property.ToLower() == "identifier")
+						propInfo.SetValue(obj, new Guid(kvp.Value), null);
+					else
+						propInfo.SetValue(obj, kvp.Value, null);
 			}
 		}
 

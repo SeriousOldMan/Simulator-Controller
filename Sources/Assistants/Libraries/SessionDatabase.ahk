@@ -1235,6 +1235,24 @@ computeDriverName(forName, surName, nickName) {
 	return Trim(name)
 }
 
+createGUID() {
+	local guid, pGuid, sGuid, size
+
+    VarSetCapacity(pGuid, 16, 0)
+
+	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
+
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
+			guid := StrGet(&sGuid)
+
+            return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
+		}
+    }
+
+    return ""
+}
+
 synchronizeDatabase() {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
@@ -1313,7 +1331,7 @@ synchronizeDrivers(connector, simulators, timestamp, lastSynchronization) {
 				modified := true
 
 				if (connector.CountData("License"
-									  , substituteVariables("ID = %ID% And Forname = %ForName% And Surname = %Surname% And Nickname = %Nickname%"
+									  , substituteVariables("ID = '%ID%' And Forname = '%ForName%' And Surname = '%Surname%' And Nickname = '%Nickname%'"
 														  , {ID: driver.ID, Forname: driver.Forname
 														   , Surname: driver.Surname, Nickname: driver.Nickname})) = 0)
 					connector.CreateData("License",

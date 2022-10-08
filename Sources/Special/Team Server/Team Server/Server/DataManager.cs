@@ -35,6 +35,16 @@ namespace TeamServer.Server
 					propInfo.SetValue(obj, kvp.Value, null);
 			}
 		}
+
+		protected string CreateSelection(string where)
+        {
+			where = where.Trim();
+
+			if (where.Length == 0)
+				return "AccoundID = '" + Token.AccountID + "'";
+			else
+				return "AccoundID = '" + Token.AccountID + "' And " + where;
+		}
         #endregion
 
         #region Validation
@@ -98,14 +108,15 @@ namespace TeamServer.Server
 		#region Query
 		public IEnumerable<Guid> QueryLicenses(string where)
 		{
+
 			return ObjectManager.Connection.QueryAsync<License>(
-				@"Select Identifier From Data_Licenses Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_Licenses Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountLicenses(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_Licenses Where " + where).Result;
+				@"Select Count(ID) From Data_Licenses Where " + CreateSelection(where)).Result;
 		}
 
 		public License LookupLicense(Guid identifier)
@@ -178,13 +189,13 @@ namespace TeamServer.Server
 		public IEnumerable<Guid> QueryElectronics(string where)
 		{
 			return ObjectManager.Connection.QueryAsync<Electronics>(
-				@"Select Identifier From Data_Electronics Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_Electronics Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountElectronics(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_Electronics Where " + where).Result;
+				@"Select Count(ID) From Data_Electronics Where " + CreateSelection(where)).Result;
 		}
 
 		public Electronics LookupElectronics(Guid identifier)
@@ -258,13 +269,13 @@ namespace TeamServer.Server
 		public IEnumerable<Guid> QueryTyres(string where)
 		{
 			return ObjectManager.Connection.QueryAsync<Tyres>(
-				@"Select Identifier From Data_Tyres Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_Tyres Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyres(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_Tyres Where " + where).Result;
+				@"Select Count(ID) From Data_Tyres Where " + CreateSelection(where)).Result;
 		}
 
 		public Tyres LookupTyres(Guid identifier)
@@ -338,13 +349,13 @@ namespace TeamServer.Server
 		public IEnumerable<Guid> QueryBrakes(string where)
 		{
 			return ObjectManager.Connection.QueryAsync<Brakes>(
-				@"Select Identifier From Data_Brakes Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_Brakes Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountBrakes(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_Brakes Where " + where).Result;
+				@"Select Count(ID) From Data_Brakes Where " + CreateSelection(where)).Result;
 		}
 
 		public Brakes LookupBrakes(Guid identifier)
@@ -418,13 +429,13 @@ namespace TeamServer.Server
 		public IEnumerable<Guid>  QueryTyresPressures(string where)
 		{
 			return ObjectManager.Connection.QueryAsync<TyresPressures>(
-				@"Select Identifier From Data_TyresPressures Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_TyresPressures Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyresPressures(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_TyresPressures Where " + where).Result;
+				@"Select Count(ID) From Data_TyresPressures Where " + CreateSelection(where)).Result;
 		}
 
 		public TyresPressures LookupTyresPressures(Guid identifier)
@@ -498,13 +509,13 @@ namespace TeamServer.Server
 		public IEnumerable<Guid> QueryTyresPressuresDistribution(string where)
 		{
 			return ObjectManager.Connection.QueryAsync<TyresPressuresDistribution>(
-				@"Select Identifier From Data_TyresPressuresDistribution Where " + where).Result.Select(d => d.Identifier);
+				@"Select Identifier From Data_TyresPressuresDistribution Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
 		}
 
 		public int CountTyresPressuresDistribution(string where)
 		{
 			return ObjectManager.Connection.ExecuteScalarAsync<int>(
-				@"Select Count(ID) From Data_TyresPressuresDistribution Where " + where).Result;
+				@"Select Count(ID) From Data_TyresPressuresDistribution Where " + CreateSelection(where)).Result;
 		}
 
 		public TyresPressuresDistribution LookupTyresPressuresDistribution(Guid identifier)

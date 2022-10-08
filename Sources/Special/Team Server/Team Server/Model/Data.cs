@@ -29,8 +29,13 @@ namespace TeamServer.Model.Data
         }
     }
 
+    public abstract class SimulatorObject : DataObject
+    {
+        public string Simulator { get; set; }
+    }
+
     [Table("Data_Licenses")]
-    public class License : DataObject
+    public class License : SimulatorObject
     {
         [Indexed]
         public string Driver { get; set; }
@@ -42,10 +47,8 @@ namespace TeamServer.Model.Data
         public string Nickname { get; set; }
     }
 
-    public abstract class SimulatorObject : DataObject
+    public abstract class CarObject : SimulatorObject
     {
-        public string Simulator { get; set; }
-
         [Indexed]
         public string Car { get; set; }
 
@@ -56,7 +59,7 @@ namespace TeamServer.Model.Data
         public string Driver { get; set; }
     }
 
-    public abstract class TelemetryObject : SimulatorObject
+    public abstract class TelemetryObject : CarObject
     {
         public string Weather { get; set; }
 

@@ -141,13 +141,13 @@ namespace TeamServer.Controllers
                 {
                     case "License":
                         return ControllerUtils.SerializeObject(dataManager.LookupLicense(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Forname", "Surname",
-                                                                                               "Nickname" }));
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Simulator", "Driver",
+                                                                                               "Forname", "Surname", "Nickname" }));
                     case "Electronics":
                         return ControllerUtils.SerializeObject(dataManager.LookupElectronics(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Simulator", "Car", "Track",
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Driver", "Simulator", "Car", "Track",
                                                                                                "Weather", "AirTemperature",
                                                                                                "TrackTemperature",
                                                                                                "TyreCompound", "TyreCompoundColor",
@@ -156,8 +156,8 @@ namespace TeamServer.Controllers
                                                                                                "Map", "TC", "ABS" }));
                     case "Tyres":
                         return ControllerUtils.SerializeObject(dataManager.LookupTyres(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Simulator", "Car", "Track",
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Driver", "Simulator", "Car", "Track",
                                                                                                "Weather", "AirTemperature",
                                                                                                "TrackTemperature",
                                                                                                "TyreCompound", "TyreCompoundColor",
@@ -171,8 +171,8 @@ namespace TeamServer.Controllers
                                                                                                "WearRearLeft", "WearRearRight" }));
                     case "Brakes":
                         return ControllerUtils.SerializeObject(dataManager.LookupBrakes(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Simulator", "Car", "Track",
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Driver", "Simulator", "Car", "Track",
                                                                                                "Weather", "AirTemperature",
                                                                                                "TrackTemperature",
                                                                                                "TyreCompound", "TyreCompoundColor",
@@ -184,8 +184,8 @@ namespace TeamServer.Controllers
                                                                                                "PadWearRearLeft", "PadWearRearRight" }));
                     case "TyresPressures":
                         return ControllerUtils.SerializeObject(dataManager.LookupTyresPressures(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Simulator", "Car", "Track",
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Driver", "Simulator", "Car", "Track",
                                                                                                "Weather", "AirTemperature",
                                                                                                "TrackTemperature",
                                                                                                "TyreCompound", "TyreCompoundColor",
@@ -195,8 +195,8 @@ namespace TeamServer.Controllers
                                                                                                "ColdPressureRearLeft", "ColdPressureRearRight" }));
                     case "TyresPressuresDistribution":
                         return ControllerUtils.SerializeObject(dataManager.LookupTyresPressuresDistribution(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Driver",
-                                                                                               "Simulator", "Car", "Track",
+                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                                                               "Driver", "Simulator", "Car", "Track",
                                                                                                "Weather", "AirTemperature",
                                                                                                "TrackTemperature",
                                                                                                "TyreCompound", "TyreCompoundColor",

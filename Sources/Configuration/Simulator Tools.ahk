@@ -2701,6 +2701,8 @@ runBuildTargets(ByRef buildProgress) {
 				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
 
 				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
+
+				deleteFile(sourceDirectory . "\compile.ahk")
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
@@ -2708,8 +2710,6 @@ runBuildTargets(ByRef buildProgress) {
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-
-			deleteFile(sourceDirectory . "\compile.ahk")
 
 			SplitPath targetBinary, compiledFile, targetDirectory
 			SplitPath targetSource, , sourceDirectory

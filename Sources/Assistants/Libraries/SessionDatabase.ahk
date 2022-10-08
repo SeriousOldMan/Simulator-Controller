@@ -40,7 +40,7 @@ global kWetRaceSetup := "WR"
 
 global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname", "Synchronized"]}
+global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname", "Identifier", "Synchronized"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1258,7 +1258,7 @@ synchronizeDatabase() {
 	local connector := sessionDB.Connector
 	local timestamp, simulators, ignore, synchronizer
 
-	if connector {
+	if ((sessionDB.ID = sessionDB.DatabaseID) && connector) {
 		try {
 			simulators := sessionDB.getSimulators()
 			timestamp := connector.GetServerTimestamp()
@@ -1307,36 +1307,40 @@ synchronizeDrivers(connector, simulators, timestamp, lastSynchronization) {
 
 	try {
 		for ignore, simulator in simulators {
-			db := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+			simulator := this.getSimulatorCode(simulator)
+
+			db := new Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
 
 			modified := false
 
-			for ignore, identifier in connector.QueryData("License", "Modified > " . lastSynchronization) {
+			for ignore, identifier in connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization) {
 				modified := true
 
 				driver := parseData(connector.GetData("License", identifier))
 				driver.Synchronized := timestamp
 
-				drivers := db.query("Drivers", {Where: driver})
+				drivers := db.query("Drivers", {Where: {ID: driver.ID, Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname} })
 
 				if (drivers.Length() = 0)
 					db.add("Drivers", driver)
-				else
+				else {
+					drivers[1].Identifier := driver.Identifier
 					drivers[1].Synchronized := timestamp
+				}
 			}
 
-			for ignore, driver in db.query("Drivers", {Where: {Synchronized: kNull}}) {
+			for ignore, driver in db.query("Drivers", {Where: {Synchronized: kNull, Driver: SessionDatabase.ID} }) {
+				if (driver.Identifier = kNull)
+					driver.Identifier := createGUID()
+
 				driver.Synchronized := timestamp
 
 				modified := true
 
-				if (connector.CountData("License"
-									  , substituteVariables("ID = '%ID%' And Forname = '%ForName%' And Surname = '%Surname%' And Nickname = '%Nickname%'"
-														  , {ID: driver.ID, Forname: driver.Forname
-														   , Surname: driver.Surname, Nickname: driver.Nickname})) = 0)
+				if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0)
 					connector.CreateData("License",
-									   , substituteVariables("ID=%ID%`nForname=%ForName%`nSurname=%Surname%`nNickname=%Nickname%"
-														   , {ID: driver.ID, Forname: driver.Forname
+									   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`nID=%ID%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+														   , {Identifier: driver.Identifier, Simulator: simulator, ID: driver.ID, Forname: driver.Forname
 															, Surname: driver.Surname, Nickname: driver.Nickname}))
 			}
 

@@ -2331,7 +2331,7 @@ loadSimulatorConfiguration()
 if !vDetachedInstallation {
 	checkForUpdates()
 
-	if false && !isDebug() {
+	if !isDebug() {
 		requestShareSessionDatabaseConsent()
 		shareSessionDatabase()
 		checkForNews()

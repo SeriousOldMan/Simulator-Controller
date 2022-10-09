@@ -241,12 +241,8 @@ updateSessionDatabase() {
 
 	minutes := inList(A_Args, "-Synchronize")
 
-	minutes := true
-
 	if minutes {
 		minutes := A_Args[id + 1]
-
-		minutes := true
 
 		if (minutes && (minutes != kFalse)) {
 			if ((minutes == true) || (minutes = kTrue)) {
